@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import User from "../models/userModel.js";
+import Account from "../models/account.js";
 import dotenv from "dotenv";
 dotenv.config();
 
 class AuthController {
-  async getUserFromToken(req, res) {
-    const user = await User.findOne({ username: req.user.username }).select(
+  async getAccountFromToken(req, res) {
+    const user = await Account.findOne({ username: req.user.username }).select(
       "-password"
     );
     res.status(200).json(user);
@@ -14,15 +14,16 @@ class AuthController {
 
   async register(req, res) {
     try {
-      const user = new User(req.body);
-      user.password = await bcrypt.hash(data.password, 10);
-      const createdUser = await user.save();
-      if (!createdUser) {
-        return res.status(422).json({ message: "User creation failed" });
+      const user = new Account(req.body);
+      user.password = await bcrypt.hash(user.password, 10);
+      const createdAccount = await user.save();
+      if (!createdAccount) {
+        return res.status(422).json({ message: "Account creation failed" });
       }
 
       res.status(201).json(user);
     } catch (error) {
+      console.log(error.message);
       res.status(500).json({ message: "An unexpected error occurred" });
     }
   }
@@ -30,7 +31,7 @@ class AuthController {
   async login(req, res) {
     try {
       const { username, password } = req.body;
-      const user = await User.findOne({ username: username });
+      const user = await Account.findOne({ username: username });
 
       if (!user) {
         return res
@@ -65,6 +66,7 @@ class AuthController {
         },
       });
     } catch (error) {
+      console.log(error.message);
       res.status(500).json({ message: "An unexpected error occurred" });
     }
   }
@@ -72,7 +74,7 @@ class AuthController {
   async dashboardLogin(req, res) {
     try {
       const { username, password } = req.body;
-      const user = await User.findOne({ username: username });
+      const user = await Account.findOne({ username: username });
 
       if (!user) {
         return res

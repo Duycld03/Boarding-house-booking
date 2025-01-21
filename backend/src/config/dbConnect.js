@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
-const dbUlr = process.env.MONGODB_URI || "mongodb://localhost:27017/";
-const dbName = process.env.DATABASE_NAME || "shoppingCart";
+const dbUlr = process.env.MONGODB_URI;
+const dbName = process.env.DATABASE_NAME;
 
 function connect() {
   try {
