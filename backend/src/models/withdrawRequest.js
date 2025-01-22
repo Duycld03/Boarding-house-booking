@@ -45,7 +45,7 @@ const WithdrawRequestSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  bankDetails: BankDetailsSchema,
+  bankingAccount: BankDetailsSchema,
 });
 
 const WithdrawRequest = mongoose.model(

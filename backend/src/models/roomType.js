@@ -9,6 +9,10 @@ const RoomTypeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  facilities: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Facility'
+  }],
   price: {
     type: Number,
     required: true,
@@ -16,6 +20,10 @@ const RoomTypeSchema = new mongoose.Schema({
   imageURL: {
     type: String,
   },
+  isDelete: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const RoomType = mongoose.model("RoomType", RoomTypeSchema);

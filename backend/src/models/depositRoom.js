@@ -19,6 +19,8 @@ const DepositRoomSchema = new mongoose.Schema({
     type: String,
     default: "pending",
   },
+}, {
+  timestamps: true
 });
 
 const DepositRoom = mongoose.model("DepositRoom", DepositRoomSchema);
