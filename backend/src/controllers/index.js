@@ -1,3 +1,4 @@
-import authController from "./authController.js";
+import authController from './authController.js';
+import withdrawalRequestsController from './withdrawalRequestsController.js';
 
-export { authController };
+export { authController, withdrawalRequestsController };
