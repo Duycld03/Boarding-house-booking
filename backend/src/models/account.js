@@ -60,7 +60,7 @@ const AccountSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-AccountSchema.plugin(mongoose_delete, { deletedBy: true, deletedByType: String, overrideMethods: 'all' });
+AccountSchema.plugin(mongoose_delete, { deletedBy: true, overrideMethods: 'all' });
 
 const Account = mongoose.model("Account", AccountSchema);
 export default Account;
