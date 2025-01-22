@@ -25,10 +25,6 @@ const WithdrawRequestSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  currency: {
-    type: String,
-    required: true,
-  },
   status: {
     type: String,
     default: "pending",
@@ -37,15 +33,11 @@ const WithdrawRequestSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Account",
   },
-  transactionId: {
-    type: String,
-    required: true,
-  },
   reasonForCancel: {
     type: String,
     required: true,
   },
-  bankDetails: BankDetailsSchema,
+  bankingAccount: BankDetailsSchema,
 });
 
 const WithdrawRequest = mongoose.model(
