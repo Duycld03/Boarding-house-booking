@@ -16,7 +16,7 @@ const AddressSchema = new mongoose.Schema({
   },
   detail: {
     type: String,
-    default: '',
+    default: "",
   },
 });
 
@@ -48,35 +48,41 @@ const BoardingHouseSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default: '',
+      default: "",
     },
     priceRange: {
       type: Number,
       required: true,
+      min: 0,
     },
     totalRooms: {
       type: Number,
       required: true,
+      min: 0,
     },
     availableRooms: {
       type: Number,
       required: true,
+      min: 0,
     },
     electricityPrice: {
       type: Number,
       required: true,
+      min: 0,
     },
     waterPrice: {
       type: Number,
       required: true,
+      min: 0,
     },
     likes: {
       type: Number,
       default: 0,
+      min: 0,
     },
     boardingHouseType: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'BoardingHouseType',
+      ref: "BoardingHouseType",
       required: true,
     },
     address: AddressSchema,

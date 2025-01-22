@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 
-
-
 const ImagesSchema = new mongoose.Schema({
   _id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -17,7 +15,6 @@ const ImagesSchema = new mongoose.Schema({
   },
 });
 
-
 const RoomSchema = new mongoose.Schema(
   {
     boardingHouseId: {
@@ -25,11 +22,13 @@ const RoomSchema = new mongoose.Schema(
       ref: "BoardingHouse",
       required: true,
     },
-    rentBy: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
-      required: true,
-    }],
+    rentBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account",
+        required: true,
+      },
+    ],
     roomNumber: {
       type: String,
       required: true,
@@ -50,8 +49,8 @@ const RoomSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   { timestamps: true }
 );
