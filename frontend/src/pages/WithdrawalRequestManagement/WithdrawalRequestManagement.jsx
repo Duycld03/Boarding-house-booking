@@ -7,118 +7,114 @@ import { Select, Tag } from 'antd';
 import { getWithdrawRequests } from '../../api/withdrawalrequestmanagement';
 
 function WithdrawalRequestManagement() {
+  // Order status options (normalized for consistency)
   const orderStatusOptions = [
-    { value: 'Pending', label: 'Pending' },
-    { value: 'Completed', label: 'Completed' },
-    { value: 'Cancelled', label: 'Cancelled' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'processed', label: 'Processed' },
+    { value: 'cancelled', label: 'Cancelled' },
   ];
 
+  // Status colors (normalized keys)
   const statusColors = {
-    Pending: 'orange',
-    Completed: 'green',
-    Cancelled: 'red',
+    pending: 'orange',
+    processed: 'green',
+    cancelled: 'red',
   };
 
+  // Format the amount to a short version like 1K, 1M, 1B
+  const formatAmount = (amount) => {
+    if (amount >= 1e9) {
+      return (amount / 1e9).toFixed(1) + 'B';
+    } else if (amount >= 1e6) {
+      return (amount / 1e6).toFixed(1) + 'M';
+    } else if (amount >= 1e3) {
+      return (amount / 1e3).toFixed(1) + 'K';
+    }
+    return amount;
+  };
+
+  // Define table columns
   const columns = [
-    { title: 'Amount', dataIndex: 'amount', key: 'amount' },
-    { title: 'Currency', dataIndex: 'currency', key: 'currency' },
+    {
+      title: 'Full Name',
+      dataIndex: 'userId',
+      key: 'userId',
+      render: (user) => user?.fullname || 'N/A', // Get fullname from populated userId
+    },
+    {
+      title: 'Amount / VND',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (amount) => formatAmount(amount) + ' VND',
+    },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => <Tag color={statusColors[status]}>{status}</Tag>,
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (text) => new Date(text).toLocaleString(),
-    },
-    {
-      title: 'Updated At',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      render: (text) => new Date(text).toLocaleString(),
-    },
-    { title: 'Processed By', dataIndex: 'processedBy', key: 'processedBy' },
-    {
-      title: 'Bank Name',
-      dataIndex: 'bankDetails',
-      key: 'bankName',
-      render: (text) => text?.bankName || 'N/A',
-    },
-    {
-      title: 'Account Number',
-      dataIndex: 'bankDetails',
-      key: 'accountNumber',
-      render: (text) => text?.accountNumber || 'N/A',
-    },
-    {
-      title: 'Account Holder',
-      dataIndex: 'bankDetails',
-      key: 'accountHolderName',
-      render: (text) => text?.accountHolderName || 'N/A',
-    },
-    {
-      title: 'Reason for Cancel',
-      dataIndex: 'reasonForCancel',
-      key: 'reasonForCancel',
-    },
-    {
-      title: 'Update Status',
-      key: 'updateStatus',
-      render: (_, record) => (
-        <Select
-          defaultValue={record.status}
-          style={{ width: 120 }}
-          onChange={(value) => {
-            setSelectedRequest(record._id);
-            setNewStatus(value);
-            setOpenStatusChangeModal(true);
-          }}
-        >
-          {orderStatusOptions.map((option) => (
-            <Select.Option key={option.value} value={option.value}>
-              {option.label}
-            </Select.Option>
-          ))}
-        </Select>
+      render: (status) => (
+        <Tag color={statusColors[status.toLowerCase()]}>
+          {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
+        </Tag>
       ),
+    },
+    {
+      title: 'Processed By',
+      dataIndex: 'processedBy',
+      key: 'processedBy',
+      render: (processedBy) => processedBy?.fullname || 'N/A', // Get fullname from populated processedBy
     },
   ];
 
+  // State management
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]); // Make sure data is initialized as an empty array
+  const [data, setData] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [newStatus, setNewStatus] = useState('');
   const [openStatusChangeModal, setOpenStatusChangeModal] = useState(false);
 
+  // Fetch data from API
   const fetchData = async () => {
     try {
+      setLoading(true); // Set loading state
       const res = await getWithdrawRequests();
       if (res) {
         setData(res);
+      } else {
+        setData([]);
       }
     } catch (error) {
-      console.error('Failed to fetch staff accounts:', error);
+      console.error('Failed to fetch withdrawal requests:', error);
+      toast.error(
+        'Failed to fetch withdrawal requests. Please try again later.'
+      );
       setData([]);
+    } finally {
+      setLoading(false); // Clear loading state
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
+  // Handle status change confirmation
   const handleStatusChange = () => {
     console.log(`Updated status for request ${selectedRequest}: ${newStatus}`);
     setOpenStatusChangeModal(false);
     setSelectedRequest(null);
     setNewStatus('');
+    toast.success('Status updated successfully.');
+    fetchData(); // Refresh data after status change
   };
 
-  const handleMessage = () => {
-    toast.success('Add success');
+  // Handle component mount
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // Handle delete confirmation
+  const handleDelete = () => {
+    console.log('Delete request confirmed');
+    setIsOpen(false);
+    toast.success('Withdrawal request deleted successfully.');
+    fetchData(); // Refresh data after deletion
   };
 
   return (
@@ -136,18 +132,13 @@ function WithdrawalRequestManagement() {
             />
             <Button
               size="large"
-              onClick={handleMessage}
+              onClick={() => toast.success('Add success')}
               btnAdd
               title="Add new Withdrawal Request"
             />
           </div>
           <div>
-            {/* Ensure data is passed correctly */}
-            {loading ? (
-              <Loader />
-            ) : (
-              <Table columns={columns} data={data || []} />
-            )}
+            <Table columns={columns} data={data || []} />
           </div>
           <ConfirmModal
             title="Confirm Status Change"
@@ -157,9 +148,11 @@ function WithdrawalRequestManagement() {
             isOpen={openStatusChangeModal}
           />
           <ConfirmModal
+            title="Confirm Deletion"
+            content="Do you want to delete this withdrawal request?"
+            onOk={handleDelete}
             onCancel={() => setIsOpen(false)}
             isOpen={isOpen}
-            content={'Do you want to delete this request?'}
           />
         </>
       )}
