@@ -4,7 +4,7 @@ import Loader from '../../component/Loader';
 import { useEffect, useState } from 'react';
 import { Button, ConfirmModal } from '../../component';
 import { Select, Tag } from 'antd';
-// import { getWithdrawalRequests } from '../../api/withdrawalrequestmanagement';
+import { getWithdrawRequests } from '../../api/withdrawalrequestmanagement';
 
 function WithdrawalRequestManagement() {
   const orderStatusOptions = [
@@ -94,28 +94,21 @@ function WithdrawalRequestManagement() {
   const [newStatus, setNewStatus] = useState('');
   const [openStatusChangeModal, setOpenStatusChangeModal] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await getWithdrawalRequests();
-  //       console.log('API response:', response);
+  const fetchData = async () => {
+    try {
+      const res = await getWithdrawRequests();
+      if (res) {
+        setData(res);
+      }
+    } catch (error) {
+      console.error('Failed to fetch staff accounts:', error);
+      setData([]);
+    }
+  };
 
-  //       if (response && response.data && response.data.length > 0) {
-  //         setData(response.data);
-  //       } else {
-  //         console.error('No data in the response');
-  //         setData([]);
-  //       }
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.error('Error fetching withdrawal requests:', error);
-  //       setData([]);
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleStatusChange = () => {
     console.log(`Updated status for request ${selectedRequest}: ${newStatus}`);
@@ -150,7 +143,11 @@ function WithdrawalRequestManagement() {
           </div>
           <div>
             {/* Ensure data is passed correctly */}
-            <Table columns={columns} data={data || []} loading={loading} />
+            {loading ? (
+              <Loader />
+            ) : (
+              <Table columns={columns} data={data || []} />
+            )}
           </div>
           <ConfirmModal
             title="Confirm Status Change"
