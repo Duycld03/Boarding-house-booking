@@ -4,7 +4,7 @@ import Loader from '../../component/Loader';
 import { useEffect, useState } from 'react';
 import { Button, ConfirmModal } from '../../component';
 import { Select, Tag } from 'antd';
-import { getWithdrawalRequests } from '../../api/withdrawalrequestmanagement';
+// import { getWithdrawalRequests } from '../../api/withdrawalrequestmanagement';
 
 function WithdrawalRequestManagement() {
   const orderStatusOptions = [
@@ -94,28 +94,28 @@ function WithdrawalRequestManagement() {
   const [newStatus, setNewStatus] = useState('');
   const [openStatusChangeModal, setOpenStatusChangeModal] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getWithdrawalRequests();
-        console.log('API response:', response);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await getWithdrawalRequests();
+  //       console.log('API response:', response);
 
-        if (response && response.data && response.data.length > 0) {
-          setData(response.data);
-        } else {
-          console.error('No data in the response');
-          setData([]);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching withdrawal requests:', error);
-        setData([]);
-        setLoading(false);
-      }
-    };
+  //       if (response && response.data && response.data.length > 0) {
+  //         setData(response.data);
+  //       } else {
+  //         console.error('No data in the response');
+  //         setData([]);
+  //       }
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error('Error fetching withdrawal requests:', error);
+  //       setData([]);
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const handleStatusChange = () => {
     console.log(`Updated status for request ${selectedRequest}: ${newStatus}`);
