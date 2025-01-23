@@ -16,18 +16,22 @@ const AddressSchema = new mongoose.Schema({
   },
   detail: {
     type: String,
-    required: true,
+    default: "",
   },
 });
 
 const ImagesSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    auto: true,
+  },
   imageUrl: {
     type: String,
     required: true,
   },
   isPrimary: {
     type: Boolean,
-    required: true,
+    default: false,
   },
 });
 
@@ -44,38 +48,42 @@ const BoardingHouseSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
+      default: "",
     },
-    facilities: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
     priceRange: {
-      type: String,
+      type: Number,
       required: true,
+      min: 0,
     },
-
     totalRooms: {
       type: Number,
       required: true,
+      min: 0,
     },
     availableRooms: {
       type: Number,
       required: true,
+      min: 0,
     },
     electricityPrice: {
       type: Number,
       required: true,
+      min: 0,
     },
     waterPrice: {
       type: Number,
       required: true,
+      min: 0,
     },
     likes: {
       type: Number,
       default: 0,
+      min: 0,
+    },
+    boardingHouseType: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "BoardingHouseType",
+      required: true,
     },
     address: AddressSchema,
     images: [ImagesSchema],

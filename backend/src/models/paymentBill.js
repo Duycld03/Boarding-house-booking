@@ -1,14 +1,29 @@
 import mongoose from "mongoose";
-const PaymentBillSchema = new mongoose.Schema(
+
+const BillSchema = new mongoose.Schema({
+  oldNumber: {
+    type: Number,
+    required: true,
+  },
+  newNumber: {
+    type: Number,
+    required: true,
+  },
+  quantityConsumed: {
+    type: Number,
+    required: true,
+  },
+  totalAmount: {
+    type: Number,
+    required: true,
+  },
+});
+
+const paymentBillSchema = new mongoose.Schema(
   {
     roomId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Room",
-      required: true,
-    },
-    payBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
       required: true,
     },
     paymentAmount: {
@@ -17,15 +32,23 @@ const PaymentBillSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "pending",
-    },
-    paymentMethod: {
-      type: String,
       required: true,
     },
+    additionalFee: {
+      type: Number,
+      default: 0,
+    },
+    electricalBill: BillSchema,
+    waterBill: BillSchema,
   },
-  { timestamps: true }
+  {
+    timestamps: {
+      createdAt: true,
+      updatedAt: false,
+    },
+  }
 );
 
-const PaymentBill = mongoose.model("PaymentBill", PaymentBillSchema);
+const PaymentBill = mongoose.model("PaymentBill", paymentBillSchema);
+
 export default PaymentBill;

@@ -4,10 +4,9 @@
   "description": "project boarding house booking of group 4",
   "main": "index.js",
   "scripts": {
-    "client": "cd frontend && npm start",
+    "client": "cd frontend && npm run dev",
     "server": "cd backend && npm start",
-    "dashboard": "cd dashboard && npm run dev",
-    "start": "concurrently \"npm run client\" \"npm run server\" \"npm run dashboard\"",
+    "start": "concurrently \"npm run client\" \"npm run server\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
