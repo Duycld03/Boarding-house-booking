@@ -1,8 +1,11 @@
-import Table from '../../component/Table';
-import { toast } from 'react-toastify';
-import Loader from '../../component/Loader';
 import { useEffect, useState } from 'react';
-import { Button, ConfirmModal } from '../../component';
+import {
+  TableCustom as Table,
+  Button,
+  ConfirmModal,
+  Loader,
+} from '../../component';
+import { toast } from 'react-toastify';
 import { Tag } from 'antd';
 import { getWithdrawRequests } from '../../api/withdrawalrequestmanagement';
 
@@ -51,19 +54,18 @@ function WithdrawalRequestManagement() {
       title: 'Processed By',
       dataIndex: 'processedBy',
       key: 'processedBy',
-      render: (processedBy) => processedBy?.fullname || 'N/A', // Get fullname from populated processedBy
+      render: (processedBy) => processedBy?.fullname || 'N/A',
     },
     {
       title: 'Action',
-      render: () => (
+      render: (record) => (
         <>
           <Button
+            title={'Delete'}
             btnDelete
             className="btn-delete"
-            onClick={() => setIsOpen(true)}
-          >
-            Delete
-          </Button>
+            onClick={() => handleDeleteModal(record)}
+          ></Button>
         </>
       ),
     },
@@ -71,14 +73,13 @@ function WithdrawalRequestManagement() {
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [isOpenStatusChangeModal, setIsOpenStatusChangeModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [newStatus, setNewStatus] = useState('');
-  const [openStatusChangeModal, setOpenStatusChangeModal] = useState(false);
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       const res = await getWithdrawRequests();
       if (res) {
         setData(res);
@@ -91,65 +92,91 @@ function WithdrawalRequestManagement() {
         'Failed to fetch withdrawal requests. Please try again later.'
       );
       setData([]);
-    } finally {
-      setLoading(false);
     }
   };
 
+  const handleStatusChangeModal = (record) => {
+    setSelectedRequest(record);
+    setIsOpenStatusChangeModal(true);
+  };
+
   const handleStatusChange = () => {
-    console.log(`Updated status for request ${selectedRequest}: ${newStatus}`);
-    setOpenStatusChangeModal(false);
+    // Handle API call to update status
+    console.log(
+      `Updated status for request ${selectedRequest._id}: ${newStatus}`
+    );
+    setIsOpenStatusChangeModal(false);
     setSelectedRequest(null);
     setNewStatus('');
     toast.success('Status updated successfully.');
     fetchData();
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const handleDeleteModal = (record) => {
+    setSelectedRequest(record);
+    setIsOpenDeleteModal(true);
+  };
 
   const handleDelete = () => {
+    // Handle API call to delete request
     console.log('Delete request confirmed');
-    setIsOpen(false);
+    setIsOpenDeleteModal(false);
+    setSelectedRequest(null);
     toast.success('Withdrawal request deleted successfully.');
     fetchData();
   };
 
+  useEffect(() => {
+    setLoading(true);
+    fetchData().finally(() => {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    });
+  }, []);
   return (
     <div className="txt">
       {loading ? (
         <Loader />
       ) : (
         <>
-          <div className="flex justify-between">
-            <Button
-              btnFilter
-              size={'large'}
-              onClick={() => toast.success('Filter success')}
-            />
+          <div className="flex justify-between mb-4">
             <Button
               size="large"
               onClick={() => toast.success('Add success')}
               btnAdd
-            />
+              title={'Add new'}
+            ></Button>
+            <Button
+              btnFilter
+              size="large"
+              onClick={() => toast.success('Filter success')}
+              title={'Filter'}
+            ></Button>
           </div>
           <div>
-            <Table columns={columns} data={data || []} />
+            <Table columns={columns} data={data || []} loading={loading} />
           </div>
           <ConfirmModal
             title="Confirm Status Change"
             content={`Do you want to change the status to ${newStatus}?`}
             onOk={handleStatusChange}
-            onCancel={() => setOpenStatusChangeModal(false)}
-            isOpen={openStatusChangeModal}
-          />
+            onCancel={() => setIsOpenStatusChangeModal(false)}
+            isOpen={isOpenStatusChangeModal}
+          >
+            <input
+              type="text"
+              placeholder="Enter new status"
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value)}
+            />
+          </ConfirmModal>
           <ConfirmModal
             title="Confirm Deletion"
             content="Do you want to delete this withdrawal request?"
             onOk={handleDelete}
-            onCancel={() => setIsOpen(false)}
-            isOpen={isOpen}
+            onCancel={() => setIsOpenDeleteModal(false)}
+            isOpen={isOpenDeleteModal}
           />
         </>
       )}
