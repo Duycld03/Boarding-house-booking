@@ -61,6 +61,7 @@ function WithdrawalRequestManagement() {
             btnDelete
             title={'Delete Withdrawal Requests'}
             className="btn-delete"
+            onClick={() => setIsOpen(true)}
           >
             Delete
           </Button>
@@ -127,7 +128,7 @@ function WithdrawalRequestManagement() {
               btnFilter
               title={'Filter Withdrawal Request'}
               size={'large'}
-              onClick={() => setIsOpen(true)}
+              onClick={() => toast.success('Filter success')}
             />
             <Button
               size="large"
