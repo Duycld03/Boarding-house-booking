@@ -59,7 +59,6 @@ function WithdrawalRequestManagement() {
         <>
           <Button
             btnDelete
-            title={'Delete Withdrawal Requests'}
             className="btn-delete"
             onClick={() => setIsOpen(true)}
           >
@@ -126,7 +125,6 @@ function WithdrawalRequestManagement() {
           <div className="flex justify-between">
             <Button
               btnFilter
-              title={'Filter Withdrawal Request'}
               size={'large'}
               onClick={() => toast.success('Filter success')}
             />
@@ -134,7 +132,6 @@ function WithdrawalRequestManagement() {
               size="large"
               onClick={() => toast.success('Add success')}
               btnAdd
-              title="Add new Withdrawal Request"
             />
           </div>
           <div>
