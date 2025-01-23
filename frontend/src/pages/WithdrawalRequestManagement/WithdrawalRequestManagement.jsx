@@ -3,25 +3,16 @@ import { toast } from 'react-toastify';
 import Loader from '../../component/Loader';
 import { useEffect, useState } from 'react';
 import { Button, ConfirmModal } from '../../component';
-import { Select, Tag } from 'antd';
+import { Tag } from 'antd';
 import { getWithdrawRequests } from '../../api/withdrawalrequestmanagement';
 
 function WithdrawalRequestManagement() {
-  // Order status options (normalized for consistency)
-  const orderStatusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'processed', label: 'Processed' },
-    { value: 'cancelled', label: 'Cancelled' },
-  ];
-
-  // Status colors (normalized keys)
   const statusColors = {
     pending: 'orange',
     processed: 'green',
     cancelled: 'red',
   };
 
-  // Format the amount to a short version like 1K, 1M, 1B
   const formatAmount = (amount) => {
     if (amount >= 1e9) {
       return (amount / 1e9).toFixed(1) + 'B';
@@ -33,13 +24,12 @@ function WithdrawalRequestManagement() {
     return amount;
   };
 
-  // Define table columns
   const columns = [
     {
       title: 'Full Name',
       dataIndex: 'userId',
       key: 'userId',
-      render: (user) => user?.fullname || 'N/A', // Get fullname from populated userId
+      render: (user) => user?.fullname || 'N/A',
     },
     {
       title: 'Amount / VND',
@@ -63,9 +53,22 @@ function WithdrawalRequestManagement() {
       key: 'processedBy',
       render: (processedBy) => processedBy?.fullname || 'N/A', // Get fullname from populated processedBy
     },
+    {
+      title: 'Action',
+      render: () => (
+        <>
+          <Button
+            btnDelete
+            title={'Delete Withdrawal Requests'}
+            className="btn-delete"
+          >
+            Delete
+          </Button>
+        </>
+      ),
+    },
   ];
 
-  // State management
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -73,10 +76,9 @@ function WithdrawalRequestManagement() {
   const [newStatus, setNewStatus] = useState('');
   const [openStatusChangeModal, setOpenStatusChangeModal] = useState(false);
 
-  // Fetch data from API
   const fetchData = async () => {
     try {
-      setLoading(true); // Set loading state
+      setLoading(true);
       const res = await getWithdrawRequests();
       if (res) {
         setData(res);
@@ -90,31 +92,28 @@ function WithdrawalRequestManagement() {
       );
       setData([]);
     } finally {
-      setLoading(false); // Clear loading state
+      setLoading(false);
     }
   };
 
-  // Handle status change confirmation
   const handleStatusChange = () => {
     console.log(`Updated status for request ${selectedRequest}: ${newStatus}`);
     setOpenStatusChangeModal(false);
     setSelectedRequest(null);
     setNewStatus('');
     toast.success('Status updated successfully.');
-    fetchData(); // Refresh data after status change
+    fetchData();
   };
 
-  // Handle component mount
   useEffect(() => {
     fetchData();
   }, []);
 
-  // Handle delete confirmation
   const handleDelete = () => {
     console.log('Delete request confirmed');
     setIsOpen(false);
     toast.success('Withdrawal request deleted successfully.');
-    fetchData(); // Refresh data after deletion
+    fetchData();
   };
 
   return (
@@ -125,8 +124,8 @@ function WithdrawalRequestManagement() {
         <>
           <div className="flex justify-between">
             <Button
-              btnDelete
-              title={'Delete Withdrawal Request'}
+              btnFilter
+              title={'Filter Withdrawal Request'}
               size={'large'}
               onClick={() => setIsOpen(true)}
             />
