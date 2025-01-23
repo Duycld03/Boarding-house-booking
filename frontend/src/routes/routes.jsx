@@ -8,6 +8,7 @@ import {
   WithdrawalRequestManagement,
   ContactPage,
   AboutUs,
+  ListReviewManagement
 } from "../pages";
 import { AuthLayout, HeaderOnly } from "../Layouts";
 
@@ -59,6 +60,11 @@ const routes = [
     path: "about-us",
     page: AboutUs,
     layout: HeaderOnly,
+  },
+  {
+    path: `${dashBoard}/list-boarding-house-reviews`,
+    page: ListReviewManagement,
+    layout: null,
   },
 ];
 

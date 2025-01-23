@@ -64,6 +64,15 @@ const menuItems = [
     ),
     icon: <FontAwesomeIcon icon={faCreditCard} />,
   },
+  {
+    key: "list-boarding-house-reviews",
+    label: (
+      <Link to={dashBoard + "/list-boarding-house-reviews"}>
+        List Review
+      </Link>
+    ),
+    icon: <FontAwesomeIcon icon={faCreditCard} />,
+  },
 ];
 
 export default menuItems;
