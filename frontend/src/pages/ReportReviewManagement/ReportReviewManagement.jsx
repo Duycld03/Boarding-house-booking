@@ -1,70 +1,111 @@
-import Table from "../../component/Table";
-import { toast } from "react-toastify";
-import Loader from "../../component/Loader";
-import { useEffect, useState } from "react";
-import { Button, ConfirmModal } from "../../component";
+import Table from '../../component/Table';
+import { toast } from 'react-toastify';
+import Loader from '../../component/Loader';
+import { useEffect, useState } from 'react';
+import { Button, ConfirmModal } from '../../component';
+import { Tag } from 'antd';
+import convertTimetap from '../../utils/convertTimetap'; // Import the convertTimetap function
+import { getReviewReports } from '../../api/reportManagement'; // Import getReviewReports from the API file
 
 function ReportReviewManagement() {
-  // Dữ liệu mẫu cho bảng
-  const data = [
-    {
-      _id: "1",
-      name: "John Doe",
-      age: 28,
-      address: "123 Main St, City, Country",
-    },
-    {
-      _id: "2",
-      name: "Jane Smith",
-      age: 34,
-      address: "456 Another St, City, Country",
-    },
-    {
-      _id: "3",
-      name: "Sam Johnson",
-      age: 40,
-      address: "789 Third St, City, Country",
-    },
-  ];
-
-  // Các cột cho bảng
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
-    },
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
-    },
-  ];
-
-  const onProcessData = (combinedData) => {
-    console.log("Processed Data: ", combinedData);
-  };
-
+  const [data, setData] = useState([]); // Initializing with an empty array
   const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
-  const handleToggleMobal = () => {
-    setIsOpen(!isOpen);
+  // Fetch data from the API
+  const fetchData = async () => {
+    try {
+      const res = await getReviewReports();
+      if (res) {
+        setData(res);
+      } else {
+        setData([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch withdrawal requests:', error);
+      toast.error(
+        'Failed to fetch withdrawal requests. Please try again later.'
+      );
+      setData([]);
+    }
   };
 
+  // Call fetchData on component mount
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(!loading);
-    }, 1000);
+    setLoading(true);
+    fetchData().finally(() => {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    });
   }, []);
 
-  const handleMessage = () => {
-    toast.success("Add success");
+  // Define columns for the Table component
+  const columns = [
+    {
+      title: 'Reporter',
+      dataIndex: 'reporter',
+      key: 'reporter',
+      render: (reporter) => reporter?.fullname || 'N/A',
+    },
+    {
+      title: 'Reason',
+      dataIndex: 'reason',
+      key: 'reason',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        const statusColors = {
+          pending: 'orange',
+          'in progress': 'blue',
+          resolved: 'green',
+          rejected: 'red',
+        };
+        return <Tag color={statusColors[status.toLowerCase()]}>{status}</Tag>;
+      },
+    },
+    {
+      title: 'Created at',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (createdAt) => convertTimetap(createdAt), // Format timestamp
+    },
+    {
+      title: 'Processed by',
+      dataIndex: 'processedBy',
+      key: 'processedBy',
+      render: (processedBy) => processedBy?.fullname || 'N/A',
+    },
+    {
+      title: 'Action',
+      render: (record) => (
+        <Button
+          title={'Delete'}
+          btnDelete
+          className="btn-delete"
+          onClick={() => handleDeleteModal(record)}
+        />
+      ),
+    },
+  ];
+
+  // Handle opening the delete modal
+  const handleDeleteModal = (record) => {
+    setSelectedRequest(record);
+    setIsOpenDeleteModal(true);
+  };
+
+  // Handle deleting a report
+  const handleDelete = () => {
+    // Simulate deleting a report
+    setData(data.filter((item) => item._id !== selectedRequest._id));
+    setIsOpenDeleteModal(false);
+    setSelectedRequest(null);
+    toast.success('Review report deleted successfully.');
   };
 
   return (
@@ -73,32 +114,21 @@ function ReportReviewManagement() {
         <Loader />
       ) : (
         <>
-          <div className="flex justify-between">
+          <div className="flex justify-between mb-4">
             <Button
-              btnDelete
-              title={"Delete account"}
-              size={"large"}
-              onClick={handleToggleMobal}
-            />
-            <Button
+              btnFilter
               size="large"
-              onClick={handleMessage}
-              btnAdd
-              title="Add new user"
+              onClick={() => toast.success('Filter success')}
+              title={'Filter'}
             />
           </div>
-          <div>
-            <Table
-              columns={columns}
-              data={data}
-              onRowClick={onProcessData}
-              loading={loading}
-            />
-          </div>
+          <Table columns={columns} data={data} loading={loading} />
           <ConfirmModal
-            onCancel={handleToggleMobal}
-            isOpen={isOpen}
-            content={"Do you want to add new?"}
+            title="Confirm Deletion"
+            content="Do you want to delete this review report?"
+            onOk={handleDelete}
+            onCancel={() => setIsOpenDeleteModal(false)}
+            isOpen={isOpenDeleteModal}
           />
         </>
       )}

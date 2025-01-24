@@ -3,7 +3,8 @@ import Report from '../models/report.js';
 class reportController {
   async getReviewReports(req, res) {
     try {
-      const ReviewReports = await Report.find()
+      const ReviewReports = await Report.find({ deletedAt: null })
+        .sort({ createdAt: -1 })
         .populate({
           path: 'reporter',
           select: 'fullname',
