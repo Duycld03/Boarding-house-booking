@@ -8,7 +8,7 @@ import {
 import { toast } from 'react-toastify';
 import { Tag } from 'antd';
 import { getReviewReports } from '../../../api/reportManagement';
-import convertTimetap from '../../../utils/formatAmount';
+import convertTimetap from '../../../utils/convertTimetap';
 
 function ReportReviewManagement() {
   const [data, setData] = useState([]); // Initializing with an empty array
