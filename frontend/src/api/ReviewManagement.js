@@ -10,3 +10,10 @@ export const getReviews = async () => {
         throw error; // Ném lỗi để xử lý ở nơi gọi hàm
     }
 };
+// import axios from "./axios.config";
+
+// export const getReviews = () => {
+//     return axios.get("/listReviews");
+// };
+
+

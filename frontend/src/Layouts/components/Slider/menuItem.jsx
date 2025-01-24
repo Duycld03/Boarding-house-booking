@@ -68,7 +68,7 @@ const menuItems = [
     key: "list-boarding-house-reviews",
     label: (
       <Link to={dashBoard + "/list-boarding-house-reviews"}>
-        List Review
+        Review Management
       </Link>
     ),
     icon: <FontAwesomeIcon icon={faCreditCard} />,

@@ -7,7 +7,7 @@ import ReportBoardingHouse from './ReportBoardingHouse'
 import WithdrawalRequestManagement from './WithdrawalRequestManagement'
 import ContactForm from './Contact'
 import AboutUs from './AboutUs'
-import ListReviewManagement from './ListReviewManagement'
+import ReviewManagement from './ReviewManagement'
 export {
     Login,
     BoardingHouseManagement,
@@ -18,5 +18,5 @@ export {
     WithdrawalRequestManagement,
     ContactForm as ContactPage,
     AboutUs,
-    ListReviewManagement
+    ReviewManagement
 }

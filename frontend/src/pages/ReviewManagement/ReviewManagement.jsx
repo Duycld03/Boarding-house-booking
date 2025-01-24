@@ -3,21 +3,13 @@ import {
     TableCustom as Table,
     Button,
     ConfirmModal,
-    Loader,
+    Loader
 } from '../../component';
 import { toast } from 'react-toastify';
-import { Tag } from 'antd';
-import { getReviews } from '../../api/listReviewManagement';
+import { getReviews } from '../../api/ReviewManagement';
 
 function BoardingHouseReviewManagement() {
-    const ratingColors = {
-        1: 'red',
-        2: 'orange',
-        3: 'yellow',
-        4: 'lightgreen',
-        5: 'green',
-    };
-
+    // cột của bảng 
     const columns = [
         {
             title: 'Boarding House Name',
@@ -35,9 +27,9 @@ function BoardingHouseReviewManagement() {
             dataIndex: 'rating',
             key: 'rating',
             render: (rating) => (
-                <Tag color={ratingColors[rating]}>
-                    {'★'.repeat(rating) + '☆'.repeat(5 - rating)}
-                </Tag>
+                <span style={{ color: [rating] }}>
+                    {rating} / 5
+                </span>
             ),
         },
         {
@@ -50,7 +42,7 @@ function BoardingHouseReviewManagement() {
             title: 'Reviewer',
             dataIndex: 'accountId',
             key: 'accountId',
-            render: (account) => account?.fullname || 'N/A',
+            render: (account) => account?.username || 'N/A',
         },
         {
             title: 'Action',
@@ -72,6 +64,7 @@ function BoardingHouseReviewManagement() {
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
 
+    // hàm lấy data
     const fetchData = async () => {
         try {
             const res = await getReviews();
@@ -83,6 +76,7 @@ function BoardingHouseReviewManagement() {
             }
         } catch (error) {
             console.error('Failed to fetch reviews:', error);
+            toast.error('Failed to fetch reviews. Please try again later.');
         }
     };
 
@@ -91,12 +85,18 @@ function BoardingHouseReviewManagement() {
         setIsOpenDeleteModal(true);
     };
 
+    //thêm hàm delete đây
     const handleDelete = async () => {
 
     };
 
     useEffect(() => {
-        fetchData().finally(() => setLoading(false));
+        setLoading(true);
+        fetchData().finally(() => {
+            setTimeout(() => {
+                setLoading(false);
+            }, 1000);
+        });
     }, []);
 
     return (
@@ -124,7 +124,11 @@ function BoardingHouseReviewManagement() {
                         </Button>
                     </div>
                     <div>
-                        <Table columns={columns} data={data || []} loading={loading} />
+                        <Table
+                            columns={columns}
+                            data={data}
+                            loading={loading}
+                        />
                     </div>
                     <ConfirmModal
                         title="Confirm Deletion"
