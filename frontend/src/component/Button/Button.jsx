@@ -1,25 +1,27 @@
-import { Button } from "antd";
+import { Button } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
   UndoOutlined,
   PlusOutlined,
   RestOutlined,
-} from "@ant-design/icons";
+  FilterOutlined,
+} from '@ant-design/icons';
 
 const ButtonCustom = ({
   title,
-  size = "medium", // small, medium, large
+  size = 'medium',
   btnDelete = false,
   btnUpdate = false,
   btnRestore = false,
   btnTrash = false,
   btnAdd = false,
-  width = "auto",
-  height = "auto",
+  btnFilter = false,
+  width = 'auto',
+  height = 'auto',
   onClick,
   icon,
-  iconPosition = "left",
+  iconPosition = 'left',
   className,
   style,
   bgColor,
@@ -37,24 +39,27 @@ const ButtonCustom = ({
     <RestOutlined />
   ) : btnAdd ? (
     <PlusOutlined />
+  ) : btnFilter ? (
+    <FilterOutlined />
   ) : null;
 
-  // Tailwind classes for button background
   const backgroundClass = btnDelete
-    ? "bg-red-500 hover:bg-red-600 text-white"
+    ? 'bg-red-500 hover:bg-red-600 text-white'
     : btnUpdate
-    ? "bg-blue-500 hover:bg-blue-600 text-white"
+    ? 'bg-blue-500 hover:bg-blue-600 text-white'
     : btnRestore
-    ? "bg-green-500 hover:bg-green-600 text-white"
+    ? 'bg-green-500 hover:bg-green-600 text-white'
     : btnTrash
-    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+    ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
     : btnAdd
-    ? "bg-primary hover:bg-purple-600 text-white"
-    : "bg-gray-200 hover:bg-gray-300";
+    ? 'bg-purple-500 hover:bg-purple-600 text-white'
+    : btnFilter
+    ? 'bg-teal-500 hover:bg-teal-600 text-white'
+    : 'bg-gray-200 hover:bg-gray-300';
 
   const customStyle = {
-    width: width !== "auto" ? width : undefined,
-    height: height !== "auto" ? height : undefined,
+    width: width !== 'auto' ? width : undefined,
+    height: height !== 'auto' ? height : undefined,
     ...style,
   };
 
@@ -72,9 +77,9 @@ const ButtonCustom = ({
         disabled={disabled}
         {...props}
       >
-        {iconPosition === "left" && (presetIcon || icon)}
+        {iconPosition === 'left' && (presetIcon || icon)}
         {title}
-        {iconPosition === "right" && (presetIcon || icon)}
+        {iconPosition === 'right' && (presetIcon || icon)}
       </Button>
     </div>
   );
