@@ -1,39 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   TableCustom as Table,
   Button,
   ConfirmModal,
   Loader,
-} from '../../component';
-import { toast } from 'react-toastify';
-import { Tag } from 'antd';
-import { getWithdrawRequests } from '../../api/withdrawalrequestmanagement';
-import formatAmount from '../../utils/formatAmount';
+} from "../../../component";
+import { toast } from "react-toastify";
+import { Tag } from "antd";
+import { getWithdrawRequests } from "../../../api/withdrawalrequestmanagement";
+import formatAmount from "../../../utils/formatAmount";
 
 function WithdrawalRequestManagement() {
   const statusColors = {
-    pending: 'orange',
-    processed: 'green',
-    cancelled: 'red',
+    pending: "orange",
+    processed: "green",
+    cancelled: "red",
   };
 
   const columns = [
     {
-      title: 'Full Name',
-      dataIndex: 'userId',
-      key: 'userId',
-      render: (user) => user?.fullname || 'N/A',
+      title: "Full Name",
+      dataIndex: "userId",
+      key: "userId",
+      render: (user) => user?.fullname || "N/A",
     },
     {
-      title: 'Amount / VND',
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (amount) => formatAmount(amount) + ' VND',
+      title: "Amount / VND",
+      dataIndex: "amount",
+      key: "amount",
+      render: (amount) => formatAmount(amount) + " VND",
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (status) => (
         <Tag color={statusColors[status.toLowerCase()]}>
           {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
@@ -41,17 +41,17 @@ function WithdrawalRequestManagement() {
       ),
     },
     {
-      title: 'Processed By',
-      dataIndex: 'processedBy',
-      key: 'processedBy',
-      render: (processedBy) => processedBy?.fullname || 'N/A',
+      title: "Processed By",
+      dataIndex: "processedBy",
+      key: "processedBy",
+      render: (processedBy) => processedBy?.fullname || "N/A",
     },
     {
-      title: 'Action',
+      title: "Action",
       render: (record) => (
         <>
           <Button
-            title={'Delete'}
+            title={"Delete"}
             btnDelete
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
@@ -66,7 +66,7 @@ function WithdrawalRequestManagement() {
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [isOpenStatusChangeModal, setIsOpenStatusChangeModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [newStatus, setNewStatus] = useState('');
+  const [newStatus, setNewStatus] = useState("");
 
   const fetchData = async () => {
     try {
@@ -77,9 +77,9 @@ function WithdrawalRequestManagement() {
         setData([]);
       }
     } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
+      console.error("Failed to fetch withdrawal requests:", error);
       toast.error(
-        'Failed to fetch withdrawal requests. Please try again later.'
+        "Failed to fetch withdrawal requests. Please try again later."
       );
       setData([]);
     }
@@ -97,8 +97,8 @@ function WithdrawalRequestManagement() {
     );
     setIsOpenStatusChangeModal(false);
     setSelectedRequest(null);
-    setNewStatus('');
-    toast.success('Status updated successfully.');
+    setNewStatus("");
+    toast.success("Status updated successfully.");
     fetchData();
   };
 
@@ -109,10 +109,10 @@ function WithdrawalRequestManagement() {
 
   const handleDelete = () => {
     // Handle API call to delete request
-    console.log('Delete request confirmed');
+    console.log("Delete request confirmed");
     setIsOpenDeleteModal(false);
     setSelectedRequest(null);
-    toast.success('Withdrawal request deleted successfully.');
+    toast.success("Withdrawal request deleted successfully.");
     fetchData();
   };
 
@@ -133,15 +133,15 @@ function WithdrawalRequestManagement() {
           <div className="flex justify-between mb-4">
             <Button
               size="large"
-              onClick={() => toast.success('Add success')}
+              onClick={() => toast.success("Add success")}
               btnAdd
-              title={'Add new'}
+              title={"Add new"}
             ></Button>
             <Button
               btnFilter
               size="large"
-              onClick={() => toast.success('Filter success')}
-              title={'Filter'}
+              onClick={() => toast.success("Filter success")}
+              title={"Filter"}
             ></Button>
           </div>
           <div>

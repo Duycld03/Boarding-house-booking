@@ -1,10 +1,15 @@
-import Table from "../../component/Table";
 import { toast } from "react-toastify";
-import Loader from "../../component/Loader";
 import { useEffect, useState } from "react";
-import { Button, ConfirmModal } from "../../component";
+import {
+  Button,
+  ConfirmModal,
+  TableCustom as Table,
+  Loader,
+} from "../../../component";
+import { DatePicker } from "antd";
 
-function ReportBoardingHouse() {
+function BoardingHouseManagement() {
+  // Dữ liệu mẫu cho bảng
   const data = [
     {
       _id: "1",
@@ -105,4 +110,4 @@ function ReportBoardingHouse() {
   );
 }
 
-export default ReportBoardingHouse;
+export default BoardingHouseManagement;

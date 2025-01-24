@@ -1,6 +1,6 @@
 import { Input, Button, Form } from "antd";
 
-function ContactForm() {
+function Contact() {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
@@ -70,4 +70,4 @@ function ContactForm() {
   );
 }
 
-export default ContactForm;
+export default Contact;

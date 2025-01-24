@@ -1,11 +1,10 @@
-import Table from "../../component/Table";
+import Table from "../../../component/Table";
 import { toast } from "react-toastify";
-import Loader from "../../component/Loader";
+import Loader from "../../../component/Loader";
 import { useEffect, useState } from "react";
-import { Button, ConfirmModal } from "../../component";
+import { Button, ConfirmModal } from "../../../component";
 
-function ReportReviewManagement() {
-  // Dữ liệu mẫu cho bảng
+function ReportBoardingHouse() {
   const data = [
     {
       _id: "1",
@@ -106,4 +105,4 @@ function ReportReviewManagement() {
   );
 }
 
-export default ReportReviewManagement;
+export default ReportBoardingHouse;
