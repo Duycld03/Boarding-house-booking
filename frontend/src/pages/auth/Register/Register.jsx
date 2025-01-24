@@ -1,7 +1,7 @@
 import { Form, Button, Checkbox, Card } from "antd";
-import CustomInput from "../../component/Input";
+import CustomInput from "../../../component/Input";
 
-function LoginForm() {
+function Register() {
   const onFinish = (values) => {
     console.log("Form values:", values);
   };
@@ -30,10 +30,10 @@ function LoginForm() {
           className={"font-body text-4xl font-bold"}
           style={{ textAlign: "center", marginBottom: "20px" }}
         >
-          Login
+          Register
         </h2>
         <Form
-          name="login"
+          name="Register"
           layout="vertical"
           initialValues={{
             remember: true,
@@ -94,7 +94,7 @@ function LoginForm() {
               htmlType="submit"
               block
             >
-              Login
+              Register
             </Button>
           </Form.Item>
         </Form>
@@ -103,4 +103,4 @@ function LoginForm() {
   );
 }
 
-export default LoginForm;
+export default Register;

@@ -1,21 +1,36 @@
-import Login from './Login'
-import BoardingHouseManagement from './BoardingHouseManagement'
-import Home from './Home'
-import AccountManagement from './AccountManagement'
-import ReportReviewManagement from './ReportReviewManagement'
-import ReportBoardingHouse from './ReportBoardingHouse'
-import WithdrawalRequestManagement from './WithdrawalRequestManagement'
-import ContactForm from './Contact'
-import AboutUs from './AboutUs'
+import { Login, Register } from './auth'
+import { AboutUs, Home, Contact } from './common'
+
+import {
+    BoardingHouseManagement,
+    ReportReviewManagement,
+    ReportBoardingHouse,
+    WithdrawalRequestManagement,
+    AccountManagement
+} from './dashboard'
+
+
+
 
 export {
+
+    //auth
     Login,
-    BoardingHouseManagement,
+    Register,
+
+    //common
+    AboutUs,
+    Contact,
     Home,
+
+    // owner
+
+
+    //dashboard
+    BoardingHouseManagement,
     AccountManagement,
     ReportBoardingHouse,
     ReportReviewManagement,
     WithdrawalRequestManagement,
-    ContactForm as ContactPage,
-    AboutUs
+
 }
