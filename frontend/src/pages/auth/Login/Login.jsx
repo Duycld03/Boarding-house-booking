@@ -29,6 +29,7 @@ function Login() {
       }
     } catch (error) {
       showNotification(error.response.data.message);
+      form.resetFields();
     }
   };
 
