@@ -7,7 +7,10 @@ import {
 } from '../../../component';
 import { toast } from 'react-toastify';
 import { Tag } from 'antd';
-import { getReviewReports } from '../../../api/reportManagement';
+import {
+  getReviewReports,
+  deleteReviewReport,
+} from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
 
 function ReportReviewManagement() {
@@ -103,12 +106,26 @@ function ReportReviewManagement() {
   };
 
   // Handle deleting a report
-  const handleDelete = () => {
-    // Simulate deleting a report
-    setData(data.filter((item) => item._id !== selectedRequest._id));
-    setIsOpenDeleteModal(false);
-    setSelectedRequest(null);
-    toast.success('Review report deleted successfully.');
+  const handleDelete = async () => {
+    if (!selectedRequest) return;
+
+    try {
+      // Call the delete API
+      await deleteReviewReport(selectedRequest._id);
+
+      // Remove the deleted report from the state
+      setData(data.filter((item) => item._id !== selectedRequest._id));
+
+      // Show success notification
+      toast.success('Review report deleted successfully.');
+    } catch (error) {
+      console.error('Failed to delete review report:', error);
+      toast.error('Failed to delete review report. Please try again later.');
+    } finally {
+      // Close the modal and reset selectedRequest
+      setIsOpenDeleteModal(false);
+      setSelectedRequest(null);
+    }
   };
 
   return (
