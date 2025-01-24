@@ -40,9 +40,8 @@ const ReportSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Add mongoose-delete plugin
+// Add mongoose-delete plugin without 'deletedAt'
 ReportSchema.plugin(mongooseDelete, {
-  deletedAt: true,
   overrideMethods: 'all',
 });
 
