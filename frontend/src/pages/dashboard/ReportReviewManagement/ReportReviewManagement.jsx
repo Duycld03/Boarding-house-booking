@@ -1,11 +1,14 @@
-import Table from '../../component/Table';
-import { toast } from 'react-toastify';
-import Loader from '../../component/Loader';
 import { useEffect, useState } from 'react';
-import { Button, ConfirmModal } from '../../component';
+import {
+  TableCustom as Table,
+  Button,
+  ConfirmModal,
+  Loader,
+} from '../../../component';
+import { toast } from 'react-toastify';
 import { Tag } from 'antd';
-import convertTimetap from '../../utils/convertTimetap'; // Import the convertTimetap function
-import { getReviewReports } from '../../api/reportManagement'; // Import getReviewReports from the API file
+import { getReviewReports } from '../../../api/reportManagement';
+import convertTimetap from '../../../utils/formatAmount';
 
 function ReportReviewManagement() {
   const [data, setData] = useState([]); // Initializing with an empty array
