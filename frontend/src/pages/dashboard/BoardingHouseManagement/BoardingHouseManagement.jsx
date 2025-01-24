@@ -6,32 +6,42 @@ import {
   TableCustom as Table,
   Loader,
 } from "../../../component";
-import { DatePicker } from "antd";
+import { getAllBoardingHDB } from "../../../api/BoardingHManagement";
+import formatAmount from "../../../utils/formatAmount";
+import convertTimetap from "../../../utils/convertTimetap";
 
 function BoardingHouseManagement() {
-  // Dữ liệu mẫu cho bảng
-  const data = [
-    {
-      _id: "1",
-      name: "John Doe",
-      age: 28,
-      address: "123 Main St, City, Country",
-    },
-    {
-      _id: "2",
-      name: "Jane Smith",
-      age: 34,
-      address: "456 Another St, City, Country",
-    },
-    {
-      _id: "3",
-      name: "Sam Johnson",
-      age: 40,
-      address: "789 Third St, City, Country",
-    },
-  ];
+  const [boardingHData, setBoardingHData] = useState([]);
+  const [loading, setLoading] = useState(true); // Initially set to true
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Các cột cho bảng
+  // fetch data
+  const fetchData = async () => {
+    setLoading(true); // Start loading before fetching
+    try {
+      const res = await getAllBoardingHDB();
+      if (res) {
+        setBoardingHData(res);
+        console.log(res);
+      } else {
+        setBoardingHData([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch withdrawal requests:", error);
+      toast.error(
+        "Failed to fetch withdrawal requests. Please try again later."
+      );
+      setBoardingHData([]);
+    } finally {
+      setLoading(false); // Stop loading after fetching is done
+    }
+  };
+
+  useEffect(() => {
+    fetchData().finally(setLoading(false));
+  }, []); //
+
+  // Table column
   const columns = [
     {
       title: "Name",
@@ -39,14 +49,56 @@ function BoardingHouseManagement() {
       key: "name",
     },
     {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
-    },
-    {
       title: "Address",
       dataIndex: "address",
       key: "address",
+      render: (text) => {
+        return text
+          ? ` ${text.detail}, ${text.ward}, ${text.district}, ${text.province}`
+          : "";
+      },
+    },
+    {
+      title: "Price Range (VND)",
+      dataIndex: "priceRange",
+      key: "priceRange",
+      render: (text) => {
+        return `${formatAmount(text)}/month`;
+      },
+    },
+    {
+      title: "Boarding House Type",
+      dataIndex: "boardingHouseType",
+      key: "boardingHouseType",
+      render: (text) => {
+        return text ? text.name : "";
+      },
+    },
+    {
+      title: "Total Rooms",
+      dataIndex: "totalRooms",
+      key: "totalRooms",
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => {
+        return convertTimetap(text);
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          btnDelete
+          title={"Delete"}
+          onClick={() => handleDelete(record._id)}
+        >
+          Delete
+        </Button>
+      ),
     },
   ];
 
@@ -54,21 +106,16 @@ function BoardingHouseManagement() {
     console.log("Processed Data: ", combinedData);
   };
 
-  const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
-
   const handleToggleMobal = () => {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(!loading);
-    }, 1000);
-  }, []);
-
   const handleMessage = () => {
     toast.success("Add success");
+  };
+
+  const handleDelete = (id) => {
+    console.log(id);
   };
 
   return (
@@ -79,22 +126,22 @@ function BoardingHouseManagement() {
         <>
           <div className="flex justify-between">
             <Button
-              btnDelete
-              title={"Delete account"}
-              size={"large"}
-              onClick={handleToggleMobal}
-            />
-            <Button
               size="large"
               onClick={handleMessage}
               btnAdd
               title="Add new user"
             />
+            <Button
+              btnFilter
+              title={"Filter"}
+              size={"large"}
+              onClick={handleToggleMobal}
+            />
           </div>
           <div>
             <Table
               columns={columns}
-              data={data}
+              data={boardingHData}
               onRowClick={onProcessData}
               loading={loading}
             />
