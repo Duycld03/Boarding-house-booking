@@ -6,26 +6,48 @@ import {
   ReportBoardingHouse,
   ReportReviewManagement,
   WithdrawalRequestManagement,
-  ContactPage,
+  Contact,
   AboutUs,
-  ReviewManagement
+  ReviewManagement,
+  Register,
 } from "../pages";
 import { AuthLayout, HeaderOnly } from "../Layouts";
 
 const dashBoard = "/dashboard";
 
 const routes = [
+  //auth
   {
     path: "/login",
     page: Login,
     layout: AuthLayout,
   },
+
+  {
+    path: "/register",
+    page: Register,
+    layout: AuthLayout,
+  },
+
+  //common
   {
     path: "/",
     label: "Home",
     page: Home,
     layout: HeaderOnly,
   },
+  {
+    path: "/contact",
+    page: Contact,
+    layout: HeaderOnly,
+  },
+  {
+    path: "about-us",
+    page: AboutUs,
+    layout: HeaderOnly,
+  },
+
+  // dashBoard
   {
     path: `${dashBoard}/boarding-house-management`,
     page: BoardingHouseManagement,
@@ -51,16 +73,7 @@ const routes = [
     page: WithdrawalRequestManagement,
     layout: null,
   },
-  {
-    path: "/contact",
-    page: ContactPage,
-    layout: HeaderOnly,
-  },
-  {
-    path: "about-us",
-    page: AboutUs,
-    layout: HeaderOnly,
-  },
+
   {
     path: `${dashBoard}/list-boarding-house-reviews`,
     page: ReviewManagement,

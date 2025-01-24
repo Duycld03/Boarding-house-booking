@@ -1,8 +1,8 @@
-import Table from "../../component/Table";
+import Table from "../../../component/Table";
 import { toast } from "react-toastify";
-import Loader from "../../component/Loader";
+import Loader from "../../../component/Loader";
 import { useEffect, useState } from "react";
-import { Button, ConfirmModal } from "../../component";
+import { Button, ConfirmModal } from "../../../component";
 
 function ReportBoardingHouse() {
   const data = [

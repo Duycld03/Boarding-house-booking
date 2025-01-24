@@ -1,24 +1,6 @@
 import mongoose from "mongoose";
 import mongoose_delete from "mongoose-delete";
 
-const AddressSchema = new mongoose.Schema({
-  province: {
-    type: String,
-    required: true,
-  },
-  district: {
-    type: String,
-    required: true,
-  },
-  ward: {
-    type: String,
-    required: true,
-  },
-  detail: {
-    type: String,
-    default: "",
-  },
-});
 
 const ImagesSchema = new mongoose.Schema({
   _id: {
@@ -85,7 +67,24 @@ const BoardingHouseSchema = new mongoose.Schema(
       ref: "BoardingHouseType",
       required: true,
     },
-    address: AddressSchema,
+    address: {
+      province: {
+        type: String,
+        required: true,
+      },
+      district: {
+        type: String,
+        required: true,
+      },
+      ward: {
+        type: String,
+        required: true,
+      },
+      detail: {
+        type: String,
+        default: "",
+      }
+    },
     images: [ImagesSchema],
   },
   { timestamps: true }

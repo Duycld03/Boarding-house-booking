@@ -1,6 +1,10 @@
 import { Router } from 'express';
 
-import { withdrawalRequestsController } from '../controllers/index.js';
+import {
+  withdrawalRequestsController,
+  reportController,
+  BoardingHouseController,
+} from '../controllers/index.js';
 
 const adminRouter = Router();
 
@@ -8,5 +12,14 @@ adminRouter.get(
   '/withdrawRequests',
   withdrawalRequestsController.getWithdrawRequests
 );
+adminRouter.get('/reviewreports', reportController.getReviewReports);
+adminRouter.delete(
+  '/reviewreports/:reviewReportId',
+  reportController.softDeleteReport
+);
+
+adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard)
+
+
 
 export default adminRouter;

@@ -17,7 +17,7 @@ const ConfirmModal = ({ title, content, onOk, onCancel, isOpen }) => {
           size="large"
           title="Confirm"
           onClick={onOk}
-          className={"bg-primary text-white"}
+          className={"bg-teal-600 text-white"}
         />
         <ButtonCustom
           title="Cancel"
