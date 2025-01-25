@@ -12,8 +12,10 @@ import {
   getReviewReports,
   deleteReport,
   sendReplyByEmail,
+  // filterReports,
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
+import FilterReport from './FilterReport';
 
 function ReportReviewManagement() {
   const [data, setData] = useState([]);
@@ -22,6 +24,13 @@ function ReportReviewManagement() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isReplayPopupOpen, setIsReplayPopupOpen] = useState(false); // Replay Popup visibility
   const [replayReportData, setReplayReportData] = useState(null); // Data for the Replay Popup
+  const [filterValue, setFilterValue] = useState({
+    gender: null,
+    role: null,
+    startDate: null,
+    endDate: null,
+    status: null,
+  });
 
   // Fetch data from the API
   const fetchData = async () => {
@@ -189,13 +198,8 @@ function ReportReviewManagement() {
         <Loader />
       ) : (
         <>
-          <div className="flex justify-between mb-4">
-            <Button
-              btnFilter
-              size="large"
-              onClick={() => toast.success('Filter success')}
-              title={'Filter'}
-            />
+          <div className="flex justify-end mb-4">
+            <FilterReport setFilterValue={setFilterValue} />
           </div>
           <Table columns={columns} data={data} loading={loading} />
           <ConfirmModal
