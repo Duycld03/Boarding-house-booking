@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import Account from "../models/account.js";
 import dotenv from "dotenv";
+import googleAuth from "google-auth-library";
+import Account from "../models/account.js";
 dotenv.config();
 
 // testing models
@@ -82,6 +83,48 @@ class AuthController {
     } catch (error) {
       console.log(error.message);
       res.status(500).json({ message: "An unexpected error occurred" });
+    }
+  }
+
+  async loginWithGoogle(req, res) {
+    const { credential, clientId, remember } = req.body;
+    const client = new googleAuth.OAuth2Client({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+    });
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      const user = await Account.findOne({ email: payload.email });
+
+      if (!user) {
+        return res.status(200).json({
+          isRegistered: false,
+          message: "User not registered. Please complete registration.",
+          user: payload,
+        });
+      }
+
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          username: user.username,
+          role: user.role,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: remember ? "7d" : process.env.JWT_EXPIRE,
+        }
+      );
+      res.status(200).json({
+        token,
+        user,
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(401).json({ message: "Invalid Google Token" });
     }
   }
 }

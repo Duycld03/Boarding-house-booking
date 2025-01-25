@@ -11,3 +11,7 @@ export const register = (data) => {
 export const getUser = () => {
   return axios.get("auth/user");
 };
+
+export const loginWithGoogle = (data) => {
+  return axios.post("/login-with-google", data);
+};

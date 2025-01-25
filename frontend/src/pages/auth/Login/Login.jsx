@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { Form, Button, Checkbox, Card, Input, notification } from "antd";
 import { useNavigate } from "react-router-dom";
-import { login, getUser } from "../../../api/authManagement";
+import { GoogleLogin } from "@react-oauth/google";
+import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
 
 function Login() {
   const navigate = useNavigate();
@@ -45,6 +46,24 @@ function Login() {
   useEffect(() => {
     checkUser();
   }, []);
+
+  const loginWithGoogleHandler = async (response) => {
+    try {
+      const remember = form.getFieldValue("remember");
+      const data = { ...response, remember };
+      const res = await loginWithGoogle(data);
+
+      if (res.isRegistered) {
+        localStorage.setItem("access_token", res.token);
+        navigate("/");
+      } else {
+        // navigate("/register", { state: { user: res.user } });
+        console.log("User not registered");
+      }
+    } catch (error) {
+      showNotification(error.response.data.message);
+    }
+  };
 
   return (
     <>
@@ -97,7 +116,6 @@ function Login() {
             >
               <Input.Password size="large" placeholder="Enter your password" />
             </Form.Item>
-
             <Form.Item name="remember" valuePropName="checked">
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
@@ -115,6 +133,14 @@ function Login() {
               >
                 Login
               </Button>
+            </Form.Item>
+            <Form.Item>
+              <GoogleLogin
+                onSuccess={loginWithGoogleHandler}
+                onError={() => {
+                  console.log("error");
+                }}
+              />
             </Form.Item>
           </Form>
         </Card>

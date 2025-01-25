@@ -36,7 +36,10 @@ const CustomHeader = () => {
         setIsAdmin(true);
       }
       setIsLoggedIn(true);
-    } catch (error) {}
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const logout = () => {
@@ -47,7 +50,7 @@ const CustomHeader = () => {
 
   useEffect(() => {
     checkUser();
-  }, [isLoggedIn]);
+  }, []);
 
   // Menu items for navigation
   const menuItems = [
