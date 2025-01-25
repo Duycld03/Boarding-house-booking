@@ -71,9 +71,7 @@ class AuthController {
   async login(req, res) {
     try {
       const { username, password, remember } = req.body;
-      const user = await Account.findOne({ username: username }).select(
-        "-password"
-      );
+      const user = await Account.findOne({ username: username });
 
       if (!user) {
         return res
@@ -99,6 +97,7 @@ class AuthController {
         }
       );
 
+      delete user.password;
       res.status(200).json({
         token,
         user,
