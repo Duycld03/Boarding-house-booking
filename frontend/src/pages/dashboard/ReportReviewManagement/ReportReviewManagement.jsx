@@ -12,7 +12,7 @@ import {
   getReviewReports,
   deleteReport,
   sendReplyByEmail,
-  // filterReports,
+  filterReports,
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
 import FilterReport from './FilterReport';
@@ -22,22 +22,22 @@ function ReportReviewManagement() {
   const [loading, setLoading] = useState(true);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [isReplayPopupOpen, setIsReplayPopupOpen] = useState(false); // Replay Popup visibility
-  const [replayReportData, setReplayReportData] = useState(null); // Data for the Replay Popup
+  const [isReplayPopupOpen, setIsReplayPopupOpen] = useState(false);
+  const [replayReportData, setReplayReportData] = useState(null);
   const [filterValue, setFilterValue] = useState({
-    gender: null,
-    role: null,
     startDate: null,
     endDate: null,
     status: null,
+    reason: null,
   });
 
-  // Fetch data from the API
   const fetchData = async () => {
+    setLoading(true);
     try {
       const res = await getReviewReports();
       if (res) {
         setData(res);
+        console.log(res);
       } else {
         setData([]);
       }
@@ -47,18 +47,41 @@ function ReportReviewManagement() {
         'Failed to fetch withdrawal requests. Please try again later.'
       );
       setData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Call fetchData on component mount
-  useEffect(() => {
+  const filterReportData = async () => {
     setLoading(true);
-    fetchData().finally(() => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    });
+    try {
+      const res = await filterReports(filterValue);
+      console.log('Filtered Data:', res); // Log the response to check its structure
+
+      if (res && Array.isArray(res.data)) {
+        setData(res.data); // Adjusting for data field if necessary
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error('Failed to fetch filtered reports:', error);
+      toast.error('Failed to fetch filtered reports. Please try again later.');
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //fetch account data
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  //Filter account data
+  useEffect(() => {
+    console.log('Filter Value:', filterValue); // This should show updated filter values when changed
+    filterReportData();
+  }, [filterValue]);
 
   // Define columns for the Table component
   const columns = [
@@ -71,7 +94,7 @@ function ReportReviewManagement() {
     {
       title: 'Email',
       dataIndex: 'reporter',
-      key: 'eamil',
+      key: 'email',
       render: (reporter) => reporter?.email || 'N/A',
     },
     {
@@ -99,23 +122,15 @@ function ReportReviewManagement() {
       render: (createdAt) => convertTimetap(createdAt),
     },
     {
-      title: 'Processed by',
-      dataIndex: 'processedBy',
-      key: 'processedBy',
-      render: (processedBy) => processedBy?.fullname || 'N/A',
-    },
-    {
       title: 'Action',
       render: (record) => (
         <div className="flex gap-2">
-          {/* Delete Button */}
           <Button
             title={'Delete'}
             btnDelete
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
-          {/* Replay Button */}
           {record.status !== 'rejected' && record.status !== 'resolved' && (
             <Button
               title={'Replay'}
@@ -137,10 +152,10 @@ function ReportReviewManagement() {
 
   // Handle opening the replay popup
   const handleReplay = (record) => {
-    console.log('Replay button clicked for record:', record);
-    setReplayReportData(record); // Set the selected report data
-    setIsReplayPopupOpen(true); // Open the popup
+    setReplayReportData(record);
+    setIsReplayPopupOpen(true);
   };
+
   // Handle deleting a report
   const handleDelete = async () => {
     if (!selectedRequest) return;
@@ -150,45 +165,33 @@ function ReportReviewManagement() {
       setData(data.filter((item) => item._id !== selectedRequest._id));
       toast.success('Review report deleted successfully.');
     } catch (error) {
-      console.error('Failed to delete review report:', error);
+      console.error('Failed to fetch withdrawal requests:', error);
       toast.error('Failed to delete review report. Please try again later.');
     } finally {
       setIsOpenDeleteModal(false);
       setSelectedRequest(null);
     }
   };
+
   const handleReplaySubmit = async (formData) => {
-    console.log('Form Data Submitted:', formData); // Debugging log
     if (!replayReportData || !replayReportData._id) {
       toast.error('Report data is missing. Please try again.');
       return;
     }
 
     try {
-      // Update the report data by calling API
       await sendReplyByEmail(replayReportData._id, {
         status: formData.status,
         detailReport: formData.detailReport,
       });
 
-      // Close the replay popup
       setIsReplayPopupOpen(false);
-
-      // Fetch updated data from the API
-      fetchData(); // This will refresh the data from the API
+      fetchData();
     } catch (error) {
-      console.error('Failed to send reply or update report:', error);
+      console.error('Failed to fetch filtered reports:', error);
       toast.error(
         'Failed to send reply or update report. Please try again later.'
       );
-      // Log additional error information for debugging
-      if (error.response) {
-        console.error('Error Response:', error.response);
-      } else if (error.request) {
-        console.error('Error Request:', error.request);
-      } else {
-        console.error('Error Message:', error.message);
-      }
     }
   };
 
@@ -201,6 +204,7 @@ function ReportReviewManagement() {
           <div className="flex justify-end mb-4">
             <FilterReport setFilterValue={setFilterValue} />
           </div>
+          {/* Show filtered data if available, else show full data */}
           <Table columns={columns} data={data} loading={loading} />
           <ConfirmModal
             title="Confirm Deletion"
