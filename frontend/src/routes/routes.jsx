@@ -9,6 +9,7 @@ import {
   Contact,
   AboutUs,
   Register,
+  RegisterWithGoogle,
 } from "../pages";
 import { AuthLayout, HeaderOnly } from "../Layouts";
 
@@ -25,6 +26,11 @@ const routes = [
   {
     path: "/register",
     page: Register,
+    layout: AuthLayout,
+  },
+  {
+    path: "/register-with-google",
+    page: RegisterWithGoogle,
     layout: AuthLayout,
   },
 

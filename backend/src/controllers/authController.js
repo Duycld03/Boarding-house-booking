@@ -52,6 +52,7 @@ class AuthController {
         }
       );
 
+      delete user.password;
       res.status(201).json({
         token,
         user,
@@ -70,7 +71,9 @@ class AuthController {
   async login(req, res) {
     try {
       const { username, password, remember } = req.body;
-      const user = await Account.findOne({ username: username });
+      const user = await Account.findOne({ username: username }).select(
+        "-password"
+      );
 
       if (!user) {
         return res
@@ -117,7 +120,9 @@ class AuthController {
         audience: process.env.GOOGLE_CLIENT_ID,
       });
       const payload = ticket.getPayload();
-      const user = await Account.findOne({ email: payload.email });
+      const user = await Account.findOne({ email: payload.email }).select(
+        "-password"
+      );
 
       if (!user) {
         return res.status(200).json({
@@ -139,6 +144,7 @@ class AuthController {
         }
       );
       res.status(200).json({
+        isRegistered: true,
         token,
         user,
       });

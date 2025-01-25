@@ -57,8 +57,7 @@ function Login() {
         localStorage.setItem("access_token", res.token);
         navigate("/");
       } else {
-        // navigate("/register", { state: { user: res.user } });
-        console.log("User not registered");
+        navigate("/register-with-google", { state: { user: res.user } });
       }
     } catch (error) {
       showNotification(error.response.data.message);
@@ -114,7 +113,11 @@ function Login() {
                 },
               ]}
             >
-              <Input.Password size="large" placeholder="Enter your password" />
+              <Input.Password
+                size="large"
+                placeholder="Enter your password"
+                autoComplete="current-password"
+              />
             </Form.Item>
             <Form.Item name="remember" valuePropName="checked">
               <Checkbox>Remember me</Checkbox>
