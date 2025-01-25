@@ -13,12 +13,9 @@ adminRouter.get(
   withdrawalRequestsController.getWithdrawRequests
 );
 adminRouter.get('/review-reports', reportController.getReviewReports);
-adminRouter.delete(
-  '/review-reports/:reviewReportId',
-  reportController.softDeleteReport
-);
+adminRouter.delete('/reports/:reportId', reportController.softDeleteReport);
 adminRouter.put(
-  '/review-reports/:reportId/send-email',
+  '/reports/:reportId/send-email',
   reportController.sendReportReplyByEmail
 );
 

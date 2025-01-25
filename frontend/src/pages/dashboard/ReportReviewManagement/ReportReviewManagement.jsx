@@ -10,8 +10,8 @@ import { toast } from 'react-toastify';
 import { Tag } from 'antd';
 import {
   getReviewReports,
-  deleteReviewReport,
-  sendReportReplyByEmail,
+  deleteReport,
+  sendReplyByEmail,
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
 
@@ -107,7 +107,7 @@ function ReportReviewManagement() {
             onClick={() => handleDeleteModal(record)}
           />
           {/* Replay Button */}
-          {record.status !== 'rejected' && (
+          {record.status !== 'rejected' && record.status !== 'resolved' && (
             <Button
               title={'Replay'}
               btnReplay
@@ -137,7 +137,7 @@ function ReportReviewManagement() {
     if (!selectedRequest) return;
 
     try {
-      await deleteReviewReport(selectedRequest._id);
+      await deleteReport(selectedRequest._id);
       setData(data.filter((item) => item._id !== selectedRequest._id));
       toast.success('Review report deleted successfully.');
     } catch (error) {
@@ -157,7 +157,7 @@ function ReportReviewManagement() {
 
     try {
       // Update the report data by calling API
-      await sendReportReplyByEmail(replayReportData._id, {
+      await sendReplyByEmail(replayReportData._id, {
         status: formData.status,
         detailReport: formData.detailReport,
       });

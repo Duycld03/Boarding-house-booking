@@ -66,8 +66,8 @@ const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
         >
           {reportData?.status === 'pending' ? (
             <Select placeholder="Select status">
-              <Option value="rejected">Rejected</Option>
-              <Option value="resolved">Resolved</Option>
+              <Option value="rejected">rejected</Option>
+              <Option value="resolved">resolved</Option>
             </Select>
           ) : (
             <Input disabled value={reportData?.status} />
