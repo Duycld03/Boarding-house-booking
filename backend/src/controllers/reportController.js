@@ -140,7 +140,7 @@ class reportController {
   async filterReports(req, res) {
     try {
       const { startDate, endDate, reason, status } = req.query;
-      let filter = {};
+      let filter = { reportType: { $regex: /^review$/i } };
 
       const convertToISODate = (dateString) => {
         const [day, month, year] = dateString.split('-');
@@ -167,7 +167,12 @@ class reportController {
         filter.status = status;
       }
 
-      const reports = await Report.find(filter).sort({ createdAt: 1 });
+      const reports = await Report.find(filter)
+        .sort({ createdAt: 1 })
+        .populate({
+          path: 'reporter', // Populate reporter details
+          select: 'fullname email', // Select only these fields
+        });
 
       res.status(200).json({ success: true, data: reports });
     } catch (error) {
