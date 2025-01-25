@@ -21,14 +21,15 @@ function FilterReport({ setFilterValue }) {
   const handleSubmit = (values) => {
     const { startDate, endDate } = values;
 
-    // Check if startDate is later than endDate
-    if (
-      startDate &&
-      endDate &&
-      convertTimetap(startDate) > convertTimetap(endDate)
-    ) {
-      toast.error('Start date cannot be later than end date.');
-      return;
+    if (startDate && endDate) {
+      const startDateObj = new Date(startDate);
+      const endDateObj = new Date(endDate);
+
+      // Check if startDate is later than endDate
+      if (startDateObj > endDateObj) {
+        toast.error('Start date cannot be later than end date.');
+        return;
+      }
     }
 
     if (startDate && !endDate) {
