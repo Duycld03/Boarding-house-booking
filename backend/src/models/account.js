@@ -55,12 +55,13 @@ const AccountSchema = mongoose.Schema(
     },
     status: {
       type: String,
+      default: 'inactive'
     },
   },
   { timestamps: true }
 );
 
-AccountSchema.plugin(mongoose_delete, { deletedBy: true, overrideMethods: 'all' });
+AccountSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
 
 const Account = mongoose.model("Account", AccountSchema);
 export default Account;
