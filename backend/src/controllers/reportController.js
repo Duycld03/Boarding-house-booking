@@ -137,6 +137,44 @@ class reportController {
       return res.status(500).json({ error: error.message });
     }
   }
+  async filterReports(req, res) {
+    try {
+      const { startDate, endDate, reason, status } = req.query;
+      let filter = {};
+
+      const convertToISODate = (dateString) => {
+        const [day, month, year] = dateString.split('-');
+        return new Date(`${year}-${month}-${day}T00:00:00.000Z`); // Đảm bảo ngày có định dạng ISO đầy đủ
+      };
+
+      if (startDate && endDate) {
+        const startISO = convertToISODate(startDate);
+        const endISO = convertToISODate(endDate);
+
+        endISO.setHours(23, 59, 59, 999);
+
+        filter.createdAt = {
+          $gte: startISO,
+          $lte: endISO,
+        };
+      }
+
+      if (reason) {
+        filter.reason = { $regex: new RegExp(reason, 'i') }; // Case-insensitive
+      }
+
+      if (status) {
+        filter.status = status;
+      }
+
+      const reports = await Report.find(filter).sort({ createdAt: 1 });
+
+      res.status(200).json({ success: true, data: reports });
+    } catch (error) {
+      console.error('Error filtering reports:', error);
+      res.status(500).json({ success: false, message: 'Server Error' });
+    }
+  }
 }
 
 export default new reportController();

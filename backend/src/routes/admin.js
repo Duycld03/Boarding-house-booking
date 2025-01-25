@@ -19,6 +19,7 @@ adminRouter.put(
   '/reports/:reportId/send-email',
   reportController.sendReportReplyByEmail
 );
+adminRouter.get('/reports/filter', reportController.filterReports);
 
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard);
 
