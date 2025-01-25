@@ -28,4 +28,4 @@ adminRouter.get('/account', AccountController.getAllAccount)
 adminRouter.delete('/account/:accountId', AccountController.softDeleteAccount)
 adminRouter.get('/account/filter', AccountController.filterAccounts);
 
-export default adminRouter;
+export { adminRouter };
