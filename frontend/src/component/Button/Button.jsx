@@ -6,7 +6,7 @@ import {
   PlusOutlined,
   RestOutlined,
   FilterOutlined,
-  ReloadOutlined, // Icon cho Replay
+  SendOutlined,
 } from '@ant-design/icons';
 
 const ButtonCustom = ({
@@ -44,7 +44,7 @@ const ButtonCustom = ({
   ) : btnFilter ? (
     <FilterOutlined />
   ) : btnReplay ? ( // Icon cho Replay
-    <ReloadOutlined />
+    <SendOutlined />
   ) : null;
 
   const backgroundClass = btnDelete

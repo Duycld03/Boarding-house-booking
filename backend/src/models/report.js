@@ -36,6 +36,10 @@ const ReportSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    detailReport: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

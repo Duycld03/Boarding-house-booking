@@ -11,6 +11,7 @@ import { Tag } from 'antd';
 import {
   getReviewReports,
   deleteReviewReport,
+  sendReportReplyByEmail,
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
 
@@ -76,7 +77,6 @@ function ReportReviewManagement() {
       render: (status) => {
         const statusColors = {
           pending: 'orange',
-          'in progress': 'blue',
           resolved: 'green',
           rejected: 'red',
         };
@@ -107,12 +107,14 @@ function ReportReviewManagement() {
             onClick={() => handleDeleteModal(record)}
           />
           {/* Replay Button */}
-          <Button
-            title={'Replay'}
-            btnReplay
-            className="btn-replay"
-            onClick={() => handleReplay(record)}
-          />
+          {record.status !== 'rejected' && (
+            <Button
+              title={'Replay'}
+              btnReplay
+              className="btn-replay"
+              onClick={() => handleReplay(record)}
+            />
+          )}
         </div>
       ),
     },
@@ -146,16 +148,38 @@ function ReportReviewManagement() {
       setSelectedRequest(null);
     }
   };
-
-  // Handle submitting replay data
   const handleReplaySubmit = async (formData) => {
+    console.log('Form Data Submitted:', formData); // Debugging log
+    if (!replayReportData || !replayReportData._id) {
+      toast.error('Report data is missing. Please try again.');
+      return;
+    }
+
     try {
-      console.log('Replay submitted with data:', formData);
-      toast.success('Replay submitted successfully!');
-      setIsReplayPopupOpen(false); // Close the popup after submission
+      // Update the report data by calling API
+      await sendReportReplyByEmail(replayReportData._id, {
+        status: formData.status,
+        detailReport: formData.detailReport,
+      });
+
+      // Close the replay popup
+      setIsReplayPopupOpen(false);
+
+      // Fetch updated data from the API
+      fetchData(); // This will refresh the data from the API
     } catch (error) {
-      console.error('Failed to submit replay:', error);
-      toast.error('Failed to submit replay. Please try again later.');
+      console.error('Failed to send reply or update report:', error);
+      toast.error(
+        'Failed to send reply or update report. Please try again later.'
+      );
+      // Log additional error information for debugging
+      if (error.response) {
+        console.error('Error Response:', error.response);
+      } else if (error.request) {
+        console.error('Error Request:', error.request);
+      } else {
+        console.error('Error Message:', error.message);
+      }
     }
   };
 

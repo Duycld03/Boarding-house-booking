@@ -1,7 +1,9 @@
-import { Modal, Input, Button, Form } from 'antd';
+import { Modal, Input, Button, Form, Select } from 'antd';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import convertTimetap from '../../utils/convertTimetap';
+
+const { Option } = Select;
 
 const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
   const [loading, setLoading] = useState(false);
@@ -57,8 +59,19 @@ const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
         <Form.Item label="Email" name="email">
           <Input disabled />
         </Form.Item>
-        <Form.Item label="Status" name="status">
-          <Input disabled />
+        <Form.Item
+          label="Status"
+          name="status"
+          rules={[{ required: true, message: 'Please select a status.' }]}
+        >
+          {reportData?.status === 'pending' ? (
+            <Select placeholder="Select status">
+              <Option value="rejected">Rejected</Option>
+              <Option value="resolved">Resolved</Option>
+            </Select>
+          ) : (
+            <Input disabled value={reportData?.status} />
+          )}
         </Form.Item>
         <Form.Item label="Created At" name="createdAt">
           <Input disabled />
@@ -70,8 +83,8 @@ const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
           <Input disabled />
         </Form.Item>
         <Form.Item
-          label="Details"
-          name="details"
+          label="Detail Report"
+          name="detailReport"
           rules={[{ required: true, message: 'Please provide details.' }]}
         >
           <Input.TextArea
