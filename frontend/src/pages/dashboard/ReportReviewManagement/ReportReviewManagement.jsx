@@ -1,131 +1,70 @@
-import { useEffect, useState } from 'react';
-import {
-  TableCustom as Table,
-  Button,
-  ConfirmModal,
-  Loader,
-} from '../../../component';
-import { toast } from 'react-toastify';
-import { Tag } from 'antd';
-import {
-  getReviewReports,
-  deleteReviewReport,
-} from '../../../api/reportManagement';
-import convertTimetap from '../../../utils/convertTimetap';
+import Table from "../../../component/Table";
+import { toast } from "react-toastify";
+import Loader from "../../../component/Loader";
+import { useEffect, useState } from "react";
+import { Button, ConfirmModal } from "../../../component";
 
 function ReportReviewManagement() {
-  const [data, setData] = useState([]); // Initializing with an empty array
-  const [loading, setLoading] = useState(true);
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null);
-
-  // Fetch data from the API
-  const fetchData = async () => {
-    try {
-      const res = await getReviewReports();
-      if (res) {
-        setData(res);
-      } else {
-        setData([]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
-      toast.error(
-        'Failed to fetch withdrawal requests. Please try again later.'
-      );
-      setData([]);
-    }
-  };
-
-  // Call fetchData on component mount
-  useEffect(() => {
-    setLoading(true);
-    fetchData().finally(() => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    });
-  }, []);
-
-  // Define columns for the Table component
-  const columns = [
+  // Dữ liệu mẫu cho bảng
+  const data = [
     {
-      title: 'Reporter',
-      dataIndex: 'reporter',
-      key: 'reporter',
-      render: (reporter) => reporter?.fullname || 'N/A',
+      _id: "1",
+      name: "John Doe",
+      age: 28,
+      address: "123 Main St, City, Country",
     },
     {
-      title: 'Reason',
-      dataIndex: 'reason',
-      key: 'reason',
+      _id: "2",
+      name: "Jane Smith",
+      age: 34,
+      address: "456 Another St, City, Country",
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        const statusColors = {
-          pending: 'orange',
-          'in progress': 'blue',
-          resolved: 'green',
-          rejected: 'red',
-        };
-        return <Tag color={statusColors[status.toLowerCase()]}>{status}</Tag>;
-      },
-    },
-    {
-      title: 'Created at',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (createdAt) => convertTimetap(createdAt), // Format timestamp
-    },
-    {
-      title: 'Processed by',
-      dataIndex: 'processedBy',
-      key: 'processedBy',
-      render: (processedBy) => processedBy?.fullname || 'N/A',
-    },
-    {
-      title: 'Action',
-      render: (record) => (
-        <Button
-          title={'Delete'}
-          btnDelete
-          className="btn-delete"
-          onClick={() => handleDeleteModal(record)}
-        />
-      ),
+      _id: "3",
+      name: "Sam Johnson",
+      age: 40,
+      address: "789 Third St, City, Country",
     },
   ];
 
-  // Handle opening the delete modal
-  const handleDeleteModal = (record) => {
-    setSelectedRequest(record);
-    setIsOpenDeleteModal(true);
+  // Các cột cho bảng
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Age",
+      dataIndex: "age",
+      key: "age",
+    },
+    {
+      title: "Address",
+      dataIndex: "address",
+      key: "address",
+    },
+  ];
+
+  const onProcessData = (combinedData) => {
+    console.log("Processed Data: ", combinedData);
   };
 
-  // Handle deleting a report
-  const handleDelete = async () => {
-    if (!selectedRequest) return;
+  const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
-    try {
-      // Call the delete API
-      await deleteReviewReport(selectedRequest._id);
+  const handleToggleMobal = () => {
+    setIsOpen(!isOpen);
+  };
 
-      // Remove the deleted report from the state
-      setData(data.filter((item) => item._id !== selectedRequest._id));
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(!loading);
+    }, 1000);
+  }, []);
 
-      // Show success notification
-      toast.success('Review report deleted successfully.');
-    } catch (error) {
-      console.error('Failed to delete review report:', error);
-      toast.error('Failed to delete review report. Please try again later.');
-    } finally {
-      // Close the modal and reset selectedRequest
-      setIsOpenDeleteModal(false);
-      setSelectedRequest(null);
-    }
+  const handleMessage = () => {
+    toast.success("Add success");
   };
 
   return (
@@ -134,21 +73,32 @@ function ReportReviewManagement() {
         <Loader />
       ) : (
         <>
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-between">
             <Button
-              btnFilter
+              btnDelete
+              title={"Delete account"}
+              size={"large"}
+              onClick={handleToggleMobal}
+            />
+            <Button
               size="large"
-              onClick={() => toast.success('Filter success')}
-              title={'Filter'}
+              onClick={handleMessage}
+              btnAdd
+              title="Add new user"
             />
           </div>
-          <Table columns={columns} data={data} loading={loading} />
+          <div>
+            <Table
+              columns={columns}
+              data={data}
+              onRowClick={onProcessData}
+              loading={loading}
+            />
+          </div>
           <ConfirmModal
-            title="Confirm Deletion"
-            content="Do you want to delete this review report?"
-            onOk={handleDelete}
-            onCancel={() => setIsOpenDeleteModal(false)}
-            isOpen={isOpenDeleteModal}
+            onCancel={handleToggleMobal}
+            isOpen={isOpen}
+            content={"Do you want to add new?"}
           />
         </>
       )}
