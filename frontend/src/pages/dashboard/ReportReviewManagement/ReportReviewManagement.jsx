@@ -4,6 +4,7 @@ import {
   Button,
   ConfirmModal,
   Loader,
+  FormReplayPopup,
 } from '../../../component';
 import { toast } from 'react-toastify';
 import { Tag } from 'antd';
@@ -14,10 +15,12 @@ import {
 import convertTimetap from '../../../utils/convertTimetap';
 
 function ReportReviewManagement() {
-  const [data, setData] = useState([]); // Initializing with an empty array
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [isReplayPopupOpen, setIsReplayPopupOpen] = useState(false); // Replay Popup visibility
+  const [replayReportData, setReplayReportData] = useState(null); // Data for the Replay Popup
 
   // Fetch data from the API
   const fetchData = async () => {
@@ -56,6 +59,12 @@ function ReportReviewManagement() {
       render: (reporter) => reporter?.fullname || 'N/A',
     },
     {
+      title: 'Email',
+      dataIndex: 'reporter',
+      key: 'eamil',
+      render: (reporter) => reporter?.email || 'N/A',
+    },
+    {
       title: 'Reason',
       dataIndex: 'reason',
       key: 'reason',
@@ -78,7 +87,7 @@ function ReportReviewManagement() {
       title: 'Created at',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (createdAt) => convertTimetap(createdAt), // Format timestamp
+      render: (createdAt) => convertTimetap(createdAt),
     },
     {
       title: 'Processed by',
@@ -102,7 +111,7 @@ function ReportReviewManagement() {
             title={'Replay'}
             btnReplay
             className="btn-replay"
-            // onClick={() => handleReplay(record)}
+            onClick={() => handleReplay(record)}
           />
         </div>
       ),
@@ -115,26 +124,38 @@ function ReportReviewManagement() {
     setIsOpenDeleteModal(true);
   };
 
+  // Handle opening the replay popup
+  const handleReplay = (record) => {
+    console.log('Replay button clicked for record:', record);
+    setReplayReportData(record); // Set the selected report data
+    setIsReplayPopupOpen(true); // Open the popup
+  };
   // Handle deleting a report
   const handleDelete = async () => {
     if (!selectedRequest) return;
 
     try {
-      // Call the delete API
       await deleteReviewReport(selectedRequest._id);
-
-      // Remove the deleted report from the state
       setData(data.filter((item) => item._id !== selectedRequest._id));
-
-      // Show success notification
       toast.success('Review report deleted successfully.');
     } catch (error) {
       console.error('Failed to delete review report:', error);
       toast.error('Failed to delete review report. Please try again later.');
     } finally {
-      // Close the modal and reset selectedRequest
       setIsOpenDeleteModal(false);
       setSelectedRequest(null);
+    }
+  };
+
+  // Handle submitting replay data
+  const handleReplaySubmit = async (formData) => {
+    try {
+      console.log('Replay submitted with data:', formData);
+      toast.success('Replay submitted successfully!');
+      setIsReplayPopupOpen(false); // Close the popup after submission
+    } catch (error) {
+      console.error('Failed to submit replay:', error);
+      toast.error('Failed to submit replay. Please try again later.');
     }
   };
 
@@ -160,6 +181,14 @@ function ReportReviewManagement() {
             onCancel={() => setIsOpenDeleteModal(false)}
             isOpen={isOpenDeleteModal}
           />
+          {isReplayPopupOpen && (
+            <FormReplayPopup
+              visible={isReplayPopupOpen}
+              onClose={() => setIsReplayPopupOpen(false)}
+              onSubmit={handleReplaySubmit}
+              reportData={replayReportData}
+            />
+          )}
         </>
       )}
     </div>
