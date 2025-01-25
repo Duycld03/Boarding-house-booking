@@ -89,12 +89,22 @@ function ReportReviewManagement() {
     {
       title: 'Action',
       render: (record) => (
-        <Button
-          title={'Delete'}
-          btnDelete
-          className="btn-delete"
-          onClick={() => handleDeleteModal(record)}
-        />
+        <div className="flex gap-2">
+          {/* Delete Button */}
+          <Button
+            title={'Delete'}
+            btnDelete
+            className="btn-delete"
+            onClick={() => handleDeleteModal(record)}
+          />
+          {/* Replay Button */}
+          <Button
+            title={'Replay'}
+            btnReplay
+            className="btn-replay"
+            // onClick={() => handleReplay(record)}
+          />
+        </div>
       ),
     },
   ];
