@@ -12,7 +12,7 @@ import {
   getReviewReports,
   deleteReport,
   sendReplyByEmail,
-  filterReports,
+  filterReviewReports,
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
 import FilterReport from './FilterReport';
@@ -55,7 +55,7 @@ function ReportReviewManagement() {
   const filterReportData = async () => {
     setLoading(true);
     try {
-      const res = await filterReports(filterValue);
+      const res = await filterReviewReports(filterValue);
       console.log('Filtered Data:', res); // Log the response to check its structure
 
       if (res && Array.isArray(res.data)) {

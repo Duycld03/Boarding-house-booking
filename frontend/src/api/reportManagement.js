@@ -9,7 +9,7 @@ export const deleteReport = (reportId) => {
 export const sendReplyByEmail = (reportId, data) => {
   return axios.put(`/dashboard/reports/${reportId}/send-email`, data);
 };
-export const filterReports = (filterValue) => {
+export const filterReviewReports = (filterValue) => {
   return axios.get(`/dashboard/reports/filter`, {
     params: filterValue,
   });

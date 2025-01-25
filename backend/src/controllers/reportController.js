@@ -137,7 +137,7 @@ class reportController {
       return res.status(500).json({ error: error.message });
     }
   }
-  async filterReports(req, res) {
+  async filterReviewReports(req, res) {
     try {
       const { startDate, endDate, reason, status } = req.query;
       let filter = { reportType: { $regex: /^review$/i } };
