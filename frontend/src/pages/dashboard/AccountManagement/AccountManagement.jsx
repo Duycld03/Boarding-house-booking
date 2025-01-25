@@ -1,50 +1,149 @@
 import Table from "../../../component/Table";
 import { toast } from "react-toastify";
-import Loader from "../../../component/Loader";
 import { useEffect, useState } from "react";
 import { Button, ConfirmModal } from "../../../component";
+import {
+  getAllAccount,
+  deleteAccount,
+  filterAccount,
+} from "../../../api/AccountManagement";
+import convertTimetap from "../../../utils/convertTimetap";
+import { Avatar } from "antd";
+import DefaultAvatar from "../../../assets/images/none_avatar.png";
+import FilterAccount from "./FilterAccount";
 
 function AccountManagement() {
-  // Dữ liệu mẫu cho bảng
-  const data = [
-    {
-      _id: "1",
-      name: "John Doe",
-      age: 28,
-      address: "123 Main St, City, Country",
-    },
-    {
-      _id: "2",
-      name: "Jane Smith",
-      age: 34,
-      address: "456 Another St, City, Country",
-    },
-    {
-      _id: "3",
-      name: "Sam Johnson",
-      age: 40,
-      address: "789 Third St, City, Country",
-    },
-  ];
+  const [accountData, setAccountData] = useState([]);
+  const [currentRecord, setCurrentRecord] = useState(null);
+  const [filterValue, setFilterValue] = useState({
+    gender: null,
+    role: null,
+    startDate: null,
+    endDate: null,
+    status: null,
+  });
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await getAllAccount();
+      if (res) {
+        setAccountData(res);
+        console.log(res);
+      } else {
+        setAccountData([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch withdrawal requests:", error);
+      toast.error(
+        "Failed to fetch withdrawal requests. Please try again later."
+      );
+      setAccountData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterAccountData = async () => {
+    setLoading(true);
+    try {
+      const res = await filterAccount(filterValue);
+      if (Array.isArray(res)) {
+        setAccountData(res);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error) {
+      console.error("Failed to fetch filtered accounts:", error);
+      toast.error("Failed to fetch filtered accounts. Please try again later.");
+      setAccountData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //fetch account data
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  //Filter account data
+  useEffect(() => {
+    filterAccountData();
+  }, [filterValue]);
 
   // Các cột cho bảng
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Avatar",
+      dataIndex: "avatarImage",
+      key: "avatarImage",
+      render: (avatarImage) => {
+        const resolvedSrc = avatarImage
+          ? `http://localhost:3000/${avatarImage}`
+          : DefaultAvatar;
+        return (
+          <Avatar
+            src={resolvedSrc}
+            shape="circle"
+            size="large"
+            onError={(e) => (e.target.src = DefaultAvatar)}
+          />
+        );
+      },
     },
     {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
+      title: "Full Name",
+      dataIndex: "fullname",
+      key: "fullname",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt) => convertTimetap(createdAt),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          title={"Delete"}
+          onClick={() => {
+            handleToggleMobal();
+            setCurrentRecord(record);
+          }}
+          btnDelete
+        >
+          Delete
+        </Button>
+      ),
     },
   ];
+
+  useEffect(() => {
+    console.log("filter value: ", filterValue);
+  }, [filterValue]);
 
   const onProcessData = (combinedData) => {
     console.log("Processed Data: ", combinedData);
@@ -57,51 +156,39 @@ function AccountManagement() {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(!loading);
-    }, 1000);
-  }, []);
-
-  const handleMessage = () => {
-    toast.success("Add success");
+  const handleDelete = async () => {
+    try {
+      await deleteAccount(currentRecord._id);
+      fetchData();
+      handleToggleMobal();
+      toast.success("Delete account successful");
+    } catch (error) {
+      toast.error("Failed: ", error);
+    }
   };
 
   return (
     <div className="txt">
-      {loading ? (
-        <Loader />
-      ) : (
-        <>
-          <div className="flex justify-between">
-            <Button
-              btnDelete
-              title={"Delete account"}
-              size={"large"}
-              onClick={handleToggleMobal}
-            />
-            <Button
-              size="large"
-              onClick={handleMessage}
-              btnAdd
-              title="Add new user"
-            />
-          </div>
-          <div>
-            <Table
-              columns={columns}
-              data={data}
-              onRowClick={onProcessData}
-              loading={loading}
-            />
-          </div>
-          <ConfirmModal
-            onCancel={handleToggleMobal}
-            isOpen={isOpen}
-            content={"Do you want to add new?"}
+      <>
+        <div className="flex justify-between">
+          <Button size="large" btnAdd title="Add new" />
+          <FilterAccount setFilterValue={setFilterValue} />
+        </div>
+        <div>
+          <Table
+            columns={columns}
+            data={accountData}
+            onRowClick={onProcessData}
+            loading={loading}
           />
-        </>
-      )}
+        </div>
+        <ConfirmModal
+          onCancel={handleToggleMobal}
+          isOpen={isOpen}
+          onOk={handleDelete}
+          content={"Do you want to add new?"}
+        />
+      </>
     </div>
   );
 }

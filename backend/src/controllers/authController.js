@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import Account from "../models/account.js";
 import dotenv from "dotenv";
+import googleAuth from "google-auth-library";
+import Account from "../models/account.js";
 dotenv.config();
 
 // testing models
@@ -48,7 +49,7 @@ class AuthController {
 
   async login(req, res) {
     try {
-      const { username, password } = req.body;
+      const { username, password, remember } = req.body;
       const user = await Account.findOne({ username: username });
 
       if (!user) {
@@ -71,17 +72,13 @@ class AuthController {
         },
         process.env.JWT_SECRET,
         {
-          expiresIn: process.env.JWT_EXPIRE,
+          expiresIn: remember ? "7d" : process.env.JWT_EXPIRE,
         }
       );
 
       res.status(200).json({
         token,
-        user: {
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName,
-        },
+        user,
       });
     } catch (error) {
       console.log(error.message);
@@ -89,27 +86,27 @@ class AuthController {
     }
   }
 
-  async dashboardLogin(req, res) {
+  async loginWithGoogle(req, res) {
+    const { credential, clientId, remember } = req.body;
+    const client = new googleAuth.OAuth2Client({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+    });
     try {
-      const { username, password } = req.body;
-      const user = await Account.findOne({ username: username });
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      const user = await Account.findOne({ email: payload.email });
 
       if (!user) {
-        return res
-          .status(401)
-          .json({ message: "Username or Password is incorrect" });
+        return res.status(200).json({
+          isRegistered: false,
+          message: "User not registered. Please complete registration.",
+          user: payload,
+        });
       }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res
-          .status(401)
-          .json({ message: "Username or Password is incorrect" });
-      }
-
-      if (user.role !== "admin" && user.role !== "staff") {
-        return res.status(403).json({ message: "Forbidden" });
-      }
       const token = jwt.sign(
         {
           userId: user._id,
@@ -118,20 +115,16 @@ class AuthController {
         },
         process.env.JWT_SECRET,
         {
-          expiresIn: process.env.JWT_EXPIRE,
+          expiresIn: remember ? "7d" : process.env.JWT_EXPIRE,
         }
       );
-
       res.status(200).json({
         token,
-        user: {
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName,
-        },
+        user,
       });
     } catch (error) {
-      res.status(500).json({ message: "An unexpected error occurred" });
+      console.log(error.message);
+      res.status(401).json({ message: "Invalid Google Token" });
     }
   }
 }

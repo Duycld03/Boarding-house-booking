@@ -1,2 +1,1 @@
-export * from './authMiddleware.js';
-export * from './dashboardMiddleware.js';
+export * from "./authMiddleware.js";

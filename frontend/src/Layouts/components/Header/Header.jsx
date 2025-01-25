@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Layout,
   Menu,
@@ -16,15 +16,41 @@ import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../assets/images/Icon.svg";
 import UserAvatar from "../../../assets/images/none_avatar.png";
 import { MenuOutlined } from "@ant-design/icons";
+import { getUser } from "../../../api/authManagement";
 
 const cx = classNames.bind(Styles);
 const { useBreakpoint } = Grid;
 const { Header } = Layout;
 
-const CustomHeader = ({ isLoggedIn, isAdmin }) => {
+const CustomHeader = () => {
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const screens = useBreakpoint();
+
+  const checkUser = async () => {
+    try {
+      const res = await getUser();
+      if (res.role === "admin") {
+        setIsAdmin(true);
+      }
+      setIsLoggedIn(true);
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    setIsLoggedIn(false);
+    navigate("/");
+  };
+
+  useEffect(() => {
+    checkUser();
+  }, []);
 
   // Menu items for navigation
   const menuItems = [
@@ -45,9 +71,7 @@ const CustomHeader = ({ isLoggedIn, isAdmin }) => {
         {
           key: "logout",
           label: "Logout",
-          onClick: () => {
-            console.log("Logout clicked");
-          },
+          onClick: logout,
         },
       ]}
     />
@@ -201,9 +225,7 @@ const CustomHeader = ({ isLoggedIn, isAdmin }) => {
                     {
                       key: "logout",
                       label: "Logout",
-                      onClick: () => {
-                        console.log("Logout clicked");
-                      },
+                      onClick: logout,
                     },
                   ]}
                   style={{ border: "none" }}
