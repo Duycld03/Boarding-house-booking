@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { Form, Button, Checkbox, Card, Input, notification } from "antd";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../../api/authManagement";
+import { GoogleLogin } from "@react-oauth/google";
+import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
 
 function Login() {
   const navigate = useNavigate();
@@ -25,11 +27,41 @@ function Login() {
       if (role === "user" || role === "owner") {
         navigate("/");
       } else if (role === "admin") {
-        navigate("/dashboard");
+        navigate("/dashboard/account-management");
       }
     } catch (error) {
       showNotification(error.response.data.message);
       form.resetFields();
+    }
+  };
+  const checkUser = async () => {
+    try {
+      await getUser();
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const loginWithGoogleHandler = async (response) => {
+    try {
+      const remember = form.getFieldValue("remember");
+      const data = { ...response, remember };
+      const res = await loginWithGoogle(data);
+
+      if (res.isRegistered) {
+        localStorage.setItem("access_token", res.token);
+        navigate("/");
+      } else {
+        // navigate("/register", { state: { user: res.user } });
+        console.log("User not registered");
+      }
+    } catch (error) {
+      showNotification(error.response.data.message);
     }
   };
 
@@ -84,7 +116,6 @@ function Login() {
             >
               <Input.Password size="large" placeholder="Enter your password" />
             </Form.Item>
-
             <Form.Item name="remember" valuePropName="checked">
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
@@ -102,6 +133,14 @@ function Login() {
               >
                 Login
               </Button>
+            </Form.Item>
+            <Form.Item>
+              <GoogleLogin
+                onSuccess={loginWithGoogleHandler}
+                onError={() => {
+                  console.log("error");
+                }}
+              />
             </Form.Item>
           </Form>
         </Card>
