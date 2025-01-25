@@ -1,7 +1,7 @@
 import axios from './axios.config';
 
 export const getReviewReports = () => {
-  return axios.get('/dashboard/review-reports');
+  return axios.get('/dashboard/reviewreports');
 };
 export const deleteReport = (reportId) => {
   return axios.delete(`/dashboard/reports/${reportId}`);
