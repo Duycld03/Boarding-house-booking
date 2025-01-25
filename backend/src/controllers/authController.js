@@ -40,9 +40,29 @@ class AuthController {
         return res.status(422).json({ message: "Account creation failed" });
       }
 
-      res.status(201).json(user);
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          username: user.username,
+          role: user.role,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: process.env.JWT_EXPIRE,
+        }
+      );
+
+      res.status(201).json({
+        token,
+        user,
+      });
     } catch (error) {
       console.log(error.message);
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message: "Username or Email or Phone Number already exist!",
+        });
+      }
       res.status(500).json({ message: "An unexpected error occurred" });
     }
   }
