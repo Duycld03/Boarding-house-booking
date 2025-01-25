@@ -22,6 +22,7 @@ adminRouter.delete(
   '/reviewreports/:reviewReportId',
   reportController.softDeleteReport
 );
+adminRouter.put('/reports/:reviewReportId/status', reportController.updateReportStatus);
 
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard)
 

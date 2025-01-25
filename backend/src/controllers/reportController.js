@@ -41,6 +41,24 @@ class reportController {
       return res.status(500).json({ error: error.message });
     }
   }
+  async updateReportStatus(req, res) {
+    try {
+      const { reviewReportId } = req.params;
+      const { status, processedBy } = req.body;
+
+      const report = await Report.findByIdAndUpdate(
+        reviewReportId,
+        { status, processedBy },
+        { new: true }
+      );
+      if (!report) {
+        return res.status(404).json({ error: 'Report not found' });
+      }
+      return res.status(200).json({ message: 'Report status updated successfully', report });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 export default new reportController();

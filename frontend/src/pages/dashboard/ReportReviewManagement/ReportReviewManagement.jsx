@@ -1,132 +1,144 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   TableCustom as Table,
   Button,
   ConfirmModal,
   Loader,
-} from '../../../component';
-import { toast } from 'react-toastify';
-import { Tag } from 'antd';
+} from "../../../component";
+import { toast } from "react-toastify";
+import { Tag } from "antd";
 import {
   getReviewReports,
-  deleteReviewReport,
-} from '../../../api/reportManagement';
-import convertTimetap from '../../../utils/convertTimetap';
+  updateReportStatus,
+} from "../../../api/reportManagement";
+import convertTimetap from "../../../utils/convertTimetap";
 
 function ReportReviewManagement() {
-  const [data, setData] = useState([]); // Initializing with an empty array
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [isOpenConfirmModal, setIsOpenConfirmModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [actionType, setActionType] = useState("");
 
   // Fetch data from the API
   const fetchData = async () => {
+    setLoading(true);
     try {
       const res = await getReviewReports();
-      if (res) {
-        setData(res);
-      } else {
-        setData([]);
-      }
+      setData(res || []);
     } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
-      toast.error(
-        'Failed to fetch withdrawal requests. Please try again later.'
-      );
+      console.error("Failed to fetch review reports:", error);
+      toast.error("Failed to fetch review reports. Please try again later.");
       setData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Call fetchData on component mount
   useEffect(() => {
-    setLoading(true);
-    fetchData().finally(() => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    });
+    fetchData();
   }, []);
 
-  // Define columns for the Table component
+  const statusColors = {
+    resolved: "green",
+    rejected: "red",
+  };
+
+  const handleOpenConfirmModal = (record, type) => {
+    setSelectedRequest(record);
+    setActionType(type);
+    setIsOpenConfirmModal(true);
+  };
+  // Fetch data from the API
+  const handleConfirmAction = async () => {
+    if (!selectedRequest) return;
+    try {
+      await updateReportStatus(selectedRequest._id, actionType);
+      setData(
+        data.map((item) =>
+          item._id === selectedRequest._id
+            ? { ...item, status: actionType }
+            : item
+        )
+      );
+      toast.success(
+        actionType === "rejected"
+          ? "Report rejected successfully!"
+          : "Report processed successfully!"
+      );
+    } catch (error) {
+      console.error("Failed to update report status:", error);
+      toast.error("Failed to update report status. Please try again later.");
+    } finally {
+      setIsOpenConfirmModal(false);
+      setSelectedRequest(null);
+      setActionType("");
+    }
+  };
+
   const columns = [
     {
-      title: 'Reporter',
-      dataIndex: 'reporter',
-      key: 'reporter',
-      render: (reporter) => reporter?.fullname || 'N/A',
+      title: "Reporter",
+      dataIndex: "reporter",
+      key: "reporter",
+      render: (reporter) => reporter?.fullname || "N/A",
     },
     {
-      title: 'Reason',
-      dataIndex: 'reason',
-      key: 'reason',
+      title: "Reason",
+      dataIndex: "reason",
+      key: "reason",
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        const statusColors = {
-          pending: 'orange',
-          'in progress': 'blue',
-          resolved: 'green',
-          rejected: 'red',
-        };
-        return <Tag color={statusColors[status.toLowerCase()]}>{status}</Tag>;
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag color={statusColors[status.toLowerCase()]}>{status}</Tag>
+      ),
+    },
+    {
+      title: "Created at",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt) => {
+        // Format the timestamp or return "Invalid date" if formatting fails
+        try {
+          return convertTimetap(createdAt);
+        } catch (error) {
+          console.error("Error formatting createdAt:", error);
+          return "Invalid date";
+        }
       },
     },
     {
-      title: 'Created at',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (createdAt) => convertTimetap(createdAt), // Format timestamp
+      title: "Processed by",
+      dataIndex: "processedBy",
+      key: "processedBy",
+      render: (processedBy) => processedBy?.fullname || "N/A",
     },
     {
-      title: 'Processed by',
-      dataIndex: 'processedBy',
-      key: 'processedBy',
-      render: (processedBy) => processedBy?.fullname || 'N/A',
-    },
-    {
-      title: 'Action',
+      title: "Action",
+      key: "action",
       render: (record) => (
-        <Button
-          title={'Delete'}
-          btnDelete
-          className="btn-delete"
-          onClick={() => handleDeleteModal(record)}
-        />
+        <div className="flex space-x-4">
+          <Button
+            btnDelete
+            title="Reject"
+            size="medium"
+            className="px-4 py-2 text-base"
+            onClick={() => handleOpenConfirmModal(record, "rejected")}
+          />
+          <Button
+            btnRestore
+            title="Process"
+            size="medium"
+            className="px-4 py-2 text-base"
+            onClick={() => handleOpenConfirmModal(record, "resolved")}
+          />
+        </div>
       ),
     },
   ];
-
-  // Handle opening the delete modal
-  const handleDeleteModal = (record) => {
-    setSelectedRequest(record);
-    setIsOpenDeleteModal(true);
-  };
-
-  // Handle deleting a report
-  const handleDelete = async () => {
-    if (!selectedRequest) return;
-
-    try {
-      // Call the delete API
-      await deleteReviewReport(selectedRequest._id);
-
-      // Remove the deleted report from the state
-      setData(data.filter((item) => item._id !== selectedRequest._id));
-
-      // Show success notification
-      toast.success('Review report deleted successfully.');
-    } catch (error) {
-      console.error('Failed to delete review report:', error);
-      toast.error('Failed to delete review report. Please try again later.');
-    } finally {
-      // Close the modal and reset selectedRequest
-      setIsOpenDeleteModal(false);
-      setSelectedRequest(null);
-    }
-  };
 
   return (
     <div className="txt">
@@ -137,18 +149,20 @@ function ReportReviewManagement() {
           <div className="flex justify-between mb-4">
             <Button
               btnFilter
-              size="large"
-              onClick={() => toast.success('Filter success')}
-              title={'Filter'}
+              title="Filter"
+              size="medium"
+              className="px-4 py-2 text-base"
+              onClick={() => toast.success("Filter success")}
             />
           </div>
-          <Table columns={columns} data={data} loading={loading} />
+          <Table columns={columns} data={data} />
           <ConfirmModal
-            title="Confirm Deletion"
-            content="Do you want to delete this review report?"
-            onOk={handleDelete}
-            onCancel={() => setIsOpenDeleteModal(false)}
-            isOpen={isOpenDeleteModal}
+            title="Confirm Action"
+            content={`Are you sure you want to ${actionType === "rejected" ? "reject" : "process"
+              } this report?`}
+            isOpen={isOpenConfirmModal}
+            onOk={handleConfirmAction}
+            onCancel={() => setIsOpenConfirmModal(false)}
           />
         </>
       )}
