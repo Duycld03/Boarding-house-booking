@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import { Form, Button, Checkbox, Card, Input, notification } from "antd";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../../api/authManagement";
+import { login, getUser } from "../../../api/authManagement";
 
 function Login() {
   const navigate = useNavigate();
@@ -25,13 +26,25 @@ function Login() {
       if (role === "user" || role === "owner") {
         navigate("/");
       } else if (role === "admin") {
-        navigate("/dashboard");
+        navigate("/dashboard/account-management");
       }
     } catch (error) {
       showNotification(error.response.data.message);
       form.resetFields();
     }
   };
+  const checkUser = async () => {
+    try {
+      await getUser();
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    checkUser();
+  }, []);
 
   return (
     <>
