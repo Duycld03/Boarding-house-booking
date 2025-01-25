@@ -1,12 +1,8 @@
 import { Router } from 'express';
 
 import {
-  withdrawalRequestsController, BoardingHouseController,
-
-
-
-
-  AccountController
+  BoardingHouseController,
+  withdrawalRequestsController
 } from '../controllers/index.js';
 
 const adminRouter = Router();
@@ -17,12 +13,6 @@ adminRouter.get(
 );
 
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard)
-
-//Account
-adminRouter.get('/account', AccountController.getAllAccount)
-adminRouter.delete('/account/:accountId', AccountController.softDeleteAccount)
-adminRouter.get('/account/filter', AccountController.filterAccounts);
-
 
 
 
