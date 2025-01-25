@@ -1,23 +1,31 @@
-import { Router } from "express";
+import { Router } from 'express';
 
 import {
+
   withdrawalRequestsController,
-  reportController,
+  AccountController,
   BoardingHouseController,
-} from "../controllers/index.js";
+  reportController,
+
+} from '../controllers/index.js';
 
 const adminRouter = Router();
 
 adminRouter.get(
-  "/withdrawRequests",
+  '/withdrawRequests',
   withdrawalRequestsController.getWithdrawRequests
 );
-adminRouter.get("/review-reports", reportController.getReviewReports);
+adminRouter.get('/reviewreports', reportController.getReviewReports);
 adminRouter.delete(
-  "/review-reports/:reviewReportId",
+  '/reviewreports/:reviewReportId',
   reportController.softDeleteReport
 );
 
-adminRouter.get("/boardinghouse", BoardingHouseController.getAllBHOnDashBoard);
+adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard)
+
+//Account
+adminRouter.get('/account', AccountController.getAllAccount)
+adminRouter.delete('/account/:accountId', AccountController.softDeleteAccount)
+adminRouter.get('/account/filter', AccountController.filterAccounts);
 
 export { adminRouter };
