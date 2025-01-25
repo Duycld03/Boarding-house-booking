@@ -118,6 +118,14 @@ function Login() {
                 placeholder="Enter your password"
                 autoComplete="current-password"
               />
+              <p className="text-right">
+                <span
+                  className="text-blue-500 cursor-pointer"
+                  onClick={() => navigate("/forgot-password")}
+                >
+                  Forgot password?
+                </span>
+              </p>
             </Form.Item>
             <Form.Item name="remember" valuePropName="checked">
               <Checkbox>Remember me</Checkbox>
@@ -146,6 +154,15 @@ function Login() {
               />
             </Form.Item>
           </Form>
+          <p className="text-center">
+            Don't have an account?{" "}
+            <span
+              className="text-blue-500 cursor-pointer"
+              onClick={() => navigate("/register")}
+            >
+              Register
+            </span>
+          </p>
         </Card>
       </div>
     </>
