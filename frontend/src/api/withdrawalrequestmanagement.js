@@ -1,5 +1,5 @@
-import axios from './axios.config';
+import axios from "./axios.config";
 
 export const getWithdrawRequests = () => {
-  return axios.get('/admin/withdrawRequests');
+  return axios.get("/dashboard/withdrawRequests");
 };
