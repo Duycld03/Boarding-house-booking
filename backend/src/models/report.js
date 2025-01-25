@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import mongooseDelete from 'mongoose-delete';
 
 const ReportSchema = new mongoose.Schema(
   {
@@ -8,31 +9,41 @@ const ReportSchema = new mongoose.Schema(
     },
     targetId: {
       type: mongoose.Schema.Types.ObjectId,
-      require: true,
+      required: true,
     },
     reporter: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
-      require: true,
+      ref: 'Account',
+      required: true,
     },
     reason: {
       type: String,
-      require: true,
+      required: true,
     },
     details: {
       type: String,
-      require: true,
+      required: true,
     },
     status: {
       type: String,
     },
     processedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
+      ref: 'Account',
     },
+    images: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true }
 );
 
-const Report = mongoose.model("Report", ReportSchema);
+// Add mongoose-delete plugin without 'deletedAt'
+ReportSchema.plugin(mongooseDelete, {
+  overrideMethods: 'all',
+});
+
+const Report = mongoose.model('Report', ReportSchema);
 export default Report;
