@@ -1,8 +1,8 @@
-import axios from "./axios.config";
+import axios from './axios.config';
 
 export const getReviewReports = () => {
-  return axios.get("/dashboard/review-reports");
+  return axios.get('/admin/reviewreports');
 };
 export const deleteReviewReport = (reviewReportId) => {
-  return axios.delete(`/dashboard/review-reports/${reviewReportId}`);
+  return axios.delete(`/admin/reviewreports/${reviewReportId}`);
 };

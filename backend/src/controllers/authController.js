@@ -48,7 +48,7 @@ class AuthController {
 
   async login(req, res) {
     try {
-      const { username, password, remember } = req.body;
+      const { username, password } = req.body;
       const user = await Account.findOne({ username: username });
 
       if (!user) {
@@ -71,16 +71,66 @@ class AuthController {
         },
         process.env.JWT_SECRET,
         {
-          expiresIn: remember ? "7d" : process.env.JWT_EXPIRE,
+          expiresIn: process.env.JWT_EXPIRE,
         }
       );
 
       res.status(200).json({
         token,
-        user,
+        user: {
+          username: user.username,
+          email: user.email,
+          fullName: user.fullName,
+        },
       });
     } catch (error) {
       console.log(error.message);
+      res.status(500).json({ message: "An unexpected error occurred" });
+    }
+  }
+
+  async dashboardLogin(req, res) {
+    try {
+      const { username, password } = req.body;
+      const user = await Account.findOne({ username: username });
+
+      if (!user) {
+        return res
+          .status(401)
+          .json({ message: "Username or Password is incorrect" });
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res
+          .status(401)
+          .json({ message: "Username or Password is incorrect" });
+      }
+
+      if (user.role !== "admin" && user.role !== "staff") {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          username: user.username,
+          role: user.role,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: process.env.JWT_EXPIRE,
+        }
+      );
+
+      res.status(200).json({
+        token,
+        user: {
+          username: user.username,
+          email: user.email,
+          fullName: user.fullName,
+        },
+      });
+    } catch (error) {
       res.status(500).json({ message: "An unexpected error occurred" });
     }
   }
