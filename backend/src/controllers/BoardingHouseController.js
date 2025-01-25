@@ -7,9 +7,10 @@ class BoardingHouseController {
             ).populate('boardingHouseType')
                 .populate({
                     path: 'ownerId',
-                });
+                }).sort({ createdAt: 1 })
 
-            return res.status(200).json(boardingHData.sort());
+
+            return res.status(200).json(boardingHData);
         } catch (error) {
             console.error('Error fetching boarding house data:', error);
             return res.status(500).json({
