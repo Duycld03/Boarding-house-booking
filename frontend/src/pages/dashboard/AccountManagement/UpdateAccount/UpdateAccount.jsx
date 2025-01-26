@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Form, Select, Modal, Input, DatePicker, Tag, Avatar } from "antd";
-import { Button, ConfirmModal } from "../../../../component";
+import { Button } from "../../../../component";
 import { toast } from "react-toastify";
 import moment from "moment";
 import formatAmount from "../../../../utils/formatAmount";
@@ -10,12 +10,7 @@ const { Option } = Select;
 const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
 
   useEffect(() => {
     if (accountData) {
