@@ -1,40 +1,27 @@
 import { Form, Button, Card, Input, Select, notification } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { getUser, sendOTPRegister } from "../../../api/authManagement";
+import { register, getUser } from "../../../api/authManagement";
 
-function Register() {
+function RegisterWithGoogle() {
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const showErrorNotification = (description) => {
+  const showNotification = (description) => {
     api.error({
       message: "Register Failed",
       description: description || "An unexpected error occurred",
     });
   };
-
-  const showSuccessfulNotification = (description) => {
-    api.success({
-      message: "Register Successfully",
-      description: description,
-      duration: 2,
-    });
-  };
   const onFinish = async (values) => {
     try {
-      const res = await sendOTPRegister(values);
-      showSuccessfulNotification(res.message);
-
-      // After 2 seconds, navigate to verify-register page
-      setTimeout(() => {
-        navigate("/verify-register", {
-          state: { account: res.account, verifyToken: res.verifyToken },
-        });
-      }, 2000);
+      const res = await register(values);
+      localStorage.setItem("access_token", res.token);
+      navigate("/");
     } catch (error) {
-      showErrorNotification(error?.response?.data?.message);
+      showNotification(error.response.data.message);
     }
   };
 
@@ -47,6 +34,15 @@ function Register() {
 
   useEffect(() => {
     checkUser();
+  }, []);
+
+  useEffect(() => {
+    if (!location?.state?.user) {
+      return navigate("/");
+    }
+    const user = location?.state?.user;
+    user.fullname = user.name;
+    form.setFieldsValue(user);
   }, []);
 
   return (
@@ -63,7 +59,7 @@ function Register() {
             className={"font-body text-4xl font-bold"}
             style={{ textAlign: "center", marginBottom: "20px" }}
           >
-            Register
+            Register With Google
           </h2>
           <Form
             form={form}
@@ -90,6 +86,7 @@ function Register() {
             </Form.Item>
 
             <Form.Item
+              hidden
               label="Email"
               name="email"
               rules={[
@@ -227,4 +224,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default RegisterWithGoogle;
