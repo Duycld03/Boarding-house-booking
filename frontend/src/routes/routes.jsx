@@ -8,6 +8,7 @@ import {
   WithdrawalRequestManagement,
   Contact,
   AboutUs,
+  ReviewManagement,
   Register,
   RegisterWithGoogle,
   VerifyRegister,
@@ -82,6 +83,12 @@ const routes = [
   {
     path: `${dashBoard}/withdrawal-requests-management`,
     page: WithdrawalRequestManagement,
+    layout: null,
+  },
+
+  {
+    path: `${dashBoard}/list-boarding-house-reviews`,
+    page: ReviewManagement,
     layout: null,
   },
 ];
