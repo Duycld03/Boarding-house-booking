@@ -4,6 +4,7 @@ import { Button } from "../../../../component";
 import { toast } from "react-toastify";
 import moment from "moment";
 import formatAmount from "../../../../utils/formatAmount";
+import DefaultAccount from "../../../../assets/images/none_avatar.png";
 
 const { Option } = Select;
 
@@ -91,7 +92,11 @@ const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
         left-1/2 transform -translate-x-1/2"
         >
           <Avatar
-            src={`http://localhost:3000/${accountData?.avatarImage}`}
+            src={
+              accountData?.avatarImage
+                ? `http://localhost:3000/${accountData.avatarImage}`
+                : DefaultAccount
+            }
             alt="Avatar"
             size="large"
             shape="circle"
