@@ -1,4 +1,4 @@
-import { Login, Register, RegisterWithGoogle } from "./auth";
+import { Login, Register, RegisterWithGoogle, VerifyRegister } from "./auth";
 import { AboutUs, Home, Contact } from "./common";
 
 import {
@@ -14,6 +14,7 @@ export {
   Login,
   Register,
   RegisterWithGoogle,
+  VerifyRegister,
 
   //common
   AboutUs,

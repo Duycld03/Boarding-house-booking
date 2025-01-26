@@ -1,26 +1,40 @@
 import { Form, Button, Card, Input, Select, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { register, getUser } from "../../../api/authManagement";
+import { getUser, sendOTPRegister } from "../../../api/authManagement";
 
 function Register() {
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
 
-  const showNotification = (description) => {
+  const showErrorNotification = (description) => {
     api.error({
       message: "Register Failed",
       description: description || "An unexpected error occurred",
     });
   };
+
+  const showSuccessfulNotification = (description) => {
+    api.success({
+      message: "Register Successfully",
+      description: description,
+      duration: 2,
+    });
+  };
   const onFinish = async (values) => {
     try {
-      const res = await register(values);
-      localStorage.setItem("access_token", res.token);
-      navigate("/");
+      const res = await sendOTPRegister(values);
+      showSuccessfulNotification(res.message);
+
+      // After 2 seconds, navigate to verify-register page
+      setTimeout(() => {
+        navigate("/verify-register", {
+          state: { account: res.account, verifyToken: res.verifyToken },
+        });
+      }, 2000);
     } catch (error) {
-      showNotification(error.response.data.message);
+      showErrorNotification(error?.response?.data?.message);
     }
   };
 

@@ -12,6 +12,14 @@ export const register = (data) => {
   return axios.post("/register", data);
 };
 
+export const sendOTPRegister = (data) => {
+  return axios.post("/send-otp-register", data);
+};
+
+export const verifyRegister = (data) => {
+  return axios.post("/verify-register", data);
+};
+
 export const getUser = () => {
   return axios.get("auth/user");
 };

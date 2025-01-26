@@ -10,6 +10,7 @@ import {
   AboutUs,
   Register,
   RegisterWithGoogle,
+  VerifyRegister,
 } from "../pages";
 import { AuthLayout, HeaderOnly } from "../Layouts";
 
@@ -31,6 +32,11 @@ const routes = [
   {
     path: "/register-with-google",
     page: RegisterWithGoogle,
+    layout: AuthLayout,
+  },
+  {
+    path: "/verify-register",
+    page: VerifyRegister,
     layout: AuthLayout,
   },
 
