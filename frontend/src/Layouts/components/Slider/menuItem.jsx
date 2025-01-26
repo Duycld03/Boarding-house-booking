@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCreditCard,
   faClipboardList,
+  faCalendarCheck
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import {
@@ -71,7 +72,7 @@ const menuItems = [
         Review Management
       </Link>
     ),
-    icon: <FontAwesomeIcon icon={faCreditCard} />,
+    icon: <FontAwesomeIcon icon={faCalendarCheck} />,
   },
 ];
 
