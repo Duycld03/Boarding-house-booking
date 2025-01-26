@@ -136,6 +136,8 @@ function Login() {
                 placeholder="Enter your password"
                 autoComplete="current-password"
               />
+            </Form.Item>
+            <div>
               <p className="text-right">
                 <span
                   className="text-blue-500 cursor-pointer"
@@ -145,7 +147,7 @@ function Login() {
                   Forgot password?
                 </span>
               </p>
-            </Form.Item>
+            </div>
             <Form.Item name="remember" valuePropName="checked">
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
