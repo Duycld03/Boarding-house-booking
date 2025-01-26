@@ -1,71 +1,76 @@
-import { useState } from "react";
-import { DatePicker, Form, Select } from "antd";
-import moment from "moment";
-import ButtonCustom from "../../../component/Button";
-import { toast } from "react-toastify";
+import { useState } from 'react';
+import { DatePicker, Form, Select } from 'antd';
+import { toast } from 'react-toastify';
+import ButtonCustom from '../../../component/Button';
+import convertTimetap from '../../../utils/convertTimetap'; // Import convertTimetap
 const { Option } = Select;
-function FilterAccount({ setFilterValue }) {
+
+function FilterReport({ setFilterValue }) {
   const [isOpen, setIsOpen] = useState(false);
-  // State for each filter field
-  const [gender, setGender] = useState(null);
-  const [role, setRole] = useState(null);
+  const [reason, setReason] = useState(null);
   const [status, setStatus] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  // Handle filter button click to toggle dropdown visibility
+
   const handleFilterClick = () => {
     setIsOpen(!isOpen);
   };
+
   const [form] = Form.useForm();
-  // Handle submitting the filter form
+
   const handleSubmit = (values) => {
     const { startDate, endDate } = values;
 
+    if (startDate && endDate) {
+      const startDateObj = new Date(startDate);
+      const endDateObj = new Date(endDate);
+
+      // Check if startDate is later than endDate
+      if (startDateObj > endDateObj) {
+        toast.error('Start date cannot be later than end date.');
+        return;
+      }
+    }
+
     if (startDate && !endDate) {
-      toast.error("Please select an end date.");
+      toast.error('Please select an end date.');
       return;
     }
 
     if (endDate && !startDate) {
-      toast.error("Please select a start date.");
+      toast.error('Please select a start date.');
       return;
     }
 
-    if (startDate && endDate && startDate.isAfter(endDate)) {
-      toast.error("Start date cannot be later than end date.");
-      return;
-    }
     setFilterValue({
-      gender: values.gender || "",
-      role: values.role || "",
-      status: values.status || "",
-      startDate: startDate || "",
-      endDate: endDate || "",
+      reason: values.reason || '',
+      status: values.status || '',
+      startDate: startDate ? convertTimetap(startDate) : '',
+      endDate: endDate ? convertTimetap(endDate) : '',
     });
   };
-  // Clear all filter inputs and reset state
+
   const handleClear = () => {
-    setGender("");
-    setRole(null);
+    setReason(null);
     setStatus(null);
     setStartDate(null);
     setEndDate(null);
     setFilterValue({
-      gender: "",
-      role: "",
-      status: "",
-      startDate: "",
-      endDate: "",
+      reason: '',
+      status: '',
+      startDate: '',
+      endDate: '',
     });
     form.resetFields();
   };
+
   return (
     <div className="relative inline-block text-left">
       <div>
         <ButtonCustom
           onClick={handleFilterClick}
           size="large"
-          title={"Filter"}
+          title={'Filter'}
           btnFilter
         ></ButtonCustom>
       </div>
@@ -77,29 +82,22 @@ function FilterAccount({ setFilterValue }) {
             layout="vertical"
             className="py-2 px-4"
           >
-            <Form.Item label="Gender" name="gender" className="mb-2">
+            <Form.Item label="Reason" name="reason" className="mb-2">
               <Select
-                value={gender}
-                placeholder="Select gender"
-                onChange={setGender}
+                value={reason}
+                placeholder="Select reason"
+                onChange={setReason}
                 allowClear
               >
-                <Option value="male">Male</Option>
-                <Option value="female">Female</Option>
-                <Option value="other">Other</Option>
+                <Option value="Spam">Spam</Option>
+                <Option value="Misleading information">
+                  Misleading information
+                </Option>
+                <Option value="Privacy violation">Privacy violation</Option>
+                <Option value="Inappropriate content">
+                  Inappropriate content.
+                </Option>
               </Select>
-            </Form.Item>
-            <Form.Item label="Role" name="role" className="mb-2">
-              <Select
-                value={role} // Controlled value
-                placeholder="Select role"
-                onChange={setRole}
-                options={[
-                  { label: "User", value: "user" },
-                  { label: "Owner", value: "owner" },
-                ]}
-                allowClear
-              />
             </Form.Item>
             <Form.Item label="Status" name="status" className="mb-2">
               <Select
@@ -108,14 +106,15 @@ function FilterAccount({ setFilterValue }) {
                 onChange={setStatus}
                 allowClear
               >
-                <Option value="active">Active</Option>
-                <Option value="inactive">Inactive</Option>
+                <Option value="pending">pending</Option>
+                <Option value="resolved">resolved</Option>
+                <Option value="rejected">rejected</Option>
               </Select>
             </Form.Item>
             <Form.Item label="Start Date" name="startDate" className="mb-2">
               <DatePicker
                 className="w-full"
-                value={startDate ? moment(startDate) : null}
+                value={startDate ? convertTimetap(startDate) : null}
                 onChange={(date) => setStartDate(date)}
                 format="DD-MM-YYYY"
                 allowClear
@@ -124,7 +123,7 @@ function FilterAccount({ setFilterValue }) {
             <Form.Item label="End Date" name="endDate" className="mb-2">
               <DatePicker
                 className="w-full"
-                value={endDate ? moment(endDate) : null}
+                value={endDate ? convertTimetap(endDate) : null}
                 onChange={(date) => setEndDate(date)}
                 format="DD-MM-YYYY"
                 allowClear
@@ -134,14 +133,13 @@ function FilterAccount({ setFilterValue }) {
               <div className="flex justify-between">
                 <ButtonCustom
                   btnFilter
-                  ButtonCustom
                   size="large"
                   htmlType="submit"
-                  className={"flex-1 w-40"}
+                  className={'flex-1 w-40'}
                 />
                 <ButtonCustom
                   onClick={handleClear}
-                  className={"flex-1 w-40"}
+                  className={'flex-1 w-40'}
                   btnDelete
                   size="large"
                 />
@@ -153,4 +151,5 @@ function FilterAccount({ setFilterValue }) {
     </div>
   );
 }
-export default FilterAccount;
+
+export default FilterReport;

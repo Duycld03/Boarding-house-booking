@@ -37,10 +37,10 @@ function RegisterWithGoogle() {
   }, []);
 
   useEffect(() => {
-    if (!location.state.user) {
+    if (!location?.state?.user) {
       return navigate("/");
     }
-    const user = location.state.user;
+    const user = location?.state?.user;
     user.fullname = user.name;
     form.setFieldsValue(user);
   }, []);

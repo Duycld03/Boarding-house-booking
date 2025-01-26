@@ -33,9 +33,115 @@ class AuthController {
     res.status(200).json(user);
   }
 
+  async sendOTPRegister(req, res) {
+    try {
+      const account = req.body;
+
+      const existingUser = await Account.findOne({
+        $or: [
+          { email: account.email },
+          { username: account.username },
+          { phoneNumber: account.phoneNumber },
+        ],
+      });
+
+      if (existingUser) {
+        return res.status(409).json({
+          message: "Email or Username or Phone Number already exists",
+        });
+      }
+
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      const verifyToken = jwt.sign({ otp }, process.env.JWT_SECRET, {
+        expiresIn: "10m",
+      });
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "todohongy@gmail.com",
+          pass: "crdr lghi jfmd gjkv",
+        },
+      });
+      const mailOptions = {
+        from: "support@example.com",
+        to: account.email,
+        subject: "Mã OTP xác minh tài khoản của bạn",
+        html: `
+  <p>Kính gửi Anh/Chị ${account.fullname},</p>
+  <p>Chúng tôi đã nhận được yêu cầu xác minh tài khoản của bạn trên nền tảng XYZ.</p>
+  <p>Mã OTP của bạn là:</p>
+  <h2 style="color: #2a7ae4; text-align: center;">${otp}</h2>
+  <p>Lưu ý: Mã OTP này có hiệu lực trong vòng 5 phút. Vui lòng không chia sẻ mã này với bất kỳ ai.</p>
+  <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
+  <p>Nếu bạn cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi qua email <a href="mailto:support@example.com">support@example.com</a> hoặc số điện thoại 0123-456-789.</p>
+  <p>Trân trọng,<br>
+  Đội ngũ Hỗ trợ Nền tảng XYZ<br>
+  Email: <a href="mailto:support@example.com">support@example.com</a><br>
+  Hotline: 0123-456-789</p>
+  `,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      res.status(200).json({
+        verifyToken,
+        account,
+        message: "OTP sent successfully, please check your email.",
+      });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json({ message: "An unexpected error occurred" });
+    }
+  }
+
   async register(req, res) {
     try {
       const user = new Account(req.body);
+      user.password = await bcrypt.hash(user.password, 10);
+      const createdAccount = await user.save();
+      if (!createdAccount) {
+        return res.status(422).json({ message: "Account creation failed" });
+      }
+
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          username: user.username,
+          role: user.role,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: process.env.JWT_EXPIRE,
+        }
+      );
+
+      delete user.password;
+      res.status(201).json({
+        token,
+        user,
+      });
+    } catch (error) {
+      console.log(error.message);
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message: "Username or Email or Phone Number already exist!",
+        });
+      }
+      res.status(500).json({ message: "An unexpected error occurred" });
+    }
+  }
+
+  async verifyRegister(req, res) {
+    try {
+      const { verifyToken, otp, account } = req.body;
+
+      const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET);
+      if (decoded.otp != otp) {
+        return res.status(400).json({ message: "Invalid OTP" });
+      }
+
+      const user = new Account(account);
       user.password = await bcrypt.hash(user.password, 10);
       const createdAccount = await user.save();
       if (!createdAccount) {

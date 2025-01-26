@@ -1,31 +1,39 @@
-import { Login, Register, RegisterWithGoogle } from "./auth";
-import { AboutUs, Home, Contact } from "./common";
+import { Login, Register, RegisterWithGoogle, VerifyRegister } from "./auth";
+import { AboutUs, Home, Contact } from './common'
 
 import {
-  BoardingHouseManagement,
-  ReportReviewManagement,
-  ReportBoardingHouse,
-  WithdrawalRequestManagement,
-  AccountManagement,
-} from "./dashboard";
+    BoardingHouseManagement,
+    ReportReviewManagement,
+    ReportBoardingHouse,
+    WithdrawalRequestManagement,
+    AccountManagement,
+    ReviewManagement
+} from './dashboard'
+
+
+
 
 export {
-  //auth
-  Login,
-  Register,
-  RegisterWithGoogle,
 
-  //common
-  AboutUs,
-  Contact,
-  Home,
+    //auth
+    Login,
+    Register,
+    RegisterWithGoogle,
+    VerifyRegister,
 
-  // owner
+    //common
+    AboutUs,
+    Contact,
+    Home,
 
-  //dashboard
-  BoardingHouseManagement,
-  AccountManagement,
-  ReportBoardingHouse,
-  ReportReviewManagement,
-  WithdrawalRequestManagement,
-};
+    // owner
+
+
+    //dashboard
+    BoardingHouseManagement,
+    AccountManagement,
+    ReportBoardingHouse,
+    ReportReviewManagement,
+    WithdrawalRequestManagement,
+    ReviewManagement
+}
