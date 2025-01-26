@@ -122,6 +122,12 @@ function ReportReviewManagement() {
       render: (createdAt) => convertTimetap(createdAt),
     },
     {
+      title: 'Processed Date',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (updatedAt) => convertTimetap(updatedAt),
+    },
+    {
       title: 'Action',
       render: (record) => (
         <div className="flex gap-2">
