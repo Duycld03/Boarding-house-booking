@@ -36,9 +36,7 @@ function VerifyRegister() {
     try {
       await getUser();
       navigate("/");
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
