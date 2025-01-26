@@ -22,7 +22,7 @@ adminRouter.delete(
   '/reviewreports/:reviewReportId',
   reportController.softDeleteReport
 );
-adminRouter.get('/listReviews', ReviewController.getReviews);
+adminRouter.get('/reviews', ReviewController.getReviews);
 
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard)
 
