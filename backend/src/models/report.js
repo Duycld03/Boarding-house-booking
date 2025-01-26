@@ -5,7 +5,7 @@ const ReportSchema = new mongoose.Schema(
   {
     reportType: {
       type: String,
-      enum: ['Review', 'BoardingHouse'],
+      enum: ['review', 'boardingHouse'],
       required: true,
     },
     targetId: {
