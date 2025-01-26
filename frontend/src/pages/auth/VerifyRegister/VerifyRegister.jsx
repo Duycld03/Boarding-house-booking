@@ -1,17 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Form, Button, Card, Input } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getUser, verifyRegister } from "../../../api/authManagement";
 import { toast } from "react-toastify";
+import { getUser, verifyRegister } from "../../../api/authManagement";
+import { Back } from "../../../component";
 
 function VerifyRegister() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
 
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
     try {
+      setLoading(true);
       const data = {
         ...values,
         account: location?.state?.account,
@@ -21,9 +24,11 @@ function VerifyRegister() {
       localStorage.setItem("access_token", res.token);
       toast.success("Register successful");
       navigate("/");
+      setLoading(false);
     } catch (error) {
       toast.error(error?.response?.data?.message);
       form.resetFields();
+      setLoading(false);
     }
   };
   const checkUser = async () => {
@@ -51,6 +56,9 @@ function VerifyRegister() {
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
+        <p className="mb-5">
+          <Back />
+        </p>
         <h2 className={"font-body text-4xl font-bold text-center mb-5"}>
           Verify OTP
         </h2>
@@ -80,7 +88,7 @@ function VerifyRegister() {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" htmlType="submit" loading={loading} block>
               Verify
             </Button>
           </Form.Item>

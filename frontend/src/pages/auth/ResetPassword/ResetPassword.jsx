@@ -1,5 +1,5 @@
 import { Form, Button, Card, Input } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { resetPassword } from "../../../api/authManagement";
@@ -7,17 +7,21 @@ import { resetPassword } from "../../../api/authManagement";
 function ResetPassword() {
   const { token } = useParams();
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
     try {
+      setLoading(true);
       const data = { ...values, token };
       const res = await resetPassword(data);
       toast.success(res.message);
       navigate("/login");
+      setLoading(false);
     } catch (error) {
       toast.error(error?.response?.data?.message);
       form.resetFields();
+      setLoading(false);
     }
   };
 
@@ -101,7 +105,7 @@ function ResetPassword() {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button type="primary" htmlType="submit" loading={loading} block>
               Reset Password
             </Button>
           </Form.Item>

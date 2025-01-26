@@ -1,22 +1,27 @@
 import { Form, Button, Card, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { getUser, sendOTPRegister } from "../../../api/authManagement";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { getUser, sendOTPRegister } from "../../../api/authManagement";
+import { Back } from "../../../component";
 
 function Register() {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const onFinish = async (values) => {
     try {
+      setLoading(true);
       const res = await sendOTPRegister(values);
       toast.success(res.message);
       navigate("/verify-register", {
         state: { account: res.account, verifyToken: res.verifyToken },
       });
+      setLoading(false);
     } catch (error) {
       toast.error(error?.response?.data?.message);
+      setLoading(false);
     }
   };
 
@@ -39,6 +44,9 @@ function Register() {
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
+        <p className="mb-5">
+          <Back />
+        </p>
         <h2
           className={"font-body text-4xl font-bold"}
           style={{ textAlign: "center", marginBottom: "20px" }}
@@ -191,6 +199,7 @@ function Register() {
                 padding: 20,
               }}
               htmlType="submit"
+              loading={loading}
               block
             >
               Register

@@ -1,16 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Form, Button, Checkbox, Card, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
 import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
+import { Back } from "../../../component";
 
 function Login() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   const onFinish = async (values) => {
     try {
+      setLoading(true);
       const res = await login(values);
       const role = res.user.role;
 
@@ -22,9 +25,11 @@ function Login() {
         navigate("/dashboard/account-management");
       }
       toast.success("Login successful");
+      setLoading(false);
     } catch (error) {
       toast.error(error?.response?.data?.message);
       form.resetFields();
+      setLoading(false);
     }
   };
   const checkUser = async () => {
@@ -48,7 +53,6 @@ function Login() {
         localStorage.setItem("access_token", res.token);
         navigate("/");
         toast.success("Login successful");
-
       } else {
         navigate("/register-with-google", { state: { user: res.user } });
       }
@@ -65,6 +69,10 @@ function Login() {
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
+        <p className="mb-5">
+          <Back />
+        </p>
+
         <h2 className={"font-body text-4xl font-bold text-center mb-5"}>
           Login
         </h2>
@@ -133,6 +141,7 @@ function Login() {
                 padding: 20,
               }}
               htmlType="submit"
+              loading={loading}
               block
             >
               Login
