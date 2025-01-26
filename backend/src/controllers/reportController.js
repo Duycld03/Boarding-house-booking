@@ -81,13 +81,13 @@ class reportController {
       // Kiểm tra nếu status là 'Resolved', thực hiện xóa mềm đối tượng liên quan
       if (status.toLowerCase() === 'resolved') {
         // Xóa mềm đối tượng Review hoặc BoardingHouse nếu báo cáo đã được xử lý và có trạng thái 'resolved'
-        if (report.reportType === 'Review') {
+        if (report.reportType === 'review') {
           await Review.findByIdAndUpdate(
             report.targetId,
             { deleted: true },
             { new: true }
           );
-        } else if (report.reportType === 'BoardingHouse') {
+        } else if (report.reportType === 'boardingHouse') {
           await BoardingHouse.findByIdAndUpdate(
             report.targetId,
             { deleted: true },
@@ -178,6 +178,26 @@ class reportController {
     } catch (error) {
       console.error('Error filtering reports:', error);
       res.status(500).json({ success: false, message: 'Server Error' });
+    }
+  }
+  async getBHReports(req, res) {
+    try {
+      const BHReports = await Report.find({
+        reportType: { $regex: /^boardinghouse$/i },
+      })
+        .sort({ createdAt: -1 })
+        .populate({
+          path: 'reporter',
+          select: 'fullname email',
+        })
+        .populate({
+          path: 'processedBy',
+          select: 'fullname',
+        });
+
+      return res.status(200).json(BHReports);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
     }
   }
 }
