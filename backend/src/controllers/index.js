@@ -1,6 +1,5 @@
 import authController from "./authController.js";
 import ReviewController from "./reviewController.js";
-import authController from './authController.js';
 import withdrawalRequestsController from './withdrawalRequestsController.js';
 import reportController from './reportController.js';
 import BoardingHouseController from './BoardingHouseController.js';

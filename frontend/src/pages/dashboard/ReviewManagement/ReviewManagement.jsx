@@ -4,11 +4,11 @@ import {
     Button,
     ConfirmModal,
     Loader
-} from '../../component';
+} from '../../../component';
 import { toast } from 'react-toastify';
-import { getReviews } from '../../api/ReviewManagement';
+import { getReviews } from '../../../api/ReviewManagement';
 
-function BoardingHouseReviewManagement() {
+function ReviewManagement() {
     // cột của bảng 
     const columns = [
         {
@@ -68,15 +68,17 @@ function BoardingHouseReviewManagement() {
     const fetchData = async () => {
         try {
             const res = await getReviews();
-            if (res && res.data) {
-                setData(res.data);
-                console.log(res);
+            if (res) {
+                setData(res);
             } else {
                 setData([]);
             }
         } catch (error) {
-            console.error('Failed to fetch reviews:', error);
-            toast.error('Failed to fetch reviews. Please try again later.');
+            console.error("Failed to fetch withdrawal requests:", error);
+            toast.error(
+                "Failed to fetch withdrawal requests. Please try again later."
+            );
+            setData([]);
         }
     };
 
@@ -143,4 +145,4 @@ function BoardingHouseReviewManagement() {
     );
 }
 
-export default BoardingHouseReviewManagement;
+export default ReviewManagement;
