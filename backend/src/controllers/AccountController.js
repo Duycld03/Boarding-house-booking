@@ -7,7 +7,6 @@ class AccountController {
         try {
             const accountData = await Account.find({ role: { $ne: "admin" } }).sort({ createdAt: 1 });
             if (accountData) {
-                console.log(accountData);
                 return res.status(200).json(accountData);
 
             } else {

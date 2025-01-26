@@ -137,7 +137,7 @@ function AccountManagement() {
       .then((res) => {
         if (res) {
           fetchData();
-          toast.error("Add new account successful");
+          toast.success("Add new account successful");
         } else {
           toast.error("Add account failed, no response received.");
         }
