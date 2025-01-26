@@ -1,3 +1,4 @@
+
 import { Login, Register } from './auth'
 import { AboutUs, Home, Contact } from './common'
 
@@ -6,7 +7,8 @@ import {
     ReportReviewManagement,
     ReportBoardingHouse,
     WithdrawalRequestManagement,
-    AccountManagement
+    AccountManagement,
+    ReviewManagement
 } from './dashboard'
 
 
@@ -32,5 +34,5 @@ export {
     ReportBoardingHouse,
     ReportReviewManagement,
     WithdrawalRequestManagement,
-
+    ReviewManagement
 }

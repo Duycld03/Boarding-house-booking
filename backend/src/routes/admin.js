@@ -6,7 +6,7 @@ import {
   AccountController,
   BoardingHouseController,
   reportController,
-
+  ReviewController
 } from '../controllers/index.js';
 
 const adminRouter = Router();
@@ -22,6 +22,7 @@ adminRouter.delete(
   '/reviewreports/:reviewReportId',
   reportController.softDeleteReport
 );
+adminRouter.get('/reviews', ReviewController.getReviews);
 
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard)
 
