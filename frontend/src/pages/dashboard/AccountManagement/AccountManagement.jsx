@@ -1,6 +1,7 @@
 import Table from "../../../component/Table";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import { Button, ConfirmModal } from "../../../component";
 import {
   getAllAccount,
   deleteAccount,
@@ -18,7 +19,9 @@ import UpdateAccountModal from "./UpdateAccount/UpdateAccount";
 function AccountManagement() {
   const [accountData, setAccountData] = useState([]);
   const [selectedData, setSelectedData] = useState(undefined);
+  const [currentRecord, setCurrentRecord] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [filterValue, setFilterValue] = useState({
     gender: null,
     role: null,
@@ -134,6 +137,7 @@ function AccountManagement() {
       .then((res) => {
         if (res) {
           fetchData();
+          toast.error("Add new account successful");
         } else {
           toast.error("Add account failed, no response received.");
         }
