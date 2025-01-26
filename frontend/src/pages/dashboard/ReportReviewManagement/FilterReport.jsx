@@ -89,13 +89,13 @@ function FilterReport({ setFilterValue }) {
                 onChange={setReason}
                 allowClear
               >
-                <Option value="Spam">spam</Option>
+                <Option value="Spam">Spam</Option>
                 <Option value="Misleading information">
-                  misleading information
+                  Misleading information
                 </Option>
-                <Option value="Privacy violation">privacy violation</Option>
+                <Option value="Privacy violation">Privacy violation</Option>
                 <Option value="Inappropriate content">
-                  inappropriate content.
+                  Inappropriate content.
                 </Option>
               </Select>
             </Form.Item>

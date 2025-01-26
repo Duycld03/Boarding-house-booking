@@ -203,32 +203,28 @@ function ReportReviewManagement() {
 
   return (
     <div className="txt">
-      {loading ? (
-        <Loader />
-      ) : (
-        <>
-          <div className="flex justify-end mb-4">
-            <FilterReport setFilterValue={setFilterValue} />
-          </div>
-          {/* Show filtered data if available, else show full data */}
-          <Table columns={columns} data={data} loading={loading} />
-          <ConfirmModal
-            title="Confirm Deletion"
-            content="Do you want to delete this review report?"
-            onOk={handleDelete}
-            onCancel={() => setIsOpenDeleteModal(false)}
-            isOpen={isOpenDeleteModal}
+      <>
+        <div className="flex justify-end mb-4">
+          <FilterReport setFilterValue={setFilterValue} />
+        </div>
+        {/* Show filtered data if available, else show full data */}
+        <Table columns={columns} data={data} loading={loading} />
+        <ConfirmModal
+          title="Confirm Deletion"
+          content="Do you want to delete this review report?"
+          onOk={handleDelete}
+          onCancel={() => setIsOpenDeleteModal(false)}
+          isOpen={isOpenDeleteModal}
+        />
+        {isReplayPopupOpen && (
+          <FormReplayPopup
+            visible={isReplayPopupOpen}
+            onClose={() => setIsReplayPopupOpen(false)}
+            onSubmit={handleReplaySubmit}
+            reportData={replayReportData}
           />
-          {isReplayPopupOpen && (
-            <FormReplayPopup
-              visible={isReplayPopupOpen}
-              onClose={() => setIsReplayPopupOpen(false)}
-              onSubmit={handleReplaySubmit}
-              reportData={replayReportData}
-            />
-          )}
-        </>
-      )}
+        )}
+      </>
     </div>
   );
 }

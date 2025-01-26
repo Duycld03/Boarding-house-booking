@@ -168,7 +168,7 @@ class reportController {
       }
 
       const reports = await Report.find(filter)
-        .sort({ createdAt: 1 })
+        .sort({ createdAt: -1 })
         .populate({
           path: 'reporter', // Populate reporter details
           select: 'fullname email', // Select only these fields
