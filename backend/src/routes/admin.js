@@ -29,5 +29,7 @@ adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard)
 adminRouter.get('/account', AccountController.getAllAccount)
 adminRouter.delete('/account/:accountId', AccountController.softDeleteAccount)
 adminRouter.get('/account/filter', AccountController.filterAccounts);
+adminRouter.post('/account/create', AccountController.createAccount);
+adminRouter.put('/account/:accountId', AccountController.updateAccount)
 
 export { adminRouter };
