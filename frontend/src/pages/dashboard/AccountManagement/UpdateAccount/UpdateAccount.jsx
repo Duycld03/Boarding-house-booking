@@ -142,6 +142,11 @@ const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
                 required: true,
                 message: "Full name is required", // Thông báo lỗi nếu không có giá trị
               },
+              {
+                pattern: /^[a-zA-Z\s]+$/, // Chỉ cho phép chữ cái và khoảng trắng
+                message:
+                  "Full name cannot contain numbers or special characters", // Thông báo lỗi nếu không hợp lệ
+              },
             ]}
           >
             <Input placeholder="Full Name" />

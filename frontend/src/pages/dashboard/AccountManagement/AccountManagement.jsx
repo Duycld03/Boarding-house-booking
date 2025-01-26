@@ -129,22 +129,6 @@ function AccountManagement() {
       key: "createdAt",
       render: (createdAt) => convertTimetap(createdAt),
     },
-    // {
-    //   title: "Action",
-    //   key: "action",
-    //   render: (_, record) => (
-    //     <Button
-    //       title={"Delete"}
-    //       onClick={() => {
-    //         handleToggleMobal();
-    //         setCurrentRecord(record);
-    //       }}
-    //       btnDelete
-    //     >
-    //       Delete
-    //     </Button>
-    //   ),
-    // },
   ];
 
   //Add new data
@@ -172,6 +156,7 @@ function AccountManagement() {
       .then((res) => {
         if (res) {
           fetchData();
+          toast.success("Update account successful!");
         } else {
           toast.error("Update failed, no response received.");
         }
