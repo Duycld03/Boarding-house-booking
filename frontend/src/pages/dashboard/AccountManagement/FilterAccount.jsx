@@ -21,24 +21,18 @@ function FilterAccount({ setFilterValue }) {
   const handleSubmit = (values) => {
     const { startDate, endDate } = values;
 
-    // if (
-    //   startDate &&
-    //   endDate &&
-    //   moment(startDate, "YYYY-MM-DD", true).isAfter(
-    //     moment(endDate, "YYYY-MM-DD", true)
-    //   )
-    // ) {
-    //   toast.error("Start date cannot be later than end date.");
-    //   return;
-    // }
-
     if (startDate && !endDate) {
       toast.error("Please select an end date.");
       return;
     }
 
     if (endDate && !startDate) {
-      toast.error("Please select an start date");
+      toast.error("Please select a start date.");
+      return;
+    }
+
+    if (startDate && endDate && startDate.isAfter(endDate)) {
+      toast.error("Start date cannot be later than end date.");
       return;
     }
     setFilterValue({
@@ -102,7 +96,6 @@ function FilterAccount({ setFilterValue }) {
                 onChange={setRole}
                 options={[
                   { label: "User", value: "user" },
-                  { label: "Admin", value: "admin" },
                   { label: "Owner", value: "owner" },
                 ]}
                 allowClear

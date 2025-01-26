@@ -5,6 +5,7 @@ import {
   AccountController,
   BoardingHouseController,
   reportController,
+  ReviewController
 } from '../controllers/index.js';
 
 const adminRouter = Router();
@@ -20,6 +21,7 @@ adminRouter.put(
   reportController.sendReportReplyByEmail
 );
 adminRouter.get('/reports/filter', reportController.filterReviewReports);
+adminRouter.get('/reviews', ReviewController.getReviews);
 
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard);
 
@@ -27,5 +29,7 @@ adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard);
 adminRouter.get('/account', AccountController.getAllAccount);
 adminRouter.delete('/account/:accountId', AccountController.softDeleteAccount);
 adminRouter.get('/account/filter', AccountController.filterAccounts);
+adminRouter.post('/account/create', AccountController.createAccount);
+adminRouter.put('/account/:accountId', AccountController.updateAccount)
 
 export { adminRouter };

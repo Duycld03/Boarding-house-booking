@@ -1,4 +1,4 @@
-import { Login, Register } from './auth'
+import { Login, Register, RegisterWithGoogle, VerifyRegister } from "./auth";
 import { AboutUs, Home, Contact } from './common'
 
 import {
@@ -6,7 +6,8 @@ import {
     ReportReviewManagement,
     ReportBoardingHouse,
     WithdrawalRequestManagement,
-    AccountManagement
+    AccountManagement,
+    ReviewManagement
 } from './dashboard'
 
 
@@ -17,6 +18,8 @@ export {
     //auth
     Login,
     Register,
+    RegisterWithGoogle,
+    VerifyRegister,
 
     //common
     AboutUs,
@@ -32,5 +35,5 @@ export {
     ReportBoardingHouse,
     ReportReviewManagement,
     WithdrawalRequestManagement,
-
+    ReviewManagement
 }

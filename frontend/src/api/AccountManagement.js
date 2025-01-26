@@ -2,11 +2,22 @@ import axios from './axios.config';
 export const getAllAccount = () => {
     return axios.get('/dashboard/account');
 };
-export const deleteAccount = (id) => {
-    return axios.delete(`/dashboard/account/${id}`);
+
+export const deleteAccount = (accountId) => {
+    return axios.delete(`/dashboard/account/${accountId}`);
 };
+
 export const filterAccount = (filterValue) => {
     return axios.get(`/dashboard/account/filter`, {
         params: filterValue,
     });
 };
+
+export const createAccount = (accountData) => {
+    return axios.post(`/dashboard/account/create`, accountData);
+};
+
+export const updateAccount = (accountId, accountData) => {
+    return axios.put(`/dashboard/account/${accountId}`, accountData);
+};
+

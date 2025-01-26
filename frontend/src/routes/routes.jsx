@@ -8,7 +8,10 @@ import {
   WithdrawalRequestManagement,
   Contact,
   AboutUs,
+  ReviewManagement,
   Register,
+  RegisterWithGoogle,
+  VerifyRegister,
 } from "../pages";
 import { AuthLayout, HeaderOnly } from "../Layouts";
 
@@ -25,6 +28,16 @@ const routes = [
   {
     path: "/register",
     page: Register,
+    layout: AuthLayout,
+  },
+  {
+    path: "/register-with-google",
+    page: RegisterWithGoogle,
+    layout: AuthLayout,
+  },
+  {
+    path: "/verify-register",
+    page: VerifyRegister,
     layout: AuthLayout,
   },
 
@@ -70,6 +83,12 @@ const routes = [
   {
     path: `${dashBoard}/withdrawal-requests-management`,
     page: WithdrawalRequestManagement,
+    layout: null,
+  },
+
+  {
+    path: `${dashBoard}/list-boarding-house-reviews`,
+    page: ReviewManagement,
     layout: null,
   },
 ];

@@ -6,15 +6,22 @@ import {
   getAllAccount,
   deleteAccount,
   filterAccount,
+  updateAccount,
+  createAccount,
 } from "../../../api/AccountManagement";
 import convertTimetap from "../../../utils/convertTimetap";
 import { Avatar } from "antd";
 import DefaultAvatar from "../../../assets/images/none_avatar.png";
 import FilterAccount from "./FilterAccount";
+import AddAccountModal from "./AddAccount";
+import UpdateAccountModal from "./UpdateAccount/UpdateAccount";
 
 function AccountManagement() {
   const [accountData, setAccountData] = useState([]);
+  const [selectedData, setSelectedData] = useState(undefined);
   const [currentRecord, setCurrentRecord] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [filterValue, setFilterValue] = useState({
     gender: null,
     role: null,
@@ -29,7 +36,6 @@ function AccountManagement() {
       const res = await getAllAccount();
       if (res) {
         setAccountData(res);
-        console.log(res);
       } else {
         setAccountData([]);
       }
@@ -123,47 +129,62 @@ function AccountManagement() {
       key: "createdAt",
       render: (createdAt) => convertTimetap(createdAt),
     },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Button
-          title={"Delete"}
-          onClick={() => {
-            handleToggleMobal();
-            setCurrentRecord(record);
-          }}
-          btnDelete
-        >
-          Delete
-        </Button>
-      ),
-    },
   ];
 
-  useEffect(() => {
-    console.log("filter value: ", filterValue);
-  }, [filterValue]);
+  //Add new data
+  const handleAddNewData = (data) => {
+    createAccount(data)
+      .then((res) => {
+        if (res) {
+          fetchData();
+          toast.success("Add new account successful");
+        } else {
+          toast.error("Add account failed, no response received.");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred : ", error.response.data.error);
+      });
+  };
 
+  //update data
   const onProcessData = (combinedData) => {
-    console.log("Processed Data: ", combinedData);
+    setSelectedData(combinedData);
   };
 
-  const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleToggleMobal = () => {
-    setIsOpen(!isOpen);
+  const handleUpdate = (value) => {
+    updateAccount(selectedData?._id, value)
+      .then((res) => {
+        if (res) {
+          fetchData();
+          toast.success("Update account successful!");
+        } else {
+          toast.error("Update failed, no response received.");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred : ", error.response.data.error);
+      });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (id) => {
     try {
-      await deleteAccount(currentRecord._id);
-      fetchData();
-      handleToggleMobal();
-      toast.success("Delete account successful");
+      if (!id) {
+        toast.error("Invalid ID");
+        return;
+      }
+      const response = await deleteAccount(id);
+
+      if (response) {
+        fetchData();
+        toast.success("Delete account successful");
+      } else {
+        toast.error(
+          "Failed to delete account. Server response was not successful."
+        );
+      }
     } catch (error) {
-      toast.error("Failed: ", error);
+      toast.error("An error occurred : ", error.response.data.error);
     }
   };
 
@@ -171,7 +192,7 @@ function AccountManagement() {
     <div className="txt">
       <>
         <div className="flex justify-between">
-          <Button size="large" btnAdd title="Add new" />
+          <AddAccountModal onAddData={handleAddNewData} />
           <FilterAccount setFilterValue={setFilterValue} />
         </div>
         <div>
@@ -182,11 +203,12 @@ function AccountManagement() {
             loading={loading}
           />
         </div>
-        <ConfirmModal
-          onCancel={handleToggleMobal}
-          isOpen={isOpen}
-          onOk={handleDelete}
-          content={"Do you want to add new?"}
+
+        {/* Update and detail Account */}
+        <UpdateAccountModal
+          accountData={selectedData}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
         />
       </>
     </div>
