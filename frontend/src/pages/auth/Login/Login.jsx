@@ -48,6 +48,7 @@ function Login() {
         localStorage.setItem("access_token", res.token);
         navigate("/");
         toast.success("Login successful");
+
       } else {
         navigate("/register-with-google", { state: { user: res.user } });
       }
