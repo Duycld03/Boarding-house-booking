@@ -3,6 +3,11 @@ import { Form, Button, Checkbox, Card, Input, notification } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { login, getUser, loginWithGoogle } from '../../../api/authManagement';
+import { useEffect } from "react";
+import { Form, Button, Checkbox, Card, Input, notification } from "antd";
+import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
 
 function Login() {
   const navigate = useNavigate();
@@ -12,8 +17,8 @@ function Login() {
 
   const showNotification = (description) => {
     api.error({
-      message: 'Login Failed',
-      description: description || 'Invalid username or password',
+      message: "Login Failed",
+      description: description || "Invalid username or password",
     });
   };
 
@@ -23,11 +28,16 @@ function Login() {
       const role = res.user.role;
 
       localStorage.setItem('access_token', res.token);
+      localStorage.setItem("access_token", res.token);
 
       if (role === 'user' || role === 'owner') {
         navigate('/');
       } else if (role === 'admin') {
         navigate('/dashboard/account-management');
+      if (role === "user" || role === "owner") {
+        navigate("/");
+      } else if (role === "admin") {
+        navigate("/dashboard/account-management");
       }
     } catch (error) {
       showNotification(error.response.data.message);
@@ -38,6 +48,7 @@ function Login() {
     try {
       await getUser();
       navigate('/');
+      navigate("/");
     } catch (error) {}
   };
 
@@ -48,14 +59,18 @@ function Login() {
   const loginWithGoogleHandler = async (response) => {
     try {
       const remember = form.getFieldValue('remember');
+      const remember = form.getFieldValue("remember");
       const data = { ...response, remember };
       const res = await loginWithGoogle(data);
 
       if (res.isRegistered) {
         localStorage.setItem('access_token', res.token);
         navigate('/');
+        localStorage.setItem("access_token", res.token);
+        navigate("/");
       } else {
         navigate('/register-with-google', { state: { user: res.user } });
+        navigate("/register-with-google", { state: { user: res.user } });
       }
     } catch (error) {
       showNotification(error.response.data.message);
@@ -70,9 +85,11 @@ function Login() {
           style={{
             width: 400,
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
         >
           <h2 className={'font-body text-4xl font-bold text-center mb-5'}>
+          <h2 className={"font-body text-4xl font-bold text-center mb-5"}>
             Login
           </h2>
           <Form
@@ -91,6 +108,7 @@ function Login() {
                 {
                   required: true,
                   message: 'Please input your username!',
+                  message: "Please input your username!",
                 },
               ]}
             >
@@ -104,10 +122,12 @@ function Login() {
                 {
                   required: true,
                   message: 'Please input your password!',
+                  message: "Please input your password!",
                 },
                 {
                   min: 5,
                   message: 'Password must be at least 5 characters!',
+                  message: "Password must be at least 5 characters!",
                 },
               ]}
             >
@@ -120,6 +140,7 @@ function Login() {
                 <span
                   className="text-blue-500 cursor-pointer"
                   onClick={() => navigate('/forgot-password')}
+                  onClick={() => navigate("/forgot-password")}
                 >
                   Forgot password?
                 </span>
@@ -135,6 +156,9 @@ function Login() {
                   backgroundColor: '#40BFFF',
                   borderColor: '#40BFFF',
                   color: '#fff',
+                  backgroundColor: "#40BFFF",
+                  borderColor: "#40BFFF",
+                  color: "#fff",
                   padding: 20,
                 }}
                 htmlType="submit"
@@ -148,6 +172,7 @@ function Login() {
                 onSuccess={loginWithGoogleHandler}
                 onError={() => {
                   console.log('error');
+                  console.log("error");
                 }}
               />
             </Form.Item>
@@ -155,7 +180,6 @@ function Login() {
           <p className="text-center">
             <span
               className="text-blue-500 cursor-pointer"
-              onClick={() => navigate('/register')}
             >
               Register
             </span>
