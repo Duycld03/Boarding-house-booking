@@ -3,7 +3,6 @@ import {
   ownerMiddleware,
   adminMiddleware,
 } from "../middlewares/index.js";
-
 import { commonRouter } from "./common.js";
 import { authRouter } from "./auth.js";
 import { ownerRouter } from "./owner.js";
@@ -15,5 +14,6 @@ function routes(app) {
   app.use("/owner", ownerMiddleware, ownerRouter);
   app.use("/dashboard", adminMiddleware, adminRouter);
 }
+
 
 export default routes
