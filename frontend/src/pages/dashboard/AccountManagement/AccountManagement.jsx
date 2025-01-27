@@ -15,6 +15,7 @@ import DefaultAvatar from "../../../assets/images/none_avatar.png";
 import FilterAccount from "./FilterAccount";
 import AddAccountModal from "./AddAccount";
 import UpdateAccountModal from "./UpdateAccount/UpdateAccount";
+import { FileTextOutlined } from "@ant-design/icons";
 
 function AccountManagement() {
   const [accountData, setAccountData] = useState([]);
@@ -22,13 +23,7 @@ function AccountManagement() {
   const [currentRecord, setCurrentRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [filterValue, setFilterValue] = useState({
-    gender: null,
-    role: null,
-    startDate: null,
-    endDate: null,
-    status: null,
-  });
+  const [filterValue, setFilterValue] = useState();
 
   const fetchData = async () => {
     setLoading(true);
@@ -85,15 +80,20 @@ function AccountManagement() {
       dataIndex: "avatarImage",
       key: "avatarImage",
       render: (avatarImage) => {
+        const baseUrl = "http://localhost:3000";
         const resolvedSrc = avatarImage
-          ? `http://localhost:3000/${avatarImage}`
-          : DefaultAvatar;
+          ? `${baseUrl}/${avatarImage}`
+          : `${baseUrl}/${DefaultAvatar}`;
+
         return (
           <Avatar
             src={resolvedSrc}
             shape="circle"
             size="large"
-            onError={(e) => (e.target.src = DefaultAvatar)}
+            onError={(e) => {
+              e.target.onerror = null; // Prevent infinite error loop
+              e.target.src = `${baseUrl}/${DefaultAvatar}`;
+            }}
           />
         );
       },
@@ -129,14 +129,37 @@ function AccountManagement() {
       key: "createdAt",
       render: (createdAt) => convertTimetap(createdAt),
     },
+    {
+      title: "Ation",
+      key: "action",
+      render: (createdAt, record) => (
+        <div className="flex gap-3">
+          <Button
+            size="large"
+            btnDelete
+            title={"Delete"}
+            onClick={() => handleSelectDelete(record)}
+          />
+          <Button
+            onClick={() => onProcessData(record)}
+            size="large"
+            title={"Detail"}
+            icon={<FileTextOutlined />}
+            className={"bg-emerald-600 text-white"}
+          />
+        </div>
+      ),
+    },
   ];
 
   //Add new data
   const handleAddNewData = (data) => {
-    createAccount(data)
+    createAccount(data);
+    setLoading(true)
       .then((res) => {
         if (res) {
           fetchData();
+          setLoading(false);
           toast.success("Add new account successful");
         } else {
           toast.error("Add account failed, no response received.");
@@ -167,16 +190,32 @@ function AccountManagement() {
       });
   };
 
-  const handleDelete = async (id) => {
+  //on delete:
+  const handleToggleMobal = () => {
+    setIsOpen(!isOpen);
+  };
+  const handleSelectDelete = (record) => {
+    setCurrentRecord(record);
+    handleToggleMobal();
+  };
+
+  const handleCancel = () => {
+    setCurrentRecord(null);
+    handleToggleMobal();
+  };
+
+  const handleDelete = async () => {
+    setLoading(true);
     try {
-      if (!id) {
+      if (!currentRecord._id) {
         toast.error("Invalid ID");
         return;
       }
-      const response = await deleteAccount(id);
-
+      const response = await deleteAccount(currentRecord?._id);
       if (response) {
         fetchData();
+        setCurrentRecord("");
+        handleToggleMobal();
         toast.success("Delete account successful");
       } else {
         toast.error(
@@ -184,7 +223,11 @@ function AccountManagement() {
         );
       }
     } catch (error) {
-      toast.error("An error occurred : ", error.response.data.error);
+      toast.error(
+        "An error occurred: " + error.response?.data?.error || error.message
+      );
+    } finally {
+      setLoading(false); // Ensures loading is stopped in all cases
     }
   };
 
@@ -196,12 +239,7 @@ function AccountManagement() {
           <FilterAccount setFilterValue={setFilterValue} />
         </div>
         <div>
-          <Table
-            columns={columns}
-            data={accountData}
-            onRowClick={onProcessData}
-            loading={loading}
-          />
+          <Table columns={columns} data={accountData} loading={loading} />
         </div>
 
         {/* Update and detail Account */}
@@ -209,6 +247,14 @@ function AccountManagement() {
           accountData={selectedData}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
+        />
+
+        <ConfirmModal
+          title="Confirm Deletion"
+          content="Do you want to delete this account report?"
+          onOk={handleDelete}
+          onCancel={handleCancel}
+          isOpen={isOpen}
         />
       </>
     </div>

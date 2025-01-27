@@ -39,12 +39,6 @@ const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
     setIsModalVisible(false);
   };
 
-  const handleOnOkDelete = () => {
-    onDelete(accountData?._id);
-    setIsModalVisible(false);
-    handleToggleMobal();
-  };
-
   const handleSubmit = () => {
     form
       .validateFields()
@@ -203,31 +197,23 @@ const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
             </div>
           </Form.Item>
 
-          <div className="flex justify-between">
+          <div className="flex justify-end">
             <Button
-              title={"Delete"}
-              btnDelete
-              onClick={handleOnOkDelete}
+              className="bg-orange-600 text-white"
               size="large"
-            />
-            <div className="flex">
-              <Button
-                className="bg-orange-600 text-white"
-                size="large"
-                onClick={handleCancel}
-                title="Cancel"
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-primary text-white ml-2"
-                size="large"
-                onClick={handleSubmit}
-                title="Update"
-              >
-                Update
-              </Button>
-            </div>
+              onClick={handleCancel}
+              title="Cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-primary text-white ml-2"
+              size="large"
+              onClick={handleSubmit}
+              title="Update"
+            >
+              Update
+            </Button>
           </div>
         </Form>
       </Modal>

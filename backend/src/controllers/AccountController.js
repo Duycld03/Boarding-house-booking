@@ -5,7 +5,7 @@ class AccountController {
 
     async getAllAccount(req, res, next) {
         try {
-            const accountData = await Account.find({ role: { $ne: "admin" } }).sort({ createdAt: 1 });
+            const accountData = await Account.find().sort({ createdAt: 1 });
             if (accountData) {
                 return res.status(200).json(accountData);
 
