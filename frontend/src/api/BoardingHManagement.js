@@ -3,3 +3,26 @@ import axios from "./axios.config";
 export const getAllBoardingHDB = () => {
     return axios.get("/dashboard/boardinghouse");
 };
+export const getBoardingHouseDetails = async (boardingHouseId) => {
+    return axios.get(`/dashboard/boardinghouse/${boardingHouseId}`);
+};
+export const updateBoardingHouseDetails = (boardingHouseId, updateData) => {
+    return axios.put(`/dashboard/boardinghouse/${boardingHouseId}`, updateData);
+};
+export const getAllBoardingHouseTypes = () => {
+    return axios.get("/dashboard/types");
+};
+export const addBoardingHouseImage = (boardingHouseId, imageData) => {
+    return axios.post(`/dashboard/boardinghouse/${boardingHouseId}/images`, imageData);
+};
+
+export const updateBoardingHouseImage = (boardingHouseId, imageId, imageData) => {
+    return axios.put(`/dashboard/boardinghouse/${boardingHouseId}/images/${imageId}`, imageData);
+};
+
+export const deleteBoardingHouseImage = (boardingHouseId, imageId) => {
+    return axios.delete(`/dashboard/boardinghouse/${boardingHouseId}/images/${imageId}`);
+};
+export const getBoardingHouseImages = async (boardingHouseId) => {
+    return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
+}
