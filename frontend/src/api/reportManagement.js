@@ -14,6 +14,12 @@ export const filterReviewReports = (filterValue) => {
     params: filterValue,
   });
 };
+export const filterBHReports = (filterValue) => {
+  return axios.get(`/dashboard/reports/filter/boarding-house`, {
+    params: filterValue,
+  });
+};
+
 export const getBHReports = () => {
   return axios.get('/dashboard/boarding-house-reports');
 };

@@ -5,11 +5,11 @@ const ReportSchema = new mongoose.Schema(
   {
     reportType: {
       type: String,
-      enum: ['review', 'boardingHouse'],
       required: true,
     },
     targetId: {
       type: mongoose.Schema.Types.ObjectId,
+      refPath: 'reportType',
       required: true,
     },
     reporter: {
