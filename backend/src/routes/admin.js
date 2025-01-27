@@ -15,25 +15,27 @@ adminRouter.get(
   '/withdrawRequests',
   withdrawalRequestsController.getWithdrawRequests
 );
+
+//report
 adminRouter.get('/review-reports', reportController.getReviewReports);
 adminRouter.delete('/reports/:reportId', reportController.softDeleteReport);
 adminRouter.put(
   '/reports/:reportId/send-email',
   reportController.sendReportReplyByEmail
 );
-
 adminRouter.get('/reports/filter', reportController.filterReviewReports);
+adminRouter.get('/reports/filter/boarding-house', reportController.filterBHReports);
 
 
 //review
 adminRouter.get('/reviews', ReviewController.getReviews);
 adminRouter.get('/reviews/filter', reviewController.filterReviews);
 adminRouter.delete('/reviews/:reviewId', reviewController.softDeleteReview);
+adminRouter.get('/boarding-house-reports', reportController.getBHReports);
 
 
 //boarding house
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard);
-adminRouter.get('/boarding-house-reports', reportController.getBHReports);
 
 //Account
 adminRouter.get('/account', AccountController.getAllAccount);

@@ -9,14 +9,13 @@ import {
 import { toast } from 'react-toastify';
 import { Tag } from 'antd';
 import {
-  getReviewReports,
   deleteReport,
   sendReplyByEmail,
   getBHReports,
-  // filterReviewReports,
+  filterBHReports,
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
-import FilterReport from '../ReportReviewManagement/FilterReport';
+import FilterBHReportPopup from './FilterBHReportPopup ';
 
 function ReportBoardingHouse() {
   const [data, setData] = useState([]);
@@ -25,12 +24,7 @@ function ReportBoardingHouse() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isReplayPopupOpen, setIsReplayPopupOpen] = useState(false);
   const [replayReportData, setReplayReportData] = useState(null);
-  const [filterValue, setFilterValue] = useState({
-    startDate: null,
-    endDate: null,
-    status: null,
-    reason: null,
-  });
+  const [filterValue, setFilterValue] = useState({});
 
   const fetchData = async () => {
     setLoading(true);
@@ -53,36 +47,33 @@ function ReportBoardingHouse() {
     }
   };
 
-  // const filterReportData = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const res = await filterReviewReports(filterValue);
-  //     console.log('Filtered Data:', res); // Log the response to check its structure
-
-  //     if (res && Array.isArray(res.data)) {
-  //       setData(res.data); // Adjusting for data field if necessary
-  //     } else {
-  //       throw new Error('Invalid response format');
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to fetch filtered reports:', error);
-  //     toast.error('Failed to fetch filtered reports. Please try again later.');
-  //     setData([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const filterReportData = async () => {
+    setLoading(true);
+    try {
+      const res = await filterBHReports(filterValue);
+      if (res) {
+        setData(res);
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error('Failed to fetch filtered reports:', error);
+      toast.error('Failed to fetch filtered reports. Please try again later.');
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   //fetch account data
   useEffect(() => {
     fetchData();
   }, []);
 
-  //Filter account data
-  // useEffect(() => {
-  //   console.log('Filter Value:', filterValue); // This should show updated filter values when changed
-  //   filterReportData();
-  // }, [filterValue]);
+  //Filter BH report
+  useEffect(() => {
+    filterReportData();
+  }, [filterValue]);
 
   // Define columns for the Table component
   const columns = [
@@ -93,10 +84,10 @@ function ReportBoardingHouse() {
       render: (reporter) => reporter?.fullname || 'N/A',
     },
     {
-      title: 'Email',
-      dataIndex: 'reporter',
+      title: 'Boarding house name',
+      dataIndex: 'targetId',
       key: 'email',
-      render: (reporter) => reporter?.email || 'N/A',
+      render: (target) => target?.name || 'N/A',
     },
     {
       title: 'Reason',
@@ -206,7 +197,7 @@ function ReportBoardingHouse() {
     <div className="txt">
       <>
         <div className="flex justify-end mb-4">
-          <FilterReport setFilterValue={setFilterValue} />
+          <FilterBHReportPopup setFilterValue={setFilterValue} />
         </div>
         {/* Show filtered data if available, else show full data */}
         <Table columns={columns} data={data} loading={loading} />

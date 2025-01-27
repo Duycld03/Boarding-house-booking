@@ -50,7 +50,6 @@ class reportController {
       const { reportId } = req.params;
       const { status, detailReport } = req.body;
 
-      // Cập nhật chỉ 2 trường status và detailReport, giữ nguyên các trường còn lại
       const report = await Report.findByIdAndUpdate(
         reportId,
         {
@@ -144,7 +143,7 @@ class reportController {
 
       const convertToISODate = (dateString) => {
         const [day, month, year] = dateString.split('-');
-        return new Date(`${year}-${month}-${day}T00:00:00.000Z`); // Đảm bảo ngày có định dạng ISO đầy đủ
+        return new Date(`${year}-${month}-${day}T00:00:00.000Z`);
       };
 
       if (startDate && endDate) {
@@ -180,20 +179,81 @@ class reportController {
       res.status(500).json({ success: false, message: 'Server Error' });
     }
   }
+
+  async filterBHReports(req, res) {
+    try {
+      const { boardingHouse, startDate, endDate, reason, status } = req.query;
+
+      let filter = { reportType: { $regex: /^boardinghouse$/i } };
+
+      if (startDate || endDate) {
+        const start = startDate ? new Date(startDate) : null;
+        const end = endDate ? new Date(endDate) : null;
+
+        if (start && isNaN(start)) {
+          return res
+            .status(400)
+            .json({ message: 'Invalid start date provided' });
+        }
+
+        if (end && isNaN(end)) {
+          return res.status(400).json({ message: 'Invalid end date provided' });
+        }
+
+        filter.createdAt = {};
+        if (start) filter.createdAt.$gte = start;
+        if (end) filter.createdAt.$lte = end;
+      }
+
+      if (reason) {
+        filter.reason = { $regex: new RegExp(reason, 'i') };
+      }
+      if (status) {
+        filter.status = status;
+      }
+
+      const reportsQuery = await Report.find(filter)
+        .populate({
+          path: 'targetId',
+          select: 'name',
+          model: 'BoardingHouse',
+          options: { withDeleted: true },
+        })
+        .populate('reporter')
+        .sort({ createdAt: 1 });
+
+      if (boardingHouse) {
+        const filterBHReportData = reportsQuery.filter((report) =>
+          report?.targetId?.name
+            ?.toLowerCase()
+            .includes(boardingHouse.toLowerCase())
+        );
+
+        console.log(filterBHReportData);
+
+        res.status(200).json(filterBHReportData);
+      } else {
+        res.status(200).json(reportsQuery);
+      }
+    } catch (error) {
+      console.error('Error filtering boarding house reports:', error);
+      res.status(500).json({ success: false, message: 'Server Error' });
+    }
+  }
+
   async getBHReports(req, res) {
     try {
       const BHReports = await Report.find({
         reportType: { $regex: /^boardinghouse$/i },
       })
-        .sort({ createdAt: -1 })
         .populate({
-          path: 'reporter',
-          select: 'fullname email',
+          path: 'targetId',
+          select: 'name',
+          model: 'BoardingHouse',
+          options: { withDeleted: true },
         })
-        .populate({
-          path: 'processedBy',
-          select: 'fullname',
-        });
+        .populate('reporter')
+        .sort({ createdAt: 1 });
 
       return res.status(200).json(BHReports);
     } catch (error) {
