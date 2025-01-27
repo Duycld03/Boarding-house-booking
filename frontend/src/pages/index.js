@@ -5,6 +5,7 @@ import {
   VerifyRegister,
   ForgotPassword,
   ResetPassword,
+  ChangePassword,
 } from "./auth";
 import { AboutUs, Home, Contact } from "./common";
 
@@ -25,6 +26,7 @@ export {
   VerifyRegister,
   ForgotPassword,
   ResetPassword,
+  ChangePassword,
 
   //common
   AboutUs,

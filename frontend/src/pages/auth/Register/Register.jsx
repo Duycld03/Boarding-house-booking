@@ -16,7 +16,7 @@ function Register() {
       const res = await sendOTPRegister(values);
       toast.success(res.message);
       navigate("/verify-register", {
-        state: { account: res.account, verifyToken: res.verifyToken },
+        state: { account: res.account, token: res.token },
       });
       setLoading(false);
     } catch (error) {

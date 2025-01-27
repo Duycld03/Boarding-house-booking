@@ -4,6 +4,7 @@ import RegisterWithGoogle from "./RegisterWithGoogle";
 import VerifyRegister from "./VerifyRegister";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
+import ChangePassword from "./ChangePassword";
 
 export {
   Login,
@@ -12,4 +13,5 @@ export {
   VerifyRegister,
   ForgotPassword,
   ResetPassword,
+  ChangePassword,
 };

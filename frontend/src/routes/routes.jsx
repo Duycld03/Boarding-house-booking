@@ -14,6 +14,7 @@ import {
   VerifyRegister,
   ForgotPassword,
   ResetPassword,
+  ChangePassword,
 } from "../pages";
 import { AuthLayout, HeaderOnly } from "../Layouts";
 
@@ -50,6 +51,11 @@ const routes = [
   {
     path: "/reset-password/:token",
     page: ResetPassword,
+    layout: AuthLayout,
+  },
+  {
+    path: "/change-password",
+    page: ChangePassword,
     layout: AuthLayout,
   },
 
