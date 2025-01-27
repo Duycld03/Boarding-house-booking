@@ -20,7 +20,6 @@ class AccountController {
   }
 
 
-
   async softDeleteAccount(req, res, next) {
     try {
       const { accountId } = req.params;
