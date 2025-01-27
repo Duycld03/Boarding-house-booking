@@ -1,8 +1,8 @@
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import googleAuth from "google-auth-library";
 import nodemailer from "nodemailer";
+import { generateToken, verifyToken } from "../utils/functions.js";
 
 import Account from "../models/account.js";
 dotenv.config();
@@ -52,9 +52,8 @@ class AuthController {
       }
 
       const otp = Math.floor(100000 + Math.random() * 900000);
-      const verifyToken = jwt.sign({ otp }, process.env.JWT_SECRET, {
-        expiresIn: "10m",
-      });
+      const hashedOtp = await bcrypt.hash(otp.toString(), 10);
+      const token = generateToken({ otp: hashedOtp }, "10m");
 
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -85,7 +84,7 @@ class AuthController {
       await transporter.sendMail(mailOptions);
 
       res.status(200).json({
-        verifyToken,
+        token,
         account,
         message: "OTP sent successfully, please check your email.",
       });
@@ -104,17 +103,11 @@ class AuthController {
         return res.status(422).json({ message: "Account creation failed" });
       }
 
-      const token = jwt.sign(
-        {
-          userId: user._id,
-          username: user.username,
-          role: user.role,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: process.env.JWT_EXPIRE,
-        }
-      );
+      const token = generateToken({
+        userId: user._id,
+        username: user.username,
+        role: user.role,
+      });
 
       delete user.password;
       res.status(201).json({
@@ -134,10 +127,11 @@ class AuthController {
 
   async verifyRegister(req, res) {
     try {
-      const { verifyToken, otp, account } = req.body;
+      const { token, otp, account } = req.body;
 
-      const decoded = jwt.verify(verifyToken, process.env.JWT_SECRET);
-      if (decoded.otp != otp) {
+      const decoded = verifyToken(token);
+      const isOtpValid = await bcrypt.compare(otp.toString(), decoded.otp);
+      if (!isOtpValid) {
         return res.status(400).json({ message: "Invalid OTP" });
       }
 
@@ -148,21 +142,15 @@ class AuthController {
         return res.status(422).json({ message: "Account creation failed" });
       }
 
-      const token = jwt.sign(
-        {
-          userId: user._id,
-          username: user.username,
-          role: user.role,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: process.env.JWT_EXPIRE,
-        }
-      );
+      const accessToken = generateToken({
+        userId: user._id,
+        username: user.username,
+        role: user.role,
+      });
 
       delete user.password;
       res.status(201).json({
-        token,
+        token: accessToken,
         user,
       });
     } catch (error) {
@@ -193,16 +181,13 @@ class AuthController {
           .status(401)
           .json({ message: "Username or Password is incorrect" });
       }
-      const token = jwt.sign(
+      const token = generateToken(
         {
           userId: user._id,
           username: user.username,
           role: user.role,
         },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: remember ? "7d" : process.env.JWT_EXPIRE,
-        }
+        remember ? "7d" : "1d"
       );
       delete user.password;
       res.status(200).json({
@@ -238,17 +223,15 @@ class AuthController {
         });
       }
 
-      const token = jwt.sign(
+      const token = generateToken(
         {
           userId: user._id,
           username: user.username,
           role: user.role,
         },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: remember ? "7d" : process.env.JWT_EXPIRE,
-        }
+        remember ? "7d" : "1d"
       );
+
       res.status(200).json({
         isRegistered: true,
         token,
@@ -268,13 +251,7 @@ class AuthController {
         return res.status(404).json({ message: "Email not found" });
       }
 
-      const resetToken = jwt.sign(
-        { userId: user._id },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1h",
-        }
-      );
+      const resetToken = generateToken({ userId: user._id }, "1h");
 
       const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
@@ -313,7 +290,7 @@ class AuthController {
   async resetPassword(req, res) {
     try {
       const { token, password } = req.body;
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = verifyToken(token);
       const user = await Account.findById(decoded.userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });

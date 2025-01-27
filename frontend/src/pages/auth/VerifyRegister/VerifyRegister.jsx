@@ -18,7 +18,7 @@ function VerifyRegister() {
       const data = {
         ...values,
         account: location?.state?.account,
-        verifyToken: location?.state?.verifyToken,
+        token: location?.state?.token,
       };
       const res = await verifyRegister(data);
       localStorage.setItem("access_token", res.token);
@@ -43,7 +43,7 @@ function VerifyRegister() {
   }, []);
 
   useEffect(() => {
-    if (!location?.state?.account || !location?.state?.verifyToken) {
+    if (!location?.state?.account || !location?.state?.token) {
       navigate("/register");
     }
   }, []);
