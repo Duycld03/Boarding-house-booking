@@ -1,24 +1,19 @@
-import { useEffect } from "react";
-import { Form, Button, Checkbox, Card, Input, notification } from "antd";
+import { useEffect, useState } from "react";
+import { Form, Button, Checkbox, Card, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify";
 import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
+import { Back } from "../../../component";
 
 function Login() {
   const navigate = useNavigate();
-
-  const [api, contextHolder] = notification.useNotification();
   const [form] = Form.useForm();
-
-  const showNotification = (description) => {
-    api.error({
-      message: "Login Failed",
-      description: description || "Invalid username or password",
-    });
-  };
+  const [loading, setLoading] = useState(false);
 
   const onFinish = async (values) => {
     try {
+      setLoading(true);
       const res = await login(values);
       const role = res.user.role;
 
@@ -29,18 +24,19 @@ function Login() {
       } else if (role === "admin") {
         navigate("/dashboard/account-management");
       }
+      toast.success("Login successful");
+      setLoading(false);
     } catch (error) {
-      showNotification(error.response.data.message);
+      toast.error(error?.response?.data?.message);
       form.resetFields();
+      setLoading(false);
     }
   };
   const checkUser = async () => {
     try {
       await getUser();
       navigate("/");
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -56,96 +52,121 @@ function Login() {
       if (res.isRegistered) {
         localStorage.setItem("access_token", res.token);
         navigate("/");
+        toast.success("Login successful");
       } else {
-        // navigate("/register", { state: { user: res.user } });
-        console.log("User not registered");
+        navigate("/register-with-google", { state: { user: res.user } });
       }
     } catch (error) {
-      showNotification(error.response.data.message);
+      toast.error(error?.response?.data?.message);
     }
   };
 
   return (
-    <>
-      {contextHolder}
-      <div className="flex justify-center items-center h-screen bg-[#f0f2f5]">
-        <Card
-          style={{
-            width: 400,
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+    <div className="flex justify-center items-center h-screen bg-[#f0f2f5]">
+      <Card
+        style={{
+          width: 400,
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <p className="mb-5">
+          <Back />
+        </p>
+
+        <h2 className={"font-body text-4xl font-bold text-center mb-5"}>
+          Login
+        </h2>
+        <Form
+          form={form}
+          name="login"
+          layout="vertical"
+          initialValues={{
+            remember: true,
           }}
+          onFinish={onFinish}
         >
-          <h2 className={"font-body text-4xl font-bold text-center mb-5"}>
-            Login
-          </h2>
-          <Form
-            form={form}
-            name="login"
-            layout="vertical"
-            initialValues={{
-              remember: true,
-            }}
-            onFinish={onFinish}
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[
+              {
+                required: true,
+                message: "Please input your username!",
+              },
+            ]}
           >
-            <Form.Item
-              label="Username"
-              name="username"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your username!",
-                },
-              ]}
-            >
-              <Input size="large" placeholder="Enter your username" />
-            </Form.Item>
+            <Input size="large" placeholder="Enter your username" />
+          </Form.Item>
 
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your password!",
-                },
-                {
-                  min: 5,
-                  message: "Password must be at least 5 characters!",
-                },
-              ]}
-            >
-              <Input.Password size="large" placeholder="Enter your password" />
-            </Form.Item>
-            <Form.Item name="remember" valuePropName="checked">
-              <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                style={{
-                  backgroundColor: "#40BFFF",
-                  borderColor: "#40BFFF",
-                  color: "#fff",
-                  padding: 20,
-                }}
-                htmlType="submit"
-                block
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+              {
+                min: 5,
+                message: "Password must be at least 5 characters!",
+              },
+            ]}
+          >
+            <Input.Password
+              size="large"
+              placeholder="Enter your password"
+              autoComplete="current-password"
+            />
+          </Form.Item>
+          <div>
+            <p className="text-right">
+              <span
+                className="text-blue-500 cursor-pointer"
+                onClick={() => navigate("/forgot-password")}
               >
-                Login
-              </Button>
-            </Form.Item>
-            <Form.Item>
-              <GoogleLogin
-                onSuccess={loginWithGoogleHandler}
-                onError={() => {
-                  console.log("error");
-                }}
-              />
-            </Form.Item>
-          </Form>
-        </Card>
-      </div>
-    </>
+                Forgot password?
+              </span>
+            </p>
+          </div>
+          <Form.Item name="remember" valuePropName="checked">
+            <Checkbox>Remember me</Checkbox>
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              style={{
+                backgroundColor: "#40BFFF",
+                borderColor: "#40BFFF",
+                color: "#fff",
+                padding: 20,
+              }}
+              htmlType="submit"
+              loading={loading}
+              block
+            >
+              Login
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <GoogleLogin
+              onSuccess={loginWithGoogleHandler}
+              onError={() => {
+                console.log("error");
+              }}
+            />
+          </Form.Item>
+        </Form>
+        <p className="text-center">
+          Don't have an account?{" "}
+          <span
+            className="text-blue-500 cursor-pointer"
+            onClick={() => navigate("/register")}
+          >
+            Register
+          </span>
+        </p>
+      </Card>
+    </div>
   );
 }
 

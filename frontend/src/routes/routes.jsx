@@ -10,6 +10,11 @@ import {
   AboutUs,
   ReviewManagement,
   Register,
+  RegisterWithGoogle,
+  VerifyRegister,
+  ForgotPassword,
+  ResetPassword,
+  ChangePassword,
 } from "../pages";
 import { AuthLayout, HeaderOnly } from "../Layouts";
 
@@ -26,6 +31,31 @@ const routes = [
   {
     path: "/register",
     page: Register,
+    layout: AuthLayout,
+  },
+  {
+    path: "/register-with-google",
+    page: RegisterWithGoogle,
+    layout: AuthLayout,
+  },
+  {
+    path: "/verify-register",
+    page: VerifyRegister,
+    layout: AuthLayout,
+  },
+  {
+    path: "/forgot-password",
+    page: ForgotPassword,
+    layout: AuthLayout,
+  },
+  {
+    path: "/reset-password/:token",
+    page: ResetPassword,
+    layout: AuthLayout,
+  },
+  {
+    path: "/change-password",
+    page: ChangePassword,
     layout: AuthLayout,
   },
 

@@ -1,15 +1,16 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import mongooseDelete from 'mongoose-delete';
 
 const ReviewSchema = new mongoose.Schema(
   {
     accountId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
+      ref: 'Account',
       required: true,
     },
     boardingHouseId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "BoardingHouse",
+      ref: 'BoardingHouse',
       required: true,
     },
     content: {
@@ -28,6 +29,9 @@ const ReviewSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+ReviewSchema.plugin(mongooseDelete, {
+  overrideMethods: 'all',
+});
 
-const Review = mongoose.model("Review", ReviewSchema);
+const Review = mongoose.model('Review', ReviewSchema);
 export default Review;

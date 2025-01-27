@@ -36,10 +36,7 @@ const CustomHeader = () => {
         setIsAdmin(true);
       }
       setIsLoggedIn(true);
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const logout = () => {
@@ -67,6 +64,11 @@ const CustomHeader = () => {
           key: "profile",
           label: "Profile",
           onClick: () => navigate("/profile"),
+        },
+        {
+          key: "change-password",
+          label: "Change Password",
+          onClick: () => navigate("/change-password"),
         },
         {
           key: "logout",
@@ -221,6 +223,11 @@ const CustomHeader = () => {
                       key: "profile",
                       label: "Profile",
                       onClick: () => navigate("/profile"),
+                    },
+                    {
+                      key: "change-password",
+                      label: "Change Password",
+                      onClick: () => navigate("/change-password"),
                     },
                     {
                       key: "logout",

@@ -4,6 +4,7 @@ import { Button } from "../../../../component";
 import { toast } from "react-toastify";
 import moment from "moment";
 import formatAmount from "../../../../utils/formatAmount";
+import DefaultAccount from "../../../../assets/images/none_avatar.png";
 
 const { Option } = Select;
 
@@ -36,12 +37,6 @@ const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
   const handleCancel = () => {
     form.resetFields();
     setIsModalVisible(false);
-  };
-
-  const handleOnOkDelete = () => {
-    onDelete(accountData?._id);
-    setIsModalVisible(false);
-    handleToggleMobal();
   };
 
   const handleSubmit = () => {
@@ -91,7 +86,11 @@ const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
         left-1/2 transform -translate-x-1/2"
         >
           <Avatar
-            src={`http://localhost:3000/${accountData?.avatarImage}`}
+            src={
+              accountData?.avatarImage
+                ? `http://localhost:3000/${accountData.avatarImage}`
+                : DefaultAccount
+            }
             alt="Avatar"
             size="large"
             shape="circle"
@@ -198,31 +197,23 @@ const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
             </div>
           </Form.Item>
 
-          <div className="flex justify-between">
+          <div className="flex justify-end">
             <Button
-              title={"Delete"}
-              btnDelete
-              onClick={handleOnOkDelete}
+              className="bg-orange-600 text-white"
               size="large"
-            />
-            <div className="flex">
-              <Button
-                className="bg-orange-600 text-white"
-                size="large"
-                onClick={handleCancel}
-                title="Cancel"
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-primary text-white ml-2"
-                size="large"
-                onClick={handleSubmit}
-                title="Update"
-              >
-                Update
-              </Button>
-            </div>
+              onClick={handleCancel}
+              title="Cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-primary text-white ml-2"
+              size="large"
+              onClick={handleSubmit}
+              title="Update"
+            >
+              Update
+            </Button>
           </div>
         </Form>
       </Modal>
