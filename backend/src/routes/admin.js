@@ -7,6 +7,7 @@ import {
   reportController,
   ReviewController,
 } from '../controllers/index.js';
+import reviewController from '../controllers/reviewController.js';
 
 const adminRouter = Router();
 
@@ -20,9 +21,17 @@ adminRouter.put(
   '/reports/:reportId/send-email',
   reportController.sendReportReplyByEmail
 );
-adminRouter.get('/reports/filter', reportController.filterReviewReports);
-adminRouter.get('/reviews', ReviewController.getReviews);
 
+adminRouter.get('/reports/filter', reportController.filterReviewReports);
+
+
+//review
+adminRouter.get('/reviews', ReviewController.getReviews);
+adminRouter.get('/reviews/filter', reviewController.filterReviews);
+adminRouter.delete('/reviews/:reviewId', reviewController.softDeleteReview);
+
+
+//boarding house
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard);
 adminRouter.get('/boarding-house-reports', reportController.getBHReports);
 
