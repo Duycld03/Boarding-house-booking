@@ -86,7 +86,7 @@ class reportController {
             { deleted: true },
             { new: true }
           );
-        } else if (report.reportType === 'BoardingHouse') {
+        } else if (report.reportType === 'boardingHouse') {
           await BoardingHouse.findByIdAndUpdate(
             report.targetId,
             { deleted: true },
@@ -180,23 +180,24 @@ class reportController {
     }
   }
 
-
   async filterBHReports(req, res) {
     try {
       const { boardingHouse, startDate, endDate, reason, status } = req.query;
 
-      let filter = {};
+      let filter = { reportType: { $regex: /^boardinghouse$/i } };
 
       if (startDate || endDate) {
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
 
         if (start && isNaN(start)) {
-          return res.status(400).json({ message: "Invalid start date provided" });
+          return res
+            .status(400)
+            .json({ message: 'Invalid start date provided' });
         }
 
         if (end && isNaN(end)) {
-          return res.status(400).json({ message: "Invalid end date provided" });
+          return res.status(400).json({ message: 'Invalid end date provided' });
         }
 
         filter.createdAt = {};
@@ -211,33 +212,34 @@ class reportController {
         filter.status = status;
       }
 
-      const reportsQuery = await Report.find(filter).populate({
-        path: 'targetId',
-        select: 'name',
-      })
-        .populate('reporter').sort({ createdAt: 1 })
-
+      const reportsQuery = await Report.find(filter)
+        .populate({
+          path: 'targetId',
+          select: 'name',
+          model: 'BoardingHouse',
+          options: { withDeleted: true },
+        })
+        .populate('reporter')
+        .sort({ createdAt: 1 });
 
       if (boardingHouse) {
-        const filterBHReportData = reportsQuery.filter(report =>
-          report?.targetId?.name?.toLowerCase().includes(boardingHouse.toLowerCase())
+        const filterBHReportData = reportsQuery.filter((report) =>
+          report?.targetId?.name
+            ?.toLowerCase()
+            .includes(boardingHouse.toLowerCase())
         );
 
         console.log(filterBHReportData);
 
         res.status(200).json(filterBHReportData);
-
       } else {
-
         res.status(200).json(reportsQuery);
       }
-
     } catch (error) {
-      console.error("Error filtering boarding house reports:", error);
-      res.status(500).json({ success: false, message: "Server Error" });
+      console.error('Error filtering boarding house reports:', error);
+      res.status(500).json({ success: false, message: 'Server Error' });
     }
   }
-
 
   async getBHReports(req, res) {
     try {
@@ -247,8 +249,11 @@ class reportController {
         .populate({
           path: 'targetId',
           select: 'name',
+          model: 'BoardingHouse',
+          options: { withDeleted: true },
         })
-        .populate('reporter').sort({ createdAt: 1 })
+        .populate('reporter')
+        .sort({ createdAt: 1 });
 
       return res.status(200).json(BHReports);
     } catch (error) {
