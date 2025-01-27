@@ -12,6 +12,8 @@ import {
   Register,
   RegisterWithGoogle,
   VerifyRegister,
+  ForgotPassword,
+  ResetPassword,
 } from "../pages";
 import { AuthLayout, HeaderOnly } from "../Layouts";
 
@@ -38,6 +40,16 @@ const routes = [
   {
     path: "/verify-register",
     page: VerifyRegister,
+    layout: AuthLayout,
+  },
+  {
+    path: "/forgot-password",
+    page: ForgotPassword,
+    layout: AuthLayout,
+  },
+  {
+    path: "/reset-password/:token",
+    page: ResetPassword,
     layout: AuthLayout,
   },
 

@@ -36,10 +36,7 @@ const CustomHeader = () => {
         setIsAdmin(true);
       }
       setIsLoggedIn(true);
-      console.log(res);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const logout = () => {
