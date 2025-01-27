@@ -10,8 +10,9 @@ const AddressSelector = ({
     formData,
 }) => {
     return (
-        <div className="grid grid-cols-1 gap-4">
-            <div>
+        <div className="col-span-2">
+            <label className="block text-3xl font-semibold mb-2">Address</label>
+            <div className="mb-4">
                 <label className="block mb-1">Tỉnh/Thành phố</label>
                 <select
                     name="address.province"
@@ -21,7 +22,7 @@ const AddressSelector = ({
                         onInputChange(e); // Update province in formData
                     }}
                     required
-                    className="w-full border rounded px-2 py-1"
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="">Chọn Tỉnh/Thành phố</option>
                     {provinces.map((province) => (
@@ -31,18 +32,17 @@ const AddressSelector = ({
                     ))}
                 </select>
             </div>
-            <div>
+            <div className="mb-4">
                 <label className="block mb-1">Quận/Huyện</label>
                 <select
                     name="address.district"
                     value={formData?.address?.district || ""}
-
                     onChange={(e) => {
                         onDistrictChange(e); // Fetch wards
                         onInputChange(e); // Update district in formData
                     }}
                     required
-                    className="w-full border rounded px-2 py-1"
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={!formData?.address?.province}
                 >
                     <option value="">Chọn Quận/Huyện</option>
@@ -53,14 +53,14 @@ const AddressSelector = ({
                     ))}
                 </select>
             </div>
-            <div>
+            <div className="mb-4">
                 <label className="block mb-1">Phường/Xã</label>
                 <select
                     name="address.ward"
                     value={formData?.address?.ward || ""}
                     onChange={onInputChange}
                     required
-                    className="w-full border rounded px-2 py-1"
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={!formData?.address?.district}
                 >
                     <option value="">Chọn Phường/Xã</option>
@@ -78,11 +78,11 @@ const AddressSelector = ({
                     value={formData?.address?.detail || ""}
                     onChange={onInputChange}
                     required
-                    className="w-full border rounded px-2 py-1"
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Nhập địa chỉ chi tiết"
                 ></textarea>
             </div>
-        </div >
+        </div>
     );
 };
 

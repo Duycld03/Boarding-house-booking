@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import AddressSelector from "../../../component/AddressSelector";
+import { Form, Input, Select, InputNumber } from "antd";
 import {
   Button,
   TableCustom as Table,
@@ -23,6 +24,8 @@ import {
 } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import convertTimetap from "../../../utils/convertTimetap";
+import { FileTextOutlined } from "@ant-design/icons";
+
 
 function BoardingHouseManagement() {
   const [boardingHData, setBoardingHData] = useState([]);
@@ -70,28 +73,28 @@ function BoardingHouseManagement() {
       toast.error("Failed to fetch boarding house types.");
     }
   };
-  // Fetch danh sách tỉnh thành
-  const fetchProvincesData = async () => {
-    const data = await fetchProvinces();
-    setProvinces(data);
-  };
-  const fetchDistrictsData = async () => {
-    const province = provinces.find(f => f.name === formData.address.province);
+  // // Fetch danh sách tỉnh thành
+  // const fetchProvincesData = async () => {
+  //   const data = await fetchProvinces();
+  //   setProvinces(data);
+  // };
+  // const fetchDistrictsData = async () => {
+  //   const province = provinces.find(f => f.name === formData.address.province);
 
-    const data = await fetchDistricts(province.code);
-    console.log("test1.1: ", data);
+  //   const data = await fetchDistricts(province.code);
+  //   console.log("test1.1: ", data);
 
-    setDistricts(data);
-    setWards([]); // Reset danh sách phường/xã
-  };
-  const fetchWardsData = async () => {
-    const district = districts.find(f => f.name === formData?.address?.district);
-    console.log("test2.1: ", districts);
-    const data = await fetchWards(district.code);
-    console.log("test2.2: ", data);
+  //   setDistricts(data);
+  //   setWards([]); // Reset danh sách phường/xã
+  // };
+  // const fetchWardsData = async () => {
+  //   const district = districts.find(f => f.name === formData?.address?.district);
+  //   console.log("test2.1: ", districts);
+  //   const data = await fetchWards(district.code);
+  //   console.log("test2.2: ", data);
 
-    setWards(data);
-  };
+  //   setWards(data);
+  // };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -107,7 +110,7 @@ function BoardingHouseManagement() {
           if (selectedProvince) {
             const districtsData = await fetchDistricts(selectedProvince.code);
             setDistricts(districtsData);
-
+            setWards([]);
             // Nếu đã chọn quận, fetch wards
             if (formData?.address?.district) {
               const selectedDistrict = districtsData.find(
@@ -124,7 +127,6 @@ function BoardingHouseManagement() {
         console.error("Error fetching data:", error);
       }
     };
-
     fetchData();
   }, [formData?.address?.province, formData?.address?.district]);
 
@@ -273,7 +275,17 @@ function BoardingHouseManagement() {
       toast.error("Failed to delete image.");
     }
   };
-
+  const handleSoftDelete = async (record) => {
+    try {
+      const updatedData = { deleted: true };
+      await updateBoardingHouseDetails(record._id, updatedData);
+      toast.success("Boarding house deleted successfully.");
+      fetchData();
+    } catch (error) {
+      console.error("Failed to delete boarding house:", error);
+      toast.error("Failed to delete boarding house. Please try again.");
+    }
+  };
   useEffect(() => {
     fetchData();
     fetchBoardingHouseTypes();
@@ -318,6 +330,27 @@ function BoardingHouseManagement() {
       key: "createdAt",
       render: (text) => convertTimetap(text),
     },
+    {
+      title: "Ation",
+      key: "action",
+      render: (createdAt, record) => (
+        <div className="flex gap-3">
+          <Button
+            size="large"
+            btnDelete
+            title={"Delete"}
+            onClick={() => handleSoftDelete(record)}
+          />
+          <Button
+            onClick={() => handleRowClick(record._id)}
+            size="large"
+            title={"Detail"}
+            icon={<FileTextOutlined />}
+            className={"bg-emerald-500 text-white"}
+          />
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -326,11 +359,11 @@ function BoardingHouseManagement() {
         <Loader />
       ) : (
         <>
-          <h1 className=" text-2xl font-bold mb-4">Boarding House Management</h1>
+
           <Table
             columns={columns}
             data={boardingHData}
-            onRowClick={(record) => handleRowClick(record._id)}
+            // onRowClick={(record) => handleRowClick(record._id)}
             loading={loading}
           />
           {isDetailOpen && formData && (
@@ -339,39 +372,32 @@ function BoardingHouseManagement() {
                 onSubmit={handleSubmit}
                 className="bg-white p-6 rounded-lg w-full max-w-3xl overflow-auto"
               >
-                <h2 className="overflow-auto scrollbar-thin text-xl font-bold mb-4">
+                <h2 className=" text-3xl font-bold mb-4">
                   Boarding House Detail
                 </h2>
-                <div className="grid grid-cols-2 gap-4 max-h-[600px] overflow-y-auto">
-                  <div>
+                <div className="grid grid-cols-2 gap-4 max-h-[600px] overflow-y-auto w-full ">
+                  <div className="col-span-2">
                     <label>Name Owner</label>
                     <input
                       type="text"
                       value={formData.ownerId?.fullname || ""}
                       readOnly
-                      className="w-full border rounded px-2 py-1 mb-4"
+                      disabled
+                      className="w-full border rounded px-2 py-1 mb-2"
                     />
                   </div>
-                  <div>
-                    <label>Owner</label>
-                    <input
-                      type="text"
-                      value={formData.ownerId?.username || ""}
-                      readOnly
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
+
+                  <div className="col-span-2">
                     <label>Name Boarding House</label>
                     <input
                       type="text"
                       name="name"
                       value={formData.name || ""}
                       onChange={handleInputChange}
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border rounded px-2 py-1 mb-2"
                     />
                   </div>
-                  <div>
+                  <div className="col-span-2">
                     <label>Boarding House Type</label>
                     <select
                       name="boardingHouseType"
@@ -384,7 +410,7 @@ function BoardingHouseManagement() {
                           },
                         })
                       }
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border rounded px-2 py-1 mb-2"
                     >
                       {/* <option value="" disabled>
                         Select a type
@@ -477,31 +503,13 @@ function BoardingHouseManagement() {
                       className="w-full border rounded px-2 py-1"
                     ></textarea>
                   </div>
-                  <div>
+                  <div className="col-span-2">
                     <label>Price Range (VND)</label>
                     <input
                       type="number"
                       name="priceRange"
                       value={formData.priceRange || ""}
                       onChange={handleInputChange}
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
-                    <label>Total Rooms</label>
-                    <input
-                      type="number"
-                      value={formData.totalRooms || ""}
-                      readOnly
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
-                    <label>Available Rooms</label>
-                    <input
-                      type="number"
-                      value={formData.availableRooms || ""}
-                      readOnly
                       className="w-full border rounded px-2 py-1"
                     />
                   </div>
@@ -525,22 +533,45 @@ function BoardingHouseManagement() {
                       className="w-full border rounded px-2 py-1"
                     />
                   </div>
+                  <div>
+                    <label>Total Rooms</label>
+                    <input
+                      type="number"
+                      value={formData.totalRooms || ""}
+                      readOnly
+                      disabled
+                      className="w-full border rounded px-2 py-1 mb-4"
+                    />
+                  </div>
+                  <div>
+                    <label>Available Rooms</label>
+                    <input
+                      type="number"
+                      value={formData.availableRooms || ""}
+                      readOnly
+                      disabled
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </div>
                 </div>
-                <div className="flex justify-end mt-4">
-                  <button
-                    type="submit"
-                    onClick={handleSubmit}
-                    className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-                  >
-                    Update
-                  </button>
-                  <button
-                    type="button"
+
+                <div className="flex justify-end">
+                  <Button
+                    className="bg-orange-600 text-white"
+                    size="large"
                     onClick={handleCloseDetail}
-                    className="bg-gray-500 text-white px-4 py-2 rounded"
+                    title="Cancel"
                   >
                     Cancel
-                  </button>
+                  </Button>
+                  <Button
+                    className="bg-primary text-white ml-2"
+                    size="large"
+                    onClick={handleSubmit}
+                    title="Update"
+                  >
+                    Update
+                  </Button>
                 </div>
               </form>
             </div>
