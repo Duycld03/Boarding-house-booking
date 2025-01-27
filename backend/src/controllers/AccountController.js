@@ -17,7 +17,6 @@ class AccountController {
       return res.status(500).json({ error: error.message });
     }
 
-  }
 
 
   async softDeleteAccount(req, res, next) {
