@@ -1,14 +1,13 @@
 import { Form, Button, Card, Input } from "antd";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { forgotPassword } from "../../../api/authManagement";
 import { Back } from "../../../component";
 
 function ForgotPassword() {
-  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   const onFinish = async (values) => {
     try {
@@ -16,12 +15,23 @@ function ForgotPassword() {
       const res = await forgotPassword(values);
       toast.success(res.message);
       setLoading(false);
+      setCountdown(15);
     } catch (error) {
       toast.error(error?.response?.data?.message);
       form.resetFields();
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const intervalId = setTimeout(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearTimeout(intervalId);
+    }
+  }, [countdown]);
 
   return (
     <div className="flex justify-center items-center h-screen bg-[#f0f2f5]">
@@ -62,8 +72,14 @@ function ForgotPassword() {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>
-              Send Email
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              disabled={countdown > 0}
+              block
+            >
+              {countdown > 0 ? `Wait ${countdown}s` : "Send Email"}
             </Button>
           </Form.Item>
         </Form>
