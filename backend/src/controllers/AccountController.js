@@ -4,21 +4,22 @@ import { generateToken } from "../utils/functions.js";
 
 class AccountController {
 
-    async getAllAccount(req, res, next) {
-        try {
-            const accountData = await Account.find().sort({ createdAt: 1 });
-            if (accountData) {
-                return res.status(200).json(accountData);
+  async getAllAccount(req, res, next) {
+    try {
+      const accountData = await Account.find().sort({ createdAt: 1 });
+      if (accountData) {
+        return res.status(200).json(accountData);
 
-            } else {
-                return res.status(404).json({ message: "No accounts found" });
-            }
-        } catch (error) {
-            return res.status(500).json({ error: error.message });
-        }
-
+      } else {
+        return res.status(404).json({ message: "No accounts found" });
+      }
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
     }
+
   }
+
+
 
   async softDeleteAccount(req, res, next) {
     try {
