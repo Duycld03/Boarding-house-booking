@@ -15,7 +15,12 @@ import Styles from "./Header.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../assets/images/Icon.svg";
 import UserAvatar from "../../../assets/images/none_avatar.png";
-import { MenuOutlined } from "@ant-design/icons";
+import {
+  LockOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { getUser } from "../../../api/authManagement";
 
 const cx = classNames.bind(Styles);
@@ -57,21 +62,25 @@ const CustomHeader = () => {
   ];
 
   // User menu for dropdown
+
   const userMenu = (
     <Menu
       items={[
         {
           key: "profile",
+          icon: <UserOutlined />,
           label: "Profile",
           onClick: () => navigate("/profile"),
         },
         {
           key: "change-password",
+          icon: <LockOutlined />, // Icon cho Change Password
           label: "Change Password",
           onClick: () => navigate("/change-password"),
         },
         {
           key: "logout",
+          icon: <LogoutOutlined />, // Icon cho Logout
           label: "Logout",
           onClick: logout,
         },
@@ -147,7 +156,7 @@ const CustomHeader = () => {
           overlayStyle={{
             fontSize: "16px",
             padding: "8px",
-            width: 150,
+            width: 200,
           }}
         >
           {screens.lg && (
