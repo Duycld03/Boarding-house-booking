@@ -4,6 +4,7 @@
   "description": "project boarding house booking of group 4",
   "main": "index.js",
   "scripts": {
+    "prepare": "npx husky install",
     "client": "cd frontend && npm run dev",
     "server": "cd backend && npm start",
     "start": "concurrently \"npm run client\" \"npm run server\"",
