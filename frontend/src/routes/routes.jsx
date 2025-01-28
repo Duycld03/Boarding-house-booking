@@ -15,8 +15,9 @@ import {
   ForgotPassword,
   ResetPassword,
   ChangePassword,
+  Profile,
 } from "../pages";
-import { AuthLayout, HeaderOnly } from "../Layouts";
+import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 
 const dashBoard = "/dashboard";
 
@@ -75,6 +76,11 @@ const routes = [
     path: "about-us",
     page: AboutUs,
     layout: HeaderOnly,
+  },
+  {
+    path: "profile",
+    page: Profile,
+    layout: ProfileLayout,
   },
 
   // dashBoard
