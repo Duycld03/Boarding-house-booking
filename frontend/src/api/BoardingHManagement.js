@@ -26,3 +26,14 @@ export const deleteBoardingHouseImage = (boardingHouseId, imageId) => {
 export const getBoardingHouseImages = async (boardingHouseId) => {
     return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
 }
+
+export const getMaxPriceBH = async () => {
+    return axios.get('/dashboard/boardinghouse/chore/get-max');
+}
+
+
+export const filterBH = async (filterValue) => {
+    return axios.get(`/dashboard/boardinghouse/chore/filter`, {
+        params: filterValue,
+    });
+}

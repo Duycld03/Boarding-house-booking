@@ -1,5 +1,7 @@
+import mongoose from 'mongoose';
 import BoardingHouse from '../models/boardingHouse.js'
 import BoardingHouseType from '../models/boardingHouseType .js'
+import unidecode from 'unidecode'
 
 class BoardingHouseController {
     async getAllBHOnDashBoard(req, res, next) {
@@ -259,6 +261,97 @@ class BoardingHouseController {
             });
         }
     }
+
+    async filterBoardingHouse(req, res) {
+        try {
+            let { boardingHouseType, district, name, priceRange, province, ward, startDate, endDate } = req.query;
+
+            let filter = {};
+            let result = [];
+
+            if (boardingHouseType) {
+                filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType); // Convert string to ObjectId
+            }
+
+            if (priceRange && priceRange.length === 2) {
+                filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
+            }
+
+            if (startDate && endDate) {
+                filter.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
+            }
+
+            // Query the boarding houses based on filter
+            const boardingHouses = await BoardingHouse.find(filter)
+                .populate('boardingHouseType')
+                .populate({
+                    path: 'ownerId',
+                })
+                .sort({ createdAt: 1 });
+
+            result = boardingHouses;
+
+            if (province) {
+                result = result.filter((bh) => {
+                    return bh.address?.province && bh.address.province.toLowerCase().includes(province.toLowerCase());
+                });
+            }
+
+            if (district) {
+                result = result.filter((bh) => {
+                    return bh.address?.district && bh.address.district.toLowerCase().includes(district.toLowerCase());
+                });
+            }
+
+            if (ward) {
+                result = result.filter((bh) => {
+                    return bh.address?.ward && bh.address.ward.toLowerCase().includes(ward.toLowerCase());
+                });
+            }
+
+            // Handle name search if provided
+            if (name) {
+                result = result.filter((bh) => {
+                    return bh.name && bh.name.toLowerCase().includes(name.toLowerCase());
+                });
+            }
+
+            res.status(200).json(result);
+
+        } catch (error) {
+            console.error("Error filtering boarding houses:", error);
+            res.status(500).json({ message: "Server Error" });
+        }
+    }
+
+
+
+
+
+
+
+
+    async getMaxPriceBH(req, res, next) {
+        try {
+            const boardingHouses = await BoardingHouse.find({}, { priceRange: 1 });
+
+            if (!boardingHouses || boardingHouses.length === 0) {
+                return res.status(404).json({ message: "No boarding house found" });
+            }
+
+            const maxPrice = boardingHouses[0].priceRange; // Lấy giá trị lớn nhất
+
+            const roundedPrice = Math.ceil(maxPrice / 100) * 100; // Làm tròn lên theo bội số của 100
+
+            res.status(200).json({ maxPrice: roundedPrice });
+        } catch (error) {
+            console.error("Error fetching max price:", error);
+            res.status(500).json({ message: "Internal Server Error", error: error.message });
+        }
+    }
+
+
+
 }
 
 export default new BoardingHouseController();
