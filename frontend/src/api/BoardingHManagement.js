@@ -8,6 +8,7 @@ export const getBoardingHouseDetails = async (boardingHouseId) => {
 };
 export const updateBoardingHouseDetails = (boardingHouseId, updateData) => {
     return axios.put(`/dashboard/boardinghouse/${boardingHouseId}`, updateData);
+
 };
 export const getAllBoardingHouseTypes = () => {
     return axios.get("/dashboard/types");
