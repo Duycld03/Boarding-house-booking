@@ -9,5 +9,6 @@ authRouter.get("/", (req, res) => {
 
 authRouter.get("/user", authController.getAccountFromToken);
 authRouter.post("/change-password", AccountController.changePassword);
+authRouter.put("/profile", AccountController.updateAccountFromProfile);
 
 export { authRouter };

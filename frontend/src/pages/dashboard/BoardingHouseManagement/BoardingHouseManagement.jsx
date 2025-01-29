@@ -1,11 +1,7 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import AddressSelector from "../../../component/AddressSelector";
-import {
-  Button,
-  TableCustom as Table,
-  Loader,
-} from "../../../component";
+import { Button, TableCustom as Table, Loader } from "../../../component";
 import {
   fetchProvinces,
   fetchDistricts,
@@ -19,11 +15,13 @@ import {
   getBoardingHouseImages,
   addBoardingHouseImage,
   updateBoardingHouseImage,
-  deleteBoardingHouseImage
+  deleteBoardingHouseImage,
+  filterBH,
 } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import convertTimetap from "../../../utils/convertTimetap";
 import CreateBoardingHouse from "./CreateBoardingHouse";
+import FilterBoardingHouse from "./FilterBoardingHouse";
 
 function BoardingHouseManagement() {
   const [boardingHData, setBoardingHData] = useState([]);
@@ -36,9 +34,13 @@ function BoardingHouseManagement() {
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
   const [error, setError] = useState(""); // Thêm state error
   const [images, setImages] = useState([]); // Lưu danh sách ảnh
+
   const [formData, setFormData] = useState({
   });
   const [isFormOpen, setIsFormOpen] = useState(false); // Controls the visibility of the form
+
+  const [filterValue, setFilterValue] = useState();
+
 
   // Fetch dữ liệu danh sách Boarding House
   const fetchData = async () => {
@@ -83,7 +85,22 @@ function BoardingHouseManagement() {
       toast.error("Failed to fetch images.");
     }
   };
-  // Fetch  Boarding House types 
+
+  const fetchFilterData = async () => {
+    try {
+      const res = await filterBH(filterValue);
+      setBoardingHData(res);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+      toast.error("Failed to fetch filter data.");
+    }
+  };
+
+  useEffect(() => {
+    fetchFilterData();
+  }, [filterValue]);
+
+  // Fetch  Boarding House types
   const fetchBoardingHouseTypes = async () => {
     try {
       const response = await getAllBoardingHouseTypes();
@@ -93,13 +110,16 @@ function BoardingHouseManagement() {
       toast.error("Failed to fetch boarding house types.");
     }
   };
+
   // Fetch danh sách tỉnh thành
   const fetchProvincesData = async () => {
     const data = await fetchProvinces();
     setProvinces(data);
   };
   const fetchDistrictsData = async () => {
-    const province = provinces.find(f => f.name === formData.address.province);
+    const province = provinces.find(
+      (f) => f.name === formData.address.province
+    );
 
     const data = await fetchDistricts(province.code);
     console.log("test1.1: ", data);
@@ -108,7 +128,9 @@ function BoardingHouseManagement() {
     setWards([]); // Reset danh sách phường/xã
   };
   const fetchWardsData = async () => {
-    const district = districts.find(f => f.name === formData?.address?.district);
+    const district = districts.find(
+      (f) => f.name === formData?.address?.district
+    );
     console.log("test2.1: ", districts);
     const data = await fetchWards(district.code);
     console.log("test2.2: ", data);
@@ -158,7 +180,6 @@ function BoardingHouseManagement() {
       setFormData(data);
       setIsDetailOpen(true);
       fetchImages(id);
-
     } catch (error) {
       console.error("Failed to fetch boarding house details:", error);
       toast.error("Failed to fetch boarding house details.");
@@ -258,7 +279,10 @@ function BoardingHouseManagement() {
       const uploadedImageUrl = URL.createObjectURL(file);
       console.log("Uploaded Image URL:", uploadedImageUrl); // Debugging
 
-      await addBoardingHouseImage(formData._id, { imageUrl: uploadedImageUrl, isPrimary });
+      await addBoardingHouseImage(formData._id, {
+        imageUrl: uploadedImageUrl,
+        isPrimary,
+      });
       fetchImages(formData._id);
       toast.success("Image added successfully.");
     } catch (error) {
@@ -282,7 +306,6 @@ function BoardingHouseManagement() {
     }
   };
 
-
   const handleImageDelete = async (imageId) => {
     try {
       // Gọi API xóa ảnh
@@ -301,6 +324,10 @@ function BoardingHouseManagement() {
     fetchData();
     fetchBoardingHouseTypes();
   }, []);
+
+  useEffect(() => {
+    console.log("Filter value: ", filterValue);
+  }, [filterValue]);
 
   // Cấu hình cột trong bảng
   const columns = [
@@ -345,248 +372,245 @@ function BoardingHouseManagement() {
 
   return (
     <div className="boarding-house-management">
-      {loading ? (
-        <Loader />
-      ) : (
-        <>
-          <h1 className=" text-2xl font-bold mb-4">Boarding House Management</h1>
+        <h1 className=" text-2xl font-bold mb-4">Boarding House Management</h1>
           <div>
-
             <Button btnAdd title="Add new" size="large" onClick={handleOpenForm}></Button>
           </div>
-
-          {/* {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <Table columns={columns} data={boardingHouses} />
-          )} */}
-
-          <Table
-            columns={columns}
-            data={boardingHData}
-            onRowClick={(record) => handleRowClick(record._id)}
-            loading={loading}
+        <div className="flex justify-end">
+          <FilterBoardingHouse
+            setFilterValue={setFilterValue}
+            boardingHouseTypes={boardingHouseTypes}
           />
+        </div>
+        <Table
+          columns={columns}
+          data={boardingHData}
+          onRowClick={(record) => handleRowClick(record._id)}
+          loading={loading}
+        />
           {isFormOpen && (
             <CreateBoardingHouse
-              onClose={handleCloseForm}
-              onSuccess={handleFormSuccess}
+             onClose={handleCloseForm}
+             onSuccess={handleFormSuccess}
             />
           )}
-          {isDetailOpen && formData && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <form
-                onSubmit={handleSubmit}
-                className="bg-white p-6 rounded-lg w-full max-w-3xl overflow-auto"
-              >
-                <h2 className="overflow-auto scrollbar-thin text-xl font-bold mb-4">
-                  Boarding House Detail
-                </h2>
-                <div className="grid grid-cols-2 gap-4 max-h-[600px] overflow-y-auto">
-                  <div>
-                    <label>Name Owner</label>
-                    <input
-                      type="text"
-                      value={formData.ownerId?.fullname || ""}
-                      readOnly
-                      className="w-full border rounded px-2 py-1 mb-4"
-                    />
-                  </div>
-                  <div>
-                    <label>Owner</label>
-                    <input
-                      type="text"
-                      value={formData.ownerId?.username || ""}
-                      readOnly
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
-                    <label>Name Boarding House</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name || ""}
-                      onChange={handleInputChange}
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
-                    <label>Boarding House Type</label>
-                    <select
-                      name="boardingHouseType"
-                      value={formData.boardingHouseType?._id || ""}
-                      onChange={(e) =>
-                        handleSelectedTypesChange({
-                          target: {
-                            name: "boardingHouseType",
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                      className="w-full border rounded px-2 py-1"
-                    >
-                      {/* <option value="" disabled>
+        {isDetailOpen && formData && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white p-6 rounded-lg w-full max-w-3xl overflow-auto"
+            >
+              <h2 className="overflow-auto scrollbar-thin text-xl font-bold mb-4">
+                Boarding House Detail
+              </h2>
+              <div className="grid grid-cols-2 gap-4 max-h-[600px] overflow-y-auto">
+                <div>
+                  <label>Name Owner</label>
+                  <input
+                    type="text"
+                    value={formData.ownerId?.fullname || ""}
+                    readOnly
+                    className="w-full border rounded px-2 py-1 mb-4"
+                  />
+                </div>
+                <div>
+                  <label>Owner</label>
+                  <input
+                    type="text"
+                    value={formData.ownerId?.username || ""}
+                    readOnly
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label>Name Boarding House</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name || ""}
+                    onChange={handleInputChange}
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label>Boarding House Type</label>
+                  <select
+                    name="boardingHouseType"
+                    value={formData.boardingHouseType?._id || ""}
+                    onChange={(e) =>
+                      handleSelectedTypesChange({
+                        target: {
+                          name: "boardingHouseType",
+                          value: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full border rounded px-2 py-1"
+                  >
+                    {/* <option value="" disabled>
                         Select a type
                       </option> */}
-                      name="boardingHouseType"
-                      value={formData.boardingHouseType?._id || ""}
-                      {boardingHouseTypes.map((type) => (
-                        <option key={type.value} value={type.value}>
-                          {type.label}
+                    name="boardingHouseType" value=
+                    {formData.boardingHouseType?._id || ""}
+                    {boardingHouseTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                        </option>
-                      ))}
-
-                    </select>
+                <div className="col-span-2">
+                  <label>Primary Image</label>
+                  <div className="relative mb-4">
+                    {images.length > 0 ? (
+                      <img
+                        src={
+                          images.find((img) => img.isPrimary)?.imageUrl ||
+                          "https://via.placeholder.com/150"
+                        }
+                        alt="Primary"
+                        className="w-full h-48 object-cover border rounded"
+                      />
+                    ) : (
+                      <p className="text-gray-500">
+                        No primary image available
+                      </p>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, true)}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
                   </div>
+                </div>
 
-                  <div className="col-span-2">
-                    <label>Primary Image</label>
-                    <div className="relative mb-4">
-                      {images.length > 0 ? (
-                        <img
-                          src={
-                            images.find((img) => img.isPrimary)?.imageUrl || "https://via.placeholder.com/150"
-                          }
-                          alt="Primary"
-                          className="w-full h-48 object-cover border rounded"
-                        />
-                      ) : (
-                        <p className="text-gray-500">No primary image available</p>
-                      )}
+                {/* Other Images */}
+                <div className="col-span-2">
+                  <label>Other Images</label>
+                  <div className="overflow-x-auto flex gap-4 py-2">
+                    {images
+                      .filter((img) => !img.isPrimary)
+                      .map((image, index) => (
+                        <div
+                          key={image._id}
+                          className="relative flex-shrink-0 w-32 h-32"
+                        >
+                          <img
+                            src={image.imageUrl}
+                            alt={`Other ${index}`}
+                            className="w-full h-full object-cover border rounded"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleImageDelete(image._id)}
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      ))}
+                    {/* Add New Image */}
+                    <div className="w-32 h-32 flex items-center justify-center border rounded relative">
                       <input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleImageUpload(e, true)}
+                        onChange={(e) => handleImageUpload(e)}
                         className="absolute inset-0 opacity-0 cursor-pointer"
                       />
+                      <span className="text-gray-500">+ Add Image</span>
                     </div>
                   </div>
+                </div>
 
-                  {/* Other Images */}
-                  <div className="col-span-2">
-                    <label>Other Images</label>
-                    <div className="overflow-x-auto flex gap-4 py-2">
-                      {images
-                        .filter((img) => !img.isPrimary)
-                        .map((image, index) => (
-                          <div key={image._id} className="relative flex-shrink-0 w-32 h-32">
-                            <img
-                              src={image.imageUrl}
-                              alt={`Other ${index}`}
-                              className="w-full h-full object-cover border rounded"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleImageDelete(image._id)}
-                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                            >
-                              &times;
-                            </button>
-                          </div>
-                        ))}
-                      {/* Add New Image */}
-                      <div className="w-32 h-32 flex items-center justify-center border rounded relative">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(e)}
-                          className="absolute inset-0 opacity-0 cursor-pointer"
-                        />
-                        <span className="text-gray-500">+ Add Image</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <AddressSelector
-                    provinces={provinces}
-                    districts={districts}
-                    wards={wards}
-                    onProvinceChange={handleInputChange}
-                    onDistrictChange={handleInputChange}
-                    onInputChange={handleInputChange}
-                    formData={formData}
+                <AddressSelector
+                  provinces={provinces}
+                  districts={districts}
+                  wards={wards}
+                  onProvinceChange={handleInputChange}
+                  onDistrictChange={handleInputChange}
+                  onInputChange={handleInputChange}
+                  formData={formData}
+                />
+                <div className="col-span-2">
+                  <label>Description</label>
+                  <textarea
+                    name="description"
+                    value={formData.description || ""}
+                    onChange={handleInputChange}
+                    className="w-full border rounded px-2 py-1"
+                  ></textarea>
+                </div>
+                <div>
+                  <label>Price Range (VND)</label>
+                  <input
+                    type="number"
+                    name="priceRange"
+                    value={formData.priceRange || ""}
+                    onChange={handleInputChange}
+                    className="w-full border rounded px-2 py-1"
                   />
-                  <div className="col-span-2">
-                    <label>Description</label>
-                    <textarea
-                      name="description"
-                      value={formData.description || ""}
-                      onChange={handleInputChange}
-                      className="w-full border rounded px-2 py-1"
-                    ></textarea>
-                  </div>
-                  <div>
-                    <label>Price Range (VND)</label>
-                    <input
-                      type="number"
-                      name="priceRange"
-                      value={formData.priceRange || ""}
-                      onChange={handleInputChange}
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
-                    <label>Total Rooms</label>
-                    <input
-                      type="number"
-                      value={formData.totalRooms || ""}
-                      readOnly
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
-                    <label>Available Rooms</label>
-                    <input
-                      type="number"
-                      value={formData.availableRooms || ""}
-                      readOnly
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
-                    <label>Electricity Price</label>
-                    <input
-                      type="number"
-                      name="electricityPrice"
-                      value={formData.electricityPrice || ""}
-                      onChange={handleInputChange}
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
-                  <div>
-                    <label>Water Price</label>
-                    <input
-                      type="number"
-                      name="waterPrice"
-                      value={formData.waterPrice || ""}
-                      onChange={handleInputChange}
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </div>
                 </div>
-                <div className="flex justify-end mt-4">
-                  <button
-                    type="submit"
-                    onClick={handleSubmit}
-                    className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-                  >
-                    Update
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCloseDetail}
-                    className="bg-gray-500 text-white px-4 py-2 rounded"
-                  >
-                    Cancel
-                  </button>
+                <div>
+                  <label>Total Rooms</label>
+                  <input
+                    type="number"
+                    value={formData.totalRooms || ""}
+                    readOnly
+                    className="w-full border rounded px-2 py-1"
+                  />
                 </div>
-              </form>
-            </div>
-          )}
-        </>
-      )}
+                <div>
+                  <label>Available Rooms</label>
+                  <input
+                    type="number"
+                    value={formData.availableRooms || ""}
+                    readOnly
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label>Electricity Price</label>
+                  <input
+                    type="number"
+                    name="electricityPrice"
+                    value={formData.electricityPrice || ""}
+                    onChange={handleInputChange}
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label>Water Price</label>
+                  <input
+                    type="number"
+                    name="waterPrice"
+                    value={formData.waterPrice || ""}
+                    onChange={handleInputChange}
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-4">
+                <button
+                  type="submit"
+                  onClick={handleSubmit}
+                  className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+                >
+                  Update
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCloseDetail}
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      </>
     </div>
   );
 }

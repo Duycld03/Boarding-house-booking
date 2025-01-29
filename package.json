@@ -4,6 +4,7 @@
   "description": "project boarding house booking of group 4",
   "main": "index.js",
   "scripts": {
+    "prepare": "npx husky install",
     "client": "cd frontend && npm run dev",
     "server": "cd backend && npm start",
     "start": "concurrently \"npm run client\" \"npm run server\"",
@@ -15,7 +16,6 @@
   "license": "ISC",
   "dependencies": {
     "concurrently": "^9.0.1",
-    "nodemailer": "^6.10.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

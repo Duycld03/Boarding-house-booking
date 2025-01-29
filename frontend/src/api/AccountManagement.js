@@ -24,3 +24,15 @@ export const updateAccount = (accountId, accountData) => {
 export const changePassword = (data) => {
   return axios.post("auth/change-password", data);
 };
+
+export const updateAccountFromProfile = (data) => {
+  return axios.put("auth/profile", data);
+};
+
+export const updateEmail = (data) => {
+  return axios.put("auth/email", data);
+};
+
+export const updateAvatar = (data) => {
+  return axios.put("auth/avatar", data);
+};
