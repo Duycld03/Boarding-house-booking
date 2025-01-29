@@ -26,3 +26,13 @@ export const deleteBoardingHouseImage = (boardingHouseId, imageId) => {
 export const getBoardingHouseImages = async (boardingHouseId) => {
     return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
 }
+export const createBoardingHouse = (data) => {
+    return axios.post('/dashboard/boardinghouse/create', data);
+};
+export const uploadFile = (data) => {
+    return axios.post('/dashboard/boardinghouse/uploadFile', data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};

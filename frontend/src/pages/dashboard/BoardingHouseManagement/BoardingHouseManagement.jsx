@@ -23,6 +23,7 @@ import {
 } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import convertTimetap from "../../../utils/convertTimetap";
+import CreateBoardingHouse from "./CreateBoardingHouse";
 
 function BoardingHouseManagement() {
   const [boardingHData, setBoardingHData] = useState([]);
@@ -36,8 +37,9 @@ function BoardingHouseManagement() {
   const [error, setError] = useState(""); // Thêm state error
   const [images, setImages] = useState([]); // Lưu danh sách ảnh
   const [formData, setFormData] = useState({
-
   });
+  const [isFormOpen, setIsFormOpen] = useState(false); // Controls the visibility of the form
+
   // Fetch dữ liệu danh sách Boarding House
   const fetchData = async () => {
     setLoading(true);
@@ -51,6 +53,27 @@ function BoardingHouseManagement() {
       setLoading(false);
     }
   };
+  // Open the form
+  const handleOpenForm = () => {
+    setIsFormOpen(true);
+    setIsDetailOpen(false); // Close the detail modal if open
+  };
+
+  // Handle closing the create form
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+  };
+
+  // Handle success after creating a new boarding house
+  const handleFormSuccess = () => {
+    fetchData(); // Refresh the list of boarding houses
+    handleCloseForm(); // Close the form
+  };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchData();
+  }, []);
   const fetchImages = async (id) => {
     try {
       const { data } = await getBoardingHouseImages(id); // Gọi API
@@ -327,12 +350,29 @@ function BoardingHouseManagement() {
       ) : (
         <>
           <h1 className=" text-2xl font-bold mb-4">Boarding House Management</h1>
+          <div>
+
+            <Button btnAdd title="Add new" size="large" onClick={handleOpenForm}></Button>
+          </div>
+
+          {/* {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <Table columns={columns} data={boardingHouses} />
+          )} */}
+
           <Table
             columns={columns}
             data={boardingHData}
             onRowClick={(record) => handleRowClick(record._id)}
             loading={loading}
           />
+          {isFormOpen && (
+            <CreateBoardingHouse
+              onClose={handleCloseForm}
+              onSuccess={handleFormSuccess}
+            />
+          )}
           {isDetailOpen && formData && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <form

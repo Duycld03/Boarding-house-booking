@@ -12,7 +12,7 @@ const AddressSelector = ({
     return (
         <div className="grid grid-cols-1 gap-4">
             <div>
-                <label className="block mb-1">Tỉnh/Thành phố</label>
+                <label className="block mb-1 text-2xl">Province</label>
                 <select
                     name="address.province"
                     value={formData?.address?.province || ""}
@@ -23,7 +23,7 @@ const AddressSelector = ({
                     required
                     className="w-full border rounded px-2 py-1"
                 >
-                    <option value="">Chọn Tỉnh/Thành phố</option>
+                    <option value="">Select Province</option>
                     {provinces.map((province) => (
                         <option key={province.code} value={province.name}>
                             {province.name}
@@ -32,7 +32,7 @@ const AddressSelector = ({
                 </select>
             </div>
             <div>
-                <label className="block mb-1">Quận/Huyện</label>
+                <label className="block mb-1 text-2xl">District</label>
                 <select
                     name="address.district"
                     value={formData?.address?.district || ""}
@@ -45,7 +45,7 @@ const AddressSelector = ({
                     className="w-full border rounded px-2 py-1"
                     disabled={!formData?.address?.province}
                 >
-                    <option value="">Chọn Quận/Huyện</option>
+                    <option value="">Select District</option>
                     {districts.map((district) => (
                         <option key={district.code} value={district.name}>
                             {district.name}
@@ -54,7 +54,7 @@ const AddressSelector = ({
                 </select>
             </div>
             <div>
-                <label className="block mb-1">Phường/Xã</label>
+                <label className="block mb-1 text-2xl">Ward</label>
                 <select
                     name="address.ward"
                     value={formData?.address?.ward || ""}
@@ -63,7 +63,7 @@ const AddressSelector = ({
                     className="w-full border rounded px-2 py-1"
                     disabled={!formData?.address?.district}
                 >
-                    <option value="">Chọn Phường/Xã</option>
+                    <option value="">Select Ward</option>
                     {wards.map((ward) => (
                         <option key={ward.code} value={ward.name}>
                             {ward.name}
@@ -72,14 +72,14 @@ const AddressSelector = ({
                 </select>
             </div>
             <div>
-                <label className="block mb-1">Địa chỉ chi tiết</label>
+                <label className="block mb-1 text-2xl">Detail</label>
                 <textarea
                     name="address.detail"
                     value={formData?.address?.detail || ""}
                     onChange={onInputChange}
                     required
                     className="w-full border rounded px-2 py-1"
-                    placeholder="Nhập địa chỉ chi tiết"
+                    placeholder="Enter address details"
                 ></textarea>
             </div>
         </div >
