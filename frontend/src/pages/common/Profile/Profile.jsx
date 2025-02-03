@@ -3,35 +3,77 @@ import Styles from "./Profile.module.css";
 import { useEffect, useState } from "react";
 import { Loader } from "../../../component";
 import { Form, Input, Radio, Avatar, Upload, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import UserAvatar from "../../../assets/images/none_avatar.png";
 import { getUser } from "../../../api/authManagement";
-import { updateAccountFromProfile } from "../../../api/AccountManagement";
+import {
+  updateAccountFromProfile,
+  updateAvatar,
+} from "../../../api/AccountManagement";
 
 const cx = classNames.bind(Styles);
+
+const getBase64 = (img, callback) => {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result));
+  reader.readAsDataURL(img);
+};
+const beforeUpload = (file) => {
+  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+  if (!isJpgOrPng) {
+    message.error("You can only upload JPG/PNG file!");
+  }
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isLt2M) {
+    message.error("Image must smaller than 2MB!");
+  }
+  return isJpgOrPng && isLt2M;
+};
 
 function Profile() {
   const [form] = Form.useForm();
   const [formEmail] = Form.useForm();
   const [profileLoading, setProfileLoading] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [avatar, setAvatar] = useState(UserAvatar);
+  const [imageUrl, setImageUrl] = useState(UserAvatar);
   const [username, setUsername] = useState("");
   const [isOwner, setIsOwner] = useState(false);
   const [accountBalance, setAccountBalance] = useState(0);
   const [email, setEmail] = useState("");
 
   const handleAvatarChange = (info) => {
+    if (info.file.status === "uploading") {
+      setLoading(true);
+      return;
+    }
     if (info.file.status === "done") {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setAvatar(reader.result);
-      };
-      reader.readAsDataURL(info.file.originFileObj);
-      toast.success("Avatar updated successfully!");
+      // Get this url from response in real world.
+      getBase64(info.file.originFileObj, (url) => {
+        setLoading(false);
+        setImageUrl(url);
+      });
     }
   };
+
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+      }}
+      type="button"
+    >
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </button>
+  );
 
   const loadProfileForm = (data) => {
     form.setFieldsValue({
@@ -47,7 +89,11 @@ function Profile() {
       setProfileLoading(true);
       const res = await getUser();
       setAccountBalance(res.accountBalance);
-      setAvatar(res.avatar || UserAvatar);
+
+      const avatar =
+        import.meta.env.VITE_BASE_URL + res.avatarImage || UserAvatar;
+      setImageUrl(avatar);
+
       setUsername(res.username);
       setEmail(res.email);
       setIsOwner(res.role === "owner");
@@ -77,6 +123,25 @@ function Profile() {
     console.log(values);
   };
 
+  const handleUpload = async ({ file, onSuccess, onError }) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const res = await updateAvatar(formData);
+
+      // setImageUrl(response.url);
+      toast.success("Upload avatar successfully!");
+      onSuccess();
+      setLoading(false);
+    } catch (error) {
+      toast.error("Upload avatar failed!");
+      onError(error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     getUserProfile();
   }, []);
@@ -88,17 +153,26 @@ function Profile() {
       ) : (
         <div className="flex justify-between mb-4 flex-col md:w-[50%] mx-auto">
           <div className="flex justify-center items-center flex-col">
-            <Avatar size={100} src={avatar} />
             <Upload
+              name="avatar"
+              listType="picture-circle"
+              className="avatar-uploader"
               showUploadList={false}
-              beforeUpload={() => false}
+              customRequest={handleUpload}
+              beforeUpload={beforeUpload}
               onChange={handleAvatarChange}
             >
-              <p className="text-center text-3xl font-bold">@{username}</p>
-              <Button icon={<EditOutlined />} className="mt-5">
-                Change Avatar
-              </Button>
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="avatar"
+                  className="w-36 h-36 rounded-full"
+                />
+              ) : (
+                uploadButton
+              )}
             </Upload>
+            <p className="text-3xl text-center">@{username}</p>
           </div>
           <Form form={formEmail} layout="vertical" onFinish={onEmailFinish}>
             {isOwner && (

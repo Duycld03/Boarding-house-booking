@@ -274,5 +274,28 @@ class AccountController {
       res.status(500).json({ message: "Server Error" });
     }
   }
+
+  async updateAvatar(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const account = await Account.findById(req.user.userId);
+
+      if (!account) {
+        return res.status(404).json({ message: "Account not found" });
+      }
+
+      const imgPath =
+        req.file.destination.replace("public", "") + "/" + req.file.filename;
+
+      account.avatarImage = imgPath;
+
+      await account.save();
+
+      res.status(200).json({ message: "Avatar updated successfully" });
+    } catch (error) {}
+  }
 }
 export default new AccountController();

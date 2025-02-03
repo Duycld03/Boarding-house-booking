@@ -34,5 +34,9 @@ export const updateEmail = (data) => {
 };
 
 export const updateAvatar = (data) => {
-  return axios.put("auth/avatar", data);
+  return axios.put("auth/update-avatar", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
