@@ -8,6 +8,7 @@ export const getBoardingHouseDetails = async (boardingHouseId) => {
 };
 export const updateBoardingHouseDetails = (boardingHouseId, updateData) => {
     return axios.put(`/dashboard/boardinghouse/${boardingHouseId}`, updateData);
+
 };
 export const getAllBoardingHouseTypes = () => {
     return axios.get("/dashboard/types");
@@ -25,4 +26,15 @@ export const deleteBoardingHouseImage = (boardingHouseId, imageId) => {
 };
 export const getBoardingHouseImages = async (boardingHouseId) => {
     return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
+}
+
+export const getMaxPriceBH = async () => {
+    return axios.get('/dashboard/boardinghouse/chore/get-max');
+}
+
+
+export const filterBH = async (filterValue) => {
+    return axios.get(`/dashboard/boardinghouse/chore/filter`, {
+        params: filterValue,
+    });
 }

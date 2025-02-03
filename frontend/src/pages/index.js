@@ -7,7 +7,7 @@ import {
   ResetPassword,
   ChangePassword,
 } from "./auth";
-import { AboutUs, Home, Contact } from "./common";
+import { AboutUs, Home, Contact, Profile } from "./common";
 
 import {
   BoardingHouseManagement,
@@ -32,6 +32,7 @@ export {
   AboutUs,
   Contact,
   Home,
+  Profile,
 
   // owner
 

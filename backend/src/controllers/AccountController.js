@@ -3,22 +3,18 @@ import bcrypt from "bcrypt";
 import { generateToken } from "../utils/functions.js";
 
 class AccountController {
-
   async getAllAccount(req, res, next) {
     try {
       const accountData = await Account.find().sort({ createdAt: 1 });
       if (accountData) {
         return res.status(200).json(accountData);
-
       } else {
         return res.status(404).json({ message: "No accounts found" });
       }
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
-
   }
-
 
   async softDeleteAccount(req, res, next) {
     try {
@@ -244,6 +240,37 @@ class AccountController {
       res.status(200).json({ message: "Password changed successfully", token });
     } catch (error) {
       console.error("Error changing password:", error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+
+  async updateAccountFromProfile(req, res) {
+    try {
+      const { fullname, phoneNumber, gender } = req.body;
+      const account = await Account.findById(req.user.userId);
+
+      if (!account) {
+        return res.status(404).json({ message: "Account not found" });
+      }
+
+      if (!/^[0-9]+$/.test(phoneNumber) || phoneNumber.length < 10) {
+        return res.status(400).json({
+          message:
+            "Phone number must contain only numbers and be at least 10 digits long",
+        });
+      }
+
+      if (!["male", "female", "other"].includes(gender)) {
+        return res.status(400).json({ message: "Invalid gender value" });
+      }
+
+      account.fullname = fullname.trim();
+      account.phoneNumber = phoneNumber;
+      account.gender = gender;
+      await account.save();
+
+      res.status(200).json({ message: "Profile updated successfully" });
+    } catch (error) {
       res.status(500).json({ message: "Server Error" });
     }
   }

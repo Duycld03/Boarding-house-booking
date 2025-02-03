@@ -34,7 +34,7 @@ adminRouter.delete('/reviews/:reviewId', reviewController.softDeleteReview);
 adminRouter.get('/boarding-house-reports', reportController.getBHReports);
 
 
-
+//boarding house
 adminRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnDashBoard)
 adminRouter.get("/boardinghouse/:id", BoardingHouseController.getBoardingHouseDetails);
 adminRouter.put("/boardinghouse/:id", BoardingHouseController.updateBoardingHouseDetails);
@@ -43,6 +43,8 @@ adminRouter.post("/boardinghouse/:id/images", BoardingHouseController.addBoardin
 adminRouter.put("/boardinghouse/:id/images/:imageId", BoardingHouseController.updateBoardingHouseImage);
 adminRouter.delete("/boardinghouse/:id/images/:imageId", BoardingHouseController.deleteBoardingHouseImage);
 adminRouter.get("/boardinghouse/:id/images", BoardingHouseController.getBoardingHouseImages);
+adminRouter.get("/boardinghouse/chore/get-max", BoardingHouseController.getMaxPriceBH)
+adminRouter.get("/boardinghouse/chore/filter", BoardingHouseController.filterBoardingHouse)
 
 
 //Account
