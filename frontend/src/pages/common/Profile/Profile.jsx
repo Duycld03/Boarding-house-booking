@@ -13,6 +13,7 @@ import {
 } from "../../../api/AccountManagement";
 
 const cx = classNames.bind(Styles);
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
@@ -90,9 +91,9 @@ function Profile() {
       const res = await getUser();
       setAccountBalance(res.accountBalance);
 
-      const avatar =
-        import.meta.env.VITE_BASE_URL + res.avatarImage || UserAvatar;
-      setImageUrl(avatar);
+      if (res.avatarImage) {
+        setImageUrl(`${BASE_URL}/${res.avatarImage}`);
+      }
 
       setUsername(res.username);
       setEmail(res.email);
