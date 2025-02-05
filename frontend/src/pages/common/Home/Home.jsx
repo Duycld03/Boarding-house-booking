@@ -16,7 +16,6 @@ function Home() {
     setLoading(true);
     try {
       const res = await getAllBHHome();
-      console.log('API Response:', res);
 
       const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -28,12 +27,15 @@ function Home() {
         const now = new Date().getTime();
         const hoursAgo = Math.floor((now - createdAt) / 3600000); // Tính số giờ trước
 
-        let timeAgoText = 'Vừa đăng';
-        if (hoursAgo > 0) {
-          timeAgoText = `${hoursAgo} giờ trước`;
-        }
+        let timeAgoText = 'Just posted';
+
         if (hoursAgo >= 24) {
-          timeAgoText = `${Math.floor(hoursAgo / 24)} ngày trước`;
+          const daysAgo = Math.floor(hoursAgo / 24);
+          timeAgoText = daysAgo === 1 ? '1 day ago' : `${daysAgo} days ago`;
+        } else if (hoursAgo > 1) {
+          timeAgoText = `${hoursAgo} hours ago`;
+        } else if (hoursAgo === 1) {
+          timeAgoText = '1 hour ago';
         }
 
         return {
