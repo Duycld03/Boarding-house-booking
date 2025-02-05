@@ -8,23 +8,28 @@
     display: flex;
     width: 100%;
     max-width: 1200px;
-    background: white;
+   
 }
 
 .filter {
     width: 250px;
-    background: grey;
-    /* Màu nền */
+  background: grey;
     padding: 20px;
     border-radius: 8px;
     margin-right: 20px;
-    /* Khoảng cách giữa filter và grid */
+    height: 100%;
+    position: sticky;
+    top: 0;
 }
 
+/* The grid now takes the remaining space */
 .grid {
     flex: 1;
-    /* Phần này chiếm phần còn lại */
     padding-left: 20px;
-    /* Tạo khoảng cách với sidebar */
     background: white;
+    border-radius: 8px;
+}
+
+h2 {
+    margin-bottom: 20px;
 }

@@ -31,7 +31,7 @@ function Home() {
         const imgPath =
           item.images?.find((img) => img.isPrimary)?.imageUrl || '';
         const imgUrl = imgPath ? `${baseUrl}${imgPath}` : '';
-        const timeAgoText = formatTimeAgo(item.updatedAt); // Sử dụng hàm formatTimeAgo
+        const timeAgoText = formatTimeAgo(item.updatedAt);
 
         return {
           id: item._id?.$oid || item._id,
@@ -39,7 +39,7 @@ function Home() {
           price: formatAmount(item.priceRange),
           detail: truncateDetail(
             item.address?.province || 'No address provided'
-          ), // Cắt chuỗi ở đây
+          ),
           rating: item.rating || 0,
           img: imgUrl,
           updatedAt: item.updatedAt,
