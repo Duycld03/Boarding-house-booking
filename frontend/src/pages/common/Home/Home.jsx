@@ -12,7 +12,7 @@ import truncateDetail from '../../../utils/truncateDetail';
 const cx = classNames.bind(Styles);
 
 function Home() {
-  const [data, setData] = useState([]);
+  const [originalData, setOriginalData] = useState([]); // Lưu dữ liệu gốc
   const [activeTab, setActiveTab] = useState('all');
   const [loadingTabs, setLoadingTabs] = useState({
     all: false,
@@ -29,9 +29,10 @@ function Home() {
 
       const formattedData = res.map((item) => {
         const imgPath =
-          item.images?.find((img) => img.isPrimary)?.imageUrl || '';
+          item.images?.find((img) => img.isPrimary)?.imageUrl ||
+          item.images?.[0]?.imageUrl ||
+          '';
         const imgUrl = imgPath ? `${baseUrl}${imgPath}` : '';
-        const timeAgoText = formatTimeAgo(item.updatedAt);
 
         return {
           id: item._id?.$oid || item._id,
@@ -41,35 +42,43 @@ function Home() {
             item.address?.province || 'No address provided'
           ),
           rating: item.rating || 0,
+          reviewCount: item.reviewCount || 0, // Bổ sung để tránh lỗi
           img: imgUrl,
           updatedAt: item.updatedAt,
-          timeAgo: timeAgoText,
+          timeAgo: formatTimeAgo(item.updatedAt),
         };
       });
 
-      setData(formattedData);
+      setOriginalData(formattedData); // Lưu trữ dữ liệu gốc
     } catch (error) {
       console.error('Failed to fetch boarding houses:', error);
       toast.error('Failed to fetch boarding houses. Please try again later.');
-      setData([]);
+      setOriginalData([]);
     } finally {
       setLoadingTabs((prev) => ({ ...prev, [tab]: false }));
     }
   };
-
   useEffect(() => {
     fetchData(activeTab);
   }, [activeTab]);
 
-  const allData = [...data].sort((a, b) => a.name.localeCompare(b.name));
-  const newestData = [...data]
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)) // Sắp xếp giảm dần theo updatedAt
-    .slice(0, 10); // Giới hạn top 10
+  const allData = [...originalData].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
-  // Sort by rating and limit to the top 4
-  const highRatingData = [...data]
-    .sort((a, b) => b.rating - a.rating) // Sort descending by rating
-    .slice(0, 4); // Limit to the top 4
+  const newestData = [...originalData]
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    .slice(0, 10);
+
+  const highRatingData = [...originalData]
+    .filter((item) => item.rating >= 3)
+    .sort((a, b) => {
+      if (b.reviewCount !== a.reviewCount) {
+        return b.reviewCount - a.reviewCount;
+      }
+      return b.rating - a.rating;
+    })
+    .slice(0, 10);
 
   return (
     <div className={cx('home-container')}>
