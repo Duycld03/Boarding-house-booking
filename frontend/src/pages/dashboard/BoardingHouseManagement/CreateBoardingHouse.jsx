@@ -371,49 +371,54 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                                             <span>Preview</span>
                                         ),
                                     }}
-
                                 />
-
                             </div>
                         ) : null}
-
                     </div>
                 </Form.Item>
 
                 {/* Other Images */}
                 <Form.Item
-                    label="Other Images"
-                    className="mb-2"
+                    label={
+                        <span>Other Images</span>
+                    }
+                    className="mb-4"
                     review={
-                        formData.otherImages.length > 0
-                            ? `${formData.otherImages.length} images uploaded successfully`
-                            : "Please upload other images"
+                        formData.otherImages.length > 0 ? `${formData.otherImages.length} images uploaded successfully` : "Please upload other images"
                     }
                 >
-                    <Upload {...uploadOtherImgProps} listType="picture-card" showUploadList={false}>
-                        <Button icon={<PlusOutlined />}>Upload Images</Button>
-                    </Upload>
                     <div className="mt-4 flex flex-wrap gap-4">
                         {formData.otherImages.map((file, index) => (
-                            <div key={index} className="relative">
-                                <Image
+                            <div
+                                key={index}
+                                className="relative w-40 h-40 border rounded"
+                            >
+                                {/* Hiển thị ảnh */}
+                                <img
                                     src={URL.createObjectURL(file)}
                                     alt={`Other ${index + 1}`}
-                                    className="w-32 h-32 object-cover border rounded"
-                                    width={128} // Sets the width of the preview image
-                                    preview={{
-                                        mask: <span>Preview</span>, // Adds a "Preview" mask on hover
-                                    }}
+                                    className="w-full h-full object-cover rounded"
                                 />
+                                {/* Nút delete */}
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveOtherImage(index)}
-                                    className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full"
+                                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
                                 >
                                     X
                                 </button>
                             </div>
                         ))}
+                        <Upload
+                            {...uploadOtherImgProps}
+                            listType="picture-card"
+                            showUploadList={false}
+                        >
+                            <div>
+                                <PlusOutlined />
+                                <div style={{ marginTop: 8 }}>Upload Images</div>
+                            </div>
+                        </Upload>
                     </div>
                 </Form.Item>
 
