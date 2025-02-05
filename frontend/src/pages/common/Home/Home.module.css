@@ -1,0 +1,28 @@
+.home-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.content {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    /* Giới hạn chiều rộng */
+}
+
+.filter {
+    width: 250px;
+    /* Độ rộng sidebar */
+    background: blue;
+    /* Màu xám */
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.grid {
+    flex: 1;
+    /* Phần này chiếm phần còn lại */
+    padding-left: 20px;
+    /* Tạo khoảng cách với sidebar */
+}
