@@ -62,7 +62,9 @@ function Home() {
   }, [activeTab]);
 
   const allData = [...data].sort((a, b) => a.name.localeCompare(b.name));
-  const newestData = [...data].sort((a, b) => b.id - a.id);
+  const newestData = [...data]
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)) // Sắp xếp giảm dần theo updatedAt
+    .slice(0, 10); // Giới hạn top 10
 
   // Sort by rating and limit to the top 4
   const highRatingData = [...data]
