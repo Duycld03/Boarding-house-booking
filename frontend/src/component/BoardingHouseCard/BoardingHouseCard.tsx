@@ -33,7 +33,6 @@ const BoardingHouseCard = ({
   img,
   timeAgo,
 }: BoardingHouseCardProps) => {
-  // Kiểm tra và xử lý giá trị rating
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
 
   // State for heart icon toggling
@@ -58,18 +57,16 @@ const BoardingHouseCard = ({
         overflow: 'hidden',
       }}
     >
-      {/* Link wraps the entire card except for the heart icon */}
-      <Link
-        to={`/boarding-house/${id}`}
-        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-      >
-        {/* Image */}
+      {/* Image wrapped with Link for navigation */}
+      <Link to={`/boarding-house/${id}`} style={{ width: '100%' }}>
         <Image
           alt={name}
           src={img}
           style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
         />
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+
+        {/* Content below image */}
+        <div style={{ flex: 1, overflow: 'hidden', padding: '10px' }}>
           <Typography.Title level={5}>{name}</Typography.Title>
           <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
             {[...Array(validRating)].map((_, index) => (
@@ -80,7 +77,7 @@ const BoardingHouseCard = ({
             ))}
           </div>
           <Typography.Text type="secondary">{price} VND/month</Typography.Text>
-          {/* Align both text and heart icon on the same row */}
+
           <div
             style={{
               display: 'flex',
@@ -93,15 +90,6 @@ const BoardingHouseCard = ({
             <Typography.Text strong>
               {detail} - {timeAgo}
             </Typography.Text>
-            <div onClick={handleHeartClick}>
-              <HeartFilled
-                style={{
-                  color: liked ? 'red' : 'gray',
-                  cursor: 'pointer',
-                  fontSize: '20px',
-                }}
-              />
-            </div>
           </div>
         </div>
       </Link>
