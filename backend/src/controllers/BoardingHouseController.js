@@ -14,7 +14,7 @@ class BoardingHouseController {
             ).populate('boardingHouseType')
                 .populate({
                     path: 'ownerId',
-                }).sort({ createdAt: 1 })
+                }).sort({ createdAt: -1 })
 
 
             return res.status(200).json(boardingHData);
@@ -278,8 +278,8 @@ class BoardingHouseController {
                 priceRange,
                 electricityPrice,
                 waterPrice,
-                availableRooms,
-                totalRooms,
+                // availableRooms,
+                // totalRooms,
             } = req.body;
 
 
@@ -359,8 +359,8 @@ class BoardingHouseController {
                     detail: detail || "",
                 },
                 images,
-                availableRooms,
-                totalRooms,
+                // availableRooms,
+                // totalRooms,
             });
 
             // Lưu boarding house vào database
@@ -378,7 +378,6 @@ class BoardingHouseController {
         }
     }
     async uploadFile(req, res) {
-        console.log("tnhi: ", req.body)
         const storagePath = "./public/images/boardingHouse";
 
         // Tạo thư mục lưu file nếu chưa tồn tại

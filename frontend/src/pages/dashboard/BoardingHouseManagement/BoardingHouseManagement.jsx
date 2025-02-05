@@ -373,10 +373,10 @@ function BoardingHouseManagement() {
   return (
     <div className="boarding-house-management">
       <h1 className=" text-2xl font-bold mb-4">Boarding House Management</h1>
-      <div>
+      <div className="flex justify-between"
+      >
         <Button btnAdd title="Add new" size="large" onClick={handleOpenForm}></Button>
-      </div>
-      <div className="flex justify-end">
+
         <FilterBoardingHouse
           setFilterValue={setFilterValue}
           boardingHouseTypes={boardingHouseTypes}

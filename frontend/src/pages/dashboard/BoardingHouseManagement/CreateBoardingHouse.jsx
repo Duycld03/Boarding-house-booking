@@ -12,8 +12,8 @@ import {
     fetchWards,
 } from "../../../api/apiAddress";
 import { Loader, Button } from "../../../component";
-import { Form, Input, Select, Slider } from "antd";
-
+import { Form, Input, Select, Upload, InputNumber } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 function AddBoardingHouseForm({ onClose, onSuccess }) {
     const [formData, setFormData] = useState({
         owner: "",
@@ -31,8 +31,8 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
         priceRange: "",
         electricityPrice: "",
         waterPrice: "",
-        totalRooms: "",
-        availableRooms: "",
+        // totalRooms: "",
+        // availableRooms: "",
     });
 
     const [loading, setLoading] = useState(false);
@@ -42,7 +42,23 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
     const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
     const [primaryImage, setPrimaryImage] = useState(null);
     const [otherImages, setOtherImages] = useState([]);
-
+    const uploadOtherImgProps = {
+        beforeUpload: (file) => {
+            handleFileChange({ target: { files: [file] } }, false);
+            return false; // Prevent automatic upload
+        },
+        multiple: true,
+        accept: "image/*",
+    };
+    const uploadProps = {
+        beforeUpload: (file) => {
+            handleFileChange({ target: { files: [file] } }, true);
+            return false; // Prevent automatic upload
+        },
+        accept: "image/*",
+        maxCount: 1,
+        showUploadList: false,
+    };
     // Fetch provinces, districts, and wards dynamically
     useEffect(() => {
         const fetchData = async () => {
@@ -210,8 +226,8 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             priceRange: formData.priceRange,
             electricityPrice: formData.electricityPrice,
             waterPrice: formData.waterPrice,
-            availableRooms: formData.availableRooms,
-            totalRooms: formData.totalRooms
+            // availableRooms: formData.availableRooms,
+            // totalRooms: formData.totalRooms
         }
         // const form = { ...formData }
 
@@ -326,11 +342,9 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
                 {/* Primary Image */}
                 <Form.Item label="Primary Image" className="mb-2">
-                    <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleFileChange(e, true)}
-                    />
+                    <Upload {...uploadProps}>
+                        <Button icon={<PlusOutlined />}>Upload Primary Image</Button>
+                    </Upload>
                     {formData.primaryImage && (
                         <img
                             src={URL.createObjectURL(formData.primaryImage)}
@@ -342,12 +356,9 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
                 {/* Other Images */}
                 <Form.Item label="Other Images" className="mb-2">
-                    <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleFileChange(e, false)}
-                        multiple
-                    />
+                    <Upload {...uploadOtherImgProps} listType="picture-card" showUploadList={false}>
+                        <Button icon={<PlusOutlined />}>Upload Images</Button>
+                    </Upload>
                     <div className="mt-4 flex flex-wrap gap-4">
                         {formData.otherImages.map((file, index) => (
                             <div key={index} className="relative">
@@ -375,12 +386,18 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     rules={[{ required: true, message: "Please enter the price range" }]}
                     className="mb-2"
                 >
-                    <Input
-                        type="number"
+                    <InputNumber
                         placeholder="Enter price range"
                         name="priceRange"
                         value={formData.priceRange}
-                        onChange={handleInputChange}
+                        onChange={(value) =>
+                            handleInputChange({ target: { name: "priceRange", value } })
+                        }
+                        formatter={(value) =>
+                            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        } // Thêm dấu phẩy ngăn cách hàng nghìn
+                        parser={(value) => value.replace(/\$\s?|(,*)/g, "")} // Loại bỏ dấu phẩy khi nhập
+                        className="w-full"
                     />
                 </Form.Item>
 
@@ -391,12 +408,18 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     rules={[{ required: true, message: "Please enter the electricity price" }]}
                     className="mb-2"
                 >
-                    <Input
-                        type="number"
+                    <InputNumber
                         placeholder="Enter electricity price"
                         name="electricityPrice"
                         value={formData.electricityPrice}
-                        onChange={handleInputChange}
+                        onChange={(value) =>
+                            handleInputChange({ target: { name: "electricityPrice", value } })
+                        }
+                        formatter={(value) =>
+                            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                        className="w-full"
                     />
                 </Form.Item>
 
@@ -407,17 +430,23 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     rules={[{ required: true, message: "Please enter the water price" }]}
                     className="mb-2"
                 >
-                    <Input
-                        type="number"
+                    <InputNumber
                         placeholder="Enter water price"
                         name="waterPrice"
                         value={formData.waterPrice}
-                        onChange={handleInputChange}
+                        onChange={(value) =>
+                            handleInputChange({ target: { name: "waterPrice", value } })
+                        }
+                        formatter={(value) =>
+                            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                        className="w-full"
                     />
                 </Form.Item>
 
                 {/* Total Rooms */}
-                <Form.Item
+                {/* <Form.Item
                     label="Total Rooms"
                     name="totalRooms"
                     rules={[{ required: true, message: "Please enter the total number of rooms" }]}
@@ -433,7 +462,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                 </Form.Item>
 
                 {/* Available Rooms */}
-                <Form.Item
+                {/* <Form.Item
                     label="Available Rooms"
                     name="availableRooms"
                     rules={[{ required: true, message: "Please enter the available rooms" }]}
@@ -446,7 +475,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                         value={formData.availableRooms}
                         onChange={handleInputChange}
                     />
-                </Form.Item>
+                </Form.Item> */ }
 
                 {/* Form Buttons */}
                 <div className="flex justify-end mt-4 ">

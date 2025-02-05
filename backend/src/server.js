@@ -26,7 +26,7 @@ connect();
 // Cấu hình express để phân tích body của request
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/images/boardingHouse", express.static(path.join(__dirname, "../public/images/boardingHouse")));
+app.use("/public/images/boardingHouse", express.static(path.join(__dirname, "../public/images/boardingHouse")));
 
 
 app.use(express.static("public"));
