@@ -6,6 +6,7 @@ import {
   StarFilled,
   HeartFilled,
 } from '@ant-design/icons';
+import { Link } from 'react-router-dom'; // Import Link for navigation
 
 interface BoardingHouseCardProps {
   id: number;
@@ -24,6 +25,7 @@ interface BoardingHouseGridProps {
 const ITEMS_PER_PAGE = 9;
 
 const BoardingHouseCard = ({
+  id,
   name,
   price,
   detail,
@@ -38,62 +40,71 @@ const BoardingHouseCard = ({
   const [liked, setLiked] = useState(false);
 
   // Handle heart icon click
-  const handleHeartClick = () => {
+  const handleHeartClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the click event from bubbling up to the Link
     setLiked((prevLiked) => !prevLiked); // Toggle liked state
   };
 
   return (
     <Card
       hoverable
-      cover={
-        <Image
-          alt={name}
-          src={img}
-          style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
-        />
-      }
       style={{
         width: '100%',
         maxWidth: '400px',
         borderRadius: '8px',
-        height: '420px',
+        height: '380px', // Fixed height for the Card
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
       }}
     >
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <Typography.Title level={5}>{name}</Typography.Title>
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-          {[...Array(validRating)].map((_, index) => (
-            <StarFilled
-              key={index}
-              style={{ color: 'gold', fontSize: '20px' }}
-            />
-          ))}
-        </div>
-        <Typography.Text type="secondary">{price} VND/month</Typography.Text>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: 4,
-            marginBottom: 4,
-          }}
-        >
-          <Typography.Text strong>
-            {detail} - {timeAgo}
-          </Typography.Text>
-          <HeartFilled
+      {/* Link wraps the entire card except for the heart icon */}
+      <Link
+        to={`/boarding-house/${id}`}
+        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+      >
+        {/* Image */}
+        <Image
+          alt={name}
+          src={img}
+          style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
+        />
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <Typography.Title level={5}>{name}</Typography.Title>
+          <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
+            {[...Array(validRating)].map((_, index) => (
+              <StarFilled
+                key={index}
+                style={{ color: 'gold', fontSize: '20px' }}
+              />
+            ))}
+          </div>
+          <Typography.Text type="secondary">{price} VND/month</Typography.Text>
+          {/* Align both text and heart icon on the same row */}
+          <div
             style={{
-              color: liked ? 'red' : 'gray',
-              cursor: 'pointer',
-              fontSize: '20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: 4,
+              marginBottom: 4,
             }}
-            onClick={handleHeartClick}
-          />
+          >
+            <Typography.Text strong>
+              {detail} - {timeAgo}
+            </Typography.Text>
+            <div onClick={handleHeartClick}>
+              <HeartFilled
+                style={{
+                  color: liked ? 'red' : 'gray',
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                }}
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      </Link>
     </Card>
   );
 };
@@ -135,7 +146,7 @@ const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'flex-end', // Căn bên phải
+          justifyContent: 'flex-end', // Align to the right
           alignItems: 'center',
           marginTop: 16,
           gap: 10,
