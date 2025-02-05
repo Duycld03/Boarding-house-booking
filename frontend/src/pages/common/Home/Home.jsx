@@ -25,7 +25,7 @@ function Home() {
     try {
       const res = await getAllBHHome();
 
-      const baseUrl = import.meta.env.VITE_BASE_URL;
+      const baseUrl = 'http://localhost:3000';
 
       const formattedData = res.map((item) => {
         const imgPath =
