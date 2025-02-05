@@ -369,12 +369,27 @@ class BoardingHouseController {
   }
   async getAllBHOnHome(req, res, next) {
     try {
-      const boardingHData = await BoardingHouse.find()
-        .populate('boardingHouseType')
-        .populate({
-          path: 'ownerId',
-        })
-        .sort({ createdAt: 1 });
+      const boardingHData = await BoardingHouse.aggregate([
+        {
+          $lookup: {
+            from: 'reviews', // Tên collection của Review
+            localField: '_id',
+            foreignField: 'boardingHouseId',
+            as: 'reviews',
+          },
+        },
+        {
+          $addFields: {
+            rating: { $ifNull: [{ $avg: '$reviews.rating' }, 0] }, // Tính trung bình rating, nếu không có thì mặc định 0
+            reviewCount: { $size: '$reviews' }, // Đếm số lượng review
+          },
+        },
+        {
+          $project: {
+            reviews: 0, // Ẩn danh sách review để response nhẹ hơn
+          },
+        },
+      ]);
 
       return res.status(200).json(boardingHData);
     } catch (error) {

@@ -6,9 +6,10 @@ interface BoardingHouseCardProps {
   id: number;
   name: string;
   price: string | number;
-  location: string;
+  detail: string;
   rating: number;
   img: string;
+  timeAgo: number;
 }
 
 interface BoardingHouseGridProps {
@@ -20,47 +21,40 @@ const ITEMS_PER_PAGE = 9;
 const BoardingHouseCard = ({
   name,
   price,
-  location,
+  detail,
   rating,
   img,
+  timeAgo,
 }: BoardingHouseCardProps) => {
-  // Round the rating to the nearest integer
-  const roundedRating = Math.round(rating);
+  // Kiểm tra và xử lý giá trị rating
+  const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
 
   return (
     <Card
       hoverable
       cover={
-        <div
-          style={{
-            borderTop: '2px solid #ddd',
-            borderRadius: 8,
-            padding: 4,
-          }}
-        >
-          <Image alt={name} src={img} />
-        </div>
+        <Image
+          alt={name}
+          src={img}
+          style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
+        />
       }
-      style={{ width: '100%', maxWidth: '400px' }}
+      style={{ width: '100%', maxWidth: '400px', borderRadius: '8px' }} // Đảm bảo bo tròn card
     >
       <Typography.Title level={5}>{name}</Typography.Title>
       <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-        {/* Render the number of stars based on roundedRating */}
-        {[...Array(roundedRating)].map((_, index) => (
+        {/* Render stars chỉ khi validRating hợp lệ */}
+        {[...Array(validRating)].map((_, index) => (
           <StarFilled key={index} style={{ color: 'gold' }} />
         ))}
-        <Typography.Text style={{ marginLeft: 5 }}></Typography.Text>
       </div>
-      <Typography.Text type="secondary" style={{ display: 'block' }}>
-        ${price}/month
-      </Typography.Text>
+      <Typography.Text type="secondary">${price}/month</Typography.Text>
       <Typography.Text strong style={{ display: 'block', marginTop: 4 }}>
-        {location}
+        {detail} - {timeAgo}
       </Typography.Text>
     </Card>
   );
 };
-
 const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);

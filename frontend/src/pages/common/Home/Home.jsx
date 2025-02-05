@@ -1,111 +1,70 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import Styles from './Home.module.css';
 import BoardingHouseGrid from '../../../component/BoardingHouseCard';
 import { Tabs } from 'antd';
-
-const boardingHouses = [
-  {
-    id: 1,
-    name: 'Cozy Apartment',
-    price: 500,
-    location: 'New York',
-    rating: 4.5,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product37.png`,
-  },
-  {
-    id: 2,
-    name: 'Luxury Condo',
-    price: 1200,
-    location: 'Los Angeles',
-    rating: 4.8,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product39.png`,
-  },
-  {
-    id: 3,
-    name: 'Affordable ',
-    price: 700,
-    location: 'San Francisco',
-    rating: 4.2,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product40.png`,
-  },
-  {
-    id: 4,
-    name: 'Cozy Apartment',
-    price: 500,
-    location: 'New York',
-    rating: 4.5,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product37.png`,
-  },
-  {
-    id: 5,
-    name: 'Luxury Condo',
-    price: 1200,
-    location: 'Los Angeles',
-    rating: 4.8,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product39.png`,
-  },
-  {
-    id: 6,
-    name: 'Affordable ',
-    price: 700,
-    location: 'San Francisco',
-    rating: 4.2,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product40.png`,
-  },
-  {
-    id: 7,
-    name: 'Luxury Condo',
-    price: 1200,
-    location: 'Los Angeles',
-    rating: 4.8,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product39.png`,
-  },
-  {
-    id: 8,
-    name: 'Affordable ',
-    price: 700,
-    location: 'San Francisco',
-    rating: 4.2,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product40.png`,
-  },
-  {
-    id: 9,
-    name: 'Cozy Apartment',
-    price: 500,
-    location: 'New York',
-    rating: 4.5,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product37.png`,
-  },
-  {
-    id: 10,
-    name: 'Luxury Condo',
-    price: 1200,
-    location: 'Los Angeles',
-    rating: 4.8,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product39.png`,
-  },
-  {
-    id: 11,
-    name: 'Affordable ',
-    price: 700,
-    location: 'San Francisco',
-    rating: 4.2,
-    img: `${import.meta.env.VITE_BASE_URL}images/products/product40.png`,
-  },
-  // Thêm nhiều dữ liệu hơn nếu cần
-];
+import { getAllBHHome } from '../../../api/BoardingHManagement';
+import { toast } from 'react-toastify';
 
 const cx = classNames.bind(Styles);
 
 function Home() {
-  const [data] = useState(boardingHouses);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await getAllBHHome();
+      console.log('API Response:', res);
+
+      const baseUrl = import.meta.env.VITE_BASE_URL;
+
+      const formattedData = res.map((item) => {
+        const imgPath =
+          item.images?.find((img) => img.isPrimary)?.imageUrl || '';
+        const imgUrl = imgPath ? `${baseUrl}${imgPath}` : '';
+        const createdAt = new Date(item.createdAt || new Date()).getTime(); // Chuyển đổi thời gian tạo
+        const now = new Date().getTime();
+        const hoursAgo = Math.floor((now - createdAt) / 3600000); // Tính số giờ trước
+
+        let timeAgoText = 'Vừa đăng';
+        if (hoursAgo > 0) {
+          timeAgoText = `${hoursAgo} giờ trước`;
+        }
+        if (hoursAgo >= 24) {
+          timeAgoText = `${Math.floor(hoursAgo / 24)} ngày trước`;
+        }
+
+        return {
+          id: item._id?.$oid || item._id,
+          name: item.name,
+          price: item.priceRange,
+          detail: item.address?.province || 'No address provided',
+          rating: item.rating || 0,
+          img: imgUrl,
+          createdAt: item.createdAt,
+          timeAgo: timeAgoText, // Thêm hiển thị thời gian
+        };
+      });
+
+      setData(formattedData);
+    } catch (error) {
+      console.error('Failed to fetch boarding houses:', error);
+      toast.error('Failed to fetch boarding houses. Please try again later.');
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Dữ liệu cho từng tab
   const allData = data;
-  // "Newest" giả sử là sắp xếp theo id giảm dần (các bản ghi mới có id cao hơn)
   const newestData = [...data].sort((a, b) => b.id - a.id);
-  // "High rating" sắp xếp theo rating giảm dần
   const highRatingData = [...data].sort((a, b) => b.rating - a.rating);
 
   return (
@@ -114,20 +73,19 @@ function Home() {
         {/* Sidebar bên trái */}
         <div className={cx('filter')}>
           <h2>Filter option</h2>
-          {/* Thêm các bộ lọc tại đây nếu cần */}
         </div>
 
         {/* Grid bên phải */}
         <div className={cx('grid')}>
           <Tabs defaultActiveKey="all">
             <Tabs.TabPane tab="Tất cả" key="all">
-              <BoardingHouseGrid data={allData} />
+              <BoardingHouseGrid data={allData} loading={loading} />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Newest" key="newest">
-              <BoardingHouseGrid data={newestData} />
+              <BoardingHouseGrid data={newestData} loading={loading} />
             </Tabs.TabPane>
             <Tabs.TabPane tab="High rating" key="highRating">
-              <BoardingHouseGrid data={highRatingData} />
+              <BoardingHouseGrid data={highRatingData} loading={loading} />
             </Tabs.TabPane>
           </Tabs>
         </div>
