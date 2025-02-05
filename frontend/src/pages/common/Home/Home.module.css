@@ -25,9 +25,9 @@
 /* The grid now takes the remaining space */
 .grid {
     flex: 1;
-    padding-left: 20px;
     background: white;
-    padding-right: 20px;
+    padding: 20px;
+    border-radius: 8px;
 }
 
 h2 {
