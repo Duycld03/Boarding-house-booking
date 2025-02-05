@@ -89,7 +89,7 @@ function Home() {
 
         <div className={cx('grid')}>
           <Tabs defaultActiveKey="all" onChange={(key) => setActiveTab(key)}>
-            <Tabs.TabPane tab="Tất cả" key="all">
+            <Tabs.TabPane tab="All" key="all">
               <BoardingHouseGrid data={allData} loading={loadingTabs.all} />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Newest" key="newest">
