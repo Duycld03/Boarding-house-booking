@@ -63,7 +63,11 @@ function Home() {
 
   const allData = [...data].sort((a, b) => a.name.localeCompare(b.name));
   const newestData = [...data].sort((a, b) => b.id - a.id);
-  const highRatingData = [...data].sort((a, b) => b.rating - a.rating);
+
+  // Sort by rating and limit to the top 4
+  const highRatingData = [...data]
+    .sort((a, b) => b.rating - a.rating) // Sort descending by rating
+    .slice(0, 4); // Limit to the top 4
 
   return (
     <div className={cx('home-container')}>
