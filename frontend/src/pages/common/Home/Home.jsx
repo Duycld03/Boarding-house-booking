@@ -10,10 +10,15 @@ const cx = classNames.bind(Styles);
 
 function Home() {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+  const [loadingTabs, setLoadingTabs] = useState({
+    all: false,
+    newest: false,
+    highRating: false,
+  });
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (tab) => {
+    setLoadingTabs((prev) => ({ ...prev, [tab]: true }));
     try {
       const res = await getAllBHHome();
 
@@ -23,9 +28,9 @@ function Home() {
         const imgPath =
           item.images?.find((img) => img.isPrimary)?.imageUrl || '';
         const imgUrl = imgPath ? `${baseUrl}${imgPath}` : '';
-        const createdAt = new Date(item.createdAt || new Date()).getTime(); // Chuyển đổi thời gian tạo
+        const createdAt = new Date(item.createdAt || new Date()).getTime();
         const now = new Date().getTime();
-        const hoursAgo = Math.floor((now - createdAt) / 3600000); // Tính số giờ trước
+        const hoursAgo = Math.floor((now - createdAt) / 3600000);
 
         let timeAgoText = 'Just posted';
 
@@ -46,7 +51,7 @@ function Home() {
           rating: item.rating || 0,
           img: imgUrl,
           createdAt: item.createdAt,
-          timeAgo: timeAgoText, // Thêm hiển thị thời gian
+          timeAgo: timeAgoText,
         };
       });
 
@@ -56,38 +61,41 @@ function Home() {
       toast.error('Failed to fetch boarding houses. Please try again later.');
       setData([]);
     } finally {
-      setLoading(false);
+      setLoadingTabs((prev) => ({ ...prev, [tab]: false }));
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(activeTab);
+  }, [activeTab]);
 
-  // Dữ liệu cho từng tab
-  const allData = data;
+  const allData = [...data].sort((a, b) => a.name.localeCompare(b.name));
   const newestData = [...data].sort((a, b) => b.id - a.id);
   const highRatingData = [...data].sort((a, b) => b.rating - a.rating);
 
   return (
     <div className={cx('home-container')}>
       <div className={cx('content')}>
-        {/* Sidebar bên trái */}
         <div className={cx('filter')}>
           <h2>Filter option</h2>
         </div>
 
-        {/* Grid bên phải */}
         <div className={cx('grid')}>
-          <Tabs defaultActiveKey="all">
+          <Tabs defaultActiveKey="all" onChange={(key) => setActiveTab(key)}>
             <Tabs.TabPane tab="Tất cả" key="all">
-              <BoardingHouseGrid data={allData} loading={loading} />
+              <BoardingHouseGrid data={allData} loading={loadingTabs.all} />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Newest" key="newest">
-              <BoardingHouseGrid data={newestData} loading={loading} />
+              <BoardingHouseGrid
+                data={newestData}
+                loading={loadingTabs.newest}
+              />
             </Tabs.TabPane>
             <Tabs.TabPane tab="High rating" key="highRating">
-              <BoardingHouseGrid data={highRatingData} loading={loading} />
+              <BoardingHouseGrid
+                data={highRatingData}
+                loading={loadingTabs.highRating}
+              />
             </Tabs.TabPane>
           </Tabs>
         </div>

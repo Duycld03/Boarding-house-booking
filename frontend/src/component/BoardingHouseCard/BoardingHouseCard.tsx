@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Card, List, Typography, Image, Button } from 'antd';
-import { LeftOutlined, RightOutlined, StarFilled } from '@ant-design/icons';
+import {
+  LeftOutlined,
+  RightOutlined,
+  StarFilled,
+  HeartFilled,
+} from '@ant-design/icons';
 
 interface BoardingHouseCardProps {
   id: number;
@@ -29,6 +34,14 @@ const BoardingHouseCard = ({
   // Kiểm tra và xử lý giá trị rating
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
 
+  // State for heart icon toggling
+  const [liked, setLiked] = useState(false);
+
+  // Handle heart icon click
+  const handleHeartClick = () => {
+    setLiked((prevLiked) => !prevLiked); // Toggle liked state
+  };
+
   return (
     <Card
       hoverable
@@ -49,12 +62,25 @@ const BoardingHouseCard = ({
         ))}
       </div>
       <Typography.Text type="secondary">${price}/month</Typography.Text>
-      <Typography.Text strong style={{ display: 'block', marginTop: 4 }}>
-        {detail} - {timeAgo}
-      </Typography.Text>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 4,
+        }}
+      >
+        <Typography.Text strong>
+          {detail} - {timeAgo}
+        </Typography.Text>
+        <HeartFilled
+          style={{ color: liked ? 'red' : 'gray', cursor: 'pointer' }}
+          onClick={handleHeartClick} // Toggle heart color on click
+        />
+      </div>
     </Card>
   );
 };
+
 const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
