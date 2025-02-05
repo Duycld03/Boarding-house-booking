@@ -33,41 +33,42 @@ const BoardingHouseCard = ({
   img,
   timeAgo,
 }: BoardingHouseCardProps) => {
+  // Kiểm tra và xử lý giá trị rating
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
 
   // State for heart icon toggling
   const [liked, setLiked] = useState(false);
 
   // Handle heart icon click
-  const handleHeartClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent the click event from bubbling up to the Link
+  const handleHeartClick = () => {
     setLiked((prevLiked) => !prevLiked); // Toggle liked state
   };
 
   return (
-    <Card
-      hoverable
-      style={{
-        width: '100%',
-        maxWidth: '400px',
-        borderRadius: '8px',
-        height: '380px', // Fixed height for the Card
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Image wrapped with Link for navigation */}
-      <Link to={`/boarding-house/${id}`} style={{ width: '100%' }}>
-        <Image
-          alt={name}
-          src={img}
-          style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
-        />
-
-        {/* Content below image */}
-        <div style={{ flex: 1, overflow: 'hidden', padding: '10px' }}>
-          <Typography.Title level={5}>{name}</Typography.Title>
+    <Link to={`/boarding-house/${id}`} style={{ width: '100%' }}>
+      <Card
+        hoverable
+        cover={
+          <Image
+            alt={name}
+            src={img}
+            style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
+          />
+        }
+        style={{
+          width: '100%',
+          maxWidth: '400px',
+          borderRadius: '8px',
+          height: '420px',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <Typography.Title level={5} style={{ fontSize: '20px' }}>
+            {name}
+          </Typography.Title>
           <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
             {[...Array(validRating)].map((_, index) => (
               <StarFilled
@@ -76,13 +77,22 @@ const BoardingHouseCard = ({
               />
             ))}
           </div>
-          <Typography.Text type="secondary">{price} VND/month</Typography.Text>
-
+          {/* Price in orange color with more spacing and increased fontWeight */}
+          <Typography.Text
+            type="secondary"
+            style={{
+              color: '#f57c00',
+              fontWeight: '600', // Increased font weight
+              marginTop: '12px', // Increased top margin
+              marginBottom: '12px', // Increased bottom margin
+            }}
+          >
+            {price} VND/month
+          </Typography.Text>
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center',
               marginTop: 4,
               marginBottom: 4,
             }}
@@ -92,8 +102,8 @@ const BoardingHouseCard = ({
             </Typography.Text>
           </div>
         </div>
-      </Link>
-    </Card>
+      </Card>
+    </Link>
   );
 };
 
@@ -134,7 +144,7 @@ const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'flex-end', // Align to the right
+          justifyContent: 'flex-end', // Căn bên phải
           alignItems: 'center',
           marginTop: 16,
           gap: 10,
