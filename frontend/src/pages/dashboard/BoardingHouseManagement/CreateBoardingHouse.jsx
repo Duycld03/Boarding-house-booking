@@ -12,6 +12,7 @@ import {
     fetchWards,
 } from "../../../api/apiAddress";
 import { Loader, Button } from "../../../component";
+import { Form, Input, Select, Slider } from "antd";
 
 function AddBoardingHouseForm({ onClose, onSuccess }) {
     const [formData, setFormData] = useState({
@@ -238,217 +239,239 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
         <div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             onClick={(e) => {
-                // Kiểm tra nếu nhấn vào vùng bên ngoài form
                 if (e.target === e.currentTarget) {
-                    onClose(); // Gọi hàm đóng form
+                    onClose();
                 }
             }}
         >
-
-            <form
-                onSubmit={handleSubmit}
+            <Form
+                layout="vertical"
+                onSubmitCapture={handleSubmit}
                 className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
             >
                 <h2 className="text-2xl font-bold mb-4">Create New Boarding House</h2>
-                <div className="grid-cols-1 gap-4 mb-4">
-                    <div>
-                        <label className="text-2xl ">Owner</label>
-                        <input
-                            type="text"
-                            name="owner"
-                            value={formData.owner}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            placeholder="Enter owner's username"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="text-2xl">Boarding House Type</label>
-                        <select
-                            name="boardingHouseType"
-                            value={formData.boardingHouseType}
-                            onChange={(e) => setFormData((prev) => ({ ...prev, boardingHouseType: e.target.value }))}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            required
-                        >
-                            <option value="" disabled>
-                                Select Type
-                            </option>
-                            {boardingHouseTypes.map((type) => (
-                                <option key={type.value} value={type.value}>
-                                    {type.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="text-2xl" >Name Boarding House</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            placeholder="Enter boarding house name"
-                            required
-                        />
-                    </div>
-                    <AddressSelector
-                        provinces={provinces}
-                        districts={districts}
-                        wards={wards}
-                        onProvinceChange={handleInputChange}
-                        onDistrictChange={handleInputChange}
-                        onInputChange={handleInputChange}
-                        formData={formData}
+
+                {/* Owner */}
+                <Form.Item
+                    label="Owner"
+                    name="owner"
+                    rules={[{ required: true, message: "Please enter owner's username" }]}
+                    className="mb-2"
+                >
+                    <Input
+                        placeholder="Enter owner's username"
+                        name="owner"
+                        value={formData.owner}
+                        onChange={handleInputChange}
                     />
-                    <div className="col-span-2">
-                        <label className="text-2xl">Description</label>
-                        <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            placeholder="Enter description"
-                        ></textarea>
-                    </div>
+                </Form.Item>
 
-                    <div className="p-6">
-                        {/* Upload Primary Image */}
-                        <div className="mb-6">
-                            <label className="block font-semibold mb-2 text-2xl">Primary Image</label>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => handleFileChange(e, true)}
-                                className="w-full border rounded px-2 py-1 mb-2"
-                            />
-                            {formData.primaryImage && (
-                                <div className="mt-2">
-                                    <img
-                                        src={URL.createObjectURL(formData.primaryImage)}
-                                        alt="Primary"
-                                        className="w-32 h-32 object-cover border rounded"
-                                    />
-                                </div>
-                            )}
-                        </div>
+                {/* Boarding House Type */}
+                <Form.Item
+                    label="Boarding House Type"
+                    name="boardingHouseType"
+                    rules={[{ required: true, message: "Please select a boarding house type" }]}
+                    className="mb-2"
+                >
+                    <Select
+                        placeholder="Select Type"
+                        value={formData.boardingHouseType}
+                        onChange={(value) => setFormData((prev) => ({ ...prev, boardingHouseType: value }))}
+                    >
+                        {boardingHouseTypes.map((type) => (
+                            <Select.Option key={type.value} value={type.value}>
+                                {type.label}
+                            </Select.Option>
+                        ))}
+                    </Select>
+                </Form.Item>
 
-                        {/* Upload Other Images */}
-                        <div className="mb-6">
-                            <label className="block font-semibold mb-2 text-2xl">Other Images</label>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => handleFileChange(e, false)}
-                                className="w-full border rounded px-2 py-1 mb-2"
-                                multiple
-                            />
-                            {/* Hiển thị danh sách Other Images */}
-                            <div className="mt-4 flex flex-wrap gap-4">
-                                {formData.otherImages.map((file, index) => (
-                                    <div key={index} className="relative">
-                                        <img
-                                            src={URL.createObjectURL(file)}
-                                            alt={`Other ${index + 1}`}
-                                            className="w-32 h-32 object-cover border rounded"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveOtherImage(index)}
-                                            className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full"
-                                        >
-                                            X
-                                        </button>
-                                    </div>
-                                ))}
+                {/* Boarding House Name */}
+                <Form.Item
+                    label="Name Boarding House"
+                    name="name"
+                    rules={[{ required: true, message: "Please enter the boarding house name" }]}
+                    className="mb-2"
+                >
+                    <Input
+                        placeholder="Enter boarding house name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                    />
+                </Form.Item>
+
+                {/* Address Selector */}
+                <AddressSelector
+                    provinces={provinces}
+                    districts={districts}
+                    wards={wards}
+                    onProvinceChange={handleInputChange}
+                    onDistrictChange={handleInputChange}
+                    onInputChange={handleInputChange}
+                    formData={formData}
+                />
+
+                {/* Description */}
+                <Form.Item label="Description" name="description" className="mb-2">
+
+                    <Input.TextArea
+                        placeholder="Enter description"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        rows={4}
+                    />
+                </Form.Item>
+
+                {/* Primary Image */}
+                <Form.Item label="Primary Image" className="mb-2">
+                    <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e, true)}
+                    />
+                    {formData.primaryImage && (
+                        <img
+                            src={URL.createObjectURL(formData.primaryImage)}
+                            alt="Primary"
+                            className="mt-2 w-32 h-32 object-cover border rounded"
+                        />
+                    )}
+                </Form.Item>
+
+                {/* Other Images */}
+                <Form.Item label="Other Images" className="mb-2">
+                    <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e, false)}
+                        multiple
+                    />
+                    <div className="mt-4 flex flex-wrap gap-4">
+                        {formData.otherImages.map((file, index) => (
+                            <div key={index} className="relative">
+                                <img
+                                    src={URL.createObjectURL(file)}
+                                    alt={`Other ${index + 1}`}
+                                    className="w-32 h-32 object-cover border rounded"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveOtherImage(index)}
+                                    className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full"
+                                >
+                                    X
+                                </button>
                             </div>
-                        </div>
+                        ))}
                     </div>
+                </Form.Item>
 
-                    <div>
-                        <label className="text-2xl">Price Range (VND)</label>
-                        <input
-                            type="number"
-                            name="priceRange"
-                            value={formData.priceRange}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            placeholder="Enter price range"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="text-2xl">Electricity Price (VND)</label>
-                        <input
-                            type="number"
-                            name="electricityPrice"
-                            value={formData.electricityPrice}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            placeholder="Enter electricity price"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="text-2xl">Water Price (VND)</label>
-                        <input
-                            type="number"
-                            name="waterPrice"
-                            value={formData.waterPrice}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            placeholder="Enter water price"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="text-2xl">Total Rooms</label>
-                        <input
-                            type="number"
-                            name="totalRooms"
-                            value={formData.totalRooms}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            placeholder="Enter total rooms"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="text-2xl">Available Rooms</label>
-                        <input
-                            type="number"
-                            name="availableRooms"
-                            value={formData.availableRooms}
-                            onChange={handleInputChange}
-                            className="w-full border rounded px-2 py-1 mb-4"
-                            placeholder="Enter available rooms"
-                            required
-                        />
-                    </div>
-                </div>
-                <div className="flex justify-end mt-4">
+                {/* Price Range */}
+                <Form.Item
+                    label="Price Range (VND)"
+                    name="priceRange"
+                    rules={[{ required: true, message: "Please enter the price range" }]}
+                    className="mb-2"
+                >
+                    <Input
+                        type="number"
+                        placeholder="Enter price range"
+                        name="priceRange"
+                        value={formData.priceRange}
+                        onChange={handleInputChange}
+                    />
+                </Form.Item>
+
+                {/* Electricity Price */}
+                <Form.Item
+                    label="Electricity Price (VND)"
+                    name="electricityPrice"
+                    rules={[{ required: true, message: "Please enter the electricity price" }]}
+                    className="mb-2"
+                >
+                    <Input
+                        type="number"
+                        placeholder="Enter electricity price"
+                        name="electricityPrice"
+                        value={formData.electricityPrice}
+                        onChange={handleInputChange}
+                    />
+                </Form.Item>
+
+                {/* Water Price */}
+                <Form.Item
+                    label="Water Price (VND)"
+                    name="waterPrice"
+                    rules={[{ required: true, message: "Please enter the water price" }]}
+                    className="mb-2"
+                >
+                    <Input
+                        type="number"
+                        placeholder="Enter water price"
+                        name="waterPrice"
+                        value={formData.waterPrice}
+                        onChange={handleInputChange}
+                    />
+                </Form.Item>
+
+                {/* Total Rooms */}
+                <Form.Item
+                    label="Total Rooms"
+                    name="totalRooms"
+                    rules={[{ required: true, message: "Please enter the total number of rooms" }]}
+                    className="mb-2"
+                >
+                    <Input
+                        type="number"
+                        placeholder="Enter total rooms"
+                        name="totalRooms"
+                        value={formData.totalRooms}
+                        onChange={handleInputChange}
+                    />
+                </Form.Item>
+
+                {/* Available Rooms */}
+                <Form.Item
+                    label="Available Rooms"
+                    name="availableRooms"
+                    rules={[{ required: true, message: "Please enter the available rooms" }]}
+                    className="mb-2"
+                >
+                    <Input
+                        type="number"
+                        placeholder="Enter available rooms"
+                        name="availableRooms"
+                        value={formData.availableRooms}
+                        onChange={handleInputChange}
+                    />
+                </Form.Item>
+
+                {/* Form Buttons */}
+                <div className="flex justify-end mt-4 ">
                     <Button
                         title="Cancel"
                         btnCancel={true}
                         onClick={onClose}
-                        className="bg-red-500 hover:bg-red-600 w-full text-white mr-4"
+                        className="bg-red-500 hover:bg-red-600 text-white mr-2"
                         size="large"
-                    />
-
+                    >
+                        Cancel
+                    </Button>
                     <Button
-                        className="bg-primary w-full text-white ml-4"
+                        className="bg-primary w-full text-white ml-2"
                         size="large"
                         onClick={handleSubmit}
                         title="Submit"
                     >
                         Submit
                     </Button>
+
                 </div>
-            </form>
+            </Form>
         </div>
     );
-}
+};
 
 export default AddBoardingHouseForm;
