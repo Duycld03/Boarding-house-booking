@@ -379,7 +379,7 @@ class BoardingHouseController {
     }
     async uploadFile(req, res) {
         console.log("tnhi: ", req.body)
-        const storagePath = "./src/assets/images";
+        const storagePath = "./public/images/boardingHouse";
 
         // Tạo thư mục lưu file nếu chưa tồn tại
         if (!fs.existsSync(storagePath)) {
@@ -407,12 +407,11 @@ class BoardingHouseController {
                 if (!req.file) {
                     return res.status(400).json({ message: "No file provided." });
                 }
-
-                // // Trả về đường dẫn file
-                // const filePath = `http://localhost:3000/assets/images/${req.file.filename}`;
-                // res.status(200).json({ filePath });
-                const filePath = `${req.protocol}://${req.get('host')}/assets/images/${req.file.filename}`;
+                // Trả về đường dẫn file
+                const filePath = `/public/images/boardingHouse/${req.file.filename}`;
                 res.status(200).json({ filePath });
+                // const filePath = `${req.protocol}://${req.get('host')}/assets/images/${req.file.filename}`;
+                // res.status(200).json({ filePath });
             });
         } catch (error) {
             console.error("Error in uploadFile:", error);

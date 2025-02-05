@@ -135,11 +135,35 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
         console.log("Form Data:", formData);
         // console.log("Boarding House Type:", formData.boardingHouseType);
-
+        if (!formData.owner) {
+            toast.error("Please enter owner name.");
+            return;
+        }
         if (!formData.boardingHouseType) {
             toast.error("Please select a boarding house type.");
             return;
         }
+        if (!formData.name) {
+            toast.error("Please input a boarding house name.");
+            return;
+        }
+        if (!formData.address.province) {
+            toast.error("Please input a boarding house province.");
+            return;
+        }
+        if (!formData.address.district) {
+            toast.error("Please input a boarding house district.");
+            return;
+        }
+        if (!formData.address.ward) {
+            toast.error("Please input a boarding house ward.");
+            return;
+        }
+        if (!formData.address.detail) {
+            toast.error("Please input a boarding house details.");
+            return;
+        }
+
         const imagesData = [];
         const payloadPrimary = new FormData();
         payloadPrimary.append("file", formData.primaryImage);
