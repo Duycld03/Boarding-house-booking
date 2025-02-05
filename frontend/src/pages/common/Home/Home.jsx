@@ -1,9 +1,9 @@
+import { useState } from 'react';
 import classNames from 'classnames/bind';
 import Styles from './Home.module.css';
 import BoardingHouseGrid from '../../../component/BoardingHouseCard';
-import { useState } from 'react';
+import { Tabs } from 'antd';
 
-// Dữ liệu giả lập (Bạn có thể thay bằng dữ liệu thực từ API)
 const boardingHouses = [
   {
     id: 1,
@@ -101,21 +101,39 @@ const cx = classNames.bind(Styles);
 function Home() {
   const [data] = useState(boardingHouses);
 
+  // Dữ liệu cho từng tab
+  const allData = data;
+  // "Newest" giả sử là sắp xếp theo id giảm dần (các bản ghi mới có id cao hơn)
+  const newestData = [...data].sort((a, b) => b.id - a.id);
+  // "High rating" sắp xếp theo rating giảm dần
+  const highRatingData = [...data].sort((a, b) => b.rating - a.rating);
+
   return (
     <div className={cx('home-container')}>
       <div className={cx('content')}>
         {/* Sidebar bên trái */}
         <div className={cx('filter')}>
           <h2>Filter option</h2>
-          {/* Thêm các bộ lọc tại đây */}
+          {/* Thêm các bộ lọc tại đây nếu cần */}
         </div>
 
         {/* Grid bên phải */}
         <div className={cx('grid')}>
-          <BoardingHouseGrid data={data} />
+          <Tabs defaultActiveKey="all">
+            <Tabs.TabPane tab="Tất cả" key="all">
+              <BoardingHouseGrid data={allData} />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Newest" key="newest">
+              <BoardingHouseGrid data={newestData} />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="High rating" key="highRating">
+              <BoardingHouseGrid data={highRatingData} />
+            </Tabs.TabPane>
+          </Tabs>
         </div>
       </div>
     </div>
   );
 }
+
 export default Home;
