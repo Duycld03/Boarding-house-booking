@@ -12,7 +12,7 @@ import {
     fetchWards,
 } from "../../../api/apiAddress";
 import { Loader, Button } from "../../../component";
-import { Form, Input, Select, Upload, InputNumber } from "antd";
+import { Form, Input, Select, Upload, InputNumber, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 function AddBoardingHouseForm({ onClose, onSuccess }) {
     const [formData, setFormData] = useState({
@@ -153,7 +153,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
         console.log("Form Data:", formData);
         // console.log("Boarding House Type:", formData.boardingHouseType);
         if (!formData.owner) {
-            toast.error("Please enter owner name.");
+            toast.error("Please enter owner username.");
             return;
         }
         if (!formData.boardingHouseType) {
@@ -161,23 +161,23 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             return;
         }
         if (!formData.name) {
-            toast.error("Please input a boarding house name.");
+            toast.error("Please enter a boarding house name.");
             return;
         }
         if (!formData.address.province) {
-            toast.error("Please input a boarding house province.");
+            toast.error("Please select a boarding house province.");
             return;
         }
         if (!formData.address.district) {
-            toast.error("Please input a boarding house district.");
+            toast.error("Please select a boarding house district.");
             return;
         }
         if (!formData.address.ward) {
-            toast.error("Please input a boarding house ward.");
+            toast.error("Please select a boarding house ward.");
             return;
         }
         if (!formData.address.detail) {
-            toast.error("Please input a boarding house details.");
+            toast.error("Please enter a boarding house details.");
             return;
         }
 
@@ -341,31 +341,69 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                 </Form.Item>
 
                 {/* Primary Image */}
-                <Form.Item label="Primary Image" className="mb-2">
-                    <Upload {...uploadProps}>
-                        <Button icon={<PlusOutlined />}>Upload Primary Image</Button>
-                    </Upload>
-                    {formData.primaryImage && (
-                        <img
-                            src={URL.createObjectURL(formData.primaryImage)}
-                            alt="Primary"
-                            className="mt-2 w-32 h-32 object-cover border rounded"
-                        />
-                    )}
+                <Form.Item
+                    label={
+                        <span>
+                            Primary Image
+                        </span>
+                    }
+                    className="mb-4"
+                    review={formData.primaryImage ? "Image uploaded successfully" : "Please upload a primary image"}
+                >
+                    <div className="flex items-center gap-4">
+                        <Upload {...uploadProps}>
+                            <Button
+                                icon={<PlusOutlined />}
+                                className="bg-blue-500 text-white hover:bg-blue-600"
+                            >
+                                Upload Primary Image
+                            </Button>
+                        </Upload>
+                        {formData.primaryImage ? (
+                            <div className="flex flex-col items-center">
+                                <Image
+                                    src={URL.createObjectURL(formData.primaryImage)}
+                                    alt="Primary"
+                                    className="object-cover border rounded"
+                                    width={128}
+                                    preview={{
+                                        mask: (
+                                            <span>Preview</span>
+                                        ),
+                                    }}
+
+                                />
+
+                            </div>
+                        ) : null}
+
+                    </div>
                 </Form.Item>
 
                 {/* Other Images */}
-                <Form.Item label="Other Images" className="mb-2">
+                <Form.Item
+                    label="Other Images"
+                    className="mb-2"
+                    review={
+                        formData.otherImages.length > 0
+                            ? `${formData.otherImages.length} images uploaded successfully`
+                            : "Please upload other images"
+                    }
+                >
                     <Upload {...uploadOtherImgProps} listType="picture-card" showUploadList={false}>
                         <Button icon={<PlusOutlined />}>Upload Images</Button>
                     </Upload>
                     <div className="mt-4 flex flex-wrap gap-4">
                         {formData.otherImages.map((file, index) => (
                             <div key={index} className="relative">
-                                <img
+                                <Image
                                     src={URL.createObjectURL(file)}
                                     alt={`Other ${index + 1}`}
                                     className="w-32 h-32 object-cover border rounded"
+                                    width={128} // Sets the width of the preview image
+                                    preview={{
+                                        mask: <span>Preview</span>, // Adds a "Preview" mask on hover
+                                    }}
                                 />
                                 <button
                                     type="button"
@@ -381,13 +419,13 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
                 {/* Price Range */}
                 <Form.Item
-                    label="Price Range (VND)"
+                    label="Price Rent/month"
                     name="priceRange"
-                    rules={[{ required: true, message: "Please enter the price range" }]}
+                    rules={[{ required: true, message: "Please enter the price rent" }]}
                     className="mb-2"
                 >
                     <InputNumber
-                        placeholder="Enter price range"
+                        placeholder="Enter price rent"
                         name="priceRange"
                         value={formData.priceRange}
                         onChange={(value) =>
@@ -403,7 +441,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
                 {/* Electricity Price */}
                 <Form.Item
-                    label="Electricity Price (VND)"
+                    label="Electricity Price/kW"
                     name="electricityPrice"
                     rules={[{ required: true, message: "Please enter the electricity price" }]}
                     className="mb-2"
@@ -425,7 +463,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
                 {/* Water Price */}
                 <Form.Item
-                    label="Water Price (VND)"
+                    label="Water Price/m3"
                     name="waterPrice"
                     rules={[{ required: true, message: "Please enter the water price" }]}
                     className="mb-2"
