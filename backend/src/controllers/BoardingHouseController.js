@@ -371,6 +371,9 @@ class BoardingHouseController {
     try {
       const boardingHData = await BoardingHouse.aggregate([
         {
+          $match: { totalRooms: { $gt: 0 } }, // Filter boarding houses with totalRoom > 0
+        },
+        {
           $lookup: {
             from: 'reviews', // Tên collection của Review
             localField: '_id',

@@ -8,16 +8,17 @@
     display: flex;
     width: 100%;
     max-width: 1200px;
-    /* Giới hạn chiều rộng */
+    background: white;
 }
 
 .filter {
     width: 250px;
-    /* Độ rộng sidebar */
-    background: blue;
-    /* Màu xám */
+    background: grey;
+    /* Màu nền */
     padding: 20px;
     border-radius: 8px;
+    margin-right: 20px;
+    /* Khoảng cách giữa filter và grid */
 }
 
 .grid {
@@ -25,4 +26,5 @@
     /* Phần này chiếm phần còn lại */
     padding-left: 20px;
     /* Tạo khoảng cách với sidebar */
+    background: white;
 }

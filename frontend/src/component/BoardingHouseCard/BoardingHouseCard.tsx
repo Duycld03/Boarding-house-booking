@@ -52,30 +52,47 @@ const BoardingHouseCard = ({
           style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
         />
       }
-      style={{ width: '100%', maxWidth: '400px', borderRadius: '8px' }} // Đảm bảo bo tròn card
+      style={{
+        width: '100%',
+        maxWidth: '400px',
+        borderRadius: '8px',
+        height: '420px',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
     >
-      <Typography.Title level={5}>{name}</Typography.Title>
-      <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
-        {/* Render stars chỉ khi validRating hợp lệ */}
-        {[...Array(validRating)].map((_, index) => (
-          <StarFilled key={index} style={{ color: 'gold' }} />
-        ))}
-      </div>
-      <Typography.Text type="secondary">${price}/month</Typography.Text>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: 4,
-        }}
-      >
-        <Typography.Text strong>
-          {detail} - {timeAgo}
-        </Typography.Text>
-        <HeartFilled
-          style={{ color: liked ? 'red' : 'gray', cursor: 'pointer' }}
-          onClick={handleHeartClick} // Toggle heart color on click
-        />
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        <Typography.Title level={5}>{name}</Typography.Title>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: 4 }}>
+          {[...Array(validRating)].map((_, index) => (
+            <StarFilled
+              key={index}
+              style={{ color: 'gold', fontSize: '20px' }}
+            />
+          ))}
+        </div>
+        <Typography.Text type="secondary">{price} VND/month</Typography.Text>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: 4,
+            marginBottom: 4,
+          }}
+        >
+          <Typography.Text strong>
+            {detail} - {timeAgo}
+          </Typography.Text>
+          <HeartFilled
+            style={{
+              color: liked ? 'red' : 'gray',
+              cursor: 'pointer',
+              fontSize: '20px',
+            }}
+            onClick={handleHeartClick}
+          />
+        </div>
       </div>
     </Card>
   );
@@ -96,14 +113,21 @@ const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
         grid={{
           gutter: 10,
           xs: 1,
-          sm: 2,
-          md: 3,
-          lg: 4,
+          sm: 1,
+          md: 2,
+          lg: 3,
           xl: 3,
         }}
         dataSource={paginatedData}
         renderItem={(item) => (
-          <List.Item style={{ marginBottom: 10, padding: 0, marginTop: 20 }}>
+          <List.Item
+            style={{
+              marginBottom: 10,
+              padding: 0,
+              marginTop: 20,
+              marginRight: 20,
+            }}
+          >
             <BoardingHouseCard {...item} />
           </List.Item>
         )}
@@ -115,6 +139,8 @@ const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
           alignItems: 'center',
           marginTop: 16,
           gap: 10,
+          marginRight: 20,
+          marginBottom: 20,
         }}
       >
         <Button

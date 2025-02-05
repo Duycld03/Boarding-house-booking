@@ -5,6 +5,9 @@ import BoardingHouseGrid from '../../../component/BoardingHouseCard';
 import { Tabs } from 'antd';
 import { getAllBHHome } from '../../../api/BoardingHManagement';
 import { toast } from 'react-toastify';
+import formatAmount from '../../../utils/formatAmount';
+import { formatTimeAgo } from '../../../utils/timeUtils';
+import truncateDetail from '../../../utils/truncateDetail';
 
 const cx = classNames.bind(Styles);
 
@@ -28,29 +31,18 @@ function Home() {
         const imgPath =
           item.images?.find((img) => img.isPrimary)?.imageUrl || '';
         const imgUrl = imgPath ? `${baseUrl}${imgPath}` : '';
-        const createdAt = new Date(item.createdAt || new Date()).getTime();
-        const now = new Date().getTime();
-        const hoursAgo = Math.floor((now - createdAt) / 3600000);
-
-        let timeAgoText = 'Just posted';
-
-        if (hoursAgo >= 24) {
-          const daysAgo = Math.floor(hoursAgo / 24);
-          timeAgoText = daysAgo === 1 ? '1 day ago' : `${daysAgo} days ago`;
-        } else if (hoursAgo > 1) {
-          timeAgoText = `${hoursAgo} hours ago`;
-        } else if (hoursAgo === 1) {
-          timeAgoText = '1 hour ago';
-        }
+        const timeAgoText = formatTimeAgo(item.updatedAt); // Sử dụng hàm formatTimeAgo
 
         return {
           id: item._id?.$oid || item._id,
           name: item.name,
-          price: item.priceRange,
-          detail: item.address?.province || 'No address provided',
+          price: formatAmount(item.priceRange),
+          detail: truncateDetail(
+            item.address?.province || 'No address provided'
+          ), // Cắt chuỗi ở đây
           rating: item.rating || 0,
           img: imgUrl,
-          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
           timeAgo: timeAgoText,
         };
       });
