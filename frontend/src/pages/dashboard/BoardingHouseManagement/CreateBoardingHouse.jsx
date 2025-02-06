@@ -273,7 +273,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                 className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
             >
                 <h2 className="text-4xl font-bold mb-8">Create New Boarding House</h2>
-                <h2 className="text-3xl font-bold mb-4 ">Owner and information</h2>
+                <h2 className="text-3xl font-bold mb-4 ">1. Owner and information</h2>
                 {/* Owner */}
                 <Form.Item
                     label="Owner"
@@ -335,7 +335,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     />
                 </Form.Item>
 
-                <h2 className="text-3xl font-bold mb-4 mt-10 ">Address</h2>
+                <h2 className="text-3xl font-bold mb-4 mt-10 ">2. Address</h2>
                 {/* Address Selector */}
                 <AddressSelector
                     provinces={provinces}
@@ -346,7 +346,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     onInputChange={handleInputChange}
                     formData={formData}
                 />
-                <h2 className="text-3xl font-bold mb-4 mt-10 ">Image</h2>
+                <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
                 {/* Primary Image */}
                 <Form.Item
                     label={<span>Primary Image</span>}
@@ -463,7 +463,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                         `}
                     </style>
                 </Form.Item>
-                <h2 className="text-3xl font-bold mb-4 mt-10 ">Price</h2>
+                <h2 className="text-3xl font-bold mb-4 mt-10 ">4. Price</h2>
                 {/* Price Range */}
                 <Form.Item
                     label="Price Rent/month (VND)"

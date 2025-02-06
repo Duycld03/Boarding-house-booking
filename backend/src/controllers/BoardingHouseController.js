@@ -310,6 +310,14 @@ class BoardingHouseController {
                     .status(400)
                     .json({ message: "Name is required and must not contain special characters." });
             }
+            // Check if the boarding house name already exists
+            const existingBoardingHouse = await BoardingHouse.findOne({ name });
+            if (existingBoardingHouse) {
+                console.error("Boarding house name already exists:", name);
+                return res
+                    .status(400)
+                    .json({ message: "A boarding house with this name already exists." });
+            }
 
             // Validate address
             const { province, district, ward, detail } = address;
@@ -332,7 +340,7 @@ class BoardingHouseController {
                 console.error("Too many images:", images.length);
                 return res
                     .status(400)
-                    .json({ message: "You can upload a maximum of 15 images." });
+                    .json({ message: "You can't upload more than 15 images for other image." });
             }
 
             // Validate price fields
