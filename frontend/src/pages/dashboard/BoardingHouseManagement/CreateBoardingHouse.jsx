@@ -59,6 +59,13 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
         maxCount: 1,
         showUploadList: false,
     };
+    const handleRemovePrimaryImage = () => {
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            primaryImage: null, // Xóa ảnh primary
+        }));
+    };
+
     // Fetch provinces, districts, and wards dynamically
     useEffect(() => {
         const fetchData = async () => {
@@ -316,18 +323,6 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                         onChange={handleInputChange}
                     />
                 </Form.Item>
-
-                {/* Address Selector */}
-                <AddressSelector
-                    provinces={provinces}
-                    districts={districts}
-                    wards={wards}
-                    onProvinceChange={handleInputChange}
-                    onDistrictChange={handleInputChange}
-                    onInputChange={handleInputChange}
-                    formData={formData}
-                />
-
                 {/* Description */}
                 <Form.Item label="Description" name="description" className="mb-2">
 
@@ -340,86 +335,133 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     />
                 </Form.Item>
 
+
+                {/* Address Selector */}
+                <AddressSelector
+                    provinces={provinces}
+                    districts={districts}
+                    wards={wards}
+                    onProvinceChange={handleInputChange}
+                    onDistrictChange={handleInputChange}
+                    onInputChange={handleInputChange}
+                    formData={formData}
+                />
+
                 {/* Primary Image */}
                 <Form.Item
-                    label={
-                        <span>
-                            Primary Image
-                        </span>
-                    }
+                    label={<span>Primary Image</span>}
                     className="mb-4"
-                    review={formData.primaryImage ? "Image uploaded successfully" : "Please upload a primary image"}
                 >
-                    <div className="flex items-center gap-4">
-                        <Upload {...uploadProps}>
-                            <Button
-                                icon={<PlusOutlined />}
-                                className="bg-blue-500 text-white hover:bg-blue-600"
+                    <div className="flex flex-col gap-4">
+                        {/* Nút Upload Primary Image */}
+                        {!formData.primaryImage && (
+                            <Upload
+                                {...uploadProps}
+                                listType="picture-card"
+                                showUploadList={false}
+                                className="custom-upload w-full max-w-lg"
                             >
-                                Upload Primary Image
-                            </Button>
-                        </Upload>
-                        {formData.primaryImage ? (
-                            <div className="flex flex-col items-center">
+                                <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
+                                    <PlusOutlined className="text-2xl text-gray-400" />
+                                    <p className="text-gray-500 mt-2 text-sm font-medium">Add Image</p>
+                                    <p className="text-gray-400 text-xs">Drag-drop or click here to choose a file</p>
+                                </div>
+                            </Upload>
+                        )}
+
+                        {/* Hiển thị Primary Image nếu đã upload */}
+                        {formData.primaryImage && (
+                            <div className="relative w-full max-w-lg">
                                 <Image
                                     src={URL.createObjectURL(formData.primaryImage)}
                                     alt="Primary"
                                     className="object-cover border rounded"
-                                    width={128}
-                                    preview={{
-                                        mask: (
-                                            <span>Preview</span>
-                                        ),
+                                    style={{
+                                        width: "100%",
+                                        height: "auto",
+                                        maxHeight: "300px",
                                     }}
+                                    preview={{ mask: <span className="text-white">Preview</span> }}
                                 />
+                                {/* Nút xóa ảnh */}
+                                <button
+                                    type="button"
+                                    onClick={handleRemovePrimaryImage}
+                                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-3 py-1 rounded-full z-10 shadow-lg"
+                                >
+                                    X
+                                </button>
                             </div>
-                        ) : null}
+                        )}
                     </div>
+                    {/* thêm css để bỏ đường viền khung của antd*/}
+                    <style>
+                        {`
+                            .custom-upload .ant-upload
+                            {
+                            border: none !important;
+                            background: none !important;
+                            padding: 0 !important;
+                            }
+                        `}
+                    </style>
                 </Form.Item>
 
                 {/* Other Images */}
                 <Form.Item
-                    label={
-                        <span>Other Images</span>
-                    }
+                    label={<span>Other Images</span>}
                     className="mb-4"
-                    review={
-                        formData.otherImages.length > 0 ? `${formData.otherImages.length} images uploaded successfully` : "Please upload other images"
-                    }
                 >
                     <div className="mt-4 flex flex-wrap gap-4">
                         {formData.otherImages.map((file, index) => (
-                            <div
-                                key={index}
-                                className="relative w-40 h-40 border rounded"
-                            >
-                                {/* Hiển thị ảnh */}
-                                <img
+                            <div key={index} className="relative">
+                                {/* Hiển thị ảnh bằng Ant Design Image */}
+                                <Image
                                     src={URL.createObjectURL(file)}
                                     alt={`Other ${index + 1}`}
-                                    className="w-full h-full object-cover rounded"
+                                    className="object-cover border rounded"
+                                    width={100}
+                                    height={100}
+                                    preview={{
+                                        mask: (<span>Preview</span>),
+                                    }}
                                 />
                                 {/* Nút delete */}
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveOtherImage(index)}
-                                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
                                 >
                                     X
                                 </button>
                             </div>
                         ))}
+
+                        {/* Upload component */}
                         <Upload
                             {...uploadOtherImgProps}
                             listType="picture-card"
                             showUploadList={false}
+                            className="custom-upload"
                         >
-                            <div>
-                                <PlusOutlined />
-                                <div style={{ marginTop: 8 }}>Upload Images</div>
+                            <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
+                                <PlusOutlined className="text-2xl text-gray-400" />
+                                <p className="text-gray-500 mt-2 text-sm font-medium">Add Images</p>
+                                <p className="text-gray-400 text-xs">Drag-drop or click here to choose a file</p>
                             </div>
                         </Upload>
                     </div>
+                    {/* thêm css để bỏ đường viền khung của antd*/}
+                    <style>
+                        {`
+                            .custom-upload .ant-upload
+                            {
+                            border: none !important;
+                            background: none !important;
+                            padding: 0 !important;
+                            }
+                        `}
+                    </style>
                 </Form.Item>
 
                 {/* Price Range */}
@@ -446,7 +488,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
                 {/* Electricity Price */}
                 <Form.Item
-                    label="Electricity Price/kW"
+                    label="Electricity Price/kWh"
                     name="electricityPrice"
                     rules={[{ required: true, message: "Please enter the electricity price" }]}
                     className="mb-2"
@@ -468,7 +510,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
                 {/* Water Price */}
                 <Form.Item
-                    label="Water Price/m3"
+                    label="Water Price/m³"
                     name="waterPrice"
                     rules={[{ required: true, message: "Please enter the water price" }]}
                     className="mb-2"
@@ -487,7 +529,6 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                         className="w-full"
                     />
                 </Form.Item>
-
                 {/* Total Rooms */}
                 {/* <Form.Item
                     label="Total Rooms"
