@@ -272,8 +272,8 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                 onSubmitCapture={handleSubmit}
                 className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
             >
-                <h2 className="text-2xl font-bold mb-4">Create New Boarding House</h2>
-
+                <h2 className="text-4xl font-bold mb-8">Create New Boarding House</h2>
+                <h2 className="text-3xl font-bold mb-4 ">Owner and information</h2>
                 {/* Owner */}
                 <Form.Item
                     label="Owner"
@@ -335,7 +335,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     />
                 </Form.Item>
 
-
+                <h2 className="text-3xl font-bold mb-4 mt-10 ">Address</h2>
                 {/* Address Selector */}
                 <AddressSelector
                     provinces={provinces}
@@ -346,7 +346,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     onInputChange={handleInputChange}
                     formData={formData}
                 />
-
+                <h2 className="text-3xl font-bold mb-4 mt-10 ">Image</h2>
                 {/* Primary Image */}
                 <Form.Item
                     label={<span>Primary Image</span>}
@@ -371,7 +371,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
 
                         {/* Hiển thị Primary Image nếu đã upload */}
                         {formData.primaryImage && (
-                            <div className="relative w-full max-w-lg">
+                            <div className="items-center justify-center flex flex-col gap-4">
                                 <Image
                                     src={URL.createObjectURL(formData.primaryImage)}
                                     alt="Primary"
@@ -463,10 +463,10 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                         `}
                     </style>
                 </Form.Item>
-
+                <h2 className="text-3xl font-bold mb-4 mt-10 ">Price</h2>
                 {/* Price Range */}
                 <Form.Item
-                    label="Price Rent/month"
+                    label="Price Rent/month (VND)"
                     name="priceRange"
                     rules={[{ required: true, message: "Please enter the price rent" }]}
                     className="mb-2"
@@ -483,12 +483,13 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                         } // Thêm dấu phẩy ngăn cách hàng nghìn
                         parser={(value) => value.replace(/\$\s?|(,*)/g, "")} // Loại bỏ dấu phẩy khi nhập
                         className="w-full"
+                        min={0}
                     />
                 </Form.Item>
 
                 {/* Electricity Price */}
                 <Form.Item
-                    label="Electricity Price/kWh"
+                    label="Electricity Price/kWh (VND)"
                     name="electricityPrice"
                     rules={[{ required: true, message: "Please enter the electricity price" }]}
                     className="mb-2"
@@ -505,12 +506,13 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                         }
                         parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                         className="w-full"
+                        min={0}
                     />
                 </Form.Item>
 
                 {/* Water Price */}
                 <Form.Item
-                    label="Water Price/m³"
+                    label="Water Price/m³ (VND)"
                     name="waterPrice"
                     rules={[{ required: true, message: "Please enter the water price" }]}
                     className="mb-2"
@@ -527,6 +529,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                         }
                         parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                         className="w-full"
+                        min={0}
                     />
                 </Form.Item>
                 {/* Total Rooms */}
