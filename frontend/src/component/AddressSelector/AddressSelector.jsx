@@ -1,4 +1,8 @@
 import React from "react";
+import { Form, Select, Input } from "antd";
+
+const { Option } = Select;
+const { TextArea } = Input;
 
 const AddressSelector = ({
     provinces = [],
@@ -10,79 +14,93 @@ const AddressSelector = ({
     formData,
 }) => {
     return (
-        <div className="grid grid-cols-1 gap-4">
-            <div>
-                <label className="block mb-1">Tỉnh/Thành phố</label>
-                <select
-                    name="address.province"
-                    value={formData?.address?.province || ""}
-                    onChange={(e) => {
-                        onProvinceChange(e); // Fetch districts
-                        onInputChange(e); // Update province in formData
-                    }}
-                    required
-                    className="w-full border rounded px-2 py-1"
-                >
-                    <option value="">Chọn Tỉnh/Thành phố</option>
-                    {provinces.map((province) => (
-                        <option key={province.code} value={province.name}>
-                            {province.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div>
-                <label className="block mb-1">Quận/Huyện</label>
-                <select
-                    name="address.district"
-                    value={formData?.address?.district || ""}
+        <div className="col-span-2">
+            <Form layout="vertical">
+                {/* Province Selector */}
+                <Form.Item label="Province" required className="mb-2">
+                    <Select
+                        placeholder="Select province"
+                        value={formData?.address?.province || undefined}
+                        onChange={(value) => {
+                            // Reset district and ward when province changes
+                            onProvinceChange({
+                                target: { name: "address.province", value }
+                            });
+                            onInputChange({
+                                target: { name: "address.district", value: "" }
+                            });
+                            onInputChange({
+                                target: { name: "address.ward", value: "" }
+                            });
+                        }}
+                        allowClear
+                    >
+                        {provinces.map((province) => (
+                            <Option key={province.code} value={province.name}>
+                                {province.name}
+                            </Option>
+                        ))}
+                    </Select>
+                </Form.Item>
 
-                    onChange={(e) => {
-                        onDistrictChange(e); // Fetch wards
-                        onInputChange(e); // Update district in formData
-                    }}
-                    required
-                    className="w-full border rounded px-2 py-1"
-                    disabled={!formData?.address?.province}
-                >
-                    <option value="">Chọn Quận/Huyện</option>
-                    {districts.map((district) => (
-                        <option key={district.code} value={district.name}>
-                            {district.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div>
-                <label className="block mb-1">Phường/Xã</label>
-                <select
-                    name="address.ward"
-                    value={formData?.address?.ward || ""}
-                    onChange={onInputChange}
-                    required
-                    className="w-full border rounded px-2 py-1"
-                    disabled={!formData?.address?.district}
-                >
-                    <option value="">Chọn Phường/Xã</option>
-                    {wards.map((ward) => (
-                        <option key={ward.code} value={ward.name}>
-                            {ward.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div>
-                <label className="block mb-1">Địa chỉ chi tiết</label>
-                <textarea
-                    name="address.detail"
-                    value={formData?.address?.detail || ""}
-                    onChange={onInputChange}
-                    required
-                    className="w-full border rounded px-2 py-1"
-                    placeholder="Nhập địa chỉ chi tiết"
-                ></textarea>
-            </div>
-        </div >
+                {/* District Selector */}
+                <Form.Item label="District" required className="mb-2">
+                    <Select
+                        placeholder="Select district"
+                        value={formData?.address?.district || undefined}
+                        onChange={(value) => {
+                            // Reset ward when district changes
+                            onDistrictChange({
+                                target: { name: "address.district", value }
+                            });
+                            onInputChange({
+                                target: { name: "address.ward", value: "" }
+                            });
+                        }}
+                        disabled={!formData?.address?.province}
+                        allowClear
+                    >
+                        {districts.map((district) => (
+                            <Option key={district.code} value={district.name}>
+                                {district.name}
+                            </Option>
+                        ))}
+                    </Select>
+                </Form.Item>
+
+                {/* Ward Selector */}
+                <Form.Item label="Ward" required className="mb-2">
+                    <Select
+                        placeholder="Select ward"
+                        value={formData?.address?.ward || undefined}
+                        onChange={(value) => {
+                            onInputChange({
+                                target: { name: "address.ward", value }
+                            });
+                        }}
+                        disabled={!formData?.address?.district}
+                        allowClear
+                    >
+                        {wards.map((ward) => (
+                            <Option key={ward.code} value={ward.name}>
+                                {ward.name}
+                            </Option>
+                        ))}
+                    </Select>
+                </Form.Item>
+
+                {/* Address Details */}
+                <Form.Item label="Details" required>
+                    <TextArea
+                        placeholder="Input details boarding house address"
+                        value={formData?.address?.detail || ""}
+                        onChange={(e) => onInputChange(e)}
+                        name="address.detail"
+                        autoSize={{ minRows: 3, maxRows: 5 }}
+                    />
+                </Form.Item>
+            </Form>
+        </div>
     );
 };
 

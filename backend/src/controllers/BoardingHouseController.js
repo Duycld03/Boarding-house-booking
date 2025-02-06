@@ -3,6 +3,10 @@ import BoardingHouse from '../models/boardingHouse.js'
 import BoardingHouseType from '../models/boardingHouseType .js'
 import unidecode from 'unidecode'
 
+// import path from "path";
+import fs from "fs";
+import multer from "multer";
+import Account from '../models/account.js';
 class BoardingHouseController {
     async getAllBHOnDashBoard(req, res, next) {
         try {
@@ -10,7 +14,7 @@ class BoardingHouseController {
             ).populate('boardingHouseType')
                 .populate({
                     path: 'ownerId',
-                }).sort({ createdAt: 1 })
+                }).sort({ createdAt: -1 })
 
 
             return res.status(200).json(boardingHData);
@@ -261,6 +265,167 @@ class BoardingHouseController {
             });
         }
     }
+
+    async createBoardingHouse(req, res) {
+        try {
+            const {
+                ownerUsername,
+                boardingHouseType,
+                name,
+                address,
+                description,
+                images,
+                priceRange,
+                electricityPrice,
+                waterPrice,
+                // availableRooms,
+                // totalRooms,
+            } = req.body;
+
+
+            console.log("Request body received:", req.body);
+
+            // Validate owner
+            const ownerAccount = await Account.findOne({ username: ownerUsername, role: "owner" });
+            console.log("Owner account found:", ownerAccount);
+            if (!ownerAccount) {
+                console.error("Invalid owner:", ownerUsername);
+                return res
+                    .status(400)
+                    .json({ message: "Invalid owner username or the user is not a landlord." });
+            }
+            const ownerId = ownerAccount._id;
+
+            // Validate boarding house type
+            const boardingHouseTypeExists = await BoardingHouseType.findById(boardingHouseType);
+            if (!boardingHouseTypeExists) {
+                console.error("Invalid boarding house type:", boardingHouseType);
+                return res.status(400).json({ message: "Invalid boarding house type." });
+            }
+
+            // Validate name
+            if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
+                console.error("Invalid name:", name);
+                return res
+                    .status(400)
+                    .json({ message: "Name is required and must not contain special characters." });
+            }
+            // Check if the boarding house name already exists
+            const existingBoardingHouse = await BoardingHouse.findOne({ name });
+            if (existingBoardingHouse) {
+                console.error("Boarding house name already exists:", name);
+                return res
+                    .status(400)
+                    .json({ message: "A boarding house with this name already exists." });
+            }
+
+            // Validate address
+            const { province, district, ward, detail } = address;
+            if (!province || !district || !ward) {
+                console.error("Invalid address:", address);
+                return res
+                    .status(400)
+                    .json({ message: "Province, district, and ward are required fields in the address." });
+            }
+
+            // Validate images
+            const primaryImageCount = images.filter((img) => img.isPrimary).length;
+            if (primaryImageCount !== 1) {
+                console.error("Invalid primary images count:", primaryImageCount);
+                return res
+                    .status(400)
+                    .json({ message: "You must upload exactly one primary image." });
+            }
+            if (images.length > 15) {
+                console.error("Too many images:", images.length);
+                return res
+                    .status(400)
+                    .json({ message: "You can't upload more than 15 images for other image." });
+            }
+
+            // Validate price fields
+            if (priceRange <= 0 || electricityPrice <= 0 || waterPrice <= 0) {
+                console.error("Invalid price fields:", { priceRange, electricityPrice, waterPrice });
+                return res
+                    .status(400)
+                    .json({ message: "Price fields must be greater than 0." });
+            }
+
+            // Tạo mới boarding house
+            const newBoardingHouse = new BoardingHouse({
+                ownerId,
+                name,
+                description: description || "",
+                priceRange,
+                electricityPrice,
+                waterPrice,
+                boardingHouseType,
+                address: {
+                    province,
+                    district,
+                    ward,
+                    detail: detail || "",
+                },
+                images,
+                // availableRooms,
+                // totalRooms,
+            });
+
+            // Lưu boarding house vào database
+            const savedBoardingHouse = await newBoardingHouse.save();
+
+            return res
+                .status(201)
+                .json({ message: "Boarding house created successfully!", data: savedBoardingHouse });
+        } catch (error) {
+            console.error("Error creating boarding house:", error);
+            return res.status(500).json({
+                message: "An unexpected error occurred while creating boarding house.",
+                error: error.message,
+            });
+        }
+    }
+    async uploadFile(req, res) {
+        const storagePath = "./public/images/boardingHouse";
+
+        // Tạo thư mục lưu file nếu chưa tồn tại
+        if (!fs.existsSync(storagePath)) {
+            fs.mkdirSync(storagePath, { recursive: true });
+        }
+        // const { multer } = await import("multer");
+        try {
+            const storage = multer.diskStorage({
+                destination: (req, file, cb) => {
+                    cb(null, storagePath);
+                },
+                filename: (req, file, cb) => {
+                    cb(null, `${Date.now()}-${file.originalname}`);
+                },
+            });
+
+            const upload = multer({ storage }).single("file");
+
+            upload(req, res, (err) => {
+                if (err) {
+                    console.error("Error uploading file:", err);
+                    return res.status(500).json({ message: "Failed to upload file." });
+                }
+
+                if (!req.file) {
+                    return res.status(400).json({ message: "No file provided." });
+                }
+                // Trả về đường dẫn file
+                const filePath = `/public/images/boardingHouse/${req.file.filename}`;
+                res.status(200).json({ filePath });
+                // const filePath = `${req.protocol}://${req.get('host')}/assets/images/${req.file.filename}`;
+                // res.status(200).json({ filePath });
+            });
+        } catch (error) {
+            console.error("Error in uploadFile:", error);
+            res.status(500).json({ message: "Internal server error." });
+        }
+    }
+
 
     async filterBoardingHouse(req, res) {
         try {
