@@ -201,7 +201,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             });
         } catch (error) {
             console.error("Failed to upload image:", error);
-            toast.error("Failed to upload image.");
+            toast.error("Please upload primary image.");
             return;
         }
 
@@ -218,7 +218,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                 });
             } catch (error) {
                 console.error("Failed to upload image:", error);
-                toast.error("Failed to upload image.");
+                toast.error("Please upload other image.");
                 return;
             }
         }
