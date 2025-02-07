@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { Card, List, Typography, Image, Button } from 'antd';
-import { LeftOutlined, RightOutlined, StarFilled } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import {
+  LeftOutlined,
+  RightOutlined,
+  StarFilled,
+  HeartOutlined,
+  HeartFilled,
+} from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 interface BoardingHouseCardProps {
   id: number;
@@ -28,73 +35,118 @@ const BoardingHouseCard = ({
   img,
   timeAgo,
 }: BoardingHouseCardProps) => {
+  const navigate = useNavigate();
+  const [isFavorite, setIsFavorite] = useState(false);
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
 
+  // Điều hướng khi click vào card
+  const handleCardClick = () => {
+    navigate(`/boarding-house/${id}`);
+  };
+
+  // Xử lý khi nhấn vào icon heart
+  const handleFavoriteClick = (event: React.MouseEvent) => {
+    event.stopPropagation(); // Ngăn không cho card bị click
+    setIsFavorite(!isFavorite);
+    toast.success(
+      isFavorite
+        ? 'Đã xóa khỏi danh sách yêu thích'
+        : 'Đã lưu vào danh sách yêu thích'
+    );
+  };
+
   return (
-    <Link to={`/boarding-house/${id}`} style={{ width: '100%' }}>
-      <Card
-        hoverable
-        cover={
-          <Image
-            alt={name}
-            src={img}
-            style={{
-              width: '100%',
-              height: '200px', // Cố định kích thước ảnh
-              objectFit: 'cover',
-              borderTopLeftRadius: '8px',
-              borderTopRightRadius: '8px',
-            }}
-          />
-        }
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          borderRadius: '8px',
-          border: '2px solid #ddd', // Tăng độ lớn border
-          height: '370px',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          marginRight: '10px', // Thêm margin-right
-        }}
-      >
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          <Typography.Title level={5} style={{ fontSize: '20px' }}>
-            {name}
-          </Typography.Title>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginTop: 8,
-              marginBottom: 8,
-            }}
-          >
-            {[...Array(validRating)].map((_, index) => (
-              <StarFilled
-                key={index}
-                style={{ color: 'gold', fontSize: '20px' }}
-              />
-            ))}
-          </div>
-          <Typography.Text
-            style={{
-              color: '#f57c00',
-              fontWeight: '700', // Tăng độ đậm
-              fontSize: '18px', // Tăng kích thước chữ
-              marginTop: '12px',
-              marginBottom: '12px',
-            }}
-          >
-            {price} VND/month
-          </Typography.Text>
-          <Typography.Text strong style={{ display: 'block', marginTop: 8 }}>
+    <Card
+      hoverable
+      onClick={handleCardClick} // Click vào toàn card để điều hướng
+      cover={
+        <Image
+          alt={name}
+          src={img}
+          style={{
+            width: '100%',
+            height: '200px',
+            objectFit: 'cover',
+            borderTopLeftRadius: '8px',
+            borderTopRightRadius: '8px',
+          }}
+        />
+      }
+      style={{
+        width: '100%',
+        maxWidth: '400px',
+        borderRadius: '8px',
+        border: '2px solid #ddd',
+        height: '370px',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        marginRight: '10px',
+      }}
+    >
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        <Typography.Title level={5} style={{ fontSize: '20px' }}>
+          {name}
+        </Typography.Title>
+
+        {/* Hiển thị rating */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginTop: 8,
+            marginBottom: 8,
+          }}
+        >
+          {[...Array(validRating)].map((_, index) => (
+            <StarFilled
+              key={index}
+              style={{ color: 'gold', fontSize: '20px' }}
+            />
+          ))}
+        </div>
+
+        {/* Giá tiền */}
+        <Typography.Text
+          style={{
+            color: '#f57c00',
+            fontWeight: '700',
+            fontSize: '18px',
+            marginTop: '12px',
+            marginBottom: '12px',
+          }}
+        >
+          {price} VND/month
+        </Typography.Text>
+
+        {/* Detail + TimeAgo + Icon Heart */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between', // Đẩy icon heart sang phải
+            marginTop: 8,
+          }}
+        >
+          <Typography.Text strong>
             {detail} - {timeAgo}
           </Typography.Text>
+
+          {/* Icon heart */}
+          <Button
+            type="text"
+            onClick={handleFavoriteClick} // Bấm vào icon heart không chuyển trang
+            icon={
+              isFavorite ? (
+                <HeartFilled style={{ color: 'red', fontSize: '22px' }} />
+              ) : (
+                <HeartOutlined style={{ fontSize: '22px' }} />
+              )
+            }
+          />
         </div>
-      </Card>
-    </Link>
+      </div>
+    </Card>
   );
 };
 
@@ -111,7 +163,7 @@ const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
     <div>
       <List
         grid={{
-          gutter: 20, // Tăng khoảng cách giữa các card
+          gutter: 10,
           xs: 1,
           sm: 1,
           md: 2,
