@@ -48,11 +48,7 @@ const BoardingHouseCard = ({
   const handleFavoriteClick = (event: React.MouseEvent) => {
     event.stopPropagation(); // Ngăn không cho card bị click
     setIsFavorite(!isFavorite);
-    toast.success(
-      isFavorite
-        ? 'Đã xóa khỏi danh sách yêu thích'
-        : 'Đã lưu vào danh sách yêu thích'
-    );
+    toast.success(isFavorite ? 'Removed from favorites' : 'Saved to favorites');
   };
 
   return (
