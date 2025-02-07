@@ -39,12 +39,12 @@ const BoardingHouseSchema = new mongoose.Schema(
     },
     totalRooms: {
       type: Number,
-      required: true,
+      required: false,
       min: 0,
     },
     availableRooms: {
       type: Number,
-      required: true,
+      required: false,
       min: 0,
     },
     electricityPrice: {

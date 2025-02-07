@@ -43,6 +43,8 @@ adminRouter.post("/boardinghouse/:id/images", BoardingHouseController.addBoardin
 adminRouter.put("/boardinghouse/:id/images/:imageId", BoardingHouseController.updateBoardingHouseImage);
 adminRouter.delete("/boardinghouse/:id/images/:imageId", BoardingHouseController.deleteBoardingHouseImage);
 adminRouter.get("/boardinghouse/:id/images", BoardingHouseController.getBoardingHouseImages);
+adminRouter.post('/boardinghouse/create', BoardingHouseController.createBoardingHouse);
+adminRouter.post("/boardinghouse/uploadFile", BoardingHouseController.uploadFile)
 adminRouter.get("/boardinghouse/chore/get-max", BoardingHouseController.getMaxPriceBH)
 adminRouter.get("/boardinghouse/chore/filter", BoardingHouseController.filterBoardingHouse)
 

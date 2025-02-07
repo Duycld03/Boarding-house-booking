@@ -39,7 +39,17 @@ export const deleteBoardingHouseImage = (boardingHouseId, imageId) => {
   );
 };
 export const getBoardingHouseImages = async (boardingHouseId) => {
-  return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
+    return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
+}
+export const createBoardingHouse = (data) => {
+    return axios.post('/dashboard/boardinghouse/create', data);
+};
+export const uploadFile = (data) => {
+    return axios.post('/dashboard/boardinghouse/uploadFile', data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
 };
 
 export const getMaxPriceBH = async () => {
@@ -47,7 +57,7 @@ export const getMaxPriceBH = async () => {
 };
 
 export const filterBH = async (filterValue) => {
-  return axios.get(`/dashboard/boardinghouse/chore/filter`, {
-    params: filterValue,
-  });
-};
+    return axios.get(`/dashboard/boardinghouse/chore/filter`, {
+        params: filterValue,
+    });
+}
