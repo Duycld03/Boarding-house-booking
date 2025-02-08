@@ -63,8 +63,7 @@ const BoardingHouseCard = ({
         toast.error('Dữ liệu phản hồi không hợp lệ!');
       }
     } catch (error) {
-      toast.error('Có lỗi xảy ra! Vui lòng thử lại.');
-      console.error('Error in handleFavoriteClick:', error);
+      navigate(`/login`);
     }
   };
 
