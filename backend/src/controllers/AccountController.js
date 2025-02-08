@@ -1,6 +1,7 @@
 import Account from "../models/account.js";
 import bcrypt from "bcrypt";
-import { generateToken } from "../utils/functions.js";
+import nodemailer from "nodemailer";
+import { generateToken, verifyToken } from "../utils/functions.js";
 
 class AccountController {
   async getAllAccount(req, res, next) {
@@ -295,7 +296,91 @@ class AccountController {
       await account.save();
 
       res.status(200).json({ message: "Avatar updated successfully" });
-    } catch (error) {}
+    } catch (error) {
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+
+  async sendOTPChangeEmail(req, res) {
+    try {
+      const { email } = req.body;
+
+      const existingEmail = await Account.findOne({ email });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email is already registered" });
+      }
+
+      const account = await Account.findById(req.user.userId);
+      if (!account) {
+        return res.status(404).json({ message: "Account not found" });
+      }
+
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      const hashedOtp = await bcrypt.hash(otp.toString(), 10);
+      const token = generateToken({ otp: hashedOtp }, "10m");
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "todohongy@gmail.com",
+          pass: "ersq syrb ihov ilvx",
+        },
+      });
+
+      const mailOptions = {
+        from: "support@example.com",
+        to: email,
+        subject: "Mã OTP xác nhận thay đổi email",
+        html: `
+    <p>Kính gửi Anh/Chị ${account.fullname},</p>
+    <p>Chúng tôi đã nhận được yêu cầu thay đổi địa chỉ email của bạn trên nền tảng XYZ.</p>
+    <p>Vui lòng sử dụng mã OTP dưới đây để xác nhận yêu cầu:</p>
+    <h2 style="color: #2a7ae4; text-align: center;">${otp}</h2>
+    <p>Lưu ý: Mã OTP này có hiệu lực trong vòng 5 phút. Vui lòng không chia sẻ mã này với bất kỳ ai.</p>
+    <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này và giữ nguyên email hiện tại của bạn.</p>
+    <p>Nếu bạn cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi qua email 
+    <a href="mailto:support@example.com">support@example.com</a> hoặc số điện thoại 0123-456-789.</p>
+    <p>Trân trọng,<br>
+    Đội ngũ Hỗ trợ Nền tảng XYZ<br>
+    Email: <a href="mailto:support@example.com">support@example.com</a><br>
+    Hotline: 0123-456-789</p>
+  `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      res.status(200).json({
+        token,
+        email,
+        message: "OTP sent successfully, please check your email.",
+      });
+    } catch (error) {
+      console.log("Error sending OTP:", error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+
+  async verifyChangeEmail(req, res) {
+    try {
+      const { email, otp, token } = req.body;
+
+      const decoded = verifyToken(token);
+      const isOtpValid = await bcrypt.compare(otp.toString(), decoded.otp);
+      if (!isOtpValid) {
+        return res.status(400).json({ message: "Invalid OTP" });
+      }
+
+      const account = await Account.findById(req.user.userId);
+      if (!account) {
+        return res.status(404).json({ message: "Account not found" });
+      }
+
+      account.email = email;
+      await account.save();
+      res.status(200).json({ message: "Email changed successfully" });
+    } catch (error) {
+      console.log("Error verifying email:", error);
+      res.status(500).json({ message: "Server Error" });
+    }
   }
 }
 export default new AccountController();

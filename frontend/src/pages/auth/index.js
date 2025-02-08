@@ -5,6 +5,7 @@ import VerifyRegister from "./VerifyRegister";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 import ChangePassword from "./ChangePassword";
+import VerifyChangeEmail from "./VerifyChangeEmail";
 
 export {
   Login,
@@ -14,4 +15,5 @@ export {
   ForgotPassword,
   ResetPassword,
   ChangePassword,
+  VerifyChangeEmail,
 };

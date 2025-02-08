@@ -12,9 +12,12 @@ authRouter.get("/user", authController.getAccountFromToken);
 authRouter.post("/change-password", AccountController.changePassword);
 authRouter.put("/profile", AccountController.updateAccountFromProfile);
 authRouter.put(
-  "/update-avatar",
+  "/avatar",
   upload.single("avatar"),
   AccountController.updateAvatar
 );
+
+authRouter.post("/send-otp-change-email", AccountController.sendOTPChangeEmail);
+authRouter.post("/verify-change-email", AccountController.verifyChangeEmail);
 
 export { authRouter };

@@ -10,7 +10,9 @@ import { getUser } from "../../../api/authManagement";
 import {
   updateAccountFromProfile,
   updateAvatar,
+  sendOTPChangeEmail,
 } from "../../../api/AccountManagement";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(Styles);
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -33,6 +35,8 @@ const beforeUpload = (file) => {
 };
 
 function Profile() {
+  const navigate = useNavigate();
+
   const [form] = Form.useForm();
   const [formEmail] = Form.useForm();
   const [profileLoading, setProfileLoading] = useState(true);
@@ -121,7 +125,18 @@ function Profile() {
   };
 
   const onEmailFinish = async (values) => {
-    console.log(values);
+    try {
+      setLoading(true);
+      const res = await sendOTPChangeEmail(values);
+      toast.success(res.message);
+      navigate("/verify-change-email", {
+        state: { email: res.email, token: res.token },
+      });
+      setLoading(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      setLoading(false);
+    }
   };
 
   const handleUpload = async ({ file, onSuccess, onError }) => {
