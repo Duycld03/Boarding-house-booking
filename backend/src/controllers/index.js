@@ -1,9 +1,10 @@
-import authController from "./authController.js";
-import ReviewController from "./reviewController.js";
-import withdrawalRequestsController from "./withdrawalRequestsController.js";
-import reportController from "./reportController.js";
-import BoardingHouseController from "./BoardingHouseController.js";
-import AccountController from "./AccountController.js";
+import authController from './authController.js';
+import ReviewController from './reviewController.js';
+import withdrawalRequestsController from './withdrawalRequestsController.js';
+import reportController from './reportController.js';
+import BoardingHouseController from './BoardingHouseController.js';
+import AccountController from './AccountController.js';
+import favoriteController from './favoriteController.js';
 
 export {
   authController,
@@ -12,4 +13,5 @@ export {
   BoardingHouseController,
   AccountController,
   ReviewController,
+  favoriteController,
 };
