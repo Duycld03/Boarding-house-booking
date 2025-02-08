@@ -753,7 +753,7 @@ function BoardingHouseManagement(onClose) {
               <h2 className="text-3xl font-bold mb-4 mt-10 ">5. Room</h2>
               <Form.Item label="Total Rooms" className="mb-2">
                 <InputNumber
-                  value={formData.totalRooms || ""}
+                  value={formData.totalRooms || "0"}
                   readOnly
                   className="bg-gray-100 text-gray-500 cursor-not-allowed"
                   style={{ width: "100%" }}
@@ -762,7 +762,7 @@ function BoardingHouseManagement(onClose) {
 
               <Form.Item label="Available Rooms" className="mb-2">
                 <InputNumber
-                  value={formData.availableRooms || ""}
+                  value={formData.availableRooms || "0"}
                   readOnly
                   className="bg-gray-100 text-gray-500 cursor-not-allowed"
                   style={{ width: "100%" }}

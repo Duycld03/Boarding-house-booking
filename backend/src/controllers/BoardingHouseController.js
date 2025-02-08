@@ -332,8 +332,10 @@ class BoardingHouseController {
                 priceRange,
                 electricityPrice,
                 waterPrice,
-                // availableRooms,
-                // totalRooms,
+                totalRooms = 0,
+                availableRooms = 0,
+                likes = 0,
+                rating = 5,
             } = req.body;
 
 
@@ -421,8 +423,10 @@ class BoardingHouseController {
                     detail: detail || "",
                 },
                 images,
-                // availableRooms,
-                // totalRooms,
+                totalRooms,
+                availableRooms,
+                likes,
+                rating
             });
 
             // Lưu boarding house vào database
