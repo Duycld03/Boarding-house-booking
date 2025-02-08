@@ -2,7 +2,7 @@ import classNames from "classnames/bind";
 import Styles from "./Profile.module.css";
 import { useEffect, useState } from "react";
 import { Loader } from "../../../component";
-import { Form, Input, Radio, Avatar, Upload, Button } from "antd";
+import { Form, Input, Radio, Avatar, Upload, Button, Card } from "antd";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import UserAvatar from "../../../assets/images/none_avatar.png";
@@ -167,129 +167,131 @@ function Profile() {
       {profileLoading ? (
         <Loader />
       ) : (
-        <div className="flex justify-between mb-4 flex-col md:w-[50%] mx-auto">
-          <div className="flex justify-center items-center flex-col">
-            <Upload
-              name="avatar"
-              listType="picture-circle"
-              className="avatar-uploader"
-              showUploadList={false}
-              customRequest={handleUpload}
-              beforeUpload={beforeUpload}
-              onChange={handleAvatarChange}
-            >
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt="avatar"
-                  className="w-36 h-36 rounded-full"
-                />
-              ) : (
-                uploadButton
+        <div className="flex justify-between mb-4 flex-col md:w-[60%] mx-auto">
+          <Card>
+            <div className="flex justify-center items-center flex-col">
+              <Upload
+                name="avatar"
+                listType="picture-circle"
+                className="avatar-uploader"
+                showUploadList={false}
+                customRequest={handleUpload}
+                beforeUpload={beforeUpload}
+                onChange={handleAvatarChange}
+              >
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt="avatar"
+                    className="w-36 h-36 rounded-full"
+                  />
+                ) : (
+                  uploadButton
+                )}
+              </Upload>
+              <p className="text-3xl text-center">@{username}</p>
+            </div>
+            <Form form={formEmail} layout="vertical" onFinish={onEmailFinish}>
+              {isOwner && (
+                <Form.Item label="Account Balance">
+                  <div>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(accountBalance)}
+                  </div>
+                </Form.Item>
               )}
-            </Upload>
-            <p className="text-3xl text-center">@{username}</p>
-          </div>
-          <Form form={formEmail} layout="vertical" onFinish={onEmailFinish}>
-            {isOwner && (
-              <Form.Item label="Account Balance">
-                <div>
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(accountBalance)}
+              <Form.Item
+                label="Email"
+                name="email"
+                initialValue={email}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your email!",
+                  },
+                  {
+                    type: "email",
+                    message: "Please enter a valid email!",
+                  },
+                ]}
+              >
+                <div className="flex items-end justify-between gap-5">
+                  <Input
+                    size="large"
+                    placeholder="Enter your email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <Button
+                    name="change-email"
+                    type="primary"
+                    size="large"
+                    htmlType="submit"
+                    loading={loading}
+                  >
+                    Change Email
+                  </Button>
                 </div>
               </Form.Item>
-            )}
-            <Form.Item
-              label="Email"
-              name="email"
-              initialValue={email}
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your email!",
-                },
-                {
-                  type: "email",
-                  message: "Please enter a valid email!",
-                },
-              ]}
-            >
-              <div className="flex items-end justify-between gap-5">
+            </Form>
+
+            <Form form={form} layout="vertical" onFinish={onFinish}>
+              <Form.Item
+                label="Full Name"
+                name="fullname"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your fullname!",
+                  },
+                ]}
+              >
+                <Input size="large" placeholder="Enter your fullname" />
+              </Form.Item>
+
+              <Form.Item
+                label="Phone Number"
+                name="phoneNumber"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your phone number!",
+                  },
+                  {
+                    len: 10,
+                    message: "Phone number must be 10 characters!",
+                  },
+                ]}
+              >
                 <Input
+                  type="number"
                   size="large"
-                  placeholder="Enter your email"
-                  name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your confirm password"
                 />
+              </Form.Item>
+              <Form.Item label="Gender" name="gender">
+                <Radio.Group>
+                  <Radio value="male">Male</Radio>
+                  <Radio value="female">Female</Radio>
+                  <Radio value="other">Other</Radio>
+                </Radio.Group>
+              </Form.Item>
+
+              <Form.Item>
                 <Button
-                  name="change-email"
                   type="primary"
                   size="large"
                   htmlType="submit"
                   loading={loading}
                 >
-                  Change Email
+                  Save
                 </Button>
-              </div>
-            </Form.Item>
-          </Form>
-
-          <Form form={form} layout="vertical" onFinish={onFinish}>
-            <Form.Item
-              label="Full Name"
-              name="fullname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your fullname!",
-                },
-              ]}
-            >
-              <Input size="large" placeholder="Enter your fullname" />
-            </Form.Item>
-
-            <Form.Item
-              label="Phone Number"
-              name="phoneNumber"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your phone number!",
-                },
-                {
-                  len: 10,
-                  message: "Phone number must be 10 characters!",
-                },
-              ]}
-            >
-              <Input
-                type="number"
-                size="large"
-                placeholder="Enter your confirm password"
-              />
-            </Form.Item>
-            <Form.Item label="Gender" name="gender">
-              <Radio.Group>
-                <Radio value="male">Male</Radio>
-                <Radio value="female">Female</Radio>
-                <Radio value="other">Other</Radio>
-              </Radio.Group>
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                type="primary"
-                size="large"
-                htmlType="submit"
-                loading={loading}
-              >
-                Save
-              </Button>
-            </Form.Item>
-          </Form>
+              </Form.Item>
+            </Form>
+          </Card>
         </div>
       )}
     </div>

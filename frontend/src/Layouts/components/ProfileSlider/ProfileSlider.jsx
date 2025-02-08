@@ -22,6 +22,7 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
       {...props}
     >
       <Menu
+        theme="dark"
         mode="inline"
         defaultSelectedKeys={["1"]}
         defaultOpenKeys={["sub1"]}
