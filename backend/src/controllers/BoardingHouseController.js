@@ -55,8 +55,61 @@ class BoardingHouseController {
     }
     async updateBoardingHouseDetails(req, res, next) {
         try {
-            const { id } = req.params;
+            const { id } = req.params; // Boarding house ID
             const updateData = req.body;
+
+            // Destructure data for validation
+            const { name, address, images, priceRange, electricityPrice, waterPrice } = updateData;
+
+            // Validate name
+            if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Name is required and must not contain special characters.",
+                });
+            }
+
+            // Check if the name already exists (excluding the current boarding house)
+            const existingBoardingHouse = await BoardingHouse.findOne({ name, _id: { $ne: id } });
+            if (existingBoardingHouse) {
+                return res.status(400).json({
+                    success: false,
+                    message: "A boarding house with this name already exists.",
+                });
+            }
+
+            // Validate address
+            if (!address || !address.province || !address.district || !address.ward) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Province, district, and ward are required fields in the address.",
+                });
+            }
+
+            // Validate images
+            const primaryImageCount = images?.filter((img) => img.isPrimary).length || 0;
+            if (primaryImageCount !== 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "You must upload exactly one primary image.",
+                });
+            }
+            if (images?.length > 15) {
+                return res.status(400).json({
+                    success: false,
+                    message: "You can't upload more than 15 images.",
+                });
+            }
+
+            // Validate price fields
+            if (!priceRange || priceRange <= 0 || !electricityPrice || electricityPrice <= 0 || !waterPrice || waterPrice <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Price fields must be greater than 0.",
+                });
+            }
+
+            // Update the boarding house details
             const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
                 id,
                 { $set: updateData },
@@ -65,17 +118,18 @@ class BoardingHouseController {
                 .populate("boardingHouseType", "name")
                 .populate("ownerId", "email");
 
+            // Check if the boarding house exists
             if (!updatedBoardingHouse) {
                 return res.status(404).json({
                     success: false,
-                    message: "Boarding house not found",
+                    message: "Boarding house not found.",
                 });
             }
 
-
+            // Successfully updated
             return res.status(200).json({
                 success: true,
-                message: "Boarding house updated successfully",
+                message: "Boarding house updated successfully.",
                 data: updatedBoardingHouse,
             });
         } catch (error) {
@@ -515,7 +569,45 @@ class BoardingHouseController {
         }
     }
 
+    async softDeleteBoardingHouse(req, res) {
+        try {
+            const { id } = req.params;
 
+            // Find the boarding house by ID
+            const boardingHouse = await BoardingHouse.findById(id);
+            if (!boardingHouse) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Boarding house not found",
+                });
+            }
+
+            // Check if the boarding house is already soft deleted
+            if (boardingHouse.deleted) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Boarding house is already soft deleted",
+                });
+            }
+
+
+            boardingHouse.deleted = true;
+            boardingHouse.deletedAt = new Date(); // Optional: track deletion timestamp
+            await boardingHouse.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "Boarding house soft deleted successfully",
+            });
+        } catch (error) {
+            console.error("Error soft deleting boarding house:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Failed to soft delete boarding house. Please try again later.",
+                error: error.message,
+            });
+        }
+    }
 
 }
 

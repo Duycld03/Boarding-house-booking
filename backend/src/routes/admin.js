@@ -47,8 +47,8 @@ adminRouter.post('/boardinghouse/create', BoardingHouseController.createBoarding
 adminRouter.post("/boardinghouse/uploadFile", BoardingHouseController.uploadFile)
 adminRouter.get("/boardinghouse/chore/get-max", BoardingHouseController.getMaxPriceBH)
 adminRouter.get("/boardinghouse/chore/filter", BoardingHouseController.filterBoardingHouse)
-
-
+adminRouter.delete("/boardinghouse/:id/softDelete", BoardingHouseController.softDeleteBoardingHouse);
+adminRouter.post("/boardinghouse/uploadFile", BoardingHouseController.uploadFile)
 //Account
 adminRouter.get('/account', AccountController.getAllAccount);
 adminRouter.delete('/account/:accountId', AccountController.softDeleteAccount);
