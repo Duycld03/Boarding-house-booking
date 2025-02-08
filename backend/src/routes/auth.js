@@ -14,6 +14,6 @@ authRouter.get('/', (req, res) => {
 authRouter.get('/user', authController.getAccountFromToken);
 authRouter.post('/change-password', AccountController.changePassword);
 authRouter.put('/profile', AccountController.updateAccountFromProfile);
-authRouter.post('/users/:userId/favorites', favoriteController.createFavorite);
+authRouter.post('/favorites', favoriteController.createFavorite);
 
 export { authRouter };
