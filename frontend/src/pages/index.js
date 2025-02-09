@@ -6,8 +6,8 @@ import {
   ForgotPassword,
   ResetPassword,
   ChangePassword,
-} from './auth';
-import { AboutUs, Home, Contact, Profile, BoardingHouseDetail } from './common';
+} from "./auth";
+import { AboutUs, Home, Contact, Profile, ErrorPage, BoardingHouseDetail } from "./common";
 
 import {
   BoardingHouseManagement,
@@ -34,6 +34,7 @@ export {
   Contact,
   Home,
   Profile,
+  ErrorPage,
 
   // owner
 

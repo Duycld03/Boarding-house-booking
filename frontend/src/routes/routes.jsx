@@ -17,8 +17,10 @@ import {
   ChangePassword,
   Profile,
   BoardingHouseDetail,
-} from '../pages';
-import { AuthLayout, HeaderOnly, ProfileLayout } from '../Layouts';
+  ErrorPage,
+} from "../pages";
+import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
+
 
 const dashBoard = '/dashboard';
 
@@ -82,6 +84,11 @@ const routes = [
     path: 'profile',
     page: Profile,
     layout: ProfileLayout,
+  },
+  {
+    path: "/error-page",
+    page: ErrorPage,
+    layout: AuthLayout,
   },
 
   // dashBoard
