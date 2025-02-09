@@ -29,7 +29,6 @@ jobs:
           
       # Install dependencies for main
       - name: Install main dependencies
-        working-directory: ./
         run: npm ci
 
       # Install dependencies for backend
