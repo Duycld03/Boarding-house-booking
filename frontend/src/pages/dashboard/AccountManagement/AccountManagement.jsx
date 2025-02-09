@@ -145,7 +145,7 @@ function AccountManagement() {
             size="large"
             title={"Detail"}
             icon={<FileTextOutlined />}
-            className={"bg-emerald-500 text-white"}
+            className={"bg-emerald-700 text-white"}
           />
         </div>
       ),
