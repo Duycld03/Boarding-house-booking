@@ -2,12 +2,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import AddressSelector from "../../../component/AddressSelector";
 import { Button, TableCustom as Table, Loader } from "../../../component";
-import {
-  FileTextOutlined,
-  HeartFilled,
-  StarFilled,
-  StarOutlined,
-} from "@ant-design/icons";
+import { FileTextOutlined, HeartFilled, StarFilled, StarOutlined } from "@ant-design/icons";
 
 import {
   fetchProvinces,
@@ -22,7 +17,7 @@ import {
   getBoardingHouseImages,
   filterBH,
   uploadFile,
-  softDeleteBoardingHouse,
+  softDeleteBoardingHouse
 } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import convertTimetap from "../../../utils/convertTimetap";
@@ -60,6 +55,8 @@ function BoardingHouseManagement(onClose) {
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [filterValue, setFilterValue] = useState();
+
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -197,6 +194,7 @@ function BoardingHouseManagement(onClose) {
     fetchData();
   }, [formData?.address?.province, formData?.address?.district]);
 
+
   // Xử lý thay đổi input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -213,6 +211,7 @@ function BoardingHouseManagement(onClose) {
       }));
     }
   };
+
 
   const handleSelectedTypesChange = (event) => {
     const { name, value } = event.target;
@@ -255,6 +254,7 @@ function BoardingHouseManagement(onClose) {
         toast.error("Invalid form data. Please try again.");
         return;
       }
+
 
       const imagesData = [...images];
       const payloadPrimary = new FormData();
@@ -318,11 +318,7 @@ function BoardingHouseManagement(onClose) {
       }
     } catch (error) {
       // Handle any unexpected errors
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
+      if (error.response && error.response.data && error.response.data.message) {
         // Display the specific error message from the backend
         toast.error(error.response.data.message);
       } else {
@@ -354,13 +350,14 @@ function BoardingHouseManagement(onClose) {
     setIsDetailOpen(false);
   };
 
+
   const handleRemovePrimaryImage = () => {
     setFormData((prev) => ({
       ...prev,
       primaryImage: null,
     }));
 
-    //  remove primary Image
+    //  remove primary Image 
     setImages((prevImages) =>
       prevImages.map((img) =>
         img.isPrimary ? { ...img, isPrimary: false } : img
@@ -368,6 +365,7 @@ function BoardingHouseManagement(onClose) {
     );
     toast.success("Primary image removed.");
   };
+
 
   const handleRemoveOtherImage = (index) => {
     setFormData((prev) => ({
@@ -377,7 +375,7 @@ function BoardingHouseManagement(onClose) {
     toast.success("Temporary image removed.");
   };
   const handleImageDelete = (imageId) => {
-    // Remove image
+    // Remove image 
     setImages((prevImages) => prevImages.filter((img) => img._id !== imageId));
     toast.success("Image removed from the list.");
   };
@@ -476,7 +474,7 @@ function BoardingHouseManagement(onClose) {
             size="large"
             title={"Detail"}
             icon={<FileTextOutlined />}
-            className={"bg-emerald-700 text-white"}
+            className={"bg-emerald-500 text-white"}
           />
         </div>
       ),
@@ -486,19 +484,19 @@ function BoardingHouseManagement(onClose) {
   return (
     <div className="boarding-house-management">
       <div className="flex justify-between">
-        <Button
-          btnAdd
-          title="Add new"
-          size="large"
-          onClick={handleOpenForm}
-        ></Button>
+        <Button btnAdd title="Add new" size="large" onClick={handleOpenForm}></Button>
 
         <FilterBoardingHouse
           setFilterValue={setFilterValue}
           boardingHouseTypes={boardingHouseTypes}
         />
       </div>
-      <Table columns={columns} data={boardingHData} loading={loading} />
+      <Table
+        columns={columns}
+        data={boardingHData}
+
+        loading={loading}
+      />
       {isFormOpen && (
         <CreateBoardingHouse
           onClose={handleCloseForm}
@@ -521,25 +519,19 @@ function BoardingHouseManagement(onClose) {
             className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
           >
             <h2 className="text-4xl font-bold mb-8">Boarding House Detail</h2>
-            <h2 className="text-3xl font-bold mb-4 ">
-              1. Owner and information
-            </h2>
+            <h2 className="text-3xl font-bold mb-4 ">1. Owner and information</h2>
             {/* <div className="  gap-4 max-h-[600px] "> */}
 
             <Form.Item label="Name Owner" className="mb-2">
-              <Input
-                value={formData.ownerId?.fullname || ""}
+              <Input value={formData.ownerId?.fullname || ""}
                 readOnly
-                className="bg-gray-100 text-gray-500 cursor-not-allowed"
-              />
+                className="bg-gray-100 text-gray-500 cursor-not-allowed" />
             </Form.Item>
 
             <Form.Item label="Owner" className="mb-2">
-              <Input
-                value={formData.ownerId?.username || ""}
+              <Input value={formData.ownerId?.username || ""}
                 readOnly
-                className="bg-gray-100 text-gray-500 cursor-not-allowed"
-              />
+                className="bg-gray-100 text-gray-500 cursor-not-allowed" />
             </Form.Item>
 
             <Form.Item label="Name Boarding House" className="mb-2">
@@ -597,16 +589,13 @@ function BoardingHouseManagement(onClose) {
             <Form.Item label="Primary Image" className="mb-4">
               <div className="flex flex-col gap-4">
                 {/* Check primary Image exists */}
-                {formData.primaryImage ||
-                images?.find((img) => img.isPrimary) ? (
+                {formData.primaryImage || images?.find((img) => img.isPrimary) ? (
                   <div className="relative">
                     <Image
                       src={
                         formData.primaryImage
                           ? URL.createObjectURL(formData.primaryImage)
-                          : `http://localhost:3000${
-                              images.find((img) => img.isPrimary)?.imageUrl
-                            }`
+                          : `http://localhost:3000${images.find((img) => img.isPrimary)?.imageUrl}`
                       }
                       alt="Primary"
                       className="object-cover border rounded"
@@ -615,9 +604,7 @@ function BoardingHouseManagement(onClose) {
                         height: "auto",
                         maxHeight: "300px",
                       }}
-                      preview={{
-                        mask: <span className="text-white">Preview</span>,
-                      }}
+                      preview={{ mask: <span className="text-white">Preview</span> }}
                     />
                     {/* Delete Button */}
                     <button
@@ -638,12 +625,8 @@ function BoardingHouseManagement(onClose) {
                   >
                     <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
                       <PlusOutlined className="text-2xl text-gray-400" />
-                      <p className="text-gray-500 mt-2 text-sm font-medium">
-                        Add Primary Image
-                      </p>
-                      <p className="text-gray-400 text-xs">
-                        Drag-drop or click here to choose a file
-                      </p>
+                      <p className="text-gray-500 mt-2 text-sm font-medium">Add Primary Image</p>
+                      <p className="text-gray-400 text-xs">Drag-drop or click here to choose a file</p>
                     </div>
                   </Upload>
                 )}
@@ -711,12 +694,8 @@ function BoardingHouseManagement(onClose) {
                 >
                   <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
                     <PlusOutlined className="text-2xl text-gray-400" />
-                    <p className="text-gray-500 mt-2 text-sm font-medium">
-                      Add Primary Image
-                    </p>
-                    <p className="text-gray-400 text-xs">
-                      Drag-drop or click here to choose a file
-                    </p>
+                    <p className="text-gray-500 mt-2 text-sm font-medium">Add Primary Image</p>
+                    <p className="text-gray-400 text-xs">Drag-drop or click here to choose a file</p>
                   </div>
                 </Upload>
               </div>
@@ -745,9 +724,7 @@ function BoardingHouseManagement(onClose) {
                   name="electricityPrice"
                   value={formData.electricityPrice || ""}
                   onChange={(value) =>
-                    handleInputChange({
-                      target: { name: "electricityPrice", value },
-                    })
+                    handleInputChange({ target: { name: "electricityPrice", value } })
                   }
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -792,26 +769,11 @@ function BoardingHouseManagement(onClose) {
                 />
               </Form.Item>
 
-              <h2 className="text-3xl font-bold mb-4 mt-10 ">
-                6. Like and Rating
-              </h2>
-              <Form.Item>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: "16px",
-                  }}
-                >
+              <h2 className="text-3xl font-bold mb-4 mt-10 ">6. Like and Rating</h2>
+              <Form.Item >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
                   {/* like */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <HeartFilled style={{ fontSize: "24px", color: "red" }} />
                     <span style={{ fontSize: "16px", color: "#595959" }}>
                       {formData.likes
@@ -821,13 +783,7 @@ function BoardingHouseManagement(onClose) {
                   </div>
 
                   {/* Rating */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                    }}
-                  >
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                     {Array.from({ length: 5 }, (_, index) => {
                       if (index < Math.floor(formData.rating || 0)) {
                         return (
@@ -836,10 +792,7 @@ function BoardingHouseManagement(onClose) {
                             style={{ fontSize: "24px", color: "#FFD700" }}
                           />
                         );
-                      } else if (
-                        index === Math.floor(formData.rating || 0) &&
-                        (formData.rating || 0) % 1 !== 0
-                      ) {
+                      } else if (index === Math.floor(formData.rating || 0) && (formData.rating || 0) % 1 !== 0) {
                         return (
                           <StarOutlined
                             key={index}
