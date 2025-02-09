@@ -59,7 +59,7 @@ class AuthController {
         service: "gmail",
         auth: {
           user: "todohongy@gmail.com",
-          pass: "crdr lghi jfmd gjkv",
+          pass: "ersq syrb ihov ilvx",
         },
       });
       const mailOptions = {
@@ -259,7 +259,7 @@ class AuthController {
         service: "gmail",
         auth: {
           user: "todohongy@gmail.com",
-          pass: "crdr lghi jfmd gjkv",
+          pass: "ersq syrb ihov ilvx",
         },
       });
       const mailOptions = {
