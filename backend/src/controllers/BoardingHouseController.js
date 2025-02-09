@@ -339,11 +339,11 @@ class BoardingHouseController {
             } = req.body;
 
 
-            console.log("Request body received:", req.body);
+            // console.log("Request body received:", req.body);
 
             // Validate owner
             const ownerAccount = await Account.findOne({ username: ownerUsername, role: "owner" });
-            console.log("Owner account found:", ownerAccount);
+            // console.log("Owner account found:", ownerAccount);
             if (!ownerAccount) {
                 console.error("Invalid owner:", ownerUsername);
                 return res
