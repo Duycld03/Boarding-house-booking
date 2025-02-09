@@ -26,6 +26,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+          
+      # Install dependencies for main
+      - name: Install main dependencies
+        working-directory: ./
+        run: npm ci
 
       # Install dependencies for backend
       - name: Install backend dependencies
