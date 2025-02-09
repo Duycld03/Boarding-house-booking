@@ -224,6 +224,7 @@ function Profile() {
                     name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled
                   />
                   <Button
                     name="change-email"
