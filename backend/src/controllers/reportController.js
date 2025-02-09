@@ -52,14 +52,8 @@ class reportController {
 
       // Lấy thông tin báo cáo ban đầu
       const report = await Report.findById(reportId)
-        .populate({
-          path: 'reporter',
-          select: 'fullname email',
-        })
-        .populate({
-          path: 'processedBy',
-          select: 'fullname',
-        });
+        .populate({ path: 'reporter', select: 'fullname email' })
+        .populate({ path: 'processedBy', select: 'fullname' });
 
       if (!report) {
         return res.status(404).json({ error: 'Report not found' });
@@ -73,10 +67,7 @@ class reportController {
       const relatedReports = await Report.find({
         targetId: report.targetId,
         reason: report.reason,
-      }).populate({
-        path: 'reporter',
-        select: 'fullname email',
-      });
+      }).populate({ path: 'reporter', select: 'fullname email' });
 
       if (relatedReports.length === 0) {
         return res.status(404).json({ error: 'No related reports found' });
@@ -85,12 +76,7 @@ class reportController {
       // Cập nhật trạng thái và chi tiết xử lý cho tất cả các báo cáo liên quan
       await Report.updateMany(
         { targetId: report.targetId, reason: report.reason },
-        {
-          $set: {
-            status: status,
-            detailReport: detailReport,
-          },
-        }
+        { $set: { status: status, detailReport: detailReport } }
       );
 
       // Nếu status là 'Resolved', thực hiện xóa mềm đối tượng liên quan
@@ -111,6 +97,21 @@ class reportController {
         }
       }
 
+      // Populate thêm thông tin về nhà trọ nếu reportType là boardingHouse
+      let boardingHouseName = '';
+      if (report.reportType === 'boardingHouse') {
+        await report.populate({
+          path: 'targetId',
+          select: 'name',
+          model: 'BoardingHouse',
+          options: { withDeleted: true },
+        });
+
+        boardingHouseName = report.targetId
+          ? report.targetId.name
+          : 'Không xác định';
+      }
+
       // Cấu hình email
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -122,24 +123,34 @@ class reportController {
 
       // Gửi email cho tất cả những người tố cáo liên quan
       for (const relatedReport of relatedReports) {
+        // Kiểm tra loại báo cáo và thay đổi nội dung email phù hợp
+        const reportSubject =
+          relatedReport.reportType === 'boardingHouse'
+            ? `liên quan đến nhà trọ ${boardingHouseName}`
+            : 'liên quan đến bình luận trong bài viết';
+
         const mailOptions = {
           from: 'support@example.com',
           to: relatedReport.reporter.email,
           subject: `Kết quả xử lý báo cáo: #${relatedReport._id}`,
           html: `
-                <p>Kính gửi Anh/Chị ${relatedReport.reporter.fullname},</p>
-                <p>Cảm ơn bạn đã gửi báo cáo về vấn đề "${relatedReport.reason || 'undefined'}" liên quan đến bình luận trong bài viết trên nền tảng của chúng tôi.</p>
-                <p>Chúng tôi xin thông báo rằng báo cáo của bạn đã được xử lý với kết quả như sau:</p>
-                <ul>
-                    <li><strong>Trạng thái báo cáo:</strong> ${status}</li>
-                    <li><strong>Ngày gửi báo cáo:</strong> ${new Date(relatedReport.createdAt).toLocaleDateString()}</li>
-                    <li><strong>Người xử lý:</strong> ${report.processedBy.fullname}</li>
-                    <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
-                    <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>
-                </ul>
-                <p>Nếu bạn có thêm câu hỏi hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi qua email <a href="mailto:support@example.com">support@example.com</a> hoặc số điện thoại 0123-456-789.</p>
-                <p>Trân trọng,<br>Đội ngũ Hỗ trợ Nền tảng XYZ<br>Email: <a href="mailto:support@example.com">support@example.com</a><br>Hotline: 0123-456-789</p>
-                `,
+            <p>Kính gửi Anh/Chị ${relatedReport.reporter.fullname},</p>
+            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề "${
+              relatedReport.reason || 'undefined'
+            }" ${reportSubject} trên nền tảng của chúng tôi.</p>
+            <p>Chúng tôi xin thông báo rằng báo cáo của bạn đã được xử lý với kết quả như sau:</p>
+            <ul>
+                <li><strong>Trạng thái báo cáo:</strong> ${status}</li>
+                <li><strong>Ngày gửi báo cáo:</strong> ${new Date(
+                  relatedReport.createdAt
+                ).toLocaleDateString()}</li>
+                <li><strong>Người xử lý:</strong> ${report.processedBy.fullname}</li>
+                <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
+                <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>
+            </ul>
+            <p>Nếu bạn có thêm câu hỏi hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi qua email <a href="mailto:support@example.com">support@example.com</a> hoặc số điện thoại 0123-456-789.</p>
+            <p>Trân trọng,<br>Đội ngũ Hỗ trợ Nền tảng XYZ<br>Email: <a href="mailto:support@example.com">support@example.com</a><br>Hotline: 0123-456-789</p>
+        `,
         };
 
         await transporter.sendMail(mailOptions);
