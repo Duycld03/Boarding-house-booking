@@ -7,7 +7,10 @@ function Loader({
   type = "spinningBubbles",
 }) {
   return (
-    <div className={`flex justify-center items-center h-screen ${customClass}`}>
+    <div
+      className={`flex justify-center items-center
+     h-screen ${customClass}`}
+    >
       <ReactLoading type={type} color={color} height={size} width={size} />
     </div>
   );

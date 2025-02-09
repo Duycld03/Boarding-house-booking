@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCreditCard,
   faClipboardList,
+  faCalendarCheck
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import {
@@ -63,6 +64,15 @@ const menuItems = [
       </Link>
     ),
     icon: <FontAwesomeIcon icon={faCreditCard} />,
+  },
+  {
+    key: "list-boarding-house-reviews",
+    label: (
+      <Link to={dashBoard + "/list-boarding-house-reviews"}>
+        Review Management
+      </Link>
+    ),
+    icon: <FontAwesomeIcon icon={faCalendarCheck} />,
   },
 ];
 

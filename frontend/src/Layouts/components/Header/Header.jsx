@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Layout,
   Menu,
@@ -15,16 +15,50 @@ import Styles from "./Header.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../assets/images/Icon.svg";
 import UserAvatar from "../../../assets/images/none_avatar.png";
-import { MenuOutlined } from "@ant-design/icons";
+import {
+  LockOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { getUser } from "../../../api/authManagement";
 
 const cx = classNames.bind(Styles);
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 const { useBreakpoint } = Grid;
 const { Header } = Layout;
 
-const CustomHeader = ({ isLoggedIn, isAdmin }) => {
+const CustomHeader = () => {
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [avatar, setAvatar] = useState(UserAvatar);
   const navigate = useNavigate();
   const screens = useBreakpoint();
+
+  const checkUser = async () => {
+    try {
+      const res = await getUser();
+      if (res.avatarImage) {
+        setAvatar(`${BASE_URL}/${res.avatarImage}`);
+      }
+
+      if (res.role === "admin") {
+        setIsAdmin(true);
+      }
+      setIsLoggedIn(true);
+    } catch (error) {}
+  };
+
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    setIsLoggedIn(false);
+    navigate("/");
+  };
+
+  useEffect(() => {
+    checkUser();
+  }, []);
 
   // Menu items for navigation
   const menuItems = [
@@ -34,20 +68,27 @@ const CustomHeader = ({ isLoggedIn, isAdmin }) => {
   ];
 
   // User menu for dropdown
+
   const userMenu = (
     <Menu
       items={[
         {
           key: "profile",
+          icon: <UserOutlined />,
           label: "Profile",
           onClick: () => navigate("/profile"),
         },
         {
+          key: "change-password",
+          icon: <LockOutlined />, // Icon cho Change Password
+          label: "Change Password",
+          onClick: () => navigate("/change-password"),
+        },
+        {
           key: "logout",
+          icon: <LogoutOutlined />, // Icon cho Logout
           label: "Logout",
-          onClick: () => {
-            console.log("Logout clicked");
-          },
+          onClick: logout,
         },
       ]}
     />
@@ -121,12 +162,12 @@ const CustomHeader = ({ isLoggedIn, isAdmin }) => {
           overlayStyle={{
             fontSize: "16px",
             padding: "8px",
-            width: 150,
+            width: 200,
           }}
         >
           {screens.lg && (
             <Avatar
-              src={UserAvatar}
+              src={avatar}
               size={60}
               style={{ cursor: "pointer", marginRight: 20 }}
             />
@@ -199,11 +240,14 @@ const CustomHeader = ({ isLoggedIn, isAdmin }) => {
                       onClick: () => navigate("/profile"),
                     },
                     {
+                      key: "change-password",
+                      label: "Change Password",
+                      onClick: () => navigate("/change-password"),
+                    },
+                    {
                       key: "logout",
                       label: "Logout",
-                      onClick: () => {
-                        console.log("Logout clicked");
-                      },
+                      onClick: logout,
                     },
                   ]}
                   style={{ border: "none" }}

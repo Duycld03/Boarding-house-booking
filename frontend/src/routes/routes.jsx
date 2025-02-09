@@ -6,25 +6,96 @@ import {
   ReportBoardingHouse,
   ReportReviewManagement,
   WithdrawalRequestManagement,
-  ContactPage,
+  Contact,
   AboutUs,
+  ReviewManagement,
+  Register,
+  RegisterWithGoogle,
+  VerifyRegister,
+  ForgotPassword,
+  ResetPassword,
+  ChangePassword,
+  Profile,
+  VerifyChangeEmail,
+  ErrorPage,
 } from "../pages";
-import { AuthLayout, HeaderOnly } from "../Layouts";
+import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 
 const dashBoard = "/dashboard";
 
 const routes = [
+  //auth
   {
     path: "/login",
     page: Login,
     layout: AuthLayout,
   },
+
+  {
+    path: "/register",
+    page: Register,
+    layout: AuthLayout,
+  },
+  {
+    path: "/register-with-google",
+    page: RegisterWithGoogle,
+    layout: AuthLayout,
+  },
+  {
+    path: "/verify-register",
+    page: VerifyRegister,
+    layout: AuthLayout,
+  },
+  {
+    path: "/forgot-password",
+    page: ForgotPassword,
+    layout: AuthLayout,
+  },
+  {
+    path: "/reset-password/:token",
+    page: ResetPassword,
+    layout: AuthLayout,
+  },
+  {
+    path: "/change-password",
+    page: ChangePassword,
+    layout: AuthLayout,
+  },
+  {
+    path: "/verify-change-email/",
+    page: VerifyChangeEmail,
+    layout: AuthLayout,
+  },
+
+  //common
   {
     path: "/",
     label: "Home",
     page: Home,
     layout: HeaderOnly,
   },
+  {
+    path: "/contact",
+    page: Contact,
+    layout: HeaderOnly,
+  },
+  {
+    path: "about-us",
+    page: AboutUs,
+    layout: HeaderOnly,
+  },
+  {
+    path: "profile",
+    page: Profile,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/error-page",
+    page: ErrorPage,
+    layout: AuthLayout,
+  },
+
+  // dashBoard
   {
     path: `${dashBoard}/boarding-house-management`,
     page: BoardingHouseManagement,
@@ -50,15 +121,11 @@ const routes = [
     page: WithdrawalRequestManagement,
     layout: null,
   },
+
   {
-    path: "/contact",
-    page: ContactPage,
-    layout: HeaderOnly,
-  },
-  {
-    path: "about-us",
-    page: AboutUs,
-    layout: HeaderOnly,
+    path: `${dashBoard}/list-boarding-house-reviews`,
+    page: ReviewManagement,
+    layout: null,
   },
 ];
 

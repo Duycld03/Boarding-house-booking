@@ -1,21 +1,49 @@
-import Login from './Login'
-import BoardingHouseManagement from './BoardingHouseManagement'
-import Home from './Home'
-import AccountManagement from './AccountManagement'
-import ReportReviewManagement from './ReportReviewManagement'
-import ReportBoardingHouse from './ReportBoardingHouse'
-import WithdrawalRequestManagement from './WithdrawalRequestManagement'
-import ContactForm from './Contact'
-import AboutUs from './AboutUs'
+import {
+  Login,
+  Register,
+  RegisterWithGoogle,
+  VerifyRegister,
+  ForgotPassword,
+  ResetPassword,
+  ChangePassword,
+  VerifyChangeEmail,
+} from "./auth";
+import { AboutUs, Home, Contact, Profile, ErrorPage } from "./common";
+
+import {
+  BoardingHouseManagement,
+  ReportReviewManagement,
+  ReportBoardingHouse,
+  WithdrawalRequestManagement,
+  AccountManagement,
+  ReviewManagement,
+} from "./dashboard";
 
 export {
-    Login,
-    BoardingHouseManagement,
-    Home,
-    AccountManagement,
-    ReportBoardingHouse,
-    ReportReviewManagement,
-    WithdrawalRequestManagement,
-    ContactForm as ContactPage,
-    AboutUs
-}
+  //auth
+  Login,
+  Register,
+  RegisterWithGoogle,
+  VerifyRegister,
+  ForgotPassword,
+  ResetPassword,
+  ChangePassword,
+  VerifyChangeEmail,
+
+  //common
+  AboutUs,
+  Contact,
+  Home,
+  Profile,
+  ErrorPage,
+
+  // owner
+
+  //dashboard
+  BoardingHouseManagement,
+  AccountManagement,
+  ReportBoardingHouse,
+  ReportReviewManagement,
+  WithdrawalRequestManagement,
+  ReviewManagement,
+};

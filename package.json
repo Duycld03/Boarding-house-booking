@@ -4,15 +4,23 @@
   "description": "project boarding house booking of group 4",
   "main": "index.js",
   "scripts": {
-    "client": "cd frontend && npm start",
+    "prepare": "npx husky install",
+    "client": "cd frontend && npm run dev",
     "server": "cd backend && npm start",
-    "dashboard": "cd dashboard && npm run dev",
-    "start": "concurrently \"npm run client\" \"npm run server\" \"npm run dashboard\"",
+    "start": "concurrently \"npm run client\" \"npm run server\"",
+    "pre-commit:server": "cd backend && npm run build-babel",
+    "pre-commit:client": "cd frontend && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^9.0.1"
+    "concurrently": "^9.0.1",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "husky": "^9.1.7"
   }
 }

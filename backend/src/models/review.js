@@ -1,0 +1,37 @@
+import mongoose from 'mongoose';
+import mongooseDelete from 'mongoose-delete';
+
+const ReviewSchema = new mongoose.Schema(
+  {
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Account',
+      required: true,
+    },
+    boardingHouseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'BoardingHouse',
+      required: true,
+    },
+    content: {
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+    },
+    images: [
+      {
+        type: String,
+      },
+    ],
+  },
+  { timestamps: true }
+);
+ReviewSchema.plugin(mongooseDelete, {
+  overrideMethods: 'all',
+});
+
+const Review = mongoose.model('Review', ReviewSchema);
+export default Review;
