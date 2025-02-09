@@ -5,7 +5,7 @@ on:
     branches: ["main", "feature"]
   pull_request:
     branches: ["main", "feature"]
-    
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # 🔧 Setup Node.js
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -42,11 +43,10 @@ jobs:
           echo "VITE_GOOGLE_CLIENT_ID=480377782126-c36ime4tr9j9iiq9ld0vhh6pnpgn44i0.apps.googleusercontent.com" >> $GITHUB_ENV
 
       # 🚀 Install dependencies for backend
-      - name: Install backend dependencies
-        working-directory: ./backend
-        run: npm ci
+
 
       # 🚀 Install dependencies for frontend
+
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
@@ -68,3 +68,4 @@ jobs:
       # ✅ Run tests (Nếu có)
       # - name: Run tests
       #   run: npm test
+
