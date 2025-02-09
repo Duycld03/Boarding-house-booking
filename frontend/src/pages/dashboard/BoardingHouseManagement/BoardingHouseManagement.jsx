@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import AddressSelector from "../../../component/AddressSelector";
 import { Button, TableCustom as Table, Loader } from "../../../component";
-import { FileTextOutlined, HeartOutlined, StarFilled, StarOutlined } from "@ant-design/icons";
+import { FileTextOutlined, HeartFilled, StarFilled, StarOutlined } from "@ant-design/icons";
 
 import {
   fetchProvinces,
@@ -774,7 +774,7 @@ function BoardingHouseManagement(onClose) {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
                   {/* like */}
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <HeartOutlined style={{ fontSize: "24px", color: "#595959" }} />
+                    <HeartFilled style={{ fontSize: "24px", color: "red" }} />
                     <span style={{ fontSize: "16px", color: "#595959" }}>
                       {formData.likes
                         ? Number(formData.likes).toLocaleString("en-US") // Format big numbers with commas
@@ -789,21 +789,21 @@ function BoardingHouseManagement(onClose) {
                         return (
                           <StarFilled
                             key={index}
-                            style={{ fontSize: "24px", color: "#595959" }}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
                           />
                         );
                       } else if (index === Math.floor(formData.rating || 0) && (formData.rating || 0) % 1 !== 0) {
                         return (
                           <StarOutlined
                             key={index}
-                            style={{ fontSize: "24px", color: "#595959" }}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
                           />
                         );
                       } else {
                         return (
                           <StarOutlined
                             key={index}
-                            style={{ fontSize: "24px", color: "#595959" }}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
                           />
                         );
                       }
