@@ -332,16 +332,18 @@ class BoardingHouseController {
                 priceRange,
                 electricityPrice,
                 waterPrice,
-                // availableRooms,
-                // totalRooms,
+                totalRooms = 0,
+                availableRooms = 0,
+                likes = 0,
+                rating = 5,
             } = req.body;
 
 
-            console.log("Request body received:", req.body);
+            // console.log("Request body received:", req.body);
 
             // Validate owner
             const ownerAccount = await Account.findOne({ username: ownerUsername, role: "owner" });
-            console.log("Owner account found:", ownerAccount);
+            // console.log("Owner account found:", ownerAccount);
             if (!ownerAccount) {
                 console.error("Invalid owner:", ownerUsername);
                 return res
@@ -421,8 +423,10 @@ class BoardingHouseController {
                     detail: detail || "",
                 },
                 images,
-                // availableRooms,
-                // totalRooms,
+                totalRooms,
+                availableRooms,
+                likes,
+                rating
             });
 
             // Lưu boarding house vào database

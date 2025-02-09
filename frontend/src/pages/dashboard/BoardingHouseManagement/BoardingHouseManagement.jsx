@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import AddressSelector from "../../../component/AddressSelector";
 import { Button, TableCustom as Table, Loader } from "../../../component";
-import { FileTextOutlined } from "@ant-design/icons";
+import { FileTextOutlined, HeartFilled, StarFilled, StarOutlined } from "@ant-design/icons";
 
 import {
   fetchProvinces,
@@ -62,7 +62,7 @@ function BoardingHouseManagement(onClose) {
     setLoading(true);
     try {
       const response = await getAllBoardingHDB();
-      console.log("API Response:", response);
+      // console.log("API Response:", response);
       setBoardingHData(response || []);
     } catch (error) {
       console.error("Failed to fetch boarding houses:", error);
@@ -753,7 +753,7 @@ function BoardingHouseManagement(onClose) {
               <h2 className="text-3xl font-bold mb-4 mt-10 ">5. Room</h2>
               <Form.Item label="Total Rooms" className="mb-2">
                 <InputNumber
-                  value={formData.totalRooms || ""}
+                  value={formData.totalRooms || "0"}
                   readOnly
                   className="bg-gray-100 text-gray-500 cursor-not-allowed"
                   style={{ width: "100%" }}
@@ -762,11 +762,54 @@ function BoardingHouseManagement(onClose) {
 
               <Form.Item label="Available Rooms" className="mb-2">
                 <InputNumber
-                  value={formData.availableRooms || ""}
+                  value={formData.availableRooms || "0"}
                   readOnly
                   className="bg-gray-100 text-gray-500 cursor-not-allowed"
                   style={{ width: "100%" }}
                 />
+              </Form.Item>
+
+              <h2 className="text-3xl font-bold mb-4 mt-10 ">6. Like and Rating</h2>
+              <Form.Item >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
+                  {/* like */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <HeartFilled style={{ fontSize: "24px", color: "red" }} />
+                    <span style={{ fontSize: "16px", color: "#595959" }}>
+                      {formData.likes
+                        ? Number(formData.likes).toLocaleString("en-US") // Format big numbers with commas
+                        : "0"}
+                    </span>
+                  </div>
+
+                  {/* Rating */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    {Array.from({ length: 5 }, (_, index) => {
+                      if (index < Math.floor(formData.rating || 0)) {
+                        return (
+                          <StarFilled
+                            key={index}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
+                          />
+                        );
+                      } else if (index === Math.floor(formData.rating || 0) && (formData.rating || 0) % 1 !== 0) {
+                        return (
+                          <StarOutlined
+                            key={index}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
+                          />
+                        );
+                      } else {
+                        return (
+                          <StarOutlined
+                            key={index}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
+                          />
+                        );
+                      }
+                    })}
+                  </div>
+                </div>
               </Form.Item>
             </div>
             {/* </div> */}
