@@ -27,6 +27,21 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
           
+      # 📌 Thiết lập biến môi trường từ .env (backend)
+      - name: Set environment variables (backend)
+        run: |
+          echo "DATABASE_NAME=MotelTeach" >> $GITHUB_ENV
+          echo "MONGODB_URI=mongodb://localhost:27017/MotelTeach" >> $GITHUB_ENV
+          echo "JWT_SECRET=38b4a1f8-c75f-4c74-8a0d-a87c7d94437a" >> $GITHUB_ENV
+          echo "JWT_EXPIRE=1d" >> $GITHUB_ENV
+          echo "GOOGLE_CLIENT_ID=480377782126-c36ime4tr9j9iiq9ld0vhh6pnpgn44i0.apps.googleusercontent.com" >> $GITHUB_ENV
+          echo "CLIENT_URL=http://localhost:5173" >> $GITHUB_ENV
+      # 📌 Thiết lập biến môi trường từ .env (frontend)
+      - name: Set environment variables (frontend)
+        run: |
+          echo "VITE_BASE_URL=http://localhost:3000/" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_CLIENT_ID=480377782126-c36ime4tr9j9iiq9ld0vhh6pnpgn44i0.apps.googleusercontent.com" >> $GITHUB_ENV
+      
       # Install dependencies for main
       - name: Install main dependencies
         run: npm ci
