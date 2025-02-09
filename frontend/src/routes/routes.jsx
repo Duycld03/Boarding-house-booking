@@ -17,6 +17,7 @@ import {
   ChangePassword,
   Profile,
   VerifyChangeEmail,
+  ErrorPage,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 
@@ -87,6 +88,11 @@ const routes = [
     path: "profile",
     page: Profile,
     layout: ProfileLayout,
+  },
+  {
+    path: "/error-page",
+    page: ErrorPage,
+    layout: AuthLayout,
   },
 
   // dashBoard
