@@ -126,7 +126,7 @@ class reportController {
         // Kiểm tra loại báo cáo và thay đổi nội dung email phù hợp
         const reportSubject =
           relatedReport.reportType === 'boardingHouse'
-            ? `liên quan đến nhà trọ ${boardingHouseName}`
+            ? `liên quan đến nhà trọ <strong>${boardingHouseName}</strong>`
             : 'liên quan đến bình luận trong bài viết';
 
         const mailOptions = {
@@ -135,9 +135,9 @@ class reportController {
           subject: `Kết quả xử lý báo cáo: #${relatedReport._id}`,
           html: `
             <p>Kính gửi Anh/Chị ${relatedReport.reporter.fullname},</p>
-            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề "${
+            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${
               relatedReport.reason || 'undefined'
-            }" ${reportSubject} trên nền tảng của chúng tôi.</p>
+            }"</strong> ${reportSubject} trên nền tảng của chúng tôi.</p>
             <p>Chúng tôi xin thông báo rằng báo cáo của bạn đã được xử lý với kết quả như sau:</p>
             <ul>
                 <li><strong>Trạng thái báo cáo:</strong> ${status}</li>
