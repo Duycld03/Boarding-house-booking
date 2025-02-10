@@ -7,7 +7,7 @@ import unidecode from 'unidecode'
 import fs from "fs";
 import multer from "multer";
 import Account from '../models/account.js';
-class BoardingHouseController {
+class boardingHouseController {
     async getAllBHOnDashBoard(req, res, next) {
         try {
             const boardingHData = await BoardingHouse.find(
@@ -612,5 +612,5 @@ class BoardingHouseController {
 
 }
 
-export default new BoardingHouseController();
+export default new boardingHouseController();
 

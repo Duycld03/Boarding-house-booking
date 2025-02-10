@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authController, AccountController } from "./../controllers/index.js";
+import { authController, accountController } from "./../controllers/index.js";
 import { upload } from "../config/upload.config.js";
 
 const authRouter = Router();
@@ -9,15 +9,15 @@ authRouter.get("/", (req, res) => {
 });
 
 authRouter.get("/user", authController.getAccountFromToken);
-authRouter.post("/change-password", AccountController.changePassword);
-authRouter.put("/profile", AccountController.updateAccountFromProfile);
+authRouter.post("/change-password", accountController.changePassword);
+authRouter.put("/profile", accountController.updateAccountFromProfile);
 authRouter.put(
   "/avatar",
   upload.single("avatar"),
-  AccountController.updateAvatar
+  accountController.updateAvatar
 );
 
-authRouter.post("/send-otp-change-email", AccountController.sendOTPChangeEmail);
-authRouter.post("/verify-change-email", AccountController.verifyChangeEmail);
+authRouter.post("/send-otp-change-email", accountController.sendOTPChangeEmail);
+authRouter.post("/verify-change-email", accountController.verifyChangeEmail);
 
 export { authRouter };
