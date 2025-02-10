@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import Styles from './Home.module.css';
 import BoardingHouseGrid from '@/component/BoardingHouseCard';
 import { Tabs } from 'antd';
-import { getAllBHHome } from '../../../api/BoardingHManagement';
+import { getAllBHHome } from '@/api/BoardingHManagement';
 import { toast } from 'react-toastify';
 import formatAmount from '@/utils/formatAmount';
 import { formatTimeAgo } from '@/utils/timeUtils';
