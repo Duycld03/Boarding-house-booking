@@ -17,6 +17,7 @@ import {
   ChangePassword,
   Profile,
   BoardingHouseDetail,
+  VerifyChangeEmail,
   ErrorPage,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
@@ -60,6 +61,11 @@ const routes = [
   {
     path: '/change-password',
     page: ChangePassword,
+    layout: AuthLayout,
+  },
+  {
+    path: "/verify-change-email/",
+    page: VerifyChangeEmail,
     layout: AuthLayout,
   },
 

@@ -203,7 +203,7 @@ function ReportBoardingHouse() {
         <Table columns={columns} data={data} loading={loading} />
         <ConfirmModal
           title="Confirm Deletion"
-          content="Do you want to delete this review report?"
+          content="Do you want to delete this boarding house report?"
           onOk={handleDelete}
           onCancel={() => setIsOpenDeleteModal(false)}
           isOpen={isOpenDeleteModal}

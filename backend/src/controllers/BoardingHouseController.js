@@ -7,7 +7,7 @@ import unidecode from 'unidecode';
 import fs from 'fs';
 import multer from 'multer';
 import Account from '../models/account.js';
-class BoardingHouseController {
+class boardingHouseController {
     async getAllBHOnDashBoard(req, res, next) {
         try {
             const boardingHData = await BoardingHouse.find()
@@ -526,8 +526,7 @@ class BoardingHouseController {
                 .populate('boardingHouseType')
                 .populate({
                     path: 'ownerId',
-                })
-                .sort({ createdAt: 1 });
+                }).sort({ createdAt: -1 })
 
             result = boardingHouses;
 
@@ -574,15 +573,13 @@ class BoardingHouseController {
 
     async getMaxPriceBH(req, res, next) {
         try {
-            const boardingHouses = await BoardingHouse.find({}, { priceRange: 1 });
+            const maxPriceHouse = await BoardingHouse.findOne().sort({ priceRange: -1 });
+            if (!maxPriceHouse || maxPriceHouse === 0) {
+                return res.status(404).json({ message: "No boarding house found" });
 
-            if (!boardingHouses || boardingHouses.length === 0) {
-                return res.status(404).json({ message: 'No boarding house found' });
             }
 
-            const maxPrice = boardingHouses[0].priceRange; // Lấy giá trị lớn nhất
-
-            const roundedPrice = Math.ceil(maxPrice / 100) * 100; // Làm tròn lên theo bội số của 100
+            const roundedPrice = Math.ceil(maxPriceHouse.priceRange / 100) * 100;
 
             res.status(200).json({ maxPrice: roundedPrice });
         } catch (error) {
@@ -673,4 +670,7 @@ class BoardingHouseController {
 
 }
 
-export default new BoardingHouseController();
+
+export default new boardingHouseController();
+
+

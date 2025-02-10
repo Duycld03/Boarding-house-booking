@@ -15,7 +15,6 @@ const authMiddleware = (req, res, next) => {
     try {
       const decoded = verifyToken(token);
       req.user = decoded;
-      console.log(decoded);
     } catch (error) {
       return res.status(401).json({ message: "Token is invalid" });
     }

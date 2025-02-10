@@ -2,36 +2,83 @@ import classNames from "classnames/bind";
 import Styles from "./Profile.module.css";
 import { useEffect, useState } from "react";
 import { Loader } from "../../../component";
-import { Form, Input, Radio, Avatar, Upload, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Form, Input, Radio, Avatar, Upload, Button, Card } from "antd";
+import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import UserAvatar from "../../../assets/images/none_avatar.png";
 import { getUser } from "../../../api/authManagement";
-import { updateAccountFromProfile } from "../../../api/AccountManagement";
+import {
+  updateAccountFromProfile,
+  updateAvatar,
+  sendOTPChangeEmail,
+} from "../../../api/AccountManagement";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(Styles);
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+const getBase64 = (img, callback) => {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result));
+  reader.readAsDataURL(img);
+};
+const beforeUpload = (file) => {
+  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+  if (!isJpgOrPng) {
+    message.error("You can only upload JPG/PNG file!");
+  }
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isLt2M) {
+    message.error("Image must smaller than 2MB!");
+  }
+  return isJpgOrPng && isLt2M;
+};
 
 function Profile() {
+  const navigate = useNavigate();
+
   const [form] = Form.useForm();
   const [formEmail] = Form.useForm();
   const [profileLoading, setProfileLoading] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [avatar, setAvatar] = useState(UserAvatar);
+  const [imageUrl, setImageUrl] = useState(UserAvatar);
   const [username, setUsername] = useState("");
   const [isOwner, setIsOwner] = useState(false);
   const [accountBalance, setAccountBalance] = useState(0);
   const [email, setEmail] = useState("");
 
   const handleAvatarChange = (info) => {
+    if (info.file.status === "uploading") {
+      setLoading(true);
+      return;
+    }
     if (info.file.status === "done") {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setAvatar(reader.result);
-      };
-      reader.readAsDataURL(info.file.originFileObj);
-      toast.success("Avatar updated successfully!");
+      // Get this url from response in real world.
+      getBase64(info.file.originFileObj, (url) => {
+        setLoading(false);
+        setImageUrl(url);
+      });
     }
   };
+
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+      }}
+      type="button"
+    >
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </button>
+  );
 
   const loadProfileForm = (data) => {
     form.setFieldsValue({
@@ -47,7 +94,11 @@ function Profile() {
       setProfileLoading(true);
       const res = await getUser();
       setAccountBalance(res.accountBalance);
-      setAvatar(res.avatar || UserAvatar);
+
+      if (res.avatarImage) {
+        setImageUrl(`${BASE_URL}/${res.avatarImage}`);
+      }
+
       setUsername(res.username);
       setEmail(res.email);
       setIsOwner(res.role === "owner");
@@ -74,7 +125,37 @@ function Profile() {
   };
 
   const onEmailFinish = async (values) => {
-    console.log(values);
+    try {
+      setLoading(true);
+      const res = await sendOTPChangeEmail(values);
+      toast.success(res.message);
+      navigate("/verify-change-email", {
+        state: { email: res.email, token: res.token },
+      });
+      setLoading(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      setLoading(false);
+    }
+  };
+
+  const handleUpload = async ({ file, onSuccess, onError }) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const res = await updateAvatar(formData);
+
+      // setImageUrl(response.url);
+      toast.success("Upload avatar successfully!");
+      onSuccess();
+      setLoading(false);
+    } catch (error) {
+      toast.error("Upload avatar failed!");
+      onError(error);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -86,120 +167,132 @@ function Profile() {
       {profileLoading ? (
         <Loader />
       ) : (
-        <div className="flex justify-between mb-4 flex-col md:w-[50%] mx-auto">
-          <div className="flex justify-center items-center flex-col">
-            <Avatar size={100} src={avatar} />
-            <Upload
-              showUploadList={false}
-              beforeUpload={() => false}
-              onChange={handleAvatarChange}
-            >
-              <p className="text-center text-3xl font-bold">@{username}</p>
-              <Button icon={<EditOutlined />} className="mt-5">
-                Change Avatar
-              </Button>
-            </Upload>
-          </div>
-          <Form form={formEmail} layout="vertical" onFinish={onEmailFinish}>
-            {isOwner && (
-              <Form.Item label="Account Balance">
-                <div>
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(accountBalance)}
+        <div className="flex justify-between mb-4 flex-col md:w-[60%] mx-auto">
+          <Card>
+            <div className="flex justify-center items-center flex-col">
+              <Upload
+                name="avatar"
+                listType="picture-circle"
+                className="avatar-uploader"
+                showUploadList={false}
+                customRequest={handleUpload}
+                beforeUpload={beforeUpload}
+                onChange={handleAvatarChange}
+              >
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt="avatar"
+                    className="w-36 h-36 rounded-full"
+                  />
+                ) : (
+                  uploadButton
+                )}
+              </Upload>
+              <p className="text-3xl text-center">@{username}</p>
+            </div>
+            <Form form={formEmail} layout="vertical" onFinish={onEmailFinish}>
+              {isOwner && (
+                <Form.Item label="Account Balance">
+                  <div>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(accountBalance)}
+                  </div>
+                </Form.Item>
+              )}
+              <Form.Item
+                label="Email"
+                name="email"
+                initialValue={email}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your email!",
+                  },
+                  {
+                    type: "email",
+                    message: "Please enter a valid email!",
+                  },
+                ]}
+              >
+                <div className="flex items-end justify-between gap-5">
+                  <Input
+                    size="large"
+                    placeholder="Enter your email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled
+                  />
+                  <Button
+                    name="change-email"
+                    type="primary"
+                    size="large"
+                    htmlType="submit"
+                    loading={loading}
+                  >
+                    Change Email
+                  </Button>
                 </div>
               </Form.Item>
-            )}
-            <Form.Item
-              label="Email"
-              name="email"
-              initialValue={email}
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your email!",
-                },
-                {
-                  type: "email",
-                  message: "Please enter a valid email!",
-                },
-              ]}
-            >
-              <div className="flex items-end justify-between gap-5">
+            </Form>
+
+            <Form form={form} layout="vertical" onFinish={onFinish}>
+              <Form.Item
+                label="Full Name"
+                name="fullname"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your fullname!",
+                  },
+                ]}
+              >
+                <Input size="large" placeholder="Enter your fullname" />
+              </Form.Item>
+
+              <Form.Item
+                label="Phone Number"
+                name="phoneNumber"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your phone number!",
+                  },
+                  {
+                    len: 10,
+                    message: "Phone number must be 10 characters!",
+                  },
+                ]}
+              >
                 <Input
+                  type="number"
                   size="large"
-                  placeholder="Enter your email"
-                  name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your confirm password"
                 />
+              </Form.Item>
+              <Form.Item label="Gender" name="gender">
+                <Radio.Group>
+                  <Radio value="male">Male</Radio>
+                  <Radio value="female">Female</Radio>
+                  <Radio value="other">Other</Radio>
+                </Radio.Group>
+              </Form.Item>
+
+              <Form.Item>
                 <Button
-                  name="change-email"
                   type="primary"
                   size="large"
                   htmlType="submit"
                   loading={loading}
                 >
-                  Change Email
+                  Save
                 </Button>
-              </div>
-            </Form.Item>
-          </Form>
-
-          <Form form={form} layout="vertical" onFinish={onFinish}>
-            <Form.Item
-              label="Full Name"
-              name="fullname"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your fullname!",
-                },
-              ]}
-            >
-              <Input size="large" placeholder="Enter your fullname" />
-            </Form.Item>
-
-            <Form.Item
-              label="Phone Number"
-              name="phoneNumber"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your phone number!",
-                },
-                {
-                  len: 10,
-                  message: "Phone number must be 10 characters!",
-                },
-              ]}
-            >
-              <Input
-                type="number"
-                size="large"
-                placeholder="Enter your confirm password"
-              />
-            </Form.Item>
-            <Form.Item label="Gender" name="gender">
-              <Radio.Group>
-                <Radio value="male">Male</Radio>
-                <Radio value="female">Female</Radio>
-                <Radio value="other">Other</Radio>
-              </Radio.Group>
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                type="primary"
-                size="large"
-                htmlType="submit"
-                loading={loading}
-              >
-                Save
-              </Button>
-            </Form.Item>
-          </Form>
+              </Form.Item>
+            </Form>
+          </Card>
         </div>
       )}
     </div>

@@ -6,6 +6,7 @@ import {
   ForgotPassword,
   ResetPassword,
   ChangePassword,
+  VerifyChangeEmail,
 } from "./auth";
 import { AboutUs, Home, Contact, Profile, ErrorPage, BoardingHouseDetail } from "./common";
 
@@ -28,6 +29,7 @@ export {
   ResetPassword,
   ChangePassword,
   BoardingHouseDetail,
+  VerifyChangeEmail,
 
   //common
   AboutUs,
