@@ -22,7 +22,7 @@ function FilterBoardingHouse({ setFilterValue }) {
   const [boardingHouseType, setBoardingHouseType] = useState([]);
   const [priceRangeValue, setPriceRangeValue] = useState({
     min: 0,
-    max: 1000,
+    max: 100000000000000,
   });
 
   const [currentPrice, setCurrentPrice] = useState({
@@ -52,18 +52,22 @@ function FilterBoardingHouse({ setFilterValue }) {
       console.error("Error fetching boarding house types:", error);
     }
   };
-
   const fetchMaxPrice = async () => {
     try {
       const res = await getMaxPriceBH();
       if (res) {
+        const maxPrice = res.maxPrice;
         setPriceRangeValue({
           min: 0,
-          max: res.maxPrice,
+          max: maxPrice,
+        });
+        setCurrentPrice({
+          min: 0,
+          max: maxPrice,
         });
       }
     } catch (error) {
-      console.log("there are something wrong!", error);
+      console.log("Có lỗi xảy ra khi lấy giá tối đa!", error);
     }
   };
 
