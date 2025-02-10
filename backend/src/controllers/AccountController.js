@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { generateToken, verifyToken } from "../utils/functions.js";
 
-class AccountController {
+class accountController {
   async getAllAccount(req, res, next) {
     try {
       const accountData = await Account.find().sort({ createdAt: 1 });
@@ -383,4 +383,4 @@ class AccountController {
     }
   }
 }
-export default new AccountController();
+export default new accountController();
