@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, List, Typography, Image, Button } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, List, Typography, Image, Button, Spin } from 'antd';
 import {
   LeftOutlined,
   RightOutlined,
@@ -9,15 +9,17 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { addFavorite, getFavorite } from '../../api/favoriteManagement'; // Import API
 
 interface BoardingHouseCardProps {
-  id: number;
+  id: string;
   name: string;
   price: string | number;
   detail: string;
   rating: number;
   img: string;
-  timeAgo: number;
+  timeAgo: string;
+  isFavorite?: boolean;
 }
 
 interface BoardingHouseGridProps {
@@ -34,9 +36,10 @@ const BoardingHouseCard = ({
   rating,
   img,
   timeAgo,
+  isFavorite: initialFavorite = false,
 }: BoardingHouseCardProps) => {
   const navigate = useNavigate();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
 
   // Điều hướng khi click vào card
@@ -44,17 +47,30 @@ const BoardingHouseCard = ({
     navigate(`/boarding-house/${id}`);
   };
 
-  // Xử lý khi nhấn vào icon heart
-  const handleFavoriteClick = (event: React.MouseEvent) => {
-    event.stopPropagation(); // Ngăn không cho card bị click
-    setIsFavorite(!isFavorite);
-    toast.success(isFavorite ? 'Removed from favorites' : 'Saved to favorites');
+  // Xử lý thêm/xóa yêu thích
+  const handleFavoriteClick = async (event: React.MouseEvent) => {
+    event.stopPropagation(); // Ngăn chặn click vào card
+
+    try {
+      console.log('Calling API with id:', id);
+      const response = await addFavorite(id); // Gọi API
+      console.log('API Response:', response);
+
+      if (response && typeof response.isFavorite !== 'undefined') {
+        setIsFavorite(response.isFavorite); // Cập nhật trạng thái
+      } else {
+        console.error('Invalid response structure:', response);
+        toast.error('Dữ liệu phản hồi không hợp lệ!');
+      }
+    } catch (error) {
+      navigate(`/login`);
+    }
   };
 
   return (
     <Card
       hoverable
-      onClick={handleCardClick} // Click vào toàn card để điều hướng
+      onClick={handleCardClick}
       cover={
         <Image
           alt={name}
@@ -120,7 +136,7 @@ const BoardingHouseCard = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between', // Đẩy icon heart sang phải
+            justifyContent: 'space-between',
             marginTop: 8,
           }}
         >
@@ -131,7 +147,7 @@ const BoardingHouseCard = ({
           {/* Icon heart */}
           <Button
             type="text"
-            onClick={handleFavoriteClick} // Bấm vào icon heart không chuyển trang
+            onClick={handleFavoriteClick}
             icon={
               isFavorite ? (
                 <HeartFilled style={{ color: 'red', fontSize: '22px' }} />
@@ -148,56 +164,89 @@ const BoardingHouseCard = ({
 
 const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Gọi API lấy danh sách phòng yêu thích khi trang tải
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        setLoading(true);
+        const response = await getFavorite();
+        if (response && Array.isArray(response.favorites)) {
+          setFavoriteIds(response.favorites.map((fav) => fav.id)); // Lưu danh sách ID yêu thích
+        }
+      } catch (error) {
+        console.error('Failed to fetch favorites:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
+
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
 
-  const paginatedData = data.slice(
-    currentPage * ITEMS_PER_PAGE,
-    (currentPage + 1) * ITEMS_PER_PAGE
-  );
+  const paginatedData = data
+    .slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE)
+    .map((item) => ({
+      ...item,
+      isFavorite: favoriteIds.includes(item.id), // Kiểm tra xem có trong danh sách yêu thích không
+    }));
 
   return (
     <div>
-      <List
-        grid={{
-          gutter: 10,
-          xs: 1,
-          sm: 1,
-          md: 2,
-          lg: 3,
-          xl: 3,
-        }}
-        dataSource={paginatedData}
-        renderItem={(item) => (
-          <List.Item style={{ padding: 0 }}>
-            <BoardingHouseCard {...item} />
-          </List.Item>
-        )}
-      />
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginTop: 16,
-          gap: 10,
-          marginRight: 20,
-          marginBottom: 20,
-        }}
-      >
-        <Button
-          disabled={currentPage === 0}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-          icon={<LeftOutlined />}
+      {loading ? (
+        <Spin
+          size="large"
+          style={{ display: 'block', textAlign: 'center', margin: '20px' }}
         />
-        <Typography.Text>
-          {currentPage + 1} / {totalPages}
-        </Typography.Text>
-        <Button
-          disabled={currentPage === totalPages - 1}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-          icon={<RightOutlined />}
-        />
-      </div>
+      ) : (
+        <>
+          <List
+            grid={{
+              gutter: 10,
+              xs: 1,
+              sm: 1,
+              md: 2,
+              lg: 3,
+              xl: 3,
+            }}
+            dataSource={paginatedData}
+            renderItem={(item) => (
+              <List.Item style={{ padding: 0 }}>
+                <BoardingHouseCard {...item} />
+              </List.Item>
+            )}
+          />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              marginTop: 16,
+              gap: 10,
+              marginRight: 20,
+              marginBottom: 20,
+            }}
+          >
+            <Button
+              disabled={currentPage === 0}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              icon={<LeftOutlined />}
+            />
+            <Typography.Text>
+              {currentPage + 1} / {totalPages}
+            </Typography.Text>
+            <Button
+              disabled={currentPage === totalPages - 1}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              icon={<RightOutlined />}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
