@@ -1,11 +1,12 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
 name: Node.js CI
 
 on:
   push:
-    branches: ["main", "feature"]
   pull_request:
-    branches: ["main", "feature"]
-    
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,18 +14,19 @@ jobs:
     strategy:
       matrix:
         node-version: [20.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-      # 🛎️ Checkout code
+      # Checkout code
       - uses: actions/checkout@v4
 
-      # 🔧 Setup Node.js
+      # Setup Node.js for matrix version
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-
+          
       # 📌 Thiết lập biến môi trường từ .env (backend)
       - name: Set environment variables (backend)
         run: |
@@ -34,37 +36,36 @@ jobs:
           echo "JWT_EXPIRE=1d" >> $GITHUB_ENV
           echo "GOOGLE_CLIENT_ID=480377782126-c36ime4tr9j9iiq9ld0vhh6pnpgn44i0.apps.googleusercontent.com" >> $GITHUB_ENV
           echo "CLIENT_URL=http://localhost:5173" >> $GITHUB_ENV
-
       # 📌 Thiết lập biến môi trường từ .env (frontend)
       - name: Set environment variables (frontend)
         run: |
           echo "VITE_BASE_URL=http://localhost:3000/" >> $GITHUB_ENV
           echo "VITE_GOOGLE_CLIENT_ID=480377782126-c36ime4tr9j9iiq9ld0vhh6pnpgn44i0.apps.googleusercontent.com" >> $GITHUB_ENV
+      
+      # Install dependencies for main
+      - name: Install main dependencies
+        run: npm ci
 
-      # 🚀 Install dependencies for backend
+      # Install dependencies for backend
       - name: Install backend dependencies
         working-directory: ./backend
         run: npm ci
 
-      # 🚀 Install dependencies for frontend
+      # Install dependencies for frontend
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
 
-      # 🏗️ Start backend server & check if it's running
+      # Build and start backend
       - name: Start backend server
         working-directory: ./backend
-        run: |
-          npm start &
-          npx wait-on http://localhost:3000 || { echo "❌ Backend failed to start"; exit 1; }
+        run: npm start &
 
-      # 🏗️ Start frontend client
+      # Build and start frontend
       - name: Start frontend client
         working-directory: ./frontend
-        run: |
-          npm run dev &
-          npx wait-on http://localhost:5173 || { echo "❌ Frontend failed to start"; exit 1; }
+        run: npm run dev &
 
-      # ✅ Run tests (Nếu có)
-      # - name: Run tests
-      #   run: npm test
+    # Run tests (optional)
+    # - name: Run tests
+    #   run: npm test

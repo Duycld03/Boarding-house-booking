@@ -17,8 +17,11 @@ import {
   ChangePassword,
   Profile,
   BoardingHouseDetail,
-} from '../pages';
-import { AuthLayout, HeaderOnly, ProfileLayout } from '../Layouts';
+  VerifyChangeEmail,
+  ErrorPage,
+} from "../pages";
+import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
+
 
 const dashBoard = '/dashboard';
 
@@ -60,6 +63,11 @@ const routes = [
     page: ChangePassword,
     layout: AuthLayout,
   },
+  {
+    path: "/verify-change-email/",
+    page: VerifyChangeEmail,
+    layout: AuthLayout,
+  },
 
   //common
   {
@@ -82,6 +90,11 @@ const routes = [
     path: 'profile',
     page: Profile,
     layout: ProfileLayout,
+  },
+  {
+    path: "/error-page",
+    page: ErrorPage,
+    layout: AuthLayout,
   },
 
   // dashBoard

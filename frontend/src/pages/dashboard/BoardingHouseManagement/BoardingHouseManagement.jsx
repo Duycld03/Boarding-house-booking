@@ -1,7 +1,14 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import AddressSelector from "../../../component/AddressSelector";
-import { Button, TableCustom as Table, Loader } from "../../../component";
+import { Button, TableCustom as Table, ConfirmModal } from "../../../component";
+import {
+  FileTextOutlined,
+  HeartFilled,
+  StarFilled,
+  StarOutlined,
+} from "@ant-design/icons";
+
 import {
   fetchProvinces,
   fetchDistricts,
@@ -13,41 +20,58 @@ import {
   updateBoardingHouseDetails,
   getAllBoardingHouseTypes,
   getBoardingHouseImages,
-  addBoardingHouseImage,
-  updateBoardingHouseImage,
-  deleteBoardingHouseImage,
   filterBH,
+  uploadFile,
+  softDeleteBoardingHouse,
 } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import convertTimetap from "../../../utils/convertTimetap";
 import CreateBoardingHouse from "./CreateBoardingHouse";
 import FilterBoardingHouse from "./FilterBoardingHouse";
-
-function BoardingHouseManagement() {
+import { Form, Input, Select, Upload, InputNumber, Image } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+function BoardingHouseManagement(onClose) {
   const [boardingHData, setBoardingHData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  // const [formData, setFormData] = useState(null);
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
-  const [error, setError] = useState(""); // Thêm state error
-  const [images, setImages] = useState([]); // Lưu danh sách ảnh
-
+  const [images, setImages] = useState([]);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const [formData, setFormData] = useState({
+    owner: "",
+    boardingHouseType: "",
+    name: "",
+    address: {
+      province: "",
+      district: "",
+      ward: "",
+      detail: "",
+    },
+    description: "",
+    primaryImage: null,
+    otherImages: [],
+    priceRange: "",
+    electricityPrice: "",
+    waterPrice: "",
+    // totalRooms: "",
+    // availableRooms: "",
   });
-  const [isFormOpen, setIsFormOpen] = useState(false); // Controls the visibility of the form
-
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [filterValue, setFilterValue] = useState();
-
-
-  // Fetch dữ liệu danh sách Boarding House
+  // Handle opening the delete modal
+  const handleDeleteModal = (record) => {
+    setSelectedRequest(record);
+    setIsOpenDeleteModal(true);
+  };
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await getAllBoardingHDB();
-      console.log("API Response:", response);
+      // console.log("API Response:", response);
       setBoardingHData(response || []);
     } catch (error) {
       console.error("Failed to fetch boarding houses:", error);
@@ -55,10 +79,43 @@ function BoardingHouseManagement() {
       setLoading(false);
     }
   };
+
+  //upload props
+  const uploadOtherImgProps = {
+    beforeUpload: (file) => {
+      handleFileChange({ target: { files: [file] } }, false);
+      return false; // Prevent auto-upload
+    },
+    multiple: true,
+    accept: "image/*",
+  };
+  const uploadProps = {
+    beforeUpload: (file) => {
+      handleFileChange({ target: { files: [file] } }, true);
+      return false; // Prevent auto-upload
+    },
+    accept: "image/*",
+    maxCount: 1,
+    showUploadList: false,
+  };
+
+  // Handle file uploads
+  const handleFileChange = (e, isPrimary = false) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      primaryImage: isPrimary ? file : prev.primaryImage,
+      otherImages: isPrimary
+        ? prev.otherImages
+        : [...(prev.otherImages || []), file],
+    }));
+  };
   // Open the form
   const handleOpenForm = () => {
     setIsFormOpen(true);
-    setIsDetailOpen(false); // Close the detail modal if open
+    setIsDetailOpen(false);
   };
 
   // Handle closing the create form
@@ -68,8 +125,8 @@ function BoardingHouseManagement() {
 
   // Handle success after creating a new boarding house
   const handleFormSuccess = () => {
-    fetchData(); // Refresh the list of boarding houses
-    handleCloseForm(); // Close the form
+    fetchData();
+    handleCloseForm();
   };
 
   // Fetch data on component mount
@@ -78,8 +135,8 @@ function BoardingHouseManagement() {
   }, []);
   const fetchImages = async (id) => {
     try {
-      const { data } = await getBoardingHouseImages(id); // Gọi API
-      setImages(data); // Lưu danh sách ảnh vào state
+      const { data } = await getBoardingHouseImages(id);
+      setImages(data);
     } catch (error) {
       console.error("Failed to fetch images:", error);
       toast.error("Failed to fetch images.");
@@ -111,36 +168,9 @@ function BoardingHouseManagement() {
     }
   };
 
-  // Fetch danh sách tỉnh thành
-  const fetchProvincesData = async () => {
-    const data = await fetchProvinces();
-    setProvinces(data);
-  };
-  const fetchDistrictsData = async () => {
-    const province = provinces.find(
-      (f) => f.name === formData.address.province
-    );
-
-    const data = await fetchDistricts(province.code);
-    console.log("test1.1: ", data);
-
-    setDistricts(data);
-    setWards([]); // Reset danh sách phường/xã
-  };
-  const fetchWardsData = async () => {
-    const district = districts.find(
-      (f) => f.name === formData?.address?.district
-    );
-    console.log("test2.1: ", districts);
-    const data = await fetchWards(district.code);
-    console.log("test2.2: ", data);
-
-    setWards(data);
-  };
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch provinces trước
         const provincesData = await fetchProvinces();
         setProvinces(provincesData);
 
@@ -173,19 +203,6 @@ function BoardingHouseManagement() {
     fetchData();
   }, [formData?.address?.province, formData?.address?.district]);
 
-  // Mở popup và lấy chi tiết Boarding House
-  const handleRowClick = async (id) => {
-    try {
-      const { data } = await getBoardingHouseDetails(id);
-      setFormData(data);
-      setIsDetailOpen(true);
-      fetchImages(id);
-    } catch (error) {
-      console.error("Failed to fetch boarding house details:", error);
-      toast.error("Failed to fetch boarding house details.");
-    }
-  };
-
   // Xử lý thay đổi input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -202,13 +219,12 @@ function BoardingHouseManagement() {
       }));
     }
   };
+
   const handleSelectedTypesChange = (event) => {
     const { name, value } = event.target;
-
-    // Cập nhật trạng thái formData
     setFormData((prevData) => ({
       ...prevData,
-      [name]: { _id: value }, // Giả sử bạn lưu giá trị như một đối tượng
+      [name]: { _id: value },
     }));
   };
   const handleCloseDetail = () => {
@@ -220,106 +236,195 @@ function BoardingHouseManagement() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.name) {
+      toast.error("Please enter a boarding house name.");
+      return;
+    }
+    if (!formData.address.province) {
+      toast.error("Please select a boarding house province.");
+      return;
+    }
+    if (!formData.address.district) {
+      toast.error("Please select a boarding house district.");
+      return;
+    }
+    if (!formData.address.ward) {
+      toast.error("Please select a boarding house ward.");
+      return;
+    }
+    if (!formData.address.detail) {
+      toast.error("Please enter a boarding house details.");
+      return;
+    }
     try {
-      // Validate required fields
       if (!formData._id) {
-        console.error("Invalid formData: Missing boarding house ID");
         toast.error("Invalid form data. Please try again.");
         return;
       }
 
-      // Prepare data for the update
-      const updateData = {
-        name: formData.name || "",
-        description: formData.description || "",
-        priceRange: formData.priceRange || 0,
-        electricityPrice: formData.electricityPrice || 0,
-        waterPrice: formData.waterPrice || 0,
-        address: {
-          province: formData.address.province || "",
-          district: formData.address.district || "",
-          ward: formData.address.ward || "",
-          detail: formData.address.detail || "",
-        },
-        boardingHouseType: formData.boardingHouseType._id || "",
-      };
+      const imagesData = [...images];
+      const payloadPrimary = new FormData();
 
-      // Perform the update for the boarding house
-      await updateBoardingHouseDetails(formData._id, updateData);
+      // Upload primary image
+      if (formData.primaryImage) {
+        payloadPrimary.append("file", formData.primaryImage);
 
-      // Check if images need to be updated
-      if (images.length > 0) {
-        const newImages = images.filter((img) => !img._id); // Images that were newly added
-        for (const image of newImages) {
-          await addBoardingHouseImage(formData._id, {
-            imageUrl: image.imageUrl,
-            isPrimary: image.isPrimary || false,
+        try {
+          const responsePrimary = await uploadFile(payloadPrimary);
+          imagesData.push({
+            imageUrl: responsePrimary.filePath,
+            isPrimary: true,
           });
+        } catch (error) {
+          toast.error("Please upload a primary image.");
+          return;
         }
       }
 
-      // Refresh data and close the modal
-      toast.success("Boarding house updated successfully.");
-      fetchData(); // Refresh the list of boarding houses
-      setIsDetailOpen(false); // Close the modal
+      // Validate and upload other images
+      for (const image of formData.otherImages) {
+        const payload = new FormData();
+        payload.append("file", image);
+
+        try {
+          const response = await uploadFile(payload);
+          imagesData.push({
+            imageUrl: response.filePath,
+            isPrimary: false,
+          });
+        } catch (error) {
+          toast.error("Failed to upload an image.");
+          return;
+        }
+      }
+
+      const form = {
+        ownerUsername: formData.owner,
+        boardingHouseType: formData.boardingHouseType,
+        name: formData.name,
+        address: formData.address,
+        description: formData.description,
+        images: imagesData,
+        priceRange: formData.priceRange,
+        electricityPrice: formData.electricityPrice,
+        waterPrice: formData.waterPrice,
+      };
+
+      setLoading(true);
+
+      //API  update boarding house details
+      const response = await updateBoardingHouseDetails(formData._id, form);
+
+      if (response.success) {
+        toast.success("Boarding house updated successfully.");
+        fetchData();
+        setIsDetailOpen(false);
+      } else {
+        toast.error(response.message || "Failed to update boarding house.");
+      }
     } catch (error) {
-      console.error("Failed to update boarding house:", error);
-      toast.error("Failed to update boarding house. Please try again later.");
+      // Handle any unexpected errors
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        // Display the specific error message from the backend
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Failed to update boarding house. Please try again later.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
-  const handleImageUpload = async (e, isPrimary = false) => {
-    const file = e.target.files[0];
-    if (!file) {
-      toast.error("No file selected.");
+  const handleCancel = () => {
+    setFormData({
+      owner: "",
+      boardingHouseType: "",
+      name: "",
+      address: {
+        province: "",
+        district: "",
+        ward: "",
+        detail: "",
+      },
+      description: "",
+      primaryImage: null,
+      otherImages: [],
+      priceRange: "",
+      electricityPrice: "",
+      waterPrice: "",
+    });
+
+    setIsDetailOpen(false);
+  };
+
+  const handleRemovePrimaryImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      primaryImage: null,
+    }));
+
+    //  remove primary Image
+    setImages((prevImages) =>
+      prevImages.map((img) =>
+        img.isPrimary ? { ...img, isPrimary: false } : img
+      )
+    );
+    toast.success("Primary image removed.");
+  };
+
+  const handleRemoveOtherImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      otherImages: prev.otherImages.filter((_, i) => i !== index),
+    }));
+    toast.success("Temporary image removed.");
+  };
+  const handleImageDelete = (imageId) => {
+    // Remove image
+    setImages((prevImages) => prevImages.filter((img) => img._id !== imageId));
+    toast.success("Image removed from the list.");
+  };
+
+  //hàm soft Delete
+  const handleSelectDelete = async () => {
+    if (!selectedRequest) {
+      toast.error("No boarding house selected for deletion.");
       return;
     }
 
     try {
-      // Simulate upload
-      const uploadedImageUrl = URL.createObjectURL(file);
-      console.log("Uploaded Image URL:", uploadedImageUrl); // Debugging
-
-      await addBoardingHouseImage(formData._id, {
-        imageUrl: uploadedImageUrl,
-        isPrimary,
+      const response = await softDeleteBoardingHouse(selectedRequest._id); // Pass the correct _id
+      if (response.success) {
+        toast.success("Boarding house deleted successfully.");
+        fetchData(); // Refresh the data
+        setIsOpenDeleteModal(false); // Close the modal
+        setSelectedRequest(null); // Clear the selected request
+      } else {
+        toast.error(response.message || "Failed to delete boarding house.");
+      }
+    } catch (error) {
+      console.error("Failed to delete boarding house:", error);
+      toast.error("Failed to delete boarding house. Please try again later.");
+    }
+  };
+  // mở form details
+  const onProcessData = async (record) => {
+    try {
+      const { data } = await getBoardingHouseDetails(record._id);
+      setFormData({
+        ...data,
+        otherImages: Array.isArray(data.otherImages) ? data.otherImages : [],
       });
-      fetchImages(formData._id);
-      toast.success("Image added successfully.");
+      setIsDetailOpen(true); // Open the details form
+      fetchImages(record._id); // Load images
     } catch (error) {
-      console.error("Failed to upload image:", error);
-      toast.error("Failed to upload image.");
+      console.error("Failed to fetch boarding house details:", error);
+      toast.error("Failed to fetch boarding house details.");
     }
   };
-
-  const handleAddImage = async () => {
-    try {
-      setLoading(true);
-      const newImage = { imageUrl: newImage, isPrimary };
-      const response = await addBoardingHouseImage(boardingHouseId, newImage);
-      setImages(response.data.data.images);
-      setNewImageUrl("");
-      setIsPrimary(false);
-      setLoading(false);
-    } catch (err) {
-      setError("Failed to add image");
-      setLoading(false);
-    }
-  };
-
-  const handleImageDelete = async (imageId) => {
-    try {
-      // Gọi API xóa ảnh
-      await deleteBoardingHouseImage(formData._id, imageId);
-
-      // Reload danh sách ảnh sau khi xóa thành công
-      fetchImages(formData._id);
-      toast.success("Image deleted successfully.");
-    } catch (error) {
-      console.error("Failed to delete image:", error);
-      toast.error("Failed to delete image.");
-    }
-  };
-
   useEffect(() => {
     fetchData();
     fetchBoardingHouseTypes();
@@ -368,26 +473,57 @@ function BoardingHouseManagement() {
       key: "createdAt",
       render: (text) => convertTimetap(text),
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (text, record) => (
+        <div className="flex gap-3">
+          <Button
+            title="Delete"
+            size="large"
+            btnDelete
+            className="btn-delete"
+            onClick={() => handleDeleteModal(record)}
+          />
+          <Button
+            onClick={() => onProcessData(record)}
+            size="large"
+            title="Detail"
+            icon={<FileTextOutlined />}
+            className="text-white"
+            bgColor="rgb(5 150 105)"
+          />
+        </div>
+      ),
+    }
   ];
 
   return (
     <div className="boarding-house-management">
-      <h1 className=" text-2xl font-bold mb-4">Boarding House Management</h1>
-      <div className="flex justify-between"
-      >
-        <Button btnAdd title="Add new" size="large" onClick={handleOpenForm}></Button>
+      <div className="flex justify-between">
+        <Button
+          btnAdd
+          title="Add new"
+          size="large"
+          onClick={handleOpenForm}
+        ></Button>
 
         <FilterBoardingHouse
           setFilterValue={setFilterValue}
           boardingHouseTypes={boardingHouseTypes}
         />
       </div>
-      <Table
-        columns={columns}
-        data={boardingHData}
-        onRowClick={(record) => handleRowClick(record._id)}
-        loading={loading}
-      />
+      <Table columns={columns} data={boardingHData} loading={loading} />
+      <ConfirmModal
+        title="Confirm Deletion"
+        content={`Are you sure you want to delete "${selectedRequest?.name || 'this boarding house'}"?`}
+        onOk={handleSelectDelete}
+        onCancel={() => {
+          setIsOpenDeleteModal(false);
+          setSelectedRequest(null);
+        }}
+        isOpen={isOpenDeleteModal}
+      />;
       {isFormOpen && (
         <CreateBoardingHouse
           onClose={handleCloseForm}
@@ -395,223 +531,382 @@ function BoardingHouseManagement() {
         />
       )}
       {isDetailOpen && formData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <form
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          // click out close details
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCloseDetail();
+            }
+          }}
+        >
+          <Form
+            layout="vertical"
             onSubmit={handleSubmit}
-            className="bg-white p-6 rounded-lg w-full max-w-3xl overflow-auto"
+            className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
           >
-            <h2 className="overflow-auto scrollbar-thin text-xl font-bold mb-4">
-              Boarding House Detail
+            <h2 className="text-4xl font-bold mb-8">Boarding House Detail</h2>
+            <h2 className="text-3xl font-bold mb-4 ">
+              1. Owner and information
             </h2>
-            <div className="grid grid-cols-2 gap-4 max-h-[600px] overflow-y-auto">
-              <div>
-                <label>Name Owner</label>
-                <input
-                  type="text"
-                  value={formData.ownerId?.fullname || ""}
-                  readOnly
-                  className="w-full border rounded px-2 py-1 mb-4"
-                />
-              </div>
-              <div>
-                <label>Owner</label>
-                <input
-                  type="text"
-                  value={formData.ownerId?.username || ""}
-                  readOnly
-                  className="w-full border rounded px-2 py-1"
-                />
-              </div>
-              <div>
-                <label>Name Boarding House</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name || ""}
-                  onChange={handleInputChange}
-                  className="w-full border rounded px-2 py-1"
-                />
-              </div>
-              <div>
-                <label>Boarding House Type</label>
-                <select
-                  name="boardingHouseType"
-                  value={formData.boardingHouseType?._id || ""}
-                  onChange={(e) =>
-                    handleSelectedTypesChange({
-                      target: {
-                        name: "boardingHouseType",
-                        value: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full border rounded px-2 py-1"
-                >
-                  {/* <option value="" disabled>
-                        Select a type
-                      </option> */}
-                  name="boardingHouseType" value=
-                  {formData.boardingHouseType?._id || ""}
-                  {boardingHouseTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* <div className="  gap-4 max-h-[600px] "> */}
 
-              <div className="col-span-2">
-                <label>Primary Image</label>
-                <div className="relative mb-4">
-                  {images.length > 0 ? (
-                    <img
-                      src={
-                        images.find((img) => img.isPrimary)?.imageUrl ||
-                        "https://via.placeholder.com/150"
-                      }
-                      alt="Primary"
-                      className="w-full h-48 object-cover border rounded"
-                    />
-                  ) : (
-                    <p className="text-gray-500">
-                      No primary image available
-                    </p>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e, true)}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* Other Images */}
-              <div className="col-span-2">
-                <label>Other Images</label>
-                <div className="overflow-x-auto flex gap-4 py-2">
-                  {images
-                    .filter((img) => !img.isPrimary)
-                    .map((image, index) => (
-                      <div
-                        key={image._id}
-                        className="relative flex-shrink-0 w-32 h-32"
-                      >
-                        <img
-                          src={image.imageUrl}
-                          alt={`Other ${index}`}
-                          className="w-full h-full object-cover border rounded"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleImageDelete(image._id)}
-                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ))}
-                  {/* Add New Image */}
-                  <div className="w-32 h-32 flex items-center justify-center border rounded relative">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e)}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
-                    <span className="text-gray-500">+ Add Image</span>
-                  </div>
-                </div>
-              </div>
-
-              <AddressSelector
-                provinces={provinces}
-                districts={districts}
-                wards={wards}
-                onProvinceChange={handleInputChange}
-                onDistrictChange={handleInputChange}
-                onInputChange={handleInputChange}
-                formData={formData}
+            <Form.Item label="Name Owner" className="mb-2">
+              <Input
+                value={formData.ownerId?.fullname || ""}
+                readOnly
+                className="bg-gray-100 text-gray-500 cursor-not-allowed"
               />
-              <div className="col-span-2">
-                <label>Description</label>
-                <textarea
+            </Form.Item>
+
+            <Form.Item label="Owner" className="mb-2">
+              <Input
+                value={formData.ownerId?.username || ""}
+                readOnly
+                className="bg-gray-100 text-gray-500 cursor-not-allowed"
+              />
+            </Form.Item>
+
+            <Form.Item label="Name Boarding House" className="mb-2">
+              <Input
+                name="name"
+                value={formData.name || ""}
+                onChange={handleInputChange}
+              />
+            </Form.Item>
+
+            <Form.Item label="Boarding House Type" className="mb-2">
+              <Select
+                name="boardingHouseType"
+                value={formData.boardingHouseType?._id || ""}
+                onChange={(value) =>
+                  handleSelectedTypesChange({
+                    target: {
+                      name: "boardingHouseType",
+                      value,
+                    },
+                  })
+                }
+              >
+                {boardingHouseTypes.map((type) => (
+                  <Select.Option key={type.value} value={type.value}>
+                    {type.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <div className="col-span-2">
+              <Form.Item label="Description">
+                <Input.TextArea
                   name="description"
                   value={formData.description || ""}
                   onChange={handleInputChange}
-                  className="w-full border rounded px-2 py-1"
-                ></textarea>
+                  rows={4}
+                />
+              </Form.Item>
+            </div>
+
+            <h2 className="text-3xl font-bold mb-4 mt-10 ">Address</h2>
+            <AddressSelector
+              provinces={provinces}
+              districts={districts}
+              wards={wards}
+              onProvinceChange={handleInputChange}
+              onDistrictChange={handleInputChange}
+              onInputChange={handleInputChange}
+              formData={formData}
+            />
+            <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
+            {/* Primary Image */}
+            <Form.Item label="Primary Image" className="mb-4">
+              <div className="flex flex-col gap-4">
+                {/* Check primary Image exists */}
+                {formData.primaryImage ||
+                  images?.find((img) => img.isPrimary) ? (
+                  <div className="relative">
+                    <Image
+                      src={
+                        formData.primaryImage
+                          ? URL.createObjectURL(formData.primaryImage)
+                          : `http://localhost:3000${images.find((img) => img.isPrimary)?.imageUrl
+                          }`
+                      }
+                      alt="Primary"
+                      className="object-cover border rounded"
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        maxHeight: "300px",
+                      }}
+                      preview={{
+                        mask: <span className="text-white">Preview</span>,
+                      }}
+                    />
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      onClick={handleRemovePrimaryImage}
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                    >
+                      X
+                    </button>
+                  </div>
+                ) : (
+                  // If no primary image exists, show the upload button
+                  <Upload
+                    {...uploadProps}
+                    listType="picture-card"
+                    showUploadList={false}
+                    className="custom-upload"
+                  >
+                    <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
+                      <PlusOutlined className="text-2xl text-gray-400" />
+                      <p className="text-gray-500 mt-2 text-sm font-medium">
+                        Add Primary Image
+                      </p>
+                      <p className="text-gray-400 text-xs">
+                        Drag-drop or click here to choose a file
+                      </p>
+                    </div>
+                  </Upload>
+                )}
               </div>
-              <div>
-                <label>Price Range (VND)</label>
-                <input
-                  type="number"
+            </Form.Item>
+
+            <Form.Item label="Other Images" className="mb-4">
+              <div className="mt-4 flex flex-wrap gap-4">
+                {/* Display Other Images*/}
+                {images
+                  .filter((img) => !img.isPrimary) // Exclude primary images
+                  .map((img) => (
+                    <div key={img._id} className="relative">
+                      <Image
+                        src={`http://localhost:3000${img.imageUrl}`}
+                        alt="Other Image"
+                        className="object-cover border rounded"
+                        width={100}
+                        height={100}
+                        preview={{
+                          mask: <span className="text-white">Preview</span>,
+                        }}
+                      />
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleImageDelete(img._id)}
+                        className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
+
+                {/* Display Uploaded Other Images */}
+                {(formData.otherImages || []).map((file, index) => (
+                  <div key={index} className="relative group">
+                    <Image
+                      src={URL.createObjectURL(file)}
+                      alt={`Other Image ${index + 1}`}
+                      className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+                      width={100}
+                      height={100}
+                      preview={{
+                        mask: <span className="text-white">Preview</span>,
+                      }}
+                    />
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveOtherImage(index)}
+                      className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    >
+                      X
+                    </button>
+                  </div>
+                ))}
+
+                {/* Upload Other Images */}
+                <Upload
+                  {...uploadOtherImgProps}
+                  listType="picture-card"
+                  showUploadList={false}
+                  className="custom-upload"
+                >
+                  <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
+                    <PlusOutlined className="text-2xl text-gray-400" />
+                    <p className="text-gray-500 mt-2 text-sm font-medium">
+                      Add Primary Image
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      Drag-drop or click here to choose a file
+                    </p>
+                  </div>
+                </Upload>
+              </div>
+            </Form.Item>
+
+            <h2 className="text-3xl font-bold mb-4 mt-10 ">4. Price</h2>
+            <div>
+              <Form.Item label="Price Rent/month (VND)" className="mb-2">
+                <InputNumber
                   name="priceRange"
                   value={formData.priceRange || ""}
-                  onChange={handleInputChange}
-                  className="w-full border rounded px-2 py-1"
+                  onChange={(value) =>
+                    handleInputChange({ target: { name: "priceRange", value } })
+                  }
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  } // Thêm dấu phẩy ngăn cách hàng nghìn
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  className="w-full"
+                  min={0}
                 />
-              </div>
-              <div>
-                <label>Total Rooms</label>
-                <input
-                  type="number"
-                  value={formData.totalRooms || ""}
-                  readOnly
-                  className="w-full border rounded px-2 py-1"
-                />
-              </div>
-              <div>
-                <label>Available Rooms</label>
-                <input
-                  type="number"
-                  value={formData.availableRooms || ""}
-                  readOnly
-                  className="w-full border rounded px-2 py-1"
-                />
-              </div>
-              <div>
-                <label>Electricity Price</label>
-                <input
-                  type="number"
+              </Form.Item>
+
+              <Form.Item label="Electricity Price/kWh (VND)" className="mb-2">
+                <InputNumber
                   name="electricityPrice"
                   value={formData.electricityPrice || ""}
-                  onChange={handleInputChange}
-                  className="w-full border rounded px-2 py-1"
+                  onChange={(value) =>
+                    handleInputChange({
+                      target: { name: "electricityPrice", value },
+                    })
+                  }
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  className="w-full"
+                  min={0}
                 />
-              </div>
-              <div>
-                <label>Water Price</label>
-                <input
-                  type="number"
+              </Form.Item>
+
+              <Form.Item label="Water Price/m³ (VND)" className="mb-2">
+                <InputNumber
                   name="waterPrice"
                   value={formData.waterPrice || ""}
-                  onChange={handleInputChange}
-                  className="w-full border rounded px-2 py-1"
+                  onChange={(value) =>
+                    handleInputChange({ target: { name: "waterPrice", value } })
+                  }
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  className="w-full"
+                  min={0}
                 />
-              </div>
+              </Form.Item>
+              <h2 className="text-3xl font-bold mb-4 mt-10 ">5. Room</h2>
+              <Form.Item label="Total Rooms" className="mb-2">
+                <InputNumber
+                  value={formData.totalRooms || "0"}
+                  readOnly
+                  className="bg-gray-100 text-gray-500 cursor-not-allowed"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+
+              <Form.Item label="Available Rooms" className="mb-2">
+                <InputNumber
+                  value={formData.availableRooms || "0"}
+                  readOnly
+                  className="bg-gray-100 text-gray-500 cursor-not-allowed"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+
+              <h2 className="text-3xl font-bold mb-4 mt-10 ">
+                6. Like and Rating
+              </h2>
+              <Form.Item>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "16px",
+                  }}
+                >
+                  {/* like */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <HeartFilled style={{ fontSize: "24px", color: "red" }} />
+                    <span style={{ fontSize: "16px", color: "#595959" }}>
+                      {formData.likes
+                        ? Number(formData.likes).toLocaleString("en-US") // Format big numbers with commas
+                        : "0"}
+                    </span>
+                  </div>
+
+                  {/* Rating */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
+                    {Array.from({ length: 5 }, (_, index) => {
+                      if (index < Math.floor(formData.rating || 0)) {
+                        return (
+                          <StarFilled
+                            key={index}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
+                          />
+                        );
+                      } else if (
+                        index === Math.floor(formData.rating || 0) &&
+                        (formData.rating || 0) % 1 !== 0
+                      ) {
+                        return (
+                          <StarOutlined
+                            key={index}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
+                          />
+                        );
+                      } else {
+                        return (
+                          <StarOutlined
+                            key={index}
+                            style={{ fontSize: "24px", color: "#FFD700" }}
+                          />
+                        );
+                      }
+                    })}
+                  </div>
+                </div>
+              </Form.Item>
             </div>
-            <div className="flex justify-end mt-4">
-              <button
-                type="submit"
-                onClick={handleSubmit}
-                className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-              >
-                Update
-              </button>
-              <button
-                type="button"
-                onClick={handleCloseDetail}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
+            {/* </div> */}
+            <div className="flex justify-end">
+              <Button
+                className="bg-orange-600 text-white"
+                size="large"
+                onClick={handleCancel}
+                title="Cancel"
               >
                 Cancel
-              </button>
+              </Button>
+              <Button
+                className="bg-primary text-white ml-2"
+                size="large"
+                onClick={handleSubmit}
+                title="Update"
+              >
+                Update
+              </Button>
             </div>
-          </form>
+          </Form>
         </div>
       )}
     </div>
-  )
-};
+  );
+}
 
 export default BoardingHouseManagement;

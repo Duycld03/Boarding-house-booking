@@ -41,11 +41,13 @@ const BoardingHouseSchema = new mongoose.Schema(
       type: Number,
       required: false,
       min: 0,
+      default: 0,
     },
     availableRooms: {
       type: Number,
       required: false,
       min: 0,
+      default: 0,
     },
     electricityPrice: {
       type: Number,
@@ -61,6 +63,10 @@ const BoardingHouseSchema = new mongoose.Schema(
       type: Number,
       default: 0,
       min: 0,
+    },
+    rating: {
+      type: Number,
+      default: 5,
     },
     boardingHouseType: {
       type: mongoose.Schema.Types.ObjectId,

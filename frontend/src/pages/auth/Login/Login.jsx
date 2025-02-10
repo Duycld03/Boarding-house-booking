@@ -5,17 +5,21 @@ import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
 import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
 import { Back } from "../../../component";
+import { useCurrentUser } from "../../../context/userContext";
 
 function Login() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
+  const { loginData } = useCurrentUser();
+
   const onFinish = async (values) => {
     try {
       setLoading(true);
       const res = await login(values);
       const role = res.user.role;
+      loginData(res.user);
 
       localStorage.setItem("access_token", res.token);
 

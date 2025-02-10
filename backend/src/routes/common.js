@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   authController,
-  BoardingHouseController,
+  boardingHouseController,
 } from '../controllers/index.js';
 
 const commonRouter = Router();
@@ -17,6 +17,6 @@ commonRouter.post('/forgot-password', authController.forgotPassword);
 commonRouter.post('/reset-password', authController.resetPassword);
 commonRouter.post('/send-otp-register', authController.sendOTPRegister);
 commonRouter.post('/verify-register', authController.verifyRegister);
-commonRouter.get('/boardinghouse', BoardingHouseController.getAllBHOnHome);
+commonRouter.get('/boardinghouse', boardingHouseController.getAllBHOnHome);
 
 export { commonRouter };

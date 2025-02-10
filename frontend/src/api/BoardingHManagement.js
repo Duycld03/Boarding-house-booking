@@ -61,3 +61,6 @@ export const filterBH = async (filterValue) => {
         params: filterValue,
     });
 }
+export const softDeleteBoardingHouse = async (boardingHouseId) => {
+    return axios.delete(`/dashboard/boardinghouse/${boardingHouseId}/softDelete`);
+};

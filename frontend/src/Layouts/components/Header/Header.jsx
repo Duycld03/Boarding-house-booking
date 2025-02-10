@@ -22,8 +22,10 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { getUser } from "../../../api/authManagement";
+import { useCurrentUser } from "../../../context/userContext";
 
 const cx = classNames.bind(Styles);
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 const { useBreakpoint } = Grid;
 const { Header } = Layout;
 
@@ -31,12 +33,18 @@ const CustomHeader = () => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [avatar, setAvatar] = useState(UserAvatar);
   const navigate = useNavigate();
   const screens = useBreakpoint();
+  const { contextLogout } = useCurrentUser();
 
   const checkUser = async () => {
     try {
       const res = await getUser();
+      if (res.avatarImage) {
+        setAvatar(`${BASE_URL}/${res.avatarImage}`);
+      }
+
       if (res.role === "admin") {
         setIsAdmin(true);
       }
@@ -46,6 +54,7 @@ const CustomHeader = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token");
+    contextLogout();
     setIsLoggedIn(false);
     navigate("/");
   };
@@ -161,7 +170,7 @@ const CustomHeader = () => {
         >
           {screens.lg && (
             <Avatar
-              src={UserAvatar}
+              src={avatar}
               size={60}
               style={{ cursor: "pointer", marginRight: 20 }}
             />
