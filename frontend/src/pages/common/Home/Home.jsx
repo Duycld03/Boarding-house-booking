@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
-import classNames from "classnames/bind";
-import Styles from "./Home.module.css";
-import BoardingHouseGrid from "../../../component/BoardingHouseCard";
-import { Tabs } from "antd";
-import { getAllBHHome } from "../../../api/BoardingHManagement";
-import { toast } from "react-toastify";
-import formatAmount from "../../../utils/formatAmount";
-import { formatTimeAgo } from "../../../utils/timeUtils";
-import truncateDetail from "../../../utils/truncateDetail";
+import { useState, useEffect } from 'react';
+import classNames from 'classnames/bind';
+import Styles from './Home.module.css';
+import BoardingHouseGrid from '../../../component/BoardingHouseCard';
+import { Tabs } from 'antd';
+import { getAllBHHome } from '../../../api/BoardingHManagement';
+import { toast } from 'react-toastify';
+import formatAmount from '../../../utils/formatAmount';
+import { formatTimeAgo } from '../../../utils/timeUtils';
+import truncateDetail from '../../../utils/truncateDetail';
 
 const cx = classNames.bind(Styles);
 
 function Home() {
   const [originalData, setOriginalData] = useState([]); // Lưu dữ liệu gốc
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState('all');
   const [loadingTabs, setLoadingTabs] = useState({
     all: false,
     newest: false,
@@ -25,21 +25,21 @@ function Home() {
     try {
       const res = await getAllBHHome();
 
-      const baseUrl = "http://localhost:3000";
+      const baseUrl = 'http://localhost:3000';
 
       const formattedData = res.map((item) => {
         const imgPath =
           item.images?.find((img) => img.isPrimary)?.imageUrl ||
           item.images?.[0]?.imageUrl ||
-          "";
-        const imgUrl = imgPath ? `${baseUrl}${imgPath}` : "";
+          '';
+        const imgUrl = imgPath ? `${baseUrl}${imgPath}` : '';
 
         return {
           id: item._id?.$oid || item._id,
           name: item.name,
           price: formatAmount(item.priceRange),
           detail: truncateDetail(
-            item.address?.province || "No address provided"
+            item.address?.province || 'No address provided'
           ),
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0, // Bổ sung để tránh lỗi
@@ -51,8 +51,8 @@ function Home() {
 
       setOriginalData(formattedData); // Lưu trữ dữ liệu gốc
     } catch (error) {
-      console.error("Failed to fetch boarding houses:", error);
-      toast.error("Failed to fetch boarding houses. Please try again later.");
+      console.error('Failed to fetch boarding houses:', error);
+      toast.error('Failed to fetch boarding houses. Please try again later.');
       setOriginalData([]);
     } finally {
       setLoadingTabs((prev) => ({ ...prev, [tab]: false }));
@@ -81,13 +81,13 @@ function Home() {
     .slice(0, 10);
 
   return (
-    <div className={cx("home-container")}>
-      <div className={cx("content")}>
-        <div className={cx("filter")}>
+    <div className={cx('home-container')}>
+      <div className={cx('content')}>
+        <div className={cx('filter')}>
           <h2>Filter option</h2>
         </div>
 
-        <div className={cx("grid")}>
+        <div className={cx('grid')}>
           <Tabs defaultActiveKey="all" onChange={(key) => setActiveTab(key)}>
             <Tabs.TabPane tab="All" key="all">
               <BoardingHouseGrid data={allData} loading={loadingTabs.all} />
