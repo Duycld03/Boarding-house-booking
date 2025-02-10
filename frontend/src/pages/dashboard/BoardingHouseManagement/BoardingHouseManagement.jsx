@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import AddressSelector from "../../../component/AddressSelector";
-import { Button, TableCustom as Table, Loader } from "../../../component";
+import { Button, TableCustom as Table, ConfirmModal } from "../../../component";
 import {
   FileTextOutlined,
   HeartFilled,
@@ -39,6 +39,8 @@ function BoardingHouseManagement(onClose) {
   const [wards, setWards] = useState([]);
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
   const [images, setImages] = useState([]);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const [formData, setFormData] = useState({
     owner: "",
     boardingHouseType: "",
@@ -60,7 +62,11 @@ function BoardingHouseManagement(onClose) {
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [filterValue, setFilterValue] = useState();
-
+  // Handle opening the delete modal
+  const handleDeleteModal = (record) => {
+    setSelectedRequest(record);
+    setIsOpenDeleteModal(true);
+  };
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -383,12 +389,19 @@ function BoardingHouseManagement(onClose) {
   };
 
   //hàm soft Delete
-  const handleSelectDelete = async (record) => {
+  const handleSelectDelete = async () => {
+    if (!selectedRequest) {
+      toast.error("No boarding house selected for deletion.");
+      return;
+    }
+
     try {
-      const response = await softDeleteBoardingHouse(record._id);
+      const response = await softDeleteBoardingHouse(selectedRequest._id); // Pass the correct _id
       if (response.success) {
         toast.success("Boarding house deleted successfully.");
         fetchData(); // Refresh the data
+        setIsOpenDeleteModal(false); // Close the modal
+        setSelectedRequest(null); // Clear the selected request
       } else {
         toast.error(response.message || "Failed to delete boarding house.");
       }
@@ -466,22 +479,23 @@ function BoardingHouseManagement(onClose) {
       render: (text, record) => (
         <div className="flex gap-3">
           <Button
+            title="Delete"
             size="large"
             btnDelete
-            title={"Delete"}
-            onClick={() => handleSelectDelete(record)}
+            className="btn-delete"
+            onClick={() => handleDeleteModal(record)}
           />
           <Button
-            onClick={() => onProcessData(record)} // Open details form
+            onClick={() => onProcessData(record)}
             size="large"
-            title={"Detail"}
+            title="Detail"
             icon={<FileTextOutlined />}
-            className={"text-white"}
-            bgColor={"rgb(5 150 105)"}
+            className="text-white"
+            bgColor="rgb(5 150 105)"
           />
         </div>
       ),
-    },
+    }
   ];
 
   return (
@@ -500,6 +514,16 @@ function BoardingHouseManagement(onClose) {
         />
       </div>
       <Table columns={columns} data={boardingHData} loading={loading} />
+      <ConfirmModal
+        title="Confirm Deletion"
+        content={`Are you sure you want to delete "${selectedRequest?.name || 'this boarding house'}"?`}
+        onOk={handleSelectDelete}
+        onCancel={() => {
+          setIsOpenDeleteModal(false);
+          setSelectedRequest(null);
+        }}
+        isOpen={isOpenDeleteModal}
+      />;
       {isFormOpen && (
         <CreateBoardingHouse
           onClose={handleCloseForm}
@@ -599,15 +623,14 @@ function BoardingHouseManagement(onClose) {
               <div className="flex flex-col gap-4">
                 {/* Check primary Image exists */}
                 {formData.primaryImage ||
-                images?.find((img) => img.isPrimary) ? (
+                  images?.find((img) => img.isPrimary) ? (
                   <div className="relative">
                     <Image
                       src={
                         formData.primaryImage
                           ? URL.createObjectURL(formData.primaryImage)
-                          : `http://localhost:3000${
-                              images.find((img) => img.isPrimary)?.imageUrl
-                            }`
+                          : `http://localhost:3000${images.find((img) => img.isPrimary)?.imageUrl
+                          }`
                       }
                       alt="Primary"
                       className="object-cover border rounded"
