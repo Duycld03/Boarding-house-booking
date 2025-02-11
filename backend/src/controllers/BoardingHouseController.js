@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 import BoardingHouse from '../models/boardingHouse.js';
 import BoardingHouseType from '../models/boardingHouseType .js';
-import unidecode from 'unidecode';
+import RoomType from '../models/roomType.js'
+import Room from '../models/room.js'
 
 // import path from "path";
 import fs from 'fs';
@@ -32,7 +33,7 @@ class boardingHouseController {
       const { id } = req.params;
       const boardingHouse = await BoardingHouse.findById(id)
         .populate('boardingHouseType', 'name')
-        .populate('ownerId', 'email username fullname') // Populate owner details
+        .populate('ownerId', 'email username fullname')
         .exec();
 
       if (!boardingHouse) {
@@ -55,6 +56,36 @@ class boardingHouseController {
       });
     }
   }
+
+  async getRoomTypeByBhId(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const [bhRoomType, bhRoom] = await Promise.all([
+        RoomType.find({ boardingHouseId: id }).populate("facilities"),
+        Room.find({ boardingHouseId: id }),
+      ]);
+
+      if (!bhRoomType.length && !bhRoom.length) {
+        return res.status(404).json({ message: "No room types or rooms found" });
+      }
+
+      const roomTypesWithAvailableCount = bhRoomType.map((roomType) => {
+        const availableRoomCount = bhRoom.filter(
+          (room) => room.roomTypeId.toString() === roomType._id.toString() && room.isAvailable
+        ).length;
+        return { ...roomType.toObject(), availableRoom: availableRoomCount };
+      });
+
+      res.status(200).json({
+        data: roomTypesWithAvailableCount,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
 
   async getBoardingHouseDetailInUser(req, res, next) {
     try {

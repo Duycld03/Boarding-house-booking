@@ -5,21 +5,27 @@ import {
   faFlag,
 } from "@fortawesome/free-regular-svg-icons";
 import {
-  faBookmark as faBookmarkSolid, // Filled
+  faBookmark as faBookmarkSolid,
+  faEllipsisV,
 } from "@fortawesome/free-solid-svg-icons";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Thumbs, FreeMode } from "swiper/modules";
+import {
+  Navigation,
+  Pagination,
+  Thumbs,
+  FreeMode,
+  Autoplay,
+} from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
-import { Tooltip } from "antd";
+import { Dropdown, Menu, Tooltip } from "antd";
 
 const BoardingHouseGallery = ({ images, onReport, onSave }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [isReported, setIsReported] = useState(false);
 
   if (!images || images.length === 0) return <p>Không có ảnh</p>;
 
@@ -28,36 +34,51 @@ const BoardingHouseGallery = ({ images, onReport, onSave }) => {
     ...images.filter((img) => !img.isPrimary),
   ];
 
-  return (
-    <div className="flex flex-col mx-auto w-full md:w-3/4 relative">
-      {/* Toggle Icons */}
-      <div className="absolute top-10 right-14 flex gap-10 z-10">
+  const menu = (
+    <Menu>
+      <Menu.Item key="save" onClick={() => setIsSaved(!isSaved)}>
         <Tooltip
           placement="left"
-          title={isSaved ? "Saved!" : "Save this boardinghouse"}
+          title={isSaved ? "Saved!" : "Save this boarding house"}
         >
-          <button onClick={() => setIsSaved(!isSaved)}>
+          <FontAwesomeIcon
+            icon={isSaved ? faBookmarkSolid : faBookmarkRegular}
+            className="text-yellow-500 text-2xl"
+          />
+          <span className="ml-2">{isSaved ? "Saved" : "Save"}</span>
+        </Tooltip>
+      </Menu.Item>
+      <Menu.Item key="report" onClick={() => onReport()}>
+        <Tooltip placement="left" title="Report this boarding house">
+          <FontAwesomeIcon icon={faFlag} className="text-red-500 text-2xl" />
+          <span className="ml-2">Report</span>
+        </Tooltip>
+      </Menu.Item>
+    </Menu>
+  );
+
+  return (
+    <div className="flex flex-col mx-auto w-full md:w-3/4 relative">
+      <div className="absolute top-10 right-14 z-10">
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <button>
             <FontAwesomeIcon
-              icon={isSaved ? faBookmarkSolid : faBookmarkRegular}
-              className="md:text-5xl text-yellow-500"
+              icon={faEllipsisV}
+              className="text-5xl text-white"
             />
           </button>
-        </Tooltip>
-        <Tooltip placement="left" title={"Report this boarding house"}>
-          <button onClick={() => onReport()}>
-            <FontAwesomeIcon icon={faFlag} className={`md:text-5xl`} />
-          </button>
-        </Tooltip>
+        </Dropdown>
       </div>
 
-      {/* Main Swiper */}
+      {/* Main Swiper with autoplay */}
       <Swiper
-        modules={[Navigation, Pagination, Thumbs, FreeMode]}
+        modules={[Navigation, Pagination, Thumbs, FreeMode, Autoplay]}
         spaceBetween={10}
         slidesPerView={1}
         navigation
         pagination={{ clickable: true }}
         loop
+        autoplay={{ delay: 2500, disableOnInteraction: false }} // Thêm autoplay
         thumbs={{ swiper: thumbsSwiper }}
         className="w-full"
       >
