@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "concurrently": "^9.0.1",
+    "react-router-dom": "^7.1.5",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
