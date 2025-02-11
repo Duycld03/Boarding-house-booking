@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Layout, Spin, Empty, Button, Tag } from "antd";
+import { Layout, Spin, Empty, Button, Tag, Divider } from "antd";
 import {
   getBoardingHouseDetail,
+  getReviewByBhId,
   getRoomTypeByBhId,
 } from "../../../api/ownerUser/boardingHouse";
 import BoardingHouseGallery from "./BoardingHouseGallery";
@@ -11,6 +12,7 @@ import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
+import ReviewList from "./ReviewList";
 
 const { Content } = Layout;
 
@@ -18,6 +20,7 @@ function BoardingHouseDetail() {
   const { id } = useParams();
   const [boardingHouse, setBoardingHouse] = useState(null);
   const [roomTypes, setRoomType] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -29,6 +32,7 @@ function BoardingHouseDetail() {
     setIsLiked(!isLiked);
   };
 
+  //BH data
   const fetchData = async () => {
     try {
       const response = await getBoardingHouseDetail(id);
@@ -40,6 +44,7 @@ function BoardingHouseDetail() {
     }
   };
 
+  //Room type
   const fetchRoomTypes = async () => {
     try {
       const response = await getRoomTypeByBhId(id);
@@ -51,10 +56,22 @@ function BoardingHouseDetail() {
     }
   };
 
+  const fetchReviews = async () => {
+    try {
+      const response = await getReviewByBhId(id);
+      setReviews(response);
+    } catch (error) {
+      console.error("Error fetching boarding house review:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       fetchData();
       fetchRoomTypes();
+      fetchReviews();
     }
   }, [id]);
 
@@ -64,7 +81,7 @@ function BoardingHouseDetail() {
   };
 
   return (
-    <Content className="md:max-w-screen-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="md:max-w-screen-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       {loading ? (
         <div className="flex justify-center items-center h-40">
           <Spin size="large" />
@@ -122,11 +139,11 @@ function BoardingHouseDetail() {
               </span>
             </div>
 
-            <div className="md:mt-10">
+            <div className="md:mt-14">
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
                 <div
-                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed transition-all duration-300 ${
+                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${
                     expanded ? "max-h-full" : "max-h-60 overflow-hidden"
                   }`}
                 >
@@ -147,15 +164,23 @@ function BoardingHouseDetail() {
                   )}
               </div>
             </div>
+            <Divider className="border-gray-500" />
 
             {/* Room Type Section */}
-            <div className="md:mt-10" ref={roomTypeRef}>
+            <div className="md:mt-14" ref={roomTypeRef}>
               <p className="font-bold text-4xl">
                 Available room type in boarding house
               </p>
               {roomTypes.map((rType, index) => (
                 <RoomCard key={index} roomData={rType} />
               ))}
+            </div>
+            <Divider className="border-gray-500" />
+
+            {/* Review */}
+            <div className="md:my-14">
+              <p className="font-bold mb-10 text-4xl">Rating & Review</p>
+              <ReviewList reviews={reviews} rating={boardingHouse?.rating} />
             </div>
           </div>
         </>
@@ -164,7 +189,7 @@ function BoardingHouseDetail() {
           <Empty description="Không tìm thấy thông tin nhà trọ" />
         </div>
       )}
-    </Content>
+    </div>
   );
 }
 

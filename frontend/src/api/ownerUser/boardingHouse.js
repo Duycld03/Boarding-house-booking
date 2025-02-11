@@ -7,3 +7,8 @@ export const getBoardingHouseDetail = (id) => {
 export const getRoomTypeByBhId = (id) => {
     return axios.get(`/boardinghouse/room-types/${id}`);
 };
+
+
+export const getReviewByBhId = (id) => {
+    return axios.get(`/boardinghouse/reviews/${id}`);
+};

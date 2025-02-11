@@ -10,19 +10,16 @@ const { Title, Paragraph, Text } = Typography;
 
 const RoomCard = ({ roomData }) => {
   return (
-    <Card
-      className=" w-5/6 mx-auto bg-gray-100 mt-6 rounded-lg shadow-md md:p-4"
-      hoverable
-    >
+    <Card className=" w-5/6 mx-auto  mt-6 rounded-lg shadow-md" hoverable>
       {/* image */}
-      <div className="w-full flex flex-wrap">
+      <div className="w-full flex flex-wrap gap-10">
         <img
           className="max-h-[400px] md:w-1/2 sm:w-full object-cover rounded-lg"
           src={`${import.meta.env.VITE_BASE_URL}/${roomData?.imageURL}`}
         />
 
         {/* content */}
-        <div className="flex flex-1 gap-x-10 justify-between flex-col px-5">
+        <div className="flex flex-1 gap-x-10 justify-evenly flex-col px-5">
           <Title level={3} className="text-gray-800 font-bold">
             {roomData?.typeName}
           </Title>
@@ -59,14 +56,14 @@ const RoomCard = ({ roomData }) => {
 
           <div className="flex justify-between mt-4">
             <Button
-              className="bg-primary text-white md:min-w-[200px] font-bold py-2 px-4 rounded-md"
+              className="bg-primary text-white md:min-w-[200px] font-bold py-2 px-4 rounded-xl"
               size="large"
             >
               Deposit
             </Button>
             <Button
               size="large"
-              className="bg-red-400 md:min-w-[200px] text-white font-bold py-2 px-4 rounded-md"
+              className="bg-red-400 md:min-w-[200px] text-white font-bold py-2 px-4 rounded-xl"
             >
               Make appointment
             </Button>

@@ -26,6 +26,7 @@ import { Dropdown, Menu, Tooltip } from "antd";
 const BoardingHouseGallery = ({ images, onReport, onSave }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [isReported, setIsReported] = useState(false);
 
   if (!images || images.length === 0) return <p>Không có ảnh</p>;
 

@@ -8,6 +8,7 @@ import Room from '../models/room.js'
 import fs from 'fs';
 import multer from 'multer';
 import Account from '../models/account.js';
+import Review from '../models/review.js';
 class boardingHouseController {
   async getAllBHOnDashBoard(req, res, next) {
     try {
@@ -84,7 +85,6 @@ class boardingHouseController {
       next(error);
     }
   }
-
 
 
   async getBoardingHouseDetailInUser(req, res, next) {
@@ -739,6 +739,28 @@ class boardingHouseController {
       });
     }
   }
+
+
+  async getReviewByBhId(req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ message: "bhId is required" });
+      }
+
+      const reviews = await Review.find({ boardingHouseId: id }).populate("accountId");
+
+      if (!reviews.length) {
+        return res.status(404).json({ message: "No reviews found" });
+      }
+
+      res.status(200).json(reviews);
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+
 }
 
 export default new boardingHouseController();
