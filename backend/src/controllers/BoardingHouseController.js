@@ -55,6 +55,33 @@ class boardingHouseController {
       });
     }
   }
+
+  async getBoardingHouseDetailInUser(req, res, next) {
+    try {
+      const { id } = req.params;
+      const boardingHouse = await BoardingHouse.findById(id)
+        .populate('boardingHouseType', 'name')
+        .populate('ownerId')
+        .exec();
+
+      if (!boardingHouse) {
+        return res.status(404).json({
+          success: false,
+          message: 'Boarding house not found',
+        });
+      }
+      return res.status(200).json(boardingHouse);
+    } catch (error) {
+      console.error('Error fetching boarding house details:', error);
+      return res.status(500).json({
+        success: false,
+        message:
+          'Failed to fetch boarding house details. Please try again later.',
+        error: error.message,
+      });
+    }
+  }
+
   async updateBoardingHouseDetails(req, res, next) {
     try {
       const { id } = req.params; // Boarding house ID
