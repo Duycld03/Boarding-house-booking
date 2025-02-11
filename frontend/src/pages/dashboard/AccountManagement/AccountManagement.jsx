@@ -155,18 +155,20 @@ function AccountManagement() {
 
   //Add new data
   const handleAddNewData = (data) => {
-    createAccount(data);
-    setLoading(true)
+    setLoading(true);
+    createAccount(data)
       .then((res) => {
         if (res) {
           fetchData();
           setLoading(false);
           toast.success("Add new account successful");
         } else {
+          setLoading(false);
           toast.error("Add account failed, no response received.");
         }
       })
       .catch((error) => {
+        setLoading(false);
         toast.error("An error occurred : ", error.response.data.error);
       });
   };
