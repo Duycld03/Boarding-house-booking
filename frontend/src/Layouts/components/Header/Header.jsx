@@ -42,7 +42,7 @@ const CustomHeader = () => {
     try {
       const res = await getUser();
       if (res.avatarImage) {
-        setAvatar(`${BASE_URL}/${res.avatarImage}`);
+        setAvatar(res.avatarImage.url);
       }
 
       if (res.role === "admin") {

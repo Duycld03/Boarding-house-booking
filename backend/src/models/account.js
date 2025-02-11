@@ -1,6 +1,17 @@
 import mongoose from "mongoose";
 import mongoose_delete from "mongoose-delete";
 
+const AvatarImageSchema = mongoose.Schema({
+  publicId: {
+    type: String,
+    default: "",
+  },
+  url: {
+    type: String,
+    default: "",
+  },
+});
+
 const AccountSchema = mongoose.Schema(
   {
     username: {
@@ -45,9 +56,7 @@ const AccountSchema = mongoose.Schema(
     socialId: {
       type: String,
     },
-    avatarImage: {
-      type: String,
-    },
+    avatarImage: AvatarImageSchema,
     accountBalance: {
       type: Number,
       default: 0,
@@ -55,13 +64,13 @@ const AccountSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      default: 'inactive'
+      default: "inactive",
     },
   },
   { timestamps: true }
 );
 
-AccountSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
+AccountSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 const Account = mongoose.model("Account", AccountSchema);
 export default Account;
