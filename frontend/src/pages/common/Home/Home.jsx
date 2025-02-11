@@ -5,7 +5,7 @@ import BoardingHouseGrid from '../../../component/BoardingHouseCard';
 import { Tabs } from 'antd';
 import { getAllBHHome } from '../../../api/BoardingHManagement';
 import { toast } from 'react-toastify';
-import formatAmount from '../../../utils/formatAmount';
+import formatAmount from '@/utils/formatAmount';
 import { formatTimeAgo } from '../../../utils/timeUtils';
 import truncateDetail from '../../../utils/truncateDetail';
 
