@@ -5,7 +5,9 @@ name: Node.js CI
 
 on:
   push:
+    branches: ["main", "feature"]
   pull_request:
+    branches: ["main", "feature"]
 
 jobs:
   build:
@@ -26,7 +28,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-          
+
       # 📌 Thiết lập biến môi trường từ .env (backend)
       - name: Set environment variables (backend)
         run: |
@@ -41,7 +43,7 @@ jobs:
         run: |
           echo "VITE_BASE_URL=http://localhost:3000/" >> $GITHUB_ENV
           echo "VITE_GOOGLE_CLIENT_ID=480377782126-c36ime4tr9j9iiq9ld0vhh6pnpgn44i0.apps.googleusercontent.com" >> $GITHUB_ENV
-      
+
       # Install dependencies for main
       - name: Install main dependencies
         run: npm ci
