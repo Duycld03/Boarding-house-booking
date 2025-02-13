@@ -15,7 +15,6 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(Styles);
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
@@ -95,9 +94,7 @@ function Profile() {
       const res = await getUser();
       setAccountBalance(res.accountBalance);
 
-      if (res.avatarImage) {
-        setImageUrl(`${BASE_URL}/${res.avatarImage}`);
-      }
+      setImageUrl(res?.avatarImage?.url ?? UserAvatar);
 
       setUsername(res.username);
       setEmail(res.email);
@@ -147,8 +144,7 @@ function Profile() {
     try {
       const res = await updateAvatar(formData);
 
-      // setImageUrl(response.url);
-      toast.success("Upload avatar successfully!");
+      toast.success(res.message);
       onSuccess();
       setLoading(false);
     } catch (error) {
@@ -183,7 +179,7 @@ function Profile() {
                   <img
                     src={imageUrl}
                     alt="avatar"
-                    className="w-36 h-36 rounded-full"
+                    className="w-36 h-36 rounded-full object-cover"
                   />
                 ) : (
                   uploadButton

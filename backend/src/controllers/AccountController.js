@@ -2,6 +2,7 @@ import Account from "../models/account.js";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { generateToken, verifyToken } from "../utils/functions.js";
+import { v2 as cloudinary } from "cloudinary";
 
 class accountController {
   async getAllAccount(req, res, next) {
@@ -277,6 +278,7 @@ class accountController {
   }
 
   async updateAvatar(req, res) {
+    console.log(req.file);
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -288,15 +290,27 @@ class accountController {
         return res.status(404).json({ message: "Account not found" });
       }
 
-      const imgPath =
-        req.file.destination.replace("public", "") + "/" + req.file.filename;
+      if (!account.avatarImage) {
+        account.avatarImage = {
+          url: req.file.path,
+          publicId: req.file.filename,
+        };
 
-      account.avatarImage = imgPath;
+        await account.save();
+
+        return res.status(200).json({ message: "Avatar updated successfully" });
+      }
+
+      cloudinary.uploader.destroy(account.avatarImage.publicId);
+
+      account.avatarImage.url = req.file.path;
+      account.avatarImage.publicId = req.file.filename;
 
       await account.save();
 
       res.status(200).json({ message: "Avatar updated successfully" });
     } catch (error) {
+      console.log("Error updating avatar:", error);
       res.status(500).json({ message: "Server Error" });
     }
   }
