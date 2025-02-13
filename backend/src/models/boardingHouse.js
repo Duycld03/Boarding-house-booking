@@ -12,15 +12,11 @@ const ImagesSchema = new mongoose.Schema({
   },
   publicId: {
     type: String,
-    default: "",
+    default: '',
   },
   isPrimary: {
     type: Boolean,
     default: false,
-  },
-  publicId: {
-    type: String,
-    default: '',
   },
 });
 

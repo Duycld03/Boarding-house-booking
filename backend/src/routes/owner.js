@@ -7,5 +7,6 @@ ownerRouter.get('/', (req, res) => {
   res.send('This is a owner router');
 });
 ownerRouter.get('/boardinghouseowner', boardingHouseController.getAllBHOwner);
+ownerRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
 
 export { ownerRouter };

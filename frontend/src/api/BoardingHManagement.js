@@ -65,5 +65,8 @@ export const softDeleteBoardingHouse = async (boardingHouseId) => {
   return axios.delete(`/dashboard/boardinghouse/${boardingHouseId}/softDelete`);
 };
 export const getAllBHOwner = () => {
-  return axios.get('owner/boardinghouseowner');
+  return axios.get('/owner/boardinghouseowner');
+};
+export const getAllBoardingHouseTypesOwner = () => {
+  return axios.get('/owner/types');
 };
