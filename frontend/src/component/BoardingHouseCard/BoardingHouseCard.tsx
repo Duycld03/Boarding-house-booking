@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Card, List, Typography, Image, Button, Spin } from 'antd';
+import React, { useEffect, useState } from "react";
+import { Card, List, Typography, Image, Button, Spin } from "antd";
 import {
   LeftOutlined,
   RightOutlined,
   StarFilled,
   HeartOutlined,
   HeartFilled,
-} from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { addFavorite, getFavorite } from '../../api/favoriteManagement'; // Import API
+} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { addFavorite, getFavorite } from "../../api/favoriteManagement"; // Import API
 
 interface BoardingHouseCardProps {
   id: string;
@@ -52,15 +52,15 @@ const BoardingHouseCard = ({
     event.stopPropagation(); // Ngăn chặn click vào card
 
     try {
-      console.log('Calling API with id:', id);
+      console.log("Calling API with id:", id);
       const response = await addFavorite(id); // Gọi API
-      console.log('API Response:', response);
+      console.log("API Response:", response);
 
-      if (response && typeof response.isFavorite !== 'undefined') {
+      if (response && typeof response.isFavorite !== "undefined") {
         setIsFavorite(response.isFavorite); // Cập nhật trạng thái
       } else {
-        console.error('Invalid response structure:', response);
-        toast.error('Dữ liệu phản hồi không hợp lệ!');
+        console.error("Invalid response structure:", response);
+        toast.error("Dữ liệu phản hồi không hợp lệ!");
       }
     } catch (error) {
       navigate(`/login`);
@@ -76,36 +76,36 @@ const BoardingHouseCard = ({
           alt={name}
           src={img}
           style={{
-            width: '100%',
-            height: '200px',
-            objectFit: 'cover',
-            borderTopLeftRadius: '8px',
-            borderTopRightRadius: '8px',
+            width: "100%",
+            height: "200px",
+            objectFit: "cover",
+            borderTopLeftRadius: "8px",
+            borderTopRightRadius: "8px",
           }}
         />
       }
       style={{
-        width: '100%',
-        maxWidth: '400px',
-        borderRadius: '8px',
-        border: '2px solid #ddd',
-        height: '370px',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        marginRight: '10px',
+        width: "100%",
+        maxWidth: "400px",
+        borderRadius: "8px",
+        border: "2px solid #ddd",
+        height: "370px",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        marginRight: "10px",
       }}
     >
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <Typography.Title level={5} style={{ fontSize: '20px' }}>
+      <div style={{ flex: 1, overflow: "hidden" }}>
+        <Typography.Title level={5} style={{ fontSize: "20px" }}>
           {name}
         </Typography.Title>
 
         {/* Hiển thị rating */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             marginTop: 8,
             marginBottom: 8,
           }}
@@ -113,7 +113,7 @@ const BoardingHouseCard = ({
           {[...Array(validRating)].map((_, index) => (
             <StarFilled
               key={index}
-              style={{ color: 'gold', fontSize: '20px' }}
+              style={{ color: "gold", fontSize: "20px" }}
             />
           ))}
         </div>
@@ -121,11 +121,11 @@ const BoardingHouseCard = ({
         {/* Giá tiền */}
         <Typography.Text
           style={{
-            color: '#f57c00',
-            fontWeight: '700',
-            fontSize: '18px',
-            marginTop: '12px',
-            marginBottom: '12px',
+            color: "#f57c00",
+            fontWeight: "700",
+            fontSize: "18px",
+            marginTop: "12px",
+            marginBottom: "12px",
           }}
         >
           {price} VND/month
@@ -134,9 +134,9 @@ const BoardingHouseCard = ({
         {/* Detail + TimeAgo + Icon Heart */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
             marginTop: 8,
           }}
         >
@@ -150,9 +150,9 @@ const BoardingHouseCard = ({
             onClick={handleFavoriteClick}
             icon={
               isFavorite ? (
-                <HeartFilled style={{ color: 'red', fontSize: '22px' }} />
+                <HeartFilled style={{ color: "red", fontSize: "22px" }} />
               ) : (
-                <HeartOutlined style={{ fontSize: '22px' }} />
+                <HeartOutlined style={{ fontSize: "22px" }} />
               )
             }
           />
@@ -177,7 +177,7 @@ const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
           setFavoriteIds(response.favorites.map((fav) => fav.id)); // Lưu danh sách ID yêu thích
         }
       } catch (error) {
-        console.error('Failed to fetch favorites:', error);
+        console.error("Failed to fetch favorites:", error);
       } finally {
         setLoading(false);
       }
@@ -200,7 +200,7 @@ const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
       {loading ? (
         <Spin
           size="large"
-          style={{ display: 'block', textAlign: 'center', margin: '20px' }}
+          style={{ display: "block", textAlign: "center", margin: "20px" }}
         />
       ) : (
         <>
@@ -222,9 +222,9 @@ const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
           />
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
               marginTop: 16,
               gap: 10,
               marginRight: 20,
