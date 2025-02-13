@@ -40,8 +40,15 @@ const ReportSchema = new mongoose.Schema(
     },
     images: [
       {
-        type: String,
-      },
+        imageUrl: {
+          type: String,
+          required: true,
+        },
+        publicId: {
+          type: String,
+          default: "",
+        },
+      }
     ],
     detailReport: {
       type: String,
