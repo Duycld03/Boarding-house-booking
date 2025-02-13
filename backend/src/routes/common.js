@@ -26,4 +26,7 @@ commonRouter.get('/boardinghouse/reviews/:id', boardingHouseController.getReview
 //review
 
 
+
+
+
 export { commonRouter };

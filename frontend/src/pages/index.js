@@ -8,7 +8,7 @@ import {
   ChangePassword,
   VerifyChangeEmail,
 } from "./auth";
-import { AboutUs, Home, Contact, Profile, ErrorPage, BoardingHouseDetail } from "./common";
+import { AboutUs, Home, Contact, Profile, ErrorPage, BoardingHouseDetail, MyAppointment } from "./common";
 
 import {
   BoardingHouseManagement,
@@ -37,6 +37,8 @@ export {
   Home,
   Profile,
   ErrorPage,
+  MyAppointment,
+
 
   // owner
 

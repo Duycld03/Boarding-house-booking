@@ -19,47 +19,47 @@ import {
   BoardingHouseDetail,
   VerifyChangeEmail,
   ErrorPage,
+  MyAppointment,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 
-
-const dashBoard = '/dashboard';
+const dashBoard = "/dashboard";
 
 const routes = [
   //auth
   {
-    path: '/login',
+    path: "/login",
     page: Login,
     layout: AuthLayout,
   },
 
   {
-    path: '/register',
+    path: "/register",
     page: Register,
     layout: AuthLayout,
   },
   {
-    path: '/register-with-google',
+    path: "/register-with-google",
     page: RegisterWithGoogle,
     layout: AuthLayout,
   },
   {
-    path: '/verify-register',
+    path: "/verify-register",
     page: VerifyRegister,
     layout: AuthLayout,
   },
   {
-    path: '/forgot-password',
+    path: "/forgot-password",
     page: ForgotPassword,
     layout: AuthLayout,
   },
   {
-    path: '/reset-password/:token',
+    path: "/reset-password/:token",
     page: ResetPassword,
     layout: AuthLayout,
   },
   {
-    path: '/change-password',
+    path: "/change-password",
     page: ChangePassword,
     layout: AuthLayout,
   },
@@ -71,23 +71,23 @@ const routes = [
 
   //common
   {
-    path: '/',
-    label: 'Home',
+    path: "/",
+    label: "Home",
     page: Home,
     layout: HeaderOnly,
   },
   {
-    path: '/contact',
+    path: "/contact",
     page: Contact,
     layout: HeaderOnly,
   },
   {
-    path: 'about-us',
+    path: "about-us",
     page: AboutUs,
     layout: HeaderOnly,
   },
   {
-    path: 'profile',
+    path: "profile",
     page: Profile,
     layout: ProfileLayout,
   },
@@ -95,6 +95,12 @@ const routes = [
     path: "/error-page",
     page: ErrorPage,
     layout: AuthLayout,
+  },
+
+  {
+    path: "/my-appointment",
+    page: MyAppointment,
+    layout: ProfileLayout,
   },
 
   // dashBoard
@@ -130,7 +136,7 @@ const routes = [
     layout: null,
   },
   {
-    path: '/boarding-house/:id',
+    path: "/boarding-house/:id",
     page: BoardingHouseDetail,
     layout: HeaderOnly,
   },
