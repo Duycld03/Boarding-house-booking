@@ -4,7 +4,10 @@ import { toast } from 'react-toastify';
 import { Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { FileTextOutlined } from '@ant-design/icons';
-import { getAllBHOwner } from '../../../api/BoardingHManagement';
+import {
+  getAllBHOwner,
+  softDeleteBoardingHouseOwner,
+} from '../../../api/BoardingHManagement';
 import formatAmount from '../../../utils/formatAmount';
 import UpdateBHModal from './UpdateBH';
 import AddBHModal from './AddBH';
@@ -12,10 +15,9 @@ import AddBHModal from './AddBH';
 function BHManagementOwner() {
   const [boardingHouses, setBoardingHouses] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isAddOpen, setIsAddOpen] = useState(false);
   const navigate = useNavigate();
 
   const columns = [
@@ -62,21 +64,22 @@ function BHManagementOwner() {
             size="large"
             btnDelete
             title={'Delete'}
-            // onClick={() => handleSelectDelete(record)}
+            onClick={() => handleOpenDeleteModal(record)}
           />
           <Button
             onClick={() => openEditModal(record)}
             size="large"
             title={'Detail'}
             icon={<FileTextOutlined />}
-            className={' text-white'}
-            bgColor={'rgb(5 150 105)'}
+            className="text-white"
+            bgColor="rgb(5 150 105)"
           />
         </div>
       ),
     },
   ];
 
+  // Fetch the data
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -87,7 +90,7 @@ function BHManagementOwner() {
         setBoardingHouses(res);
       }
     } catch (error) {
-      toast.error(`Can not fetch data: ${error.message}`);
+      toast.error(`Cannot fetch data: ${error.message}`);
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
@@ -102,31 +105,57 @@ function BHManagementOwner() {
     setSelectedData(record);
     setIsEditOpen(true);
   };
+
   const handleAddNewData = async () => {
     fetchData();
+  };
+
+  // Open delete confirmation modal
+  const handleOpenDeleteModal = (record) => {
+    setSelectedData(record); // Save the selected record for deletion
+    setIsOpenDeleteModal(true); // Open the confirmation modal
+  };
+
+  // Handle the actual delete action
+  const handleDelete = async () => {
+    if (!selectedData || !selectedData._id) return;
+
+    try {
+      setLoading(true); // Show loading indicator
+      await softDeleteBoardingHouseOwner(selectedData._id); // Call the API
+      toast.success('Boarding house deleted successfully');
+      fetchData(); // Refresh the data
+    } catch (error) {
+      console.error('Error deleting boarding house:', error);
+      toast.error(error.message || 'Failed to delete boarding house');
+    } finally {
+      setLoading(false); // Hide loading indicator
+      setIsOpenDeleteModal(false); // Close the confirmation modal
+      setSelectedData(null); // Clear the selected record
+    }
   };
 
   return (
     <div>
       <div className="flex justify-between">
-        <AddBHModal
-          onAddData={handleAddNewData}
-          // ownerId={boardingHouses.ownerId}
-        />
+        <AddBHModal onAddData={handleAddNewData} />
       </div>
       <Table loading={loading} columns={columns} data={boardingHouses ?? []} />
 
+      {/* Confirm Delete Modal */}
       <ConfirmModal
-        isOpen={isOpen}
-        onCancel={() => setIsOpen(false)}
         title="Confirm Deletion"
-        message="Are you sure you want to delete this boarding house?"
+        content={`Are you sure you want to delete this boarding house`}
+        onOk={handleDelete} // Trigger the delete API call
+        onCancel={() => {
+          setIsOpenDeleteModal(false); // Close modal
+          setSelectedData(null); // Clear selected record
+        }}
+        isOpen={isOpenDeleteModal}
       />
 
-      <UpdateBHModal
-        open={isEditOpen} // ⚠️ Đúng prop với Ant Design Modal
-        onCancel={() => setIsEditOpen(false)} // ✅ Đóng modal khi hủy
-      />
+      {/* Edit Modal */}
+      <UpdateBHModal open={isEditOpen} onCancel={() => setIsEditOpen(false)} />
     </div>
   );
 }

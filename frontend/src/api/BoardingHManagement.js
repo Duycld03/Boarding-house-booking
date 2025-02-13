@@ -77,3 +77,6 @@ export const createBoardingHouseOwner = (data) => {
     },
   });
 };
+export const softDeleteBoardingHouseOwner = async (boardingHouseId) => {
+  return axios.delete(`/owner/boardinghouse/${boardingHouseId}/softDelete`);
+};

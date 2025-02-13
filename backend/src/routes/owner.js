@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { boardingHouseController } from '../controllers/index.js';
+import {
+  authController,
+  boardingHouseController,
+} from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
 const ownerRouter = Router();
@@ -13,6 +16,10 @@ ownerRouter.post(
   '/boardinghouse',
   upload.array('boardingHouse'), // Cho phép tối đa 16 ảnh trong 1 lần upload
   boardingHouseController.createBoardingHouseOwner
+);
+ownerRouter.delete(
+  '/boardinghouse/:id/softDelete',
+  boardingHouseController.softDeleteBoardingHouse
 );
 
 export { ownerRouter };
