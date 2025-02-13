@@ -5,9 +5,15 @@ const ImagesSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     auto: true,
   },
-  imageUrl: {
-    type: String,
-    required: true,
+  image: {
+    imageUrl: {
+      type: String,
+      required: true,
+    },
+    publicId: {
+      type: String,
+      default: "",
+    },
   },
   isPrimary: {
     type: Boolean,
