@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { TableCustom as Table, Button, ConfirmModal } from '../../../component';
 import { toast } from 'react-toastify';
 import { Tag, Tooltip } from 'antd';
+import { useCurrentUser } from '../../../context/userContext';
+import userRole from '../../../constants/userRole';
 
 function BHManagementOwner() {
   const [appointmentData, setAppointmentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
+  const { hasRole } = useCurrentUser();
 
   const statusColors = {
     pending: 'blue',
@@ -79,7 +82,7 @@ function BHManagementOwner() {
   // };
 
   useEffect(() => {
-    // fetchData();
+    console.log(hasRole(userRole.owner));
   }, []);
 
   const openCancelModal = (record) => {
