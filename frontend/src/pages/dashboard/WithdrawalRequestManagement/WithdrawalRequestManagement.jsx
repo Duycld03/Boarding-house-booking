@@ -7,8 +7,12 @@ import {
 } from "../../../component";
 import { toast } from "react-toastify";
 import { Tag } from "antd";
-import { getWithdrawRequests } from "../../../api/withdrawalrequestmanagement";
+import {
+  filterWithdrawRequests,
+  getWithdrawRequests,
+} from "../../../api/withdrawalrequestmanagement";
 import formatAmount from "../../../utils/formatAmount";
+import FilterWithdrawal from "./FilterWithdrawal";
 
 function WithdrawalRequestManagement() {
   const statusColors = {
@@ -67,6 +71,7 @@ function WithdrawalRequestManagement() {
   const [isOpenStatusChangeModal, setIsOpenStatusChangeModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [newStatus, setNewStatus] = useState("");
+  const [filterValue, setFilterValue] = useState();
 
   const fetchData = async () => {
     try {
@@ -82,6 +87,17 @@ function WithdrawalRequestManagement() {
         "Failed to fetch withdrawal requests. Please try again later."
       );
       setData([]);
+    }
+  };
+
+  const fetchFilter = async () => {
+    try {
+      const res = await filterWithdrawRequests(filterValue);
+      setData(res);
+    } catch (error) {
+      toast.error("Failed to fetch filtered accounts. Please try again later.");
+      setData([]);
+    } finally {
     }
   };
 
@@ -124,25 +140,21 @@ function WithdrawalRequestManagement() {
       }, 1000);
     });
   }, []);
+
+  useEffect(() => {
+    if (filterValue) {
+      fetchFilter();
+    }
+  }, [filterValue]);
+
   return (
     <div className="txt">
       {loading ? (
         <Loader />
       ) : (
         <>
-          <div className="flex justify-between mb-4">
-            <Button
-              size="large"
-              onClick={() => toast.success("Add success")}
-              btnAdd
-              title={"Add new"}
-            ></Button>
-            <Button
-              btnFilter
-              size="large"
-              onClick={() => toast.success("Filter success")}
-              title={"Filter"}
-            ></Button>
+          <div className="flex justify-end mb-4">
+            <FilterWithdrawal setFilterValue={setFilterValue} />
           </div>
           <div>
             <Table columns={columns} data={data || []} loading={loading} />
