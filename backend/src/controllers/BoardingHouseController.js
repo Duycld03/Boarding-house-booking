@@ -868,7 +868,6 @@ class boardingHouseController {
       });
 
       const savedBoardingHouse = await newBoardingHouse.save();
-      console.log('Saved Boarding House:', savedBoardingHouse);
 
       return res.status(201).json({
         message: 'Boarding house created successfully!',
@@ -878,6 +877,124 @@ class boardingHouseController {
       console.error('Error creating boarding house:', error);
       return res.status(500).json({
         message: 'An unexpected error occurred while creating boarding house.',
+        error: error.message,
+      });
+    }
+  }
+  async updateBoardingHouseDetailsOwner(req, res, next) {
+    try {
+      const { id } = req.params; // Boarding house ID
+      const updateData = req.body;
+      const { name, address, priceRange, electricityPrice, waterPrice } =
+        updateData;
+
+      // Validate name
+      if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Name is required and must not contain special characters.',
+        });
+      }
+
+      // Check if the name already exists
+      const existingBoardingHouse = await BoardingHouse.findOne({
+        name,
+        _id: { $ne: id },
+      });
+      if (existingBoardingHouse) {
+        return res.status(400).json({
+          success: false,
+          message: 'A boarding house with this name already exists.',
+        });
+      }
+
+      // Validate address
+      if (!address || !address.province || !address.district || !address.ward) {
+        return res.status(400).json({
+          success: false,
+          message:
+            'Province, district, and ward are required fields in the address.',
+        });
+      }
+
+      // Fetch existing boarding house data
+      const boardingHouse = await BoardingHouse.findById(id);
+      if (!boardingHouse) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'Boarding house not found.' });
+      }
+
+      // Handle image upload to Cloudinary
+      const images = [];
+      if (req.files && req.files.length > 0) {
+        req.files.forEach((file) => {
+          images.push({
+            imageUrl: file.path,
+            publicId: file.filename,
+            isPrimary: images.length === 0, // First image is primary
+          });
+        });
+
+        // Delete old images from Cloudinary
+        for (const oldImage of boardingHouse.images) {
+          await cloudinary.uploader.destroy(oldImage.publicId);
+        }
+
+        updateData.images = images;
+      }
+
+      // Validate images
+      const primaryImageCount =
+        updateData.images?.filter((img) => img.isPrimary).length || 0;
+      if (primaryImageCount !== 1) {
+        return res.status(400).json({
+          success: false,
+          message: 'You must upload exactly one primary image.',
+        });
+      }
+      if (updateData.images?.length > 15) {
+        return res.status(400).json({
+          success: false,
+          message: "You can't upload more than 15 images.",
+        });
+      }
+
+      // Validate price fields
+      if (
+        !priceRange ||
+        priceRange <= 0 ||
+        !electricityPrice ||
+        electricityPrice <= 0 ||
+        !waterPrice ||
+        waterPrice <= 0
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'Price fields must be greater than 0.',
+        });
+      }
+
+      // Update the boarding house details
+      const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      )
+        .populate('boardingHouseType', 'name')
+        .populate('ownerId', 'email');
+
+      return res.status(200).json({
+        success: true,
+        message: 'Boarding house updated successfully.',
+        data: updatedBoardingHouse,
+      });
+    } catch (error) {
+      console.error('Error updating boarding house details:', error);
+      return res.status(500).json({
+        success: false,
+        message:
+          'Failed to update boarding house details. Please try again later.',
         error: error.message,
       });
     }

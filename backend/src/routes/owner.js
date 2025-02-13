@@ -11,6 +11,16 @@ ownerRouter.get('/', (req, res) => {
   res.send('This is a owner router');
 });
 ownerRouter.get('/boardinghouseowner', boardingHouseController.getAllBHOwner);
+ownerRouter.get(
+  '/boardinghouse/:id',
+  boardingHouseController.getBoardingHouseDetails
+);
+ownerRouter.put(
+  '/boardinghouse/:id',
+  upload.array('boardingHouse'),
+  boardingHouseController.updateBoardingHouseDetailsOwner
+);
+
 ownerRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
 ownerRouter.post(
   '/boardinghouse',
