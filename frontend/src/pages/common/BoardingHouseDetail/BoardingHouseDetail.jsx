@@ -139,6 +139,27 @@ function BoardingHouseDetail() {
               </span>
             </div>
 
+            {/* Water price and electric price */}
+            <div className="mt-10 p-6 bg-white rounded-lg shadow-md border w-full max-w-sm">
+              <h3 className="text-3xl font-semibold text-gray-800 mb-4">
+                Extra price
+              </h3>
+              <div className="flex justify-between items-center mb-3">
+                <span className="font-medium text-gray-600">
+                  Electricity Price:
+                </span>
+                <span className="text-gray-900 font-semibold">
+                  {formatAmount(boardingHouse?.electricityPrice)} kWh (VND)
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-600">Water Price:</span>
+                <span className="text-gray-900 font-semibold">
+                  {formatAmount(boardingHouse?.waterPrice)} m³ (VND)
+                </span>
+              </div>
+            </div>
+
             <div className="md:mt-14">
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
