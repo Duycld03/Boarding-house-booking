@@ -1,141 +1,122 @@
 import { useEffect, useState } from 'react';
 import { TableCustom as Table, Button, ConfirmModal } from '../../../component';
 import { toast } from 'react-toastify';
-import { Tag, Tooltip } from 'antd';
-import { useCurrentUser } from '../../../context/userContext';
-import userRole from '../../../constants/userRole';
+import { Tooltip } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { FileTextOutlined } from '@ant-design/icons';
+import { getAllBHOwner } from '../../../api/BoardingHManagement';
+import formatAmount from '../../../utils/formatAmount';
+import UpdateBHModal from './UpdateBH';
+import AddBHModal from './AddBH';
 
 function BHManagementOwner() {
-  const [appointmentData, setAppointmentData] = useState([]);
+  const [boardingHouses, setBoardingHouses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
-  const { hasRole } = useCurrentUser();
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const statusColors = {
-    pending: 'blue',
-    confirmed: 'orange',
-    canceled: 'red',
-    completed: 'green',
-  };
-
-  const appointmentCol = [
+  const columns = [
+    { title: 'Name', dataIndex: 'name', key: 'name' },
     {
-      title: 'Chủ trọ',
-      dataIndex: 'ownerName',
-      key: 'ownerName',
-    },
-    {
-      title: 'Boarding House Name',
-      dataIndex: 'boardingHouseName',
-      key: 'boardingHouseName',
-    },
-    {
-      title: 'Số phòng',
-      dataIndex: 'roomNumber',
-      key: 'roomNumber',
-    },
-    {
-      title: 'User note',
-      dataIndex: 'note',
-      key: 'note',
-      render: (note) =>
-        note?.length > 30 ? (
-          <Tooltip title={note}>{note.substring(0, 30)}...</Tooltip>
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+      render: (address) =>
+        address ? (
+          <Tooltip
+            title={`${address.detail}, ${address.ward}, ${address.district}, ${address.province}`}
+          >
+            {`${address.detail}, ${address.ward}, ${address.district}`}
+          </Tooltip>
         ) : (
-          note
+          'N/A'
         ),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => <Tag color={statusColors[status]}>{status}</Tag>,
+      title: 'Price Range (VND)',
+      dataIndex: 'priceRange',
+      key: 'priceRange',
+      render: (price) => (price ? formatAmount(price) : 'N/A'),
+    },
+    {
+      title: 'Boarding House Type',
+      dataIndex: 'boardingHouseType',
+      key: 'boardingHouseType',
+      render: (type) => type?.name || 'N/A',
+    },
+    { title: 'Total Rooms', dataIndex: 'totalRooms', key: 'totalRooms' },
+    {
+      title: 'Available Rooms',
+      dataIndex: 'availableRooms',
+      key: 'availableRooms',
     },
     {
       title: 'Action',
       key: 'action',
-      render: (_, record) =>
-        record.status !== 'canceled' && record.status !== 'completed' ? (
+      render: (_, record) => (
+        <div className="flex gap-3">
           <Button
-            btnCancel
-            title={'Cancel'}
             size="large"
-            onClick={() => openCancelModal(record)}
+            btnDelete
+            title={'Delete'}
+            // onClick={() => handleSelectDelete(record)}
           />
-        ) : null,
+          <Button
+            onClick={() => openEditModal(record)}
+            size="large"
+            title={'Detail'}
+            icon={<FileTextOutlined />}
+            className={' text-white'}
+            bgColor={'rgb(5 150 105)'}
+          />
+        </div>
+      ),
     },
   ];
 
-  // const fetchData = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const res = await getAppointmentOfUser();
-  //     if (res) {
-  //       setAppointmentData(res);
-  //     }
-  //   } catch (error) {
-  //     toast.error(`Can not fetch data: ${error.message}`);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  useEffect(() => {
-    console.log(hasRole(userRole.owner));
-  }, []);
-
-  const openCancelModal = (record) => {
-    setSelectedData(record);
-    setIsOpen(true);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await getAllBHOwner();
+      if (res) {
+        setBoardingHouses(res);
+      }
+    } catch (error) {
+      toast.error(`Can not fetch data: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // const handleCancel = async () => {
-  //   if (!selectedData) return;
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  //   if (selectedData.status === 'confirmed') {
-  //     toast.error('Can not cancel appointment if confirmed');
-  //     setIsOpen(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoading(true);
-
-  //     const res = await updateAppointmentStatus(selectedData._id, {
-  //       status: 'canceled',
-  //     });
-
-  //     if (res) {
-  //       fetchData();
-  //       toast.success('Appointment has been canceled');
-  //     } else {
-  //       toast.error(
-  //         res?.message || 'Failed to cancel appointment. Please try again.'
-  //       );
-  //     }
-  //   } catch (error) {
-  //     toast.error(`Failed to cancel: ${error.message}`);
-  //   } finally {
-  //     setLoading(false);
-  //     setIsOpen(false);
-  //     setSelectedData(null);
-  //   }
-  // };
+  const openEditModal = (record) => {
+    setSelectedData(record);
+    setIsEditOpen(true);
+  };
 
   return (
     <div>
-      <Table
-        loading={loading}
-        columns={appointmentCol}
-        data={appointmentData ?? []}
-      />
+      <div className="flex justify-between">
+        <AddBHModal />
+      </div>
+      <Table loading={loading} columns={columns} data={boardingHouses ?? []} />
+
       <ConfirmModal
         isOpen={isOpen}
         onCancel={() => setIsOpen(false)}
-        // onOk={handleCancel}
-        title="Confirm Cancellation"
-        message="Are you sure you want to cancel this appointment?"
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this boarding house?"
+      />
+
+      <UpdateBHModal
+        open={isEditOpen} // ⚠️ Đúng prop với Ant Design Modal
+        onCancel={() => setIsEditOpen(false)} // ✅ Đóng modal khi hủy
       />
     </div>
   );

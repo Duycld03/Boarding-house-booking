@@ -773,8 +773,8 @@ class boardingHouseController {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Tìm các boarding house mà owner là người dùng hiện tại
-      const boardingHData = await BoardingHouse.find()
+      // Chỉ lấy boarding house mà owner là user hiện tại
+      const boardingHData = await BoardingHouse.find({ ownerId: account._id }) // Lọc theo ownerId
         .populate('boardingHouseType')
         .sort({ createdAt: -1 });
 
