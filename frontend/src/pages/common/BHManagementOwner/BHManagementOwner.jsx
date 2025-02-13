@@ -81,11 +81,14 @@ function BHManagementOwner() {
     setLoading(true);
     try {
       const res = await getAllBHOwner();
-      if (res) {
+      console.log('API Response:', res);
+
+      if (res && res.length > 0) {
         setBoardingHouses(res);
       }
     } catch (error) {
       toast.error(`Can not fetch data: ${error.message}`);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -99,11 +102,17 @@ function BHManagementOwner() {
     setSelectedData(record);
     setIsEditOpen(true);
   };
+  const handleAddNewData = async () => {
+    fetchData();
+  };
 
   return (
     <div>
       <div className="flex justify-between">
-        <AddBHModal />
+        <AddBHModal
+          onAddData={handleAddNewData}
+          // ownerId={boardingHouses.ownerId}
+        />
       </div>
       <Table loading={loading} columns={columns} data={boardingHouses ?? []} />
 

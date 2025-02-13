@@ -792,10 +792,9 @@ class boardingHouseController {
   async createBoardingHouseOwner(req, res, next) {
     try {
       const account = await Account.findById(req.user.userId);
-      if (!account || account.role !== 'owner') {
-        return res.status(403).json({
-          message: 'You are not authorized to perform this action.',
-        });
+      if (!account) {
+        console.error('User not found for ID:', req.user.userId);
+        return res.status(404).json({ message: 'User not found' });
       }
 
       const ownerId = account._id;
@@ -809,101 +808,67 @@ class boardingHouseController {
         waterPrice,
         totalRooms = 0,
         availableRooms = 0,
-        likes = 0,
-        rating = 5,
-        primaryIndex = 0, // Default primary image index
       } = req.body;
 
-      // Validate boarding house type
+      console.log('Validating boarding house type...');
       const boardingHouseTypeExists =
         await BoardingHouseType.findById(boardingHouseType);
       if (!boardingHouseTypeExists) {
+        console.error('Invalid boarding house type:', boardingHouseType);
         return res
           .status(400)
           .json({ message: 'Invalid boarding house type.' });
       }
 
-      // Validate name
       if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
+        console.error('Invalid name:', name);
         return res.status(400).json({
           message: 'Name is required and must not contain special characters.',
         });
       }
 
-      const existingBoardingHouse = await BoardingHouse.findOne({ name });
-      if (existingBoardingHouse) {
-        return res.status(400).json({
-          message: 'A boarding house with this name already exists.',
-        });
-      }
-
-      // Validate address
       if (!address || !address.province || !address.district || !address.ward) {
+        console.error('Invalid address:', address);
         return res.status(400).json({
           message:
             'Province, district, and ward are required fields in the address.',
         });
       }
 
-      // Validate price fields
-      if (priceRange <= 0 || electricityPrice <= 0 || waterPrice <= 0) {
-        return res
-          .status(400)
-          .json({ message: 'Price fields must be greater than 0.' });
-      }
-
-      // Handle image uploads
       const images = [];
       if (req.files && req.files.length > 0) {
-        let firstImage = true;
-        req.files.forEach((e) => {
+        req.files.forEach((file) => {
           images.push({
-            imageUrl: e.path,
-            publicId: e.filename,
-            isPrimary: firstImage,
+            imageUrl: file.path,
+            publicId: file.filename,
+            isPrimary: images.length === 0, // First image is primary
           });
-          firstImage = false;
         });
       }
 
-      // Ensure at least one image is uploaded
       if (images.length === 0) {
-        return res.status(400).json({
-          message: 'You must upload at least one image.',
-        });
+        console.error('No images uploaded.');
+        return res
+          .status(400)
+          .json({ message: 'You must upload at least one image.' });
       }
 
-      // Ensure no more than 15 images
-      if (images.length > 15) {
-        return res.status(400).json({
-          message:
-            "You can't upload more than 15 images for the boarding house.",
-        });
-      }
-
-      // Create new boarding house
       const newBoardingHouse = new BoardingHouse({
         ownerId,
         name,
-        description: description || '',
+        description,
         priceRange,
         electricityPrice,
         waterPrice,
         boardingHouseType,
-        address: {
-          province: address.province,
-          district: address.district,
-          ward: address.ward,
-          detail: address.detail || '',
-        },
+        address,
         images,
         totalRooms,
         availableRooms,
-        likes,
-        rating,
       });
 
       const savedBoardingHouse = await newBoardingHouse.save();
+      console.log('Saved Boarding House:', savedBoardingHouse);
 
       return res.status(201).json({
         message: 'Boarding house created successfully!',

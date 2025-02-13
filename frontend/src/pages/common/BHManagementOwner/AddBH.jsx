@@ -7,14 +7,24 @@ import {
   fetchDistricts,
   fetchWards,
 } from '../../../api/apiAddress';
-import { Loader, Button } from '../../../component';
-import { Form, Input, Select, Upload, InputNumber, Image, Modal } from 'antd';
+import { Button } from '../../../component';
+import {
+  Form,
+  Input,
+  Select,
+  Upload,
+  InputNumber,
+  Image,
+  Modal,
+  Spin,
+} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { createBoardingHouseOwner } from '../../../api/BoardingHManagement';
 
-function AddBHModal({ onSuccess }) {
-  const [isModalVisible, setIsModalVisible] = useState(false); // Controls outer modal visibility
+const AddBHModal = ({ onAddData }) => {
+  // State management
+  const [isModalVisible, setIsModalVisible] = useState(false); // Controls modal visibility
   const [formData, setFormData] = useState({
-    owner: '',
     boardingHouseType: '',
     name: '',
     address: {
@@ -30,35 +40,43 @@ function AddBHModal({ onSuccess }) {
     electricityPrice: '',
     waterPrice: '',
   });
-
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
-  const uploadOtherImgProps = {
-    beforeUpload: (file) => {
-      handleFileChange({ target: { files: [file] } }, false);
-      return false;
-    },
-    multiple: true,
-    accept: 'image/*',
-  };
-  const uploadProps = {
-    beforeUpload: (file) => {
-      handleFileChange({ target: { files: [file] } }, true);
-      return false;
-    },
-    accept: 'image/*',
-    maxCount: 1,
-    showUploadList: false,
+
+  // Function to reset form data
+  const resetFormData = () => {
+    setFormData({
+      boardingHouseType: '',
+      name: '',
+      address: {
+        province: '',
+        district: '',
+        ward: '',
+        detail: '',
+      },
+      description: '',
+      primaryImage: null,
+      otherImages: [],
+      priceRange: '',
+      electricityPrice: '',
+      waterPrice: '',
+    });
+    setDistricts([]); // Clear districts
+    setWards([]); // Clear wards
   };
 
-  const handleRemovePrimaryImage = () => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      primaryImage: null,
-    }));
+  // Open modal and reset form
+  const openModal = () => {
+    resetFormData(); // Clear form data
+    setIsModalVisible(true); // Open modal
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalVisible(false); // Close modal
   };
 
   // Fetch provinces, districts, and wards dynamically
@@ -124,6 +142,24 @@ function AddBHModal({ onSuccess }) {
       }));
     }
   };
+  const uploadOtherImgProps = {
+    beforeUpload: (file) => {
+      handleFileChange({ target: { files: [file] } }, false);
+      return false;
+    },
+    multiple: true,
+    accept: 'image/*',
+  };
+
+  const uploadProps = {
+    beforeUpload: (file) => {
+      handleFileChange({ target: { files: [file] } }, true);
+      return false;
+    },
+    accept: 'image/*',
+    maxCount: 1,
+    showUploadList: false,
+  };
 
   const handleFileChange = (e, isPrimary = false) => {
     const file = e.target.files[0];
@@ -146,48 +182,83 @@ function AddBHModal({ onSuccess }) {
     }));
   };
 
-  const handleSubmit = async () => {
-    // Add form validation before submission
-    try {
-      if (!formData.boardingHouseType) throw new Error('Please select a type.');
-      if (!formData.name) throw new Error('Please enter a name.');
-      if (!formData.address.province)
-        throw new Error('Please select province.');
-      if (!formData.address.district)
-        throw new Error('Please select district.');
-      if (!formData.address.ward) throw new Error('Please select ward.');
-      if (!formData.address.detail) throw new Error('Please enter details.');
-
-      const imagesData = [];
-      const payloadPrimary = new FormData();
-      payloadPrimary.append('file', formData.primaryImage);
-
-      for (const image of formData.otherImages) {
-        const payload = new FormData();
-        payload.append('file', image);
-        // Upload logic would go here
-      }
-
-      const form = {
-        ownerUsername: formData.owner,
-        boardingHouseType: formData.boardingHouseType,
-        name: formData.name,
-        address: formData.address,
-        description: formData.description,
-        images: imagesData,
-        priceRange: formData.priceRange,
-        electricityPrice: formData.electricityPrice,
-        waterPrice: formData.waterPrice,
-      };
-      console.log('Final Form Data:', form);
-      toast.success('Boarding house created successfully!');
-      setIsModalVisible(false);
-      onSuccess();
-    } catch (error) {
-      toast.error(error.message || 'Failed to submit the form.');
-    }
+  const handleRemovePrimaryImage = () => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      primaryImage: null,
+    }));
   };
 
+  const handleSubmit = async () => {
+    try {
+      setLoading(true); // Show loading spinner
+
+      const payload = new FormData();
+      if (!formData.boardingHouseType) {
+        toast.error('Please select a boarding house type.');
+        return;
+      }
+      if (!formData.name) {
+        toast.error('Please enter a boarding house name.');
+        return;
+      }
+      if (!formData.address.province) {
+        toast.error('Please select a boarding house province.');
+        return;
+      }
+      if (!formData.address.district) {
+        toast.error('Please select a boarding house district.');
+        return;
+      }
+      if (!formData.address.ward) {
+        toast.error('Please select a boarding house ward.');
+        return;
+      }
+      if (!formData.address.detail) {
+        toast.error('Please enter a boarding house details.');
+        return;
+      }
+      payload.append('boardingHouseType', formData.boardingHouseType);
+      payload.append('name', formData.name);
+      payload.append('description', formData.description);
+      payload.append('priceRange', formData.priceRange);
+      payload.append('electricityPrice', formData.electricityPrice);
+      payload.append('waterPrice', formData.waterPrice);
+      payload.append('address[province]', formData.address.province);
+      payload.append('address[district]', formData.address.district);
+      payload.append('address[ward]', formData.address.ward);
+      payload.append('address[detail]', formData.address.detail);
+
+      // Combine primaryImage and otherImages into a single array
+      const allImages = [];
+      if (formData.primaryImage) allImages.push(formData.primaryImage);
+      if (formData.otherImages.length > 0)
+        allImages.push(...formData.otherImages);
+
+      allImages.forEach((file) => {
+        payload.append('boardingHouse', file);
+      });
+
+      const response = await createBoardingHouseOwner(payload);
+
+      if (response?.message === 'Boarding house created successfully!') {
+        toast.success(response.message);
+        onAddData(); // Refresh parent data
+        closeModal(); // Close modal
+      } else {
+        throw new Error(response?.message || 'Failed to add boarding house.');
+      }
+    } catch (error) {
+      console.error('Error submitting boarding house:', error);
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          'Failed to submit the form.'
+      );
+    } finally {
+      setLoading(false); // Hide loading spinner
+    }
+  };
   return (
     <>
       {/* Trigger Button */}
@@ -195,14 +266,14 @@ function AddBHModal({ onSuccess }) {
         btnAdd
         title="Add Boarding House"
         size="large"
-        onClick={() => setIsModalVisible(true)}
+        onClick={openModal} // Open modal and reset form
       />
 
       {/* Outer Modal */}
       <Modal
         title="Create Boarding House"
         open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={closeModal} // Close modal
         footer={null}
         destroyOnClose
       >
@@ -288,6 +359,7 @@ function AddBHModal({ onSuccess }) {
               {!formData.primaryImage && (
                 <Upload
                   {...uploadProps}
+                  name="boardingHouse"
                   listType="picture-card"
                   showUploadList={false}
                   className="custom-upload w-full max-w-lg"
@@ -353,6 +425,7 @@ function AddBHModal({ onSuccess }) {
                   <Image
                     src={URL.createObjectURL(file)}
                     alt={`Other ${index + 1}`}
+                    name="boardingHouse"
                     className="object-cover border rounded"
                     width={100}
                     height={100}
@@ -508,30 +581,30 @@ function AddBHModal({ onSuccess }) {
                     />
                 </Form.Item> */}
 
-          {/* Form Buttons */}
           <div className="flex justify-end mt-4">
             <Button
               title="Cancel"
               btnCancel={true}
-              onClick={() => setIsModalVisible(false)}
+              onClick={closeModal}
               className="bg-red-500 hover:bg-red-600 text-white mr-2"
               size="large"
             >
               Cancel
             </Button>
             <Button
-              className="bg-primary text-white"
+              className="bg-primary text-white flex items-center"
               size="large"
               onClick={handleSubmit}
               title="Submit"
+              disabled={loading} // Disable button when loading
             >
-              Submit
+              {loading ? <Spin size="small" className="mr-2" /> : null} Submit
             </Button>
           </div>
         </Form>
       </Modal>
     </>
   );
-}
+};
 
 export default AddBHModal;

@@ -70,3 +70,10 @@ export const getAllBHOwner = () => {
 export const getAllBoardingHouseTypesOwner = () => {
   return axios.get('/owner/types');
 };
+export const createBoardingHouseOwner = (data) => {
+  return axios.post('owner/boardinghouse', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
