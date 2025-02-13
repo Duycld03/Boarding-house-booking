@@ -23,7 +23,7 @@ const ConfirmModal = ({ title, content, onOk, onCancel, isOpen }) => {
           title="Cancel"
           onClick={onCancel}
           size="large"
-          className={"bg-red-500 text-white"}
+          btnCancel
         />
       </div>
     </Modal>

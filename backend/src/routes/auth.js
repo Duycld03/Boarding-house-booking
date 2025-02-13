@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authController, accountController, favoriteController } from "./../controllers/index.js";
+import { authController, accountController, favoriteController, appointmentController } from "./../controllers/index.js";
 import { upload } from "../config/upload.config.js";
 
 
@@ -23,6 +23,12 @@ authRouter.put(
 
 authRouter.post("/send-otp-change-email", accountController.sendOTPChangeEmail);
 authRouter.post("/verify-change-email", accountController.verifyChangeEmail);
+
+
+
+//appointment
+authRouter.get('/appointment/user', appointmentController.getAppointmentByUserId)
+authRouter.put('/appointment/update-status/:id', appointmentController.updateAppointmentStatus)
 
 
 export { authRouter };

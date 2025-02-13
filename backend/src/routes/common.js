@@ -21,4 +21,7 @@ commonRouter.post('/verify-register', authController.verifyRegister);
 commonRouter.get('/boardinghouse', boardingHouseController.getAllBHOnHome);
 commonRouter.get('/boardinghouse/:id', boardingHouseController.getBoardingHouseDetailInUser);
 
+
+
+
 export { commonRouter };
