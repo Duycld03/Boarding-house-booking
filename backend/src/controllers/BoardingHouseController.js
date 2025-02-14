@@ -945,20 +945,20 @@ class boardingHouseController {
       }
 
       // Validate images
-      const primaryImageCount =
-        updateData.images?.filter((img) => img.isPrimary).length || 0;
-      if (primaryImageCount !== 1) {
-        return res.status(400).json({
-          success: false,
-          message: 'You must upload exactly one primary image.',
-        });
-      }
-      if (updateData.images?.length > 15) {
-        return res.status(400).json({
-          success: false,
-          message: "You can't upload more than 15 images.",
-        });
-      }
+      // const primaryImageCount =
+      //   updateData.images?.filter((img) => img.isPrimary).length || 0;
+      // if (primaryImageCount !== 1) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: 'You must upload exactly one primary image.',
+      //   });
+      // }
+      // if (updateData.images?.length > 15) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "You can't upload more than 15 images.",
+      //   });
+      // }
 
       // Validate price fields
       if (

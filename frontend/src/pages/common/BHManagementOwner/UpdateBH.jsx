@@ -121,36 +121,36 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
     }
   };
 
-  // Handle file changes for primary and other images
   const handleFileChange = (e, isPrimary = false) => {
     const file = e.target.files[0];
     if (!file) return;
 
     if (isPrimary) {
-      setUpdatedData((prev) => ({ ...prev, primaryImage: file }));
-    } else {
+      // Set the primary image without overriding other images
       setUpdatedData((prev) => ({
         ...prev,
-        otherImages: [...prev.otherImages, file],
+        primaryImage: file, // Update primaryImage only
+      }));
+    } else {
+      // Append the new file to the otherImages array
+      setUpdatedData((prev) => ({
+        ...prev,
+        otherImages: [...(prev.otherImages || []), file], // Append to otherImages
       }));
     }
   };
-  // Remove primary image
   const handleRemovePrimaryImage = () => {
+    // Remove the primary image from `updatedData` and `images`
     setUpdatedData((prev) => ({
       ...prev,
-      primaryImage: null,
+      primaryImage: null, // Set primaryImage to null
     }));
 
-    //  remove primary Image
-    setImages((prevImages) =>
-      prevImages.map((img) =>
-        img.isPrimary ? { ...img, isPrimary: false } : img
-      )
-    );
+    // Remove the primary image from the `images` array
+    setImages((prevImages) => prevImages.filter((img) => !img.isPrimary));
+
     toast.success('Primary image removed.');
   };
-
   // Remove other images
   const handleRemoveOtherImage = (index) => {
     setUpdatedData((prev) => ({
@@ -198,7 +198,12 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       console.log('✅ Updated Data:', updatedData);
 
       const payload = new FormData();
-      payload.append('boardingHouseType', updatedData.boardingHouseType);
+
+      // Append basic form fields
+      payload.append(
+        'boardingHouseType',
+        updatedData.boardingHouseType?._id || updatedData.boardingHouseType
+      );
       payload.append('name', updatedData.name);
       payload.append('description', updatedData.description);
       payload.append('priceRange', updatedData.priceRange);
@@ -209,76 +214,58 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       payload.append('address[ward]', updatedData.address.ward);
       payload.append('address[detail]', updatedData.address.detail);
 
-      // 🖼 Xử lý hình ảnh
-      const allImages = [];
-      const images = updatedData?.images || [];
-
-      let primaryImage = null;
-      let otherImages = [];
-
-      images.forEach((img) => {
-        if (img.isPrimary) {
-          primaryImage = img.imageUrl;
+      // Append primary image (new or existing) under `boardingHouse`
+      if (updatedData.primaryImage instanceof File) {
+        payload.append('boardingHouse', updatedData.primaryImage);
+      } else {
+        const existingPrimaryImage = images.find(
+          (img) => img.isPrimary
+        )?.imageUrl;
+        if (existingPrimaryImage) {
+          payload.append('boardingHouse', existingPrimaryImage);
         } else {
-          if (img.file instanceof File) {
-            otherImages.push(img.file);
+          toast.error('A primary image is required.');
+          return;
+        }
+      }
+
+      // Append new "Other Images" (files) under `boardingHouse`
+      if (updatedData.otherImages) {
+        updatedData.otherImages.forEach((file) => {
+          if (file instanceof File) {
+            payload.append('boardingHouse', file);
           }
-        }
-      });
-
-      // ✅ Kiểm tra ảnh chính
-      console.log('📌 Primary Image:', primaryImage);
-
-      if (!primaryImage) {
-        toast.error('Missing primary image.');
-        return;
+        });
       }
 
-      // Giới hạn số lượng ảnh phụ
-      if (otherImages.length > 15) {
-        toast.error("You can't upload more than 15 other images.");
-        return;
-      }
+      // Append existing "Other Images" (URLs) under `boardingHouse`
+      images
+        .filter((img) => !img.isPrimary) // Exclude primary images
+        .forEach((img) => {
+          payload.append('boardingHouse', img.imageUrl);
+        });
 
-      allImages.push(primaryImage);
-      allImages.push(...otherImages);
-
-      console.log('📸 All Images:', allImages);
-
-      if (allImages.length === 0) {
-        toast.error('You must upload at least one image.');
-        return;
-      }
-
-      // 🏷 Thêm ảnh vào payload
-      allImages.forEach((file, index) => {
-        if (file instanceof File) {
-          payload.append('boardingHouse', file);
-        } else {
-          console.warn(`⚠ Skipping invalid file at index ${index}:`, file);
-        }
-      });
-
-      // ✅ Kiểm tra payload trước khi gửi request
+      // Debug payload
       console.log('🚀 Final Payload Data:');
       for (let pair of payload.entries()) {
         console.log(pair[0], pair[1]);
       }
 
-      // Gửi request cập nhật
+      // Make API request
       const response = await updateBoardingHouseDetailsOwner(
-        updatedData._id,
+        updatedData._id, // Boarding house ID
         payload
       );
 
-      if (response?.message === 'Boarding house updated successfully!') {
-        toast.success(response.message);
+      // Handle response based on success status
+      if (response?.success) {
+        toast.success(
+          response.message || 'Boarding house updated successfully.'
+        );
         onUpdate(); // Notify parent to refresh data
         onCancel(); // Close modal
       } else {
-        throw new Error(
-          response?.message || 'Failed to update boarding house.'
-        );
+        toast.error(response?.message || 'Failed to update boarding house.');
       }
     } catch (error) {
       console.error('❌ Error updating boarding house:', error);
@@ -291,7 +278,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       setLoading(false);
     }
   };
-
   if (!updatedData) {
     return null; // Do not render modal if no data
   }
@@ -361,10 +347,9 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           formData={formData}
         />
         <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
-        {/* Primary Image */}
         <Form.Item label="Primary Image" className="mb-4">
           <div className="flex flex-col gap-4">
-            {/* Check primary Image exists */}
+            {/* Check if a primary image exists */}
             {updatedData.primaryImage ||
             images?.find((img) => img.isPrimary) ? (
               <div className="relative">
@@ -372,7 +357,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
                   src={
                     updatedData.primaryImage
                       ? URL.createObjectURL(updatedData.primaryImage)
-                      : `${images.find((img) => img.isPrimary)?.imageUrl}`
+                      : images.find((img) => img.isPrimary)?.imageUrl
                   }
                   alt="Primary"
                   className="object-cover border rounded"
@@ -419,7 +404,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
 
         <Form.Item label="Other Images" className="mb-4">
           <div className="mt-4 flex flex-wrap gap-4">
-            {/* Display Other Images*/}
+            {/* Display Other Images */}
             {images
               .filter((img) => !img.isPrimary) // Exclude primary images
               .map((img) => (
@@ -480,7 +465,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
               <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
                 <PlusOutlined className="text-2xl text-gray-400" />
                 <p className="text-gray-500 mt-2 text-sm font-medium">
-                  Add Primary Image
+                  Add Other Image
                 </p>
                 <p className="text-gray-400 text-xs">
                   Drag-drop or click here to choose a file
