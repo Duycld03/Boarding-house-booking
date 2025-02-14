@@ -26,7 +26,7 @@ import {
 import { updateBoardingHouseDetailsOwner } from '../../../api/BoardingHManagement';
 
 const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
-  const [updatedData, setUpdatedData] = useState(null); // Updated form data
+  const [updatedData, setUpdatedData] = useState({}); // Updated form data
   const [loading, setLoading] = useState(false); // Loading state
   const [provinces, setProvinces] = useState([]); // Provinces list
   const [districts, setDistricts] = useState([]); // Districts list
@@ -36,8 +36,15 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
 
   // Initialize form data and images when `formData` changes
   useEffect(() => {
+    console.log('Received formData:', formData);
+
     if (formData) {
-      setUpdatedData({ ...formData });
+      setUpdatedData({
+        ...formData,
+        primaryImage: formData.primaryImage || null, // Đảm bảo không undefined
+        otherImages: formData.otherImages || [], // Đảm bảo luôn là mảng
+      });
+
       setImages(formData.images || []);
     } else {
       setUpdatedData(null);
@@ -115,15 +122,33 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
   };
 
   // Handle file changes for primary and other images
-  const handleFileChange = (file, isPrimary = false) => {
+  const handleFileChange = (e, isPrimary = false) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
     if (isPrimary) {
       setUpdatedData((prev) => ({ ...prev, primaryImage: file }));
     } else {
       setUpdatedData((prev) => ({
         ...prev,
-        otherImages: [...(prev.otherImages || []), file],
+        otherImages: [...prev.otherImages, file],
       }));
     }
+  };
+  // Remove primary image
+  const handleRemovePrimaryImage = () => {
+    setUpdatedData((prev) => ({
+      ...prev,
+      primaryImage: null,
+    }));
+
+    //  remove primary Image
+    setImages((prevImages) =>
+      prevImages.map((img) =>
+        img.isPrimary ? { ...img, isPrimary: false } : img
+      )
+    );
+    toast.success('Primary image removed.');
   };
 
   // Remove other images
@@ -132,23 +157,17 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       ...prev,
       otherImages: prev.otherImages.filter((_, i) => i !== index),
     }));
-  };
-
-  // Remove primary image
-  const handleRemovePrimaryImage = () => {
-    setUpdatedData((prev) => ({
-      ...prev,
-      primaryImage: null,
-    }));
+    toast.success('Temporary image removed.');
   };
 
   // Delete images from backend
   const handleImageDelete = (id) => {
     setImages((prev) => prev.filter((img) => img._id !== id));
+    toast.success('Image removed from the list.');
   };
   const handleSelectedTypesChange = (event) => {
     const { name, value } = event.target;
-    updatedData((prevData) => ({
+    setUpdatedData((prevData) => ({
       ...prevData,
       [name]: { _id: value },
     }));
@@ -177,6 +196,8 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
 
     try {
       setLoading(true);
+      console.log('updatedData:', updatedData);
+      console.log('Images:', updatedData?.images);
 
       const payload = new FormData();
       payload.append('boardingHouseType', updatedData.boardingHouseType);
@@ -190,13 +211,29 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       payload.append('address[ward]', updatedData.address.ward);
       payload.append('address[detail]', updatedData.address.detail);
 
-      if (updatedData.primaryImage instanceof File) {
-        payload.append('primaryImage', updatedData.primaryImage);
-      }
+      const allImages = [];
+      const images = updatedData?.images || [];
 
-      updatedData.otherImages
-        ?.filter((file) => file instanceof File)
-        .forEach((file) => payload.append('otherImages', file));
+      images.forEach((img) => {
+        if (img.isPrimary) {
+          updatedData.primaryImage = img.file; // Ảnh chính
+        } else {
+          updatedData.otherImages = updatedData.otherImages || [];
+          updatedData.otherImages.push(img.file); // Ảnh khác
+        }
+      });
+
+      // Đảm bảo allImages chứa ít nhất một ảnh
+      if (updatedData.primaryImage) allImages.push(updatedData.primaryImage);
+      if (Array.isArray(updatedData.otherImages))
+        allImages.push(...updatedData.otherImages);
+
+      console.log('All Images:', allImages);
+
+      if (allImages.length === 0) {
+        toast.error('You must upload at least one image.');
+        return;
+      }
 
       const response = await updateBoardingHouseDetailsOwner(
         updatedData._id,
@@ -406,8 +443,8 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
               {...uploadOtherImgProps}
               listType="picture-card"
               showUploadList={false}
-              className="custom-upload"
               name="boardingHouse"
+              className="custom-upload"
             >
               <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
                 <PlusOutlined className="text-2xl text-gray-400" />
