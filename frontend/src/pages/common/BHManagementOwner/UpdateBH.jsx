@@ -107,13 +107,16 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
   // Update form data on input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const keys = name.split('.');
+    const keys = name.split('.'); // Split by dot notation for nested fields (e.g., "address.detail")
+
     if (keys.length === 2) {
+      // Handle nested fields (e.g., "address.detail")
       setUpdatedData((prev) => ({
         ...prev,
         [keys[0]]: { ...prev[keys[0]], [keys[1]]: value },
       }));
     } else {
+      // Handle top-level fields
       setUpdatedData((prev) => ({
         ...prev,
         [name]: value,
@@ -293,7 +296,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       <Form
         layout="vertical"
         onFinish={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
+        className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-lg"
       >
         <h2 className="text-3xl font-bold mb-4">1. Information</h2>
 
@@ -337,15 +340,127 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         </div>
 
         <h2 className="text-3xl font-bold mb-4 mt-10 ">Address</h2>
-        <AddressSelector
-          provinces={provinces}
-          districts={districts}
-          wards={wards}
-          onProvinceChange={handleInputChange}
-          onDistrictChange={handleInputChange}
-          onInputChange={handleInputChange}
-          formData={formData}
-        />
+        <Form.Item className="mb-4">
+          {/* Province */}
+          <Form.Item
+            label="Province"
+            required
+            rules={[{ required: true, message: 'Province is required' }]}
+          >
+            <Select
+              placeholder="Select Province"
+              loading={!provinces.length} // Loader when provinces are being fetched
+              value={updatedData?.address?.province || null}
+              onChange={(value) => {
+                handleInputChange({
+                  target: {
+                    name: 'address.province',
+                    value,
+                  },
+                });
+                // Clear district and ward when province changes
+                setUpdatedData((prev) => ({
+                  ...prev,
+                  address: {
+                    ...prev.address,
+                    province: value,
+                    district: null,
+                    ward: null,
+                  },
+                }));
+              }}
+              allowClear
+            >
+              {provinces.map((province) => (
+                <Select.Option key={province.code} value={province.name}>
+                  {province.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          {/* District */}
+          <Form.Item
+            label="District"
+            required
+            rules={[{ required: true, message: 'District is required' }]}
+          >
+            <Select
+              placeholder="Select District"
+              loading={!districts.length && updatedData?.address?.province} // Loader when districts are being fetched
+              value={updatedData?.address?.district || null}
+              onChange={(value) => {
+                handleInputChange({
+                  target: {
+                    name: 'address.district',
+                    value,
+                  },
+                });
+                // Clear ward when district changes
+                setUpdatedData((prev) => ({
+                  ...prev,
+                  address: {
+                    ...prev.address,
+                    district: value,
+                    ward: null,
+                  },
+                }));
+              }}
+              disabled={!updatedData?.address?.province} // Disabled until province is selected
+              allowClear
+            >
+              {districts.map((district) => (
+                <Select.Option key={district.code} value={district.name}>
+                  {district.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          {/* Ward */}
+          <Form.Item
+            label="Ward"
+            required
+            rules={[{ required: true, message: 'Ward is required' }]}
+          >
+            <Select
+              placeholder="Select Ward"
+              loading={!wards.length && updatedData?.address?.district} // Loader when wards are being fetched
+              value={updatedData?.address?.ward || null}
+              onChange={(value) => {
+                handleInputChange({
+                  target: {
+                    name: 'address.ward',
+                    value,
+                  },
+                });
+                setUpdatedData((prev) => ({
+                  ...prev,
+                  address: {
+                    ...prev.address,
+                    ward: value,
+                  },
+                }));
+              }}
+              disabled={!updatedData?.address?.district} // Disabled until district is selected
+              allowClear
+            >
+              {wards.map((ward) => (
+                <Select.Option key={ward.code} value={ward.name}>
+                  {ward.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item label="Detail">
+            <Input.TextArea
+              name="address.detail" // Correctly set name to "address.detail"
+              value={updatedData?.address?.detail || ''} // Bind to the state
+              onChange={handleInputChange} // Use the updated handleInputChange function
+              rows={4}
+            />
+          </Form.Item>
+        </Form.Item>
         <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
         <Form.Item label="Primary Image" className="mb-4">
           <div className="flex flex-col gap-4">
