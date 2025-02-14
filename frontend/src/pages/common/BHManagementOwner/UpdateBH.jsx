@@ -190,14 +190,12 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
     showUploadList: false,
   };
 
-  // Submit updated data
   const handleSubmit = async () => {
     if (!updatedData) return;
 
     try {
       setLoading(true);
-      console.log('updatedData:', updatedData);
-      console.log('Images:', updatedData?.images);
+      console.log('✅ Updated Data:', updatedData);
 
       const payload = new FormData();
       payload.append('boardingHouseType', updatedData.boardingHouseType);
@@ -211,30 +209,63 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       payload.append('address[ward]', updatedData.address.ward);
       payload.append('address[detail]', updatedData.address.detail);
 
+      // 🖼 Xử lý hình ảnh
       const allImages = [];
       const images = updatedData?.images || [];
 
+      let primaryImage = null;
+      let otherImages = [];
+
       images.forEach((img) => {
         if (img.isPrimary) {
-          updatedData.primaryImage = img.file; // Ảnh chính
+          primaryImage = img.imageUrl;
         } else {
-          updatedData.otherImages = updatedData.otherImages || [];
-          updatedData.otherImages.push(img.file); // Ảnh khác
+          if (img.file instanceof File) {
+            otherImages.push(img.file);
+          }
         }
       });
 
-      // Đảm bảo allImages chứa ít nhất một ảnh
-      if (updatedData.primaryImage) allImages.push(updatedData.primaryImage);
-      if (Array.isArray(updatedData.otherImages))
-        allImages.push(...updatedData.otherImages);
+      // ✅ Kiểm tra ảnh chính
+      console.log('📌 Primary Image:', primaryImage);
 
-      console.log('All Images:', allImages);
+      if (!primaryImage) {
+        toast.error('Missing primary image.');
+        return;
+      }
+
+      // Giới hạn số lượng ảnh phụ
+      if (otherImages.length > 15) {
+        toast.error("You can't upload more than 15 other images.");
+        return;
+      }
+
+      allImages.push(primaryImage);
+      allImages.push(...otherImages);
+
+      console.log('📸 All Images:', allImages);
 
       if (allImages.length === 0) {
         toast.error('You must upload at least one image.');
         return;
       }
 
+      // 🏷 Thêm ảnh vào payload
+      allImages.forEach((file, index) => {
+        if (file instanceof File) {
+          payload.append('boardingHouse', file);
+        } else {
+          console.warn(`⚠ Skipping invalid file at index ${index}:`, file);
+        }
+      });
+
+      // ✅ Kiểm tra payload trước khi gửi request
+      console.log('🚀 Final Payload Data:');
+      for (let pair of payload.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      // Gửi request cập nhật
       const response = await updateBoardingHouseDetailsOwner(
         updatedData._id,
         payload
@@ -250,7 +281,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         );
       }
     } catch (error) {
-      console.error('Error updating boarding house:', error);
+      console.error('❌ Error updating boarding house:', error);
       toast.error(
         error.response?.data?.message ||
           error.message ||
