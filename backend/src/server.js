@@ -5,6 +5,8 @@ import route from "./routes/index.js";
 import cors from "cors";
 import { fileURLToPath } from "url";
 import path from "path";
+import setupSwagger from "./config/swagger.js";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +21,10 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
+
+//setupSwagger
+setupSwagger(app);
+
 
 // Kết nối đến MongoDB
 connect();
@@ -48,4 +54,6 @@ const port = process.env.APP_PORT || 3000;
 
 app.listen(port, hostname, () => {
   console.log(`Server is running at http://${hostname}:${port}/`);
+  console.log("Swagger Docs available at http://localhost:3000/api-docs");
+
 });

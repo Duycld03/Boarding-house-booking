@@ -12,6 +12,21 @@ export const fetchProvinces = async () => {
     }
 };
 
+
+export const fetchProvincesByName = async (name) => {
+    try {
+        const response = await axios.get(`${host}?depth=1`);
+        const provinces = response.data;
+
+        return provinces.find((province) => province.name.includes(name)) || null;
+    } catch (error) {
+        console.error('Error fetching provinces:', error.response || error.message);
+        throw error;
+    }
+};
+
+
+
 export const fetchDistricts = async (provinceCode) => {
     try {
         // Check if the endpoint is correct

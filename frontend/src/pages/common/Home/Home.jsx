@@ -1,66 +1,69 @@
-import { useState, useEffect } from 'react';
-import classNames from 'classnames/bind';
-import Styles from './Home.module.css';
-import BoardingHouseGrid from '../../../component/BoardingHouseCard';
-import { Tabs } from 'antd';
-import { getAllBHHome } from '../../../api/BoardingHManagement';
-import { toast } from 'react-toastify';
-import formatAmount from '@/utils/formatAmount';
-import { formatTimeAgo } from '../../../utils/timeUtils';
-import truncateDetail from '../../../utils/truncateDetail';
+import { useState, useEffect } from "react";
+import classNames from "classnames/bind";
+import Styles from "./Home.module.css";
+import BoardingHouseGrid from "../../../component/BoardingHouseCard";
+import { Tabs } from "antd";
+import { toast } from "react-toastify";
+import formatAmount from "@/utils/formatAmount";
+import { formatTimeAgo } from "../../../utils/timeUtils";
+import truncateDetail from "../../../utils/truncateDetail";
+import SearchBar from "./SearchBar";
+import { getBhByArea } from "../../../api/ownerUser/boardingHouse";
+import useDebounce from "../../../hooks/useDebounce";
 
 const cx = classNames.bind(Styles);
 
 function Home() {
-  const [originalData, setOriginalData] = useState([]); // Lưu dữ liệu gốc
-  const [activeTab, setActiveTab] = useState('all');
-  const [loadingTabs, setLoadingTabs] = useState({
-    all: false,
-    newest: false,
-    highRating: false,
+  const [originalData, setOriginalData] = useState([]);
+  const [activeTab, setActiveTab] = useState("all");
+  const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState({
+    province: "",
+    district: "",
+    ward: "",
   });
 
-  const fetchData = async (tab) => {
-    setLoadingTabs((prev) => ({ ...prev, [tab]: true }));
+  const fetchBhByArea = async () => {
+    setLoading(true);
     try {
-      const res = await getAllBHHome();
-
-      const baseUrl = 'http://localhost:3000';
+      const res = await getBhByArea(searchValue);
+      const baseUrl = "http://localhost:3000";
 
       const formattedData = res.map((item) => {
         const imgPath =
           item.images?.find((img) => img.isPrimary)?.imageUrl ||
           item.images?.[0]?.imageUrl ||
-          '';
-        const imgUrl = imgPath ? `${baseUrl}${imgPath}` : '';
+          "";
+        const imgUrl = imgPath ? `${baseUrl}${imgPath}` : "";
 
         return {
           id: item._id?.$oid || item._id,
           name: item.name,
           price: formatAmount(item.priceRange),
           detail: truncateDetail(
-            item.address?.province || 'No address provided'
+            item.address?.province || "No address provided"
           ),
           rating: item.rating || 0,
-          reviewCount: item.reviewCount || 0, // Bổ sung để tránh lỗi
+          reviewCount: item.reviewCount || 0,
           img: imgUrl,
           updatedAt: item.updatedAt,
           timeAgo: formatTimeAgo(item.updatedAt),
         };
       });
 
-      setOriginalData(formattedData); // Lưu trữ dữ liệu gốc
+      setOriginalData(formattedData);
     } catch (error) {
-      console.error('Failed to fetch boarding houses:', error);
-      toast.error('Failed to fetch boarding houses. Please try again later.');
+      console.error("Error fetching boarding houses:", error);
+      toast.error("Failed to fetch boarding houses. Please try again later.");
       setOriginalData([]);
     } finally {
-      setLoadingTabs((prev) => ({ ...prev, [tab]: false }));
+      setLoading(false);
     }
   };
+
   useEffect(() => {
-    fetchData(activeTab);
-  }, [activeTab]);
+    fetchBhByArea();
+  }, [searchValue, activeTab]);
 
   const allData = [...originalData].sort((a, b) =>
     a.name.localeCompare(b.name)
@@ -81,30 +84,27 @@ function Home() {
     .slice(0, 10);
 
   return (
-    <div className={cx('home-container')}>
-      <div className={cx('content')}>
-        <div className={cx('filter')}>
-          <h2>Filter option</h2>
-        </div>
+    <div>
+      <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
+      <div className={cx("home-container")}>
+        <div className={cx("content")}>
+          <div className={cx("filter")}>
+            <h2>Filter option</h2>
+          </div>
 
-        <div className={cx('grid')}>
-          <Tabs defaultActiveKey="all" onChange={(key) => setActiveTab(key)}>
-            <Tabs.TabPane tab="All" key="all">
-              <BoardingHouseGrid data={allData} loading={loadingTabs.all} />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab="Newest" key="newest">
-              <BoardingHouseGrid
-                data={newestData}
-                loading={loadingTabs.newest}
-              />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab="High rating" key="highRating">
-              <BoardingHouseGrid
-                data={highRatingData}
-                loading={loadingTabs.highRating}
-              />
-            </Tabs.TabPane>
-          </Tabs>
+          <div className={cx("grid")}>
+            <Tabs defaultActiveKey="all" onChange={setActiveTab}>
+              <Tabs.TabPane tab="All" key="all">
+                <BoardingHouseGrid data={allData} loading={loading} />
+              </Tabs.TabPane>
+              <Tabs.TabPane tab="Newest" key="newest">
+                <BoardingHouseGrid data={newestData} loading={loading} />
+              </Tabs.TabPane>
+              <Tabs.TabPane tab="High rating" key="highRating">
+                <BoardingHouseGrid data={highRatingData} loading={loading} />
+              </Tabs.TabPane>
+            </Tabs>
+          </div>
         </div>
       </div>
     </div>

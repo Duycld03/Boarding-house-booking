@@ -12,3 +12,10 @@ export const getRoomTypeByBhId = (id) => {
 export const getReviewByBhId = (id) => {
     return axios.get(`/boardinghouse/reviews/${id}`);
 };
+
+
+export const getBhByArea = async (filterValue) => {
+    return axios.get(`/boardinghouse/home/area`, {
+        params: filterValue,
+    });
+}
