@@ -217,7 +217,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       payload.append('address[ward]', updatedData.address.ward);
       payload.append('address[detail]', updatedData.address.detail);
 
-      // Append primary image (new or existing) under `boardingHouse`
+      // Append primary image (new or existing)
       if (updatedData.primaryImage instanceof File) {
         payload.append('boardingHouse', updatedData.primaryImage);
       } else {
@@ -232,20 +232,26 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         }
       }
 
-      // Append new "Other Images" (files) under `boardingHouse`
+      // Append new "Other Images" (files)
       if (updatedData.otherImages) {
-        updatedData.otherImages.forEach((file) => {
-          if (file instanceof File) {
-            payload.append('boardingHouse', file);
+        updatedData.otherImages.forEach((files) => {
+          if (files instanceof File) {
+            payload.append('boardingHouse', files);
           }
         });
       }
 
-      // Append existing "Other Images" (URLs) under `boardingHouse`
+      // Append existing "Other Images" (URLs)
       images
         .filter((img) => !img.isPrimary) // Exclude primary images
         .forEach((img) => {
-          payload.append('boardingHouse', img.imageUrl);
+          if (
+            !updatedData.otherImages?.some(
+              (file) => file instanceof File && file.name === img.name
+            )
+          ) {
+            payload.append('boardingHouse', img.imageUrl);
+          }
         });
 
       // Debug payload
@@ -260,7 +266,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         payload
       );
 
-      // Handle response based on success status
       if (response?.success) {
         toast.success(
           response.message || 'Boarding house updated successfully.'
