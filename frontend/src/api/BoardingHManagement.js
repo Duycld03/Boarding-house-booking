@@ -80,3 +80,9 @@ export const createBoardingHouseOwner = (data) => {
 export const softDeleteBoardingHouseOwner = async (boardingHouseId) => {
   return axios.delete(`/owner/boardinghouse/${boardingHouseId}/softDelete`);
 };
+export const updateBoardingHouseDetailsOwner = (
+  boardingHouseId,
+  updateData
+) => {
+  return axios.put(`/owner/boardinghouse/${boardingHouseId}`, updateData);
+};
