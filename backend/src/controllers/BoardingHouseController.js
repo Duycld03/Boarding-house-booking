@@ -10,7 +10,6 @@ import fs from 'fs';
 import multer from 'multer';
 import Account from '../models/account.js';
 import Review from '../models/review.js';
-import { log } from 'console';
 
 class boardingHouseController {
   async getAllBHOnDashBoard(req, res, next) {
@@ -924,15 +923,24 @@ class boardingHouseController {
           .status(404)
           .json({ success: false, message: 'Boarding house not found.' });
       }
+      console.log(req.body);
 
       // Handle image upload to Cloudinary
       const images = [];
-      if (req.files && req.files.length > 0) {
+      if (req.body.boardingHouse) {
+        const data = JSON.parse(req.body.boardingHouse);
+        console.log(data);
+
+        if (Array.isArray(data)) {
+          images.push(...data);
+        }
+      }
+      if (req.files) {
         req.files.forEach((file) => {
           images.push({
             imageUrl: file.path,
             publicId: file.filename,
-            isPrimary: images.length === 0, // First image is primary
+            isPrimary: false,
           });
         });
 

@@ -32,17 +32,28 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
   const [districts, setDistricts] = useState([]); // Districts list
   const [wards, setWards] = useState([]); // Wards list
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]); // House types
-  const [images, setImages] = useState([]); // Images from backend
+  const [images, setImages] = useState([]);
 
   // Initialize form data and images when `formData` changes
   useEffect(() => {
     console.log('Received formData:', formData);
 
     if (formData) {
+      let primaryImage = {};
+      const otherImage = [];
+      formData.images.forEach((image) => {
+        if (image.isPrimary) {
+          primaryImage = image;
+        } else {
+          otherImage.push(image);
+        }
+      });
+      console.log('Other', otherImage);
+
       setUpdatedData({
         ...formData,
-        primaryImage: formData.primaryImage || null, // Đảm bảo không undefined
-        otherImages: formData.otherImages || [], // Đảm bảo luôn là mảng
+        primaryImage: primaryImage, // Đảm bảo không undefined
+        otherImages: otherImage,
       });
 
       setImages(formData.images || []);
@@ -135,7 +146,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         primaryImage: file, // Update primaryImage only
       }));
     } else {
-      // Append the new file to the otherImages array
       setUpdatedData((prev) => ({
         ...prev,
         otherImages: [...(prev.otherImages || []), file], // Append to otherImages
@@ -218,47 +228,37 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       payload.append('address[detail]', updatedData.address.detail);
 
       // Append primary image (new or existing)
-      if (updatedData.primaryImage instanceof File) {
-        payload.append('boardingHouse', updatedData.primaryImage);
-      } else {
-        const existingPrimaryImage = images.find(
-          (img) => img.isPrimary
-        )?.imageUrl;
-        if (existingPrimaryImage) {
-          payload.append('boardingHouse', existingPrimaryImage);
+      const oldImg = [];
+
+      if (updatedData.primaryImage) {
+        if (updatedData.primaryImage instanceof File) {
+          payload.append('boardingHouse', updatedData.primaryImage);
         } else {
-          toast.error('A primary image is required.');
-          return;
+          oldImg.push(updatedData.primaryImage);
         }
+      } else {
+        toast.error('A primary image is required.');
+        return;
       }
 
       // Append new "Other Images" (files)
       if (updatedData.otherImages) {
-        updatedData.otherImages.forEach((files) => {
-          if (files instanceof File) {
-            payload.append('boardingHouse', files);
+        console.log(updatedData.otherImages);
+
+        updatedData.otherImages.forEach((file) => {
+          if (file instanceof File) {
+            payload.append('boardingHouse', file);
+          } else {
+            oldImg.push(file);
           }
         });
       }
-
-      // Append existing "Other Images" (URLs)
-      images
-        .filter((img) => !img.isPrimary) // Exclude primary images
-        .forEach((img) => {
-          if (
-            !updatedData.otherImages?.some(
-              (file) => file instanceof File && file.name === img.name
-            )
-          ) {
-            payload.append('boardingHouse', img.imageUrl);
-          }
-        });
-
-      // Debug payload
-      console.log('🚀 Final Payload Data:');
-      for (let pair of payload.entries()) {
-        console.log(pair[0], pair[1]);
+      if (oldImg.length > 0) {
+        payload.append('boardingHouse', JSON.stringify(oldImg));
       }
+      // for (let pair of payload.entries()) {
+      //   console.log(pair[0], pair[1]);
+      // }
 
       // Make API request
       const response = await updateBoardingHouseDetailsOwner(
@@ -300,7 +300,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
     >
       <Form
         layout="vertical"
-        onFinish={handleSubmit}
+        // onFinish={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-lg"
       >
         <h2 className="text-3xl font-bold mb-4">1. Information</h2>
@@ -475,9 +475,8 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
               <div className="relative">
                 <Image
                   src={
-                    updatedData.primaryImage
-                      ? URL.createObjectURL(updatedData.primaryImage)
-                      : images.find((img) => img.isPrimary)?.imageUrl
+                    updatedData?.primaryImage?.imageUrl ||
+                    URL.createObjectURL(updatedData.primaryImage)
                   }
                   alt="Primary"
                   className="object-cover border rounded"
@@ -554,7 +553,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
             {(updatedData.otherImages || []).map((file, index) => (
               <div key={index} className="relative group">
                 <Image
-                  src={URL.createObjectURL(file)}
+                  src={file?.imageUrl || URL.createObjectURL(file)}
                   alt={`Other Image ${index + 1}`}
                   className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
                   width={100}
