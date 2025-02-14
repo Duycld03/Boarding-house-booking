@@ -22,7 +22,7 @@ const RoomTypeSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
-  imageURL: {
+  image: {
     imageUrl: {
       type: String,
       required: true,

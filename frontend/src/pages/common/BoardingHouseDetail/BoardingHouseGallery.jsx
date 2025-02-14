@@ -26,7 +26,6 @@ import { Dropdown, Menu, Tooltip } from "antd";
 const BoardingHouseGallery = ({ images, onReport, onSave }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [isReported, setIsReported] = useState(false);
 
   if (!images || images.length === 0) return <p>Không có ảnh</p>;
 
@@ -86,7 +85,7 @@ const BoardingHouseGallery = ({ images, onReport, onSave }) => {
         {sortedImages.map((image) => (
           <SwiperSlide key={image._id}>
             <img
-              src={`${import.meta.env.VITE_BASE_URL}${image.imageUrl}`}
+              src={image.imageUrl}
               alt="Boarding House"
               className="w-full md:h-[500px] object-cover rounded-lg"
             />
@@ -107,7 +106,7 @@ const BoardingHouseGallery = ({ images, onReport, onSave }) => {
         {sortedImages.map((image) => (
           <SwiperSlide key={image._id} className="cursor-pointer">
             <img
-              src={`${import.meta.env.VITE_BASE_URL}${image.imageUrl}`}
+              src={image.imageUrl}
               alt="Thumbnail"
               className="w-full h-52 object-cover rounded-md border border-gray-300"
             />

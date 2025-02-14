@@ -83,12 +83,7 @@ const ReviewCard = ({ reviewData, onReport }) => {
         </div>
 
         <Card.Meta
-          avatar={
-            <Avatar
-              src={`${import.meta.env.VITE_BASE_URL}${accountId?.avatarImage}`}
-              size="large"
-            />
-          }
+          avatar={<Avatar src={accountId?.avatarImage?.url} size="large" />}
           title={accountId?.fullname || "Anonymous"}
           description={
             <>
@@ -134,10 +129,10 @@ const ReviewCard = ({ reviewData, onReport }) => {
             }}
             className="md:max-w-[350px]"
           >
-            {visibleImages.map((imageUrl, index) => (
+            {visibleImages.map((image, index) => (
               <Image
                 key={index}
-                src={`${import.meta.env.VITE_BASE_URL}${imageUrl}`}
+                src={image?.imageUrl}
                 alt={`Review Image ${index + 1}`}
                 style={{
                   width: "100px",
