@@ -241,8 +241,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         onFinish={handleSubmit}
         className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
       >
-        <h2 className="text-4xl font-bold mb-8">Boarding House Detail</h2>
-        <h2 className="text-3xl font-bold mb-4">1. Owner and Information</h2>
+        <h2 className="text-3xl font-bold mb-4">1. Information</h2>
 
         <Form.Item label="Name Boarding House" className="mb-2">
           <Input
