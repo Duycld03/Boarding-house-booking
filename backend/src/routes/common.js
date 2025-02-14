@@ -43,6 +43,46 @@ commonRouter.post('/verify-register', authController.verifyRegister);
 //boarding house
 commonRouter.get('/boardinghouse', boardingHouseController.getAllBHOnHome);
 commonRouter.get('/boardinghouse/:id', boardingHouseController.getBoardingHouseDetailInUser);
+/**
+ * @swagger
+ * /boardinghouse/room-types/{id}:
+ *   get:
+ *     summary: Lấy danh sách loại phòng theo ID nhà trọ
+ *     tags: 
+ *       - Boarding House
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID của nhà trọ
+ *     responses:
+ *       200:
+ *         description: Trả về danh sách các loại phòng của nhà trọ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: ID của loại phòng
+ *                   name:
+ *                     type: string
+ *                     description: Tên loại phòng
+ *                   price:
+ *                     type: number
+ *                     description: Giá loại phòng
+ *       400:
+ *         description: ID không hợp lệ
+ *       404:
+ *         description: Không tìm thấy nhà trọ hoặc loại phòng
+ *       500:
+ *         description: Lỗi máy chủ nội bộ
+ */
 commonRouter.get('/boardinghouse/room-types/:id', boardingHouseController.getRoomTypeByBhId);
 commonRouter.get('/boardinghouse/reviews/:id', boardingHouseController.getReviewByBhId);
 

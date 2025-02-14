@@ -15,7 +15,7 @@ const RoomCard = ({ roomData }) => {
       <div className="w-full flex flex-wrap gap-10">
         <img
           className="max-h-[400px] md:w-1/2 sm:w-full object-cover rounded-lg"
-          src={`${import.meta.env.VITE_BASE_URL}/${roomData?.imageURL}`}
+          src={roomData?.imageURL.url}
         />
 
         {/* content */}
