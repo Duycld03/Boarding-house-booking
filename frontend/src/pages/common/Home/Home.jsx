@@ -25,14 +25,11 @@ function Home() {
     try {
       const res = await getAllBHHome();
 
-      const baseUrl = 'http://localhost:3000';
-
       const formattedData = res.map((item) => {
-        const imgPath =
+        const imgUrl =
           item.images?.find((img) => img.isPrimary)?.imageUrl ||
           item.images?.[0]?.imageUrl ||
           '';
-        const imgUrl = imgPath ? `${baseUrl}${imgPath}` : '';
 
         return {
           id: item._id?.$oid || item._id,
@@ -42,14 +39,14 @@ function Home() {
             item.address?.province || 'No address provided'
           ),
           rating: item.rating || 0,
-          reviewCount: item.reviewCount || 0, // Bổ sung để tránh lỗi
-          img: imgUrl,
+          reviewCount: item.reviewCount || 0,
+          img: imgUrl, // Giữ nguyên URL ảnh từ cloud
           updatedAt: item.updatedAt,
           timeAgo: formatTimeAgo(item.updatedAt),
         };
       });
 
-      setOriginalData(formattedData); // Lưu trữ dữ liệu gốc
+      setOriginalData(formattedData);
     } catch (error) {
       console.error('Failed to fetch boarding houses:', error);
       toast.error('Failed to fetch boarding houses. Please try again later.');
@@ -58,6 +55,7 @@ function Home() {
       setLoadingTabs((prev) => ({ ...prev, [tab]: false }));
     }
   };
+
   useEffect(() => {
     fetchData(activeTab);
   }, [activeTab]);
