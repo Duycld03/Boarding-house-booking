@@ -16,49 +16,47 @@ import {
   StarFilled,
   StarOutlined,
 } from "@ant-design/icons";
-import AddressSelector from "../../../component/AddressSelector";
 import { getAllBoardingHouseTypesOwner } from "../../../api/BoardingHManagement";
 import {
   fetchProvinces,
   fetchDistricts,
   fetchWards,
 } from "../../../api/apiAddress";
+import { getBoardingHouseDetail } from "../../../api/ownerUser/boardingHouse";
 import { updateBoardingHouseDetailsOwner } from "../../../api/BoardingHManagement";
+import { useNavigate, useParams } from "react-router-dom";
+import { Back } from "../../../component";
 
-const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
+const BHOwnerDetail = () => {
+  const { boardingHouseId } = useParams();
+  const navigation = useNavigate();
+
   const [updatedData, setUpdatedData] = useState({}); // Updated form data
   const [loading, setLoading] = useState(false); // Loading state
   const [provinces, setProvinces] = useState([]); // Provinces list
   const [districts, setDistricts] = useState([]); // Districts list
   const [wards, setWards] = useState([]); // Wards list
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]); // House types
-  const [images, setImages] = useState([]);
 
-  // Initialize form data and images when `formData` changes
-  useEffect(() => {
-    if (formData) {
-      let primaryImage = {};
-      const otherImage = [];
-      formData.images.forEach((image) => {
-        if (image.isPrimary) {
-          primaryImage = image;
-        } else {
-          otherImage.push(image);
-        }
-      });
-
-      setUpdatedData({
-        ...formData,
-        primaryImage: primaryImage, // Đảm bảo không undefined
-        otherImages: otherImage,
-      });
-
-      setImages(formData.images || []);
-    } else {
-      setUpdatedData(null);
-      setImages([]);
+  const fetchBoardingHouseDetails = async () => {
+    if (!boardingHouseId) {
+      toast.error("Boarding house ID not found.");
+      navigation("/bh-management-owner");
     }
-  }, [formData]);
+    try {
+      const response = await getBoardingHouseDetail(boardingHouseId);
+      const primaryImage = response.images.find((img) => img.isPrimary);
+      const otherImages = response.images.filter((img) => !img.isPrimary);
+      setUpdatedData({ ...response, primaryImage, otherImages });
+    } catch (error) {
+      console.error("Failed to fetch boarding house data:", error);
+      toast.error("Failed to fetch boarding house data.");
+    }
+  };
+  useEffect(() => {
+    fetchBoardingHouseDetails();
+    console.log(updatedData);
+  }, []);
 
   // Fetch provinces, districts, and wards
   useEffect(() => {
@@ -155,14 +153,10 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
     }));
   };
   const handleRemovePrimaryImage = () => {
-    // Remove the primary image from `updatedData` and `images`
     setUpdatedData((prev) => ({
       ...prev,
-      primaryImage: null, // Set primaryImage to null
+      primaryImage: null,
     }));
-
-    // Remove the primary image from the `images` array
-    setImages((prevImages) => prevImages.filter((img) => !img.isPrimary));
   };
   // Remove other images
   const handleRemoveOtherImage = (index) => {
@@ -173,11 +167,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
     toast.success("Temporary image removed.");
   };
 
-  // Delete images from backend
-  const handleImageDelete = (id) => {
-    setImages((prev) => prev.filter((img) => img._id !== id));
-    toast.success("Image removed from the list.");
-  };
   const handleSelectedTypesChange = (event) => {
     const { name, value } = event.target;
     setUpdatedData((prevData) => ({
@@ -240,7 +229,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         return;
       }
 
-      // Append new "Other Images" (files)
       if (updatedData.otherImages) {
         updatedData.otherImages.forEach((file) => {
           if (file instanceof File) {
@@ -262,8 +250,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         toast.success(
           response.message || "Boarding house updated successfully."
         );
-        onUpdate(); // Notify parent to refresh data
-        onCancel(); // Close modal
       } else {
         toast.error(response?.message || "Failed to update boarding house.");
       }
@@ -282,19 +268,112 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
   }
 
   return (
-    <Modal
-      title="Boarding House Detail"
-      open={open}
-      onCancel={onCancel}
-      footer={null}
-      destroyOnClose
-    >
+    <div>
       <Form
         layout="vertical"
         // onFinish={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-lg"
+        className="bg-white p-6 rounded-lg w-full shadow-lg"
       >
-        <h2 className="text-3xl font-bold mb-4">1. Information</h2>
+        <Back />
+        <h2 className="text-3xl font-bold mb-4 mt-10 ">1. Image</h2>
+        <Form.Item label="Primary Image" className="mb-4">
+          <div className="flex flex-col gap-4">
+            {/* Check if a primary image exists */}
+            {updatedData.primaryImage ? (
+              <div className="relative">
+                <Image
+                  src={
+                    updatedData?.primaryImage?.imageUrl ||
+                    URL.createObjectURL(updatedData.primaryImage)
+                  }
+                  alt="Primary"
+                  className="object-cover border rounded"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    maxHeight: "300px",
+                  }}
+                  preview={{
+                    mask: <span className="text-white">Preview</span>,
+                  }}
+                />
+                {/* Delete Button */}
+                <button
+                  type="button"
+                  onClick={handleRemovePrimaryImage}
+                  className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                >
+                  X
+                </button>
+              </div>
+            ) : (
+              <Upload
+                {...uploadProps}
+                listType="picture-card"
+                showUploadList={false}
+                className="custom-upload"
+                name="boardingHouse"
+              >
+                <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
+                  <PlusOutlined className="text-2xl text-gray-400" />
+                  <p className="text-gray-500 mt-2 text-sm font-medium">
+                    Add Primary Image
+                  </p>
+                  <p className="text-gray-400 text-xs">
+                    Drag-drop or click here to choose a file
+                  </p>
+                </div>
+              </Upload>
+            )}
+          </div>
+        </Form.Item>
+
+        <Form.Item label="Other Images" className="mb-4">
+          <div className="mt-4 flex flex-wrap gap-4">
+            {/* Display Uploaded Other Images */}
+            {(updatedData.otherImages || []).map((file, index) => (
+              <div key={index} className="relative group">
+                <Image
+                  src={file?.imageUrl || URL.createObjectURL(file)}
+                  alt={`Other Image ${index + 1}`}
+                  className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+                  width={100}
+                  height={100}
+                  preview={{
+                    mask: <span className="text-white">Preview</span>,
+                  }}
+                />
+                {/* Delete Button */}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveOtherImage(index)}
+                  className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                >
+                  X
+                </button>
+              </div>
+            ))}
+
+            <Upload
+              {...uploadOtherImgProps}
+              listType="picture-card"
+              showUploadList={false}
+              name="boardingHouse"
+              className="custom-upload"
+            >
+              <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
+                <PlusOutlined className="text-2xl text-gray-400" />
+                <p className="text-gray-500 mt-2 text-sm font-medium">
+                  Add Other Image
+                </p>
+                <p className="text-gray-400 text-xs">
+                  Drag-drop or click here to choose a file
+                </p>
+              </div>
+            </Upload>
+          </div>
+        </Form.Item>
+        <h2 className="text-3xl font-bold mb-4">2. Information</h2>
 
         <Form.Item label="Name Boarding House" className="mb-2">
           <Input
@@ -335,7 +414,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           </Form.Item>
         </div>
 
-        <h2 className="text-3xl font-bold mb-4 mt-10 ">Address</h2>
+        <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Address</h2>
         <Form.Item className="mb-4">
           {/* Province */}
           <Form.Item
@@ -456,107 +535,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
               rows={4}
             />
           </Form.Item>
-        </Form.Item>
-        <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
-        <Form.Item label="Primary Image" className="mb-4">
-          <div className="flex flex-col gap-4">
-            {/* Check if a primary image exists */}
-            {updatedData.primaryImage ||
-            images?.find((img) => img.isPrimary) ? (
-              <div className="relative">
-                <Image
-                  src={
-                    updatedData?.primaryImage?.imageUrl ||
-                    URL.createObjectURL(updatedData.primaryImage)
-                  }
-                  alt="Primary"
-                  className="object-cover border rounded"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: "300px",
-                  }}
-                  preview={{
-                    mask: <span className="text-white">Preview</span>,
-                  }}
-                />
-                {/* Delete Button */}
-                <button
-                  type="button"
-                  onClick={handleRemovePrimaryImage}
-                  className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
-                >
-                  X
-                </button>
-              </div>
-            ) : (
-              // If no primary image exists, show the upload button
-              <Upload
-                {...uploadProps}
-                listType="picture-card"
-                showUploadList={false}
-                className="custom-upload"
-                name="boardingHouse"
-              >
-                <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                  <PlusOutlined className="text-2xl text-gray-400" />
-                  <p className="text-gray-500 mt-2 text-sm font-medium">
-                    Add Primary Image
-                  </p>
-                  <p className="text-gray-400 text-xs">
-                    Drag-drop or click here to choose a file
-                  </p>
-                </div>
-              </Upload>
-            )}
-          </div>
-        </Form.Item>
-
-        <Form.Item label="Other Images" className="mb-4">
-          <div className="mt-4 flex flex-wrap gap-4">
-            {/* Display Uploaded Other Images */}
-            {(updatedData.otherImages || []).map((file, index) => (
-              <div key={index} className="relative group">
-                <Image
-                  src={file?.imageUrl || URL.createObjectURL(file)}
-                  alt={`Other Image ${index + 1}`}
-                  className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-                  width={100}
-                  height={100}
-                  preview={{
-                    mask: <span className="text-white">Preview</span>,
-                  }}
-                />
-                {/* Delete Button */}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveOtherImage(index)}
-                  className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                >
-                  X
-                </button>
-              </div>
-            ))}
-
-            {/* Upload Other Images */}
-            <Upload
-              {...uploadOtherImgProps}
-              listType="picture-card"
-              showUploadList={false}
-              name="boardingHouse"
-              className="custom-upload"
-            >
-              <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                <PlusOutlined className="text-2xl text-gray-400" />
-                <p className="text-gray-500 mt-2 text-sm font-medium">
-                  Add Other Image
-                </p>
-                <p className="text-gray-400 text-xs">
-                  Drag-drop or click here to choose a file
-                </p>
-              </div>
-            </Upload>
-          </div>
         </Form.Item>
 
         <h2 className="text-3xl font-bold mb-4 mt-10 ">4. Price</h2>
@@ -695,16 +673,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           </Form.Item>
         </div>
         {/* </div> */}
-        <div className="flex justify-end">
-          <Button
-            className="bg-orange-600 text-white"
-            size="large"
-            title="Cancel"
-            // loading={loading}
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
+        <div className="flex">
           <Button
             className="bg-primary text-white ml-2"
             size="large"
@@ -716,8 +685,8 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           </Button>
         </div>
       </Form>
-    </Modal>
+    </div>
   );
 };
 
-export default UpdateBHModal;
+export default BHOwnerDetail;

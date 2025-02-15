@@ -7,7 +7,7 @@ import {
   ResetPassword,
   ChangePassword,
   VerifyChangeEmail,
-} from './auth';
+} from "./auth";
 import {
   AboutUs,
   Home,
@@ -17,7 +17,8 @@ import {
   BoardingHouseDetail,
   MyAppointment,
   BHManagementOwner,
-} from './common';
+  BHOwnerDetail,
+} from "./common";
 
 import {
   BoardingHouseManagement,
@@ -26,7 +27,7 @@ import {
   WithdrawalRequestManagement,
   AccountManagement,
   ReviewManagement,
-} from './dashboard';
+} from "./dashboard";
 
 export {
   //auth
@@ -47,10 +48,10 @@ export {
   Profile,
   ErrorPage,
   MyAppointment,
-  BHManagementOwner,
 
   // owner
-
+  BHManagementOwner,
+  BHOwnerDetail,
   //dashboard
   BoardingHouseManagement,
   AccountManagement,

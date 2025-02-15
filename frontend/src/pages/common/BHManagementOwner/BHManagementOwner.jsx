@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { TableCustom as Table, Button, ConfirmModal } from '../../../component';
-import { toast } from 'react-toastify';
-import { Tooltip } from 'antd';
-import { FileTextOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
+import { toast } from "react-toastify";
+import { Tooltip } from "antd";
+import { FileTextOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import {
   getAllBHOwner,
   updateBoardingHouseDetailsOwner,
   softDeleteBoardingHouseOwner,
-} from '../../../api/BoardingHManagement';
-import formatAmount from '../../../utils/formatAmount';
-import AddBHModal from './AddBH';
-import UpdateBHModal from './UpdateBH';
+} from "../../../api/BoardingHManagement";
+import formatAmount from "../../../utils/formatAmount";
+import AddBHModal from "./AddBH";
+import UpdateBHModal from "./UpdateBH";
 
 function BHManagementOwner() {
   const [boardingHouses, setBoardingHouses] = useState([]); // List of boarding houses
@@ -23,11 +23,11 @@ function BHManagementOwner() {
 
   // Table columns
   const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
+    { title: "Name", dataIndex: "name", key: "name" },
     {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
+      title: "Address",
+      dataIndex: "address",
+      key: "address",
       render: (address) =>
         address ? (
           <Tooltip
@@ -36,43 +36,44 @@ function BHManagementOwner() {
             {`${address.detail}, ${address.ward}, ${address.district}`}
           </Tooltip>
         ) : (
-          'N/A'
+          "N/A"
         ),
     },
     {
-      title: 'Price Range (VND)',
-      dataIndex: 'priceRange',
-      key: 'priceRange',
-      render: (price) => (price ? formatAmount(price) : 'N/A'),
+      title: "Price Range (VND)",
+      dataIndex: "priceRange",
+      key: "priceRange",
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
     {
-      title: 'Boarding House Type',
-      dataIndex: 'boardingHouseType',
-      key: 'boardingHouseType',
-      render: (type) => type?.name || 'N/A',
+      title: "Boarding House Type",
+      dataIndex: "boardingHouseType",
+      key: "boardingHouseType",
+      render: (type) => type?.name || "N/A",
     },
-    { title: 'Total Rooms', dataIndex: 'totalRooms', key: 'totalRooms' },
+    { title: "Total Rooms", dataIndex: "totalRooms", key: "totalRooms" },
     {
-      title: 'Available Rooms',
-      dataIndex: 'availableRooms',
-      key: 'availableRooms',
+      title: "Available Rooms",
+      dataIndex: "availableRooms",
+      key: "availableRooms",
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (_, record) => (
         <div className="flex gap-3">
           <Button
             size="large"
             btnDelete
-            title={'Delete'}
+            title={"Delete"}
             onClick={() => handleOpenDeleteModal(record)}
           />
           <Button
             size="large"
-            title={'Detail'}
+            title={"Detail"}
             icon={<FileTextOutlined />}
-            onClick={() => openEditModal(record)}
+            // onClick={() => openEditModal(record)}
+            onClick={() => navigate(`/bh-management-owner/${record._id}`)}
             className="text-white"
             bgColor="rgb(5 150 105)"
           />
@@ -89,11 +90,11 @@ function BHManagementOwner() {
       if (res && Array.isArray(res)) {
         setBoardingHouses(res);
       } else {
-        toast.error('Failed to fetch boarding houses.');
+        toast.error("Failed to fetch boarding houses.");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('An error occurred while fetching data.');
+      console.error("Error fetching data:", error);
+      toast.error("An error occurred while fetching data.");
     } finally {
       setLoading(false);
     }
@@ -126,11 +127,11 @@ function BHManagementOwner() {
     try {
       setLoading(true);
       await softDeleteBoardingHouseOwner(selectedData._id); // Call delete API
-      toast.success('Boarding house deleted successfully.');
+      toast.success("Boarding house deleted successfully.");
       fetchData(); // Refresh data
     } catch (error) {
-      console.error('Error deleting boarding house:', error);
-      toast.error('Failed to delete boarding house.');
+      console.error("Error deleting boarding house:", error);
+      toast.error("Failed to delete boarding house.");
     } finally {
       setLoading(false);
       setIsOpenDeleteModal(false); // Close delete modal

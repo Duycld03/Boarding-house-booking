@@ -1,1 +1,1 @@
-export { default } from './BHManagementOwner';
+export { default } from "./BHManagementOwner";

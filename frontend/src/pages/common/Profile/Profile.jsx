@@ -163,7 +163,7 @@ function Profile() {
       {profileLoading ? (
         <Loader />
       ) : (
-        <div className="flex justify-between mb-4 flex-col md:w-[60%] mx-auto">
+        <div className="flex justify-between mb-4 flex-col  mx-auto">
           <Card>
             <div className="flex justify-center items-center flex-col">
               <Upload
