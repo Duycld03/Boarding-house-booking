@@ -605,7 +605,7 @@ const AddBHModal = ({ onAddData }) => {
               size="large"
               onClick={handleSubmit}
               title="Submit"
-              disabled={loading} // Disable button when loading
+              loading={loading} // Disable button when loading
             >
               {loading ? <Spin size="small" className="mr-2" /> : null} Submit
             </Button>
