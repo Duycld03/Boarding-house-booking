@@ -766,6 +766,7 @@ class boardingHouseController {
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
+
   async getAllBHOwner(req, res, next) {
     try {
       // Lấy thông tin tài khoản từ token
@@ -946,7 +947,6 @@ class boardingHouseController {
             isPrimary: !hasPrimary && index === 0,
           });
         });
-
         // Delete old images from Cloudinary
         for (const oldImage of boardingHouse.images) {
           await cloudinary.uploader.destroy(oldImage.publicId);
@@ -1008,6 +1008,44 @@ class boardingHouseController {
           "Failed to update boarding house details. Please try again later.",
         error: error.message,
       });
+    }
+  }
+  async getBhByArea(req, res) {
+    try {
+      const { province, district, ward } = req.query;
+      let result = [];
+
+      const boardingHData = await BoardingHouse.find(
+        { totalRooms: { $gt: 0 } },
+        { reviews: 0 }
+      );
+
+      result = boardingHData;
+
+      if (province) {
+        result = result.filter((bh) =>
+          bh.address?.province.includes(province) ?? false
+        );
+      }
+
+
+
+      if (district) {
+        result = result.filter((bh) =>
+          bh.address?.district.includes(district) ?? false
+        );
+      }
+
+      if (ward?.trim()) {
+        result = result.filter((bh) =>
+          bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) ?? false
+        );
+      }
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error" });
     }
   }
 }
