@@ -9,6 +9,8 @@ import { toast } from "react-toastify";
 import { Tag } from "antd";
 import { getWithdrawRequests } from "../../../api/withdrawalrequestmanagement";
 import formatAmount from "../../../utils/formatAmount";
+import Detail from "./WithdrawalRequestsDetails";
+import { FileTextOutlined } from "@ant-design/icons";
 
 function WithdrawalRequestManagement() {
   const statusColors = {
@@ -50,12 +52,23 @@ function WithdrawalRequestManagement() {
       title: "Action",
       render: (record) => (
         <>
-          <Button
-            title={"Delete"}
-            btnDelete
-            className="btn-delete"
-            onClick={() => handleDeleteModal(record)}
-          ></Button>
+          <div className="flex gap-3 justify-evenly">
+            <Button
+              title={"Delete"}
+              size="large"
+              btnDelete
+              className="btn-delete"
+              onClick={() => handleDeleteModal(record)}
+            ></Button>
+            <Button
+              title={"Detail"}
+              size="large"
+              onClick={() => handleDetail(record)}
+              icon={<FileTextOutlined />}
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+            />
+          </div>
         </>
       ),
     },
@@ -67,7 +80,7 @@ function WithdrawalRequestManagement() {
   const [isOpenStatusChangeModal, setIsOpenStatusChangeModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [newStatus, setNewStatus] = useState("");
-
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const fetchData = async () => {
     try {
       const res = await getWithdrawRequests();
@@ -85,6 +98,10 @@ function WithdrawalRequestManagement() {
     }
   };
 
+  const handleDetail = (record) => {
+    setSelectedRequest(record._id);
+    setIsDetailOpen(true);
+  };
   const handleStatusChangeModal = (record) => {
     setSelectedRequest(record);
     setIsOpenStatusChangeModal(true);
@@ -168,6 +185,13 @@ function WithdrawalRequestManagement() {
             onCancel={() => setIsOpenDeleteModal(false)}
             isOpen={isOpenDeleteModal}
           />
+          {isDetailOpen && selectedRequest && (
+            <Detail
+              requestId={selectedRequest}
+              onClose={() => setIsDetailOpen(false)}
+              onStatusUpdate={fetchData}
+            />
+          )}
         </>
       )}
     </div>
