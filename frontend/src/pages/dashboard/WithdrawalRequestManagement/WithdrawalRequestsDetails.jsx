@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Modal, Button as AntButton, Typography, Spin } from "antd";
+import { Select, Modal, Button as AntButton, Typography, Spin, Input } from "antd";
 import { toast } from "react-toastify";
 import { getWithdrawRequestDetail, updateWithdrawStatus } from "../../../api/withdrawalrequestmanagement";
 
@@ -12,7 +12,7 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
     const [error, setError] = useState("");
     const [newStatus, setNewStatus] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);
-    const [showReasonPopup, setShowReasonPopup] = useState(false);
+    const [showConfirmPopup, setShowConfirmPopup] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
 
     useEffect(() => {
@@ -25,8 +25,11 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
         const fetchDetail = async () => {
             try {
                 const response = await getWithdrawRequestDetail(requestId);
-                setDetail(response); // Save detail data
-                setNewStatus(response.status); // Set initial status
+                setDetail(response);
+                setNewStatus(response.status);
+                if (response.status === "cancel") {
+                    setCancelReason(response.reasonForCancel || "");
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -38,26 +41,21 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
     }, [requestId]);
 
     const handleStatusChange = (value) => {
-        if (value === "cancel") {
-            setShowReasonPopup(true);
-        } else {
-            setNewStatus(value);
-        }
+        setNewStatus(value);
     };
 
-    const handleConfirmCancel = () => {
-        if (!cancelReason.trim()) {
+    const handleConfirmUpdate = () => {
+        if (newStatus === "cancel" && !cancelReason.trim()) {
             Modal.error({
                 title: "Error",
                 content: "Please provide a reason for cancellation.",
             });
             return;
         }
-        setNewStatus("cancel");
-        setShowReasonPopup(false);
+        setShowConfirmPopup(true);
     };
 
-    const handleConfirmUpdate = async () => {
+    const handleFinalUpdate = async () => {
         setIsUpdating(true);
         try {
             const payload = {
@@ -65,12 +63,19 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
                 reasonForCancel: newStatus === "cancel" ? cancelReason : undefined,
             };
             await updateWithdrawStatus(requestId, payload);
-            toast.success("Update status successfully.");
+            toast.success("Status updated successfully.");
+
+            setDetail((prev) => ({
+                ...prev,
+                status: newStatus,
+                reasonForCancel: newStatus === "cancel" ? cancelReason : prev.reasonForCancel,
+            }));
+
             if (onStatusUpdate) onStatusUpdate();
-            onClose();
+            setShowConfirmPopup(false);
         } catch (err) {
             console.error("Error updating status:", err);
-            toast.error("Failed to update status");
+            toast.error("Failed to update status.");
         } finally {
             setIsUpdating(false);
         }
@@ -108,86 +113,96 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
             footer={null}
             width={500}
         >
-            <Form layout="vertical">
-                <Form.Item label="Username">
-                    <Input value={userId?.username || "N/A"} readOnly disabled />
-                </Form.Item>
-                <Form.Item label="Fullname">
-                    <Input value={userId?.fullname || "N/A"} readOnly disabled />
-                </Form.Item>
-                <Form.Item label="Amount">
-                    <Input
-                        value={amount ? `${amount} ${detail.currency || "USD"}` : "N/A"}
-                        readOnly disabled
-                    />
-                </Form.Item>
-                <Form.Item label="Status" required>
+            <div>
+                <div className="mb-4">
+                    <Text strong>Username:</Text> <Text>{userId?.username || "N/A"}</Text>
+                </div>
+                <div className="mb-4">
+                    <Text strong>Fullname:</Text> <Text>{userId?.fullname || "N/A"}</Text>
+                </div>
+                <div className="mb-4">
+                    <Text strong>Amount:</Text>{" "}
+                    <Text>{amount ? `${amount} ${detail.currency || "USD"}` : "N/A"}</Text>
+                </div>
+                <div className="mb-4">
+                    <Text strong>Status:</Text>{" "}
                     <Select
                         value={newStatus}
                         disabled={status !== "pending"}
                         onChange={handleStatusChange}
                         style={{ width: "100%" }}
-                        required
                     >
                         <Option value="pending">Pending</Option>
                         <Option value="cancel">Cancel</Option>
                         <Option value="accept">Accept</Option>
                     </Select>
-                </Form.Item>
-                {status === "cancel" || newStatus === "cancel" ? (
-                    <Form.Item label="Reason for Cancel">
-                        <Input
-                            value={reasonForCancel || cancelReason || ""}
-                            readOnly
-                            disabled
+                </div>
+                {newStatus === "cancel" && status !== "cancel" ? (
+                    <div className="mb-4">
+                        <Text strong>Reason for Cancel:</Text>{" "}
+                        <Input.TextArea
+                            rows={4}
+                            value={cancelReason}
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            placeholder="Enter reason for cancellation"
                         />
-                    </Form.Item>
+                    </div>
                 ) : null}
-                <Form.Item label="Created At">
-                    <Input
-                        value={new Date(createdAt).toLocaleDateString() || "N/A"}
-                        readOnly disabled
-                    />
-                </Form.Item>
-                <Form.Item label="Bank Name">
-                    <Input value={bankName || "N/A"} readOnly disabled />
-                </Form.Item>
-                <Form.Item label="Account Number">
-                    <Input value={accountNumber || "N/A"} readOnly disabled />
-                </Form.Item>
-                <Form.Item label="Account Holder Name">
-                    <Input value={accountHolderName || "N/A"} readOnly disabled />
-                </Form.Item>
-                <Form.Item label="Transaction ID">
-                    <Input value={transactionId || "N/A"} readOnly disabled />
-                </Form.Item>
+                {status === "cancel" && (
+                    <div className="mb-4">
+                        <Text strong>Reason for Cancel:</Text>{" "}
+                        <Text>{reasonForCancel || "No reason provided"}</Text>
+                    </div>
+                )}
+                <div className="mb-4">
+                    <Text strong>Created At:</Text>{" "}
+                    <Text>{new Date(createdAt).toLocaleDateString() || "N/A"}</Text>
+                </div>
+                <div className="mb-4">
+                    <Text strong>Bank Name:</Text> <Text>{bankName || "N/A"}</Text>
+                </div>
+                <div className="mb-4">
+                    <Text strong>Account Number:</Text> <Text>{accountNumber || "N/A"}</Text>
+                </div>
+                <div className="mb-4">
+                    <Text strong>Account Holder Name:</Text>{" "}
+                    <Text>{accountHolderName || "N/A"}</Text>
+                </div>
+                <div className="mb-4">
+                    <Text strong>Transaction ID:</Text> <Text>{transactionId || "N/A"}</Text>
+                </div>
                 {status === "pending" && (
-                    <Form.Item>
+                    <div className="text-right">
                         <AntButton
                             type="primary"
                             onClick={handleConfirmUpdate}
                             loading={isUpdating}
-                            style={{ float: "right" }}
                         >
                             Confirm Update
                         </AntButton>
-                    </Form.Item>
+                    </div>
                 )}
-            </Form>
+            </div>
+
+            {/* Confirmation Popup */}
             <Modal
-                visible={showReasonPopup}
-                title="Reason for Cancellation"
-                onCancel={() => setShowReasonPopup(false)}
-                onOk={handleConfirmCancel}
-                okText="Confirm"
+                visible={showConfirmPopup}
+                title="Confirm Status Change"
+                onOk={handleFinalUpdate}
+                onCancel={() => setShowConfirmPopup(false)}
+                okText="Yes, Confirm"
                 cancelText="Cancel"
             >
-                <Input.TextArea
-                    rows={4}
-                    value={cancelReason}
-                    onChange={(e) => setCancelReason(e.target.value)}
-                    placeholder="Enter reason for cancellation"
-                />
+                <Text>
+                    Are you sure you want to change the status to{" "}
+                    <Text strong>{newStatus}</Text>?
+                </Text>
+                {newStatus === "cancel" && (
+                    <div className="mt-4">
+                        <Text strong>Reason for Cancel:</Text>{" "}
+                        <Text>{cancelReason || "N/A"}</Text>
+                    </div>
+                )}
             </Modal>
         </Modal>
     );
