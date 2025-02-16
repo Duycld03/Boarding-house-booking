@@ -3,6 +3,7 @@ import BoardingHouse from '../models/boardingHouse.js';
 import BoardingHouseType from '../models/boardingHouseType .js';
 import RoomType from '../models/roomType.js'
 import Room from '../models/room.js'
+import facilities from '../models/facilities.js';
 
 // import path from "path";
 import fs from 'fs';
@@ -64,8 +65,10 @@ class boardingHouseController {
       const { id } = req.params;
 
       const [bhRoomType, bhRoom] = await Promise.all([
-        RoomType.find({ boardingHouseId: id }).populate("facilities"),
-        Room.find({ boardingHouseId: id }),
+        RoomType.find({ boardingHouseId: id })
+          .populate("facilities")
+          .populate("boardingHouseId"),
+        Room.find({ boardingHouseId: id }).populate("boardingHouseId"),
       ]);
 
       if (!bhRoomType.length && !bhRoom.length) {
@@ -86,6 +89,7 @@ class boardingHouseController {
       next(error);
     }
   }
+
 
 
   async getBoardingHouseDetailInUser(req, res, next) {

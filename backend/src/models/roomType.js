@@ -30,7 +30,15 @@ const RoomTypeSchema = new mongoose.Schema({
     publicId: {
       type: String,
       default: "",
-    },
+    }
+  },
+  roomSize: {
+    type: String,
+    default: ""
+  },
+  peopleNumber: {
+    type: String,
+    default: 0
   }
 });
 

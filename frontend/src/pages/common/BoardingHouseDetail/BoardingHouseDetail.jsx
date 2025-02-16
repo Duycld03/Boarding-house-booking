@@ -13,6 +13,7 @@ import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
 import ReviewList from "./ReviewList";
+import OwnerInfo from "./OwnerInfo";
 
 const { Content } = Layout;
 
@@ -110,33 +111,44 @@ function BoardingHouseDetail() {
               </div>
             </div>
 
-            <Tag color="blue" className="md:text-2xl md:mt-3">
-              {boardingHouse?.boardingHouseType?.name}
-            </Tag>
+            <div className="flex flex-wrap justify-between ">
+              <div>
+                <Tag color="blue" className="md:text-2xl md:mt-3">
+                  {boardingHouse?.boardingHouseType?.name}
+                </Tag>
 
-            <div className="mt-5 flex gap-4">
-              <FontAwesomeIcon
-                icon={faLocationDot}
-                className="md:text-3xl text-red-500"
-              />
-              <p className="text-2xl">
-                {boardingHouse?.address
-                  ? `${boardingHouse.address.detail}, ${boardingHouse.address.ward}, ${boardingHouse.address.district}, ${boardingHouse.address.province}`
-                  : "Address not available"}
-              </p>
-            </div>
+                <div className="mt-5 flex gap-4">
+                  <FontAwesomeIcon
+                    icon={faLocationDot}
+                    className="md:text-3xl text-red-500"
+                  />
+                  <p className="text-2xl">
+                    {boardingHouse?.address
+                      ? `${boardingHouse.address.detail}, ${boardingHouse.address.ward}, ${boardingHouse.address.district}, ${boardingHouse.address.province}`
+                      : "Address not available"}
+                  </p>
+                </div>
 
-            <div className="flex items-center gap-2 cursor-pointer select-none text-lg sm:text-xl md:text-4xl md:mt-7">
-              <button onClick={handleLike} className="focus:outline-none">
-                {isLiked ? (
-                  <HeartFilled className="text-red-500 transition-transform duration-300 scale-110" />
-                ) : (
-                  <HeartOutlined className="text-gray-600 hover:text-red-500 transition-colors duration-300" />
-                )}
-              </button>
-              <span className="text-gray-700 font-semibold">
-                {formatAmount(boardingHouse?.likes)}
-              </span>
+                <div className="flex items-center gap-2 cursor-pointer select-none text-lg sm:text-xl md:text-4xl md:mt-7">
+                  <button onClick={handleLike} className="focus:outline-none">
+                    {isLiked ? (
+                      <HeartFilled className="text-red-500 transition-transform duration-300 scale-110" />
+                    ) : (
+                      <HeartOutlined className="text-gray-600 hover:text-red-500 transition-colors duration-300" />
+                    )}
+                  </button>
+                  <span className="text-gray-700 font-semibold">
+                    {formatAmount(boardingHouse?.likes)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-4 font-bold items-center">
+                <Tag color="#f50" className="text-3xl">
+                  Owner:
+                </Tag>
+                <OwnerInfo ownerData={boardingHouse?.ownerId} />
+              </div>
             </div>
 
             {/* Water price and electric price */}
@@ -159,7 +171,6 @@ function BoardingHouseDetail() {
                 </span>
               </div>
             </div>
-
             <div className="md:mt-14">
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
