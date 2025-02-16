@@ -6,6 +6,7 @@ import reportController from "./reportController.js";
 import boardingHouseController from "./boardingHouseController.js";
 import accountController from "./accountController.js";
 import appointmentController from './appointmentController.js';
+import roomController from './roomController.js';
 
 
 export {
@@ -16,5 +17,6 @@ export {
   accountController,
   ReviewController,
   favoriteController,
-  appointmentController
+  appointmentController,
+  roomController
 };
