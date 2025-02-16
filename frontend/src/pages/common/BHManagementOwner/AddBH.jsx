@@ -289,7 +289,7 @@ const AddBHModal = ({ onAddData }) => {
         <Form
           layout="vertical"
           onSubmitCapture={handleSubmit}
-          className="bg-white p-6 rounded-lg w-full max-w-3xl"
+          className="bg-white rounded-lg w-full max-w-3xl"
         >
           <h2 className="text-3xl font-bold mb-4 ">1. Information</h2>
           {/* Boarding House Type */}
