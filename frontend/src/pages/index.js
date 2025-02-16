@@ -17,7 +17,7 @@ import {
   BoardingHouseDetail,
   MyAppointment,
   BHManagementOwner,
-  BHOwnerDetail,
+  BHDetailOwner,
 } from "./common";
 
 import {
@@ -51,7 +51,7 @@ export {
 
   // owner
   BHManagementOwner,
-  BHOwnerDetail,
+  BHDetailOwner,
   //dashboard
   BoardingHouseManagement,
   AccountManagement,

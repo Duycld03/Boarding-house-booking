@@ -1,64 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import {
-  Form,
-  Input,
-  Select,
-  Upload,
-  InputNumber,
-  Image,
-  Modal,
-  Button,
-} from 'antd';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { Form, Input, Select, Upload, InputNumber, Image, Button } from "antd";
 import {
   PlusOutlined,
   HeartFilled,
   StarFilled,
   StarOutlined,
-} from '@ant-design/icons';
-import AddressSelector from '../../../component/AddressSelector';
-import { getAllBoardingHouseTypesOwner } from '../../../api/BoardingHManagement';
+} from "@ant-design/icons";
+import { getAllBoardingHouseTypesOwner } from "../../../api/BoardingHManagement";
 import {
   fetchProvinces,
   fetchDistricts,
   fetchWards,
-} from '../../../api/apiAddress';
-import { updateBoardingHouseDetailsOwner } from '../../../api/BoardingHManagement';
+} from "../../../api/apiAddress";
+import { getBoardingHouseDetail } from "../../../api/ownerUser/boardingHouse";
+import { updateBoardingHouseDetailsOwner } from "../../../api/BoardingHManagement";
+import { useNavigate, useParams } from "react-router-dom";
+import { Back } from "../../../component";
 
-const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
+const BHDetailOwner = () => {
+  const { boardingHouseId } = useParams();
+  const navigation = useNavigate();
+
   const [updatedData, setUpdatedData] = useState({}); // Updated form data
   const [loading, setLoading] = useState(false); // Loading state
   const [provinces, setProvinces] = useState([]); // Provinces list
   const [districts, setDistricts] = useState([]); // Districts list
   const [wards, setWards] = useState([]); // Wards list
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]); // House types
-  const [images, setImages] = useState([]);
 
-  // Initialize form data and images when `formData` changes
-  useEffect(() => {
-    if (formData) {
-      let primaryImage = {};
-      const otherImage = [];
-      formData.images.forEach((image) => {
-        if (image.isPrimary) {
-          primaryImage = image;
-        } else {
-          otherImage.push(image);
-        }
-      });
-
-      setUpdatedData({
-        ...formData,
-        primaryImage: primaryImage, // Đảm bảo không undefined
-        otherImages: otherImage,
-      });
-
-      setImages(formData.images || []);
-    } else {
-      setUpdatedData(null);
-      setImages([]);
+  const fetchBoardingHouseDetails = async () => {
+    if (!boardingHouseId) {
+      toast.error("Boarding house ID not found.");
+      navigation("/bh-management-owner");
     }
-  }, [formData]);
+    try {
+      const response = await getBoardingHouseDetail(boardingHouseId);
+      const primaryImage = response.images.find((img) => img.isPrimary);
+      const otherImages = response.images.filter((img) => !img.isPrimary);
+      setUpdatedData({ ...response, primaryImage, otherImages });
+    } catch (error) {
+      console.error("Failed to fetch boarding house data:", error);
+      toast.error("Failed to fetch boarding house data.");
+    }
+  };
+  useEffect(() => {
+    fetchBoardingHouseDetails();
+    console.log(updatedData);
+  }, []);
 
   // Fetch provinces, districts, and wards
   useEffect(() => {
@@ -87,8 +76,8 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           }
         }
       } catch (error) {
-        console.error('Error fetching address data:', error);
-        toast.error('Failed to fetch address data.');
+        console.error("Error fetching address data:", error);
+        toast.error("Failed to fetch address data.");
       }
     };
 
@@ -104,8 +93,8 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
         const response = await getAllBoardingHouseTypesOwner();
         setBoardingHouseTypes(response.data || []);
       } catch (error) {
-        console.error('Failed to fetch boarding house types:', error);
-        toast.error('Failed to fetch boarding house types.');
+        console.error("Failed to fetch boarding house types:", error);
+        toast.error("Failed to fetch boarding house types.");
       }
     };
 
@@ -115,7 +104,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
   // Update form data on input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const keys = name.split('.'); // Split by dot notation for nested fields (e.g., "address.detail")
+    const keys = name.split("."); // Split by dot notation for nested fields (e.g., "address.detail")
 
     if (keys.length === 2) {
       // Handle nested fields (e.g., "address.detail")
@@ -145,7 +134,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
     }
 
     if (updatedData.otherImages.length >= 15) {
-      toast.error('You can only upload up to 15 other images.');
+      toast.error("You can only upload up to 15 other images.");
       return;
     }
 
@@ -155,14 +144,10 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
     }));
   };
   const handleRemovePrimaryImage = () => {
-    // Remove the primary image from `updatedData` and `images`
     setUpdatedData((prev) => ({
       ...prev,
-      primaryImage: null, // Set primaryImage to null
+      primaryImage: null,
     }));
-
-    // Remove the primary image from the `images` array
-    setImages((prevImages) => prevImages.filter((img) => !img.isPrimary));
   };
   // Remove other images
   const handleRemoveOtherImage = (index) => {
@@ -170,14 +155,9 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       ...prev,
       otherImages: prev.otherImages.filter((_, i) => i !== index),
     }));
-    toast.success('Temporary image removed.');
+    toast.success("Temporary image removed.");
   };
 
-  // Delete images from backend
-  const handleImageDelete = (id) => {
-    setImages((prev) => prev.filter((img) => img._id !== id));
-    toast.success('Image removed from the list.');
-  };
   const handleSelectedTypesChange = (event) => {
     const { name, value } = event.target;
     setUpdatedData((prevData) => ({
@@ -191,14 +171,14 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
       return false; // Prevent auto-upload
     },
     multiple: true,
-    accept: 'image/*',
+    accept: "image/*",
   };
   const uploadProps = {
     beforeUpload: (file) => {
       handleFileChange({ target: { files: [file] } }, true);
       return false; // Prevent auto-upload
     },
-    accept: 'image/*',
+    accept: "image/*",
     maxCount: 1,
     showUploadList: false,
   };
@@ -213,45 +193,44 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
 
       // Append basic form fields
       payload.append(
-        'boardingHouseType',
+        "boardingHouseType",
         updatedData.boardingHouseType?._id || updatedData.boardingHouseType
       );
-      payload.append('name', updatedData.name);
-      payload.append('description', updatedData.description);
-      payload.append('priceRange', updatedData.priceRange);
-      payload.append('electricityPrice', updatedData.electricityPrice);
-      payload.append('waterPrice', updatedData.waterPrice);
-      payload.append('address[province]', updatedData.address.province);
-      payload.append('address[district]', updatedData.address.district);
-      payload.append('address[ward]', updatedData.address.ward);
-      payload.append('address[detail]', updatedData.address.detail);
+      payload.append("name", updatedData.name);
+      payload.append("description", updatedData.description);
+      payload.append("priceRange", updatedData.priceRange);
+      payload.append("electricityPrice", updatedData.electricityPrice);
+      payload.append("waterPrice", updatedData.waterPrice);
+      payload.append("address[province]", updatedData.address.province);
+      payload.append("address[district]", updatedData.address.district);
+      payload.append("address[ward]", updatedData.address.ward);
+      payload.append("address[detail]", updatedData.address.detail);
 
       // Append primary image (new or existing)
       const oldImg = [];
 
       if (updatedData.primaryImage) {
         if (updatedData.primaryImage instanceof File) {
-          payload.append('boardingHouse', updatedData.primaryImage);
+          payload.append("boardingHouse", updatedData.primaryImage);
         } else {
           oldImg.push(updatedData.primaryImage);
         }
       } else {
-        toast.error('A primary image is required.');
+        toast.error("A primary image is required.");
         return;
       }
 
-      // Append new "Other Images" (files)
       if (updatedData.otherImages) {
         updatedData.otherImages.forEach((file) => {
           if (file instanceof File) {
-            payload.append('boardingHouse', file);
+            payload.append("boardingHouse", file);
           } else {
             oldImg.push(file);
           }
         });
       }
       if (oldImg.length > 0) {
-        payload.append('boardingHouse', JSON.stringify(oldImg));
+        payload.append("boardingHouse", JSON.stringify(oldImg));
       }
       const response = await updateBoardingHouseDetailsOwner(
         updatedData._id, // Boarding house ID
@@ -260,18 +239,16 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
 
       if (response?.success) {
         toast.success(
-          response.message || 'Boarding house updated successfully.'
+          response.message || "Boarding house updated successfully."
         );
-        onUpdate(); // Notify parent to refresh data
-        onCancel(); // Close modal
       } else {
-        toast.error(response?.message || 'Failed to update boarding house.');
+        toast.error(response?.message || "Failed to update boarding house.");
       }
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          'Failed to update the boarding house.'
+          "Failed to update the boarding house."
       );
     } finally {
       setLoading(false);
@@ -282,35 +259,30 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
   }
 
   return (
-    <Modal
-      title="Boarding House Detail"
-      open={open}
-      onCancel={onCancel}
-      footer={null}
-      destroyOnClose
-    >
+    <div className="mx-auto md:w-[60%]">
       <Form
         layout="vertical"
         // onFinish={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-lg"
+        className="bg-white p-6 rounded-lg w-full shadow-lg"
       >
+        <Back />
         <h2 className="text-3xl font-bold mb-4">1. Information</h2>
 
         <Form.Item label="Name Boarding House" className="mb-2">
           <Input
             name="name"
-            value={updatedData.name || ''}
+            value={updatedData.name || ""}
             onChange={handleInputChange}
           />
         </Form.Item>
         <Form.Item label="Boarding House Type" className="mb-2">
           <Select
             name="boardingHouseType"
-            value={updatedData.boardingHouseType?._id || ''}
+            value={updatedData.boardingHouseType?._id || ""}
             onChange={(value) =>
               handleSelectedTypesChange({
                 target: {
-                  name: 'boardingHouseType',
+                  name: "boardingHouseType",
                   value,
                 },
               })
@@ -328,20 +300,20 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           <Form.Item label="Description">
             <Input.TextArea
               name="description"
-              value={updatedData.description || ''}
+              value={updatedData.description || ""}
               onChange={handleInputChange}
               rows={4}
             />
           </Form.Item>
         </div>
 
-        <h2 className="text-3xl font-bold mb-4 mt-10 ">Address</h2>
+        <h2 className="text-3xl font-bold mb-4 mt-10 ">2. Address</h2>
         <Form.Item className="mb-4">
           {/* Province */}
           <Form.Item
             label="Province"
             required
-            rules={[{ required: true, message: 'Province is required' }]}
+            rules={[{ required: true, message: "Province is required" }]}
           >
             <Select
               placeholder="Select Province"
@@ -350,7 +322,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
               onChange={(value) => {
                 handleInputChange({
                   target: {
-                    name: 'address.province',
+                    name: "address.province",
                     value,
                   },
                 });
@@ -379,7 +351,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           <Form.Item
             label="District"
             required
-            rules={[{ required: true, message: 'District is required' }]}
+            rules={[{ required: true, message: "District is required" }]}
           >
             <Select
               placeholder="Select District"
@@ -388,7 +360,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
               onChange={(value) => {
                 handleInputChange({
                   target: {
-                    name: 'address.district',
+                    name: "address.district",
                     value,
                   },
                 });
@@ -417,7 +389,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           <Form.Item
             label="Ward"
             required
-            rules={[{ required: true, message: 'Ward is required' }]}
+            rules={[{ required: true, message: "Ward is required" }]}
           >
             <Select
               placeholder="Select Ward"
@@ -426,7 +398,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
               onChange={(value) => {
                 handleInputChange({
                   target: {
-                    name: 'address.ward',
+                    name: "address.ward",
                     value,
                   },
                 });
@@ -451,18 +423,18 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           <Form.Item label="Detail">
             <Input.TextArea
               name="address.detail" // Correctly set name to "address.detail"
-              value={updatedData?.address?.detail || ''} // Bind to the state
+              value={updatedData?.address?.detail || ""} // Bind to the state
               onChange={handleInputChange} // Use the updated handleInputChange function
               rows={4}
             />
           </Form.Item>
         </Form.Item>
+
         <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
         <Form.Item label="Primary Image" className="mb-4">
           <div className="flex flex-col gap-4">
             {/* Check if a primary image exists */}
-            {updatedData.primaryImage ||
-            images?.find((img) => img.isPrimary) ? (
+            {updatedData.primaryImage ? (
               <div className="relative">
                 <Image
                   src={
@@ -472,9 +444,9 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
                   alt="Primary"
                   className="object-cover border rounded"
                   style={{
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '300px',
+                    width: "100%",
+                    height: "auto",
+                    maxHeight: "300px",
                   }}
                   preview={{
                     mask: <span className="text-white">Preview</span>,
@@ -490,7 +462,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
                 </button>
               </div>
             ) : (
-              // If no primary image exists, show the upload button
               <Upload
                 {...uploadProps}
                 listType="picture-card"
@@ -538,7 +509,6 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
               </div>
             ))}
 
-            {/* Upload Other Images */}
             <Upload
               {...uploadOtherImgProps}
               listType="picture-card"
@@ -558,20 +528,19 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
             </Upload>
           </div>
         </Form.Item>
-
         <h2 className="text-3xl font-bold mb-4 mt-10 ">4. Price</h2>
         <div>
           <Form.Item label="Price Rent/month (VND)" className="mb-2">
             <InputNumber
               name="priceRange"
-              value={updatedData.priceRange || ''}
+              value={updatedData.priceRange || ""}
               onChange={(value) =>
-                handleInputChange({ target: { name: 'priceRange', value } })
+                handleInputChange({ target: { name: "priceRange", value } })
               }
               formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               } // Thêm dấu phẩy ngăn cách hàng nghìn
-              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
               className="w-full"
               min={0}
             />
@@ -580,16 +549,16 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           <Form.Item label="Electricity Price/kWh (VND)" className="mb-2">
             <InputNumber
               name="electricityPrice"
-              value={updatedData.electricityPrice || ''}
+              value={updatedData.electricityPrice || ""}
               onChange={(value) =>
                 handleInputChange({
-                  target: { name: 'electricityPrice', value },
+                  target: { name: "electricityPrice", value },
                 })
               }
               formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
               className="w-full"
               min={0}
             />
@@ -598,14 +567,14 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           <Form.Item label="Water Price/m³ (VND)" className="mb-2">
             <InputNumber
               name="waterPrice"
-              value={updatedData.waterPrice || ''}
+              value={updatedData.waterPrice || ""}
               onChange={(value) =>
-                handleInputChange({ target: { name: 'waterPrice', value } })
+                handleInputChange({ target: { name: "waterPrice", value } })
               }
               formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
               className="w-full"
               min={0}
             />
@@ -613,19 +582,19 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           <h2 className="text-3xl font-bold mb-4 mt-10 ">5. Room</h2>
           <Form.Item label="Total Rooms" className="mb-2">
             <InputNumber
-              value={updatedData.totalRooms || '0'}
+              value={updatedData.totalRooms || "0"}
               readOnly
               className="bg-gray-100 text-gray-500 cursor-not-allowed"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </Form.Item>
 
           <Form.Item label="Available Rooms" className="mb-2">
             <InputNumber
-              value={updatedData.availableRooms || '0'}
+              value={updatedData.availableRooms || "0"}
               readOnly
               className="bg-gray-100 text-gray-500 cursor-not-allowed"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </Form.Item>
 
@@ -633,34 +602,34 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           <Form.Item>
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: '16px',
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "16px",
               }}
             >
               {/* like */}
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
                 }}
               >
-                <HeartFilled style={{ fontSize: '24px', color: 'red' }} />
-                <span style={{ fontSize: '16px', color: '#595959' }}>
+                <HeartFilled style={{ fontSize: "24px", color: "red" }} />
+                <span style={{ fontSize: "16px", color: "#595959" }}>
                   {updatedData.likes
-                    ? Number(updatedData.likes).toLocaleString('en-US') // Format big numbers with commas
-                    : '0'}
+                    ? Number(updatedData.likes).toLocaleString("en-US") // Format big numbers with commas
+                    : "0"}
                 </span>
               </div>
 
               {/* Rating */}
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
                 }}
               >
                 {Array.from({ length: 5 }, (_, index) => {
@@ -668,7 +637,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
                     return (
                       <StarFilled
                         key={index}
-                        style={{ fontSize: '24px', color: '#FFD700' }}
+                        style={{ fontSize: "24px", color: "#FFD700" }}
                       />
                     );
                   } else if (
@@ -678,14 +647,14 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
                     return (
                       <StarOutlined
                         key={index}
-                        style={{ fontSize: '24px', color: '#FFD700' }}
+                        style={{ fontSize: "24px", color: "#FFD700" }}
                       />
                     );
                   } else {
                     return (
                       <StarOutlined
                         key={index}
-                        style={{ fontSize: '24px', color: '#FFD700' }}
+                        style={{ fontSize: "24px", color: "#FFD700" }}
                       />
                     );
                   }
@@ -695,16 +664,7 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           </Form.Item>
         </div>
         {/* </div> */}
-        <div className="flex justify-end">
-          <Button
-            className="bg-orange-600 text-white"
-            size="large"
-            title="Cancel"
-            // loading={loading}
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
+        <div className="flex">
           <Button
             className="bg-primary text-white ml-2"
             size="large"
@@ -716,8 +676,8 @@ const UpdateBHModal = ({ open, onCancel, formData, onUpdate }) => {
           </Button>
         </div>
       </Form>
-    </Modal>
+    </div>
   );
 };
 
-export default UpdateBHModal;
+export default BHDetailOwner;

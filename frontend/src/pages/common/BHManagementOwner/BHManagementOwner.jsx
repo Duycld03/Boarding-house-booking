@@ -11,7 +11,7 @@ import {
 } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import AddBHModal from "./AddBH";
-import UpdateBHModal from "./UpdateBH";
+// import UpdateBHModal from "./UpdateBH";
 
 function BHManagementOwner() {
   const [boardingHouses, setBoardingHouses] = useState([]); // List of boarding houses
@@ -168,12 +168,12 @@ function BHManagementOwner() {
       />
 
       {/* Edit Modal */}
-      <UpdateBHModal
+      {/* <UpdateBHModal
         open={isEditOpen}
         formData={selectedData}
         onCancel={() => setIsEditOpen(false)}
         onUpdate={handleUpdate}
-      />
+      /> */}
     </div>
   );
 }
