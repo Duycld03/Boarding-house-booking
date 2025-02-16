@@ -16,6 +16,15 @@ const ViewRoomRequestSchema = new mongoose.Schema(
       type: String,
       default: "pending",
     },
+    note: {
+      type: String,
+      default: ""
+    },
+    appointmentDate: {
+      type: Date,
+      required: true
+    }
+
   },
   { timestamps: true }
 );

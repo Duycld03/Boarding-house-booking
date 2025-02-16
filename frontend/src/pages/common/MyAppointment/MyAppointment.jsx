@@ -6,7 +6,7 @@ import {
 import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
 import { toast } from "react-toastify";
 import convertTimetap from "../../../utils/convertTimetap";
-import { Tag, Tooltip } from "antd";
+import { message, Tag, Tooltip } from "antd";
 
 function MyAppointment() {
   const [appointmentData, setAppointmentData] = useState([]);
@@ -74,16 +74,17 @@ function MyAppointment() {
         ) : null,
     },
   ];
-
   const fetchData = async () => {
     setLoading(true);
     try {
       const res = await getAppointmentOfUser();
-      if (res) {
+      if (res.length === 0) {
+        toast.info("No data available.");
+      } else {
         setAppointmentData(res);
       }
     } catch (error) {
-      toast.error(`Can not fetch data: ${error.message}`);
+      console.log(error);
     } finally {
       setLoading(false);
     }
