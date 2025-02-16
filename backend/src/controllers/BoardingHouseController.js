@@ -4,6 +4,7 @@ import BoardingHouseType from '../models/boardingHouseType .js';
 import RoomType from '../models/roomType.js';
 import Room from '../models/room.js';
 import { v2 as cloudinary } from 'cloudinary';
+import facilities from '../models/facilities.js';
 
 // import path from "path";
 import fs from 'fs';

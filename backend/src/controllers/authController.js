@@ -7,24 +7,6 @@ import { generateToken, verifyToken } from "../utils/functions.js";
 import Account from "../models/account.js";
 dotenv.config();
 
-// testing models
-import BoardingHouse from "../models/boardingHouse.js";
-import Room from "../models/room.js";
-import RoomType from "../models/roomType.js";
-import ViewRoomRequest from "../models/viewRoomRequest.js";
-import WatchLater from "../models/watchLater.js";
-import FavoriteBH from "../models/favoriteBH.js";
-import Review from "../models/review.js";
-import Report from "../models/report.js";
-import Revenue from "../models/revenue.js";
-import BoardingHouseType from "../models/boardingHouseType .js";
-import Facility from "../models/facilities.js";
-import UserPayment from "../models/userPayment.js";
-import ExtensionRequest from "../models/extensionRequest.js";
-import WithdrawRequest from "../models/withdrawRequest.js";
-import DepositRoom from "../models/depositRoom.js";
-import PaymentBill from "../models/paymentBill.js";
-
 class AuthController {
   async getAccountFromToken(req, res) {
     const user = await Account.findOne({ username: req.user.username }).select(
