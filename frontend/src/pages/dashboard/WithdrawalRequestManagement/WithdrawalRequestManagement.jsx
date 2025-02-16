@@ -75,7 +75,7 @@ function WithdrawalRequestManagement() {
 
   const fetchData = async () => {
     try {
-      const res = await getWithdrawRequests();
+      const res = await filterWithdrawRequests();
       if (res) {
         setData(res);
       } else {
