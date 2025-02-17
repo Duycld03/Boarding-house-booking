@@ -13,6 +13,7 @@ import {
 } from "../../../api/withdrawalrequestmanagement";
 import formatAmount from "../../../utils/formatAmount";
 import FilterWithdrawal from "./FilterWithdrawal";
+import convertTimetap from "../../../utils/convertTimetap";
 
 function WithdrawalRequestManagement() {
   const statusColors = {
@@ -26,7 +27,7 @@ function WithdrawalRequestManagement() {
       title: "Full Name",
       dataIndex: "userId",
       key: "userId",
-      render: (user) => user?.fullname || "N/A",
+      render: (user) => user?.fullname || "",
     },
     {
       title: "Amount / VND",
@@ -48,7 +49,13 @@ function WithdrawalRequestManagement() {
       title: "Processed By",
       dataIndex: "processedBy",
       key: "processedBy",
-      render: (processedBy) => processedBy?.fullname || "N/A",
+      render: (processedBy) => processedBy?.fullname || "",
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt) => convertTimetap(createdAt),
     },
     {
       title: "Action",
@@ -74,8 +81,15 @@ function WithdrawalRequestManagement() {
   const [filterValue, setFilterValue] = useState();
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const res = await filterWithdrawRequests();
+      const dataDefault = {
+        status: "",
+        startDate: "",
+        endDate: "",
+        amountRange: [0],
+      };
+      const res = await filterWithdrawRequests(dataDefault);
       if (res) {
         setData(res);
       } else {
@@ -87,6 +101,8 @@ function WithdrawalRequestManagement() {
         "Failed to fetch withdrawal requests. Please try again later."
       );
       setData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -133,12 +149,7 @@ function WithdrawalRequestManagement() {
   };
 
   useEffect(() => {
-    setLoading(true);
-    fetchData().finally(() => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    });
+    fetchData();
   }, []);
 
   useEffect(() => {

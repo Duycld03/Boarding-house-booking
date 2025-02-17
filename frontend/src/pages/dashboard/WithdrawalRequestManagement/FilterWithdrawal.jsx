@@ -66,13 +66,17 @@ function FilterWithdrawal({ setFilterValue }) {
       return;
     }
 
-    console.log(values);
     setFilterValue(values);
   };
 
   const handleClear = () => {
     form.resetFields();
-    setFilterValue({});
+    setFilterValue({
+      status: "",
+      startDate: "",
+      endDate: "",
+      amountRange: [0, amountRangeValue.max],
+    });
   };
 
   return (

@@ -39,7 +39,12 @@ class withdrawalRequestsController {
 
   async filterWithdrawRequests(req, res) {
     try {
-      const { status, startDate, endDate, minAmount, maxAmount } = req.body;
+      const {
+        status,
+        startDate,
+        endDate,
+        amountRange: [minAmount, maxAmount],
+      } = req.body;
       let filter = {};
 
       if (status) filter.status = status;
@@ -55,7 +60,8 @@ class withdrawalRequestsController {
           $lte: end,
         };
       }
-      if (minAmount && maxAmount) {
+
+      if (maxAmount) {
         filter.amount = {
           $gte: minAmount,
           $lte: maxAmount,
