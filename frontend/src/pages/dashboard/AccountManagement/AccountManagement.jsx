@@ -80,9 +80,6 @@ function AccountManagement() {
       dataIndex: "avatarImage",
       key: "avatarImage",
       render: (avatarImage) => {
-        {
-          console.log(avatarImage);
-        }
         return (
           <Avatar
             src={avatarImage?.url ?? DefaultAvatar}
