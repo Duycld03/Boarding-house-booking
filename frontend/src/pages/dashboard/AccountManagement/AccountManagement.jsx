@@ -80,20 +80,14 @@ function AccountManagement() {
       dataIndex: "avatarImage",
       key: "avatarImage",
       render: (avatarImage) => {
-        const baseUrl = "http://localhost:3000";
-        const resolvedSrc = avatarImage
-          ? `${baseUrl}/${avatarImage}`
-          : `${baseUrl}/${DefaultAvatar}`;
-
+        {
+          console.log(avatarImage);
+        }
         return (
           <Avatar
-            src={resolvedSrc}
+            src={avatarImage?.url ?? DefaultAvatar}
             shape="circle"
             size="large"
-            onError={(e) => {
-              e.target.onerror = null; // Prevent infinite error loop
-              e.target.src = `${baseUrl}/${DefaultAvatar}`;
-            }}
           />
         );
       },
