@@ -137,7 +137,7 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
                         <Option value="accept">Accept</Option>
                     </Select>
                 </div>
-                {newStatus === "cancel" && status !== "cancel" ? (
+                {newStatus === "cancel" && (
                     <div className="mb-4">
                         <Text strong>Reason for Cancel:</Text>{" "}
                         <Input.TextArea
@@ -145,13 +145,8 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
                             value={cancelReason}
                             onChange={(e) => setCancelReason(e.target.value)}
                             placeholder="Enter reason for cancellation"
+                            disabled={status === "cancel"}
                         />
-                    </div>
-                ) : null}
-                {status === "cancel" && (
-                    <div className="mb-4">
-                        <Text strong>Reason for Cancel:</Text>{" "}
-                        <Text>{reasonForCancel || "No reason provided"}</Text>
                     </div>
                 )}
                 <div className="mb-4">
