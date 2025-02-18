@@ -1,47 +1,46 @@
-import { useState, useEffect } from "react";
-import classNames from "classnames/bind";
-import Styles from "./Home.module.css";
-import BoardingHouseGrid from "../../../component/BoardingHouseCard";
-import { Tabs } from "antd";
-import { toast } from "react-toastify";
-import formatAmount from "@/utils/formatAmount";
-import { formatTimeAgo } from "../../../utils/timeUtils";
-import truncateDetail from "../../../utils/truncateDetail";
-import SearchBar from "./SearchBar";
-import { getBhByArea } from "../../../api/ownerUser/boardingHouse";
-import useDebounce from "../../../hooks/useDebounce";
+import { useState, useEffect } from 'react';
+import classNames from 'classnames/bind';
+import Styles from './Home.module.css';
+import BoardingHouseGrid from '../../../component/BoardingHouseCard';
+import { Tabs } from 'antd';
+import { toast } from 'react-toastify';
+import formatAmount from '@/utils/formatAmount';
+import { formatTimeAgo } from '../../../utils/timeUtils';
+import truncateDetail from '../../../utils/truncateDetail';
+import SearchBar from './SearchBar';
+import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
+import useDebounce from '../../../hooks/useDebounce';
 
 const cx = classNames.bind(Styles);
 
 function Home() {
   const [originalData, setOriginalData] = useState([]);
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState('all');
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState({
-    province: "",
-    district: "",
-    ward: "",
+    province: '',
+    district: '',
+    ward: '',
   });
 
   const fetchBhByArea = async () => {
     setLoading(true);
     try {
       const res = await getBhByArea(searchValue);
-      const baseUrl = "http://localhost:3000";
 
       const formattedData = res.map((item) => {
         const imgPath =
           item.images?.find((img) => img.isPrimary)?.imageUrl ||
           item.images?.[0]?.imageUrl ||
-          "";
-        const imgUrl = imgPath ? `${baseUrl}${imgPath}` : "";
+          '';
+        const imgUrl = imgPath ? `${imgPath}` : '';
 
         return {
           id: item._id?.$oid || item._id,
           name: item.name,
           price: formatAmount(item.priceRange),
           detail: truncateDetail(
-            item.address?.province || "No address provided"
+            item.address?.province || 'No address provided'
           ),
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0,
@@ -53,8 +52,8 @@ function Home() {
 
       setOriginalData(formattedData);
     } catch (error) {
-      console.error("Error fetching boarding houses:", error);
-      toast.error("Failed to fetch boarding houses. Please try again later.");
+      console.error('Error fetching boarding houses:', error);
+      toast.error('Failed to fetch boarding houses. Please try again later.');
       setOriginalData([]);
     } finally {
       setLoading(false);
@@ -86,13 +85,13 @@ function Home() {
   return (
     <div>
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
-      <div className={cx("home-container")}>
-        <div className={cx("content")}>
-          <div className={cx("filter")}>
+      <div className={cx('home-container')}>
+        <div className={cx('content')}>
+          <div className={cx('filter')}>
             <h2>Filter option</h2>
           </div>
 
-          <div className={cx("grid")}>
+          <div className={cx('grid')}>
             <Tabs defaultActiveKey="all" onChange={setActiveTab}>
               <Tabs.TabPane tab="All" key="all">
                 <BoardingHouseGrid data={allData} loading={loading} />

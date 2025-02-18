@@ -7,8 +7,13 @@ import {
 } from "../../../component";
 import { toast } from "react-toastify";
 import { Tag } from "antd";
-import { getWithdrawRequests } from "../../../api/withdrawalrequestmanagement";
+import {
+  filterWithdrawRequests,
+  getWithdrawRequests,
+} from "../../../api/withdrawalrequestmanagement";
 import formatAmount from "../../../utils/formatAmount";
+import FilterWithdrawal from "./FilterWithdrawal";
+import convertTimetap from "../../../utils/convertTimetap";
 
 function WithdrawalRequestManagement() {
   const statusColors = {
@@ -22,7 +27,7 @@ function WithdrawalRequestManagement() {
       title: "Full Name",
       dataIndex: "userId",
       key: "userId",
-      render: (user) => user?.fullname || "N/A",
+      render: (user) => user?.fullname || "",
     },
     {
       title: "Amount / VND",
@@ -44,7 +49,13 @@ function WithdrawalRequestManagement() {
       title: "Processed By",
       dataIndex: "processedBy",
       key: "processedBy",
-      render: (processedBy) => processedBy?.fullname || "N/A",
+      render: (processedBy) => processedBy?.fullname || "",
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt) => convertTimetap(createdAt),
     },
     {
       title: "Action",
@@ -67,10 +78,18 @@ function WithdrawalRequestManagement() {
   const [isOpenStatusChangeModal, setIsOpenStatusChangeModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [newStatus, setNewStatus] = useState("");
+  const [filterValue, setFilterValue] = useState();
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const res = await getWithdrawRequests();
+      const dataDefault = {
+        status: "",
+        startDate: "",
+        endDate: "",
+        amountRange: [0],
+      };
+      const res = await filterWithdrawRequests(dataDefault);
       if (res) {
         setData(res);
       } else {
@@ -82,6 +101,19 @@ function WithdrawalRequestManagement() {
         "Failed to fetch withdrawal requests. Please try again later."
       );
       setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFilter = async () => {
+    try {
+      const res = await filterWithdrawRequests(filterValue);
+      setData(res);
+    } catch (error) {
+      toast.error("Failed to fetch filtered accounts. Please try again later.");
+      setData([]);
+    } finally {
     }
   };
 
@@ -117,32 +149,23 @@ function WithdrawalRequestManagement() {
   };
 
   useEffect(() => {
-    setLoading(true);
-    fetchData().finally(() => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    });
+    fetchData();
   }, []);
+
+  useEffect(() => {
+    if (filterValue) {
+      fetchFilter();
+    }
+  }, [filterValue]);
+
   return (
     <div className="txt">
       {loading ? (
         <Loader />
       ) : (
         <>
-          <div className="flex justify-between mb-4">
-            <Button
-              size="large"
-              onClick={() => toast.success("Add success")}
-              btnAdd
-              title={"Add new"}
-            ></Button>
-            <Button
-              btnFilter
-              size="large"
-              onClick={() => toast.success("Filter success")}
-              title={"Filter"}
-            ></Button>
+          <div className="flex justify-end mb-4">
+            <FilterWithdrawal setFilterValue={setFilterValue} />
           </div>
           <div>
             <Table columns={columns} data={data || []} loading={loading} />
