@@ -3,8 +3,7 @@ import express from "express";
 import connect from "./config/dbConnect.js";
 import route from "./routes/index.js";
 import cors from "cors";
-import { fileURLToPath } from "url";
-import path from "path";
+
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);

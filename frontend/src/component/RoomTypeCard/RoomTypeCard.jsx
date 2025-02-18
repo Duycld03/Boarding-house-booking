@@ -1,21 +1,39 @@
-import React from "react";
-import { Card, Avatar, Typography, Divider, Button } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Card, Typography, Divider, Button } from "antd";
 import formatAmount from "../../utils/formatAmount";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-regular-svg-icons";
 import { faUserAlt } from "@fortawesome/free-solid-svg-icons";
+import CreateAppointmentForm from "../../pages/common/BoardingHouseDetail/CreateAppointmentForm";
+import { useEffect, useState } from "react";
+import { getRoomsByRoomType } from "../../api/room";
+import { toast } from "react-toastify";
 
 const { Title, Paragraph, Text } = Typography;
 
 const RoomCard = ({ roomData }) => {
+  const [listRoomData, setListRoomData] = useState([]);
+
+  const fetchRoomByRoomTypeId = async () => {
+    try {
+      const res = await getRoomsByRoomType(roomData?._id);
+      if (res) {
+        setListRoomData(res);
+      }
+    } catch (error) {
+      toast.error("Lỗi khi lấy dữ liệu phòng: " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchRoomByRoomTypeId();
+  }, []);
+
   return (
     <Card className=" w-5/6 mx-auto  mt-6 rounded-lg shadow-md" hoverable>
       {/* image */}
       <div className="w-full flex flex-wrap gap-10">
         <img
           className="max-h-[400px] md:w-1/2 sm:w-full object-cover rounded-lg"
-          src={roomData?.imageURL.url}
+          src={roomData?.image?.imageUrl}
         />
 
         {/* content */}
@@ -56,17 +74,15 @@ const RoomCard = ({ roomData }) => {
 
           <div className="flex justify-between mt-4">
             <Button
-              className="bg-primary text-white md:min-w-[200px] font-bold py-2 px-4 rounded-xl"
+              className="bg-primary text-white md:min-w-[200px]  py-2 px-4 rounded-xl"
               size="large"
             >
               Deposit
             </Button>
-            <Button
-              size="large"
-              className="bg-red-400 md:min-w-[200px] text-white font-bold py-2 px-4 rounded-xl"
-            >
-              Make appointment
-            </Button>
+            <CreateAppointmentForm
+              listRoomData={listRoomData}
+              ownerId={roomData?.boardingHouseId?.ownerId}
+            />
           </div>
         </div>
       </div>

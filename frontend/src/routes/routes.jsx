@@ -22,6 +22,7 @@ import {
   MyAppointment,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
+import { BHManagementOwner, BHDetailOwner } from "../pages/common";
 
 const dashBoard = "/dashboard";
 
@@ -100,6 +101,16 @@ const routes = [
   {
     path: "/my-appointment",
     page: MyAppointment,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/bh-management-owner",
+    page: BHManagementOwner,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/bh-management-owner/:boardingHouseId",
+    page: BHDetailOwner,
     layout: ProfileLayout,
   },
 

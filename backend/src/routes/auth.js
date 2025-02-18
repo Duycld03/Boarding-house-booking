@@ -24,8 +24,63 @@ authRouter.post("/verify-change-email", accountController.verifyChangeEmail);
 
 
 //appointment
-authRouter.get('/appointment/user', appointmentController.getAppointmentByUserId)
+authRouter.get('/appointment/user', appointmentController.getAppointmentByUserId);
 authRouter.put('/appointment/update-status/:id', appointmentController.updateAppointmentStatus)
+
+/**
+ * @swagger
+ * /auth/appointment/create-appointment/:
+ *   post:
+ *     summary: "Tạo cuộc hẹn mới"
+ *     description: "API này cho phép người dùng tạo một cuộc hẹn mới. Người dùng cần đăng nhập trước khi thực hiện yêu cầu."
+ *     tags: 
+ *       - "Appointment"
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: "object"
+ *             properties:
+ *               roomId:
+ *                 type: "string"
+ *                 description: "ID của phòng cần đặt lịch hẹn."
+ *                 example: "650d1b3f5f1b2c3d4e5f6790"
+ *               appointmentDate:
+ *                 type: "string"
+ *                 format: "date-time"
+ *                 description: "Ngày và giờ cuộc hẹn theo chuẩn ISO 8601 (YYYY-MM-DDTHH:mm:ssZ)."
+ *                 example: "2024-10-01T09:00:00Z"
+ *               note:
+ *                 type: "string"
+ *                 description: "Ghi chú thêm về cuộc hẹn (tùy chọn)."
+ *                 example: "Khách muốn xem phòng vào buổi sáng."
+ *     responses:
+ *       "200":
+ *         description: "Cuộc hẹn đã được tạo thành công."
+ *       "400":
+ *         description: "Yêu cầu không hợp lệ hoặc thiếu thông tin."
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Trường roomId và appointmentDate là bắt buộc."
+ *       "401":
+ *         description: "Người dùng chưa xác thực hoặc token không hợp lệ."
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Unauthorized"
+ *       "500":
+ *         description: "Lỗi máy chủ nội bộ."
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Đã xảy ra lỗi khi tạo cuộc hẹn."
+ */
+
+authRouter.post('/appointment/create-appointment/', appointmentController.createAppointment)
 
 
 export { authRouter };
