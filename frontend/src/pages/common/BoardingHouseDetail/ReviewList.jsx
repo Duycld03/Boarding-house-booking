@@ -3,7 +3,7 @@ import ReviewCard from "../../../component/ReviewCard/ReviewCard";
 
 const { Text } = Typography;
 
-const ReviewList = ({ reviews, rating }) => {
+const ReviewList = ({ reviews, rating, onReport, setReviewId }) => {
   if (!reviews || reviews.length === 0) {
     return <Empty description="There are no reviews yet." />;
   }
@@ -52,7 +52,13 @@ const ReviewList = ({ reviews, rating }) => {
       <List
         dataSource={reviews}
         renderItem={(review) => (
-          <ReviewCard key={review._id} reviewData={review} />
+          <ReviewCard
+            key={review._id}
+            reviewData={review}
+            onReport={onReport}
+            setReviewId={setReviewId}
+            reviewId={review._id}
+          />
         )}
         pagination={{
           pageSize: 5,

@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
 import ReviewList from "./ReviewList";
 import OwnerInfo from "./OwnerInfo";
+import ReportModal from "./ReportModal";
 
 const { Content } = Layout;
 
@@ -25,6 +26,9 @@ function BoardingHouseDetail() {
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reviewId, setReviewId] = useState("");
 
   // Ref cho room type section
   const roomTypeRef = useRef(null);
@@ -89,7 +93,10 @@ function BoardingHouseDetail() {
         </div>
       ) : boardingHouse ? (
         <>
-          <BoardingHouseGallery images={boardingHouse?.images || []} />
+          <BoardingHouseGallery
+            images={boardingHouse?.images || []}
+            onReport={() => setReportModalVisible(true)}
+          />
 
           <div className="mt-8 px-10">
             <div className="flex justify-between items-start gap-4 w-full">
@@ -212,7 +219,12 @@ function BoardingHouseDetail() {
             {/* Review */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
-              <ReviewList reviews={reviews} rating={boardingHouse?.rating} />
+              <ReviewList
+                reviews={reviews}
+                rating={boardingHouse?.rating}
+                onReport={() => setReportModalVisible(true)}
+                setReviewId={setReviewId}
+              />
             </div>
           </div>
         </>
@@ -221,6 +233,13 @@ function BoardingHouseDetail() {
           <Empty description="Không tìm thấy thông tin nhà trọ" />
         </div>
       )}
+      <ReportModal
+        visible={reportModalVisible}
+        toggleVisible={setReportModalVisible}
+        boardingHouseId={id}
+        reviewId={reviewId}
+        setReviewId={setReviewId}
+      />
     </div>
   );
 }

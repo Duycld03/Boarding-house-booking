@@ -27,7 +27,7 @@ dayjs.locale("en");
 const MAX_VISIBLE_IMAGES = 6;
 const MAX_DESCRIPTION_LENGTH = 150; // Giới hạn ký tự mô tả
 
-const ReviewCard = ({ reviewData, onReport }) => {
+const ReviewCard = ({ reviewData, onReport, setReviewId, reviewId }) => {
   if (!reviewData) return null;
 
   const {
@@ -46,9 +46,14 @@ const ReviewCard = ({ reviewData, onReport }) => {
     ? dayjs(updatedAt).fromNow()
     : "undefined";
 
+  const handleReport = () => {
+    setReviewId(reviewId);
+    onReport();
+  };
+
   const menu = (
     <Menu>
-      <Menu.Item key="report" onClick={() => onReport()}>
+      <Menu.Item key="report" onClick={handleReport}>
         <Tooltip placement="left" title="Report this review">
           <FontAwesomeIcon icon={faFlag} className="text-red-500 text-xl" />
           <span className="ml-2">Report</span>

@@ -1,7 +1,8 @@
-import Report from '../models/report.js';
-import Review from '../models/review.js';
-import BoardingHouse from '../models/boardingHouse.js';
-import nodemailer from 'nodemailer';
+import Report from "../models/report.js";
+import Review from "../models/review.js";
+import BoardingHouse from "../models/boardingHouse.js";
+import nodemailer from "nodemailer";
+import { v2 as cloudinary } from "cloudinary";
 class reportController {
   async getReviewReports(req, res) {
     try {
@@ -10,12 +11,12 @@ class reportController {
       })
         .sort({ createdAt: -1 })
         .populate({
-          path: 'reporter',
-          select: 'fullname email',
+          path: "reporter",
+          select: "fullname email",
         })
         .populate({
-          path: 'processedBy',
-          select: 'fullname',
+          path: "processedBy",
+          select: "fullname",
         });
 
       return res.status(200).json(ReviewReports);
@@ -35,12 +36,12 @@ class reportController {
       );
 
       if (!report) {
-        return res.status(404).json({ error: 'Report not found' });
+        return res.status(404).json({ error: "Report not found" });
       }
 
       return res
         .status(200)
-        .json({ message: 'Report soft deleted successfully', report });
+        .json({ message: "Report soft deleted successfully", report });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -52,25 +53,25 @@ class reportController {
 
       // Lấy thông tin báo cáo ban đầu
       const report = await Report.findById(reportId)
-        .populate({ path: 'reporter', select: 'fullname email' })
-        .populate({ path: 'processedBy', select: 'fullname' });
+        .populate({ path: "reporter", select: "fullname email" })
+        .populate({ path: "processedBy", select: "fullname" });
 
       if (!report) {
-        return res.status(404).json({ error: 'Report not found' });
+        return res.status(404).json({ error: "Report not found" });
       }
 
       if (!report.processedBy) {
-        return res.status(404).json({ error: 'Processed by user not found' });
+        return res.status(404).json({ error: "Processed by user not found" });
       }
 
       // Tìm tất cả các báo cáo có cùng targetId và reason
       const relatedReports = await Report.find({
         targetId: report.targetId,
         reason: report.reason,
-      }).populate({ path: 'reporter', select: 'fullname email' });
+      }).populate({ path: "reporter", select: "fullname email" });
 
       if (relatedReports.length === 0) {
-        return res.status(404).json({ error: 'No related reports found' });
+        return res.status(404).json({ error: "No related reports found" });
       }
 
       // Cập nhật trạng thái và chi tiết xử lý cho tất cả các báo cáo liên quan
@@ -80,44 +81,44 @@ class reportController {
       );
 
       // Nếu status là 'Resolved', thực hiện xóa mềm đối tượng liên quan
-      if (status.toLowerCase() === 'resolved') {
-        if (report.reportType === 'review') {
+      if (status.toLowerCase() === "resolved") {
+        if (report.reportType === "review") {
           await Review.findByIdAndUpdate(
             report.targetId,
             { deleted: true },
             { new: true }
           );
-        } else if (report.reportType === 'boardingHouse') {
+        } else if (report.reportType === "boardingHouse") {
           await BoardingHouse.findByIdAndUpdate(
             report.targetId,
             { deleted: true },
             { new: true }
           );
-          console.log('BoardingHouse soft deleted');
+          console.log("BoardingHouse soft deleted");
         }
       }
 
       // Populate thêm thông tin về nhà trọ nếu reportType là boardingHouse
-      let boardingHouseName = '';
-      if (report.reportType === 'boardingHouse') {
+      let boardingHouseName = "";
+      if (report.reportType === "boardingHouse") {
         await report.populate({
-          path: 'targetId',
-          select: 'name',
-          model: 'BoardingHouse',
+          path: "targetId",
+          select: "name",
+          model: "BoardingHouse",
           options: { withDeleted: true },
         });
 
         boardingHouseName = report.targetId
           ? report.targetId.name
-          : 'Không xác định';
+          : "Không xác định";
       }
 
       // Cấu hình email
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         auth: {
-          user: 'todohongy@gmail.com', // Thay bằng email của bạn
-          pass: 'ersq syrb ihov ilvx', // Thay bằng App Password
+          user: "todohongy@gmail.com", // Thay bằng email của bạn
+          pass: "ersq syrb ihov ilvx", // Thay bằng App Password
         },
       });
 
@@ -125,18 +126,18 @@ class reportController {
       for (const relatedReport of relatedReports) {
         // Kiểm tra loại báo cáo và thay đổi nội dung email phù hợp
         const reportSubject =
-          relatedReport.reportType === 'boardingHouse'
+          relatedReport.reportType === "boardingHouse"
             ? `liên quan đến nhà trọ <strong>${boardingHouseName}</strong>`
-            : 'liên quan đến bình luận trong bài viết';
+            : "liên quan đến bình luận trong bài viết";
 
         const mailOptions = {
-          from: 'support@example.com',
+          from: "support@example.com",
           to: relatedReport.reporter.email,
           subject: `Kết quả xử lý báo cáo: #${relatedReport._id}`,
           html: `
             <p>Kính gửi Anh/Chị ${relatedReport.reporter.fullname},</p>
             <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${
-              relatedReport.reason || 'undefined'
+              relatedReport.reason || "undefined"
             }"</strong> ${reportSubject} trên nền tảng của chúng tôi.</p>
             <p>Chúng tôi xin thông báo rằng báo cáo của bạn đã được xử lý với kết quả như sau:</p>
             <ul>
@@ -157,7 +158,7 @@ class reportController {
       }
 
       return res.status(200).json({
-        message: 'All related reports updated, emails sent successfully',
+        message: "All related reports updated, emails sent successfully",
         updatedReports: relatedReports.length,
       });
     } catch (error) {
@@ -171,7 +172,7 @@ class reportController {
       let filter = { reportType: { $regex: /^review$/i } };
 
       const convertToISODate = (dateString) => {
-        const [day, month, year] = dateString.split('-');
+        const [day, month, year] = dateString.split("-");
         return new Date(`${year}-${month}-${day}T00:00:00.000Z`);
       };
 
@@ -188,7 +189,7 @@ class reportController {
       }
 
       if (reason) {
-        filter.reason = { $regex: new RegExp(reason, 'i') }; // Case-insensitive
+        filter.reason = { $regex: new RegExp(reason, "i") }; // Case-insensitive
       }
 
       if (status) {
@@ -198,14 +199,14 @@ class reportController {
       const reports = await Report.find(filter)
         .sort({ createdAt: -1 })
         .populate({
-          path: 'reporter', // Populate reporter details
-          select: 'fullname email', // Select only these fields
+          path: "reporter", // Populate reporter details
+          select: "fullname email", // Select only these fields
         });
 
       res.status(200).json({ success: true, data: reports });
     } catch (error) {
-      console.error('Error filtering reports:', error);
-      res.status(500).json({ success: false, message: 'Server Error' });
+      console.error("Error filtering reports:", error);
+      res.status(500).json({ success: false, message: "Server Error" });
     }
   }
 
@@ -222,11 +223,11 @@ class reportController {
         if (start && isNaN(start)) {
           return res
             .status(400)
-            .json({ message: 'Invalid start date provided' });
+            .json({ message: "Invalid start date provided" });
         }
 
         if (end && isNaN(end)) {
-          return res.status(400).json({ message: 'Invalid end date provided' });
+          return res.status(400).json({ message: "Invalid end date provided" });
         }
 
         filter.createdAt = {};
@@ -235,7 +236,7 @@ class reportController {
       }
 
       if (reason) {
-        filter.reason = { $regex: new RegExp(reason, 'i') };
+        filter.reason = { $regex: new RegExp(reason, "i") };
       }
       if (status) {
         filter.status = status;
@@ -243,12 +244,12 @@ class reportController {
 
       const reportsQuery = await Report.find(filter)
         .populate({
-          path: 'targetId',
-          select: 'name',
-          model: 'BoardingHouse',
+          path: "targetId",
+          select: "name",
+          model: "BoardingHouse",
           options: { withDeleted: true },
         })
-        .populate('reporter')
+        .populate("reporter")
         .sort({ createdAt: 1 });
 
       if (boardingHouse) {
@@ -265,8 +266,8 @@ class reportController {
         res.status(200).json(reportsQuery);
       }
     } catch (error) {
-      console.error('Error filtering boarding house reports:', error);
-      res.status(500).json({ success: false, message: 'Server Error' });
+      console.error("Error filtering boarding house reports:", error);
+      res.status(500).json({ success: false, message: "Server Error" });
     }
   }
 
@@ -276,17 +277,71 @@ class reportController {
         reportType: { $regex: /^boardinghouse$/i },
       })
         .populate({
-          path: 'targetId',
-          select: 'name',
-          model: 'BoardingHouse',
+          path: "targetId",
+          select: "name",
+          model: "BoardingHouse",
           options: { withDeleted: true },
         })
-        .populate('reporter')
+        .populate("reporter")
         .sort({ createdAt: 1 });
 
       return res.status(200).json(BHReports);
     } catch (error) {
       return res.status(500).json({ error: error.message });
+    }
+  }
+
+  async createReport(req, res) {
+    try {
+      const { reason, details, boardingHouseId, reviewId } = req.body;
+
+      const reporter = req.user.userId;
+      const reportType = reviewId ? "review" : "boardingHouse";
+
+      if (!reason || !details || !reportType || !boardingHouseId) {
+        return res.status(400).json({
+          message: "Missing required fields",
+        });
+      }
+
+      const existingReport = await Report.findOne({
+        reporter,
+        targetId: reviewId || boardingHouseId,
+        status: "pending",
+      });
+
+      if (existingReport) {
+        if (req.files && req.files.length > 0) {
+          for (const file of req.files) {
+            cloudinary.uploader.destroy(file.filename);
+          }
+        }
+
+        return res.status(400).json({
+          message: `You have already reported this ${reviewId ? "review" : "boarding house"}`,
+        });
+      }
+
+      const newReport = new Report({
+        reason,
+        details,
+        reporter,
+        targetId: reviewId || boardingHouseId,
+        reportType,
+        reportTypeRef: reportType === "review" ? "Review" : "BoardingHouse",
+      });
+
+      if (req.files && req.files.length > 0) {
+        newReport.images = req.files.map((file) => ({
+          imageUrl: file.path,
+          publicId: file.filename,
+        }));
+      }
+
+      await newReport.save();
+      res.status(201).json({ message: "Report created successfully" });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
     }
   }
 }
