@@ -22,7 +22,10 @@ class withdrawalRequestsController {
   async getAllWithdrawalRequestStatus(req, res) {
     try {
       const withdrawRequests = await WithdrawRequest.distinct("status");
-      res.status(200).json(withdrawRequests);
+      const uniqueStatus = new Set(
+        withdrawRequests.map((status) => status.toLowerCase())
+      );
+      res.status(200).json([...uniqueStatus]);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -47,7 +50,9 @@ class withdrawalRequestsController {
       } = req.body;
       let filter = {};
 
-      if (status) filter.status = status;
+      if (status) {
+        filter.status = { $regex: new RegExp(`^${status}$`, "i") };
+      }
       if (startDate && endDate) {
         const start = new Date(startDate);
         start.setUTCHours(0, 0, 0, 0);

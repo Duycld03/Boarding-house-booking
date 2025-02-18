@@ -10,6 +10,10 @@ import {
 
 const { Option } = Select;
 
+const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 function FilterWithdrawal({ setFilterValue }) {
   const [form] = Form.useForm();
   const [status, setStatus] = useState([]);
@@ -22,7 +26,7 @@ function FilterWithdrawal({ setFilterValue }) {
   const fetchAllWithdrawRequestStatus = async () => {
     try {
       const res = await getAllWithdrawalRequestStatus();
-      setStatus(res);
+      setStatus(res.map((status) => capitalizeFirstLetter(status)));
     } catch (error) {
       console.error("Error fetching withdraw request status:", error);
     }
@@ -133,7 +137,7 @@ function FilterWithdrawal({ setFilterValue }) {
             <Form.Item label="Status" name="status" className="mb-2">
               <Select placeholder="Select status" allowClear>
                 {status?.map((status, index) => (
-                  <Option key={status} value={status}>
+                  <Option key={status} value={status} className="capitalize">
                     {status}
                   </Option>
                 ))}
