@@ -1,4 +1,6 @@
 import Review from '../models/review.js';
+import BoardingHouse from '../models/boardingHouse.js';
+
 class ReviewController {
     async getReviews(req, res) {
         try {
@@ -106,7 +108,73 @@ class ReviewController {
             return res.status(500).json({ message: "Server Error" });
         }
     }
+    async addReview(req, res) {
+        try {
+            console.log("Req1", req);
+            const accountId = req.user.userId;
+            if (!accountId) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Account ID not found.",
+                });
+            }
+            // Lấy thông tin từ request body
+            const { boardingHouseId, content, rating, images } = req.body;
+            console.log("Req2", req);
+            // Kiểm tra boarding house tồn tại
+            const boardingHouse = await BoardingHouse.findById(boardingHouseId);
+            if (!boardingHouse) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Boarding house not found.",
+                });
+            }
 
+            // Kiểm tra nếu user đã review boarding house này
+            const existingReview = await Review.findOne({
+                accountId,
+                boardingHouseId,
+            });
+
+            if (existingReview) {
+                return res.status(400).json({
+                    success: false,
+                    message: "You have already reviewed this boarding house.",
+                });
+            }
+
+            // Kiểm tra rating hợp lệ
+            if (rating < 1 || rating > 5) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Rating must be between 1 and 5 stars.",
+                });
+            }
+
+            // Tạo review mới
+            const newReview = new Review({
+                boardingHouseId,
+                content,
+                rating,
+                images,
+            });
+
+            // Lưu review vào cơ sở dữ liệu
+            await newReview.save();
+
+            return res.status(201).json({
+                success: true,
+                message: "Review added successfully.",
+                review: newReview,
+            });
+        } catch (error) {
+            console.error("Error adding review:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Server error. Please try again later.",
+            });
+        }
+    }
 
 }
 export default new ReviewController();

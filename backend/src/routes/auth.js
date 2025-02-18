@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { authController, accountController, favoriteController, appointmentController } from "./../controllers/index.js";
+import { authController, accountController, favoriteController, appointmentController, ReviewController } from "./../controllers/index.js";
 import { upload } from "../config/upload.config.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const authRouter = Router();
 
@@ -81,6 +82,7 @@ authRouter.put('/appointment/update-status/:id', appointmentController.updateApp
  */
 
 authRouter.post('/appointment/create-appointment/', appointmentController.createAppointment)
+authRouter.post("/reviews", ReviewController.addReview);
 
 
 export { authRouter };

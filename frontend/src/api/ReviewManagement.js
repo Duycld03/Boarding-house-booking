@@ -14,3 +14,10 @@ export const filterReviews = (filterValue) => {
     });
 };
 
+export const addReview = (formData) => {
+    return axios.post("/auth/reviews", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};
