@@ -24,15 +24,14 @@ function Login() {
 
       localStorage.setItem("access_token", res.token);
 
-      if (location.key !== "default") {
+      if (role === "admin") {
+        navigate("/dashboard/account-management");
+      } else if (location.key !== "default") {
         navigate(-1);
       } else {
-        if (role === "user" || role === "owner") {
-          navigate("/");
-        } else if (role === "admin") {
-          navigate("/dashboard/account-management");
-        }
+        navigate("/");
       }
+
       toast.success("Login successful");
       setLoading(false);
     } catch (error) {
@@ -60,7 +59,15 @@ function Login() {
 
       if (res.isRegistered) {
         localStorage.setItem("access_token", res.token);
-        navigate("/");
+
+        if (res.user.role === "admin") {
+          navigate("/dashboard/account-management");
+        } else if (location.key !== "default") {
+          navigate(-1);
+        } else {
+          navigate("/");
+        }
+
         toast.success("Login successful");
       } else {
         navigate("/register-with-google", { state: { user: res.user } });
