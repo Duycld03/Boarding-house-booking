@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Layout, Spin, Empty, Button, Tag, Divider } from "antd";
+import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from "antd";
 import {
   getBoardingHouseDetail,
   getReviewByBhId,
@@ -15,10 +15,15 @@ import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
 import ReviewList from "./ReviewList";
 import OwnerInfo from "./OwnerInfo";
 import ReportModal from "./ReportModal";
+import { useNavigate } from "react-router-dom";
+import { useCurrentUser } from "../../../context/userContext";
 
 const { Content } = Layout;
 
 function BoardingHouseDetail() {
+  const { isLogin } = useCurrentUser();
+  const navigate = useNavigate();
+
   const { id } = useParams();
   const [boardingHouse, setBoardingHouse] = useState(null);
   const [roomTypes, setRoomType] = useState([]);
@@ -85,6 +90,20 @@ function BoardingHouseDetail() {
     roomTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const handleOpen = () => {
+    if (!isLogin) {
+      Modal.confirm({
+        title: " You need to log in",
+        content: "Please log in to report.",
+        okText: " Log in",
+        cancelText: "Cancel",
+        onOk: () => navigate("/login"),
+      });
+      return;
+    }
+    setReportModalVisible(true);
+  };
+
   return (
     <div className="md:max-w-screen-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       {loading ? (
@@ -95,7 +114,7 @@ function BoardingHouseDetail() {
         <>
           <BoardingHouseGallery
             images={boardingHouse?.images || []}
-            onReport={() => setReportModalVisible(true)}
+            onReport={() => handleOpen()}
           />
 
           <div className="mt-8 px-10">
@@ -222,7 +241,7 @@ function BoardingHouseDetail() {
               <ReviewList
                 reviews={reviews}
                 rating={boardingHouse?.rating}
-                onReport={() => setReportModalVisible(true)}
+                onReport={() => handleOpen()}
                 setReviewId={setReviewId}
               />
             </div>
