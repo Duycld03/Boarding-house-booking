@@ -15,30 +15,33 @@ const BankDetailsSchema = new mongoose.Schema({
   },
 });
 
-const WithdrawRequestSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Account",
-    required: true,
+const WithdrawRequestSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      default: "pending",
+    },
+    processedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
+    },
+    reasonForCancel: {
+      type: String,
+      required: true,
+    },
+    bankingAccount: BankDetailsSchema,
   },
-  amount: {
-    type: Number,
-    required: true,
-  },
-  status: {
-    type: String,
-    default: "pending",
-  },
-  processedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Account",
-  },
-  reasonForCancel: {
-    type: String,
-    required: true,
-  },
-  bankingAccount: BankDetailsSchema,
-});
+  { timestamps: true }
+);
 
 const WithdrawRequest = mongoose.model(
   "WithdrawRequest",

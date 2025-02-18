@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from "express";
 
 import {
   withdrawalRequestsController,
@@ -6,54 +6,106 @@ import {
   boardingHouseController,
   reportController,
   ReviewController,
-} from '../controllers/index.js';
-import reviewController from '../controllers/reviewController.js';
+} from "../controllers/index.js";
+import reviewController from "../controllers/reviewController.js";
 
 const adminRouter = Router();
 
+// Withdrawal Requests
 adminRouter.get(
-  '/withdrawRequests',
+  "/withdrawRequests",
   withdrawalRequestsController.getWithdrawRequests
 );
 
+adminRouter.get(
+  "/withdrawRequests/status",
+  withdrawalRequestsController.getAllWithdrawalRequestStatus
+);
+
+adminRouter.get(
+  "/withdrawRequests/maxAmount",
+  withdrawalRequestsController.getMaxAmountWithdrawRequest
+);
+adminRouter.post(
+  "/withdrawRequests/filter",
+  withdrawalRequestsController.filterWithdrawRequests
+);
+
 //report
-adminRouter.get('/review-reports', reportController.getReviewReports);
-adminRouter.delete('/reports/:reportId', reportController.softDeleteReport);
+adminRouter.get("/review-reports", reportController.getReviewReports);
+adminRouter.delete("/reports/:reportId", reportController.softDeleteReport);
 adminRouter.put(
-  '/reports/:reportId/send-email',
+  "/reports/:reportId/send-email",
   reportController.sendReportReplyByEmail
 );
-adminRouter.get('/reports/filter', reportController.filterReviewReports);
-adminRouter.get('/reports/filter/boarding-house', reportController.filterBHReports);
-
+adminRouter.get("/reports/filter", reportController.filterReviewReports);
+adminRouter.get(
+  "/reports/filter/boarding-house",
+  reportController.filterBHReports
+);
 
 //review
-adminRouter.get('/reviews', ReviewController.getReviews);
-adminRouter.get('/reviews/filter', reviewController.filterReviews);
-adminRouter.delete('/reviews/:reviewId', reviewController.softDeleteReview);
-adminRouter.get('/boarding-house-reports', reportController.getBHReports);
-
+adminRouter.get("/reviews", ReviewController.getReviews);
+adminRouter.get("/reviews/filter", reviewController.filterReviews);
+adminRouter.delete("/reviews/:reviewId", reviewController.softDeleteReview);
+adminRouter.get("/boarding-house-reports", reportController.getBHReports);
 
 //boarding house
-adminRouter.get('/boardinghouse', boardingHouseController.getAllBHOnDashBoard)
-adminRouter.get("/boardinghouse/:id", boardingHouseController.getBoardingHouseDetails);
-adminRouter.put("/boardinghouse/:id", boardingHouseController.updateBoardingHouseDetails);
+adminRouter.get("/boardinghouse", boardingHouseController.getAllBHOnDashBoard);
+adminRouter.get(
+  "/boardinghouse/:id",
+  boardingHouseController.getBoardingHouseDetails
+);
+adminRouter.put(
+  "/boardinghouse/:id",
+  boardingHouseController.updateBoardingHouseDetails
+);
 adminRouter.get("/types", boardingHouseController.getAllBoardingHouseTypes);
-adminRouter.post("/boardinghouse/:id/images", boardingHouseController.addBoardingHouseImage);
-adminRouter.put("/boardinghouse/:id/images/:imageId", boardingHouseController.updateBoardingHouseImage);
-adminRouter.delete("/boardinghouse/:id/images/:imageId", boardingHouseController.deleteBoardingHouseImage);
-adminRouter.get("/boardinghouse/:id/images", boardingHouseController.getBoardingHouseImages);
-adminRouter.post('/boardinghouse/create', boardingHouseController.createBoardingHouse);
-adminRouter.post("/boardinghouse/uploadFile", boardingHouseController.uploadFile)
-adminRouter.get("/boardinghouse/chore/get-max", boardingHouseController.getMaxPriceBH)
-adminRouter.get("/boardinghouse/chore/filter", boardingHouseController.filterBoardingHouse)
-adminRouter.delete("/boardinghouse/:id/softDelete", boardingHouseController.softDeleteBoardingHouse);
-adminRouter.post("/boardinghouse/uploadFile", boardingHouseController.uploadFile)
+adminRouter.post(
+  "/boardinghouse/:id/images",
+  boardingHouseController.addBoardingHouseImage
+);
+adminRouter.put(
+  "/boardinghouse/:id/images/:imageId",
+  boardingHouseController.updateBoardingHouseImage
+);
+adminRouter.delete(
+  "/boardinghouse/:id/images/:imageId",
+  boardingHouseController.deleteBoardingHouseImage
+);
+adminRouter.get(
+  "/boardinghouse/:id/images",
+  boardingHouseController.getBoardingHouseImages
+);
+adminRouter.post(
+  "/boardinghouse/create",
+  boardingHouseController.createBoardingHouse
+);
+adminRouter.post(
+  "/boardinghouse/uploadFile",
+  boardingHouseController.uploadFile
+);
+adminRouter.get(
+  "/boardinghouse/chore/get-max",
+  boardingHouseController.getMaxPriceBH
+);
+adminRouter.get(
+  "/boardinghouse/chore/filter",
+  boardingHouseController.filterBoardingHouse
+);
+adminRouter.delete(
+  "/boardinghouse/:id/softDelete",
+  boardingHouseController.softDeleteBoardingHouse
+);
+adminRouter.post(
+  "/boardinghouse/uploadFile",
+  boardingHouseController.uploadFile
+);
 //Account
-adminRouter.get('/account', accountController.getAllAccount);
-adminRouter.delete('/account/:accountId', accountController.softDeleteAccount);
-adminRouter.get('/account/filter', accountController.filterAccounts);
-adminRouter.post('/account/create', accountController.createAccount);
-adminRouter.put('/account/:accountId', accountController.updateAccount);
+adminRouter.get("/account", accountController.getAllAccount);
+adminRouter.delete("/account/:accountId", accountController.softDeleteAccount);
+adminRouter.get("/account/filter", accountController.filterAccounts);
+adminRouter.post("/account/create", accountController.createAccount);
+adminRouter.put("/account/:accountId", accountController.updateAccount);
 
 export { adminRouter };
