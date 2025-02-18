@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Form, Button, Checkbox, Card, Input } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
 import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
@@ -11,6 +11,7 @@ function Login() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
   const { loginData } = useCurrentUser();
 
@@ -23,10 +24,14 @@ function Login() {
 
       localStorage.setItem("access_token", res.token);
 
-      if (role === "user" || role === "owner") {
-        navigate("/");
-      } else if (role === "admin") {
-        navigate("/dashboard/account-management");
+      if (location.key !== "default") {
+        navigate(-1);
+      } else {
+        if (role === "user" || role === "owner") {
+          navigate("/");
+        } else if (role === "admin") {
+          navigate("/dashboard/account-management");
+        }
       }
       toast.success("Login successful");
       setLoading(false);
