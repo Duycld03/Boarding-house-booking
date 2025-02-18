@@ -318,7 +318,7 @@ class reportController {
         }
 
         return res.status(400).json({
-          message: `You already reported this ${reportType}. Please wait for the admin to process your report.`,
+          message: `You already reported this ${reviewId ? "review" : "boarding house"}. Please wait for the admin to process your report.`,
         });
       }
 
