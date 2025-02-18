@@ -27,7 +27,7 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
                 const response = await getWithdrawRequestDetail(requestId);
                 setDetail(response);
                 setNewStatus(response.status);
-                if (response.status === "cancel") {
+                if (response.status === "cancelled") {
                     setCancelReason(response.reasonForCancel || "");
                 }
             } catch (err) {
@@ -45,7 +45,7 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
     };
 
     const handleConfirmUpdate = () => {
-        if (newStatus === "cancel" && !cancelReason.trim()) {
+        if (newStatus === "cancelled" && !cancelReason.trim()) {
             Modal.error({
                 title: "Error",
                 content: "Please provide a reason for cancellation.",
@@ -60,7 +60,7 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
         try {
             const payload = {
                 status: newStatus,
-                reasonForCancel: newStatus === "cancel" ? cancelReason : undefined,
+                reasonForCancel: newStatus === "cancelled" ? cancelReason : undefined,
             };
             await updateWithdrawStatus(requestId, payload);
             toast.success("Status updated successfully.");
@@ -68,7 +68,7 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
             setDetail((prev) => ({
                 ...prev,
                 status: newStatus,
-                reasonForCancel: newStatus === "cancel" ? cancelReason : prev.reasonForCancel,
+                reasonForCancel: newStatus === "cancelled" ? cancelReason : prev.reasonForCancel,
             }));
 
             if (onStatusUpdate) onStatusUpdate();
@@ -133,11 +133,11 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
                         style={{ width: "100%" }}
                     >
                         <Option value="pending">Pending</Option>
-                        <Option value="cancel">Cancel</Option>
-                        <Option value="accept">Accept</Option>
+                        <Option value="cancelled">Cancel</Option>
+                        <Option value="processed">Accept</Option>
                     </Select>
                 </div>
-                {newStatus === "cancel" && (
+                {newStatus === "cancelled" && (
                     <div className="mb-4">
                         <Text strong>Reason for Cancel:</Text>{" "}
                         <Input.TextArea
@@ -145,7 +145,7 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
                             value={cancelReason}
                             onChange={(e) => setCancelReason(e.target.value)}
                             placeholder="Enter reason for cancellation"
-                            disabled={status === "cancel"}
+                            disabled={status === "cancelled"}
                         />
                     </div>
                 )}
@@ -186,13 +186,12 @@ function Detail({ requestId, onClose, onStatusUpdate }) {
                 onOk={handleFinalUpdate}
                 onCancel={() => setShowConfirmPopup(false)}
                 okText="Yes, Confirm"
-                cancelText="Cancel"
+                cancelText="Cancelled"
             >
                 <Text>
-                    Are you sure you want to change the status to{" "}
-                    <Text strong>{newStatus}</Text>?
+                    Are you sure you want to change the status ?
                 </Text>
-                {newStatus === "cancel" && (
+                {newStatus === "cancelled" && (
                     <div className="mt-4">
                         <Text strong>Reason for Cancel:</Text>{" "}
                         <Text>{cancelReason || "N/A"}</Text>

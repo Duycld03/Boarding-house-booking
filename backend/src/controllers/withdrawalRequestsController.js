@@ -43,7 +43,7 @@ class withdrawalRequestsController {
       const { status, reasonForCancel } = req.body;
 
       // Kiểm tra trạng thái có hợp lệ hay không
-      const validStatuses = ["pending", "accept", "cancel"];
+      const validStatuses = ["pending", "processed", "cancelled"];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: "Invalid status value" });
       }
