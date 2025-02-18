@@ -52,7 +52,7 @@ function WithdrawalRequestManagement() {
       title: "Action",
       render: (record) => (
         <>
-          <div className="flex gap-3 justify-evenly">
+          <div className="flex gap-3 items-center">
             <Button
               title={"Delete"}
               size="large"
