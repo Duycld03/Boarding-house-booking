@@ -119,7 +119,22 @@ function WithdrawalRequestManagement() {
       setLoading(false);
     }
   };
-
+  const fetchDataDetails = async () => {
+    try {
+      const res = await getWithdrawRequests();
+      if (res) {
+        setData(res);
+      } else {
+        setData([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch withdrawal requests:", error);
+      toast.error(
+        "Failed to fetch withdrawal requests. Please try again later."
+      );
+      setData([]);
+    }
+  };
   const fetchFilter = async () => {
     try {
       const res = await filterWithdrawRequests(filterValue);
@@ -213,7 +228,7 @@ function WithdrawalRequestManagement() {
             <Detail
               requestId={selectedRequest}
               onClose={() => setIsDetailOpen(false)}
-              onStatusUpdate={fetchData}
+              onStatusUpdate={fetchDataDetails}
             />
           )}
         </>

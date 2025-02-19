@@ -22,7 +22,7 @@ class withdrawalRequestsController {
   async getWithdrawRequestDetail(req, res) {
     try {
       const { id } = req.params;
-      const withdrawRequestDetail = await withdrawRequest
+      const withdrawRequestDetail = await WithdrawRequest
         .findById(id)
         .populate({
           path: "userId",
@@ -51,7 +51,7 @@ class withdrawalRequestsController {
       if (status === "cancel" && !reasonForCancel) {
         return res.status(400).json({ message: "Reason for cancellation is required" });
       }
-      const updatedWithdrawRequest = await withdrawRequest.findByIdAndUpdate(id,
+      const updatedWithdrawRequest = await WithdrawRequest.findByIdAndUpdate(id,
         {
           status,
           reasonForCancel: status === "cancel" ? reasonForCancel : undefined,
@@ -67,7 +67,8 @@ class withdrawalRequestsController {
     } catch (error) {
       console.error("Update Error:", error.message);
       return res.status(500).json({ error: error.message });
-
+    }
+  }
 
   async getAllWithdrawalRequestStatus(req, res) {
     try {
