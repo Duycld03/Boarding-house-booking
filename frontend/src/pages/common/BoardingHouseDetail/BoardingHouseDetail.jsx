@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Layout, Spin, Empty, Button, Tag, Divider, message } from "antd";
+import { useParams } from "react-router-dom";
+import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from "antd";
 import {
   getBoardingHouseDetail,
   getReviewByBhId,
@@ -16,10 +16,18 @@ import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
 import ReviewList from "./ReviewList";
 import OwnerInfo from "./OwnerInfo";
 import AddReview from "./AddReview";
+import ReportModal from "./ReportModal";
+import { useNavigate } from "react-router-dom";
+import { useCurrentUser } from "../../../context/userContext";
+import {
+  checkReportExist,
+  getReviewReports,
+} from "../../../api/reportManagement";
 
 const { Content } = Layout;
 
 function BoardingHouseDetail() {
+  const { isLogin } = useCurrentUser();
   const { id } = useParams();
   const navigate = useNavigate(); // Điều hướng nếu cần
   const [boardingHouse, setBoardingHouse] = useState(null);
@@ -29,6 +37,13 @@ function BoardingHouseDetail() {
   const [isLiked, setIsLiked] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở/đóng modal
+
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reviewId, setReviewId] = useState("");
+  const [reportedReviews, setReportedReviews] = useState([]);
+  const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
+
+  // Ref cho room type section
   const roomTypeRef = useRef(null);
 
   // Giả sử bạn lấy accountId từ localStorage hoặc bất kỳ nguồn nào
@@ -61,14 +76,33 @@ function BoardingHouseDetail() {
     }
   };
 
-  // Fetch reviews
+  const fetchReportStatus = async (reviews) => {
+    setLoading(true);
+    try {
+      const reviewIds = reviews.map((review) => review._id);
+      const res = await checkReportExist(reviewIds, id);
+      setReportedReviews(res.reportedReviews);
+      setReportedBoardingHouse(res.boardingHouseReported);
+    } catch (error) {
+      console.error("Error fetching review reports:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchReviews = async () => {
     try {
       const response = await getReviewByBhId(id);
-      setReviews(response || []);
+      setReviews(response);
+
+      fetchReportStatus(response);
     } catch (error) {
       console.error("Error fetching reviews:", error);
     }
+  };
+
+  const handleReportStatus = () => {
+    fetchReportStatus(reviews);
   };
 
   useEffect(() => {
@@ -113,6 +147,20 @@ function BoardingHouseDetail() {
     roomTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const handleOpen = () => {
+    if (!isLogin) {
+      Modal.confirm({
+        title: " You need to log in",
+        content: "Please log in to report.",
+        okText: " Log in",
+        cancelText: "Cancel",
+        onOk: () => navigate("/login"),
+      });
+      return;
+    }
+    setReportModalVisible(true);
+  };
+
   return (
     <div className="md:max-w-screen-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       {loading ? (
@@ -121,7 +169,11 @@ function BoardingHouseDetail() {
         </div>
       ) : boardingHouse ? (
         <>
-          <BoardingHouseGallery images={boardingHouse?.images || []} />
+          <BoardingHouseGallery
+            images={boardingHouse?.images || []}
+            onReport={() => handleOpen()}
+            isReported={reportedBoardingHouse}
+          />
 
           <div className="mt-8 px-10">
             {/* Header */}
@@ -243,15 +295,13 @@ function BoardingHouseDetail() {
             {/* Reviews Section */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
-              <ReviewList reviews={reviews} rating={boardingHouse?.rating} />
-              <Button
-                type="primary"
-                size="large"
-                className="mt-4"
-                onClick={handleWriteReview}
-              >
-                Write a Review
-              </Button>
+              <ReviewList
+                reviews={reviews}
+                rating={boardingHouse?.rating}
+                onReport={() => handleOpen()}
+                setReviewId={setReviewId}
+                reportedReviews={reportedReviews}
+              />
             </div>
           </div>
         </>
@@ -267,6 +317,14 @@ function BoardingHouseDetail() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddReview}
         boardingHouseId={id}
+      />
+      <ReportModal
+        visible={reportModalVisible}
+        toggleVisible={setReportModalVisible}
+        boardingHouseId={id}
+        reviewId={reviewId}
+        setReviewId={setReviewId}
+        handleReportStatus={handleReportStatus}
       />
     </div>
   );

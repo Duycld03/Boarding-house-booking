@@ -1,26 +1,26 @@
-import mongoose from 'mongoose';
-import mongooseDelete from 'mongoose-delete';
+import mongoose from "mongoose";
+import mongooseDelete from "mongoose-delete";
 
 const ReportSchema = new mongoose.Schema(
   {
     reportType: {
       type: String,
-      enum: ['review', 'boardingHouse'],
+      enum: ["review", "boardingHouse"],
       required: true,
     },
     targetId: {
       type: mongoose.Schema.Types.ObjectId,
-      refPath: 'reportTypeRef',
+      refPath: "reportTypeRef",
       required: true,
     },
     reportTypeRef: {
       type: String,
       required: true,
-      enum: ['Review', 'BoardingHouse'],
+      enum: ["Review", "BoardingHouse"],
     },
     reporter: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Account',
+      ref: "Account",
       required: true,
     },
     reason: {
@@ -33,10 +33,11 @@ const ReportSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      default: "pending",
     },
     processedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Account',
+      ref: "Account",
     },
     images: [
       {
@@ -48,20 +49,16 @@ const ReportSchema = new mongoose.Schema(
           type: String,
           default: "",
         },
-      }
+      },
     ],
-    detailReport: {
-      type: String,
-      required: true,
-    },
   },
   { timestamps: true }
 );
 
 // Add mongoose-delete plugin without 'deletedAt'
 ReportSchema.plugin(mongooseDelete, {
-  overrideMethods: 'all',
+  overrideMethods: "all",
 });
 
-const Report = mongoose.model('Report', ReportSchema);
+const Report = mongoose.model("Report", ReportSchema);
 export default Report;

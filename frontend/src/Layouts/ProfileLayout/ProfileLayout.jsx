@@ -21,10 +21,12 @@ function ProfileLayout({ children, isLoggedIn }) {
           }}
         >
           <CustomProfileSlider />
-          <Content className={cx("content-wrapper")}>{children}</Content>
+          <div className="w-full">
+            <Content className={cx("content-wrapper")}>{children}</Content>
+            <FooterComponent />
+          </div>
         </Layout>
       </Content>
-      <FooterComponent />
     </Layout>
   );
 }

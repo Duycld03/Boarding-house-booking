@@ -1,7 +1,13 @@
 import { Router } from "express";
-import { authController, accountController, favoriteController, appointmentController, ReviewController } from "./../controllers/index.js";
+
+import {
+  authController,
+  accountController,
+  favoriteController,
+  appointmentController,
+  reportController,
+} from "./../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const authRouter = Router();
 
@@ -37,10 +43,15 @@ authRouter.put(
 authRouter.post("/send-otp-change-email", accountController.sendOTPChangeEmail);
 authRouter.post("/verify-change-email", accountController.verifyChangeEmail);
 
-
 //appointment
-authRouter.get('/appointment/user', appointmentController.getAppointmentByUserId);
-authRouter.put('/appointment/update-status/:id', appointmentController.updateAppointmentStatus)
+authRouter.get(
+  "/appointment/user",
+  appointmentController.getAppointmentByUserId
+);
+authRouter.put(
+  "/appointment/update-status/:id",
+  appointmentController.updateAppointmentStatus
+);
 
 /**
  * @swagger
@@ -48,7 +59,7 @@ authRouter.put('/appointment/update-status/:id', appointmentController.updateApp
  *   post:
  *     summary: "Tạo cuộc hẹn mới"
  *     description: "API này cho phép người dùng tạo một cuộc hẹn mới. Người dùng cần đăng nhập trước khi thực hiện yêu cầu."
- *     tags: 
+ *     tags:
  *       - "Appointment"
  *     security:
  *       - BearerAuth: []
@@ -95,8 +106,19 @@ authRouter.put('/appointment/update-status/:id', appointmentController.updateApp
  *               message: "Đã xảy ra lỗi khi tạo cuộc hẹn."
  */
 
-authRouter.post('/appointment/create-appointment/', appointmentController.createAppointment)
+
+authRouter.post(
+  "/appointment/create-appointment/",
+  appointmentController.createAppointment
+);
 authRouter.post("/reviews", ReviewController.addReview);
 
+// report
+authRouter.get("/reports/exist", reportController.checkReportExist);
+authRouter.post(
+  "/reports",
+  upload.array("report"),
+  reportController.createReport
+);
 
 export { authRouter };
