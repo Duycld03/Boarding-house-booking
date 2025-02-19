@@ -6,6 +6,7 @@ import {
   favoriteController,
   appointmentController,
   reportController,
+  ReviewController
 } from "./../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -27,17 +28,8 @@ authRouter.put(
 );
 authRouter.put(
   "/review",
-  (req, res, next) => {
-    console.log("Middleware hit - Request received");
-    next();
-  },
-  upload.single("review"), // Middleware Multer
-  (req, res, next) => {
-    console.log("File received by Multer:", req.file); // Log file từ Multer
-    console.log("Body received by Multer:", req.body); // Log body của request
-    next();
-  },
-  ReviewController.updateReviewImage // Controller xử lý
+  upload.single("review"),
+  ReviewController.updateReviewImage
 );
 
 authRouter.post("/send-otp-change-email", accountController.sendOTPChangeEmail);

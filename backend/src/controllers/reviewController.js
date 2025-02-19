@@ -1,5 +1,6 @@
 import Review from '../models/review.js';
 import BoardingHouse from '../models/boardingHouse.js';
+import { v2 as cloudinary } from "cloudinary";
 
 class ReviewController {
     async getReviews(req, res) {
@@ -119,7 +120,7 @@ class ReviewController {
                 });
             }
             const { boardingHouseId, content, rating, images } = req.body;
-            console.log("Request Body:", req);
+            // console.log("Request Body:", req);
 
             if (!rating) {
                 return res.status(400).json({
@@ -127,7 +128,6 @@ class ReviewController {
                     message: "Rating is required.",
                 });
             }
-
             // // Kiểm tra boarding house tồn tại
             const boardingHouse = await BoardingHouse.findById(boardingHouseId);
             if (!boardingHouse) {
@@ -160,6 +160,7 @@ class ReviewController {
 
             // Tạo review mới
             const newReview = new Review({
+                accountId,
                 boardingHouseId,
                 content,
                 rating,
@@ -183,22 +184,14 @@ class ReviewController {
         }
     }
     async updateReviewImage(req, res) {
-        console.log("Controller hit - Request body:", req.body); // Log body
-        console.log("Controller hit - File uploaded:", req.file); // Log file
 
         try {
             if (!req.file) {
                 console.log("No file uploaded");
                 return res.status(400).json({ message: "No file uploaded" });
             }
-
-            // Upload file lên Cloudinary
-            console.log("Uploading file to Cloudinary...");
             const result = await cloudinary.uploader.upload(req.file.path);
-
-            console.log("File uploaded to Cloudinary:", result);
-
-            // Trả về thông tin file đã upload
+            // console.log("File uploaded to Cloudinary:", result);
             return res.status(200).json({
                 message: "Image uploaded successfully",
                 data: {

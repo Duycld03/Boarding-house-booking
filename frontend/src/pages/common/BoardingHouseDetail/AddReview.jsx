@@ -1,39 +1,96 @@
 import React, { useState } from "react";
-import { Modal, Input, Rate, Upload, Button, message } from "antd";
+import { Modal, Upload, Button, Rate, Input, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { updateReviewImage, addReview } from "../../../api/ReviewManagement"; // Import addReview
+import { toast } from "react-toastify";
 
 const { TextArea } = Input;
 
-const AddReview = ({ visible, onClose, onSubmit, accountId, boardingHouseId }) => {
-    const [reviewContent, setReviewContent] = useState("");
-    const [reviewRating, setReviewRating] = useState(0);
-    const [imageFiles, setImageFiles] = useState([]);
+const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
+    const [reviewData, setReviewData] = useState({
+        content: "",
+        rating: 0,
+        imageUrls: [],
+        files: [],
+    });
+    const [uploading, setUploading] = useState(false);
 
-    // Xử lý upload hình ảnh
-    const handleImageUpload = ({ file }) => {
-        setImageFiles((prev) => [...prev, file]);
+    const handleChange = (key, value) => {
+        setReviewData((prev) => ({ ...prev, [key]: value }));
     };
 
-    // Xóa hình ảnh đã chọn
+    const handleImageUpload = (file) => {
+        setReviewData((prev) => ({
+            ...prev,
+            files: [...prev.files, file],
+        }));
+        return false;
+    };
+
     const handleRemoveImage = (fileToRemove) => {
-        setImageFiles((prev) => prev.filter((file) => file.uid !== fileToRemove.uid));
+        setReviewData((prev) => ({
+            ...prev,
+            files: prev.files.filter((file) => file.uid !== fileToRemove.uid),
+            imageUrls: prev.imageUrls.filter((url, index) => prev.files[index].uid !== fileToRemove.uid)
+        }));
     };
 
-    // Xử lý submit review
     const handleSubmit = async () => {
-        if (!reviewContent || reviewRating === 0) {
-            message.error("Please fill out all fields before submitting the review.");
-            return;
+        if (reviewData.rating === 0) {
+            return message.error("Please provide rating before submitting.");
         }
 
-        const formData = {
-            boardingHouseId,
-            content: reviewContent,
-            rating: reviewRating,
-            images: imageFiles,
-        };
+        setUploading(true);
 
-        await onSubmit(formData);
+        try {
+            const uploadedImageUrls = [];
+
+            for (const file of reviewData.files) {
+                const imageData = await updateReviewImage(file);
+                if (imageData && imageData.imageUrl) {
+                    uploadedImageUrls.push(imageData.imageUrl);
+                } else {
+                    console.error("Unexpected response format:", imageData);
+                    throw new Error(`Failed to upload image: ${file.name}. Unexpected response format.`);
+                }
+            }
+
+            const reviewDataToSend = {
+                boardingHouseId,
+                content: reviewData.content,
+                rating: reviewData.rating,
+                images: uploadedImageUrls.map(imageUrl => ({ imageUrl })),
+            };
+
+            const reviewResponse = await addReview(reviewDataToSend);
+            console.log("Response1:", reviewResponse.success);
+
+            if (reviewResponse.success === true) {
+                message.success("Review added successfully!");
+
+                setReviewData(prevState => ({
+                    ...prevState,
+                    content: "",
+                    rating: 0,
+                    imageUrls: [],
+                    files: []
+                }));
+
+                onClose();
+                onSubmit();
+
+            } else {
+                console.error("Add Review Error:", reviewResponse);
+                message.error(reviewResponse?.data?.message || "Failed to add review.");
+            }
+
+        } catch (error) {
+            console.error("Error submitting review:", error);
+            toast.error(error.response.data?.message || "Failed");
+
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
@@ -42,32 +99,24 @@ const AddReview = ({ visible, onClose, onSubmit, accountId, boardingHouseId }) =
             visible={visible}
             onCancel={onClose}
             onOk={handleSubmit}
-            okText="Submit"
-            cancelText="Cancel"
+            okText={uploading ? "Uploading..." : "Submit"}
+            confirmLoading={uploading}
         >
-            <div className="mb-4">
-                <Rate
-                    value={reviewRating}
-                    onChange={(value) => setReviewRating(value)}
-                />
-            </div>
+            <Rate value={reviewData.rating} onChange={(value) => handleChange("rating", value)} />
             <TextArea
                 rows={4}
                 placeholder="Write your review here..."
-                value={reviewContent}
-                onChange={(e) => setReviewContent(e.target.value)}
-                className="mb-4"
+                value={reviewData.content}
+                onChange={(e) => handleChange("content", e.target.value)}
+                className="mt-4"
             />
             <Upload
                 listType="picture-card"
                 multiple
-                beforeUpload={(file) => {
-                    handleImageUpload({ file });
-                    return false; // Ngăn tự động upload
-                }}
+                beforeUpload={handleImageUpload}
                 onRemove={handleRemoveImage}
             >
-                {imageFiles.length < 5 && (
+                {reviewData.files.length < 5 && (
                     <div>
                         <PlusOutlined />
                         <div style={{ marginTop: 8 }}>Upload</div>

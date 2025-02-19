@@ -29,27 +29,23 @@ const { Content } = Layout;
 function BoardingHouseDetail() {
   const { isLogin } = useCurrentUser();
   const { id } = useParams();
-  const navigate = useNavigate(); // Điều hướng nếu cần
+  const navigate = useNavigate();
   const [boardingHouse, setBoardingHouse] = useState(null);
   const [roomTypes, setRoomType] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở/đóng modal
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reviewId, setReviewId] = useState("");
   const [reportedReviews, setReportedReviews] = useState([]);
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
-  // Ref cho room type section
   const roomTypeRef = useRef(null);
 
-  // Giả sử bạn lấy accountId từ localStorage hoặc bất kỳ nguồn nào
-  const accountId = localStorage.getItem("accountId") || null;
 
-  // Xử lý like
+
   const handleLike = () => {
     setIsLiked(!isLiked);
   };
@@ -91,6 +87,7 @@ function BoardingHouseDetail() {
   };
 
   const fetchReviews = async () => {
+    setLoading(true);
     try {
       const response = await getReviewByBhId(id);
       setReviews(response);
@@ -117,14 +114,12 @@ function BoardingHouseDetail() {
   const handleAddReview = async (formData) => {
     try {
       const response = await addReview(formData);
-      console.log("formdata: ", formData) // Gửi dữ liệu review qua API
-
-      if (response.success) {
+      if (response.status === 201 && response.data.success) {
         message.success("Review added successfully!");
-        fetchReviews(); // Làm mới danh sách review
-        setIsModalOpen(false); // Đóng modal
+        setReviews((prevReviews) => [...prevReviews, response.data.newReview]);
+        setIsModalOpen(false);
       } else {
-        message.error(response.message || "Failed to add review.");
+        message.error(response.data.message || "Failed to add review.");
       }
     } catch (error) {
       console.error("Error adding review:", error);
@@ -134,12 +129,7 @@ function BoardingHouseDetail() {
 
   // Xử lý khi nhấn nút Write a Review
   const handleWriteReview = () => {
-    // if (!accountId) {
-    //   message.error("User is not logged in. Please log in to write a review.");
-    //   return;
-    // }
-
-    setIsModalOpen(true); // Hiển thị popup
+    setIsModalOpen(true);
   };
 
   // Scroll đến room type
@@ -295,8 +285,15 @@ function BoardingHouseDetail() {
             {/* Reviews Section */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
+              <Button
+                type="primary"
+                onClick={handleWriteReview}
+              >
+                Write a Review
+              </Button>
               <ReviewList
                 reviews={reviews}
+                loading={loading}
                 rating={boardingHouse?.rating}
                 onReport={() => handleOpen()}
                 setReviewId={setReviewId}
