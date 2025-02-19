@@ -3,7 +3,13 @@ import ReviewCard from "../../../component/ReviewCard/ReviewCard";
 
 const { Text } = Typography;
 
-const ReviewList = ({ reviews, rating, onReport, setReviewId }) => {
+const ReviewList = ({
+  reviews,
+  rating,
+  onReport,
+  setReviewId,
+  reportedReviews,
+}) => {
   if (!reviews || reviews.length === 0) {
     return <Empty description="There are no reviews yet." />;
   }
@@ -58,6 +64,7 @@ const ReviewList = ({ reviews, rating, onReport, setReviewId }) => {
             onReport={onReport}
             setReviewId={setReviewId}
             reviewId={review._id}
+            isReported={reportedReviews.includes(review._id)}
           />
         )}
         pagination={{

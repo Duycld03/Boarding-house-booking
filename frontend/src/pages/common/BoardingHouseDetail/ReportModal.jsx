@@ -26,6 +26,7 @@ const ReportModal = ({
   boardingHouseId,
   reviewId,
   setReviewId,
+  handleReportStatus,
 }) => {
   const [form] = Form.useForm();
 
@@ -65,10 +66,6 @@ const ReportModal = ({
       formData.append("report", file.originFileObj);
     });
 
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
-    }
-
     try {
       const res = await createReport(formData);
       toast.success(res.message);
@@ -77,6 +74,7 @@ const ReportModal = ({
       toast.error(error?.response?.data?.message);
     } finally {
       setLoading(false);
+      handleReportStatus();
       onCancel();
     }
   };

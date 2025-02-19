@@ -97,6 +97,7 @@ authRouter.post(
 );
 
 // report
+authRouter.get("/reports/exist", reportController.checkReportExist);
 authRouter.post(
   "/reports",
   upload.array("report"),

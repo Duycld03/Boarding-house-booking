@@ -31,3 +31,9 @@ export const createReport = (data) => {
     },
   });
 };
+
+export const checkReportExist = (reviewIds, boardingHouseId) => {
+  return axios.get(`/auth/reports/exist`, {
+    params: { reviewIds, boardingHouseId },
+  });
+};

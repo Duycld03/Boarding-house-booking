@@ -17,6 +17,10 @@ import OwnerInfo from "./OwnerInfo";
 import ReportModal from "./ReportModal";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../../../context/userContext";
+import {
+  checkReportExist,
+  getReviewReports,
+} from "../../../api/reportManagement";
 
 const { Content } = Layout;
 
@@ -34,6 +38,8 @@ function BoardingHouseDetail() {
 
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reviewId, setReviewId] = useState("");
+  const [reportedReviews, setReportedReviews] = useState([]);
+  const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
   // Ref cho room type section
   const roomTypeRef = useRef(null);
@@ -66,15 +72,35 @@ function BoardingHouseDetail() {
     }
   };
 
+  const fetchReportStatus = async (reviews) => {
+    setLoading(true);
+    try {
+      const reviewIds = reviews.map((review) => review._id);
+      const res = await checkReportExist(reviewIds, id);
+      setReportedReviews(res.reportedReviews);
+      setReportedBoardingHouse(res.boardingHouseReported);
+    } catch (error) {
+      console.error("Error fetching review reports:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchReviews = async () => {
     try {
       const response = await getReviewByBhId(id);
       setReviews(response);
+
+      fetchReportStatus(response);
     } catch (error) {
       console.error("Error fetching boarding house review:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReportStatus = () => {
+    fetchReportStatus(reviews);
   };
 
   useEffect(() => {
@@ -115,6 +141,7 @@ function BoardingHouseDetail() {
           <BoardingHouseGallery
             images={boardingHouse?.images || []}
             onReport={() => handleOpen()}
+            isReported={reportedBoardingHouse}
           />
 
           <div className="mt-8 px-10">
@@ -243,6 +270,7 @@ function BoardingHouseDetail() {
                 rating={boardingHouse?.rating}
                 onReport={() => handleOpen()}
                 setReviewId={setReviewId}
+                reportedReviews={reportedReviews}
               />
             </div>
           </div>
@@ -258,6 +286,7 @@ function BoardingHouseDetail() {
         boardingHouseId={id}
         reviewId={reviewId}
         setReviewId={setReviewId}
+        handleReportStatus={handleReportStatus}
       />
     </div>
   );

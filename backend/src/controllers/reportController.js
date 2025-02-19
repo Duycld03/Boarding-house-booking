@@ -344,6 +344,50 @@ class reportController {
       return res.status(500).json({ message: error.message });
     }
   }
+
+  async checkReportExist(req, res) {
+    try {
+      const { reviewIds, boardingHouseId } = req.query;
+      const reporter = req.user.userId;
+
+      let reportedReviews = [];
+      let boardingHouseReported = false;
+
+      let targetIds = [];
+
+      if (reviewIds) {
+        const reviewIdArray = Array.isArray(reviewIds)
+          ? reviewIds
+          : reviewIds.split(",");
+        targetIds = [...reviewIdArray];
+      }
+
+      if (boardingHouseId) {
+        targetIds.push(boardingHouseId);
+      }
+
+      const existingReports = await Report.find({
+        reporter,
+        targetId: { $in: targetIds },
+        status: "pending",
+      }).select("targetId");
+
+      existingReports.forEach((report) => {
+        if (report.targetId == boardingHouseId) {
+          boardingHouseReported = true;
+        } else {
+          reportedReviews.push(report.targetId);
+        }
+      });
+
+      return res.status(200).json({
+        reportedReviews,
+        boardingHouseReported,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
 }
 
 export default new reportController();

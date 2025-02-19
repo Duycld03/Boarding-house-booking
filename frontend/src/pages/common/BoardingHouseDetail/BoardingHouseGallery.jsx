@@ -4,6 +4,7 @@ import {
   faBookmark as faBookmarkRegular,
   faFlag,
 } from "@fortawesome/free-regular-svg-icons";
+import { faFlag as faFlagSolid } from "@fortawesome/free-solid-svg-icons";
 import {
   faBookmark as faBookmarkSolid,
   faEllipsisV,
@@ -23,7 +24,7 @@ import "swiper/css/thumbs";
 import "swiper/css/free-mode";
 import { Dropdown, Menu, Tooltip } from "antd";
 
-const BoardingHouseGallery = ({ images, onReport, onSave }) => {
+const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -48,9 +49,19 @@ const BoardingHouseGallery = ({ images, onReport, onSave }) => {
           <span className="ml-2">{isSaved ? "Saved" : "Save"}</span>
         </Tooltip>
       </Menu.Item>
-      <Menu.Item key="report" onClick={() => onReport()}>
-        <Tooltip placement="left" title="Report this boarding house">
-          <FontAwesomeIcon icon={faFlag} className="text-red-500 text-2xl" />
+      <Menu.Item key="report" onClick={() => onReport()} disabled={isReported}>
+        <Tooltip
+          placement="left"
+          title={
+            isReported
+              ? "You have reported this boarding house. Please wait for admin to process."
+              : "Report this boarding house"
+          }
+        >
+          <FontAwesomeIcon
+            icon={isReported ? faFlagSolid : faFlag}
+            className="text-red-500 text-2xl"
+          />
           <span className="ml-2">Report</span>
         </Tooltip>
       </Menu.Item>
