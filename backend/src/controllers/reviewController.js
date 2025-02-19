@@ -106,7 +106,55 @@ class ReviewController {
             return res.status(500).json({ message: "Server Error" });
         }
     }
+    async updateReview(req, res) {
+        try {
+            const { reviewId } = req.params;
+            console.log("reviewId (backend):", reviewId);
+            const { content, rating, images } = req.body;
+            console.log("test1:", req.body);
+            const accountId = req.user.userId;
+            console.log("accountId (backend):", accountId);
+            if (!accountId) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Account ID not found.",
+                });
+            }
 
+            const review = await Review.findOne({ _id: reviewId, accountId });
+            console.log("test2:", review);
+            if (!review) {
+                return res.status(403).json({ message: "You are not authorized to update this review" });
+            }
+
+            review.content = content || review.content;
+            review.rating = rating || review.rating;
+            review.images = images || review.images;
+            await review.save();
+
+            return res.status(200).json({ message: "Review updated successfully", review });
+        } catch (error) {
+            console.error("Error updating review:", error);
+            return res.status(500).json({ message: "Server Error" });
+        }
+    }
+    async getReviewsUser(req, res) {
+        try {
+            const reviews = await Review.find()
+                .populate({
+                    path: 'accountId',
+                    select: 'username',
+                })
+                .populate({
+                    path: 'boardingHouseId',
+                    select: 'name',
+                }).sort({ createdAt: 1 });
+            return res.status(200).json(reviews);
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    }
 
 }
 export default new ReviewController();

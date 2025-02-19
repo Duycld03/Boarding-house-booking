@@ -5,6 +5,7 @@ import {
   favoriteController,
   appointmentController,
   reportController,
+  ReviewController
 } from "./../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -103,5 +104,8 @@ authRouter.post(
   upload.array("report"),
   reportController.createReport
 );
+//review
+authRouter.put('/reviews/:reviewId', ReviewController.updateReview);
+authRouter.get("/reviews", ReviewController.getReviewsUser);
 
 export { authRouter };

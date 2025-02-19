@@ -1,6 +1,6 @@
 import { Empty, List, Typography, Rate, Progress } from "antd";
 import ReviewCard from "../../../component/ReviewCard/ReviewCard";
-
+import { getReviewsUser } from "../../../api/ReviewManagement";
 const { Text } = Typography;
 
 const ReviewList = ({
@@ -13,14 +13,20 @@ const ReviewList = ({
   if (!reviews || reviews.length === 0) {
     return <Empty description="There are no reviews yet." />;
   }
+  const handleReviewUpdated = async () => {
+    try {
+      const updatedReviews = await getReviewsUser();
+      setReviewsId(updatedReviews);
+    } catch (error) {
+      console.error("Error refreshing reviews:", error);
+    }
+  };
 
-  // Tính số lượng review theo rating
   const ratingCounts = reviews.reduce((acc, review) => {
     acc[review.rating] = (acc[review.rating] || 0) + 1;
     return acc;
   }, {});
 
-  // Danh sách mặc định từ 5 đến 1 sao
   const allRatings = [5, 4, 3, 2, 1];
 
   return (
@@ -59,6 +65,7 @@ const ReviewList = ({
         dataSource={reviews}
         renderItem={(review) => (
           <ReviewCard
+            onReviewUpdated={handleReviewUpdated}
             key={review._id}
             reviewData={review}
             onReport={onReport}

@@ -14,3 +14,9 @@ export const filterReviews = (filterValue) => {
     });
 };
 
+export const updateReview = (reviewId, updatedData) => {
+    return axios.put(`/auth/reviews/${reviewId}`, updatedData);
+};
+export const getReviewsUser = () => {
+    return axios.get("/auth/reviews");
+};
