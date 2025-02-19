@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
 import ReviewList from "./ReviewList";
 import OwnerInfo from "./OwnerInfo";
-import AddReview from "./AddReview"; // Import AddReview component
+import AddReview from "./AddReview";
 
 const { Content } = Layout;
 
@@ -31,8 +31,8 @@ function BoardingHouseDetail() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở/đóng modal
   const roomTypeRef = useRef(null);
 
-  // Thay bằng ID user thật từ hệ thống xác thực
-  const accountId = "user-id-from-auth";
+  // Giả sử bạn lấy accountId từ localStorage hoặc bất kỳ nguồn nào
+  const accountId = localStorage.getItem("accountId") || null;
 
   // Xử lý like
   const handleLike = () => {
@@ -83,9 +83,12 @@ function BoardingHouseDetail() {
   const handleAddReview = async (formData) => {
     try {
       const response = await addReview(formData);
+      console.log("formdata: ", formData) // Gửi dữ liệu review qua API
+
       if (response.success) {
         message.success("Review added successfully!");
         fetchReviews(); // Làm mới danh sách review
+        setIsModalOpen(false); // Đóng modal
       } else {
         message.error(response.message || "Failed to add review.");
       }
@@ -97,16 +100,12 @@ function BoardingHouseDetail() {
 
   // Xử lý khi nhấn nút Write a Review
   const handleWriteReview = () => {
-    if (!accountId) {
-      message.info("Please log in to write a review.");
-      navigate("/login");
-      return;
-    }
-    if (reviews.some((review) => review.accountId === accountId)) {
-      message.error("You have already reviewed this boarding house.");
-    } else {
-      setIsModalOpen(true);
-    }
+    // if (!accountId) {
+    //   message.error("User is not logged in. Please log in to write a review.");
+    //   return;
+    // }
+
+    setIsModalOpen(true); // Hiển thị popup
   };
 
   // Scroll đến room type
@@ -267,7 +266,6 @@ function BoardingHouseDetail() {
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddReview}
-        accountId={accountId}
         boardingHouseId={id}
       />
     </div>

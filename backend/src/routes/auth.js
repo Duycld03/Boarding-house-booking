@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authController, accountController, favoriteController, appointmentController, ReviewController } from "./../controllers/index.js";
-import { upload } from "../config/upload.config.js";
+import { upload } from "../config/cloudinary.config.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const authRouter = Router();
@@ -18,6 +18,20 @@ authRouter.put(
   "/avatar",
   upload.single("avatar"),
   accountController.updateAvatar
+);
+authRouter.put(
+  "/review",
+  (req, res, next) => {
+    console.log("Middleware hit - Request received");
+    next();
+  },
+  upload.single("review"), // Middleware Multer
+  (req, res, next) => {
+    console.log("File received by Multer:", req.file); // Log file từ Multer
+    console.log("Body received by Multer:", req.body); // Log body của request
+    next();
+  },
+  ReviewController.updateReviewImage // Controller xử lý
 );
 
 authRouter.post("/send-otp-change-email", accountController.sendOTPChangeEmail);

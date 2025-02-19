@@ -20,36 +20,20 @@ const AddReview = ({ visible, onClose, onSubmit, accountId, boardingHouseId }) =
     };
 
     // Xử lý submit review
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!reviewContent || reviewRating === 0) {
             message.error("Please fill out all fields before submitting the review.");
             return;
         }
 
-        if (imageFiles.length > 5) {
-            message.error("You can upload up to 5 images only.");
-            return;
-        }
+        const formData = {
+            boardingHouseId,
+            content: reviewContent,
+            rating: reviewRating,
+            images: imageFiles,
+        };
 
-        const formData = new FormData();
-        formData.append("accountId", accountId);
-        formData.append("boardingHouseId", boardingHouseId);
-        formData.append("content", reviewContent);
-        formData.append("rating", reviewRating);
-
-        // Thêm các hình ảnh vào formData
-        imageFiles.forEach((file, index) => {
-            formData.append(`images`, file);
-        });
-
-        // Gửi dữ liệu qua hàm `onSubmit` được truyền từ props
-        onSubmit(formData);
-
-        // Reset form
-        setReviewContent("");
-        setReviewRating(0);
-        setImageFiles([]);
-        onClose();
+        await onSubmit(formData);
     };
 
     return (

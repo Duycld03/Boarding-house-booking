@@ -110,7 +110,7 @@ class ReviewController {
     }
     async addReview(req, res) {
         try {
-            console.log("Req1", req);
+
             const accountId = req.user.userId;
             if (!accountId) {
                 return res.status(401).json({
@@ -118,10 +118,17 @@ class ReviewController {
                     message: "Account ID not found.",
                 });
             }
-            // Lấy thông tin từ request body
             const { boardingHouseId, content, rating, images } = req.body;
-            console.log("Req2", req);
-            // Kiểm tra boarding house tồn tại
+            console.log("Request Body:", req);
+
+            if (!rating) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Rating is required.",
+                });
+            }
+
+            // // Kiểm tra boarding house tồn tại
             const boardingHouse = await BoardingHouse.findById(boardingHouseId);
             if (!boardingHouse) {
                 return res.status(404).json({
@@ -175,6 +182,34 @@ class ReviewController {
             });
         }
     }
+    async updateReviewImage(req, res) {
+        console.log("Controller hit - Request body:", req.body); // Log body
+        console.log("Controller hit - File uploaded:", req.file); // Log file
 
+        try {
+            if (!req.file) {
+                console.log("No file uploaded");
+                return res.status(400).json({ message: "No file uploaded" });
+            }
+
+            // Upload file lên Cloudinary
+            console.log("Uploading file to Cloudinary...");
+            const result = await cloudinary.uploader.upload(req.file.path);
+
+            console.log("File uploaded to Cloudinary:", result);
+
+            // Trả về thông tin file đã upload
+            return res.status(200).json({
+                message: "Image uploaded successfully",
+                data: {
+                    imageUrl: result.secure_url,
+                    publicId: result.public_id,
+                },
+            });
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            res.status(500).json({ message: "Server Error" });
+        }
+    }
 }
 export default new ReviewController();
