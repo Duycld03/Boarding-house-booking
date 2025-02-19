@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Layout, Spin, Empty, Button, Tag, Divider } from "antd";
+import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from "antd";
 import {
   getBoardingHouseDetail,
   getReviewByBhId,
@@ -14,10 +14,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
 import ReviewList from "./ReviewList";
 import OwnerInfo from "./OwnerInfo";
+import ReportModal from "./ReportModal";
+import { useNavigate } from "react-router-dom";
+import { useCurrentUser } from "../../../context/userContext";
+import {
+  checkReportExist,
+  getReviewReports,
+} from "../../../api/reportManagement";
 
 const { Content } = Layout;
 
 function BoardingHouseDetail() {
+  const { isLogin } = useCurrentUser();
+  const navigate = useNavigate();
+
   const { id } = useParams();
   const [boardingHouse, setBoardingHouse] = useState(null);
   const [roomTypes, setRoomType] = useState([]);
@@ -25,6 +35,11 @@ function BoardingHouseDetail() {
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reviewId, setReviewId] = useState("");
+  const [reportedReviews, setReportedReviews] = useState([]);
+  const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
   // Ref cho room type section
   const roomTypeRef = useRef(null);
@@ -57,15 +72,35 @@ function BoardingHouseDetail() {
     }
   };
 
+  const fetchReportStatus = async (reviews) => {
+    setLoading(true);
+    try {
+      const reviewIds = reviews.map((review) => review._id);
+      const res = await checkReportExist(reviewIds, id);
+      setReportedReviews(res.reportedReviews);
+      setReportedBoardingHouse(res.boardingHouseReported);
+    } catch (error) {
+      console.error("Error fetching review reports:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchReviews = async () => {
     try {
       const response = await getReviewByBhId(id);
       setReviews(response);
+
+      fetchReportStatus(response);
     } catch (error) {
       console.error("Error fetching boarding house review:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleReportStatus = () => {
+    fetchReportStatus(reviews);
   };
 
   useEffect(() => {
@@ -81,6 +116,20 @@ function BoardingHouseDetail() {
     roomTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const handleOpen = () => {
+    if (!isLogin) {
+      Modal.confirm({
+        title: " You need to log in",
+        content: "Please log in to report.",
+        okText: " Log in",
+        cancelText: "Cancel",
+        onOk: () => navigate("/login"),
+      });
+      return;
+    }
+    setReportModalVisible(true);
+  };
+
   return (
     <div className="md:max-w-screen-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       {loading ? (
@@ -89,7 +138,11 @@ function BoardingHouseDetail() {
         </div>
       ) : boardingHouse ? (
         <>
-          <BoardingHouseGallery images={boardingHouse?.images || []} />
+          <BoardingHouseGallery
+            images={boardingHouse?.images || []}
+            onReport={() => handleOpen()}
+            isReported={reportedBoardingHouse}
+          />
 
           <div className="mt-8 px-10">
             <div className="flex justify-between items-start gap-4 w-full">
@@ -212,7 +265,13 @@ function BoardingHouseDetail() {
             {/* Review */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
-              <ReviewList reviews={reviews} rating={boardingHouse?.rating} />
+              <ReviewList
+                reviews={reviews}
+                rating={boardingHouse?.rating}
+                onReport={() => handleOpen()}
+                setReviewId={setReviewId}
+                reportedReviews={reportedReviews}
+              />
             </div>
           </div>
         </>
@@ -221,6 +280,14 @@ function BoardingHouseDetail() {
           <Empty description="Không tìm thấy thông tin nhà trọ" />
         </div>
       )}
+      <ReportModal
+        visible={reportModalVisible}
+        toggleVisible={setReportModalVisible}
+        boardingHouseId={id}
+        reviewId={reviewId}
+        setReviewId={setReviewId}
+        handleReportStatus={handleReportStatus}
+      />
     </div>
   );
 }

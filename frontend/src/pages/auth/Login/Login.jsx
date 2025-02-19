@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Form, Button, Checkbox, Card, Input } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
-import { toast } from 'react-toastify';
-import { login, getUser, loginWithGoogle } from '../../../api/authManagement';
-import { Back } from '../../../component';
-import { useCurrentUser } from '../../../context/userContext';
+import { useEffect, useState } from "react";
+import { Form, Button, Checkbox, Card, Input } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import { toast } from "react-toastify";
+import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
+import { Back } from "../../../component";
+import { useCurrentUser } from "../../../context/userContext";
 
 function Login() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
   const { loginData } = useCurrentUser();
 
@@ -23,12 +24,15 @@ function Login() {
 
       localStorage.setItem('access_token', res.token);
 
-      if (role === 'user' || role === 'owner') {
-        navigate('/');
-      } else if (role === 'admin') {
-        navigate('/dashboard/account-management');
+      if (role === "admin") {
+        navigate("/dashboard/account-management");
+      } else if (location.key !== "default") {
+        navigate(-1);
+      } else {
+        navigate("/");
       }
-      toast.success('Login successful');
+      toast.success("Login successful");
+
       setLoading(false);
     } catch (error) {
       toast.error(error?.response?.data?.message);
@@ -54,9 +58,18 @@ function Login() {
       const res = await loginWithGoogle(data);
 
       if (res.isRegistered) {
-        localStorage.setItem('access_token', res.token);
-        navigate('/');
-        toast.success('Login successful');
+        localStorage.setItem("access_token", res.token);
+
+        if (res.user.role === "admin") {
+          navigate("/dashboard/account-management");
+        } else if (location.key !== "default") {
+          navigate(-1);
+        } else {
+          navigate("/");
+        }
+
+        toast.success("Login successful");
+
       } else {
         navigate('/register-with-google', { state: { user: res.user } });
       }

@@ -10,10 +10,11 @@ import {
   Divider,
 } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFlag } from "@fortawesome/free-regular-svg-icons";
 import {
   faBookmark as faBookmarkSolid,
   faBookmark as faBookmarkRegular,
-  faFlag,
+  faFlag as faFlagSolid,
   faEllipsisV,
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
@@ -27,7 +28,13 @@ dayjs.locale("en");
 const MAX_VISIBLE_IMAGES = 6;
 const MAX_DESCRIPTION_LENGTH = 150; // Giới hạn ký tự mô tả
 
-const ReviewCard = ({ reviewData, onReport }) => {
+const ReviewCard = ({
+  reviewData,
+  onReport,
+  setReviewId,
+  reviewId,
+  isReported,
+}) => {
   if (!reviewData) return null;
 
   const {
@@ -46,11 +53,26 @@ const ReviewCard = ({ reviewData, onReport }) => {
     ? dayjs(updatedAt).fromNow()
     : "undefined";
 
+  const handleReport = () => {
+    setReviewId(reviewId);
+    onReport();
+  };
+
   const menu = (
     <Menu>
-      <Menu.Item key="report" onClick={() => onReport()}>
-        <Tooltip placement="left" title="Report this review">
-          <FontAwesomeIcon icon={faFlag} className="text-red-500 text-xl" />
+      <Menu.Item key="report" onClick={handleReport} disabled={isReported}>
+        <Tooltip
+          placement="left"
+          title={
+            isReported
+              ? "You have reported this review. Please wait for admin to process."
+              : "Report this review"
+          }
+        >
+          <FontAwesomeIcon
+            icon={isReported ? faFlagSolid : faFlag}
+            className="text-red-500 text-xl"
+          />
           <span className="ml-2">Report</span>
         </Tooltip>
       </Menu.Item>
