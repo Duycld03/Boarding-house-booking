@@ -3,7 +3,8 @@ import { Modal, Upload, Button, Rate, Input, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { updateReviewImage, addReview } from "../../../api/ReviewManagement"; // Import addReview
 import { toast } from "react-toastify";
-
+import { useNavigate } from "react-router-dom";
+import { useCurrentUser } from '../../../context/userContext';
 const { TextArea } = Input;
 
 const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
@@ -14,7 +15,8 @@ const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
         files: [],
     });
     const [uploading, setUploading] = useState(false);
-
+    const navigate = useNavigate();
+    const { user } = useCurrentUser();
     const handleChange = (key, value) => {
         setReviewData((prev) => ({ ...prev, [key]: value }));
     };
@@ -36,6 +38,10 @@ const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
     };
 
     const handleSubmit = async () => {
+        if (!user) {
+            message.error("You must be logged in to write a review.");
+            return navigate("/login");
+        }
         if (reviewData.rating === 0) {
             return message.error("Please provide rating before submitting.");
         }
@@ -95,14 +101,18 @@ const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
 
     return (
         <Modal
-            title="Write Your Review"
+            title={<span className="font-bold text-4xl">Rating and Review</span>}
             visible={visible}
             onCancel={onClose}
             onOk={handleSubmit}
             okText={uploading ? "Uploading..." : "Submit"}
             confirmLoading={uploading}
+            className="font-bold mb-10 text-4xl"
         >
+            <p className=" mb-2 mt-6 text-2xl">Rating </p>
             <Rate value={reviewData.rating} onChange={(value) => handleChange("rating", value)} />
+            <p className=" mb-2 mt-6 text-2xl">Desciption </p>
+
             <TextArea
                 rows={4}
                 placeholder="Write your review here..."
@@ -110,6 +120,8 @@ const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
                 onChange={(e) => handleChange("content", e.target.value)}
                 className="mt-4"
             />
+            <p className=" mb-2 mt-6 text-2xl">Images </p>
+
             <Upload
                 listType="picture-card"
                 multiple

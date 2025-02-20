@@ -286,7 +286,7 @@ function BoardingHouseDetail() {
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
               <Button
-                type="primary"
+                className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
                 onClick={handleWriteReview}
               >
                 Write a Review
