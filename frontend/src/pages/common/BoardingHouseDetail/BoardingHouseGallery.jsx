@@ -45,7 +45,9 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
     const fetchWatchLaterStatus = async () => {
       try {
         const response = await getWatchLater(id);
-        setIsSaved(response.isWatchLater); // Cập nhật trạng thái từ API
+        const watchLaterList = response.watchlaterlist || []; // Lấy danh sách đã lưu
+        const isCurrentlySaved = watchLaterList.some((item) => item.id === id);
+        setIsSaved(isCurrentlySaved); // Cập nhật trạng thái từ API
       } catch (error) {
         console.error('Error fetching watch later status:', error);
       }
