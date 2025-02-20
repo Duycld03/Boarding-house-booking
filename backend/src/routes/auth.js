@@ -1,10 +1,12 @@
 import { Router } from "express";
+
 import {
   authController,
   accountController,
   favoriteController,
   appointmentController,
   reportController,
+  ReviewController
 } from "./../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -23,6 +25,11 @@ authRouter.put(
   "/avatar",
   upload.single("avatar"),
   accountController.updateAvatar
+);
+authRouter.put(
+  "/review",
+  upload.single("review"),
+  ReviewController.updateReviewImage
 );
 
 authRouter.post("/send-otp-change-email", accountController.sendOTPChangeEmail);
@@ -91,10 +98,12 @@ authRouter.put(
  *               message: "Đã xảy ra lỗi khi tạo cuộc hẹn."
  */
 
+
 authRouter.post(
   "/appointment/create-appointment/",
   appointmentController.createAppointment
 );
+authRouter.post("/reviews", ReviewController.addReview);
 
 // report
 authRouter.get("/reports/exist", reportController.checkReportExist);
