@@ -41,12 +41,10 @@ class watchLaterController {
       }
 
       let { boardingHouseId } = req.body;
-      if (!boardingHouseId) {
-        return res.status(400).json({ message: 'Missing boardingHouseId' });
-      }
-
-      // Chuyển boardingHouseId từ string thành ObjectId
-      if (!mongoose.Types.ObjectId.isValid(boardingHouseId)) {
+      if (
+        !boardingHouseId ||
+        !mongoose.Types.ObjectId.isValid(boardingHouseId)
+      ) {
         return res.status(400).json({ message: 'Invalid boardingHouseId' });
       }
       boardingHouseId = new mongoose.Types.ObjectId(boardingHouseId);
@@ -58,15 +56,12 @@ class watchLaterController {
 
       if (existingWatchLater) {
         await WatchLater.deleteOne({ _id: existingWatchLater._id });
-
-        // Giảm số like mà không cập nhật `updatedAt`
         await BoardingHouse.updateOne(
           { _id: boardingHouseId },
           { $inc: { likes: -1 } },
           { timestamps: false }
         );
-
-        return res.status(200).json();
+        return res.status(200).json({ isWatchLater: false }); // Trả về trạng thái mới
       }
 
       // Thêm vào danh sách yêu thích
@@ -75,8 +70,7 @@ class watchLaterController {
         boardingHouseId,
       });
       await newWatchLater.save();
-
-      return res.status(201).json();
+      return res.status(201).json({ isWatchLater: true }); // Trả về trạng thái mới
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }

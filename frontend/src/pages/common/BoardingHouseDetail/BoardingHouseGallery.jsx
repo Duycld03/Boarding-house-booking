@@ -27,13 +27,14 @@ import {
   getWatchLater,
   createWatchLater,
 } from '../../../api/watchLaterManagement.js';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   if (!images || images.length === 0) return <p>Không có ảnh</p>;
 
@@ -62,10 +63,13 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
     setLoading(true);
     try {
       const response = await createWatchLater(id);
-      setIsSaved(response.isWatchLater);
+      if (response && response.isWatchLater !== undefined) {
+        setIsSaved(response.isWatchLater);
+      } else {
+        console.error('Response missing isWatchLater:', response);
+      }
     } catch (error) {
-      console.error('Error saving watch later:', error);
-      message.error('Failed to save boarding house');
+      navigate(`/login`);
     } finally {
       setLoading(false);
     }
