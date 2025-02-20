@@ -42,3 +42,6 @@ export const updateReviewImage = async (imageFile) => {
         throw error;
     }
 };
+export const deleteReviewUser = (reviewId) => {
+    return axios.delete(`/auth/reviews/${reviewId}`);
+};

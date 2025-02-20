@@ -4,8 +4,8 @@ import { useCurrentUser } from '../../../context/userContext';
 import userRole from '../../../constants/userRole';
 
 const getMenuItems = () => {
-  const { hasRole } = useCurrentUser(); // Gọi useCurrentUser() trong component
-
+  const { hasRole, user } = useCurrentUser(); // Gọi useCurrentUser() trong component
+  console.log(user);
   const menuItems = [
     {
       key: 'profile',

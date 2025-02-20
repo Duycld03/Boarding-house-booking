@@ -115,5 +115,6 @@ authRouter.post(
 //review
 authRouter.put('/reviews/:reviewId', ReviewController.updateReview);
 authRouter.get("/reviews", ReviewController.getReviewsUser);
+authRouter.delete("/reviews/:reviewId", ReviewController.softDeleteReview);
 
 export { authRouter };

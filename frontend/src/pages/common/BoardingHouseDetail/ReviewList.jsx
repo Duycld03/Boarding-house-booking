@@ -2,7 +2,6 @@ import { Empty, List, Typography, Rate, Progress } from "antd";
 import ReviewCard from "../../../component/ReviewCard/ReviewCard";
 import { getReviewsUser } from "../../../api/ReviewManagement";
 const { Text } = Typography;
-
 const ReviewList = ({
   reviews,
   rating,
@@ -13,10 +12,22 @@ const ReviewList = ({
   if (!reviews || reviews.length === 0) {
     return <Empty description="There are no reviews yet." />;
   }
+  const fetchReviews = async () => {
+    setLoading(true);
+    try {
+      const response = await getReviewsUser(id);
+      setReviews(response);
+
+      fetchReportStatus(response);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
   const handleReviewUpdated = async () => {
     try {
       const updatedReviews = await getReviewsUser();
       setReviewsId(updatedReviews);
+      fetchReviews();
     } catch (error) {
       console.error("Error refreshing reviews:", error);
     }
@@ -72,6 +83,7 @@ const ReviewList = ({
             setReviewId={setReviewId}
             reviewId={review._id}
             isReported={reportedReviews.includes(review._id)}
+
           />
         )}
         pagination={{

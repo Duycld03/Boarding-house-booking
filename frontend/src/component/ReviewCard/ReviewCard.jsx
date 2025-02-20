@@ -8,19 +8,22 @@ import {
   Menu,
   Modal,
   Input,
+  Upload
 } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash, faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/vi";
-import { updateReview, deleteReview } from "../../api/ReviewManagement"; // Import API
+import { updateReview, updateReviewImage, deleteReviewUser } from "../../api/ReviewManagement";
 import { toast } from "react-toastify";
+import { useCurrentUser } from '../../context/userContext';
 dayjs.extend(relativeTime);
 dayjs.locale("en");
 
-const MAX_VISIBLE_IMAGES = 6;
+const MAX_IMAGES = 5;
 
 const ReviewCard = ({ reviewData, onReviewUpdated }) => {
   if (!reviewData) return null;
@@ -31,106 +34,126 @@ const ReviewCard = ({ reviewData, onReviewUpdated }) => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [newImages, setNewImages] = useState(images);
-  const [newFiles, setNewFiles] = useState([]);
+  const [newFiles, setNewFiles] = useState({});
   const formattedRelativeTime = updatedAt ? dayjs(updatedAt).fromNow() : "undefined";
-
-  // 📝 Xử lý cập nhật review
+  const { user } = useCurrentUser();
+  const isCurrentUserReview = user?._id === accountId?._id;
+  const isLoggedIn = user !== null && user !== undefined;
+  // Xử lý cập nhật review
   const handleUpdate = async () => {
     setLoading(true);
     try {
       const uploadedImageUrls = [];
 
-      // 1. Upload new images and get URLs
-      for (const file of newFiles) {
+      for (const file of Object.values(newFiles)) {
         const imageData = await updateReviewImage(file);
-        if (imageData && imageData.imageUrl) {
+        if (imageData?.imageUrl) {
           uploadedImageUrls.push(imageData.imageUrl);
         } else {
-          console.error("Unexpected response format:", imageData);
-          throw new Error(`Failed to upload image: ${file.name}. Unexpected response format.`);
+          throw new Error(`Fail to update image: ${file.name}`);
         }
       }
 
-      // 2. Combine existing image URLs with newly uploaded URLs
-      const allImageUrls = [...newImages.map(img => img.imageUrl), ...uploadedImageUrls];
+      // Cập nhật lại danh sách ảnh để không lưu ảnh bị xóa
+      const allImageUrls = newImages
+        .filter(img => !img.isPreview)
+        .map(img => img.imageUrl)
+        .concat(uploadedImageUrls);
 
-      // 3. Update the review with content, rating, and all image URLs
       await updateReview(reviewId, {
-        content: newContent,
+        content: newContent.trim() === "" ? null : newContent.trim(),
         rating: newRating,
-        images: allImageUrls.map(imageUrl => ({ imageUrl })), // Send as array of objects
+        images: allImageUrls.map(imageUrl => ({ imageUrl })),
       });
 
+
       setIsEditing(false);
-      onReviewUpdated(); // Refresh reviews in parent
-      toast.success("Review updated successfully!");
+      onReviewUpdated();
+      toast.success("Update review successfull!");
     } catch (error) {
-      console.error("Error updating review:", error);
-      toast.error(error.response?.data?.message || "Failed to update review.");
+      console.error("Fail to update review:", error);
+      toast.error(error.message || "Fail to update review.");
     } finally {
       setLoading(false);
     }
   };
 
+
+  // Xử lý upload ảnh
   const handleImageUpload = (file) => {
-    setNewFiles((prev) => ({
+    const totalImages = newImages.length;
+    if (totalImages >= MAX_IMAGES) {
+      toast.error(`You must upload maximum ${MAX_IMAGES} images.`);
+      return false;
+    }
+    const previewUrl = URL.createObjectURL(file);
+    setNewFiles(prev => ({
       ...prev,
-      [file.uid]: file, // Store files by UID for easy access
+      [file.uid]: file
     }));
-    return false; // Prevent default upload behavior
+    setNewImages(prev => [...prev, { imageUrl: previewUrl, isPreview: true }]);
+    return false;
   };
 
-  const handleRemoveImage = (file) => {
-    setNewFiles((prev) => {
+
+
+  // Xóa ảnh cũ đã có trên server
+  const handleRemoveImage = (imageUrl) => {
+    setNewImages(prev => prev.filter(img => img.imageUrl !== imageUrl));
+
+    setNewFiles(prev => {
       const updatedFiles = { ...prev };
-      delete updatedFiles[file.uid];
+      Object.keys(updatedFiles).forEach(key => {
+        const fileObjectUrl = URL.createObjectURL(updatedFiles[key]);
+        if (fileObjectUrl === imageUrl) {
+          delete updatedFiles[key];
+        }
+      });
       return updatedFiles;
     });
   };
 
-  // 🗑️ Xử lý xóa mềm review
+
+  // Xóa review
   const handleDelete = () => {
     Modal.confirm({
-      title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa đánh giá này?",
-      okText: "Xóa",
-      cancelText: "Hủy",
+      title: "Confirm Delete",
+      content: "Are you sure you want to delete this review?",
+      okText: "Delete",
+      cancelText: "Cancel",
       onOk: async () => {
         try {
-          await deleteReview(reviewId);
-          onReviewUpdated(); // Cập nhật UI
+          await deleteReviewUser(reviewId);
+          onReviewUpdated();
         } catch (error) {
-          console.error("Lỗi khi xóa review:", error);
+          console.error("Error deleting review:", error);
         }
       },
     });
   };
-  const previewStyle = {
-    width: '100px',
-    height: '100px',
-    objectFit: 'cover',
-    margin: '4px',
-    borderRadius: '4px'
-  };
+
+
   const menu = (
     <Menu>
-      <Menu.Item key="edit" onClick={() => setIsEditing(true)}>
-        <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
-        <span className="ml-2">Chỉnh sửa</span>
-      </Menu.Item>
+      {isCurrentUserReview && (
+        <Menu.Item key="edit" onClick={() => setIsEditing(true)}>
+          <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
+          <span className="ml-2">Update</span>
+        </Menu.Item>
+      )}
       <Menu.Item key="delete" onClick={handleDelete}>
         <FontAwesomeIcon icon={faTrash} className="text-red-500 text-xl" />
-        <span className="ml-2">Xóa</span>
+        <span className="ml-2">Delete</span>
       </Menu.Item>
     </Menu>
   );
 
   return (
     <>
-      <Card style={{ marginBottom: 16, position: "relative" }} className="mx-auto">
-        {/* Dropdown Menu ở góc trên phải */}
-        {accountId?.fullname && accountId.fullname !== "Anonymous" && (
-          <div style={{ position: "absolute", top: 10, right: 10, zIndex: 10 }}>
+
+      <Card style={{ marginBottom: 16, position: "relative" }}>
+        {isCurrentUserReview && (
+          <div style={{ position: "absolute", top: 10, right: 10 }}>
             <Dropdown overlay={menu} trigger={["click"]}>
               <Button type="text">
                 <FontAwesomeIcon icon={faEllipsisV} className="text-gray-600" />
@@ -139,7 +162,6 @@ const ReviewCard = ({ reviewData, onReviewUpdated }) => {
           </div>
         )}
 
-
         <Card.Meta
           avatar={<Avatar src={accountId?.avatarImage?.url} size="large" />}
           title={accountId?.fullname || "Anonymous"}
@@ -147,52 +169,64 @@ const ReviewCard = ({ reviewData, onReviewUpdated }) => {
             <>
               <Rate disabled value={rating} />
               <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
-                Đã viết: {formattedRelativeTime}
+                Written: {formattedRelativeTime}
               </div>
             </>
           }
         />
 
-        {/* Mô tả Review */}
         <p style={{ marginTop: 10, color: "#595959", textAlign: "justify" }}>{content}</p>
 
         {images.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
-            {images.slice(0, MAX_VISIBLE_IMAGES).map((image, index) => (
-              <Image
-                key={index}
-                src={image?.imageUrl}
-                alt={`Review Image ${index + 1}`}
-                width={100}
-                height={100}
-                style={{ objectFit: "cover", borderRadius: "8px" }}
-              />
+            {images.map((image, index) => (
+              <Image key={index} src={image.imageUrl} width={100} height={100} style={{ objectFit: "cover", borderRadius: "8px" }} />
             ))}
           </div>
         )}
       </Card>
 
-      {/* 🆕 Modal chỉnh sửa review */}
+      {/* Modal chỉnh sửa review */}
       <Modal
-        title="Chỉnh sửa đánh giá"
+        title="Update Review"
         open={isEditing}
         onCancel={() => setIsEditing(false)}
         footer={[
           <Button key="cancel" onClick={() => setIsEditing(false)}>
-            Hủy
+            Cancel
           </Button>,
           <Button key="save" type="primary" loading={loading} onClick={handleUpdate}>
-            Lưu
+            Submit
           </Button>,
         ]}
       >
-        <p>Cập nhật đánh giá của bạn:</p>
         <Rate value={newRating} onChange={setNewRating} />
         <Input.TextArea
           rows={4}
           value={newContent}
           onChange={(e) => setNewContent(e.target.value)}
+          style={{ marginBottom: 4 }}
         />
+
+
+        <Upload
+          listType="picture-card"
+          fileList={newImages.map((img, index) => ({
+            uid: index.toString(),
+            name: `Image ${index + 1}`,
+            url: img.imageUrl,
+            thumbUrl: img.imageUrl
+          }))}
+          onRemove={(file) => handleRemoveImage(file.url)}
+          beforeUpload={handleImageUpload}
+        >
+          {newImages.length >= MAX_IMAGES ? null : (
+            <div>
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </div>
+          )}
+        </Upload>
       </Modal>
     </>
   );

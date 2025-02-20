@@ -8,7 +8,7 @@ class ReviewController {
             const reviews = await Review.find()
                 .populate({
                     path: 'accountId',
-                    select: 'username',
+                    select: 'username _id fullname avatarImage',
                 })
                 .populate({
                     path: 'boardingHouseId',
@@ -130,7 +130,7 @@ class ReviewController {
                 return res.status(403).json({ message: "You are not authorized to update this review" });
             }
 
-            review.content = content || review.content;
+            review.content = content !== undefined ? content : review.content;
             review.rating = rating || review.rating;
             review.images = images || review.images;
             await review.save();
