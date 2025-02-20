@@ -12,6 +12,8 @@ import {
   getWithdrawRequests,
 } from "../../../api/withdrawalrequestmanagement";
 import formatAmount from "../../../utils/formatAmount";
+import Detail from "./WithdrawalRequestsDetails";
+import { FileTextOutlined } from "@ant-design/icons";
 import FilterWithdrawal from "./FilterWithdrawal";
 import convertTimetap from "../../../utils/convertTimetap";
 
@@ -61,12 +63,23 @@ function WithdrawalRequestManagement() {
       title: "Action",
       render: (record) => (
         <>
-          <Button
-            title={"Delete"}
-            btnDelete
-            className="btn-delete"
-            onClick={() => handleDeleteModal(record)}
-          ></Button>
+          <div className="flex gap-3 items-center">
+            <Button
+              title={"Delete"}
+              size="large"
+              btnDelete
+              className="btn-delete"
+              onClick={() => handleDeleteModal(record)}
+            ></Button>
+            <Button
+              title={"Detail"}
+              size="large"
+              onClick={() => handleDetail(record)}
+              icon={<FileTextOutlined />}
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+            />
+          </div>
         </>
       ),
     },
@@ -78,6 +91,7 @@ function WithdrawalRequestManagement() {
   const [isOpenStatusChangeModal, setIsOpenStatusChangeModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [newStatus, setNewStatus] = useState("");
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [filterValue, setFilterValue] = useState();
 
   const fetchData = async () => {
@@ -105,7 +119,22 @@ function WithdrawalRequestManagement() {
       setLoading(false);
     }
   };
-
+  const fetchDataDetails = async () => {
+    try {
+      const res = await getWithdrawRequests();
+      if (res) {
+        setData(res);
+      } else {
+        setData([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch withdrawal requests:", error);
+      toast.error(
+        "Failed to fetch withdrawal requests. Please try again later."
+      );
+      setData([]);
+    }
+  };
   const fetchFilter = async () => {
     try {
       const res = await filterWithdrawRequests(filterValue);
@@ -117,6 +146,10 @@ function WithdrawalRequestManagement() {
     }
   };
 
+  const handleDetail = (record) => {
+    setSelectedRequest(record._id);
+    setIsDetailOpen(true);
+  };
   const handleStatusChangeModal = (record) => {
     setSelectedRequest(record);
     setIsOpenStatusChangeModal(true);
@@ -191,6 +224,13 @@ function WithdrawalRequestManagement() {
             onCancel={() => setIsOpenDeleteModal(false)}
             isOpen={isOpenDeleteModal}
           />
+          {isDetailOpen && selectedRequest && (
+            <Detail
+              requestId={selectedRequest}
+              onClose={() => setIsDetailOpen(false)}
+              onStatusUpdate={fetchDataDetails}
+            />
+          )}
         </>
       )}
     </div>
