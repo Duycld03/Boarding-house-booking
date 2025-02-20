@@ -66,9 +66,7 @@ class watchLaterController {
           { timestamps: false }
         );
 
-        return res
-          .status(200)
-          .json({ message: 'Removed from watch later', isFavorite: false });
+        return res.status(200).json();
       }
 
       // Thêm vào danh sách yêu thích
@@ -78,9 +76,7 @@ class watchLaterController {
       });
       await newWatchLater.save();
 
-      return res
-        .status(201)
-        .json({ message: 'Added to watch later', isFavorite: true });
+      return res.status(201).json();
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }

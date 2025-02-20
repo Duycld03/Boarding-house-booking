@@ -27,11 +27,13 @@ import {
   getWatchLater,
   createWatchLater,
 } from '../../../api/watchLaterManagement.js';
+import { useParams } from 'react-router-dom';
 
 const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { id } = useParams();
 
   if (!images || images.length === 0) return <p>Không có ảnh</p>;
 
@@ -41,27 +43,26 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
   useEffect(() => {
     const fetchWatchLaterStatus = async () => {
       try {
-        const response = await getWatchLater(boardingHouseId);
-        setIsSaved(response.isFavorite); // Cập nhật trạng thái từ API
+        const response = await getWatchLater(id);
+        setIsSaved(response.isWatchLater); // Cập nhật trạng thái từ API
       } catch (error) {
         console.error('Error fetching watch later status:', error);
       }
     };
 
-    if (boardingHouseId) {
+    if (id) {
       fetchWatchLaterStatus();
     }
-  }, [boardingHouseId]);
+  }, [id]);
 
   // Xử lý khi click vào Save
   const handleSaveClick = async () => {
-    if (!boardingHouseId) return;
+    if (!id) return;
 
     setLoading(true);
     try {
-      const response = await createWatchLater(boardingHouseId);
-      setIsSaved(response.isFavorite);
-      message.success(response.message);
+      const response = await createWatchLater(id);
+      setIsSaved(response.isWatchLater);
     } catch (error) {
       console.error('Error saving watch later:', error);
       message.error('Failed to save boarding house');
