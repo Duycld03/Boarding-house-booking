@@ -133,7 +133,7 @@ function MyAppointment() {
   };
 
   return (
-    <div>
+    <div className="min-h-[500px]">
       <Table
         loading={loading}
         columns={appointmentCol}
