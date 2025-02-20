@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 
 import {
   authController,
@@ -6,42 +6,43 @@ import {
   favoriteController,
   appointmentController,
   reportController,
-  ReviewController
-} from "./../controllers/index.js";
-import { upload } from "../config/cloudinary.config.js";
+  ReviewController,
+  watchLaterController,
+} from './../controllers/index.js';
+import { upload } from '../config/cloudinary.config.js';
 
 const authRouter = Router();
 
-authRouter.get("/", (req, res) => {
-  res.send("This is an auth router");
+authRouter.get('/', (req, res) => {
+  res.send('This is an auth router');
 });
 
-authRouter.get("/user", authController.getAccountFromToken);
-authRouter.get("/favorites", favoriteController.getFavorites);
-authRouter.post("/favorites/create", favoriteController.createFavorite);
-authRouter.post("/change-password", accountController.changePassword);
-authRouter.put("/profile", accountController.updateAccountFromProfile);
+authRouter.get('/user', authController.getAccountFromToken);
+authRouter.get('/favorites', favoriteController.getFavorites);
+authRouter.post('/favorites/create', favoriteController.createFavorite);
+authRouter.post('/change-password', accountController.changePassword);
+authRouter.put('/profile', accountController.updateAccountFromProfile);
 authRouter.put(
-  "/avatar",
-  upload.single("avatar"),
+  '/avatar',
+  upload.single('avatar'),
   accountController.updateAvatar
 );
 authRouter.put(
-  "/review",
-  upload.single("review"),
+  '/review',
+  upload.single('review'),
   ReviewController.updateReviewImage
 );
 
-authRouter.post("/send-otp-change-email", accountController.sendOTPChangeEmail);
-authRouter.post("/verify-change-email", accountController.verifyChangeEmail);
+authRouter.post('/send-otp-change-email', accountController.sendOTPChangeEmail);
+authRouter.post('/verify-change-email', accountController.verifyChangeEmail);
 
 //appointment
 authRouter.get(
-  "/appointment/user",
+  '/appointment/user',
   appointmentController.getAppointmentByUserId
 );
 authRouter.put(
-  "/appointment/update-status/:id",
+  '/appointment/update-status/:id',
   appointmentController.updateAppointmentStatus
 );
 
@@ -98,19 +99,21 @@ authRouter.put(
  *               message: "Đã xảy ra lỗi khi tạo cuộc hẹn."
  */
 
-
 authRouter.post(
-  "/appointment/create-appointment/",
+  '/appointment/create-appointment/',
   appointmentController.createAppointment
 );
-authRouter.post("/reviews", ReviewController.addReview);
+authRouter.post('/reviews', ReviewController.addReview);
 
 // report
-authRouter.get("/reports/exist", reportController.checkReportExist);
+authRouter.get('/reports/exist', reportController.checkReportExist);
 authRouter.post(
-  "/reports",
-  upload.array("report"),
+  '/reports',
+  upload.array('report'),
   reportController.createReport
 );
+
+authRouter.get('/watchlater', watchLaterController.getWatchLater);
+authRouter.post('/watchlater/create', watchLaterController.createWatchLater);
 
 export { authRouter };
