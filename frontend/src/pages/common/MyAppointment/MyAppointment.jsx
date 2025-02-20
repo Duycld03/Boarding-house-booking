@@ -23,7 +23,7 @@ function MyAppointment() {
 
   const appointmentCol = [
     {
-      title: "Chủ trọ",
+      title: "Owner",
       dataIndex: "ownerName",
       key: "ownerName",
     },
@@ -33,18 +33,18 @@ function MyAppointment() {
       key: "boardingHouseName",
     },
     {
-      title: "Số phòng",
+      title: "Room Number",
       dataIndex: "roomNumber",
       key: "roomNumber",
     },
     {
-      title: "Ngày hẹn",
+      title: "Appointment Date",
       dataIndex: "appointmentDate",
       key: "appointmentDate",
       render: (date) => convertTimetap(date, true),
     },
     {
-      title: "User note",
+      title: "User Note",
       dataIndex: "note",
       key: "note",
       render: (note) =>
@@ -74,6 +74,7 @@ function MyAppointment() {
         ) : null,
     },
   ];
+
   const fetchData = async () => {
     setLoading(true);
     try {
