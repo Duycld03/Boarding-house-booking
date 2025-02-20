@@ -3,6 +3,7 @@ import { Modal, Form, Select, DatePicker, Input, Button, Spin } from "antd";
 import {
   getOwnerAppointmentById,
   createAppointment,
+  getAppointmentOfUser,
 } from "../../../api/appointment";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
@@ -11,6 +12,7 @@ import timezone from "dayjs/plugin/timezone";
 import userRole from "../../../constants/userRole";
 import { useCurrentUser } from "../../../context/userContext";
 import { useNavigate } from "react-router-dom";
+import { use } from "react";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -21,6 +23,7 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
   const [ownerAppointment, setOwnerAppointment] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [userAppointment, setUsrAppointment] = useState([]);
 
   const { isLogin } = useCurrentUser();
   const navigate = useNavigate();
@@ -62,8 +65,20 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
     }
   };
 
+  const fetchDataUserAppointment = async () => {
+    try {
+      const res = await getAppointmentOfUser();
+      setUsrAppointment(res);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchOwnerAppointment();
+    fetchDataUserAppointment();
   }, [ownerId]);
 
   //Disable time
@@ -110,10 +125,9 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
     setSubmitting(true);
 
     try {
-      // Chuyển đổi sang UTC đúng cách
       const appointmentDate = dayjs(values.appointmentDate)
-        .tz("Asia/Ho_Chi_Minh", true) // Giữ nguyên giờ nhập từ user, chỉ đổi về UTC
-        .utc() // Chuyển sang UTC để lưu vào DB
+        .tz("Asia/Ho_Chi_Minh", true)
+        .utc()
         .toISOString();
 
       const appointmentData = {
@@ -122,7 +136,38 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
         note: values.note || "",
       };
 
-      console.log("Dữ liệu lưu vào DB:", appointmentData);
+      const isWithin30Minutes = (existingDate, newDate) => {
+        const diff = Math.abs(new Date(existingDate) - new Date(newDate));
+        return diff <= 30 * 60 * 1000; // 30 minutes in milliseconds
+      };
+
+      if (userAppointment.length > 0) {
+        const hasConflict = userAppointment.some((appt) =>
+          isWithin30Minutes(
+            appt.appointmentDate,
+            appointmentData.appointmentDate
+          )
+        );
+
+        if (hasConflict) {
+          toast.error(
+            "Appointments cannot be booked within 30 minutes before or after an existing appointment!"
+          );
+          return;
+        }
+      }
+
+      if (userAppointment.length > 0) {
+        const hasSameRoom =
+          userAppointment.filter(
+            (appt) => appt.roomId === appointmentData.roomId
+          ).length > 0;
+
+        if (hasSameRoom) {
+          toast.error("You cannot book an appointment in the same room!");
+          return;
+        }
+      }
 
       await createAppointment(appointmentData);
       toast.success("Đã gửi yêu cầu thành công!");

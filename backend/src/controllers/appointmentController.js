@@ -49,7 +49,8 @@ class AppointmentController {
                         roomNumber: appointment.roomId?.roomNumber || null,
                         appointmentDate: appointment?.appointmentDate,
                         status: appointment?.status,
-                        note: appointment?.note
+                        note: appointment?.note,
+                        roomId: appointment?.roomId?._id,
                     };
                 })
             );
