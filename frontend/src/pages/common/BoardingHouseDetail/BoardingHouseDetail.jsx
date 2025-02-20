@@ -6,6 +6,7 @@ import {
   getReviewByBhId,
   getRoomTypeByBhId,
 } from "../../../api/ownerUser/boardingHouse";
+import { addReview } from "../../../api/ReviewManagement";
 import BoardingHouseGallery from "./BoardingHouseGallery";
 import formatAmount from "../../../utils/formatAmount";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
@@ -14,6 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
 import ReviewList from "./ReviewList";
 import OwnerInfo from "./OwnerInfo";
+import AddReview from "./AddReview";
 import ReportModal from "./ReportModal";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../../../context/userContext";
@@ -26,30 +28,30 @@ const { Content } = Layout;
 
 function BoardingHouseDetail() {
   const { isLogin } = useCurrentUser();
-  const navigate = useNavigate();
-
   const { id } = useParams();
+  const navigate = useNavigate();
   const [boardingHouse, setBoardingHouse] = useState(null);
   const [roomTypes, setRoomType] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [expanded, setExpanded] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reviewId, setReviewId] = useState("");
   const [reportedReviews, setReportedReviews] = useState([]);
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
-  // Ref cho room type section
   const roomTypeRef = useRef(null);
+
+
 
   const handleLike = () => {
     setIsLiked(!isLiked);
   };
 
-  //BH data
-  const fetchData = async () => {
+  // Fetch dữ liệu boarding house
+  const fetchBoardingHouse = async () => {
     try {
       const response = await getBoardingHouseDetail(id);
       setBoardingHouse(response);
@@ -60,15 +62,13 @@ function BoardingHouseDetail() {
     }
   };
 
-  //Room type
+  // Fetch room types
   const fetchRoomTypes = async () => {
     try {
       const response = await getRoomTypeByBhId(id);
-      setRoomType(response?.data);
+      setRoomType(response?.data || []);
     } catch (error) {
-      console.error("Error fetching boarding house room type:", error);
-    } finally {
-      setLoading(false);
+      console.error("Error fetching room types:", error);
     }
   };
 
@@ -87,15 +87,14 @@ function BoardingHouseDetail() {
   };
 
   const fetchReviews = async () => {
+    setLoading(true);
     try {
       const response = await getReviewByBhId(id);
       setReviews(response);
 
       fetchReportStatus(response);
     } catch (error) {
-      console.error("Error fetching boarding house review:", error);
-    } finally {
-      setLoading(false);
+      console.error("Error fetching reviews:", error);
     }
   };
 
@@ -105,13 +104,35 @@ function BoardingHouseDetail() {
 
   useEffect(() => {
     if (id) {
-      fetchData();
+      fetchBoardingHouse();
       fetchRoomTypes();
       fetchReviews();
     }
   }, [id]);
 
-  // Hàm scroll đến room type
+  // Xử lý submit review
+  const handleAddReview = async (formData) => {
+    try {
+      const response = await addReview(formData);
+      if (response.status === 201 && response.data.success) {
+        message.success("Review added successfully!");
+        setReviews((prevReviews) => [...prevReviews, response.data.newReview]);
+        setIsModalOpen(false);
+      } else {
+        message.error(response.data.message || "Failed to add review.");
+      }
+    } catch (error) {
+      console.error("Error adding review:", error);
+      message.error("Failed to add review. Please try again.");
+    }
+  };
+
+  // Xử lý khi nhấn nút Write a Review
+  const handleWriteReview = () => {
+    setIsModalOpen(true);
+  };
+
+  // Scroll đến room type
   const scrollToRoomType = () => {
     roomTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -145,6 +166,7 @@ function BoardingHouseDetail() {
           />
 
           <div className="mt-8 px-10">
+            {/* Header */}
             <div className="flex justify-between items-start gap-4 w-full">
               <p className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold">
                 {boardingHouse?.name}
@@ -164,12 +186,12 @@ function BoardingHouseDetail() {
               </div>
             </div>
 
+            {/* Address and Owner */}
             <div className="flex flex-wrap justify-between ">
               <div>
                 <Tag color="blue" className="md:text-2xl md:mt-3">
                   {boardingHouse?.boardingHouseType?.name}
                 </Tag>
-
                 <div className="mt-5 flex gap-4">
                   <FontAwesomeIcon
                     icon={faLocationDot}
@@ -181,7 +203,6 @@ function BoardingHouseDetail() {
                       : "Address not available"}
                   </p>
                 </div>
-
                 <div className="flex items-center gap-2 cursor-pointer select-none text-lg sm:text-xl md:text-4xl md:mt-7">
                   <button onClick={handleLike} className="focus:outline-none">
                     {isLiked ? (
@@ -195,7 +216,6 @@ function BoardingHouseDetail() {
                   </span>
                 </div>
               </div>
-
               <div className="flex gap-4 font-bold items-center">
                 <Tag color="#f50" className="text-3xl">
                   Owner:
@@ -204,7 +224,7 @@ function BoardingHouseDetail() {
               </div>
             </div>
 
-            {/* Water price and electric price */}
+            {/* Extra Prices */}
             <div className="mt-10 p-6 bg-white rounded-lg shadow-md border w-full max-w-sm">
               <h3 className="text-3xl font-semibold text-gray-800 mb-4">
                 Extra price
@@ -224,17 +244,17 @@ function BoardingHouseDetail() {
                 </span>
               </div>
             </div>
+
+            {/* Description */}
             <div className="md:mt-14">
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
                 <div
-                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${
-                    expanded ? "max-h-full" : "max-h-60 overflow-hidden"
-                  }`}
+                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${expanded ? "max-h-full" : "max-h-60 overflow-hidden"
+                    }`}
                 >
                   {boardingHouse?.description || "No description available."}
                 </div>
-
                 {boardingHouse?.description &&
                   boardingHouse?.description.split(" ").length > 50 && (
                     <div className="mt-3">
@@ -251,7 +271,7 @@ function BoardingHouseDetail() {
             </div>
             <Divider className="border-gray-500" />
 
-            {/* Room Type Section */}
+            {/* Room Types */}
             <div className="md:mt-14" ref={roomTypeRef}>
               <p className="font-bold text-4xl">
                 Available room type in boarding house
@@ -262,11 +282,18 @@ function BoardingHouseDetail() {
             </div>
             <Divider className="border-gray-500" />
 
-            {/* Review */}
+            {/* Reviews Section */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
+              <Button
+                type="primary"
+                onClick={handleWriteReview}
+              >
+                Write a Review
+              </Button>
               <ReviewList
                 reviews={reviews}
+                loading={loading}
                 rating={boardingHouse?.rating}
                 onReport={() => handleOpen()}
                 setReviewId={setReviewId}
@@ -277,9 +304,17 @@ function BoardingHouseDetail() {
         </>
       ) : (
         <div className="flex justify-center items-center h-60">
-          <Empty description="Không tìm thấy thông tin nhà trọ" />
+          <Empty description="Boarding house not found" />
         </div>
       )}
+
+      {/* Add Review Modal */}
+      <AddReview
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddReview}
+        boardingHouseId={id}
+      />
       <ReportModal
         visible={reportModalVisible}
         toggleVisible={setReportModalVisible}

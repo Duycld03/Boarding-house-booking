@@ -11,11 +11,13 @@ import reviewController from "../controllers/reviewController.js";
 
 const adminRouter = Router();
 
+
 // Withdrawal Requests
 adminRouter.get(
   "/withdrawRequests",
   withdrawalRequestsController.getWithdrawRequests
 );
+
 
 adminRouter.get(
   "/withdrawRequests/status",
@@ -30,7 +32,8 @@ adminRouter.post(
   "/withdrawRequests/filter",
   withdrawalRequestsController.filterWithdrawRequests
 );
-
+adminRouter.get("/withdrawRequests/:id", withdrawalRequestsController.getWithdrawRequestDetail);
+adminRouter.put("/withdrawRequests/:id", withdrawalRequestsController.updateWithdrawStatus);
 //report
 adminRouter.get("/review-reports", reportController.getReviewReports);
 adminRouter.delete("/reports/:reportId", reportController.softDeleteReport);
