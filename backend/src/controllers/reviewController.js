@@ -112,27 +112,26 @@ class ReviewController {
     async updateReview(req, res) {
         try {
             const { reviewId } = req.params;
-            console.log("reviewId (backend):", reviewId);
             const { content, rating, images } = req.body;
-            console.log("test1:", req.body);
             const accountId = req.user.userId;
-            console.log("accountId (backend):", accountId);
+
             if (!accountId) {
-                return res.status(401).json({
-                    success: false,
-                    message: "Account ID not found.",
-                });
+                return res.status(401).json({ success: false, message: "Account ID not found." });
             }
 
             const review = await Review.findOne({ _id: reviewId, accountId });
-            console.log("test2:", review);
             if (!review) {
                 return res.status(403).json({ message: "You are not authorized to update this review" });
             }
 
+            // Check if images array exists and its length exceeds the limit
+            if (images && images.length > 5) {
+                return res.status(400).json({ message: "You can't upload more than 5 images." });
+            }
+
             review.content = content !== undefined ? content : review.content;
             review.rating = rating || review.rating;
-            review.images = images || review.images;
+            review.images = images || review.images; //This will allow to remove images by sending an empty array.
             await review.save();
 
             return res.status(200).json({ message: "Review updated successfully", review });

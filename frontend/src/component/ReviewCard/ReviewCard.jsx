@@ -15,11 +15,15 @@ import {
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFlag } from "@fortawesome/free-regular-svg-icons";
+
 import {
   faEdit,
   faTrash,
+  faBookmark as faBookmarkSolid,
+  faBookmark as faBookmarkRegular,
+  faFlag as faFlagSolid,
   faEllipsisV,
-  faFlag,
 } from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -70,6 +74,7 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
   };
 
   const uploadProps = {
+    multiple: true,
     beforeUpload: (file) => {
       file.uid = file.uid || `${file.name}-${new Date().getTime()}`;
       setNewFiles((prev) => [...prev, file]);
@@ -114,7 +119,7 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
       toast.success("Review updated successfully!");
     } catch (error) {
       console.error("Failed to update review:", error);
-      toast.error(error.message || "Failed to update review.");
+      toast.error(error.response.data.message || "Failed to update review.");
     } finally {
       setLoading(false);
     }
@@ -129,7 +134,6 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
       onOk: async () => {
         try {
           await deleteReviewUser(reviewIdProp);
-          onReviewUpdated();
           toast.success("Review deleted successfully.");
         } catch (error) {
           console.error("Error deleting review:", error);
@@ -168,6 +172,7 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
           </Menu.Item>
         </>
       )}
+      {/* Report option - Always visible */}
       <Menu.Item key="report" onClick={handleReport} disabled={isReported}>
         <Tooltip
           placement="left"
@@ -178,143 +183,139 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
           }
         >
           <FontAwesomeIcon
-            icon={faFlag}
+            icon={isReported ? faFlagSolid : faFlag}
             className="text-red-500 text-xl"
           />
           <span className="ml-2">Report</span>
         </Tooltip>
       </Menu.Item>
+
     </Menu>
   );
 
   return (
-    <>
-      <Card style={{ marginBottom: 16 }}>
-        {isLoggedIn && (
-          <div style={{ position: "absolute", top: 10, right: 10 }}>
-            <Dropdown overlay={menu} trigger={["click"]}>
-              <Button type="text">
-                <FontAwesomeIcon icon={faEllipsisV} className="text-gray-600" />
-              </Button>
-            </Dropdown>
-          </div>
-        )}
+    <Card style={{ marginBottom: 16 }}>
+      <div style={{ position: "absolute", top: 10, right: 10 }}>
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <Button type="text">
+            <FontAwesomeIcon icon={faEllipsisV} className="text-gray-600" />
+          </Button>
+        </Dropdown>
+      </div>
+      <Card.Meta
+        avatar={<Avatar src={accountId?.avatarImage?.url} size="large" />}
+        title={accountId?.fullname || "Anonymous"}
+        description={
+          <>
+            <Rate disabled value={rating} />
+            <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
+              {dayjs(updatedAt).fromNow()}
+            </div>
+          </>
+        }
+      />
 
-        <Card.Meta
-          avatar={<Avatar src={accountId?.avatarImage?.url} size="large" />}
-          title={accountId?.fullname || "Anonymous"}
-          description={
-            <>
-              <Rate disabled value={rating} />
-              <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
-                {formattedRelativeTime}
-              </div>
-            </>
-          }
+      <p style={{ marginTop: 10, color: "#595959", textAlign: "justify" }}>
+        {content.length <= MAX_DESCRIPTION_LENGTH
+          ? content
+          : `${content.substring(0, MAX_DESCRIPTION_LENGTH)}... `}
+      </p>
+
+      {/* Render Images */}
+      {images.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
+          {images.map((image, index) => (
+            <Image key={index} src={image.imageUrl} width={100} height={100} style={{ objectFit: "cover", borderRadius: "8px" }} />
+          ))}
+        </div>
+      )}
+
+
+      <Divider className="border-gray-700" />
+
+      {/* Update Review Modal */}
+      <Modal
+        title={<span style={{ color: '#333', fontSize: 20, fontWeight: 'bold' }}>Update Review</span>}
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" loading={loading} onClick={handleUpdate}>
+            Update
+          </Button>,
+        ]}
+      >
+        <h2 style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 10 }}>Description</h2>
+        <Input.TextArea
+          value={newContent}
+          onChange={(e) => setNewContent(e.target.value)}
+          placeholder="Enter your updated review"
+          rows={4}
         />
-
-        <p style={{ marginTop: 10, color: "#595959", textAlign: "justify" }}>
-          {content.length <= MAX_DESCRIPTION_LENGTH
-            ? content
-            : `${content.substring(0, MAX_DESCRIPTION_LENGTH)}... `}
-        </p>
-
-        {/* Render Images */}
-        {images.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
-            {images.map((image, index) => (
-              <Image key={index} src={image.imageUrl} width={100} height={100} style={{ objectFit: "cover", borderRadius: "8px" }} />
-            ))}
-          </div>
-        )}
-
-
-        <Divider className="border-gray-700" />
-
-        {/* Update Review Modal */}
-        <Modal
-          title={<span style={{ color: '#333', fontSize: 20, fontWeight: 'bold' }}>Update Review</span>}
-          visible={isModalVisible}
-          onCancel={handleCancel}
-          footer={[
-            <Button key="back" onClick={handleCancel}>
-              Cancel
-            </Button>,
-            <Button key="submit" type="primary" loading={loading} onClick={handleUpdate}>
-              Update
-            </Button>,
-          ]}
-        >
-          <h2 style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 10 }}>Description</h2>
-          <Input.TextArea
-            value={newContent}
-            onChange={(e) => setNewContent(e.target.value)}
-            placeholder="Enter your updated review"
-            rows={4}
-          />
-          <h2 style={{ fontWeight: 'bold', fontSize: 16, marginTop: 16, marginBottom: 10 }}>Rating</h2>
-          <Rate
-            value={newRating}
-            onChange={(value) => setNewRating(value)}
-            style={{ marginBottom: "16px" }}
-          />
-          <div className="flex flex-col">
-            <div className="flex flex-col mb-4">
-              <h2 style={{ fontWeight: 'bold', fontSize: 16, marginTop: 16, marginBottom: 10 }}>Your Review Image</h2>
-              <div className="flex flex-wrap">
-                {newImages.map((image, index) => (
-                  !image.isDeleted && (
-                    <div
-                      key={index}
-                      className="relative group ml-4 "
+        <h2 style={{ fontWeight: 'bold', fontSize: 16, marginTop: 16, marginBottom: 10 }}>Rating</h2>
+        <Rate
+          value={newRating}
+          onChange={(value) => setNewRating(value)}
+          style={{ marginBottom: "16px" }}
+        />
+        <div className="flex flex-col">
+          <div className="flex flex-col mb-4">
+            <h2 style={{ fontWeight: 'bold', fontSize: 16, marginTop: 16, marginBottom: 10 }}>Your Review Image</h2>
+            <div className="flex flex-wrap">
+              {newImages.map((image, index) => (
+                !image.isDeleted && (
+                  <div
+                    key={index}
+                    className="relative group ml-4 "
+                    style={{
+                      width: 96,
+                      height: 96,
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <Image
+                      src={image.imageUrl}
+                      alt={`Image ${index + 1}`}
                       style={{
                         width: 96,
                         height: 96,
-                        borderRadius: "8px",
                       }}
-                    >
-                      <Image
-                        src={image.imageUrl}
-                        alt={`Image ${index + 1}`}
-                        style={{
-                          width: 96,
-                          height: 96,
-                        }}
-                        preview={{
-                          mask: (
-                            <div className="flex items-center justify-center space-x-2">
-                              <button
-                                type="button"
-                                className="bg-white border border-red-600 text-red-600 text-sm rounded-full shadow-md hover:bg-red-600 hover:text-white transition-colors duration-300 flex items-center justify-center w-8 h-8"
-                                onClick={() => handleRemoveImage(index)}
-                              >
-                                <FontAwesomeIcon icon={faTrash} />
-                              </button>
-                            </div>
-                          ),
-                        }}
-                      />
-                    </div>
-                  )
-
-                ))}
-              </div>
-
-            </div>
-            <div className="flex">
-              <Upload {...uploadProps} listType="picture-card">
-                {newFiles.length + newImages.filter((img) => !img.isDeleted).length < MAX_IMAGES && (
-                  <div>
-                    <PlusOutlined />
-                    <div style={{ marginTop: 8 }}>Upload</div>
+                      preview={{
+                        mask: (
+                          <div className="flex items-center justify-center space-x-2">
+                            <button
+                              type="button"
+                              className="bg-white border border-red-600 text-red-600 text-sm rounded-full shadow-md hover:bg-red-600 hover:text-white transition-colors duration-300 flex items-center justify-center w-8 h-8"
+                              onClick={() => handleRemoveImage(index)}
+                            >
+                              <FontAwesomeIcon icon={faTrash} />
+                            </button>
+                          </div>
+                        ),
+                      }}
+                    />
                   </div>
-                )}
-              </Upload>
+                )
+
+              ))}
             </div>
+
           </div>
-        </Modal>
-      </Card>
-    </>
+          <div className="flex">
+            <Upload {...uploadProps} listType="picture-card">
+              {newFiles.length + newImages.filter((img) => !img.isDeleted).length < MAX_IMAGES && (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
+          </div>
+        </div>
+      </Modal>
+    </Card>
   );
 };
 
