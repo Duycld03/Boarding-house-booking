@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Card,
   Avatar,
@@ -8,113 +9,117 @@ import {
   Menu,
   Modal,
   Input,
-  Upload
+  Upload,
+  Tooltip,
+  Divider,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash, faEllipsisV } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import {
+  faEdit,
+  faTrash,
+  faEllipsisV,
+  faFlag,
+} from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/vi";
 import { updateReview, updateReviewImage, deleteReviewUser } from "../../api/ReviewManagement";
 import { toast } from "react-toastify";
-import { useCurrentUser } from '../../context/userContext';
+import { useCurrentUser } from "../../context/userContext";
+
 dayjs.extend(relativeTime);
 dayjs.locale("en");
 
 const MAX_IMAGES = 5;
+const MAX_DESCRIPTION_LENGTH = 150;
 
-const ReviewCard = ({ reviewData, onReviewUpdated }) => {
+const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isReported }) => {
   if (!reviewData) return null;
 
-  const { accountId = {}, content = "", rating, images = [], updatedAt, _id: reviewId } = reviewData;
+  const {
+    accountId = {},
+    content = "",
+    rating,
+    images = [],
+    updatedAt,
+    _id: reviewIdProp,
+  } = reviewData;
+
   const [newContent, setNewContent] = useState(content);
   const [newRating, setNewRating] = useState(rating);
   const [loading, setLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [newImages, setNewImages] = useState(images);
-  const [newFiles, setNewFiles] = useState({});
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newImages, setNewImages] = useState(
+    images.map((img) => ({ ...img, isDeleted: false }))
+  );
+  const [newFiles, setNewFiles] = useState([]);
+
   const formattedRelativeTime = updatedAt ? dayjs(updatedAt).fromNow() : "undefined";
   const { user } = useCurrentUser();
   const isCurrentUserReview = user?._id === accountId?._id;
-  const isLoggedIn = user !== null && user !== undefined;
-  // Xử lý cập nhật review
+  const isLoggedIn = Boolean(user);
+
+  const handleRemoveImage = (index) => {
+    setNewImages((prev) =>
+      prev.map((img, i) => (i === index ? { ...img, isDeleted: true } : img))
+    );
+  };
+
+  const handleRemoveFile = (file) => {
+    setNewFiles((prev) => prev.filter((f) => f.uid !== file.uid));
+  };
+
+  const uploadProps = {
+    beforeUpload: (file) => {
+      file.uid = file.uid || `${file.name}-${new Date().getTime()}`;
+      setNewFiles((prev) => [...prev, file]);
+      return false;
+    },
+    onRemove: handleRemoveFile,
+    fileList: newFiles.map((file) => ({
+      uid: file.uid,
+      name: file.name,
+      status: "done",
+      url: URL.createObjectURL(file),
+    })),
+  };
+
   const handleUpdate = async () => {
     setLoading(true);
     try {
       const uploadedImageUrls = [];
-
-      for (const file of Object.values(newFiles)) {
+      for (const file of newFiles) {
         const imageData = await updateReviewImage(file);
         if (imageData?.imageUrl) {
           uploadedImageUrls.push(imageData.imageUrl);
         } else {
-          throw new Error(`Fail to update image: ${file.name}`);
+          throw new Error(`Failed to upload image: ${file.name}`);
         }
       }
 
-      // Cập nhật lại danh sách ảnh để không lưu ảnh bị xóa
-      const allImageUrls = newImages
-        .filter(img => !img.isPreview)
-        .map(img => img.imageUrl)
-        .concat(uploadedImageUrls);
+      const allImageUrls = [
+        ...newImages
+          .filter((img) => !img.isDeleted && img.imageUrl)
+          .map((img) => img.imageUrl),
+        ...uploadedImageUrls,
+      ];
 
-      await updateReview(reviewId, {
+      await updateReview(reviewIdProp, {
         content: newContent.trim() === "" ? null : newContent.trim(),
         rating: newRating,
-        images: allImageUrls.map(imageUrl => ({ imageUrl })),
+        images: allImageUrls.map((imageUrl) => ({ imageUrl })),
       });
 
-
-      setIsEditing(false);
-      onReviewUpdated();
-      toast.success("Update review successfull!");
+      setIsModalVisible(false);
+      toast.success("Review updated successfully!");
     } catch (error) {
-      console.error("Fail to update review:", error);
-      toast.error(error.message || "Fail to update review.");
+      console.error("Failed to update review:", error);
+      toast.error(error.message || "Failed to update review.");
     } finally {
       setLoading(false);
     }
   };
 
-
-  // Xử lý upload ảnh
-  const handleImageUpload = (file) => {
-    const totalImages = newImages.length;
-    if (totalImages >= MAX_IMAGES) {
-      toast.error(`You must upload maximum ${MAX_IMAGES} images.`);
-      return false;
-    }
-    const previewUrl = URL.createObjectURL(file);
-    setNewFiles(prev => ({
-      ...prev,
-      [file.uid]: file
-    }));
-    setNewImages(prev => [...prev, { imageUrl: previewUrl, isPreview: true }]);
-    return false;
-  };
-
-
-
-  // Xóa ảnh cũ đã có trên server
-  const handleRemoveImage = (imageUrl) => {
-    setNewImages(prev => prev.filter(img => img.imageUrl !== imageUrl));
-
-    setNewFiles(prev => {
-      const updatedFiles = { ...prev };
-      Object.keys(updatedFiles).forEach(key => {
-        const fileObjectUrl = URL.createObjectURL(updatedFiles[key]);
-        if (fileObjectUrl === imageUrl) {
-          delete updatedFiles[key];
-        }
-      });
-      return updatedFiles;
-    });
-  };
-
-
-  // Xóa review
   const handleDelete = () => {
     Modal.confirm({
       title: "Confirm Delete",
@@ -123,36 +128,69 @@ const ReviewCard = ({ reviewData, onReviewUpdated }) => {
       cancelText: "Cancel",
       onOk: async () => {
         try {
-          await deleteReviewUser(reviewId);
+          await deleteReviewUser(reviewIdProp);
           onReviewUpdated();
+          toast.success("Review deleted successfully.");
         } catch (error) {
           console.error("Error deleting review:", error);
+          toast.error("Failed to delete review.");
         }
       },
     });
   };
 
+  const handleReport = () => {
+    setReviewId(reviewIdProp);
+    onReport();
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setNewFiles([]);
+    setNewImages(images.map((img) => ({ ...img, isDeleted: false })));
+  };
 
   const menu = (
     <Menu>
-      {isCurrentUserReview && (
-        <Menu.Item key="edit" onClick={() => setIsEditing(true)}>
-          <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
-          <span className="ml-2">Update</span>
-        </Menu.Item>
+      {isLoggedIn && isCurrentUserReview && (
+        <>
+          <Menu.Item key="edit" onClick={showModal}>
+            <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
+            <span className="ml-2">Update</span>
+          </Menu.Item>
+          <Menu.Item key="delete" onClick={handleDelete}>
+            <FontAwesomeIcon icon={faTrash} className="text-red-500 text-xl" />
+            <span className="ml-2">Delete</span>
+          </Menu.Item>
+        </>
       )}
-      <Menu.Item key="delete" onClick={handleDelete}>
-        <FontAwesomeIcon icon={faTrash} className="text-red-500 text-xl" />
-        <span className="ml-2">Delete</span>
+      <Menu.Item key="report" onClick={handleReport} disabled={isReported}>
+        <Tooltip
+          placement="left"
+          title={
+            isReported
+              ? "You have reported this review. Please wait for admin to process."
+              : "Report this review"
+          }
+        >
+          <FontAwesomeIcon
+            icon={faFlag}
+            className="text-red-500 text-xl"
+          />
+          <span className="ml-2">Report</span>
+        </Tooltip>
       </Menu.Item>
     </Menu>
   );
 
   return (
     <>
-
-      <Card style={{ marginBottom: 16, position: "relative" }}>
-        {isCurrentUserReview && (
+      <Card style={{ marginBottom: 16 }}>
+        {isLoggedIn && (
           <div style={{ position: "absolute", top: 10, right: 10 }}>
             <Dropdown overlay={menu} trigger={["click"]}>
               <Button type="text">
@@ -169,14 +207,19 @@ const ReviewCard = ({ reviewData, onReviewUpdated }) => {
             <>
               <Rate disabled value={rating} />
               <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
-                Written: {formattedRelativeTime}
+                {formattedRelativeTime}
               </div>
             </>
           }
         />
 
-        <p style={{ marginTop: 10, color: "#595959", textAlign: "justify" }}>{content}</p>
+        <p style={{ marginTop: 10, color: "#595959", textAlign: "justify" }}>
+          {content.length <= MAX_DESCRIPTION_LENGTH
+            ? content
+            : `${content.substring(0, MAX_DESCRIPTION_LENGTH)}... `}
+        </p>
 
+        {/* Render Images */}
         {images.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
             {images.map((image, index) => (
@@ -184,50 +227,93 @@ const ReviewCard = ({ reviewData, onReviewUpdated }) => {
             ))}
           </div>
         )}
-      </Card>
-
-      {/* Modal chỉnh sửa review */}
-      <Modal
-        title="Update Review"
-        open={isEditing}
-        onCancel={() => setIsEditing(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setIsEditing(false)}>
-            Cancel
-          </Button>,
-          <Button key="save" type="primary" loading={loading} onClick={handleUpdate}>
-            Submit
-          </Button>,
-        ]}
-      >
-        <Rate value={newRating} onChange={setNewRating} />
-        <Input.TextArea
-          rows={4}
-          value={newContent}
-          onChange={(e) => setNewContent(e.target.value)}
-          style={{ marginBottom: 4 }}
-        />
 
 
-        <Upload
-          listType="picture-card"
-          fileList={newImages.map((img, index) => ({
-            uid: index.toString(),
-            name: `Image ${index + 1}`,
-            url: img.imageUrl,
-            thumbUrl: img.imageUrl
-          }))}
-          onRemove={(file) => handleRemoveImage(file.url)}
-          beforeUpload={handleImageUpload}
+        <Divider className="border-gray-700" />
+
+        {/* Update Review Modal */}
+        <Modal
+          title={<span style={{ color: '#333', fontSize: 20, fontWeight: 'bold' }}>Update Review</span>}
+          visible={isModalVisible}
+          onCancel={handleCancel}
+          footer={[
+            <Button key="back" onClick={handleCancel}>
+              Cancel
+            </Button>,
+            <Button key="submit" type="primary" loading={loading} onClick={handleUpdate}>
+              Update
+            </Button>,
+          ]}
         >
-          {newImages.length >= MAX_IMAGES ? null : (
-            <div>
-              <PlusOutlined />
-              <div style={{ marginTop: 8 }}>Upload</div>
+          <h2 style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 10 }}>Description</h2>
+          <Input.TextArea
+            value={newContent}
+            onChange={(e) => setNewContent(e.target.value)}
+            placeholder="Enter your updated review"
+            rows={4}
+          />
+          <h2 style={{ fontWeight: 'bold', fontSize: 16, marginTop: 16, marginBottom: 10 }}>Rating</h2>
+          <Rate
+            value={newRating}
+            onChange={(value) => setNewRating(value)}
+            style={{ marginBottom: "16px" }}
+          />
+          <div className="flex flex-col">
+            <div className="flex flex-col mb-4">
+              <h2 style={{ fontWeight: 'bold', fontSize: 16, marginTop: 16, marginBottom: 10 }}>Your Review Image</h2>
+              <div className="flex flex-wrap">
+                {newImages.map((image, index) => (
+                  !image.isDeleted && (
+                    <div
+                      key={index}
+                      className="relative group ml-4 "
+                      style={{
+                        width: 96,
+                        height: 96,
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <Image
+                        src={image.imageUrl}
+                        alt={`Image ${index + 1}`}
+                        style={{
+                          width: 96,
+                          height: 96,
+                        }}
+                        preview={{
+                          mask: (
+                            <div className="flex items-center justify-center space-x-2">
+                              <button
+                                type="button"
+                                className="bg-white border border-red-600 text-red-600 text-sm rounded-full shadow-md hover:bg-red-600 hover:text-white transition-colors duration-300 flex items-center justify-center w-8 h-8"
+                                onClick={() => handleRemoveImage(index)}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            </div>
+                          ),
+                        }}
+                      />
+                    </div>
+                  )
+
+                ))}
+              </div>
+
             </div>
-          )}
-        </Upload>
-      </Modal>
+            <div className="flex">
+              <Upload {...uploadProps} listType="picture-card">
+                {newFiles.length + newImages.filter((img) => !img.isDeleted).length < MAX_IMAGES && (
+                  <div>
+                    <PlusOutlined />
+                    <div style={{ marginTop: 8 }}>Upload</div>
+                  </div>
+                )}
+              </Upload>
+            </div>
+          </div>
+        </Modal>
+      </Card>
     </>
   );
 };
