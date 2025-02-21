@@ -19,3 +19,17 @@ export const getBhByArea = async (filterValue) => {
         params: filterValue,
     });
 }
+
+export const filterBH = async (filterValue) => {
+    return axios.get(`/boardinghouse/home/filter`, {
+        params: filterValue,
+    });
+}
+
+export const getAllBoardingHouseTypes = async () => {
+    return axios.get(`/boarding-house/types`);
+}
+
+export const getBoardingHouseCountByRating = async () => {
+    return axios.get(`/boardinghouse/home/rating`);
+}

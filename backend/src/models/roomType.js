@@ -37,7 +37,7 @@ const RoomTypeSchema = new mongoose.Schema({
     default: ""
   },
   peopleNumber: {
-    type: String,
+    type: Number,
     default: 0
   }
 });

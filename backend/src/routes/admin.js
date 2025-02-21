@@ -89,10 +89,6 @@ adminRouter.post(
   boardingHouseController.uploadFile
 );
 adminRouter.get(
-  "/boardinghouse/chore/get-max",
-  boardingHouseController.getMaxPriceBH
-);
-adminRouter.get(
   "/boardinghouse/chore/filter",
   boardingHouseController.filterBoardingHouse
 );

@@ -4,6 +4,7 @@ import {
   authController,
   boardingHouseController,
   roomController,
+  BoardingHouseTypeController
 } from '../controllers/index.js';
 import ViewRoomRequest from '../models/viewRoomRequest.js';
 
@@ -100,6 +101,11 @@ commonRouter.get('/boardinghouse/room-types/:id', boardingHouseController.getRoo
 
 commonRouter.get('/boardinghouse/reviews/:id', boardingHouseController.getReviewByBhId);
 
+commonRouter.get(
+  "/boardinghouse/chore/get-max",
+  boardingHouseController.getMaxPriceBH
+);
+
 /**
  * @swagger
  * /boardinghouse/home/area:
@@ -167,7 +173,60 @@ commonRouter.get('/boardinghouse/reviews/:id', boardingHouseController.getReview
  *                   example: "Server error"
  */
 commonRouter.get('/boardinghouse/home/area', boardingHouseController.getBhByArea);
-
+/**
+ * @swagger
+ * /boardinghouse/home/filter:
+ *   get:
+ *     summary: Lọc danh sách nhà trọ theo tiêu chí
+ *     tags: 
+ *       - Boarding Houses
+ *     parameters:
+ *       - in: query
+ *         name: boardingHouseType
+ *         schema:
+ *           type: string
+ *         description: ID loại nhà trọ
+ *       - in: query
+ *         name: district
+ *         schema:
+ *           type: string
+ *         description: Tên quận/huyện
+ *       - in: query
+ *         name: priceRange
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: number
+ *         description: Khoảng giá [min, max]
+ *       - in: query
+ *         name: province
+ *         schema:
+ *           type: string
+ *         description: Tên tỉnh/thành phố
+ *       - in: query
+ *         name: ward
+ *         schema:
+ *           type: string
+ *         description: Tên phường/xã
+ *       - in: query
+ *         name: peopleNumber
+ *         schema:
+ *           type: number
+ *         description: Số lượng người ở
+ *     responses:
+ *       200:
+ *         description: Danh sách nhà trọ phù hợp
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       500:
+ *         description: Lỗi máy chủ
+ */
+commonRouter.get('/boardinghouse/home/filter', boardingHouseController.filterBoardingHouseInUser);
+commonRouter.get('/boardinghouse/home/rating', boardingHouseController.getBoardingHouseCountByRating);
 
 //review
 
@@ -242,6 +301,9 @@ commonRouter.get('/room/room-type/:roomTypeId', roomController.getRoomsByRoomTyp
 commonRouter.get('/appointment/owner/:ownerId', appointmentController.getAppointmentsByOwnerId)
 
 
+
+//boarding house type
+commonRouter.get('/boarding-house/types', BoardingHouseTypeController.getAllBoardingHouseTypesInUser);
 
 
 

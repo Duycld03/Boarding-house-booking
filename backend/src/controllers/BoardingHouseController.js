@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import BoardingHouse from '../models/boardingHouse.js';
-import BoardingHouseType from '../models/boardingHouseType .js';
+import BoardingHouseType from '../models/boardingHouseType.js';
+import facilities from '../models/facilities.js';
 import RoomType from '../models/roomType.js';
 import Room from '../models/room.js';
 import { v2 as cloudinary } from 'cloudinary';
-import facilities from '../models/facilities.js';
 
 // import path from "path";
 import fs from 'fs';
@@ -251,6 +251,10 @@ class boardingHouseController {
       });
     }
   }
+
+
+
+
   async addBoardingHouseImage(req, res) {
     try {
       const { id } = req.params;
@@ -963,21 +967,6 @@ class boardingHouseController {
         updateData.images = images;
       }
 
-      // Validate images
-      // const primaryImageCount =
-      //   updateData.images?.filter((img) => img.isPrimary).length || 0;
-      // if (primaryImageCount !== 1) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: 'You must upload exactly one primary image.',
-      //   });
-      // }
-      // if (updateData.images?.length > 15) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: "You can't upload more than 15 images.",
-      //   });
-      // }
 
       // Validate price fields
       if (
@@ -1024,8 +1013,7 @@ class boardingHouseController {
       let result = [];
 
       const boardingHData = await BoardingHouse.find(
-        { totalRooms: { $gt: 0 } },
-        { reviews: 0 }
+        { totalRooms: { $gt: 0 } }
       );
 
       result = boardingHData;
@@ -1056,6 +1044,108 @@ class boardingHouseController {
       res.status(500).json({ message: 'Server error' });
     }
   }
+
+  async filterBoardingHouseInUser(req, res) {
+    try {
+      const {
+        boardingHouseType,
+        district,
+        priceRange,
+        province,
+        ward,
+        peopleNumber,
+      } = req.query;
+
+      let filter = {};
+
+      if (boardingHouseType) {
+        filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType);
+      }
+
+      if (priceRange && Array.isArray(priceRange) && priceRange.length === 2) {
+        filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
+      }
+
+      if (peopleNumber !== undefined && peopleNumber !== null) {
+        const roomTypes = await RoomType.find({ peopleNumber: parseInt(peopleNumber) }).select('boardingHouseId');
+        const boardingHouseIds = roomTypes.map((rt) => rt.boardingHouseId);
+        if (boardingHouseIds.length === 0) {
+          return res.status(200).json([]);
+        }
+        filter._id = { $in: boardingHouseIds };
+      }
+
+
+      let result = await BoardingHouse.find(filter)
+        .populate('boardingHouseType')
+        .populate('ownerId')
+        .sort({ createdAt: -1 });
+
+      if (province) {
+        result = result.filter((bh) =>
+          bh.address?.province?.toLowerCase().includes(province.toLowerCase())
+        );
+      }
+
+      if (district) {
+        result = result.filter((bh) =>
+          bh.address?.district?.toLowerCase().includes(district.toLowerCase())
+        );
+      }
+
+      if (ward) {
+        result = result.filter((bh) =>
+          bh.address?.ward?.toLowerCase().includes(ward.toLowerCase())
+        );
+      }
+      console.log(result.length);
+
+      res.status(200).json(result);
+
+    } catch (error) {
+      console.error('Error filtering boarding houses:', error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  }
+
+
+  async getBoardingHouseCountByRating(req, res) {
+    try {
+      const result = await BoardingHouse.aggregate([
+        {
+          $match: {
+            rating: { $gte: 1, $lte: 5 }
+          }
+        },
+        {
+          $group: {
+            _id: "$rating",
+            count: { $count: {} }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            rating: "$_id",
+            count: 1
+          }
+        },
+        {
+          $sort: { rating: 1 }
+        }
+      ]);
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error getting boarding house count by rating:", error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+
+
+
+
+
 }
 
 export default new boardingHouseController();

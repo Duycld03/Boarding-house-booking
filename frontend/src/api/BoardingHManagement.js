@@ -53,7 +53,7 @@ export const uploadFile = (data) => {
 };
 
 export const getMaxPriceBH = async () => {
-  return axios.get('/dashboard/boardinghouse/chore/get-max');
+  return axios.get('/boardinghouse/chore/get-max');
 };
 
 export const filterBH = async (filterValue) => {

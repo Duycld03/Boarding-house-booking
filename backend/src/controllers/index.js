@@ -8,6 +8,7 @@ import accountController from './accountController.js';
 import appointmentController from './appointmentController.js';
 import roomController from './roomController.js';
 import watchLaterController from './watchLaterController.js';
+import BoardingHouseTypeController from './boardingHouseTypeController.js';
 
 export {
   authController,
@@ -20,4 +21,5 @@ export {
   appointmentController,
   roomController,
   watchLaterController,
+  BoardingHouseTypeController
 };

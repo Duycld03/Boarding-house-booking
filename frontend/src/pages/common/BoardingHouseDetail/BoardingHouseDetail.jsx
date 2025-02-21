@@ -19,10 +19,7 @@ import AddReview from "./AddReview";
 import ReportModal from "./ReportModal";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../../../context/userContext";
-import {
-  checkReportExist,
-  getReviewReports,
-} from "../../../api/reportManagement";
+import { checkReportExist } from "../../../api/reportManagement";
 
 const { Content } = Layout;
 
@@ -43,8 +40,6 @@ function BoardingHouseDetail() {
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
   const roomTypeRef = useRef(null);
-
-
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -250,8 +245,9 @@ function BoardingHouseDetail() {
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
                 <div
-                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${expanded ? "max-h-full" : "max-h-60 overflow-hidden"
-                    }`}
+                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${
+                    expanded ? "max-h-full" : "max-h-60 overflow-hidden"
+                  }`}
                 >
                   {boardingHouse?.description || "No description available."}
                 </div>
@@ -285,10 +281,7 @@ function BoardingHouseDetail() {
             {/* Reviews Section */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
-              <Button
-                type="primary"
-                onClick={handleWriteReview}
-              >
+              <Button type="primary" onClick={handleWriteReview}>
                 Write a Review
               </Button>
               <ReviewList
