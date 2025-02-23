@@ -90,11 +90,14 @@ function BoardingHouseDetail() {
     setLoading(true);
     try {
       const response = await getReviewByBhId(id);
-      setReviews(response);
-
-      fetchReportStatus(response);
+      if (response) {
+        setReviews(response); // Cập nhật danh sách review từ API
+        await fetchReportStatus(response);
+      }
     } catch (error) {
       console.error("Error fetching reviews:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,8 +119,9 @@ function BoardingHouseDetail() {
       const response = await addReview(formData);
       if (response.status === 201 && response.data.success) {
         message.success("Review added successfully!");
-        setReviews((prevReviews) => [...prevReviews, response.data.newReview]);
         setIsModalOpen(false);
+        await fetchReviews();
+
       } else {
         message.error(response.data.message || "Failed to add review.");
       }
@@ -312,7 +316,7 @@ function BoardingHouseDetail() {
       <AddReview
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddReview}
+        onSubmit={fetchReviews}
         boardingHouseId={id}
       />
       <ReportModal

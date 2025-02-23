@@ -83,7 +83,7 @@ const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
                 }));
 
                 onClose();
-                onSubmit();
+                await onSubmit();
 
             } else {
                 console.error("Add Review Error:", reviewResponse);
