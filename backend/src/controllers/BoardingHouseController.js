@@ -60,32 +60,32 @@ class boardingHouseController {
       });
     }
   }
-
   async getRoomTypeByBhId(req, res, next) {
     try {
       const { id } = req.params;
 
-      const [bhRoomType, bhRoom] = await Promise.all([
-        RoomType.find({ boardingHouseId: id })
-          .populate("facilities")
-          .populate("boardingHouseId"),
-        Room.find({ boardingHouseId: id }).populate("boardingHouseId"),
-      ]);
+      const bhRoomType = await RoomType.find({ boardingHouseId: id })
+        .populate("facilities")
+        .populate("boardingHouseId");
 
-      if (!bhRoomType.length && !bhRoom.length) {
-        return res
-          .status(404)
-          .json({ message: "No room types or rooms found" });
+      if (!bhRoomType.length) {
+        return res.status(404).json({ message: "No room types found" });
       }
 
-      const roomTypesWithAvailableCount = bhRoomType.map((roomType) => {
-        const availableRoomCount = bhRoom.filter(
-          (room) =>
-            room.roomTypeId.toString() === roomType._id.toString() &&
-            room.isAvailable
-        ).length;
-        return { ...roomType.toObject(), availableRoom: availableRoomCount };
-      });
+      const roomCounts = await Room.aggregate([
+        { $match: { boardingHouseId: new mongoose.Types.ObjectId(id), isAvailable: true } },
+        { $group: { _id: "$roomTypeId", count: { $sum: 1 } } }
+      ]);
+
+      const roomCountMap = roomCounts.reduce((acc, cur) => {
+        acc[cur._id.toString()] = cur.count;
+        return acc;
+      }, {});
+
+      const roomTypesWithAvailableCount = bhRoomType.map(roomType => ({
+        ...roomType.toObject(),
+        availableRoom: roomCountMap[roomType._id.toString()] || 0
+      }));
 
       res.status(200).json({
         data: roomTypesWithAvailableCount,
@@ -94,6 +94,7 @@ class boardingHouseController {
       next(error);
     }
   }
+
 
 
   async getBoardingHouseDetailInUser(req, res, next) {

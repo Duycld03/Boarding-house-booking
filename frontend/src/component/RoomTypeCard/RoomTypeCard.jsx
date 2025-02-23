@@ -10,13 +10,14 @@ import { toast } from "react-toastify";
 const { Title, Paragraph, Text } = Typography;
 
 const RoomCard = ({ roomData }) => {
-  console.log("roomData", roomData);
-
   const [listRoomData, setListRoomData] = useState([]);
 
   const fetchRoomByRoomTypeId = async () => {
     try {
-      const res = await getRoomsByRoomType(roomData?._id);
+      const res = await getRoomsByRoomType(
+        roomData?._id,
+        roomData?.boardingHouseId?._id
+      );
       if (res) {
         setListRoomData(res);
       }
