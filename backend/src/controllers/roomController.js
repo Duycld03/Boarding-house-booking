@@ -13,7 +13,7 @@ class RoomController {
                 return res.status(400).json({ message: "Missing required parameters" });
             }
 
-            const rooms = await Room.find({ roomTypeId: new mongoose.Types.ObjectId(roomTypeId) });
+            const rooms = await Room.find({ roomTypeId: new mongoose.Types.ObjectId(roomTypeId) })
 
             res.status(200).json(rooms);
         } catch (error) {

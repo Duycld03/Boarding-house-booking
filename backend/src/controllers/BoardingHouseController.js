@@ -66,14 +66,16 @@ class boardingHouseController {
       const { id } = req.params;
 
       const [bhRoomType, bhRoom] = await Promise.all([
-        RoomType.find({ boardingHouseId: id }).populate('facilities'),
-        Room.find({ boardingHouseId: id }),
+        RoomType.find({ boardingHouseId: id })
+          .populate("facilities")
+          .populate("boardingHouseId"),
+        Room.find({ boardingHouseId: id }).populate("boardingHouseId"),
       ]);
 
       if (!bhRoomType.length && !bhRoom.length) {
         return res
           .status(404)
-          .json({ message: 'No room types or rooms found' });
+          .json({ message: "No room types or rooms found" });
       }
 
       const roomTypesWithAvailableCount = bhRoomType.map((roomType) => {
@@ -92,6 +94,7 @@ class boardingHouseController {
       next(error);
     }
   }
+
 
   async getBoardingHouseDetailInUser(req, res, next) {
     try {

@@ -103,12 +103,6 @@ function MyAppointment() {
   const handleCancel = async () => {
     if (!selectedData) return;
 
-    if (selectedData.status === "confirmed") {
-      toast.error("Can not cancel appointment if confirmed");
-      setIsOpen(false);
-      return;
-    }
-
     try {
       setLoading(true);
 

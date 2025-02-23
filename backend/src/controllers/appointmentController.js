@@ -118,11 +118,14 @@ class AppointmentController {
                 status: "confirmed",
             }).populate("roomId", "roomNumber");
 
+
+
             res.status(200).json(appointments);
         } catch (error) {
             res.status(500).json({ message: "Server error", error });
         }
     }
+
     async createAppointment(req, res) {
         try {
             const { roomId, appointmentDate, note } = req.body;
