@@ -22,7 +22,7 @@ import {
   MyAppointment,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
-import { BHManagementOwner, BHDetailOwner } from "../pages/common";
+import { BHManagementOwner, BHDetailOwner, FavouriteList } from "../pages/common";
 
 const dashBoard = "/dashboard";
 
@@ -101,6 +101,11 @@ const routes = [
   {
     path: "/my-appointment",
     page: MyAppointment,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/favourite-list",
+    page: FavouriteList,
     layout: ProfileLayout,
   },
   {

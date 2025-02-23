@@ -17,6 +17,11 @@ const getMenuItems = () => {
       label: <Link to="/my-appointment">My appointment</Link>,
       icon: <ScheduleOutlined />,
     },
+    {
+      key: 'favourite-list',
+      label: <Link to="/favourite-list">Favourite</Link>,
+      icon: <ScheduleOutlined />,
+    },
   ];
 
   // Nếu user có role "owner", thêm mục quản lý nhà trọ
