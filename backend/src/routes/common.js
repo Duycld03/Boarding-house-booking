@@ -1,14 +1,14 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   appointmentController,
   authController,
   boardingHouseController,
   roomController,
-} from '../controllers/index.js';
-import ViewRoomRequest from '../models/viewRoomRequest.js';
+  depositController,
+} from "../controllers/index.js";
+import ViewRoomRequest from "../models/viewRoomRequest.js";
 
 const commonRouter = Router();
-
 
 //auth
 
@@ -17,7 +17,7 @@ const commonRouter = Router();
  * /login:
  *   post:
  *     summary: Đăng nhập
- *     tags: 
+ *     tags:
  *       - Authentication
  *     requestBody:
  *       required: true
@@ -43,25 +43,26 @@ const commonRouter = Router();
  */
 commonRouter.post("/login", authController.login);
 
-
-commonRouter.post('/login', authController.login);
-commonRouter.post('/login-with-google', authController.loginWithGoogle);
-commonRouter.post('/register', authController.register);
-commonRouter.post('/forgot-password', authController.forgotPassword);
-commonRouter.post('/reset-password', authController.resetPassword);
-commonRouter.post('/send-otp-register', authController.sendOTPRegister);
-commonRouter.post('/verify-register', authController.verifyRegister);
-
+commonRouter.post("/login", authController.login);
+commonRouter.post("/login-with-google", authController.loginWithGoogle);
+commonRouter.post("/register", authController.register);
+commonRouter.post("/forgot-password", authController.forgotPassword);
+commonRouter.post("/reset-password", authController.resetPassword);
+commonRouter.post("/send-otp-register", authController.sendOTPRegister);
+commonRouter.post("/verify-register", authController.verifyRegister);
 
 //boarding house
-commonRouter.get('/boardinghouse', boardingHouseController.getAllBHOnHome);
-commonRouter.get('/boardinghouse/:id', boardingHouseController.getBoardingHouseDetailInUser);
+commonRouter.get("/boardinghouse", boardingHouseController.getAllBHOnHome);
+commonRouter.get(
+  "/boardinghouse/:id",
+  boardingHouseController.getBoardingHouseDetailInUser
+);
 /**
  * @swagger
  * /boardinghouse/room-types/{id}:
  *   get:
  *     summary: Lấy danh sách loại phòng theo ID nhà trọ
- *     tags: 
+ *     tags:
  *       - Boarding House
  *     parameters:
  *       - in: path
@@ -96,9 +97,15 @@ commonRouter.get('/boardinghouse/:id', boardingHouseController.getBoardingHouseD
  *       500:
  *         description: Lỗi máy chủ nội bộ
  */
-commonRouter.get('/boardinghouse/room-types/:id', boardingHouseController.getRoomTypeByBhId);
+commonRouter.get(
+  "/boardinghouse/room-types/:id",
+  boardingHouseController.getRoomTypeByBhId
+);
 
-commonRouter.get('/boardinghouse/reviews/:id', boardingHouseController.getReviewByBhId);
+commonRouter.get(
+  "/boardinghouse/reviews/:id",
+  boardingHouseController.getReviewByBhId
+);
 
 /**
  * @swagger
@@ -166,11 +173,12 @@ commonRouter.get('/boardinghouse/reviews/:id', boardingHouseController.getReview
  *                   type: string
  *                   example: "Server error"
  */
-commonRouter.get('/boardinghouse/home/area', boardingHouseController.getBhByArea);
-
+commonRouter.get(
+  "/boardinghouse/home/area",
+  boardingHouseController.getBhByArea
+);
 
 //review
-
 
 /**
  * @swagger
@@ -214,8 +222,10 @@ commonRouter.get('/boardinghouse/home/area', boardingHouseController.getBhByArea
  *       500:
  *         description: Lỗi server
  */
-commonRouter.get('/room/room-type/:roomTypeId', roomController.getRoomsByRoomType);
-
+commonRouter.get(
+  "/room/room-type/:roomTypeId",
+  roomController.getRoomsByRoomType
+);
 
 /**
  * @swagger
@@ -239,11 +249,12 @@ commonRouter.get('/room/room-type/:roomTypeId', roomController.getRoomsByRoomTyp
  *       500:
  *         description: Lỗi server
  */
-commonRouter.get('/appointment/owner/:ownerId', appointmentController.getAppointmentsByOwnerId)
+commonRouter.get(
+  "/appointment/owner/:ownerId",
+  appointmentController.getAppointmentsByOwnerId
+);
 
-
-
-
+// deposit
+commonRouter.get("/deposit/vnpay-return", depositController.vnpayReturn);
 
 export { commonRouter };
-
