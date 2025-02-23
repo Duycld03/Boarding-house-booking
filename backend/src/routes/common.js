@@ -219,7 +219,7 @@ commonRouter.get('/room/room-type/:roomTypeId', roomController.getRoomsByRoomTyp
 
 /**
  * @swagger
- * /auth/appointment/owner/{ownerId}:
+ * /appointment/owner/{ownerId}:
  *   get:
  *     summary: Lấy danh sách lịch hẹn của chủ trọ
  *     tags:

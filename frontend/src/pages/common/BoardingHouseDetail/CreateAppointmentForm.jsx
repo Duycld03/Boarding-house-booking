@@ -9,10 +9,8 @@ import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import userRole from "../../../constants/userRole";
 import { useCurrentUser } from "../../../context/userContext";
 import { useNavigate } from "react-router-dom";
-import { use } from "react";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -47,7 +45,10 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
   };
 
   const fetchOwnerAppointment = async () => {
-    if (!ownerId) return;
+    if (!ownerId) {
+      console.log("can not get owner id");
+      return;
+    }
     setLoading(true);
     try {
       const res = await getOwnerAppointmentById(ownerId);
@@ -79,27 +80,28 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
   useEffect(() => {
     fetchOwnerAppointment();
     fetchDataUserAppointment();
-  }, [ownerId]);
+  }, []);
 
   //Disable time
   const isDisabledDate = (current) => {
     if (!current) return false;
 
     const today = dayjs().tz("Asia/Ho_Chi_Minh").startOf("day");
-    const selectedDay = current.tz("Asia/Ho_Chi_Minh").startOf("day");
+    const selectedDay = dayjs(current).tz("Asia/Ho_Chi_Minh").startOf("day");
 
-    if (
-      selectedDay.isBefore(today, "day") ||
-      selectedDay.isSame(today, "day")
-    ) {
+    if (selectedDay.isBefore(today) || selectedDay.isSame(today, "day")) {
       return true;
     }
 
     const appointmentCount = ownerAppointment.filter((appt) =>
-      appt.startOf("day").isSame(selectedDay, "day")
+      appt.isSame(selectedDay, "day")
     ).length;
 
-    return appointmentCount >= 3;
+    console.log(
+      `Ngày ${selectedDay.format("YYYY-MM-DD")} có ${appointmentCount} cuộc hẹn`
+    );
+
+    return appointmentCount >= 5;
   };
 
   const isDisabledTime = (selectedDate) => {
@@ -136,6 +138,19 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
         note: values.note || "",
       };
 
+      if (userAppointment.length > 0) {
+        const hasSameRoom = userAppointment.some(
+          (appt) =>
+            appt.roomId === appointmentData.roomId &&
+            (appt.status === "pending" || appt.status === "confirmed")
+        );
+
+        if (hasSameRoom) {
+          toast.error("You cannot book an appointment in the same room!");
+          return;
+        }
+      }
+
       const isWithin30Minutes = (existingDate, newDate) => {
         const diff = Math.abs(new Date(existingDate) - new Date(newDate));
         return diff <= 30 * 60 * 1000; // 30 minutes in milliseconds
@@ -157,19 +172,9 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
         }
       }
 
-      if (userAppointment.length > 0) {
-        const hasSameRoom =
-          userAppointment.filter(
-            (appt) => appt.roomId === appointmentData.roomId
-          ).length > 0;
-
-        if (hasSameRoom) {
-          toast.error("You cannot book an appointment in the same room!");
-          return;
-        }
-      }
-
       await createAppointment(appointmentData);
+      fetchOwnerAppointment();
+      fetchDataUserAppointment();
       toast.success("Đã gửi yêu cầu thành công!");
       handleClose();
     } catch (error) {

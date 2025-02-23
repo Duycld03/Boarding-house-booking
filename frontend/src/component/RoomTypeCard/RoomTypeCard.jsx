@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 const { Title, Paragraph, Text } = Typography;
 
 const RoomCard = ({ roomData }) => {
+  console.log("roomData", roomData);
+
   const [listRoomData, setListRoomData] = useState([]);
 
   const fetchRoomByRoomTypeId = async () => {
