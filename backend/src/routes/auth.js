@@ -116,6 +116,10 @@ authRouter.post(
 
 authRouter.get("/watchlater", watchLaterController.getWatchLater);
 authRouter.post("/watchlater/create", watchLaterController.createWatchLater);
+authRouter.delete(
+  "/watchlater/:watchLaterId",
+  watchLaterController.deleteWatchLater
+);
 
 // deposit
 authRouter.post("/deposit", depositController.deposit);
