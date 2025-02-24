@@ -1,6 +1,8 @@
+import https from "https";
 import moment from "moment";
 import querystring from "qs";
 import crypto from "crypto";
+import axios from "axios";
 import { sortObject } from "../utils/algorithms.js";
 import DepositRoom from "../models/depositRoom.js";
 import dotenv from "dotenv";
@@ -50,9 +52,10 @@ class DepositController {
       if (payment === "vnpay") {
         createVNPayUrl(req, res, data);
         return;
+      } else if (payment === "momo") {
+        createMomoUrl(req, res, data);
+        return;
       }
-      // Deposit logic here
-      res.status(200).json({ message: "Transfer to payment" });
     } catch (error) {
       console.error("Error depositing:", error);
       res.status(500).json({ message: "Server error", error });
@@ -96,6 +99,42 @@ class DepositController {
         res.redirect(redirectUrl);
       }
     } else {
+      const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
+      res.redirect(redirectUrl);
+    }
+  }
+
+  async momoReturn(req, res) {
+    try {
+      const {
+        orderId,
+        amount,
+        orderInfo,
+        resultCode,
+        message,
+        transId,
+        responseTime,
+      } = req.query;
+
+      const accountId = orderInfo.split("-")[0];
+      const roomId = orderInfo.split("-")[1];
+      const boardingHouseId = orderInfo.split("-")[2];
+      const time = orderInfo.split("-")[3];
+
+      if (resultCode === "0") {
+        await DepositRoom.create({
+          accountId,
+          roomId,
+          amount,
+        });
+        const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=success`;
+        res.redirect(redirectUrl);
+      } else {
+        const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
+        res.redirect(redirectUrl);
+      }
+    } catch (error) {
+      console.log("Error momo return:", error);
       const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
       res.redirect(redirectUrl);
     }
@@ -147,7 +186,89 @@ const createVNPayUrl = async (req, res, data) => {
   vnp_Params["vnp_SecureHash"] = signed;
   vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
 
-  res.status(200).json({ code: "00", url: vnpUrl });
+  res.status(200).json({ code: "00", payUrl: vnpUrl });
+};
+
+const createMomoUrl = async (req, res, data) => {
+  const { amount, accountId, roomId, boardingHouseId, time } = data;
+  var accessKey = "F8BBA842ECF85";
+  var secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+  var orderInfo = accountId + "-" + roomId + "-" + boardingHouseId + "-" + time;
+  var partnerCode = "MOMO";
+  var redirectUrl = "http://localhost:3000/deposit/momo-return";
+  var ipnUrl = "http://localhost:3000/deposit/momo-return";
+  var requestType = "payWithMethod";
+  var orderId = partnerCode + new Date().getTime();
+  var requestId = orderId;
+  var extraData = "";
+  var paymentCode =
+    "T8Qii53fAXyUftPV3m9ysyRhEanUs9KlOPfHgpMR0ON50U10Bh+vZdpJU7VY4z+Z2y77fJHkoDc69scwwzLuW5MzeUKTwPo3ZMaB29imm6YulqnWfTkgzqRaion+EuD7FN9wZ4aXE1+mRt0gHsU193y+yxtRgpmY7SDMU9hCKoQtYyHsfFR5FUAOAKMdw2fzQqpToei3rnaYvZuYaxolprm9+/+WIETnPUDlxCYOiw7vPeaaYQQH0BF0TxyU3zu36ODx980rJvPAgtJzH1gUrlxcSS1HQeQ9ZaVM1eOK/jl8KJm6ijOwErHGbgf/hVymUQG65rHU2MWz9U8QUjvDWA==";
+  var orderGroupId = "";
+  var autoCapture = true;
+  var lang = "vi";
+
+  var rawSignature =
+    "accessKey=" +
+    accessKey +
+    "&amount=" +
+    amount +
+    "&extraData=" +
+    extraData +
+    "&ipnUrl=" +
+    ipnUrl +
+    "&orderId=" +
+    orderId +
+    "&orderInfo=" +
+    orderInfo +
+    "&partnerCode=" +
+    partnerCode +
+    "&redirectUrl=" +
+    redirectUrl +
+    "&requestId=" +
+    requestId +
+    "&requestType=" +
+    requestType;
+  //signature
+  var signature = crypto
+    .createHmac("sha256", secretKey)
+    .update(rawSignature)
+    .digest("hex");
+
+  //json object send to MoMo endpoint
+  const requestBody = JSON.stringify({
+    partnerCode: partnerCode,
+    partnerName: "Test",
+    storeId: "MomoTestStore",
+    requestId: requestId,
+    amount: amount,
+    orderId: orderId,
+    orderInfo: orderInfo,
+    redirectUrl: redirectUrl,
+    ipnUrl: ipnUrl,
+    lang: lang,
+    requestType: requestType,
+    autoCapture: autoCapture,
+    extraData: extraData,
+    orderGroupId: orderGroupId,
+    signature: signature,
+  });
+
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(requestBody),
+    },
+    url: "https://test-payment.momo.vn/v2/gateway/api/create",
+    data: requestBody,
+  };
+
+  try {
+    const response = await axios(options);
+    return res.status(200).json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
 };
 
 export default new DepositController();
