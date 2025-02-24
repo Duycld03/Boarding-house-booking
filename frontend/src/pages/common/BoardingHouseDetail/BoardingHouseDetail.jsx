@@ -90,11 +90,14 @@ function BoardingHouseDetail() {
     setLoading(true);
     try {
       const response = await getReviewByBhId(id);
-      setReviews(response);
-
-      fetchReportStatus(response);
+      if (response) {
+        setReviews(response); // Cập nhật danh sách review từ API
+        await fetchReportStatus(response);
+      }
     } catch (error) {
       console.error("Error fetching reviews:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,8 +134,9 @@ function BoardingHouseDetail() {
       const response = await addReview(formData);
       if (response.status === 201 && response.data.success) {
         message.success("Review added successfully!");
-        setReviews((prevReviews) => [...prevReviews, response.data.newReview]);
         setIsModalOpen(false);
+        await fetchReviews();
+
       } else {
         message.error(response.data.message || "Failed to add review.");
       }
@@ -164,6 +168,19 @@ function BoardingHouseDetail() {
       return;
     }
     setReportModalVisible(true);
+  };
+  const handleOpenAddReview = () => {
+    if (!isLogin) {
+      Modal.confirm({
+        title: " You need to log in",
+        content: "Please log in to add review.",
+        okText: " Log in",
+        cancelText: "Cancel",
+        onOk: () => navigate("/login"),
+      });
+      return;
+    }
+    setIsModalOpen(true);
   };
 
   return (
@@ -305,7 +322,10 @@ function BoardingHouseDetail() {
             {/* Reviews Section */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
-              <Button type="primary" onClick={handleWriteReview}>
+               <Button
+                className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
+                onClick={handleOpenAddReview}
+              >
                 Write a Review
               </Button>
               <ReviewList
@@ -330,7 +350,7 @@ function BoardingHouseDetail() {
       <AddReview
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddReview}
+        onSubmit={fetchReviews}
         boardingHouseId={id}
       />
       <ReportModal
