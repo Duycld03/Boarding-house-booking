@@ -120,7 +120,9 @@ function BoardingHouseDetail() {
       toast.error("Deposit failed!");
     }
     params.delete("status");
-    navigate({ search: params.toString() }, { replace: true });
+    if (status) {
+      navigate(window.location.pathname, { replace: true });
+    }
   }, [location]);
 
   // Xử lý submit review

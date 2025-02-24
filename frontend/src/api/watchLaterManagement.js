@@ -3,6 +3,10 @@ export const getWatchLater = () => {
   return axios.get("/auth/watchlater");
 };
 
+export const getAllWatchLater = () => {
+  return axios.get("/auth/watchlater/all");
+};
+
 export const createWatchLater = (boardingHouseId) => {
   return axios.post("/auth/watchlater/create", { boardingHouseId });
 };
