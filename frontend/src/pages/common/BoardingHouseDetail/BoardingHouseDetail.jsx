@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from "antd";
 import {
   getBoardingHouseDetail,
@@ -23,10 +23,12 @@ import {
   checkReportExist,
   getReviewReports,
 } from "../../../api/reportManagement";
+import { toast } from "react-toastify";
 
 const { Content } = Layout;
 
 function BoardingHouseDetail() {
+  const location = useLocation();
   const { isLogin } = useCurrentUser();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -43,8 +45,6 @@ function BoardingHouseDetail() {
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
   const roomTypeRef = useRef(null);
-
-
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -112,6 +112,19 @@ function BoardingHouseDetail() {
       fetchReviews();
     }
   }, [id]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const status = params.get("status");
+
+    if (status === "success") {
+      toast.success("Deposit successfully!");
+    } else if (status === "fail") {
+      toast.error("Deposit failed!");
+    }
+    params.delete("status");
+    navigate({ search: params.toString() }, { replace: true });
+  }, [location]);
 
   // Xử lý submit review
   const handleAddReview = async (formData) => {
@@ -267,8 +280,9 @@ function BoardingHouseDetail() {
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
                 <div
-                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${expanded ? "max-h-full" : "max-h-60 overflow-hidden"
-                    }`}
+                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${
+                    expanded ? "max-h-full" : "max-h-60 overflow-hidden"
+                  }`}
                 >
                   {boardingHouse?.description || "No description available."}
                 </div>
@@ -294,7 +308,11 @@ function BoardingHouseDetail() {
                 Available room type in boarding house
               </p>
               {roomTypes.map((rType, index) => (
-                <RoomCard key={index} roomData={rType} />
+                <RoomCard
+                  key={index}
+                  roomData={rType}
+                  boardingHouse={boardingHouse}
+                />
               ))}
             </div>
             <Divider className="border-gray-500" />
@@ -302,7 +320,7 @@ function BoardingHouseDetail() {
             {/* Reviews Section */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
-              <Button
+               <Button
                 className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
                 onClick={handleOpenAddReview}
               >

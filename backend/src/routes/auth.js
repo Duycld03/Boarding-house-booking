@@ -6,7 +6,9 @@ import {
   favoriteController,
   appointmentController,
   reportController,
-  ReviewController
+  ReviewController,
+  watchLaterController,
+  depositController,
 } from "./../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -98,7 +100,6 @@ authRouter.put(
  *               message: "Đã xảy ra lỗi khi tạo cuộc hẹn."
  */
 
-
 authRouter.post(
   "/appointment/create-appointment/",
   appointmentController.createAppointment
@@ -112,5 +113,15 @@ authRouter.post(
   upload.array("report"),
   reportController.createReport
 );
+
+authRouter.get("/watchlater", watchLaterController.getWatchLater);
+authRouter.post("/watchlater/create", watchLaterController.createWatchLater);
+authRouter.delete(
+  "/watchlater/:watchLaterId",
+  watchLaterController.deleteWatchLater
+);
+
+// deposit
+authRouter.post("/deposit", depositController.deposit);
 
 export { authRouter };
