@@ -157,12 +157,16 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
       };
 
       if (userAppointment.length > 0) {
-        const hasConflict = userAppointment.some((appt) =>
-          isWithin30Minutes(
-            appt.appointmentDate,
-            appointmentData.appointmentDate
-          )
-        );
+        const hasConflict = userAppointment
+          .filter(
+            (appt) => appt.status === "pending" || appt.status === "confirmed"
+          ) // Chỉ lấy các appointment có status phù hợp
+          .some((appt) =>
+            isWithin30Minutes(
+              appt.appointmentDate,
+              appointmentData.appointmentDate
+            )
+          );
 
         if (hasConflict) {
           toast.error(
