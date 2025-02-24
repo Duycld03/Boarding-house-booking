@@ -9,6 +9,7 @@ const ReviewList = ({
   onReport,
   setReviewId,
   reportedReviews,
+  fetchReviews,
 }) => {
   const [rating, setRating] = useState(0);
 
@@ -77,6 +78,7 @@ const ReviewList = ({
             setReviewId={setReviewId}
             reviewId={review._id}
             isReported={reportedReviews.includes(review._id)}
+            onReviewUpdated={fetchReviews}
           />
         )}
         pagination={{

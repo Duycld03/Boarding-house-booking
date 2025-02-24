@@ -62,6 +62,7 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
   const { user } = useCurrentUser();
   const isCurrentUserReview = user?._id === accountId?._id;
   const isLoggedIn = Boolean(user);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const handleRemoveImage = (index) => {
     setNewImages((prev) =>
@@ -117,6 +118,7 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
 
       setIsModalVisible(false);
       toast.success("Review updated successfully!");
+      onReviewUpdated();
     } catch (error) {
       console.error("Failed to update review:", error);
       toast.error(error.response.data.message || "Failed to update review.");
@@ -132,12 +134,16 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
       okText: "Delete",
       cancelText: "Cancel",
       onOk: async () => {
+        setLoadingDelete(true);
         try {
           await deleteReviewUser(reviewIdProp);
           toast.success("Review deleted successfully.");
+          onReviewUpdated();
         } catch (error) {
           console.error("Error deleting review:", error);
           toast.error("Failed to delete review.");
+        } finally {
+          setLoadingDelete(false);
         }
       },
     });
@@ -166,7 +172,7 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
             <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
             <span className="ml-2">Update</span>
           </Menu.Item>
-          <Menu.Item key="delete" onClick={handleDelete}>
+          <Menu.Item key="delete" onClick={handleDelete} disabled={loadingDelete}>
             <FontAwesomeIcon icon={faTrash} className="text-red-500 text-xl" />
             <span className="ml-2">Delete</span>
           </Menu.Item>
