@@ -113,6 +113,10 @@ authRouter.post(
   upload.array("report"),
   reportController.createReport
 );
+//review
+authRouter.put('/reviews/:reviewId', ReviewController.updateReview);
+authRouter.get("/reviews", ReviewController.getReviewsUser);
+authRouter.delete("/reviews/:reviewId", ReviewController.softDeleteReview);
 
 authRouter.get("/watchlater", watchLaterController.getWatchLater);
 authRouter.get("/watchlater/all", watchLaterController.getAllWatchLater);

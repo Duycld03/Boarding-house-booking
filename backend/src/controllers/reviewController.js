@@ -8,7 +8,7 @@ class ReviewController {
             const reviews = await Review.find()
                 .populate({
                     path: 'accountId',
-                    select: 'username',
+                    select: 'username _id fullname avatarImage',
                 })
                 .populate({
                     path: 'boardingHouseId',
@@ -107,6 +107,54 @@ class ReviewController {
         } catch (error) {
             console.error("Error soft deleting review:", error);
             return res.status(500).json({ message: "Server Error" });
+        }
+    }
+    async updateReview(req, res) {
+        try {
+            const { reviewId } = req.params;
+            const { content, rating, images } = req.body;
+            const accountId = req.user.userId;
+
+            if (!accountId) {
+                return res.status(401).json({ success: false, message: "Account ID not found." });
+            }
+
+            const review = await Review.findOne({ _id: reviewId, accountId });
+            if (!review) {
+                return res.status(403).json({ message: "You are not authorized to update this review" });
+            }
+
+            // Check if images array exists and its length exceeds the limit
+            if (images && images.length > 5) {
+                return res.status(400).json({ message: "You can't upload more than 5 images." });
+            }
+
+            review.content = content !== undefined ? content : review.content;
+            review.rating = rating || review.rating;
+            review.images = images || review.images; //This will allow to remove images by sending an empty array.
+            await review.save();
+
+            return res.status(200).json({ message: "Review updated successfully", review });
+        } catch (error) {
+            console.error("Error updating review:", error);
+            return res.status(500).json({ message: "Server Error" });
+        }
+    }
+    async getReviewsUser(req, res) {
+        try {
+            const reviews = await Review.find()
+                .populate({
+                    path: 'accountId',
+                    select: 'username',
+                })
+                .populate({
+                    path: 'boardingHouseId',
+                    select: 'name',
+                }).sort({ createdAt: 1 });
+            return res.status(200).json(reviews);
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
         }
     }
     async addReview(req, res) {

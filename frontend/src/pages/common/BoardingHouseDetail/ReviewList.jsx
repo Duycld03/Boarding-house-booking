@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Empty, List, Typography, Rate, Progress } from "antd";
 import ReviewCard from "../../../component/ReviewCard/ReviewCard";
 
@@ -5,22 +6,34 @@ const { Text } = Typography;
 
 const ReviewList = ({
   reviews,
-  rating,
   onReport,
   setReviewId,
   reportedReviews,
+  fetchReviews,
 }) => {
+  const [rating, setRating] = useState(0);
+
+  useEffect(() => {
+    if (reviews.length > 0) {
+      const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+      const averageRating = totalRating / reviews.length;
+      setRating(averageRating);
+    } else {
+      setRating(0);
+    }
+  }, [reviews]);
+
   if (!reviews || reviews.length === 0) {
     return <Empty description="There are no reviews yet." />;
   }
 
-  // Tính số lượng review theo rating
+  // Calculate the number of reviews per rating
   const ratingCounts = reviews.reduce((acc, review) => {
     acc[review.rating] = (acc[review.rating] || 0) + 1;
     return acc;
   }, {});
 
-  // Danh sách mặc định từ 5 đến 1 sao
+  // List of ratings from 5 to 1
   const allRatings = [5, 4, 3, 2, 1];
 
   return (
@@ -54,7 +67,7 @@ const ReviewList = ({
         </div>
       </div>
 
-      {/* Danh sách review */}
+      {/* Review List */}
       <List
         dataSource={reviews}
         renderItem={(review) => (
@@ -65,6 +78,7 @@ const ReviewList = ({
             setReviewId={setReviewId}
             reviewId={review._id}
             isReported={reportedReviews.includes(review._id)}
+            onReviewUpdated={fetchReviews}
           />
         )}
         pagination={{

@@ -315,6 +315,7 @@ function BoardingHouseDetail() {
                 onReport={() => handleOpen()}
                 setReviewId={setReviewId}
                 reportedReviews={reportedReviews}
+                fetchReviews={fetchReviews}
               />
             </div>
           </div>
