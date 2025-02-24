@@ -91,11 +91,14 @@ function BoardingHouseDetail() {
     try {
       const response = await getReviewByBhId(id);
       if (response) {
-        setReviews(response); // Cập nhật danh sách review từ API
-        await fetchReportStatus(response);
+        setReviews([...response]);
+        fetchReportStatus(response);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
+      if (error.response && error.response.status === 404) {
+        setReviews([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -282,9 +285,8 @@ function BoardingHouseDetail() {
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
                 <div
-                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${
-                    expanded ? "max-h-full" : "max-h-60 overflow-hidden"
-                  }`}
+                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${expanded ? "max-h-full" : "max-h-60 overflow-hidden"
+                    }`}
                 >
                   {boardingHouse?.description || "No description available."}
                 </div>
@@ -322,7 +324,7 @@ function BoardingHouseDetail() {
             {/* Reviews Section */}
             <div className="md:my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
-               <Button
+              <Button
                 className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
                 onClick={handleOpenAddReview}
               >
