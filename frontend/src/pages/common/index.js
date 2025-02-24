@@ -20,6 +20,6 @@ export {
   MyAppointment,
   BHManagementOwner,
   BHDetailOwner,
-  FavouriteList
+  FavouriteList,
   WatchLater,
 };
