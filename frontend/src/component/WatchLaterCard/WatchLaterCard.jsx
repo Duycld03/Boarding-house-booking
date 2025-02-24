@@ -1,9 +1,12 @@
-import { Card, Typography, Image, Rate } from "antd";
+import { Card, Typography, Image, Rate, Empty } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
 const WatchLaterCard = ({ item, index, onCardClick, onDelete, getPrimaryImage, formatAddress }) => {
+    if (!item || Object.keys(item).length === 0) {
+        return <Empty description="No data" />;
+    }
     return (
         <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
             <div

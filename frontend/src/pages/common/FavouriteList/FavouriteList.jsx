@@ -62,7 +62,7 @@ const FavouriteList = () => {
     const paginatedFavorites = favorites.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     return (
-        <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto", minHeight: "500px" }}>
+        <div style={{ padding: "20px", margin: "0 auto", minHeight: "500px" }}>
             {loading ? (
                 <Spin size="large" style={{ display: "block", textAlign: "center", margin: "20px" }} />
             ) : (
