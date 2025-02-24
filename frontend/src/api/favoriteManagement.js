@@ -6,3 +6,6 @@ export const getFavorite = () => {
 export const addFavorite = (boardingHouseId) => {
   return axios.post('/auth/favorites/create', { boardingHouseId });
 };
+export const deleteFavorite = (boardingHouseId) => {
+  return axios.delete(`/auth/favorites/${boardingHouseId}`);
+};

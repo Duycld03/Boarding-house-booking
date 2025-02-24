@@ -18,11 +18,13 @@ authRouter.get("/", (req, res) => {
   res.send("This is an auth router");
 });
 
-authRouter.get("/user", authController.getAccountFromToken);
-authRouter.get("/favorites", favoriteController.getFavorites);
-authRouter.post("/favorites/create", favoriteController.createFavorite);
-authRouter.post("/change-password", accountController.changePassword);
-authRouter.put("/profile", accountController.updateAccountFromProfile);
+authRouter.get('/user', authController.getAccountFromToken);
+authRouter.get('/favorites', favoriteController.getFavorites);
+authRouter.post('/favorites/create', favoriteController.createFavorite);
+authRouter.delete('/favorites/:boardingHouseId', favoriteController.deleteFavorite);
+authRouter.post('/change-password', accountController.changePassword);
+authRouter.put('/profile', accountController.updateAccountFromProfile);
+
 authRouter.put(
   "/avatar",
   upload.single("avatar"),

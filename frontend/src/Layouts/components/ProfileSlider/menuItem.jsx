@@ -23,6 +23,11 @@ const getMenuItems = () => {
       icon: <ScheduleOutlined />,
     },
     {
+      key: 'favourite-list',
+      label: <Link to="/favourite-list">My favourite</Link>,
+      icon: <ScheduleOutlined />,
+    },
+    {
       key: "watch-later",
       label: <Link to="/watch-later">Watch later</Link>,
       icon: <VideoCameraOutlined />,
