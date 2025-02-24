@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from '../../../context/userContext';
 const { TextArea } = Input;
 
-const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
+const AddReview = ({ visible, onClose, onSubmit, boardingHouseId, onReport }) => {
     const [reviewData, setReviewData] = useState({
         content: "",
         rating: 0,
@@ -104,14 +104,14 @@ const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
             title={<span className="font-bold text-4xl">Rating and Review</span>}
             visible={visible}
             onCancel={onClose}
+            onReport={onReport}
             onOk={handleSubmit}
             okText={uploading ? "Uploading..." : "Submit"}
             confirmLoading={uploading}
-            className="font-bold mb-10 text-4xl"
         >
-            <p className=" mb-2 mt-6 text-2xl">Rating </p>
+            <p className=" mb-2 mt-6 text-2xl font-bold">Rating </p>
             <Rate value={reviewData.rating} onChange={(value) => handleChange("rating", value)} />
-            <p className=" mb-2 mt-6 text-2xl">Desciption </p>
+            <p className=" mb-2 mt-6 text-2xl font-bold">Desciption </p>
 
             <TextArea
                 rows={4}
@@ -120,7 +120,7 @@ const AddReview = ({ visible, onClose, onSubmit, boardingHouseId }) => {
                 onChange={(e) => handleChange("content", e.target.value)}
                 className="mt-4"
             />
-            <p className=" mb-2 mt-6 text-2xl">Images </p>
+            <p className=" mb-2 mt-6 text-2xl font-bold">Images </p>
 
             <Upload
                 listType="picture-card"

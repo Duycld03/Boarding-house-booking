@@ -154,6 +154,19 @@ function BoardingHouseDetail() {
     }
     setReportModalVisible(true);
   };
+  const handleOpenAddReview = () => {
+    if (!isLogin) {
+      Modal.confirm({
+        title: " You need to log in",
+        content: "Please log in to add review.",
+        okText: " Log in",
+        cancelText: "Cancel",
+        onOk: () => navigate("/login"),
+      });
+      return;
+    }
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="md:max-w-screen-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -291,7 +304,7 @@ function BoardingHouseDetail() {
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
               <Button
                 className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
-                onClick={handleWriteReview}
+                onClick={handleOpenAddReview}
               >
                 Write a Review
               </Button>
