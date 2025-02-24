@@ -20,6 +20,7 @@ import {
   VerifyChangeEmail,
   ErrorPage,
   MyAppointment,
+  WatchLater,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 import { BHManagementOwner, BHDetailOwner, FavouriteList } from "../pages/common";
@@ -106,6 +107,11 @@ const routes = [
   {
     path: "/favourite-list",
     page: FavouriteList,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/watch-later",
+    page: WatchLater,
     layout: ProfileLayout,
   },
   {

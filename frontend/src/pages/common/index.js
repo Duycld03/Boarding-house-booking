@@ -8,6 +8,7 @@ import MyAppointment from "./MyAppointment";
 import BHManagementOwner from "./BHManagementOwner";
 import BHDetailOwner from "./BHDetailOwner";
 import FavouriteList from "./FavouriteList";
+import WatchLater from "./WatchLater";
 
 export {
   AboutUs,
@@ -20,4 +21,5 @@ export {
   BHManagementOwner,
   BHDetailOwner,
   FavouriteList
+  WatchLater,
 };

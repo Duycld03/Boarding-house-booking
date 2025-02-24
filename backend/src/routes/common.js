@@ -256,5 +256,6 @@ commonRouter.get(
 
 // deposit
 commonRouter.get("/deposit/vnpay-return", depositController.vnpayReturn);
+commonRouter.get("/deposit/momo-return", depositController.momoReturn);
 
 export { commonRouter };

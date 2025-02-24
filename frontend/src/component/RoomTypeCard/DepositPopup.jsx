@@ -22,7 +22,7 @@ function DepositPopup({
     try {
       const data = { boardingHouseId: boardingHouse._id, ...values };
       const res = await depositRoom(data);
-      window.location.href = res.url;
+      window.location.href = res.payUrl;
     } catch (error) {
       toast.warning(error?.response?.data?.message);
     } finally {

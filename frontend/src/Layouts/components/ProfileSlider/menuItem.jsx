@@ -1,19 +1,24 @@
-import { Link } from 'react-router-dom';
-import { UserOutlined, ScheduleOutlined, HomeFilled } from '@ant-design/icons';
-import { useCurrentUser } from '../../../context/userContext';
-import userRole from '../../../constants/userRole';
+import { Link } from "react-router-dom";
+import {
+  UserOutlined,
+  ScheduleOutlined,
+  HomeFilled,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
+import { useCurrentUser } from "../../../context/userContext";
+import userRole from "../../../constants/userRole";
 
 const getMenuItems = () => {
   const { hasRole } = useCurrentUser(); // Gọi useCurrentUser() trong component
 
   const menuItems = [
     {
-      key: 'profile',
+      key: "profile",
       label: <Link to="/profile">Profile</Link>,
       icon: <UserOutlined />,
     },
     {
-      key: 'appointment-management',
+      key: "appointment-management",
       label: <Link to="/my-appointment">My appointment</Link>,
       icon: <ScheduleOutlined />,
     },
@@ -22,12 +27,17 @@ const getMenuItems = () => {
       label: <Link to="/favourite-list">My favourite</Link>,
       icon: <ScheduleOutlined />,
     },
+    {
+      key: "watch-later",
+      label: <Link to="/watch-later">Watch later</Link>,
+      icon: <VideoCameraOutlined />,
+    },
   ];
 
   // Nếu user có role "owner", thêm mục quản lý nhà trọ
   if (hasRole(userRole.owner)) {
     menuItems.push({
-      key: 'bh-management-owner',
+      key: "bh-management-owner",
       label: <Link to="/bh-management-owner">Boarding House Management</Link>,
       icon: <HomeFilled />,
     });
