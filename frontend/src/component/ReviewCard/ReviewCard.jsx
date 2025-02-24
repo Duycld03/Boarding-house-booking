@@ -178,24 +178,25 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
           </Menu.Item>
         </>
       )}
-      {/* Report option - Always visible */}
-      <Menu.Item key="report" onClick={handleReport} disabled={isReported}>
-        <Tooltip
-          placement="left"
-          title={
-            isReported
-              ? "You have reported this review. Please wait for admin to process."
-              : "Report this review"
-          }
-        >
-          <FontAwesomeIcon
-            icon={isReported ? faFlagSolid : faFlag}
-            className="text-red-500 text-xl"
-          />
-          <span className="ml-2">Report</span>
-        </Tooltip>
-      </Menu.Item>
 
+      {(!isLoggedIn || !isCurrentUserReview) && (
+        <Menu.Item key="report" onClick={handleReport} disabled={isReported}>
+          <Tooltip
+            placement="left"
+            title={
+              isReported
+                ? "You have reported this review. Please wait for admin to process."
+                : "Report this review"
+            }
+          >
+            <FontAwesomeIcon
+              icon={isReported ? faFlagSolid : faFlag}
+              className="text-red-500 text-xl"
+            />
+            <span className="ml-2">Report</span>
+          </Tooltip>
+        </Menu.Item>
+      )}
     </Menu>
   );
 
@@ -227,7 +228,6 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
           : `${content.substring(0, MAX_DESCRIPTION_LENGTH)}... `}
       </p>
 
-      {/* Render Images */}
       {images.length > 0 && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
           {images.map((image, index) => (
@@ -239,7 +239,6 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
 
       <Divider className="border-gray-700" />
 
-      {/* Update Review Modal */}
       <Modal
         title={<span style={{ color: '#333', fontSize: 20, fontWeight: 'bold' }}>Update Review</span>}
         visible={isModalVisible}
