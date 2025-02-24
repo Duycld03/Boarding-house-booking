@@ -54,9 +54,9 @@ const WatchLaterList = ({ data, onConfirmModal, setWatchLaterId }) => {
               }
               description={
                 <div className="flex flex-col justify-between align-between">
-                  <p>Type: {item?.boardingHouseId?.name}</p>
+                  <p>{item?.boardingHouseId?.boardingHouseType?.name}</p>
                   <Rate disabled defaultValue={item?.boardingHouseId?.rating} />
-                  <p>Address: {getAddress(item?.boardingHouseId?.address)}</p>
+                  <p>{getAddress(item?.boardingHouseId?.address)}</p>
                 </div>
               }
             />
