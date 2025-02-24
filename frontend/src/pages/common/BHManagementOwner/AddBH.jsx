@@ -218,6 +218,19 @@ const AddBHModal = ({ onAddData }) => {
         toast.error('Please enter a boarding house details.');
         return;
       }
+      if (!formData.priceRange) {
+        toast.error('Please enter price range.');
+        return;
+      }
+      if (!formData.electricityPrice) {
+        toast.error('Please enter electricity price.');
+        return;
+      }
+      if (!formData.waterPrice) {
+        toast.error('Please enter water price.');
+        return;
+      }
+
       payload.append('boardingHouseType', formData.boardingHouseType);
       payload.append('name', formData.name);
       payload.append('description', formData.description);
