@@ -19,7 +19,7 @@ const getMenuItems = () => {
     },
     {
       key: 'favourite-list',
-      label: <Link to="/favourite-list">Favourite</Link>,
+      label: <Link to="/favourite-list">My favourite</Link>,
       icon: <ScheduleOutlined />,
     },
   ];
