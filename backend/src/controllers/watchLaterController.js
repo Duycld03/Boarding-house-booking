@@ -33,6 +33,47 @@ class watchLaterController {
       return res.status(500).json({ error: error.message });
     }
   }
+
+  async getAllWatchLater(req, res) {
+    try {
+      const watchLaterList = await WatchLater.find({
+        accountId: req.user.userId,
+      })
+        .populate({
+          path: "boardingHouseId",
+          populate: {
+            path: "boardingHouseType",
+            model: "BoardingHouseType",
+          },
+        })
+        .lean();
+
+      return res.status(200).json(watchLaterList);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllWatchLater(req, res) {
+    try {
+      const watchLaterList = await WatchLater.find({
+        accountId: req.user.userId,
+      })
+        .populate({
+          path: "boardingHouseId",
+          populate: {
+            path: "boardingHouseType",
+            model: "BoardingHouseType",
+          },
+        })
+        .lean();
+
+      return res.status(200).json(watchLaterList);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   async createWatchLater(req, res) {
     try {
       const account = await Account.findById(req.user.userId);

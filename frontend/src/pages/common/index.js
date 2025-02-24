@@ -7,6 +7,7 @@ import BoardingHouseDetail from "./BoardingHouseDetail";
 import MyAppointment from "./MyAppointment";
 import BHManagementOwner from "./BHManagementOwner";
 import BHDetailOwner from "./BHDetailOwner";
+import WatchLater from "./WatchLater";
 
 export {
   AboutUs,
@@ -18,4 +19,5 @@ export {
   MyAppointment,
   BHManagementOwner,
   BHDetailOwner,
+  WatchLater,
 };

@@ -115,6 +115,7 @@ authRouter.post(
 );
 
 authRouter.get("/watchlater", watchLaterController.getWatchLater);
+authRouter.get("/watchlater/all", watchLaterController.getAllWatchLater);
 authRouter.post("/watchlater/create", watchLaterController.createWatchLater);
 authRouter.delete(
   "/watchlater/:watchLaterId",
