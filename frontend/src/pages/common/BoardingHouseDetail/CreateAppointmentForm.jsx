@@ -187,10 +187,10 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
   return (
     <>
       <Button
+        disabled={listRoomData?.length > 0 ? false : true}
         onClick={handleOpen}
         size="large"
         className="bg-red-400 md:min-w-[200px] text-white py-2 px-4 rounded-xl"
-        disabled={loading}
       >
         {loading ? <Spin size="small" /> : "Make appointment"}
       </Button>
