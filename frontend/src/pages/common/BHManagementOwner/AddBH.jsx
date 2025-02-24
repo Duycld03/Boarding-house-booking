@@ -218,6 +218,10 @@ const AddBHModal = ({ onAddData }) => {
         toast.error('Please enter a boarding house details.');
         return;
       }
+      if (!formData.primaryImage) {
+        toast.error('You must upload a primary image.');
+        return;
+      }
       if (!formData.priceRange) {
         toast.error('Please enter price range.');
         return;
