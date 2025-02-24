@@ -760,7 +760,7 @@ class boardingHouseController {
 
       const reviews = await Review.find({ boardingHouseId: id }).populate(
         'accountId'
-      );
+      ).sort({ updatedAt: -1 });
 
       if (!reviews.length) {
         return res.status(404).json({ message: 'No reviews found' });
