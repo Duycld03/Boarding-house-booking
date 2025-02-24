@@ -39,7 +39,7 @@ function WatchLater() {
   }, []);
 
   return (
-    <div>
+    <div className="min-h-[500px]">
       {loading ? (
         <div className="flex justify-center items-center h-40">
           <Spin size="large" />
