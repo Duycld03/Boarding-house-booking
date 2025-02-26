@@ -1,21 +1,21 @@
-import Table from "../../../component/Table";
-import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
-import { Button, ConfirmModal } from "../../../component";
+import Table from '../../../component/Table';
+import { toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
+import { Button, ConfirmModal } from '../../../component';
 import {
   getAllAccount,
   deleteAccount,
   filterAccount,
   updateAccount,
   createAccount,
-} from "../../../api/AccountManagement";
-import convertTimetap from "../../../utils/convertTimetap";
-import { Avatar } from "antd";
-import DefaultAvatar from "../../../assets/images/none_avatar.png";
-import FilterAccount from "./FilterAccount";
-import AddAccountModal from "./AddAccount";
-import UpdateAccountModal from "./UpdateAccount/UpdateAccount";
-import { FileTextOutlined } from "@ant-design/icons";
+} from '../../../api/AccountManagement';
+import convertTimetap from '../../../utils/convertTimetap';
+import { Avatar } from 'antd';
+import DefaultAvatar from '../../../assets/images/none_avatar.png';
+import FilterAccount from './FilterAccount';
+import AddAccountModal from './AddAccount';
+import UpdateAccountModal from './UpdateAccount/UpdateAccount';
+import { FileTextOutlined } from '@ant-design/icons';
 
 function AccountManagement() {
   const [accountData, setAccountData] = useState([]);
@@ -29,16 +29,10 @@ function AccountManagement() {
     setLoading(true);
     try {
       const res = await getAllAccount();
-      if (res) {
-        setAccountData(res);
-      } else {
-        setAccountData([]);
-      }
+      setAccountData(res || []);
     } catch (error) {
-      console.error("Failed to fetch withdrawal requests:", error);
-      toast.error(
-        "Failed to fetch withdrawal requests. Please try again later."
-      );
+      console.error('Failed to fetch accounts:', error);
+      toast.error('Failed to fetch accounts. Please try again later.');
       setAccountData([]);
     } finally {
       setLoading(false);
@@ -49,208 +43,205 @@ function AccountManagement() {
     setLoading(true);
     try {
       const res = await filterAccount(filterValue);
-      if (Array.isArray(res)) {
-        setAccountData(res);
-      } else {
-        throw new Error("Invalid response format");
-      }
+      setAccountData(Array.isArray(res) ? res : []);
     } catch (error) {
-      console.error("Failed to fetch filtered accounts:", error);
-      toast.error("Failed to fetch filtered accounts. Please try again later.");
+      console.error('Failed to fetch filtered accounts:', error);
+      toast.error('Failed to fetch filtered accounts. Please try again later.');
       setAccountData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  //fetch account data
   useEffect(() => {
     fetchData();
   }, []);
 
-  //Filter account data
   useEffect(() => {
-    filterAccountData();
+    if (filterValue) filterAccountData();
   }, [filterValue]);
 
-  // Các cột cho bảng
   const columns = [
     {
-      title: "Avatar",
-      dataIndex: "avatarImage",
-      key: "avatarImage",
-      render: (avatarImage) => {
-        return (
-          <Avatar
-            src={avatarImage?.url ?? DefaultAvatar}
-            shape="circle"
-            size="large"
-          />
-        );
-      },
+      title: 'Avatar',
+      dataIndex: 'avatarImage',
+      key: 'avatarImage',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+      render: (avatarImage) => (
+        <Avatar
+          src={avatarImage?.url ?? DefaultAvatar}
+          shape="circle"
+          size="large"
+        />
+      ),
     },
     {
-      title: "Username",
-      dataIndex: "username",
-      key: "username",
+      title: 'Username',
+      dataIndex: 'username',
+      key: 'username',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: "Full Name",
-      dataIndex: "fullname",
-      key: "fullname",
+      title: 'Full Name',
+      dataIndex: 'fullname',
+      key: 'fullname',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+      render: (fullname) => (
+        <div style={{ whiteSpace: 'normal' }}>{fullname}</div>
+      ),
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+      render: (email) => <div style={{ whiteSpace: 'normal' }}>{email}</div>,
     },
     {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: "Created At",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
       render: (createdAt) => convertTimetap(createdAt),
     },
     {
-      title: "Ation",
-      key: "action",
-      render: (createdAt, record) => (
+      title: 'Action',
+      key: 'action',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+      render: (_, record) => (
         <div className="flex gap-3">
           <Button
             size="large"
             btnDelete
-            title={"Delete"}
+            title="Delete"
             onClick={() => handleSelectDelete(record)}
           />
           <Button
             onClick={() => onProcessData(record)}
             size="large"
-            title={"Detail"}
+            title="Detail"
             icon={<FileTextOutlined />}
-            className={" text-white"}
-            bgColor={"rgb(5 150 105)"}
+            className="text-white"
+            bgColor="rgb(5 150 105)"
           />
         </div>
       ),
     },
   ];
 
-  //Add new data
-  const handleAddNewData = (data) => {
+  const handleAddNewData = async (data) => {
     setLoading(true);
-    createAccount(data)
-      .then((res) => {
-        if (res) {
-          fetchData();
-          setLoading(false);
-          toast.success("Add new account successful");
-        } else {
-          setLoading(false);
-          toast.error("Add account failed, no response received.");
-        }
-      })
-      .catch((error) => {
-        setLoading(false);
-        toast.error("An error occurred : ", error.response.data.error);
-      });
+    try {
+      const res = await createAccount(data);
+      if (res) {
+        fetchData();
+        toast.success('Account added successfully');
+      } else {
+        toast.error('Add account failed');
+      }
+    } catch (error) {
+      toast.error(`Error: ${error.response?.data?.error || error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  //update data
-  const onProcessData = (combinedData) => {
-    setSelectedData(combinedData);
+  const onProcessData = (data) => {
+    setSelectedData(data);
   };
 
-  const handleUpdate = (value) => {
-    updateAccount(selectedData?._id, value)
-      .then((res) => {
-        if (res) {
-          fetchData();
-          toast.success("Update account successful!");
-        } else {
-          toast.error("Update failed, no response received.");
-        }
-      })
-      .catch((error) => {
-        toast.error("An error occurred : ", error.response.data.error);
-      });
+  const handleUpdate = async (value) => {
+    try {
+      const res = await updateAccount(selectedData?._id, value);
+      if (res) {
+        fetchData();
+        toast.success('Account updated successfully');
+      } else {
+        toast.error('Update failed');
+      }
+    } catch (error) {
+      toast.error(`Error: ${error.response?.data?.error || error.message}`);
+    }
   };
 
-  //on delete:
-  const handleToggleMobal = () => {
+  const handleToggleModal = () => {
     setIsOpen(!isOpen);
   };
+
   const handleSelectDelete = (record) => {
     setCurrentRecord(record);
-    handleToggleMobal();
+    handleToggleModal();
   };
 
   const handleCancel = () => {
     setCurrentRecord(null);
-    handleToggleMobal();
+    handleToggleModal();
   };
 
   const handleDelete = async () => {
     setLoading(true);
     try {
-      if (!currentRecord._id) {
-        toast.error("Invalid ID");
+      if (!currentRecord?._id) {
+        toast.error('Invalid ID');
         return;
       }
-      const response = await deleteAccount(currentRecord?._id);
+      const response = await deleteAccount(currentRecord._id);
       if (response) {
         fetchData();
-        setCurrentRecord("");
-        handleToggleMobal();
-        toast.success("Delete account successful");
+        setCurrentRecord(null);
+        handleToggleModal();
+        toast.success('Account deleted successfully');
       } else {
-        toast.error(
-          "Failed to delete account. Server response was not successful."
-        );
+        toast.error('Failed to delete account');
       }
     } catch (error) {
-      toast.error(
-        "An error occurred: " + error.response?.data?.error || error.message
-      );
+      toast.error(`Error: ${error.response?.data?.error || error.message}`);
     } finally {
-      setLoading(false); // Ensures loading is stopped in all cases
+      setLoading(false);
     }
   };
 
   return (
     <div className="txt">
-      <>
-        <div className="flex justify-between">
-          <AddAccountModal onAddData={handleAddNewData} />
-          <FilterAccount setFilterValue={setFilterValue} />
+      <div className="flex justify-between">
+        <AddAccountModal onAddData={handleAddNewData} />
+        <FilterAccount setFilterValue={setFilterValue} />
+      </div>
+      <div className="overflow-x-auto bg-white">
+        <div className="min-w-max">
+          <Table
+            columns={columns}
+            data={accountData}
+            loading={loading}
+            scroll={{ x: 'max-content' }}
+          />
         </div>
-        <div>
-          <Table columns={columns} data={accountData} loading={loading} />
-        </div>
+      </div>
 
-        {/* Update and detail Account */}
-        <UpdateAccountModal
-          accountData={selectedData}
-          onUpdate={handleUpdate}
-          onDelete={handleDelete}
-        />
-
-        <ConfirmModal
-          title="Confirm Deletion"
-          content="Do you want to delete this account report?"
-          onOk={handleDelete}
-          onCancel={handleCancel}
-          isOpen={isOpen}
-        />
-      </>
+      <UpdateAccountModal
+        accountData={selectedData}
+        onUpdate={handleUpdate}
+        onDelete={handleDelete}
+      />
+      <ConfirmModal
+        title="Confirm Deletion"
+        content="Do you want to delete this account?"
+        onOk={handleDelete}
+        onCancel={handleCancel}
+        isOpen={isOpen}
+      />
     </div>
   );
 }
