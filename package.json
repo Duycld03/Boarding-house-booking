@@ -15,7 +15,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "antd-img-crop": "^4.24.0",
     "concurrently": "^9.0.1",
+    "react-router-dom": "^7.1.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

@@ -86,11 +86,7 @@ const UpdateAccountModal = ({ accountData, onUpdate, onDelete }) => {
         left-1/2 transform -translate-x-1/2"
         >
           <Avatar
-            src={
-              accountData?.avatarImage
-                ? `http://localhost:3000/${accountData.avatarImage}`
-                : DefaultAccount
-            }
+            src={accountData?.avatarImage?.url ?? DefaultAccount}
             alt="Avatar"
             size="large"
             shape="circle"

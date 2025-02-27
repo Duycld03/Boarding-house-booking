@@ -22,9 +22,24 @@ const RoomTypeSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
-  imageURL: {
-    type: String,
+  image: {
+    imageUrl: {
+      type: String,
+      required: true,
+    },
+    publicId: {
+      type: String,
+      default: "",
+    }
   },
+  roomSize: {
+    type: String,
+    default: ""
+  },
+  peopleNumber: {
+    type: String,
+    default: 0
+  }
 });
 
 RoomTypeSchema.plugin(mongoose_delete, { overrideMethods: true });

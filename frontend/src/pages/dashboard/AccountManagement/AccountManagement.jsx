@@ -80,20 +80,11 @@ function AccountManagement() {
       dataIndex: "avatarImage",
       key: "avatarImage",
       render: (avatarImage) => {
-        const baseUrl = "http://localhost:3000";
-        const resolvedSrc = avatarImage
-          ? `${baseUrl}/${avatarImage}`
-          : `${baseUrl}/${DefaultAvatar}`;
-
         return (
           <Avatar
-            src={resolvedSrc}
+            src={avatarImage?.url ?? DefaultAvatar}
             shape="circle"
             size="large"
-            onError={(e) => {
-              e.target.onerror = null; // Prevent infinite error loop
-              e.target.src = `${baseUrl}/${DefaultAvatar}`;
-            }}
           />
         );
       },
@@ -155,18 +146,20 @@ function AccountManagement() {
 
   //Add new data
   const handleAddNewData = (data) => {
-    createAccount(data);
-    setLoading(true)
+    setLoading(true);
+    createAccount(data)
       .then((res) => {
         if (res) {
           fetchData();
           setLoading(false);
           toast.success("Add new account successful");
         } else {
+          setLoading(false);
           toast.error("Add account failed, no response received.");
         }
       })
       .catch((error) => {
+        setLoading(false);
         toast.error("An error occurred : ", error.response.data.error);
       });
   };

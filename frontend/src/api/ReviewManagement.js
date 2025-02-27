@@ -14,3 +14,34 @@ export const filterReviews = (filterValue) => {
     });
 };
 
+export const updateReview = (reviewId, updatedData) => {
+    return axios.put(`/auth/reviews/${reviewId}`, updatedData);
+};
+export const getReviewsUser = () => {
+    return axios.get("/auth/reviews");
+};
+export const addReview = (reviewData) => {
+    return axios.post("/auth/reviews", reviewData);
+};
+export const updateReviewImage = async (imageFile) => {
+    const formData = new FormData();
+    formData.append("review", imageFile);
+
+    // console.log("Image File:", imageFile); 
+
+    try {
+        const response = await axios.put("/auth/review", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+        // console.log("Upload Response:", response);
+        return response.data;
+    } catch (error) {
+        console.error("Upload Error:", error);
+        throw error;
+    }
+};
+export const deleteReviewUser = (reviewId) => {
+    return axios.delete(`/auth/reviews/${reviewId}`);
+};

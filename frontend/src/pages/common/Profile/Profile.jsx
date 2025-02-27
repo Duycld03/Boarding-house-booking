@@ -2,7 +2,7 @@ import classNames from "classnames/bind";
 import Styles from "./Profile.module.css";
 import { useEffect, useState } from "react";
 import { Loader } from "../../../component";
-import { Form, Input, Radio, Avatar, Upload, Button, Card } from "antd";
+import { Form, Input, Radio, Upload, Button, Card } from "antd";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import UserAvatar from "../../../assets/images/none_avatar.png";
@@ -10,12 +10,11 @@ import { getUser } from "../../../api/authManagement";
 import {
   updateAccountFromProfile,
   updateAvatar,
-  sendOTPChangeEmail,
 } from "../../../api/AccountManagement";
 import { useNavigate } from "react-router-dom";
+import ChangeEmailModal from "./ChangeEmailModal";
 
 const cx = classNames.bind(Styles);
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
@@ -46,6 +45,8 @@ function Profile() {
   const [isOwner, setIsOwner] = useState(false);
   const [accountBalance, setAccountBalance] = useState(0);
   const [email, setEmail] = useState("");
+
+  const [changeEmailModalVisible, setChangeEmailModalVisible] = useState(false);
 
   const handleAvatarChange = (info) => {
     if (info.file.status === "uploading") {
@@ -95,9 +96,7 @@ function Profile() {
       const res = await getUser();
       setAccountBalance(res.accountBalance);
 
-      if (res.avatarImage) {
-        setImageUrl(`${BASE_URL}/${res.avatarImage}`);
-      }
+      setImageUrl(res?.avatarImage?.url ?? UserAvatar);
 
       setUsername(res.username);
       setEmail(res.email);
@@ -124,21 +123,6 @@ function Profile() {
     }
   };
 
-  const onEmailFinish = async (values) => {
-    try {
-      setLoading(true);
-      const res = await sendOTPChangeEmail(values);
-      toast.success(res.message);
-      navigate("/verify-change-email", {
-        state: { email: res.email, token: res.token },
-      });
-      setLoading(false);
-    } catch (error) {
-      toast.error(error?.response?.data?.message);
-      setLoading(false);
-    }
-  };
-
   const handleUpload = async ({ file, onSuccess, onError }) => {
     setLoading(true);
     const formData = new FormData();
@@ -147,8 +131,7 @@ function Profile() {
     try {
       const res = await updateAvatar(formData);
 
-      // setImageUrl(response.url);
-      toast.success("Upload avatar successfully!");
+      toast.success(res.message);
       onSuccess();
       setLoading(false);
     } catch (error) {
@@ -183,7 +166,7 @@ function Profile() {
                   <img
                     src={imageUrl}
                     alt="avatar"
-                    className="w-36 h-36 rounded-full"
+                    className="w-36 h-36 rounded-full object-cover"
                   />
                 ) : (
                   uploadButton
@@ -191,7 +174,7 @@ function Profile() {
               </Upload>
               <p className="text-3xl text-center">@{username}</p>
             </div>
-            <Form form={formEmail} layout="vertical" onFinish={onEmailFinish}>
+            <Form form={formEmail} layout="vertical">
               {isOwner && (
                 <Form.Item label="Account Balance">
                   <div>
@@ -223,14 +206,13 @@ function Profile() {
                     placeholder="Enter your email"
                     name="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     disabled
                   />
                   <Button
                     name="change-email"
                     type="primary"
                     size="large"
-                    htmlType="submit"
+                    onClick={() => setChangeEmailModalVisible(true)}
                     loading={loading}
                   >
                     Change Email
@@ -270,7 +252,7 @@ function Profile() {
                 <Input
                   type="number"
                   size="large"
-                  placeholder="Enter your confirm password"
+                  placeholder="Enter your phone number"
                 />
               </Form.Item>
               <Form.Item label="Gender" name="gender">
@@ -295,6 +277,11 @@ function Profile() {
           </Card>
         </div>
       )}
+      <ChangeEmailModal
+        isOpen={changeEmailModalVisible}
+        setToggleModal={setChangeEmailModalVisible}
+        email={email}
+      />
     </div>
   );
 }

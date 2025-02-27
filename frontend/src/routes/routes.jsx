@@ -16,10 +16,14 @@ import {
   ResetPassword,
   ChangePassword,
   Profile,
+  BoardingHouseDetail,
   VerifyChangeEmail,
   ErrorPage,
+  MyAppointment,
+  WatchLater,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
+import { BHManagementOwner, BHDetailOwner, FavouriteList } from "../pages/common";
 
 const dashBoard = "/dashboard";
 
@@ -95,6 +99,32 @@ const routes = [
     layout: AuthLayout,
   },
 
+  {
+    path: "/my-appointment",
+    page: MyAppointment,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/favourite-list",
+    page: FavouriteList,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/watch-later",
+    page: WatchLater,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/bh-management-owner",
+    page: BHManagementOwner,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/bh-management-owner/:boardingHouseId",
+    page: BHDetailOwner,
+    layout: ProfileLayout,
+  },
+
   // dashBoard
   {
     path: `${dashBoard}/boarding-house-management`,
@@ -126,6 +156,11 @@ const routes = [
     path: `${dashBoard}/list-boarding-house-reviews`,
     page: ReviewManagement,
     layout: null,
+  },
+  {
+    path: "/boarding-house/:id",
+    page: BoardingHouseDetail,
+    layout: HeaderOnly,
   },
 ];
 

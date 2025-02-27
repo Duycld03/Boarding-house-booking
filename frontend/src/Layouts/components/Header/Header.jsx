@@ -22,6 +22,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { getUser } from "../../../api/authManagement";
+import { useCurrentUser } from "../../../context/userContext";
 
 const cx = classNames.bind(Styles);
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -35,12 +36,13 @@ const CustomHeader = () => {
   const [avatar, setAvatar] = useState(UserAvatar);
   const navigate = useNavigate();
   const screens = useBreakpoint();
+  const { contextLogout } = useCurrentUser();
 
   const checkUser = async () => {
     try {
       const res = await getUser();
       if (res.avatarImage) {
-        setAvatar(`${BASE_URL}/${res.avatarImage}`);
+        setAvatar(res.avatarImage.url);
       }
 
       if (res.role === "admin") {
@@ -52,6 +54,7 @@ const CustomHeader = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token");
+    contextLogout();
     setIsLoggedIn(false);
     navigate("/");
   };

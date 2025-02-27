@@ -8,7 +8,18 @@ import {
   ChangePassword,
   VerifyChangeEmail,
 } from "./auth";
-import { AboutUs, Home, Contact, Profile, ErrorPage } from "./common";
+import {
+  AboutUs,
+  Home,
+  Contact,
+  Profile,
+  ErrorPage,
+  BoardingHouseDetail,
+  MyAppointment,
+  BHManagementOwner,
+  BHDetailOwner,
+  WatchLater,
+} from "./common";
 
 import {
   BoardingHouseManagement,
@@ -28,6 +39,7 @@ export {
   ForgotPassword,
   ResetPassword,
   ChangePassword,
+  BoardingHouseDetail,
   VerifyChangeEmail,
 
   //common
@@ -36,9 +48,12 @@ export {
   Home,
   Profile,
   ErrorPage,
+  MyAppointment,
+  WatchLater,
 
   // owner
-
+  BHManagementOwner,
+  BHDetailOwner,
   //dashboard
   BoardingHouseManagement,
   AccountManagement,
