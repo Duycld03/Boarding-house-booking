@@ -10,9 +10,9 @@ function Contact() {
   const [form] = Form.useForm();
 
   return (
-    <section className="flex justify-center items-center py-16 bg-white">
+    <section className="flex justify-center items-center py-16 bg-white rounded-xl shadow-lg">
       <div className="flex gap-12 w-full max-w-[1100px]">
-        {/* Form - 50% width */}
+        {/* Form - 40% width */}
         <div className="w-2/5 bg-white p-8 rounded-xl shadow-lg">
           <h3 className="text-[22px] font-semibold mb-5">Get in Touch</h3>
           <Form form={form} layout="vertical" className="space-y-4">
@@ -67,14 +67,14 @@ function Contact() {
           </Form>
         </div>
 
-        {/* Contact Info + Map - 50% width */}
+        {/* Contact Info + Map - 60% width */}
         <div className="w-3/5 flex flex-col items-start">
           <h3 className="text-[20px] font-semibold text-blue-500">
             Reach us at
           </h3>
           <p className="text-gray-700 text-[14px] mt-2">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Felis diam
-            lectus sapien.
+            Trường Đại học FPT Cần Thơ - nơi đào tạo công nghệ và kỹ năng hàng
+            đầu.
           </p>
 
           {/* Social Icons */}
@@ -88,7 +88,7 @@ function Contact() {
           {/* Google Maps */}
           <iframe
             className="w-full h-[350px] rounded-lg shadow-md border-none mt-4"
-            src="https://maps.google.com/maps?q=Bangalore&t=&z=13&ie=UTF8&iwloc=&output=embed"
+            src="https://maps.google.com/maps?q=FPT%20University%20Can%20Tho&t=&z=15&ie=UTF8&iwloc=&output=embed"
             allowFullScreen
             loading="lazy"
           ></iframe>
