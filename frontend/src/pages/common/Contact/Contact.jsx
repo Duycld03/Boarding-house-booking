@@ -5,12 +5,45 @@ import {
   GoogleOutlined,
   InstagramOutlined,
 } from '@ant-design/icons';
+import emailjs from '@emailjs/browser';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Contact() {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   const onFinish = (values) => {
-    console.log('Form submitted:', values);
+    setLoading(true); // Bắt đầu loading khi gửi
+    const templateParams = {
+      to_name: 'HY',
+      from_name: values.firstName,
+      reply_to: values.email,
+      phone: values.phone,
+      message: values.message,
+    };
+
+    emailjs
+      .send(
+        'service_wsy2unr',
+        'template_231iuyj',
+        templateParams,
+        'qav99nr6ty0xpDGwv'
+      )
+      .then(
+        () => {
+          toast.success('Email sent successfully!');
+          form.resetFields();
+        },
+        (error) => {
+          console.error('Failed to send email:', error);
+          toast.error('Failed to send email, please try again.');
+        }
+      )
+      .finally(() => {
+        setLoading(false); // Kết thúc loading
+      });
   };
 
   return (
@@ -18,94 +51,84 @@ function Contact() {
       <div className="flex gap-12 w-full max-w-[1100px]">
         {/* Form - 40% width */}
         <div className="w-2/5 bg-white p-8 rounded-xl shadow-lg">
-          <h3 className="text-[22px] font-semibold mb-5">Get in Touch</h3>
+          <h3 className="text-[22px] font-semibold mb-5 text-blue-600">
+            Get in Touch
+          </h3>
           <Form
             form={form}
             layout="vertical"
             className="space-y-4"
             onFinish={onFinish}
           >
-            {/* First Name */}
             <Form.Item
               label="FIRST NAME"
               name="firstName"
               rules={[
                 { required: true, message: 'First name is required!' },
-                {
-                  min: 2,
-                  message: 'First name must be at least 2 characters!',
-                },
+                { min: 2, message: 'Must be at least 2 characters!' },
                 {
                   pattern: /^[A-Za-z\s]+$/,
-                  message:
-                    'First name cannot contain numbers or special characters!',
+                  message: 'No numbers or special characters!',
                 },
               ]}
             >
               <Input
-                placeholder="Please enter first name..."
-                className="rounded-md p-2 border border-gray-300"
+                placeholder="Enter first name..."
+                className="rounded-md p-2 border border-gray-300 focus:border-blue-500"
               />
             </Form.Item>
 
-            {/* Email */}
             <Form.Item
               label="EMAIL"
               name="email"
               rules={[
-                { required: true, message: 'Email is required!' },
-                { type: 'email', message: 'Please enter a valid email!' },
                 {
-                  pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                  message: 'Invalid email format!',
+                  required: true,
+                  type: 'email',
+                  message: 'Enter a valid email!',
                 },
               ]}
             >
               <Input
-                placeholder="Please enter email..."
-                className="rounded-md p-2 border border-gray-300"
+                placeholder="Enter email..."
+                className="rounded-md p-2 border border-gray-300 focus:border-blue-500"
               />
             </Form.Item>
 
-            {/* Phone Number */}
             <Form.Item
               label="PHONE NUMBER"
               name="phone"
               rules={[
                 { required: true, message: 'Phone number is required!' },
-                {
-                  pattern: /^[0-9]{10}$/,
-                  message: 'Phone number must be 10 digits!',
-                },
+                { pattern: /^[0-9]{10}$/, message: 'Must be 10 digits!' },
               ]}
             >
               <Input
-                placeholder="Please enter phone number..."
-                className="rounded-md p-2 border border-gray-300"
+                placeholder="Enter phone number..."
+                className="rounded-md p-2 border border-gray-300 focus:border-blue-500"
               />
             </Form.Item>
 
-            {/* Message */}
             <Form.Item
-              label="WHAT DO YOU HAVE IN MIND ?"
+              label="MESSAGE"
               name="message"
               rules={[{ required: true, message: 'Message cannot be empty!' }]}
             >
               <Input.TextArea
                 rows={4}
-                placeholder="Please enter query..."
-                className="rounded-md p-2 border border-gray-300"
+                placeholder="Enter your query..."
+                className="rounded-md p-2 border border-gray-300 focus:border-blue-500"
               />
             </Form.Item>
 
-            {/* Submit Button */}
             <Form.Item>
               <Button
                 type="primary"
                 htmlType="submit"
+                loading={loading} // Thêm hiệu ứng loading khi đang gửi
                 className="w-full bg-blue-500 text-white rounded-full h-[45px] text-[16px] hover:bg-blue-700"
               >
-                Submit
+                {loading ? 'Sending...' : 'Submit'}
               </Button>
             </Form.Item>
           </Form>
@@ -117,8 +140,8 @@ function Contact() {
             Reach us at
           </h3>
           <p className="text-gray-700 text-[14px] mt-2">
-            Trường Đại học FPT Cần Thơ - nơi đào tạo công nghệ và kỹ năng hàng
-            đầu.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Felis diam
+            lectus sapien.
           </p>
 
           {/* Social Icons */}
