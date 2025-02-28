@@ -51,9 +51,7 @@ function Contact() {
       <div className="flex gap-12 w-full max-w-[1100px]">
         {/* Form - 40% width */}
         <div className="w-2/5 bg-white p-8 rounded-xl shadow-lg">
-          <h3 className="text-[22px] font-semibold mb-5 text-blue-600">
-            Get in Touch
-          </h3>
+          <h3 className="text-[22px] font-semibold mb-5 ">Get in Touch</h3>
           <Form
             form={form}
             layout="vertical"
