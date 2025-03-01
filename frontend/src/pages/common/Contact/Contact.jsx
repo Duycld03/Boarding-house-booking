@@ -15,7 +15,7 @@ function Contact() {
   const [loading, setLoading] = useState(false);
 
   const onFinish = (values) => {
-    setLoading(true); // Bắt đầu loading khi gửi
+    setLoading(true);
     const templateParams = {
       to_name: 'HY',
       from_name: values.firstName,
@@ -42,16 +42,16 @@ function Contact() {
         }
       )
       .finally(() => {
-        setLoading(false); // Kết thúc loading
+        setLoading(false);
       });
   };
 
   return (
     <section className="flex justify-center items-center py-16 bg-white rounded-xl shadow-lg">
-      <div className="flex gap-12 w-full max-w-[1100px]">
-        {/* Form - 40% width */}
-        <div className="w-2/5 bg-white p-8 rounded-xl shadow-lg">
-          <h3 className="text-[22px] font-semibold mb-5 ">Get in Touch</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-[1100px]">
+        {/* Form */}
+        <div className="bg-white p-8 rounded-xl shadow-lg">
+          <h3 className="text-[22px] font-semibold mb-5">Get in Touch</h3>
           <Form
             form={form}
             layout="vertical"
@@ -123,7 +123,7 @@ function Contact() {
               <Button
                 type="primary"
                 htmlType="submit"
-                loading={loading} // Thêm hiệu ứng loading khi đang gửi
+                loading={loading}
                 className="w-full bg-blue-500 text-white rounded-full h-[45px] text-[16px] hover:bg-blue-700"
               >
                 {loading ? 'Sending...' : 'Submit'}
@@ -132,8 +132,8 @@ function Contact() {
           </Form>
         </div>
 
-        {/* Contact Info + Map - 60% width */}
-        <div className="w-3/5 flex flex-col items-start">
+        {/* Contact Info + Map */}
+        <div className="flex flex-col items-start">
           <h3 className="text-[20px] font-semibold text-blue-500">
             Reach us at
           </h3>
