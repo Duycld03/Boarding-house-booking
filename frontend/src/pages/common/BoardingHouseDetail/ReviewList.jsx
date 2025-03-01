@@ -38,6 +38,8 @@ const ReviewList = ({
   }, {});
 
   // List of ratings from 5 to 1
+  console.log('Review', reviews);
+
   const allRatings = [5, 4, 3, 2, 1];
   return (
     <div className="mx-52">

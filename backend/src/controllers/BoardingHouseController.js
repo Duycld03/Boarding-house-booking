@@ -65,16 +65,21 @@ class boardingHouseController {
       const { id } = req.params;
 
       const bhRoomType = await RoomType.find({ boardingHouseId: id })
-        .populate("facilities")
-        .populate("boardingHouseId");
+        .populate('facilities')
+        .populate('boardingHouseId');
 
       if (!bhRoomType.length) {
-        return res.status(404).json({ message: "No room types found" });
+        return res.status(404).json({ message: 'No room types found' });
       }
 
       const roomCounts = await Room.aggregate([
-        { $match: { boardingHouseId: new mongoose.Types.ObjectId(id), isAvailable: true } },
-        { $group: { _id: "$roomTypeId", count: { $sum: 1 } } }
+        {
+          $match: {
+            boardingHouseId: new mongoose.Types.ObjectId(id),
+            isAvailable: true,
+          },
+        },
+        { $group: { _id: '$roomTypeId', count: { $sum: 1 } } },
       ]);
 
       const roomCountMap = roomCounts.reduce((acc, cur) => {
@@ -82,9 +87,9 @@ class boardingHouseController {
         return acc;
       }, {});
 
-      const roomTypesWithAvailableCount = bhRoomType.map(roomType => ({
+      const roomTypesWithAvailableCount = bhRoomType.map((roomType) => ({
         ...roomType.toObject(),
-        availableRoom: roomCountMap[roomType._id.toString()] || 0
+        availableRoom: roomCountMap[roomType._id.toString()] || 0,
       }));
 
       res.status(200).json({
@@ -94,8 +99,6 @@ class boardingHouseController {
       next(error);
     }
   }
-
-
 
   async getBoardingHouseDetailInUser(req, res, next) {
     try {
@@ -758,16 +761,24 @@ class boardingHouseController {
         return res.status(400).json({ message: 'bhId is required' });
       }
 
-      const reviews = await Review.find({ boardingHouseId: id }).populate(
-        'accountId'
-      ).sort({ updatedAt: -1 });
+      // ✅ Kiểm tra xem có dữ liệu không
+      const allReviews = await Review.find({
+        boardingHouseId: id,
+        parentId: null,
+      })
+        .populate({
+          path: 'accountId',
+          select: 'fullname avatarImage',
+        })
+        .sort({ updatedAt: -1 });
 
-      if (!reviews.length) {
+      if (!allReviews.length) {
         return res.status(404).json({ message: 'No reviews found' });
       }
 
-      res.status(200).json(reviews);
+      res.status(200).json(allReviews);
     } catch (error) {
+      console.error('🔥 Server Error:', error); // 🔥 In lỗi ra console
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }

@@ -150,21 +150,53 @@ class ReviewController {
   }
   async getReviewsUser(req, res) {
     try {
-      const reviews = await Review.find()
-        .populate({
-          path: 'accountId',
-          select: 'username',
-        })
-        .populate({
-          path: 'boardingHouseId',
-          select: 'name',
-        })
+      // 🔥 Lấy toàn bộ review gốc (không có parentId)
+      const allReviews = await Review.find({ parentId: null }) // Chỉ lấy review gốc
+        .populate({ path: 'accountId', select: 'username' })
+        .populate({ path: 'boardingHouseId', select: 'name' }) // Chỉ lấy tên nhà trọ
+        .sort({ createdAt: -1 });
+
+      // 🔥 Tạo một object để lưu review gốc và reply
+      const reviewMap = {};
+      const reviews = [];
+
+      allReviews.forEach((review) => {
+        reviewMap[review._id.toString()] = {
+          ...review.toObject(),
+          replies: [], // Mảng chứa reply
+          rating: review.rating, // Chỉ lấy rating của review gốc
+        };
+        reviews.push(reviewMap[review._id.toString()]);
+      });
+
+      // 🔥 Lấy tất cả reply (có parentId)
+      const replies = await Review.find({ parentId: { $ne: null } }) // Chỉ lấy reply
+        .populate({ path: 'accountId', select: 'username' })
+        .populate({ path: 'boardingHouseId', select: 'name' }) // Chỉ lấy tên nhà trọ
         .sort({ createdAt: 1 });
-      return res.status(200).json(reviews);
+
+      // 🔥 Gán reply vào review gốc tương ứng
+      replies.forEach((reply) => {
+        const parentId = reply.parentId.toString();
+        if (reviewMap[parentId]) {
+          reviewMap[parentId].replies.push(reply.toObject());
+        }
+      });
+
+      return res.status(200).json({
+        success: true,
+        reviews,
+      });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      console.error('Error fetching reviews:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Server error. Please try again later.',
+        error: error.message,
+      });
     }
   }
+
   async addReview(req, res) {
     try {
       const accountId = req.user.userId;
@@ -196,6 +228,7 @@ class ReviewController {
       const existingReview = await Review.findOne({
         accountId,
         boardingHouseId,
+        parentId: null, // Chỉ kiểm tra với review gốc
       });
 
       if (existingReview) {
@@ -205,7 +238,6 @@ class ReviewController {
         });
       }
 
-      // Kiểm tra rating hợp lệ
       if (rating < 1 || rating > 5) {
         return res.status(400).json({
           success: false,
@@ -224,11 +256,12 @@ class ReviewController {
 
       await newReview.save();
 
-      // 🔥 Fix: Chỉ tính rating từ các review chưa bị xóa
+      // 🔥 Chỉ lấy review gốc (không có parentId) và chưa bị xóa
       const reviews = await Review.find({
         boardingHouseId,
-        deleted: { $ne: true }, // 🔥 Chỉ lấy review chưa bị xóa
-      }).exec();
+        parentId: null, // Chỉ lấy review gốc
+        deleted: false,
+      });
 
       if (reviews.length === 0) {
         return res.status(500).json({
@@ -237,30 +270,25 @@ class ReviewController {
         });
       }
 
-      // 🔥 Tính trung bình rating mới
+      // 🔥 Tính trung bình rating từ review gốc
       const totalRating = reviews.reduce(
         (sum, review) => sum + review.rating,
         0
       );
-      const averageRating = (totalRating / reviews.length).toFixed(1); // Làm tròn 1 chữ số thập phân
+      const averageRating = (totalRating / reviews.length).toFixed(1);
 
-      // Log giá trị rating trước khi cập nhật
-      console.log('🔥 Tổng số review hợp lệ:', reviews.length);
-      console.log('🔥 Tổng điểm rating:', totalRating);
-      console.log('🔥 Rating trung bình mới:', averageRating);
-
-      // 🔥 Cập nhật BoardingHouse
+      // 🔥 Cập nhật BoardingHouse nhưng không cập nhật `updatedAt`
       await BoardingHouse.findByIdAndUpdate(
         boardingHouseId,
         {
           rating: averageRating,
         },
-        { new: true, timestamps: false } // 🔥 Ngăn Mongoose cập nhật updatedAt
+        { new: true, timestamps: false } // 🔥 Ngăn Mongoose cập nhật `updatedAt`
       );
 
       return res.status(201).json({
         success: true,
-        // message: 'Review added successfully.',
+        message: 'Review added successfully.',
         review: newReview,
         newRating: averageRating,
       });
@@ -296,7 +324,7 @@ class ReviewController {
 
   async replyReview(req, res) {
     try {
-      const accountId = req.user.userId;
+      const accountId = req.user?.userId;
       if (!accountId) {
         return res.status(401).json({
           success: false,
@@ -333,6 +361,8 @@ class ReviewController {
 
       // Kiểm tra xem review gốc đã có reply chưa
       const existingReply = await Review.findOne({ parentId });
+      console.log('🔍 Existing reply:', existingReply);
+
       if (existingReply) {
         return res.status(400).json({
           success: false,
@@ -357,10 +387,10 @@ class ReviewController {
         reply,
       });
     } catch (error) {
-      console.error('Error replying to review:', error);
       return res.status(500).json({
         success: false,
         message: 'Server error. Please try again later.',
+        error: error.message, // Trả về lỗi cụ thể nếu cần
       });
     }
   }
