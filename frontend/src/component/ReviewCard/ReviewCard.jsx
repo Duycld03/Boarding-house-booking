@@ -306,10 +306,10 @@ const ReviewCard = ({
           ))}
         </div>
       )}
-      {reviewData?.replyContent && (
+      {isReplying && (
         <ReviewReply
           reviewId={reviewIdProp}
-          currentReply={reviewData.replyContent} // Truyền phản hồi hiện tại vào
+          currentReply={reviewData?.replyContent}
           onReplyUpdated={onReviewUpdated}
         />
       )}
