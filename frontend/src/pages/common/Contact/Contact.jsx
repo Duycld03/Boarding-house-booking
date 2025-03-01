@@ -47,15 +47,31 @@ function Contact() {
   };
 
   return (
-    <section className="flex justify-center items-center py-16 bg-white rounded-xl shadow-lg">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-[1100px]">
+    <section className="flex justify-center items-center py-16 bg-white rounded-xl shadow-lg px-6 md:px-12">
+      <div className="w-full max-w-[1100px] grid grid-cols-1 md:grid-cols-2 gap-12">
+        {/* Google Map (Chỉ full width trên tablet & mobile) */}
+        <div className="w-full md:hidden">
+          <iframe
+            className="w-full h-[250px] rounded-lg shadow-md"
+            src="https://maps.google.com/maps?q=FPT%20University%20Can%20Tho&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            allowFullScreen
+            loading="lazy"
+          ></iframe>
+        </div>
+
         {/* Form */}
-        <div className="bg-white p-8 rounded-xl shadow-lg">
-          <h3 className="text-[22px] font-semibold mb-5">Get in Touch</h3>
+        <div className="bg-white p-8 rounded-xl shadow-lg w-full md:w-auto mx-auto">
+          <h3 className="text-[22px] font-semibold text-center">
+            Get in Touch
+          </h3>
+          <p className="text-gray-600 text-center mt-2">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Felis diam
+            lectus sapien.
+          </p>
           <Form
             form={form}
             layout="vertical"
-            className="space-y-4"
+            className="space-y-4 mt-4"
             onFinish={onFinish}
           >
             <Form.Item
@@ -132,8 +148,8 @@ function Contact() {
           </Form>
         </div>
 
-        {/* Contact Info + Map */}
-        <div className="flex flex-col items-start">
+        {/* Contact Info + Map (PC) */}
+        <div className="hidden md:flex flex-col items-start">
           <h3 className="text-[20px] font-semibold text-blue-500">
             Reach us at
           </h3>
