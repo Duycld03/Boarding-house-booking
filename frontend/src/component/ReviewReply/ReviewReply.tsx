@@ -1,53 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Button, Card } from 'antd';
 import { toast } from 'react-toastify';
-import { replyReview, getReplyContent } from '../../api/ReviewManagement';
+import { replyReview } from '../../api/ReviewManagement';
 
 interface ReviewReplyProps {
   reviewId: string;
+  currentReply?: string; // Nhận phản hồi hiện tại nếu có
   onReplyUpdated: () => void;
 }
 
 const ReviewReply: React.FC<ReviewReplyProps> = ({
   reviewId,
+  currentReply = '',
   onReplyUpdated,
 }) => {
-  const [replyContent, setReplyContent] = useState<string>('');
-  const [isReplied, setIsReplied] = useState<boolean>(false);
+  const [replyContent, setReplyContent] = useState<string>(currentReply);
+  const [isReplied, setIsReplied] = useState<boolean>(!!currentReply); // Kiểm tra nếu đã có phản hồi
   const [loading, setLoading] = useState<boolean>(false);
 
-  // useEffect(() => {
-  //   const fetchReply = async () => {
-  //     try {
-  //       const response = await getReplyContent(reviewId);
-  //       console.log('Fetched Reply:', response); // Kiểm tra response
-  //       if (response && response.content) {
-  //         setReplyContent(response.content);
-  //         setIsReplied(true);
-  //       } else {
-  //         setReplyContent('');
-  //         setIsReplied(false);
-  //       }
-  //     } catch (error) {
-  //       console.error('Failed to fetch reply:', error);
-  //     }
-  //   };
-
-  //   fetchReply();
-  // }, [reviewId]);
-
   const submitReply = async () => {
+    if (!replyContent.trim()) {
+      toast.error('Reply content cannot be empty.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await replyReview({
+      await replyReview({
         parentId: reviewId,
-        content: replyContent.trim(), // Content will still be trimmed, but no check for emptiness
+        content: replyContent.trim(),
       });
 
-      console.log('API Response:', response);
       toast.success('Reply sent successfully!');
-
       setIsReplied(true);
+      onReplyUpdated(); // Cập nhật lại review sau khi gửi phản hồi
     } catch (error) {
       console.error('Failed to send reply:', error);
       toast.error('Failed to send reply. Please try again later.');

@@ -393,22 +393,24 @@ class ReviewController {
       });
     }
   }
-  async getReplyContent(req, res) {
+  async getReviewContent(req, res) {
     try {
-      const { parentId } = req.params;
+      const { reviewId } = req.params; // Lấy ID review từ request
 
-      // Tìm review gốc và trả về toàn bộ dữ liệu
-      const review = await Review.findById(parentId);
-
-      // Tìm reply của review đó
-      const reply = await Review.findOne({ parentId }).select('content');
+      // Tìm review gốc
+      const review = await Review.findById(reviewId);
 
       if (!review) {
         return res.status(404).json({ error: 'Review not found' });
       }
 
+      // Tìm phản hồi của review đó (nếu có)
+      const reply = await Review.findOne({ parentId: reviewId }).select(
+        'content'
+      );
+
       return res.status(200).json({
-        review: review, // Toàn bộ dữ liệu review gốc
+        review, // Trả về toàn bộ review gốc
         replyContent: reply ? reply.content : null, // Nội dung reply (nếu có)
       });
     } catch (error) {

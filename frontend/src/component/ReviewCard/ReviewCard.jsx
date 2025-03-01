@@ -288,14 +288,11 @@ const ReviewCard = ({
           ))}
         </div>
       )}
-      {isReplying && (
+      {reviewData?.replyContent && (
         <ReviewReply
-          reviewId={reviewIdProp} // Truyền reviewId vào component
-          currentReply={reviewData?.reply}
-          onReplyUpdated={() => {
-            setIsReplying(false);
-            onReviewUpdated();
-          }}
+          reviewId={reviewIdProp}
+          currentReply={reviewData.replyContent} // Truyền phản hồi hiện tại vào
+          onReplyUpdated={onReviewUpdated}
         />
       )}
 

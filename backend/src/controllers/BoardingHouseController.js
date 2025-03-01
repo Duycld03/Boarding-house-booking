@@ -761,10 +761,10 @@ class boardingHouseController {
         return res.status(400).json({ message: 'bhId is required' });
       }
 
-      // ✅ Kiểm tra xem có dữ liệu không
+      // ✅ Lấy danh sách review gốc
       const allReviews = await Review.find({
         boardingHouseId: id,
-        parentId: null,
+        parentId: null, // Chỉ lấy review gốc
       })
         .populate({
           path: 'accountId',
@@ -776,9 +776,23 @@ class boardingHouseController {
         return res.status(404).json({ message: 'No reviews found' });
       }
 
-      res.status(200).json(allReviews);
+      // ✅ Duyệt qua từng review để lấy nội dung của reply (nếu có)
+      const reviewsWithReply = await Promise.all(
+        allReviews.map(async (review) => {
+          const reply = await Review.findOne({ parentId: review._id }).select(
+            'content'
+          );
+
+          return {
+            ...review.toObject(),
+            replyContent: reply ? reply.content : null, // Lưu nội dung phản hồi vào object
+          };
+        })
+      );
+
+      res.status(200).json(reviewsWithReply);
     } catch (error) {
-      console.error('🔥 Server Error:', error); // 🔥 In lỗi ra console
+      console.error('🔥 Server Error:', error);
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }

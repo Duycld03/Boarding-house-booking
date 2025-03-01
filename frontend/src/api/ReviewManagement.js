@@ -48,6 +48,6 @@ export const deleteReviewUser = (reviewId) => {
 export const replyReview = (replyData) => {
   return axios.post('/owner/reply', replyData);
 };
-export const getReplyContent = (parentId) => {
-  return axios.get(`owner/reviews/reply/${parentId}`);
+export const getReplyContent = (reviewId) => {
+  return axios.get(`owner/reviews/${reviewId}`);
 };
