@@ -1,19 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Button, Card } from 'antd';
 import { toast } from 'react-toastify';
+import { replyReview, getReplyContent } from '../../api/ReviewManagement';
 
 interface ReviewReplyProps {
-  currentReply?: string;
+  reviewId: string;
+  onReplyUpdated: () => void;
 }
 
-const ReviewReply: React.FC<ReviewReplyProps> = ({ currentReply = '' }) => {
-  const [replyContent, setReplyContent] = useState<string>(currentReply);
-  const [isReplied, setIsReplied] = useState<boolean>(!!currentReply); // Kiểm tra nếu đã có phản hồi
+const ReviewReply: React.FC<ReviewReplyProps> = ({
+  reviewId,
+  onReplyUpdated,
+}) => {
+  const [replyContent, setReplyContent] = useState<string>('');
+  const [isReplied, setIsReplied] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const submitReply = () => {
-    if (!replyContent.trim()) return;
-    toast.success('Reply sent successfully!');
-    setIsReplied(true); // Giả lập đã gửi phản hồi
+  // useEffect(() => {
+  //   const fetchReply = async () => {
+  //     try {
+  //       const response = await getReplyContent(reviewId);
+  //       console.log('Fetched Reply:', response); // Kiểm tra response
+  //       if (response && response.content) {
+  //         setReplyContent(response.content);
+  //         setIsReplied(true);
+  //       } else {
+  //         setReplyContent('');
+  //         setIsReplied(false);
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to fetch reply:', error);
+  //     }
+  //   };
+
+  //   fetchReply();
+  // }, [reviewId]);
+
+  const submitReply = async () => {
+    setLoading(true);
+    try {
+      const response = await replyReview({
+        parentId: reviewId,
+        content: replyContent.trim(), // Content will still be trimmed, but no check for emptiness
+      });
+
+      console.log('API Response:', response);
+      toast.success('Reply sent successfully!');
+
+      setIsReplied(true);
+    } catch (error) {
+      console.error('Failed to send reply:', error);
+      toast.error('Failed to send reply. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,6 +89,7 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({ currentReply = '' }) => {
             type="primary"
             className="mt-2"
             onClick={submitReply}
+            loading={loading}
             style={{
               marginTop: '10px',
               borderRadius: '6px',

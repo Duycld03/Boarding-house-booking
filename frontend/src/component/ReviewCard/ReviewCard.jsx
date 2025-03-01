@@ -238,6 +238,7 @@ const ReviewCard = ({
       )}
     </Menu>
   );
+  console.log('Review Dâta', reviewData);
 
   return (
     <Card style={{ marginBottom: 16 }}>
@@ -289,10 +290,10 @@ const ReviewCard = ({
       )}
       {isReplying && (
         <ReviewReply
-          reviewId={reviewIdProp}
+          reviewId={reviewIdProp} // Truyền reviewId vào component
           currentReply={reviewData?.reply}
           onReplyUpdated={() => {
-            setIsReplying(false); // Ẩn ô nhập sau khi gửi phản hồi
+            setIsReplying(false);
             onReviewUpdated();
           }}
         />

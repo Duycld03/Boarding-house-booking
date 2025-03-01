@@ -361,7 +361,6 @@ class ReviewController {
 
       // Kiểm tra xem review gốc đã có reply chưa
       const existingReply = await Review.findOne({ parentId });
-      console.log('🔍 Existing reply:', existingReply);
 
       if (existingReply) {
         return res.status(400).json({
@@ -392,6 +391,28 @@ class ReviewController {
         message: 'Server error. Please try again later.',
         error: error.message, // Trả về lỗi cụ thể nếu cần
       });
+    }
+  }
+  async getReplyContent(req, res) {
+    try {
+      const { parentId } = req.params;
+
+      // Tìm review gốc và trả về toàn bộ dữ liệu
+      const review = await Review.findById(parentId);
+
+      // Tìm reply của review đó
+      const reply = await Review.findOne({ parentId }).select('content');
+
+      if (!review) {
+        return res.status(404).json({ error: 'Review not found' });
+      }
+
+      return res.status(200).json({
+        review: review, // Toàn bộ dữ liệu review gốc
+        replyContent: reply ? reply.content : null, // Nội dung reply (nếu có)
+      });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
     }
   }
 }

@@ -33,5 +33,6 @@ ownerRouter.delete(
   boardingHouseController.softDeleteBoardingHouse
 );
 ownerRouter.post('/reply', ReviewController.replyReview);
+ownerRouter.get('/reviews/reply/:parentId', ReviewController.getReplyContent);
 
 export { ownerRouter };
