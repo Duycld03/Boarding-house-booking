@@ -313,6 +313,13 @@ const ReviewCard = ({
           onReplyUpdated={onReviewUpdated}
         />
       )}
+      {hasReply && (
+        <ReviewReply
+          reviewId={reviewIdProp}
+          currentReply={reviewData?.replyContent}
+          onReplyUpdated={onReviewUpdated}
+        />
+      )}
 
       <Divider className="border-gray-700" />
 
