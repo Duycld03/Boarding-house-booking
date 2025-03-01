@@ -24,6 +24,8 @@ import {
   getReviewReports,
 } from '../../../api/reportManagement';
 import { toast } from 'react-toastify';
+import { addFavorite, getFavorite } from '../../../api/favoriteManagement';
+
 
 const { Content } = Layout;
 
@@ -45,9 +47,41 @@ function BoardingHouseDetail() {
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
   const roomTypeRef = useRef(null);
+  useEffect(() => {
+    const fetchFavoriteStatus = async () => {
+      try {
+        const response = await getFavorite();
+        if (response && Array.isArray(response.favorites)) {
+          setIsLiked(response.favorites.some((fav) => fav.id === id));
+        }
+      } catch (error) {
+        console.error('Error fetching favorite status:', error);
+      }
+    };
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
+    if (id) {
+      fetchFavoriteStatus();
+    }
+  }, [id]);
+
+  const handleLike = async () => {
+    try {
+      const response = await addFavorite(id); // Gọi API để toggle favorite
+      if (response && typeof response.isFavorite !== 'undefined') {
+        setIsLiked(response.isFavorite); // Cập nhật trạng thái icon heart
+
+        // Cập nhật số lượng likes ngay lập tức
+        setBoardingHouse((prev) => ({
+          ...prev,
+          likes: response.isFavorite ? prev.likes + 1 : prev.likes - 1,
+        }));
+      } else {
+        console.error('Invalid response structure:', response);
+        toast.error('Dữ liệu phản hồi không hợp lệ!');
+      }
+    } catch (error) {
+      navigate(`/login`);
+    }
   };
 
   // Fetch dữ liệu boarding house
@@ -245,6 +279,7 @@ function BoardingHouseDetail() {
                       <HeartOutlined className="text-gray-600 hover:text-red-500 transition-colors duration-300" />
                     )}
                   </button>
+
                   <span className="text-gray-700 font-semibold">
                     {formatAmount(boardingHouse?.likes)}
                   </span>
