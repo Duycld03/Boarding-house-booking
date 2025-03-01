@@ -35,6 +35,7 @@ import {
 } from '../../api/ReviewManagement';
 import { toast } from 'react-toastify';
 import { useCurrentUser } from '../../context/userContext';
+import ReviewReply from '../ReviewReply/ReviewReply';
 
 dayjs.extend(relativeTime);
 dayjs.locale('en');
@@ -79,9 +80,8 @@ const ReviewCard = ({
   const isLoggedIn = Boolean(user);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const isOwner = user?._id === boardingHouse?.ownerId._id;
-
-  // Kiểm tra review đã có phản hồi hay chưa
   const hasReply = Boolean(reviewData?.reply);
+  const [isReplying, setIsReplying] = useState(false);
 
   const handleRemoveImage = (index) => {
     setNewImages((prev) =>
@@ -183,27 +183,7 @@ const ReviewCard = ({
     setNewImages(images.map((img) => ({ ...img, isDeleted: false })));
   };
   const handleReply = () => {
-    Modal.confirm({
-      title: 'Reply to Review',
-      content: (
-        <Input.TextArea
-          rows={4}
-          placeholder="Enter your reply here..."
-          onChange={(e) => setReplyContent(e.target.value)}
-        />
-      ),
-      okText: 'Reply',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          await updateReview(reviewIdProp, { reply: replyContent });
-          toast.success('Reply sent successfully!');
-          onReviewUpdated();
-        } catch (error) {
-          toast.error('Failed to send reply.');
-        }
-      },
-    });
+    setIsReplying(true);
   };
 
   const menu = (
@@ -243,16 +223,21 @@ const ReviewCard = ({
           </Tooltip>
         </Menu.Item>
       )}
-      {isOwner && !hasReply && (
-        <Menu.Item key="reply" onClick={handleReply}>
-          <FontAwesomeIcon icon={faReply} className="text-blue-500 text-xl" />
-          <span className="ml-2">Replay</span>
-        </Menu.Item>
+      {isOwner && (
+        <>
+          <Menu.Item key="reply" onClick={handleReply}>
+            <FontAwesomeIcon
+              icon={faReply}
+              className={`text-xl ${
+                hasReply ? 'text-blue-500' : 'text-gray-500'
+              }`}
+            />
+            <span className="ml-2">Reply</span>
+          </Menu.Item>
+        </>
       )}
     </Menu>
   );
-  console.log('boardingHouse in review card:', boardingHouse);
-  console.log('Owner ID:', boardingHouse?.ownerId);
 
   return (
     <Card style={{ marginBottom: 16 }}>
@@ -301,6 +286,16 @@ const ReviewCard = ({
             />
           ))}
         </div>
+      )}
+      {isReplying && (
+        <ReviewReply
+          reviewId={reviewIdProp}
+          currentReply={reviewData?.reply}
+          onReplyUpdated={() => {
+            setIsReplying(false); // Ẩn ô nhập sau khi gửi phản hồi
+            onReviewUpdated();
+          }}
+        />
       )}
 
       <Divider className="border-gray-700" />
