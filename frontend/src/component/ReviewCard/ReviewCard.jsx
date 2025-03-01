@@ -80,7 +80,7 @@ const ReviewCard = ({
   const isLoggedIn = Boolean(user);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const isOwner = user?._id === boardingHouse?.ownerId._id;
-  const hasReply = Boolean(reviewData?.reply);
+  const hasReply = Boolean(reviewData?.replyContent);
   const [isReplying, setIsReplying] = useState(false);
 
   const handleRemoveImage = (index) => {
@@ -183,7 +183,8 @@ const ReviewCard = ({
     setNewImages(images.map((img) => ({ ...img, isDeleted: false })));
   };
   const handleReply = () => {
-    setIsReplying(true);
+    console.log('Opening reply form...');
+    setIsReplying((prev) => !prev); // Toggle trạng thái
   };
 
   const menu = (
@@ -226,19 +227,36 @@ const ReviewCard = ({
       {isOwner && (
         <>
           <Menu.Item key="reply" onClick={handleReply}>
-            <FontAwesomeIcon
-              icon={faReply}
-              className={`text-xl ${
-                hasReply ? 'text-blue-500' : 'text-gray-500'
-              }`}
-            />
-            <span className="ml-2">Reply</span>
+            <Tooltip
+              placement="left"
+              title={
+                hasReply
+                  ? 'You have replied to this review.'
+                  : 'Reply to this review'
+              }
+            >
+              <div className="flex items-center">
+                <FontAwesomeIcon
+                  icon={faReply}
+                  className={`text-xl ${
+                    hasReply ? 'text-blue-500' : 'text-gray-500'
+                  }`}
+                />
+                <span
+                  className={`ml-2 ${
+                    hasReply ? 'text-gray-400 opacity-50' : 'text-black'
+                  }`}
+                >
+                  {hasReply ? 'Replied' : 'Reply'}
+                </span>
+              </div>
+            </Tooltip>
           </Menu.Item>
         </>
       )}
     </Menu>
   );
-  console.log('Review Dâta', reviewData);
+  console.log('Review Data:', reviewData);
 
   return (
     <Card style={{ marginBottom: 16 }}>

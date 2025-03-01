@@ -15,7 +15,6 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
   onReplyUpdated,
 }) => {
   const [replyContent, setReplyContent] = useState<string>(currentReply);
-  const [isReplied, setIsReplied] = useState<boolean>(!!currentReply); // Kiểm tra nếu đã có phản hồi
   const [loading, setLoading] = useState<boolean>(false);
 
   const submitReply = async () => {
@@ -32,7 +31,6 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
       });
 
       toast.success('Reply sent successfully!');
-      setIsReplied(true);
       onReplyUpdated(); // Cập nhật lại review sau khi gửi phản hồi
     } catch (error) {
       console.error('Failed to send reply:', error);
@@ -44,7 +42,7 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
 
   return (
     <div style={{ marginTop: '10px' }}>
-      {isReplied ? (
+      {currentReply ? (
         <Card
           style={{
             background: '#f9f9f9',
@@ -55,7 +53,7 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
           }}
         >
           <strong style={{ color: '#1890ff' }}>Owner Reply:</strong>
-          <p style={{ margin: '6px 0', color: '#333' }}>{replyContent}</p>
+          <p style={{ margin: '6px 0', color: '#333' }}>{currentReply}</p>
         </Card>
       ) : (
         <>
