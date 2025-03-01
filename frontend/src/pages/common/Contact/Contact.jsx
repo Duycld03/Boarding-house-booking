@@ -60,7 +60,7 @@ function Contact() {
         </div>
 
         {/* Form */}
-        <div className="bg-white p-8 rounded-xl shadow-lg w-full md:w-auto mx-auto">
+        <div className="bg-white p-8 rounded-xl shadow-lg md:w-auto mx-auto mt-[-50px] w-[90%] md:mt-0">
           <h3 className="text-[22px] font-semibold text-center">
             Get in Touch
           </h3>
