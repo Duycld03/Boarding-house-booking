@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   authController,
   boardingHouseController,
+  ReviewController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -31,5 +32,6 @@ ownerRouter.delete(
   '/boardinghouse/:id/softDelete',
   boardingHouseController.softDeleteBoardingHouse
 );
+ownerRouter.post('/reply', ReviewController.replyReview);
 
 export { ownerRouter };

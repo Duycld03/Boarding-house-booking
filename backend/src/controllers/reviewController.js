@@ -260,7 +260,7 @@ class ReviewController {
 
       return res.status(201).json({
         success: true,
-        message: 'Review added successfully.',
+        // message: 'Review added successfully.',
         review: newReview,
         newRating: averageRating,
       });
@@ -293,5 +293,77 @@ class ReviewController {
       res.status(500).json({ message: 'Server Error' });
     }
   }
+
+  async replyReview(req, res) {
+    try {
+      const accountId = req.user.userId;
+      if (!accountId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Account ID not found.',
+        });
+      }
+
+      const { parentId, content } = req.body;
+
+      if (!content) {
+        return res.status(400).json({
+          success: false,
+          message: 'Reply content is required.',
+        });
+      }
+
+      // Kiểm tra review gốc có tồn tại không
+      const parentReview = await Review.findById(parentId);
+      if (!parentReview) {
+        return res.status(404).json({
+          success: false,
+          message: 'Original review not found.',
+        });
+      }
+
+      // Đảm bảo không thể reply vào một reply khác
+      if (parentReview.parentId) {
+        return res.status(400).json({
+          success: false,
+          message:
+            'Cannot reply to another reply. Only original reviews can be replied to.',
+        });
+      }
+
+      // Kiểm tra xem review gốc đã có reply chưa
+      const existingReply = await Review.findOne({ parentId });
+      if (existingReply) {
+        return res.status(400).json({
+          success: false,
+          message:
+            'This review already has a reply. You cannot add another reply.',
+        });
+      }
+
+      // Tạo reply mới
+      const reply = new Review({
+        accountId,
+        boardingHouseId: parentReview.boardingHouseId, // Cùng boarding house với review gốc
+        content,
+        parentId, // Gán review gốc
+      });
+
+      await reply.save();
+
+      return res.status(201).json({
+        success: true,
+        message: 'Reply added successfully.',
+        reply,
+      });
+    } catch (error) {
+      console.error('Error replying to review:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Server error. Please try again later.',
+      });
+    }
+  }
 }
+
 export default new ReviewController();
