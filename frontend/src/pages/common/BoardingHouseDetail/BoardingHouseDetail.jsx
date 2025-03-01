@@ -1,29 +1,29 @@
-import { useState, useEffect, useRef } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from "antd";
+import { useState, useEffect, useRef } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
+import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from 'antd';
 import {
   getBoardingHouseDetail,
   getReviewByBhId,
   getRoomTypeByBhId,
-} from "../../../api/ownerUser/boardingHouse";
-import { addReview } from "../../../api/ReviewManagement";
-import BoardingHouseGallery from "./BoardingHouseGallery";
-import formatAmount from "../../../utils/formatAmount";
-import { HeartFilled, HeartOutlined } from "@ant-design/icons";
-import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
-import ReviewList from "./ReviewList";
-import OwnerInfo from "./OwnerInfo";
-import AddReview from "./AddReview";
-import ReportModal from "./ReportModal";
-import { useNavigate } from "react-router-dom";
-import { useCurrentUser } from "../../../context/userContext";
+} from '../../../api/ownerUser/boardingHouse';
+import { addReview } from '../../../api/ReviewManagement';
+import BoardingHouseGallery from './BoardingHouseGallery';
+import formatAmount from '../../../utils/formatAmount';
+import { HeartFilled, HeartOutlined } from '@ant-design/icons';
+import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import RoomCard from '../../../component/RoomTypeCard/RoomTypeCard';
+import ReviewList from './ReviewList';
+import OwnerInfo from './OwnerInfo';
+import AddReview from './AddReview';
+import ReportModal from './ReportModal';
+import { useNavigate } from 'react-router-dom';
+import { useCurrentUser } from '../../../context/userContext';
 import {
   checkReportExist,
   getReviewReports,
-} from "../../../api/reportManagement";
-import { toast } from "react-toastify";
+} from '../../../api/reportManagement';
+import { toast } from 'react-toastify';
 
 const { Content } = Layout;
 
@@ -40,7 +40,7 @@ function BoardingHouseDetail() {
   const [expanded, setExpanded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
-  const [reviewId, setReviewId] = useState("");
+  const [reviewId, setReviewId] = useState('');
   const [reportedReviews, setReportedReviews] = useState([]);
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
@@ -56,7 +56,7 @@ function BoardingHouseDetail() {
       const response = await getBoardingHouseDetail(id);
       setBoardingHouse(response);
     } catch (error) {
-      console.error("Error fetching boarding house details:", error);
+      console.error('Error fetching boarding house details:', error);
     } finally {
       setLoading(false);
     }
@@ -68,7 +68,7 @@ function BoardingHouseDetail() {
       const response = await getRoomTypeByBhId(id);
       setRoomType(response?.data || []);
     } catch (error) {
-      console.error("Error fetching room types:", error);
+      console.error('Error fetching room types:', error);
     }
   };
 
@@ -80,7 +80,7 @@ function BoardingHouseDetail() {
       setReportedReviews(res.reportedReviews);
       setReportedBoardingHouse(res.boardingHouseReported);
     } catch (error) {
-      console.error("Error fetching review reports:", error);
+      console.error('Error fetching review reports:', error);
     } finally {
       setLoading(false);
     }
@@ -95,7 +95,7 @@ function BoardingHouseDetail() {
         fetchReportStatus(response);
       }
     } catch (error) {
-      console.error("Error fetching reviews:", error);
+      console.error('Error fetching reviews:', error);
       if (error.response && error.response.status === 404) {
         setReviews([]);
       }
@@ -118,14 +118,14 @@ function BoardingHouseDetail() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const status = params.get("status");
+    const status = params.get('status');
 
-    if (status === "success") {
-      toast.success("Deposit successfully!");
-    } else if (status === "fail") {
-      toast.error("Deposit failed!");
+    if (status === 'success') {
+      toast.success('Deposit successfully!');
+    } else if (status === 'fail') {
+      toast.error('Deposit failed!');
     }
-    params.delete("status");
+    params.delete('status');
     if (status) {
       navigate(window.location.pathname, { replace: true });
     }
@@ -136,16 +136,15 @@ function BoardingHouseDetail() {
     try {
       const response = await addReview(formData);
       if (response.status === 201 && response.data.success) {
-        message.success("Review added successfully!");
+        message.success('Review added successfully!');
         setIsModalOpen(false);
         await fetchReviews();
-
       } else {
-        message.error(response.data.message || "Failed to add review.");
+        message.error(response.data.message || 'Failed to add review.');
       }
     } catch (error) {
-      console.error("Error adding review:", error);
-      message.error("Failed to add review. Please try again.");
+      console.error('Error adding review:', error);
+      message.error('Failed to add review. Please try again.');
     }
   };
 
@@ -156,17 +155,17 @@ function BoardingHouseDetail() {
 
   // Scroll đến room type
   const scrollToRoomType = () => {
-    roomTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    roomTypeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleOpen = () => {
     if (!isLogin) {
       Modal.confirm({
-        title: " You need to log in",
-        content: "Please log in to report.",
-        okText: " Log in",
-        cancelText: "Cancel",
-        onOk: () => navigate("/login"),
+        title: ' You need to log in',
+        content: 'Please log in to report.',
+        okText: ' Log in',
+        cancelText: 'Cancel',
+        onOk: () => navigate('/login'),
       });
       return;
     }
@@ -175,11 +174,11 @@ function BoardingHouseDetail() {
   const handleOpenAddReview = () => {
     if (!isLogin) {
       Modal.confirm({
-        title: " You need to log in",
-        content: "Please log in to add review.",
-        okText: " Log in",
-        cancelText: "Cancel",
-        onOk: () => navigate("/login"),
+        title: ' You need to log in',
+        content: 'Please log in to add review.',
+        okText: ' Log in',
+        cancelText: 'Cancel',
+        onOk: () => navigate('/login'),
       });
       return;
     }
@@ -209,7 +208,7 @@ function BoardingHouseDetail() {
 
               <div className="flex items-start sm:items-center gap-2 sm:gap-4">
                 <p className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold text-orange-500">
-                  {formatAmount(boardingHouse?.priceRange) + "(VND)/month"}
+                  {formatAmount(boardingHouse?.priceRange) + '(VND)/month'}
                 </p>
                 <Button
                   onClick={scrollToRoomType}
@@ -235,7 +234,7 @@ function BoardingHouseDetail() {
                   <p className="text-2xl">
                     {boardingHouse?.address
                       ? `${boardingHouse.address.detail}, ${boardingHouse.address.ward}, ${boardingHouse.address.district}, ${boardingHouse.address.province}`
-                      : "Address not available"}
+                      : 'Address not available'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 cursor-pointer select-none text-lg sm:text-xl md:text-4xl md:mt-7">
@@ -285,20 +284,21 @@ function BoardingHouseDetail() {
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
                 <div
-                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${expanded ? "max-h-full" : "max-h-60 overflow-hidden"
-                    }`}
+                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${
+                    expanded ? 'max-h-full' : 'max-h-60 overflow-hidden'
+                  }`}
                 >
-                  {boardingHouse?.description || "No description available."}
+                  {boardingHouse?.description || 'No description available.'}
                 </div>
                 {boardingHouse?.description &&
-                  boardingHouse?.description.split(" ").length > 50 && (
+                  boardingHouse?.description.split(' ').length > 50 && (
                     <div className="mt-3">
                       <Button
                         type="link"
                         onClick={() => setExpanded(!expanded)}
                         className="text-blue-600 text-sm sm:text-base md:text-3xl"
                       >
-                        {expanded ? "Collapse" : "Show more"}
+                        {expanded ? 'Collapse' : 'Show more'}
                       </Button>
                     </div>
                   )}
@@ -338,6 +338,7 @@ function BoardingHouseDetail() {
                 setReviewId={setReviewId}
                 reportedReviews={reportedReviews}
                 fetchReviews={fetchReviews}
+                boardingHouse={boardingHouse}
               />
             </div>
           </div>
