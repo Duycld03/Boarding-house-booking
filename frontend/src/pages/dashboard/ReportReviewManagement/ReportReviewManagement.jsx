@@ -12,6 +12,7 @@ import {
   deleteReport,
   sendReplyByEmail,
   filterReviewReports,
+  getReportReviewDetail,
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
 import FilterReport from './FilterReport';
@@ -74,8 +75,24 @@ function ReportReviewManagement() {
       setLoading(false);
     }
   };
+  const fetchReportDetail = async (reportId) => {
+    try {
+      const res = await getReportReviewDetail(reportId);
+      console.log('Report deatil', res);
+
+      if (res) {
+        setSelectedData(res);
+      } else {
+        setSelectedData(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch report details:', error);
+      toast.error('Failed to fetch report details. Please try again later.');
+    }
+  };
+
   const handleDetailModal = (record) => {
-    setSelectedData(record);
+    fetchReportDetail(record._id);
     setIsDetailModalOpen(true);
   };
 

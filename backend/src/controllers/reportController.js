@@ -424,8 +424,12 @@ class reportController {
 
       // Populate dựa trên loại report
       if (report.reportTypeRef === 'Review') {
-        populatedTarget = await Review.findById(report.targetId).populate({
-          path: 'accountId', // Sửa 'author' thành 'accountId'
+        populatedTarget = await Review.findOne(
+          { _id: report.targetId },
+          null,
+          { withDeleted: true } // Lấy cả review bị đánh dấu delete
+        ).populate({
+          path: 'accountId',
           select: 'fullname email avatarImage',
         });
       } else if (report.reportTypeRef === 'BoardingHouse') {
