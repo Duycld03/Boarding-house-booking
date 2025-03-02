@@ -422,6 +422,38 @@ class ReviewController {
       return res.status(500).json({ error: error.message });
     }
   }
+  async getReviewDetail(req, res) {
+    try {
+      const { reviewId } = req.params;
+
+      // Tìm review theo ID và đảm bảo review tồn tại
+      const review = await Review.findById(reviewId)
+        .populate({
+          path: 'accountId',
+          select: 'username _id fullname avatarImage',
+        })
+        .populate({
+          path: 'boardingHouseId',
+          select: 'name',
+        });
+
+      if (!review) {
+        return res.status(404).json({ message: 'Review not found' });
+      }
+
+      // Lấy danh sách phản hồi (replies) của review này
+      const replies = await Review.find({ parentId: reviewId })
+        .populate({
+          path: 'accountId',
+          select: 'username _id fullname avatarImage',
+        })
+        .sort({ createdAt: 1 });
+
+      return res.status(200).json({ ...review.toObject(), replies });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 export default new ReviewController();
