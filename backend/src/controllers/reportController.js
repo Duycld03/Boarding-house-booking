@@ -1,6 +1,7 @@
 import Report from '../models/report.js';
 import Review from '../models/review.js';
 import BoardingHouse from '../models/boardingHouse.js';
+import Account from '../models/account.js';
 import nodemailer from 'nodemailer';
 import { v2 as cloudinary } from 'cloudinary';
 class reportController {
@@ -60,10 +61,6 @@ class reportController {
         return res.status(404).json({ error: 'Report not found' });
       }
 
-      if (!report.processedBy) {
-        return res.status(404).json({ error: 'Processed by user not found' });
-      }
-
       // Tìm tất cả các báo cáo có cùng targetId và reason
       const relatedReports = await Report.find({
         targetId: report.targetId,
@@ -73,6 +70,28 @@ class reportController {
       if (relatedReports.length === 0) {
         return res.status(404).json({ error: 'No related reports found' });
       }
+      // Nếu processedBy chưa có, lấy từ token
+      if (!report.processedBy) {
+        const account = await Account.findById(req.user.userId).select(
+          'fullname'
+        );
+        if (!account) {
+          return res.status(404).json({ error: 'User not found in token' });
+        }
+        report.processedBy = account._id;
+        await report.save();
+
+        // Populate lại processedBy để có fullname
+        report = await Report.findById(reportId).populate({
+          path: 'processedBy',
+          select: 'fullname',
+        });
+      }
+
+      // Kiểm tra nếu vẫn chưa có fullname
+      const processedByName = report.processedBy
+        ? report.processedBy.fullname
+        : 'Không xác định';
 
       // Cập nhật trạng thái và chi tiết xử lý cho tất cả các báo cáo liên quan
       await Report.updateMany(
