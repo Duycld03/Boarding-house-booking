@@ -148,14 +148,6 @@ function ReportReviewManagement() {
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
-          {record.status !== 'rejected' && record.status !== 'resolved' && (
-            <Button
-              title={'Replay'}
-              btnReplay
-              className="btn-replay"
-              onClick={() => handleReplay(record)}
-            />
-          )}
           <Button
             title={'Detail'}
             icon={<FileTextOutlined />}

@@ -11,15 +11,24 @@ const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
       open={isOpen}
       onCancel={onClose}
       footer={[
-        <Button key="close" onClick={onClose}>
+        <Button
+          key="close"
+          onClick={onClose}
+          className="bg-orange-600 text-white"
+        >
           Close
         </Button>,
         reportData.status !== 'rejected' &&
           reportData.status !== 'resolved' && (
             <Button
               title={'Replay'}
-              className="btn-replay"
-              onClick={() => onReplay(reportData)}
+              className="bg-primary text-white ml-2 btn-replay"
+              onClick={() => {
+                onClose(); // Đóng popup detail trước
+                setTimeout(() => {
+                  onReplay(reportData); // Mở popup replay sau một chút để tránh lag
+                }, 200);
+              }}
             >
               Replay
             </Button>
