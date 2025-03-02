@@ -1,8 +1,19 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Image, Avatar, Button, Tag, Rate } from 'antd';
 import convertTimetap from '../../../utils/convertTimetap';
+import DefaultAccount from '../../../assets/images/none_avatar.png';
 
 const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
+  const [currentReport, setCurrentReport] = useState(null);
+  useEffect(() => {
+    if (isOpen && reportData) {
+      setCurrentReport(reportData); // Chỉ cập nhật khi modal mở
+    }
+  }, [isOpen, reportData]);
+
+  if (!currentReport) return null;
+
   if (!reportData) return null;
 
   const { reporter, target, reason, details, images, createdAt, status } =
@@ -10,6 +21,7 @@ const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
 
   return (
     <Modal
+      key={reportData?._id}
       title="Review Report Details"
       open={isOpen}
       onCancel={onClose}
@@ -40,7 +52,10 @@ const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
         <div className="border-b pb-4">
           <h2 className="text-2xl font-semibold">Review Information</h2>
           <div className="flex items-center gap-3">
-            <Avatar src={target?.accountId?.avatarImage?.url || ''} size={50} />
+            <Avatar
+              src={target?.accountId?.avatarImage?.url ?? DefaultAccount}
+              size={50}
+            />
             <div>
               <p>{target?.accountId?.fullname || 'Unknown'}</p>
             </div>
@@ -48,7 +63,7 @@ const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
 
           <p>
             <strong>Rating:</strong>{' '}
-            <Rate disabled defaultValue={target?.rating} />
+            <Rate disabled defaultValue={Number(target?.rating)} />
           </p>
 
           <p>
@@ -80,7 +95,10 @@ const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
         <div>
           <h2 className="text-2xl font-semibold">Report Information</h2>
           <div className="flex items-center gap-3">
-            <Avatar src={reporter.avatarImage?.url} size={50} />
+            <Avatar
+              src={reporter.avatarImage?.url ?? DefaultAccount}
+              size={50}
+            />
             <div>
               <p className="">{reporter.fullname || 'Unknown'}</p>
             </div>
