@@ -3,7 +3,6 @@ import {
   TableCustom as Table,
   Button,
   ConfirmModal,
-  Loader,
   FormReplayPopup,
 } from '../../../component';
 import { toast } from 'react-toastify';
@@ -16,6 +15,8 @@ import {
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
 import FilterReport from './FilterReport';
+import { FileTextOutlined } from '@ant-design/icons';
+import DetailReportModal from './DetailReportModal';
 
 function ReportReviewManagement() {
   const [data, setData] = useState([]);
@@ -30,6 +31,8 @@ function ReportReviewManagement() {
     status: null,
     reason: null,
   });
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -70,6 +73,14 @@ function ReportReviewManagement() {
     } finally {
       setLoading(false);
     }
+  };
+  const handleDetailModal = (record) => {
+    setSelectedData(record);
+    setIsDetailModalOpen(true);
+  };
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false);
   };
 
   //fetch account data
@@ -145,6 +156,13 @@ function ReportReviewManagement() {
               onClick={() => handleReplay(record)}
             />
           )}
+          <Button
+            title={'Detail'}
+            icon={<FileTextOutlined />}
+            className={'text-white'}
+            bgColor={'rgb(5 150 105)'}
+            onClick={() => handleDetailModal(record)}
+          />
         </div>
       ),
     },
@@ -209,6 +227,12 @@ function ReportReviewManagement() {
         </div>
         {/* Show filtered data if available, else show full data */}
         <Table columns={columns} data={data} loading={loading} />
+        <DetailReportModal
+          isOpen={isDetailModalOpen}
+          onClose={closeDetailModal}
+          reportData={selectedData}
+          onReplay={handleReplay}
+        />
         <ConfirmModal
           title="Confirm Deletion"
           content="Do you want to delete this review report?"
