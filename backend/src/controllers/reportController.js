@@ -70,7 +70,6 @@ class reportController {
       if (relatedReports.length === 0) {
         return res.status(404).json({ error: 'No related reports found' });
       }
-      // Nếu processedBy chưa có, lấy từ token
       if (!report.processedBy) {
         const account = await Account.findById(req.user.userId).select(
           'fullname'
@@ -78,19 +77,20 @@ class reportController {
         if (!account) {
           return res.status(404).json({ error: 'User not found in token' });
         }
+        // Cập nhật processedBy ngay tại đây
         report.processedBy = account._id;
         await report.save();
-
-        // Populate lại processedBy để có fullname
-        report = await Report.findById(reportId).populate({
-          path: 'processedBy',
-          select: 'fullname',
-        });
       }
 
-      // Kiểm tra nếu vẫn chưa có fullname
-      const processedByName = report.processedBy
-        ? report.processedBy.fullname
+      // Load lại report để đảm bảo processedBy đã cập nhật
+      const updatedReport = await Report.findById(reportId).populate({
+        path: 'processedBy',
+        select: 'fullname',
+      });
+
+      // Kiểm tra lại processedBy
+      const processedByName = updatedReport.processedBy
+        ? updatedReport.processedBy.fullname
         : 'Không xác định';
 
       // Cập nhật trạng thái và chi tiết xử lý cho tất cả các báo cáo liên quan
@@ -164,7 +164,7 @@ class reportController {
                 <li><strong>Ngày gửi báo cáo:</strong> ${new Date(
                   relatedReport.createdAt
                 ).toLocaleDateString()}</li>
-                <li><strong>Người xử lý:</strong> ${report.processedBy.fullname}</li>
+                <li><strong>Người xử lý:</strong> ${processedByName}</li>
                 <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
                 <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>
             </ul>

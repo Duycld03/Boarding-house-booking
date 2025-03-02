@@ -185,7 +185,10 @@ function ReportReviewManagement() {
 
   // Handle opening the replay popup
   const handleReplay = (record) => {
-    setReplayReportData(record);
+    setReplayReportData({
+      ...record,
+      status: record.status || 'pending',
+    });
     setIsReplayPopupOpen(true);
   };
 
@@ -207,21 +210,29 @@ function ReportReviewManagement() {
   };
 
   const handleReplaySubmit = async (formData) => {
+    console.log('Form data before submit:', formData);
+    console.log('Replay report data:', replayReportData);
     if (!replayReportData || !replayReportData._id) {
       toast.error('Report data is missing. Please try again.');
       return;
     }
-
+    if (!formData.status) {
+      toast.error('Please select a valid status.');
+      return;
+    }
     try {
       await sendReplyByEmail(replayReportData._id, {
         status: formData.status,
         detailReport: formData.detailReport,
       });
+      setTimeout(() => fetchData(), 500);
 
       setIsReplayPopupOpen(false);
       fetchData();
     } catch (error) {
       console.error('Failed to fetch filtered reports:', error);
+      console.error('API error:', error.response ? error.response.data : error);
+
       toast.error(
         'Failed to send reply or update report. Please try again later.'
       );
