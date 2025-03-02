@@ -1,12 +1,26 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Rate } from 'antd';
 import DefaultAccount from '../../../assets/images/none_avatar.png';
 
 const DetailModal = ({ isOpen, onClose, review }) => {
+  const [currentReport, setCurrentReport] = useState(null);
+  useEffect(() => {
+    if (isOpen && review) {
+      setCurrentReport(review); // Chỉ cập nhật khi modal mở
+    }
+  }, [isOpen, review]);
+
   if (!review) return null;
 
   return (
-    <Modal title="Review Detail" open={isOpen} onCancel={onClose} footer={null}>
+    <Modal
+      title="Review Detail"
+      key={review?._id}
+      open={isOpen}
+      onCancel={onClose}
+      footer={null}
+    >
       {/* Avatar & Reviewer Info */}
       <div>
         <p>
