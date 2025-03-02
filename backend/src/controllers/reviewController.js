@@ -5,7 +5,7 @@ import { v2 as cloudinary } from 'cloudinary';
 class ReviewController {
   async getReviews(req, res) {
     try {
-      const reviews = await Review.find()
+      const reviews = await Review.find({ parentId: null }) // Chỉ lấy review không có parentId
         .populate({
           path: 'accountId',
           select: 'username _id fullname avatarImage',
@@ -15,6 +15,7 @@ class ReviewController {
           select: 'name',
         })
         .sort({ createdAt: 1 });
+
       return res.status(200).json(reviews);
     } catch (error) {
       return res.status(500).json({ error: error.message });
@@ -25,7 +26,7 @@ class ReviewController {
     try {
       const { boardingHouse, startDate, endDate, ratings } = req.query;
 
-      let filter = {};
+      let filter = { parentId: null };
 
       // Validate and add date range filter
       if (startDate || endDate) {
@@ -67,6 +68,10 @@ class ReviewController {
       }
 
       const reviews = await Review.find(filter)
+        .populate({
+          path: 'accountId',
+          select: 'username _id fullname avatarImage',
+        })
         .populate('boardingHouseId', 'name')
         .sort({ createdAt: 1 });
 
