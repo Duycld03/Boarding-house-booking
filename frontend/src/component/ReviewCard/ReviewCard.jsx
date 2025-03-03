@@ -24,20 +24,33 @@ import {
   faBookmark as faBookmarkRegular,
   faFlag as faFlagSolid,
   faEllipsisV,
+  faReply,
 } from "@fortawesome/free-solid-svg-icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { updateReview, updateReviewImage, deleteReviewUser } from "../../api/ReviewManagement";
+import {
+  updateReview,
+  updateReviewImage,
+  deleteReviewUser,
+} from "../../api/ReviewManagement";
 import { toast } from "react-toastify";
 import { useCurrentUser } from "../../context/userContext";
+import ReviewReply from "../ReviewReply/ReviewReply";
 
 dayjs.extend(relativeTime);
 dayjs.locale("en");
 
 const MAX_IMAGES = 5;
-const MAX_DESCRIPTION_LENGTH = 150;
+const MAX_DESCRIPTION_LENGTH = 100;
 
-const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isReported }) => {
+const ReviewCard = ({
+  reviewData,
+  onReviewUpdated,
+  onReport,
+  setReviewId,
+  isReported,
+  boardingHouse,
+}) => {
   if (!reviewData) return null;
 
   const {
@@ -51,6 +64,7 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
 
   const [newContent, setNewContent] = useState(content);
   const [newRating, setNewRating] = useState(rating);
+  const [replyContent, setReplyContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newImages, setNewImages] = useState(
@@ -58,11 +72,24 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
   );
   const [newFiles, setNewFiles] = useState([]);
 
-  const formattedRelativeTime = updatedAt ? dayjs(updatedAt).fromNow() : "undefined";
+  const formattedRelativeTime = updatedAt
+    ? dayjs(updatedAt).fromNow()
+    : "undefined";
   const { user } = useCurrentUser();
   const isCurrentUserReview = user?._id === accountId?._id;
   const isLoggedIn = Boolean(user);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const isOwner = user?._id === boardingHouse?.ownerId._id;
+  const hasReply = Boolean(reviewData?.replyContent);
+  const [isReplying, setIsReplying] = useState(false);
+
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const truncateText = (text, maxLength) => {
+    if (text.length <= maxLength) return text;
+    const truncated = text.substring(0, maxLength);
+    return truncated.substring(0, truncated.lastIndexOf(" ")) + "...";
+  };
 
   const handleRemoveImage = (index) => {
     setNewImages((prev) =>
@@ -163,6 +190,14 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
     setNewFiles([]);
     setNewImages(images.map((img) => ({ ...img, isDeleted: false })));
   };
+  const handleReply = () => {
+    if (!hasReply) {
+      setIsReplying((prev) => !prev);
+    }
+  };
+  const handleCancelReply = () => {
+    setIsReplying(false); // Khi nhấn Cancel thì đóng ô nhập ngay lập tức
+  };
 
   const menu = (
     <Menu>
@@ -172,7 +207,11 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
             <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
             <span className="ml-2">Update</span>
           </Menu.Item>
-          <Menu.Item key="delete" onClick={handleDelete} disabled={loadingDelete}>
+          <Menu.Item
+            key="delete"
+            onClick={handleDelete}
+            disabled={loadingDelete}
+          >
             <FontAwesomeIcon icon={faTrash} className="text-red-500 text-xl" />
             <span className="ml-2">Delete</span>
           </Menu.Item>
@@ -197,13 +236,43 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
           </Tooltip>
         </Menu.Item>
       )}
+      {isOwner && (
+        <>
+          <Menu.Item key="reply" onClick={handleReply}>
+            <Tooltip
+              placement="left"
+              title={
+                hasReply
+                  ? "You have replied to this review."
+                  : "Reply to this review"
+              }
+            >
+              <div className="flex items-center">
+                <FontAwesomeIcon
+                  icon={faReply}
+                  className={`text-xl ${
+                    hasReply ? "text-blue-500" : "text-gray-500"
+                  }`}
+                />
+                <span
+                  className={`ml-2 ${
+                    hasReply ? "text-gray-400 opacity-50" : "text-black"
+                  }`}
+                >
+                  {hasReply ? "Replied" : "Reply"}
+                </span>
+              </div>
+            </Tooltip>
+          </Menu.Item>
+        </>
+      )}
     </Menu>
   );
 
   return (
     <Card style={{ marginBottom: 16 }}>
       <div style={{ position: "absolute", top: 10, right: 10 }}>
-        <Dropdown overlay={menu} trigger={["click"]}>
+        <Dropdown menu={menu} trigger={["click"]}>
           <Button type="text">
             <FontAwesomeIcon icon={faEllipsisV} className="text-gray-600" />
           </Button>
@@ -221,45 +290,93 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
           </>
         }
       />
-
-      <p style={{ marginTop: 10, color: "#595959", textAlign: "justify" }}>
-        {content.length <= MAX_DESCRIPTION_LENGTH
-          ? content
-          : `${content.substring(0, MAX_DESCRIPTION_LENGTH)}... `}
+      <p
+        className={`mt-2 text-gray-600 text-justify 
+    ${isExpanded ? "max-h-[300px] overflow-auto" : "overflow-hidden"} 
+    break-words leading-relaxed`}
+      >
+        {isExpanded ? content : content.slice(0, MAX_DESCRIPTION_LENGTH)}
+        {content.length > MAX_DESCRIPTION_LENGTH && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-blue-500 ml-1 cursor-pointer bg-none border-none"
+          >
+            {isExpanded ? "Show less" : "Read more"}
+          </button>
+        )}
       </p>
 
       {images.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "8px",
+            marginTop: "10px",
+          }}
+        >
           {images.map((image, index) => (
-            <Image key={index} src={image.imageUrl} width={100} height={100} style={{ objectFit: "cover", borderRadius: "8px" }} />
+            <Image
+              key={index}
+              src={image.imageUrl}
+              width={100}
+              height={100}
+              style={{ objectFit: "cover", borderRadius: "8px" }}
+            />
           ))}
         </div>
       )}
-
-
+      {(isReplying || hasReply) && (
+        <ReviewReply
+          reviewId={reviewIdProp}
+          currentReply={reviewData?.replyContent}
+          onReplyUpdated={onReviewUpdated}
+          onClick={handleReply}
+          onCancelReply={handleCancelReply}
+        />
+      )}
       <Divider className="border-gray-700" />
-
       <Modal
-        title={<span style={{ color: '#333', fontSize: 20, fontWeight: 'bold' }}>Update Review</span>}
+        title={
+          <span style={{ color: "#333", fontSize: 20, fontWeight: "bold" }}>
+            Update Review
+          </span>
+        }
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
             Cancel
           </Button>,
-          <Button key="submit" type="primary" loading={loading} onClick={handleUpdate}>
+          <Button
+            key="submit"
+            type="primary"
+            loading={loading}
+            onClick={handleUpdate}
+          >
             Update
           </Button>,
         ]}
       >
-        <h2 style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 10 }}>Description</h2>
+        <h2 style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10 }}>
+          Description
+        </h2>
         <Input.TextArea
           value={newContent}
           onChange={(e) => setNewContent(e.target.value)}
           placeholder="Enter your updated review"
           rows={4}
         />
-        <h2 style={{ fontWeight: 'bold', fontSize: 16, marginTop: 16, marginBottom: 10 }}>Rating</h2>
+        <h2
+          style={{
+            fontWeight: "bold",
+            fontSize: 16,
+            marginTop: 16,
+            marginBottom: 10,
+          }}
+        >
+          Rating
+        </h2>
         <Rate
           value={newRating}
           onChange={(value) => setNewRating(value)}
@@ -267,50 +384,60 @@ const ReviewCard = ({ reviewData, onReviewUpdated, onReport, setReviewId, isRepo
         />
         <div className="flex flex-col">
           <div className="flex flex-col mb-4">
-            <h2 style={{ fontWeight: 'bold', fontSize: 16, marginTop: 16, marginBottom: 10 }}>Your Review Image</h2>
+            <h2
+              style={{
+                fontWeight: "bold",
+                fontSize: 16,
+                marginTop: 16,
+                marginBottom: 10,
+              }}
+            >
+              Your Review Image
+            </h2>
             <div className="flex flex-wrap">
-              {newImages.map((image, index) => (
-                !image.isDeleted && (
-                  <div
-                    key={index}
-                    className="relative group ml-4 "
-                    style={{
-                      width: 96,
-                      height: 96,
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <Image
-                      src={image.imageUrl}
-                      alt={`Image ${index + 1}`}
+              {newImages.map(
+                (image, index) =>
+                  !image.isDeleted && (
+                    <div
+                      key={index}
+                      className="relative group ml-4 "
                       style={{
                         width: 96,
                         height: 96,
+                        borderRadius: "8px",
                       }}
-                      preview={{
-                        mask: (
-                          <div className="flex items-center justify-center space-x-2">
-                            <button
-                              type="button"
-                              className="bg-white border border-red-600 text-red-600 text-sm rounded-full shadow-md hover:bg-red-600 hover:text-white transition-colors duration-300 flex items-center justify-center w-8 h-8"
-                              onClick={() => handleRemoveImage(index)}
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </button>
-                          </div>
-                        ),
-                      }}
-                    />
-                  </div>
-                )
-
-              ))}
+                    >
+                      <Image
+                        src={image.imageUrl}
+                        alt={`Image ${index + 1}`}
+                        style={{
+                          width: 96,
+                          height: 96,
+                        }}
+                        preview={{
+                          mask: (
+                            <div className="flex items-center justify-center space-x-2">
+                              <button
+                                type="button"
+                                className="bg-white border border-red-600 text-red-600 text-sm rounded-full shadow-md hover:bg-red-600 hover:text-white transition-colors duration-300 flex items-center justify-center w-8 h-8"
+                                onClick={() => handleRemoveImage(index)}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            </div>
+                          ),
+                        }}
+                      />
+                    </div>
+                  )
+              )}
             </div>
-
           </div>
           <div className="flex">
             <Upload {...uploadProps} listType="picture-card">
-              {newFiles.length + newImages.filter((img) => !img.isDeleted).length < MAX_IMAGES && (
+              {newFiles.length +
+                newImages.filter((img) => !img.isDeleted).length <
+                MAX_IMAGES && (
                 <div>
                   <PlusOutlined />
                   <div style={{ marginTop: 8 }}>Upload</div>

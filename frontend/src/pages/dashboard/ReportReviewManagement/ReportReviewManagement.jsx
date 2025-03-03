@@ -3,7 +3,6 @@ import {
   TableCustom as Table,
   Button,
   ConfirmModal,
-  Loader,
   FormReplayPopup,
 } from '../../../component';
 import { toast } from 'react-toastify';
@@ -13,9 +12,12 @@ import {
   deleteReport,
   sendReplyByEmail,
   filterReviewReports,
+  getReportReviewDetail,
 } from '../../../api/reportManagement';
 import convertTimetap from '../../../utils/convertTimetap';
 import FilterReport from './FilterReport';
+import { FileTextOutlined } from '@ant-design/icons';
+import DetailReportModal from './DetailReportModal';
 
 function ReportReviewManagement() {
   const [data, setData] = useState([]);
@@ -30,6 +32,8 @@ function ReportReviewManagement() {
     status: null,
     reason: null,
   });
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -70,6 +74,30 @@ function ReportReviewManagement() {
     } finally {
       setLoading(false);
     }
+  };
+  const fetchReportDetail = async (reportId) => {
+    try {
+      const res = await getReportReviewDetail(reportId);
+      console.log('Report deatil', res);
+
+      if (res) {
+        setSelectedData(res);
+      } else {
+        setSelectedData(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch report details:', error);
+      toast.error('Failed to fetch report details. Please try again later.');
+    }
+  };
+
+  const handleDetailModal = (record) => {
+    fetchReportDetail(record._id);
+    setIsDetailModalOpen(true);
+  };
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false);
   };
 
   //fetch account data
@@ -137,14 +165,13 @@ function ReportReviewManagement() {
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
-          {record.status !== 'rejected' && record.status !== 'resolved' && (
-            <Button
-              title={'Replay'}
-              btnReplay
-              className="btn-replay"
-              onClick={() => handleReplay(record)}
-            />
-          )}
+          <Button
+            title={'Detail'}
+            icon={<FileTextOutlined />}
+            className={'text-white'}
+            bgColor={'rgb(5 150 105)'}
+            onClick={() => handleDetailModal(record)}
+          />
         </div>
       ),
     },
@@ -158,7 +185,10 @@ function ReportReviewManagement() {
 
   // Handle opening the replay popup
   const handleReplay = (record) => {
-    setReplayReportData(record);
+    setReplayReportData({
+      ...record,
+      status: record.status || 'pending',
+    });
     setIsReplayPopupOpen(true);
   };
 
@@ -180,21 +210,29 @@ function ReportReviewManagement() {
   };
 
   const handleReplaySubmit = async (formData) => {
+    console.log('Form data before submit:', formData);
+    console.log('Replay report data:', replayReportData);
     if (!replayReportData || !replayReportData._id) {
       toast.error('Report data is missing. Please try again.');
       return;
     }
-
+    if (!formData.status) {
+      toast.error('Please select a valid status.');
+      return;
+    }
     try {
       await sendReplyByEmail(replayReportData._id, {
         status: formData.status,
         detailReport: formData.detailReport,
       });
+      setTimeout(() => fetchData(), 500);
 
       setIsReplayPopupOpen(false);
       fetchData();
     } catch (error) {
       console.error('Failed to fetch filtered reports:', error);
+      console.error('API error:', error.response ? error.response.data : error);
+
       toast.error(
         'Failed to send reply or update report. Please try again later.'
       );
@@ -209,6 +247,12 @@ function ReportReviewManagement() {
         </div>
         {/* Show filtered data if available, else show full data */}
         <Table columns={columns} data={data} loading={loading} />
+        <DetailReportModal
+          isOpen={isDetailModalOpen}
+          onClose={closeDetailModal}
+          reportData={selectedData}
+          onReplay={handleReplay}
+        />
         <ConfirmModal
           title="Confirm Deletion"
           content="Do you want to delete this review report?"

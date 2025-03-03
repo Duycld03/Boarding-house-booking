@@ -9,6 +9,7 @@ import BHManagementOwner from "./BHManagementOwner";
 import BHDetailOwner from "./BHDetailOwner";
 import FavouriteList from "./FavouriteList";
 import WatchLater from "./WatchLater";
+import MyReportManagement from "./MyReport";
 
 export {
   AboutUs,
@@ -22,4 +23,5 @@ export {
   BHDetailOwner,
   FavouriteList,
   WatchLater,
+  MyReportManagement
 };

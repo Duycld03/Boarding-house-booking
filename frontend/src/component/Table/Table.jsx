@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { Divider, Table as AntTable, Button, Select } from "antd";
-import PropTypes from "prop-types";
+import { useState, useEffect } from 'react';
+import { Divider, Table as AntTable, Button, Select } from 'antd';
+import PropTypes from 'prop-types';
 
 const { Option } = Select;
 
@@ -42,7 +42,7 @@ const TableCustom = ({
       formValues: { dynamicSelect },
       selectedRows: selectedRows,
     };
-    if (onProcessData && typeof onProcessData === "function") {
+    if (onProcessData && typeof onProcessData === 'function') {
       onProcessData(combinedData);
     }
     setDynamicSelect(null);
@@ -58,9 +58,9 @@ const TableCustom = ({
   const numberedColumns = enableCount
     ? [
         {
-          title: "No.",
-          dataIndex: "number",
-          key: "number",
+          title: 'No.',
+          dataIndex: 'number',
+          key: 'number',
           render: (_, record) => <span>{record.number}</span>,
         },
         ...columns,
@@ -75,23 +75,21 @@ const TableCustom = ({
 
   const onRow = (record) => ({
     onClick: () => {
-      if (onRowClick && typeof onRowClick === "function") {
+      if (onRowClick && typeof onRowClick === 'function') {
         onRowClick(record);
       }
     },
   });
 
   return (
-    <div>
+    <div className="w-full p-2">
       {checkbox && <Divider />}
       {checkbox && (
-        <div
-          style={{ marginBottom: 16, display: "flex", alignItems: "center" }}
-        >
-          <label style={{ marginRight: 8 }}>Select Option:</label>
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <label className="mb-2 sm:mb-0 text-sm">Select Option:</label>
           <Select
             placeholder="Select an option"
-            style={{ width: 200, marginRight: 8 }}
+            className="w-full sm:w-[200px]"
             value={dynamicSelect}
             onChange={handleSelectChange}
           >
@@ -105,26 +103,28 @@ const TableCustom = ({
             type="primary"
             onClick={handleProcessData}
             disabled={isSubmitDisabled}
+            className="mt-2 sm:mt-0"
           >
             Submit
           </Button>
         </div>
       )}
-      <AntTable
-        pagination={true}
-        loading={loading}
-        bordered
-        rowKey="_id"
-        rowSelection={checkbox ? rowSelection : null}
-        columns={numberedColumns}
-        dataSource={numberedData}
-        onRow={onRow}
-      />
+      <div className="w-full overflow-x-auto">
+        <AntTable
+          pagination={{ pageSize: 10 }}
+          scroll={{ x: 'max-content' }}
+          className="text-xs sm:text-sm md:text-base"
+          rowKey="_id"
+          rowSelection={checkbox ? rowSelection : null}
+          columns={numberedColumns}
+          dataSource={numberedData}
+          onRow={onRow}
+        />
+      </div>
     </div>
   );
 };
 
-// Adding PropTypes for better type checking
 TableCustom.propTypes = {
   columns: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,

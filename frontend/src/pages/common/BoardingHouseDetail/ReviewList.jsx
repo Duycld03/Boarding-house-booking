@@ -10,12 +10,16 @@ const ReviewList = ({
   setReviewId,
   reportedReviews,
   fetchReviews,
+  boardingHouse,
 }) => {
   const [rating, setRating] = useState(0);
 
   useEffect(() => {
     if (reviews.length > 0) {
-      const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+      const totalRating = reviews.reduce(
+        (sum, review) => sum + review.rating,
+        0
+      );
       const averageRating = totalRating / reviews.length;
       setRating(averageRating);
     } else {
@@ -34,18 +38,13 @@ const ReviewList = ({
   }, {});
 
   // List of ratings from 5 to 1
-  const allRatings = [5, 4, 3, 2, 1];
+  console.log("Review", reviews);
 
+  const allRatings = [5, 4, 3, 2, 1];
   return (
-    <div className="mx-52">
-      <div className="flex flex-wrap flex-1 my-16 items-center gap-10">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: 16,
-          }}
-        >
+    <div className="lg:mx-52 mx-0">
+      <div className="flex flex-wrap flex-1 justify-center sm:justify-start my-16 items-center gap-10">
+        <div className="flex items-center mb-4">
           <Progress
             type="circle"
             strokeColor={"#40BFFF"}
@@ -57,7 +56,7 @@ const ReviewList = ({
 
         <div style={{ marginBottom: 16 }}>
           {allRatings.map((star) => (
-            <div key={star} className="flex mt-3 items-center">
+            <div key={star} className="flex mt-3 gap-3 items-center">
               <Text className="md:w-16 md:text-4xl">
                 {ratingCounts[star] || 0}
               </Text>
@@ -79,6 +78,7 @@ const ReviewList = ({
             reviewId={review._id}
             isReported={reportedReviews.includes(review._id)}
             onReviewUpdated={fetchReviews}
+            boardingHouse={boardingHouse}
           />
         )}
         pagination={{

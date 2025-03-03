@@ -19,7 +19,11 @@ function OwnerInfo({ ownerData }) {
       </Tooltip>
 
       <Modal
-        title={<span className="text-4xl font-bold">Owner Information</span>}
+        title={
+          <span className="text-lg sm:text-4xl font-bold">
+            Owner Information
+          </span>
+        }
         open={visible}
         onCancel={() => setVisible(false)}
         footer={null}

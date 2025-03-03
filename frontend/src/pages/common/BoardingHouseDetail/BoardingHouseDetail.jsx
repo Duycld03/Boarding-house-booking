@@ -1,30 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
-import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from 'antd';
+import { useState, useEffect, useRef } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from "antd";
 import {
   getBoardingHouseDetail,
   getReviewByBhId,
   getRoomTypeByBhId,
-} from '../../../api/ownerUser/boardingHouse';
-import { addReview } from '../../../api/ReviewManagement';
-import BoardingHouseGallery from './BoardingHouseGallery';
-import formatAmount from '../../../utils/formatAmount';
-import { HeartFilled, HeartOutlined } from '@ant-design/icons';
-import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import RoomCard from '../../../component/RoomTypeCard/RoomTypeCard';
-import ReviewList from './ReviewList';
-import OwnerInfo from './OwnerInfo';
-import AddReview from './AddReview';
-import ReportModal from './ReportModal';
-import { useNavigate } from 'react-router-dom';
-import { useCurrentUser } from '../../../context/userContext';
+} from "../../../api/ownerUser/boardingHouse";
+import { addReview } from "../../../api/ReviewManagement";
+import BoardingHouseGallery from "./BoardingHouseGallery";
+import formatAmount from "../../../utils/formatAmount";
+import { HeartFilled, HeartOutlined } from "@ant-design/icons";
+import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import RoomCard from "../../../component/RoomTypeCard/RoomTypeCard";
+import ReviewList from "./ReviewList";
+import OwnerInfo from "./OwnerInfo";
+import AddReview from "./AddReview";
+import ReportModal from "./ReportModal";
+import { useNavigate } from "react-router-dom";
+import { useCurrentUser } from "../../../context/userContext";
 import {
   checkReportExist,
   getReviewReports,
-} from '../../../api/reportManagement';
-import { toast } from 'react-toastify';
-import { addFavorite, getFavorite } from '../../../api/favoriteManagement';
+} from "../../../api/reportManagement";
+import { toast } from "react-toastify";
+import { addFavorite, getFavorite } from "../../../api/favoriteManagement";
 
 const { Content } = Layout;
 
@@ -41,7 +41,7 @@ function BoardingHouseDetail() {
   const [expanded, setExpanded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
-  const [reviewId, setReviewId] = useState('');
+  const [reviewId, setReviewId] = useState("");
   const [reportedReviews, setReportedReviews] = useState([]);
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
@@ -54,7 +54,7 @@ function BoardingHouseDetail() {
           setIsLiked(response.favorites.some((fav) => fav.id === id));
         }
       } catch (error) {
-        console.error('Error fetching favorite status:', error);
+        console.error("Error fetching favorite status:", error);
       }
     };
 
@@ -66,7 +66,7 @@ function BoardingHouseDetail() {
   const handleLike = async () => {
     try {
       const response = await addFavorite(id); // Gọi API để toggle favorite
-      if (response && typeof response.isFavorite !== 'undefined') {
+      if (response && typeof response.isFavorite !== "undefined") {
         setIsLiked(response.isFavorite); // Cập nhật trạng thái icon heart
 
         // Cập nhật số lượng likes ngay lập tức
@@ -75,8 +75,8 @@ function BoardingHouseDetail() {
           likes: response.isFavorite ? prev.likes + 1 : prev.likes - 1,
         }));
       } else {
-        console.error('Invalid response structure:', response);
-        toast.error('Dữ liệu phản hồi không hợp lệ!');
+        console.error("Invalid response structure:", response);
+        toast.error("Dữ liệu phản hồi không hợp lệ!");
       }
     } catch (error) {
       navigate(`/login`);
@@ -89,7 +89,7 @@ function BoardingHouseDetail() {
       const response = await getBoardingHouseDetail(id);
       setBoardingHouse(response);
     } catch (error) {
-      console.error('Error fetching boarding house details:', error);
+      console.error("Error fetching boarding house details:", error);
     } finally {
       setLoading(false);
     }
@@ -101,7 +101,7 @@ function BoardingHouseDetail() {
       const response = await getRoomTypeByBhId(id);
       setRoomType(response?.data || []);
     } catch (error) {
-      console.error('Error fetching room types:', error);
+      console.error("Error fetching room types:", error);
     }
   };
 
@@ -113,7 +113,7 @@ function BoardingHouseDetail() {
       setReportedReviews(res.reportedReviews);
       setReportedBoardingHouse(res.boardingHouseReported);
     } catch (error) {
-      console.error('Error fetching review reports:', error);
+      console.error("Error fetching review reports:", error);
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,7 @@ function BoardingHouseDetail() {
         fetchReportStatus(response);
       }
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+      console.error("Error fetching reviews:", error);
       if (error.response && error.response.status === 404) {
         setReviews([]);
       }
@@ -151,14 +151,14 @@ function BoardingHouseDetail() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const status = params.get('status');
+    const status = params.get("status");
 
-    if (status === 'success') {
-      toast.success('Deposit successfully!');
-    } else if (status === 'fail') {
-      toast.error('Deposit failed!');
+    if (status === "success") {
+      toast.success("Deposit successfully!");
+    } else if (status === "fail") {
+      toast.error("Deposit failed!");
     }
-    params.delete('status');
+    params.delete("status");
     if (status) {
       navigate(window.location.pathname, { replace: true });
     }
@@ -169,15 +169,15 @@ function BoardingHouseDetail() {
     try {
       const response = await addReview(formData);
       if (response.status === 201 && response.data.success) {
-        message.success('Review added successfully!');
+        message.success("Review added successfully!");
         setIsModalOpen(false);
         await fetchReviews();
       } else {
-        message.error(response.data.message || 'Failed to add review.');
+        message.error(response.data.message || "Failed to add review.");
       }
     } catch (error) {
-      console.error('Error adding review:', error);
-      message.error('Failed to add review. Please try again.');
+      console.error("Error adding review:", error);
+      message.error("Failed to add review. Please try again.");
     }
   };
 
@@ -188,17 +188,17 @@ function BoardingHouseDetail() {
 
   // Scroll đến room type
   const scrollToRoomType = () => {
-    roomTypeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    roomTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const handleOpen = () => {
     if (!isLogin) {
       Modal.confirm({
-        title: ' You need to log in',
-        content: 'Please log in to report.',
-        okText: ' Log in',
-        cancelText: 'Cancel',
-        onOk: () => navigate('/login'),
+        title: " You need to log in",
+        content: "Please log in to report.",
+        okText: " Log in",
+        cancelText: "Cancel",
+        onOk: () => navigate("/login"),
       });
       return;
     }
@@ -207,11 +207,11 @@ function BoardingHouseDetail() {
   const handleOpenAddReview = () => {
     if (!isLogin) {
       Modal.confirm({
-        title: ' You need to log in',
-        content: 'Please log in to add review.',
-        okText: ' Log in',
-        cancelText: 'Cancel',
-        onOk: () => navigate('/login'),
+        title: " You need to log in",
+        content: "Please log in to add review.",
+        okText: " Log in",
+        cancelText: "Cancel",
+        onOk: () => navigate("/login"),
       });
       return;
     }
@@ -232,16 +232,14 @@ function BoardingHouseDetail() {
             isReported={reportedBoardingHouse}
           />
 
-          <div className="mt-8 px-10">
+          <div className="mt-8 px-5 sm:px-10">
             {/* Header */}
-            <div className="flex justify-between items-start gap-4 w-full">
-              <p className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold">
-                {boardingHouse?.name}
-              </p>
+            <div className="flex justify-between lg:gap-0 md:gap-0 sm:gap-[100px] flex-wrap items-start w-full">
+              <p className="text-4xl font-bold">{boardingHouse?.name}</p>
 
-              <div className="flex items-start sm:items-center gap-2 sm:gap-4">
-                <p className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold text-orange-500">
-                  {formatAmount(boardingHouse?.priceRange) + '(VND)/month'}
+              <div className="flex items-center md:mt-0 sm:mt-0 mt-5 gap-4 sm:gap-5">
+                <p className="lg:text-4xl md:text-3xl sm:text-xl sm:gap-3 font-bold text-orange-500">
+                  {formatAmount(boardingHouse?.priceRange) + "(VND)/month"}
                 </p>
                 <Button
                   onClick={scrollToRoomType}
@@ -254,7 +252,7 @@ function BoardingHouseDetail() {
             </div>
 
             {/* Address and Owner */}
-            <div className="flex flex-wrap justify-between ">
+            <div className="flex flex-wrap justify-between mt-5 sm:mt-0">
               <div>
                 <Tag color="blue" className="md:text-2xl md:mt-3">
                   {boardingHouse?.boardingHouseType?.name}
@@ -267,10 +265,10 @@ function BoardingHouseDetail() {
                   <p className="text-2xl">
                     {boardingHouse?.address
                       ? `${boardingHouse.address.detail}, ${boardingHouse.address.ward}, ${boardingHouse.address.district}, ${boardingHouse.address.province}`
-                      : 'Address not available'}
+                      : "Address not available"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 cursor-pointer select-none text-lg sm:text-xl md:text-4xl md:mt-7">
+                <div className="flex items-center gap-2 cursor-pointer select-none text-4xl mt-5 sm:mt-0">
                   <button onClick={handleLike} className="focus:outline-none">
                     {isLiked ? (
                       <HeartFilled className="text-red-500 transition-transform duration-300 scale-110" />
@@ -285,7 +283,7 @@ function BoardingHouseDetail() {
                 </div>
               </div>
               <div className="flex gap-4 font-bold items-center">
-                <Tag color="#f50" className="text-3xl">
+                <Tag color="#f50" className="text-lg sm:text-3xl">
                   Owner:
                 </Tag>
                 <OwnerInfo ownerData={boardingHouse?.ownerId} />
@@ -314,25 +312,25 @@ function BoardingHouseDetail() {
             </div>
 
             {/* Description */}
-            <div className="md:mt-14">
+            <div className="mt-14">
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
                 <div
-                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${
-                    expanded ? 'max-h-full' : 'max-h-60 overflow-hidden'
+                  className={`text-gray-800 text-lg sm:text-2xl leading-relaxed text-justify transition-all duration-300 ${
+                    expanded ? "max-h-full" : "max-h-60 overflow-hidden"
                   }`}
                 >
-                  {boardingHouse?.description || 'No description available.'}
+                  {boardingHouse?.description || "No description available."}
                 </div>
                 {boardingHouse?.description &&
-                  boardingHouse?.description.split(' ').length > 50 && (
+                  boardingHouse?.description.split(" ").length > 50 && (
                     <div className="mt-3">
                       <Button
                         type="link"
                         onClick={() => setExpanded(!expanded)}
                         className="text-blue-600 text-sm sm:text-base md:text-3xl"
                       >
-                        {expanded ? 'Collapse' : 'Show more'}
+                        {expanded ? "Collapse" : "Show more"}
                       </Button>
                     </div>
                   )}
@@ -341,7 +339,7 @@ function BoardingHouseDetail() {
             <Divider className="border-gray-500" />
 
             {/* Room Types */}
-            <div className="md:mt-14" ref={roomTypeRef}>
+            <div className="mt-14" ref={roomTypeRef}>
               <p className="font-bold text-4xl">
                 Available room type in boarding house
               </p>
@@ -356,7 +354,7 @@ function BoardingHouseDetail() {
             <Divider className="border-gray-500" />
 
             {/* Reviews Section */}
-            <div className="md:my-14">
+            <div className="my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
               <Button
                 className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
@@ -372,6 +370,7 @@ function BoardingHouseDetail() {
                 setReviewId={setReviewId}
                 reportedReviews={reportedReviews}
                 fetchReviews={fetchReviews}
+                boardingHouse={boardingHouse}
               />
             </div>
           </div>

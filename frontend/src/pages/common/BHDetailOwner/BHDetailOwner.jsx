@@ -20,7 +20,6 @@ import { Back } from '../../../component';
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
-  const navigation = useNavigate();
 
   const [updatedData, setUpdatedData] = useState({}); // Updated form data
   const [loading, setLoading] = useState(false); // Loading state
@@ -28,6 +27,7 @@ const BHDetailOwner = () => {
   const [districts, setDistricts] = useState([]); // Districts list
   const [wards, setWards] = useState([]); // Wards list
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]); // House types
+  const navigate = useNavigate();
 
   const fetchBoardingHouseDetails = async () => {
     if (!boardingHouseId) {
@@ -295,15 +295,13 @@ const BHDetailOwner = () => {
   }
 
   return (
-    <div className="mx-auto md:w-[60%]">
+    <div className="mx-auto md:w-[60%] flex justify-center">
       <Form
         layout="vertical"
         // onFinish={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full shadow-lg"
+        className="bg-white p-6 rounded-lg w-full shadow-lg m-7"
       >
-        <Back />
-        <h2 className="text-3xl font-bold mb-4">1. Information</h2>
-
+        <h2 className="text-3xl font-bold">1. Information</h2>
         <Form.Item label="Name Boarding House" className="mb-2">
           <Input
             name="name"
@@ -331,7 +329,6 @@ const BHDetailOwner = () => {
             ))}
           </Select>
         </Form.Item>
-
         <div className="col-span-2">
           <Form.Item label="Description">
             <Input.TextArea
@@ -342,7 +339,6 @@ const BHDetailOwner = () => {
             />
           </Form.Item>
         </div>
-
         <h2 className="text-3xl font-bold mb-4 mt-10 ">2. Address</h2>
         <Form.Item className="mb-4">
           {/* Province */}
@@ -465,7 +461,6 @@ const BHDetailOwner = () => {
             />
           </Form.Item>
         </Form.Item>
-
         <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
         <Form.Item label="Primary Image" className="mb-4">
           <div className="flex flex-col gap-4">
@@ -518,7 +513,6 @@ const BHDetailOwner = () => {
             )}
           </div>
         </Form.Item>
-
         <Form.Item label="Other Images" className="mb-4">
           <div className="mt-4 flex flex-wrap gap-4">
             {/* Display Uploaded Other Images */}
@@ -700,9 +694,10 @@ const BHDetailOwner = () => {
           </Form.Item>
         </div>
         {/* </div> */}
-        <div className="flex">
+        <div className="flex justify-between w-full">
+          <Back />
           <Button
-            className="bg-primary text-white ml-2"
+            className="bg-primary text-white"
             size="large"
             loading={loading}
             onClick={handleSubmit}

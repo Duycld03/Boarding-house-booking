@@ -19,6 +19,7 @@ import {
   BHManagementOwner,
   BHDetailOwner,
   WatchLater,
+  MyReportManagement,
 } from "./common";
 
 import {
@@ -51,6 +52,7 @@ export {
   ErrorPage,
   MyAppointment,
   WatchLater,
+  MyReportManagement,
 
   // owner
   BHManagementOwner,
