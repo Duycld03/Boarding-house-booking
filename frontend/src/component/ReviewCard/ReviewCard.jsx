@@ -187,6 +187,9 @@ const ReviewCard = ({
       setIsReplying((prev) => !prev);
     }
   };
+  const handleCancelReply = () => {
+    setIsReplying(false); // Khi nhấn Cancel thì đóng ô nhập ngay lập tức
+  };
 
   const menu = (
     <Menu>
@@ -313,6 +316,7 @@ const ReviewCard = ({
           currentReply={reviewData?.replyContent}
           onReplyUpdated={onReviewUpdated}
           onClick={handleReply}
+          onCancelReply={handleCancelReply}
         />
       )}
 

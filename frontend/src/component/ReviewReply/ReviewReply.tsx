@@ -7,12 +7,14 @@ interface ReviewReplyProps {
   reviewId: string;
   currentReply?: string;
   onReplyUpdated: () => void;
+  onCancelReply?: () => void;
 }
 
 const ReviewReply: React.FC<ReviewReplyProps> = ({
   reviewId,
   currentReply = '',
   onReplyUpdated,
+  onCancelReply,
 }) => {
   const [replyContent, setReplyContent] = useState<string>(currentReply || '');
   const [loading, setLoading] = useState<boolean>(false);
@@ -44,7 +46,8 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
 
   const handleCancel = () => {
     setReplyContent(currentReply); // Reset nội dung
-    setIsReplying(false); // Đặt về false để nhấn Reply một lần là hiển thị ngay
+    setIsReplying(false);
+    onCancelReply?.(); // Đặt về false để nhấn Reply một lần là hiển thị ngay
   };
 
   return (
