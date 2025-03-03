@@ -106,13 +106,14 @@ const CustomHeader = () => {
       </Link>
 
       {/* Main Menu (Desktop) */}
-      <Menu
-        className="hidden lg:block"
-        theme="light"
-        mode="horizontal"
-        defaultSelectedKeys={["home"]}
-        items={menuItems}
-      />
+      {screens.lg && (
+        <Menu
+          theme="light"
+          mode="horizontal"
+          defaultSelectedKeys={["home"]}
+          items={menuItems}
+        />
+      )}
 
       {/* User Section */}
       {!isLoggedIn ? (

@@ -15,7 +15,10 @@ const ReviewList = ({
 
   useEffect(() => {
     if (reviews.length > 0) {
-      const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+      const totalRating = reviews.reduce(
+        (sum, review) => sum + review.rating,
+        0
+      );
       const averageRating = totalRating / reviews.length;
       setRating(averageRating);
     } else {
@@ -37,7 +40,7 @@ const ReviewList = ({
   const allRatings = [5, 4, 3, 2, 1];
 
   return (
-    <div className="mx-52">
+    <div className="lg:mx-52 mx-0">
       <div className="flex flex-wrap flex-1 my-16 items-center gap-10">
         <div
           style={{
