@@ -18,6 +18,7 @@ const CustomSlider = ({ width = 250, ...props }) => {
       collapsible
       collapsed={collapsed}
       onCollapse={toggleCollapsed}
+      className="lg:block hidden"
       style={{ background: "#fff" }}
       {...props}
     >
