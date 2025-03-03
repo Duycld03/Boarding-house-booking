@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Input, Button, Card } from 'antd';
-import { toast } from 'react-toastify';
-import { replyReview } from '../../api/ReviewManagement';
+import React, { useState } from "react";
+import { Input, Button, Card } from "antd";
+import { toast } from "react-toastify";
+import { replyReview } from "../../api/ReviewManagement";
 
 interface ReviewReplyProps {
   reviewId: string;
@@ -10,19 +10,22 @@ interface ReviewReplyProps {
   onCancelReply?: () => void;
 }
 
+const MAX_LENGTH = 100;
+
 const ReviewReply: React.FC<ReviewReplyProps> = ({
   reviewId,
-  currentReply = '',
+  currentReply = "",
   onReplyUpdated,
   onCancelReply,
 }) => {
-  const [replyContent, setReplyContent] = useState<string>(currentReply || '');
+  const [replyContent, setReplyContent] = useState<string>(currentReply || "");
   const [loading, setLoading] = useState<boolean>(false);
-  const [isReplying, setIsReplying] = useState<boolean>(!Boolean(currentReply)); // Fix lỗi tự động mở ô nhập lại sau khi Cancel
+  const [isReplying, setIsReplying] = useState<boolean>(!Boolean(currentReply));
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const submitReply = async () => {
     if (!replyContent.trim()) {
-      toast.error('Reply content cannot be empty.');
+      toast.error("Reply content cannot be empty.");
       return;
     }
 
@@ -33,39 +36,44 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
         content: replyContent.trim(),
       });
 
-      toast.success('Reply sent successfully!');
+      toast.success("Reply sent successfully!");
       onReplyUpdated();
       setIsReplying(false);
     } catch (error) {
-      console.error('Failed to send reply:', error);
-      toast.error('Failed to send reply. Please try again later.');
+      console.error("Failed to send reply:", error);
+      toast.error("Failed to send reply. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    setReplyContent(currentReply); // Reset nội dung
+    setReplyContent(currentReply);
     setIsReplying(false);
-    onCancelReply?.(); // Đặt về false để nhấn Reply một lần là hiển thị ngay
+    onCancelReply?.();
   };
 
   return (
-    <div style={{ marginTop: '10px' }}>
-      {currentReply ? (
-        <Card
-          style={{
-            background: '#f9f9f9',
-            borderRadius: '8px',
-            borderLeft: '4px solid #1890ff',
-            padding: '12px',
-            marginBottom: '12px',
-          }}
-        >
-          <strong style={{ color: '#1890ff' }}>Owner Reply:</strong>
-          <p style={{ margin: '6px 0', color: '#333' }}>{currentReply}</p>
+    <div className="mt-2 max-w-full">
+      {currentReply && (
+        <Card className="bg-gray-100 rounded-lg border-l-4 border-blue-500 p-3 mb-3 max-w-full break-words">
+          <strong className="text-blue-500">Owner Reply:</strong>
+          <p className="mt-1 text-gray-800 text-justify break-words">
+            {isExpanded ? currentReply : currentReply.slice(0, MAX_LENGTH)}
+            {currentReply.length > MAX_LENGTH && (
+              <>
+                {!isExpanded && <span>...</span>}
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-blue-500 ml-2 hover:underline"
+                >
+                  {isExpanded ? "See less" : "See more"}
+                </button>
+              </>
+            )}
+          </p>
         </Card>
-      ) : null}
+      )}
 
       {isReplying && (
         <>
@@ -74,36 +82,22 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
             placeholder="Enter your reply here..."
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
-            style={{
-              borderRadius: '8px',
-              borderColor: '#d9d9d9',
-              padding: '10px',
-              fontSize: '14px',
-              marginTop: '10px',
-            }}
+            className="mt-2 rounded-lg border border-gray-300 p-2 text-sm w-full max-w-full"
+            style={{ wordWrap: "break-word", whiteSpace: "pre-wrap" }}
           />
-          <div style={{ marginTop: '10px', display: 'flex', gap: '16px' }}>
+          <div className="mt-2 flex flex-wrap gap-4">
             <Button
               type="primary"
               onClick={submitReply}
               loading={loading}
-              style={{
-                borderRadius: '6px',
-                padding: '8px 16px',
-              }}
+              className="rounded-md px-4 py-2"
             >
               Send Reply
             </Button>
             <Button
               onClick={handleCancel}
               disabled={loading}
-              style={{
-                backgroundColor: '#ff4d4f',
-                borderColor: '#ff4d4f',
-                color: 'white',
-                borderRadius: '6px',
-                padding: '8px 16px',
-              }}
+              className="bg-red-500 border-red-500 text-white rounded-md px-4 py-2"
             >
               Cancel
             </Button>
