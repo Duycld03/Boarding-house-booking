@@ -21,9 +21,14 @@ import {
   ErrorPage,
   MyAppointment,
   WatchLater,
+  MyReportManagement,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
-import { BHManagementOwner, BHDetailOwner, FavouriteList } from "../pages/common";
+import {
+  BHManagementOwner,
+  BHDetailOwner,
+  FavouriteList,
+} from "../pages/common";
 
 const dashBoard = "/dashboard";
 
@@ -122,6 +127,11 @@ const routes = [
   {
     path: "/bh-management-owner/:boardingHouseId",
     page: BHDetailOwner,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/my-report-management",
+    page: MyReportManagement,
     layout: ProfileLayout,
   },
 

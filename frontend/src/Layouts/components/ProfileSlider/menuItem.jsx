@@ -4,6 +4,7 @@ import {
   ScheduleOutlined,
   HomeFilled,
   VideoCameraOutlined,
+  SnippetsOutlined,
 } from "@ant-design/icons";
 import { useCurrentUser } from "../../../context/userContext";
 import userRole from "../../../constants/userRole";
@@ -44,6 +45,12 @@ const getMenuItems = () => {
       label: <Link to="/bh-management-owner">Boarding House Management</Link>,
       icon: <HomeFilled />,
       visible: isOwner, // Chỉ Owner thấy
+    },
+    {
+      key: "my-owner-report",
+      label: <Link to="/my-report-management">My report management</Link>,
+      icon: <SnippetsOutlined />,
+      visible: isUser,
     },
   ];
 
