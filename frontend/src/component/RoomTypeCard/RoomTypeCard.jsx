@@ -52,7 +52,7 @@ const RoomCard = ({ roomData, boardingHouse }) => {
 
   return (
     <>
-      <Card className=" w-5/6 mx-auto  mt-6 rounded-lg shadow-md" hoverable>
+      <Card className=" sm:w-5/6 mx-auto  mt-6 rounded-lg shadow-md" hoverable>
         {/* image */}
         <div className="w-full flex flex-wrap gap-10">
           <img
