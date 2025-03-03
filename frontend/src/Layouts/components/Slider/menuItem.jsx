@@ -3,6 +3,7 @@ import {
   faCreditCard,
   faClipboardList,
   faCalendarCheck,
+  faTools,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import {
@@ -73,6 +74,15 @@ const menuItems = [
       </Link>
     ),
     icon: <FontAwesomeIcon icon={faCalendarCheck} />,
+  },
+  {
+    key: "Facilities-management",
+    label: (
+      <Link to={dashBoard + "/Facilities-management"}>
+        Facilities Management
+      </Link>
+    ),
+    icon: <FontAwesomeIcon icon={faTools} />,
   },
 ];
 

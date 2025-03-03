@@ -1,25 +1,16 @@
 import mongoose from "mongoose";
-import mongoose_delete from "mongoose-delete";
 
-const facilitySchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
-      required: true,
-    },
+const facilitySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
   },
-  { timestamps: true }
-);
-
-facilitySchema.plugin(mongoose_delete, {
-  deletedBy: true,
-  overrideMethods: true,
-});
+  description: {
+    type: String,
+    default: "",
+  },
+}, { timestamps: true });
 
 const Facility = mongoose.model("Facility", facilitySchema);
 

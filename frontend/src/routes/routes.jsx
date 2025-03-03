@@ -21,6 +21,7 @@ import {
   ErrorPage,
   MyAppointment,
   WatchLater,
+  FacilitiesManagement,
   MyReportManagement,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
@@ -171,6 +172,11 @@ const routes = [
     path: "/boarding-house/:id",
     page: BoardingHouseDetail,
     layout: HeaderOnly,
+  },
+  {
+    path: `${dashBoard}/facilities-management`,
+    page: FacilitiesManagement,
+    layout: null,
   },
 ];
 
