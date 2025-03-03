@@ -28,6 +28,7 @@ import {
   WithdrawalRequestManagement,
   AccountManagement,
   ReviewManagement,
+  FacilitiesManagement
 } from "./dashboard";
 
 export {
@@ -54,6 +55,8 @@ export {
   // owner
   BHManagementOwner,
   BHDetailOwner,
+
+
   //dashboard
   BoardingHouseManagement,
   AccountManagement,
@@ -61,4 +64,5 @@ export {
   ReportReviewManagement,
   WithdrawalRequestManagement,
   ReviewManagement,
+  FacilitiesManagement
 };

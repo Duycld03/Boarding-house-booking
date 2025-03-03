@@ -6,8 +6,10 @@ import {
   boardingHouseController,
   reportController,
   ReviewController,
+  FacilitiesController
 } from "../controllers/index.js";
 import reviewController from "../controllers/reviewController.js";
+import facilitiesController from "../controllers/facilitiesController.js";
 
 const adminRouter = Router();
 
@@ -110,5 +112,15 @@ adminRouter.delete("/account/:accountId", accountController.softDeleteAccount);
 adminRouter.get("/account/filter", accountController.filterAccounts);
 adminRouter.post("/account/create", accountController.createAccount);
 adminRouter.put("/account/:accountId", accountController.updateAccount);
+
+
+//Facilities
+adminRouter.get("/facilities", facilitiesController.getAllFacilities);
+adminRouter.delete("/facilities/:id", facilitiesController.deleteFacilities); //delete
+adminRouter.put("/facilities/:id", facilitiesController.updateFacilities); //update   
+adminRouter.get("/facilities/filter", facilitiesController.filterFacilities); //filter 
+adminRouter.post("/facilities", facilitiesController.addFacilities); //add
+
+
 
 export { adminRouter };

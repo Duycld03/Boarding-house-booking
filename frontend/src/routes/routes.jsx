@@ -21,9 +21,14 @@ import {
   ErrorPage,
   MyAppointment,
   WatchLater,
+  FacilitiesManagement,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
-import { BHManagementOwner, BHDetailOwner, FavouriteList } from "../pages/common";
+import {
+  BHManagementOwner,
+  BHDetailOwner,
+  FavouriteList,
+} from "../pages/common";
 
 const dashBoard = "/dashboard";
 
@@ -161,6 +166,11 @@ const routes = [
     path: "/boarding-house/:id",
     page: BoardingHouseDetail,
     layout: HeaderOnly,
+  },
+  {
+    path: `${dashBoard}/facilities-management`,
+    page: FacilitiesManagement,
+    layout: null,
   },
 ];
 
