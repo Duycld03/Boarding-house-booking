@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { Empty, List, Typography, Rate, Progress } from "antd";
-import ReviewCard from "../../../component/ReviewCard/ReviewCard";
+import { useState, useEffect } from 'react';
+import { Empty, List, Typography, Rate, Progress } from 'antd';
+import ReviewCard from '../../../component/ReviewCard/ReviewCard';
 
 const { Text } = Typography;
 
@@ -10,12 +10,16 @@ const ReviewList = ({
   setReviewId,
   reportedReviews,
   fetchReviews,
+  boardingHouse,
 }) => {
   const [rating, setRating] = useState(0);
 
   useEffect(() => {
     if (reviews.length > 0) {
-      const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+      const totalRating = reviews.reduce(
+        (sum, review) => sum + review.rating,
+        0
+      );
       const averageRating = totalRating / reviews.length;
       setRating(averageRating);
     } else {
@@ -34,21 +38,22 @@ const ReviewList = ({
   }, {});
 
   // List of ratings from 5 to 1
-  const allRatings = [5, 4, 3, 2, 1];
+  console.log('Review', reviews);
 
+  const allRatings = [5, 4, 3, 2, 1];
   return (
     <div className="mx-52">
       <div className="flex flex-wrap flex-1 my-16 items-center gap-10">
         <div
           style={{
-            display: "flex",
-            justifyContent: "center",
+            display: 'flex',
+            justifyContent: 'center',
             marginBottom: 16,
           }}
         >
           <Progress
             type="circle"
-            strokeColor={"#40BFFF"}
+            strokeColor={'#40BFFF'}
             percent={rating * 20}
             size={200}
             format={() => `${rating.toFixed(1)}/5`}
@@ -79,6 +84,7 @@ const ReviewList = ({
             reviewId={review._id}
             isReported={reportedReviews.includes(review._id)}
             onReviewUpdated={fetchReviews}
+            boardingHouse={boardingHouse}
           />
         )}
         pagination={{

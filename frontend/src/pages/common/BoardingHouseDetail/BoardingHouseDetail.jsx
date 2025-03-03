@@ -26,6 +26,7 @@ import {
 import { toast } from 'react-toastify';
 import { addFavorite, getFavorite } from '../../../api/favoriteManagement';
 
+
 const { Content } = Layout;
 
 function BoardingHouseDetail() {
@@ -372,6 +373,7 @@ function BoardingHouseDetail() {
                 setReviewId={setReviewId}
                 reportedReviews={reportedReviews}
                 fetchReviews={fetchReviews}
+                boardingHouse={boardingHouse}
               />
             </div>
           </div>
