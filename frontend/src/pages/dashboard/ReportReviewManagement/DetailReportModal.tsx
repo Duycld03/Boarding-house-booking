@@ -22,7 +22,11 @@ const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
   return (
     <Modal
       key={reportData?._id}
-      title="Review Report Details"
+      title={
+        <h2 style={{ fontSize: '20px', fontWeight: 'bold' }}>
+          Review Report Details
+        </h2>
+      }
       open={isOpen}
       onCancel={onClose}
       footer={[
