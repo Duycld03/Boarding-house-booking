@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Table, message } from "antd";
-import { PlusOutlined, FileTextOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
 import { Button, ConfirmModal } from "../../../component";
+import Table from "../../../component/Table";
+
 import {
     getAllBoardingHouseTypes,
     createBoardingHouseType,
     softDeleteBoardingHouseType,
     filterBoardingHouseTypes,
 } from "../../../api/BoardingHManagement";
-import { toast } from "react-toastify";
 import CreateBoardingHouseType from "./CreateBoardingHouseType";
 import UpdateBoardingHouseType from "./UpdateBoardingHouseType";
 import FilterBoardingHouseType from "./FilterBoardingHouseType";
+import { FileTextOutlined } from "@ant-design/icons";
 
 function BoardingHouseTypeManagement() {
     const [data, setData] = useState([]);
@@ -27,11 +28,11 @@ function BoardingHouseTypeManagement() {
         setLoading(true);
         try {
             const response = await getAllBoardingHouseTypes();
-            console.log(response);
             if (response && response.data) {
                 const formattedData = response.data.map((item) => ({
                     id: item.value,
                     name: item.label,
+                    description: item.description,
                     createdAt: item.createdAt || null,
                     updatedAt: item.updatedAt || null,
                 }));
@@ -40,7 +41,7 @@ function BoardingHouseTypeManagement() {
                 setData([]);
             }
         } catch (error) {
-            message.error("Failed to fetch data.");
+            toast.error("Failed to fetch data.");
         } finally {
             setLoading(false);
         }
@@ -66,15 +67,16 @@ function BoardingHouseTypeManagement() {
                 setData([]);
             }
         } catch (error) {
-            console.error("Filter error:", error);
-            const errorMessage =
-                error.response?.data?.message || "Failed to filter boarding house types. Please try again.";
-            toast.error(errorMessage);
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to filter boarding house types. Please try again."
+            );
             setData([]);
         } finally {
             setLoading(false);
         }
     };
+
     useEffect(() => {
         if (filterValue && (filterValue.name || filterValue.startDate || filterValue.endDate)) {
             fetchFilterData(filterValue);
@@ -90,9 +92,9 @@ function BoardingHouseTypeManagement() {
             setIsCreateModalVisible(false);
             fetchData();
         } catch (error) {
-            const errorMessage =
-                error.response?.data?.message || error.message || "An unexpected error occurred.";
-            toast.error(errorMessage);
+            toast.error(
+                error.response?.data?.message || "An unexpected error occurred."
+            );
         }
     };
 
@@ -138,16 +140,23 @@ function BoardingHouseTypeManagement() {
             key: "name",
         },
         {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+        },
+        {
             title: "Created At",
             dataIndex: "createdAt",
             key: "createdAt",
-            render: (text) => new Date(text).toLocaleDateString("en-GB"),
+            render: (text) =>
+                text ? new Date(text).toLocaleDateString("en-GB") : "N/A",
         },
         {
             title: "Updated At",
             dataIndex: "updatedAt",
             key: "updatedAt",
-            render: (text) => new Date(text).toLocaleDateString("en-GB"),
+            render: (text) =>
+                text ? new Date(text).toLocaleDateString("en-GB") : "N/A",
         },
         {
             title: "Action",
@@ -158,16 +167,14 @@ function BoardingHouseTypeManagement() {
                         title="Delete"
                         size="large"
                         btnDelete
-                        className="btn-delete"
                         onClick={() => handleDeleteModal(record)}
                     />
                     <Button
-                        onClick={() => handleOpenUpdateModal(record)}
                         size="large"
-                        title="Detail"
-                        icon={<FileTextOutlined />}
-                        className="text-white"
-                        bgColor="rgb(5 150 105)"
+                        style={{ marginLeft: 8 }}
+                        btnUpdate
+                        title={"Update"}
+                        onClick={() => handleOpenUpdateModal(record)}
                     />
                 </div>
             ),
@@ -176,33 +183,21 @@ function BoardingHouseTypeManagement() {
 
     return (
         <div style={{ padding: "20px" }}>
-            <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}>
-                Boarding House Type Management
-            </h1>
             <div className="flex justify-between">
                 <Button
                     btnAdd
                     title="Add new"
                     size="large"
                     onClick={handleOpenCreateModal}
-                ></Button>
+                />
                 <FilterBoardingHouseType setFilterValue={setFilterValue} />
             </div>
-            <Table
-                columns={columns}
-                dataSource={data}
-                rowKey="id"
-                loading={loading}
-                bordered
-                locale={{
-                    emptyText: filterValue
-                        ? "No data available for the current filter"
-                        : "No data available",
-                }}
-            />
+            <div>
+                <Table columns={columns} data={data} loading={loading} />
+            </div>
             <ConfirmModal
                 title="Confirm Deletion"
-                content={`Are you sure you want to delete "${selectedRequest?.name || 'this boarding house type'}"?`}
+                content={`Are you sure you want to delete "${selectedRequest?.name || "this boarding house type"}"?`}
                 onOk={handleSelectDelete}
                 onCancel={() => {
                     setIsOpenDeleteModal(false);

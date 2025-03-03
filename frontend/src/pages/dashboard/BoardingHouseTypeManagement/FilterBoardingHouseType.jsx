@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { Button, Form, Input, DatePicker, message } from "antd";
 import ButtonCustom from "../../../component/Button";
-
-const { RangePicker } = DatePicker;
+import moment from "moment";
 
 function FilterBoardingHouse({ setFilterValue }) {
     const [isOpen, setIsOpen] = useState(false);
     const [filters, setFilters] = useState({
         name: "",
-        startDate: "",
-        endDate: "",
+        startDate: null,
+        endDate: null,
     });
 
     const handleInputChange = (e) => {
@@ -20,15 +19,39 @@ function FilterBoardingHouse({ setFilterValue }) {
         }));
     };
 
-    const handleDateChange = (dates, dateStrings) => {
+    const handleStartDateChange = (date) => {
         setFilters((prev) => ({
             ...prev,
-            startDate: dateStrings[0] || "",
-            endDate: dateStrings[1] || "",
+            startDate: date ? date.format("YYYY-MM-DD") : null, // Use ISO format for filtering
+        }));
+    };
+
+    const handleEndDateChange = (date) => {
+        setFilters((prev) => ({
+            ...prev,
+            endDate: date ? date.format("YYYY-MM-DD") : null, // Use ISO format for filtering
         }));
     };
 
     const handleSubmit = () => {
+        const { startDate, endDate } = filters;
+
+        // Validate date range
+        if (startDate && !endDate) {
+            message.error("Please select an end date.");
+            return;
+        }
+
+        if (endDate && !startDate) {
+            message.error("Please select a start date.");
+            return;
+        }
+
+        if (startDate && endDate && moment(startDate).isAfter(moment(endDate))) {
+            message.error("Start date cannot be later than end date.");
+            return;
+        }
+
         setFilterValue(filters);
         setIsOpen(false);
     };
@@ -36,8 +59,8 @@ function FilterBoardingHouse({ setFilterValue }) {
     const handleClear = () => {
         const clearedFilters = {
             name: "",
-            startDate: "",
-            endDate: "",
+            startDate: null,
+            endDate: null,
         };
         setFilters(clearedFilters);
         setFilterValue(clearedFilters);
@@ -69,26 +92,26 @@ function FilterBoardingHouse({ setFilterValue }) {
                             />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Date Range"
-                            rules={[
-                                {
-                                    validator: () => {
-                                        if (!filters.startDate || !filters.endDate) {
-                                            return Promise.reject(
-                                                new Error("Please select a valid date range.")
-                                            );
-                                        }
-                                        return Promise.resolve();
-                                    },
-                                },
-                            ]}
-                        >
-                            <RangePicker
-                                style={{ width: "100%" }}
-                                onChange={handleDateChange}
+                        <Form.Item label="Start Date" name="startDate" className="mb-2">
+                            <DatePicker
+                                className="w-full"
+                                value={filters.startDate ? moment(filters.startDate, "YYYY-MM-DD") : null}
+                                onChange={handleStartDateChange}
+                                format="DD-MM-YYYY"
+                                allowClear
                             />
                         </Form.Item>
+
+                        <Form.Item label="End Date" name="endDate" className="mb-2">
+                            <DatePicker
+                                className="w-full"
+                                value={filters.endDate ? moment(filters.endDate, "YYYY-MM-DD") : null}
+                                onChange={handleEndDateChange}
+                                format="DD-MM-YYYY"
+                                allowClear
+                            />
+                        </Form.Item>
+
                         <Form.Item>
                             <div className="flex justify-evenly mt-4">
                                 <ButtonCustom

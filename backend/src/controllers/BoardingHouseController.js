@@ -237,12 +237,13 @@ class boardingHouseController {
 
   async getAllBoardingHouseTypes(req, res) {
     try {
-      const boardingHouseTypes = await BoardingHouseType.find();
+      const boardingHouseTypes = await BoardingHouseType.find().sort({ createdAt: -1 });
       const formattedTypes = boardingHouseTypes.map((type) => ({
         value: type._id,
         label: type.name,
         roomSize: type.roomSize,
         peopleNumber: type.peopleNumber,
+        description: type.description,
         createdAt: type.createdAt,
         updatedAt: type.updatedAt,
       }));
