@@ -183,8 +183,9 @@ const ReviewCard = ({
     setNewImages(images.map((img) => ({ ...img, isDeleted: false })));
   };
   const handleReply = () => {
-    console.log('Opening reply form...');
-    setIsReplying((prev) => !prev); // Toggle trạng thái
+    if (!hasReply) {
+      setIsReplying((prev) => !prev);
+    }
   };
 
   const menu = (
@@ -306,18 +307,12 @@ const ReviewCard = ({
           ))}
         </div>
       )}
-      {isReplying && (
+      {(isReplying || hasReply) && (
         <ReviewReply
           reviewId={reviewIdProp}
           currentReply={reviewData?.replyContent}
           onReplyUpdated={onReviewUpdated}
-        />
-      )}
-      {hasReply && (
-        <ReviewReply
-          reviewId={reviewIdProp}
-          currentReply={reviewData?.replyContent}
-          onReplyUpdated={onReviewUpdated}
+          onClick={handleReply}
         />
       )}
 

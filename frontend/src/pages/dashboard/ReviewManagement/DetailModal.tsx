@@ -15,7 +15,9 @@ const DetailModal = ({ isOpen, onClose, review }) => {
 
   return (
     <Modal
-      title="Review Detail"
+      title={
+        <h2 style={{ fontSize: '20px', fontWeight: 'bold' }}>Review Detail</h2>
+      }
       key={review?._id}
       open={isOpen}
       onCancel={onClose}
