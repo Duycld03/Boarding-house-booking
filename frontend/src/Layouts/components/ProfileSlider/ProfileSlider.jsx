@@ -14,6 +14,7 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
       collapsible
       collapsed={collapsed}
       onCollapse={() => setCollapsed(!collapsed)}
+      className="lg:block hidden"
       style={{ background: '#fff' }}
       {...props}
     >
