@@ -468,15 +468,15 @@ class reportController {
         });
 
       const formattedReports = reports.map((report) => ({
-        reporter: report.reporter.fullname,
         reportType: report.reportType === "review" ? "Review" : "Boarding House",
         target:
-          report.targetId && report.reportType === "review"
-            ? report.targetId.content
+          report.reportType === "review"
+            ? `Review của ${report.reporter.fullname}`
             : report.targetId?.name || "N/A",
         reason: report.reason,
         status: report.status,
-        createdAt: new Date(report.createdAt).toLocaleDateString(),
+        details: report.details,
+        createdAt: report.createdAt,
       }));
 
       res.status(200).json({ success: true, data: formattedReports });
@@ -484,7 +484,8 @@ class reportController {
       console.error("Error fetching reports:", error);
       res.status(500).json({ success: false, message: "Lỗi khi lấy danh sách báo cáo." });
     }
-  };
+  }
+
 
 
 
