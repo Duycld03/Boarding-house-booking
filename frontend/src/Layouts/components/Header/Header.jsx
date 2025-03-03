@@ -134,7 +134,7 @@ const CustomHeader = () => {
           </Button>
         </Space>
       ) : (
-        <Dropdown overlay={userMenu} placement="bottomRight" arrow>
+        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>
           <Avatar
             src={avatar}
             size={60}

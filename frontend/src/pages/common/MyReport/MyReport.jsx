@@ -1,5 +1,8 @@
 import { getMyReport } from "@/api/ownerUser/myReport";
 import { useEffect, useState } from "react";
+import { TableCustom as Table } from "@/component";
+import convertTimetap from "@/utils/convertTimetap";
+import { Tag, Tooltip } from "antd";
 
 function MyReport() {
   const [report, setReport] = useState([]);
@@ -8,7 +11,6 @@ function MyReport() {
   const fetchReport = async () => {
     try {
       const response = await getMyReport();
-
       setReport(response);
     } catch (error) {
       console.log("Fetch report error: ", error);
@@ -21,13 +23,68 @@ function MyReport() {
     fetchReport();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const columns = [
+    {
+      title: "Report Type",
+      dataIndex: "reportType",
+      key: "reportType",
+    },
+    {
+      title: "Target",
+      dataIndex: "target",
+      key: "target",
+    },
+    {
+      title: "Reason",
+      dataIndex: "reason",
+      key: "reason",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag
+          color={
+            status === "pending"
+              ? "orange"
+              : status === "resolved"
+              ? "green"
+              : "red"
+          }
+        >
+          {status}
+        </Tag>
+      ),
+    },
+    {
+      title: "Details",
+      dataIndex: "details",
+      key: "details",
+      render: (text) => {
+        const maxLength = 50;
+        const truncated =
+          text && text.length > maxLength
+            ? text.substring(0, maxLength) + "..."
+            : text;
+        return (
+          <Tooltip title={text}>
+            <span>{truncated}</span>
+          </Tooltip>
+        );
+      },
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => convertTimetap(text, false),
+    },
+  ];
 
   return (
     <div>
-      <h2>This is my report</h2>
+      <Table data={report} columns={columns} loading={loading} />
     </div>
   );
 }

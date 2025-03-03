@@ -21,6 +21,7 @@ import {
   ErrorPage,
   MyAppointment,
   WatchLater,
+  FacilitiesManagement,
   MyReportManagement,
   BoardingHouseTypeManagement
 } from "../pages";
@@ -176,6 +177,11 @@ const routes = [
   {
     path: `${dashBoard}/boarding-house-type-management`,
     page: BoardingHouseTypeManagement,
+    layout: null,
+  },
+   {
+    path: `${dashBoard}/facilities-management`,
+    page: FacilitiesManagement,
     layout: null,
   },
 ];
