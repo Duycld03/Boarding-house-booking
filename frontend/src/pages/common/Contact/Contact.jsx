@@ -64,10 +64,11 @@ function Contact() {
           <h3 className="text-[22px] font-semibold text-center">
             Get in Touch
           </h3>
-          <p className="text-gray-600 text-center mt-2">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Felis diam
-            lectus sapien.
+          <p className="lg:opacity-0 text-center">
+            We are group 4 from FPT University Can Tho, ready to learn and
+            create!
           </p>
+
           <Form
             form={form}
             layout="vertical"
@@ -154,8 +155,8 @@ function Contact() {
             Reach us at
           </h3>
           <p className="text-gray-700 text-[14px] mt-2">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Felis diam
-            lectus sapien.
+            We are group 4 from FPT University Can Tho, ready to learn and
+            create!
           </p>
 
           {/* Social Icons */}
