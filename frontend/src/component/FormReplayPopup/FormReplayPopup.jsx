@@ -76,9 +76,9 @@ const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
         <Form.Item label="Created At" name="createdAt">
           <Input disabled />
         </Form.Item>
-        <Form.Item label="Processed By" name="processedBy">
+        {/* <Form.Item label="Processed By" name="processedBy">
           <Input disabled />
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item label="Updated At" name="updatedAt">
           <Input disabled />
         </Form.Item>
