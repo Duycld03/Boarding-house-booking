@@ -9,41 +9,45 @@ import { useCurrentUser } from "../../../context/userContext";
 import userRole from "../../../constants/userRole";
 
 const getMenuItems = () => {
-  const { hasRole, user } = useCurrentUser(); // Gọi useCurrentUser() trong component
-  console.log(user);
+  const { hasRole } = useCurrentUser(); // Lấy thông tin user từ context
+
+  const isOwner = hasRole(userRole.owner);
+  const isUser = hasRole(userRole.user) || isOwner; // Owner kế thừa quyền của User
+
   const menuItems = [
     {
       key: "profile",
       label: <Link to="/profile">Profile</Link>,
       icon: <UserOutlined />,
+      visible: true, // Ai cũng có quyền xem
     },
     {
       key: "appointment-management",
       label: <Link to="/my-appointment">My appointment</Link>,
       icon: <ScheduleOutlined />,
+      visible: isUser, // Chỉ User & Owner thấy
     },
     {
-      key: 'favourite-list',
+      key: "favourite-list",
       label: <Link to="/favourite-list">My favourite</Link>,
       icon: <ScheduleOutlined />,
+      visible: isUser, // Chỉ User & Owner thấy
     },
     {
       key: "watch-later",
       label: <Link to="/watch-later">Watch later</Link>,
       icon: <VideoCameraOutlined />,
+      visible: isUser, // Chỉ User & Owner thấy
     },
-  ];
-
-  // Nếu user có role "owner", thêm mục quản lý nhà trọ
-  if (hasRole(userRole.owner)) {
-    menuItems.push({
+    {
       key: "bh-management-owner",
       label: <Link to="/bh-management-owner">Boarding House Management</Link>,
       icon: <HomeFilled />,
-    });
-  }
+      visible: isOwner, // Chỉ Owner thấy
+    },
+  ];
 
-  return menuItems;
+  return menuItems.filter((item) => item.visible);
 };
 
 export default getMenuItems;
