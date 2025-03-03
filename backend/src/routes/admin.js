@@ -50,6 +50,10 @@ adminRouter.get(
   '/reports/filter/boarding-house',
   reportController.filterBHReports
 );
+adminRouter.get(
+  '/reportReview/:reportId',
+  reportController.getReportReviewDetail
+);
 
 //review
 adminRouter.get('/reviews', ReviewController.getReviews);
@@ -57,6 +61,8 @@ adminRouter.get('/reviews/filter', reviewController.filterReviews);
 adminRouter.delete('/reviews/:reviewId', reviewController.softDeleteReview);
 adminRouter.get('/boarding-house-reports', reportController.getBHReports);
 adminRouter.get('/review/:reviewId', ReviewController.getReviewDetail);
+
+
 
 //boarding house
 adminRouter.get('/boardinghouse', boardingHouseController.getAllBHOnDashBoard);
