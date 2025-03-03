@@ -56,7 +56,7 @@ const RoomCard = ({ roomData, boardingHouse }) => {
         {/* image */}
         <div className="w-full flex flex-wrap gap-10">
           <img
-            className="max-h-[400px] md:w-1/2 sm:w-full object-cover rounded-lg"
+            className="max-h-[400px] w-full xl:w-1/2 object-cover rounded-lg"
             src={roomData?.image?.imageUrl}
           />
 

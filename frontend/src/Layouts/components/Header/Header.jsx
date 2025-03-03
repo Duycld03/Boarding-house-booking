@@ -85,8 +85,6 @@ const CustomHeader = () => {
     },
   ];
 
-  const userMenu = <Menu items={userMenuItems} />;
-
   return (
     <Header className={cx("flex justify-between items-center bg-white")}>
       {/* Logo */}
@@ -106,14 +104,13 @@ const CustomHeader = () => {
       </Link>
 
       {/* Main Menu (Desktop) */}
-      {screens.lg && (
-        <Menu
-          theme="light"
-          mode="horizontal"
-          defaultSelectedKeys={["home"]}
-          items={menuItems}
-        />
-      )}
+      <Menu
+        className="lg:block hidden"
+        theme="light"
+        mode="horizontal"
+        defaultSelectedKeys={["home"]}
+        items={menuItems}
+      />
 
       {/* User Section */}
       {!isLoggedIn ? (

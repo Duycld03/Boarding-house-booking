@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Divider, Table as AntTable, Button, Select } from 'antd';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from "react";
+import { Divider, Table as AntTable, Button, Select, Grid } from "antd";
+import PropTypes from "prop-types";
 
 const { Option } = Select;
 
@@ -13,6 +13,7 @@ const TableCustom = ({
   enableCount = true,
   loading = false,
   onRowClick,
+  scrollY = null,
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -23,6 +24,10 @@ const TableCustom = ({
     setSelectedRowKeys(newSelectedRowKeys);
     setSelectedRows(newSelectedRows);
   };
+
+  const { useBreakpoint } = Grid;
+
+  const screens = useBreakpoint();
 
   const handleSelectChange = (value) => {
     setDynamicSelect(value);
@@ -42,7 +47,7 @@ const TableCustom = ({
       formValues: { dynamicSelect },
       selectedRows: selectedRows,
     };
-    if (onProcessData && typeof onProcessData === 'function') {
+    if (onProcessData && typeof onProcessData === "function") {
       onProcessData(combinedData);
     }
     setDynamicSelect(null);
@@ -58,9 +63,9 @@ const TableCustom = ({
   const numberedColumns = enableCount
     ? [
         {
-          title: 'No.',
-          dataIndex: 'number',
-          key: 'number',
+          title: "No.",
+          dataIndex: "number",
+          key: "number",
           render: (_, record) => <span>{record.number}</span>,
         },
         ...columns,
@@ -75,7 +80,7 @@ const TableCustom = ({
 
   const onRow = (record) => ({
     onClick: () => {
-      if (onRowClick && typeof onRowClick === 'function') {
+      if (onRowClick && typeof onRowClick === "function") {
         onRowClick(record);
       }
     },
@@ -109,17 +114,21 @@ const TableCustom = ({
           </Button>
         </div>
       )}
-      <div className="w-full overflow-x-auto">
-        <AntTable
-          pagination={{ pageSize: 10 }}
-          scroll={{ x: 'max-content' }}
-          className="text-xs sm:text-sm md:text-base"
-          rowKey="_id"
-          rowSelection={checkbox ? rowSelection : null}
-          columns={numberedColumns}
-          dataSource={numberedData}
-          onRow={onRow}
-        />
+      <div className="w-full">
+        <div className="max-w-full">
+          <AntTable
+            pagination={{ pageSize: 10 }}
+            scroll={{
+              x: "max-content",
+            }}
+            className="text-xs sm:text-sm md:text-base"
+            rowKey="_id"
+            rowSelection={checkbox ? rowSelection : null}
+            columns={numberedColumns}
+            dataSource={numberedData}
+            onRow={onRow}
+          />
+        </div>
       </div>
     </div>
   );
