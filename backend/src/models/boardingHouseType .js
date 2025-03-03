@@ -8,17 +8,8 @@ const boardingHouseTypeSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Account",
-    },
-    roomSize: {
+    description: {
       type: String,
-      required: true,
-    },
-    peopleNumber: {
-      type: Number,
       required: true,
     },
   },

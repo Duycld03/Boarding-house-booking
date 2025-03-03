@@ -57,6 +57,15 @@ const menuItems = [
     icon: <HomeOutlined />,
   },
   {
+    key: "boarding-house-type-management",
+    label: (
+      <Link to={dashBoard + "/boarding-house-type-management"}>
+        Boarding House Type Management
+      </Link>
+    ),
+    icon: <HomeOutlined />,
+  },
+  {
     key: "withdrawal-requests-management",
     label: (
       <Link to={dashBoard + "/withdrawal-requests-management"}>

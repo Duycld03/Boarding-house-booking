@@ -4,4 +4,5 @@ import ReportReviewManagement from "./ReportReviewManagement";
 import WithdrawalRequestManagement from "./WithdrawalRequestManagement";
 import BoardingHouseManagement from "./BoardingHouseManagement";
 import ReviewManagement from "./ReviewManagement";
-export { AccountManagement, ReportBoardingHouse, ReportReviewManagement, WithdrawalRequestManagement, BoardingHouseManagement, ReviewManagement }
+import BoardingHouseTypeManagement from "./BoardingHouseTypeManagement";
+export { AccountManagement, ReportBoardingHouse, ReportReviewManagement, WithdrawalRequestManagement, BoardingHouseManagement, ReviewManagement, BoardingHouseTypeManagement }
