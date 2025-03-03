@@ -155,15 +155,14 @@ class reportController {
           subject: `Kết quả xử lý báo cáo: #${relatedReport._id}`,
           html: `
             <p>Kính gửi Anh/Chị ${relatedReport.reporter.fullname},</p>
-            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${
-              relatedReport.reason || 'undefined'
+            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${relatedReport.reason || 'undefined'
             }"</strong> ${reportSubject} trên nền tảng của chúng tôi.</p>
             <p>Chúng tôi xin thông báo rằng báo cáo của bạn đã được xử lý với kết quả như sau:</p>
             <ul>
                 <li><strong>Trạng thái báo cáo:</strong> ${status}</li>
                 <li><strong>Ngày gửi báo cáo:</strong> ${new Date(
-                  relatedReport.createdAt
-                ).toLocaleDateString()}</li>
+              relatedReport.createdAt
+            ).toLocaleDateString()}</li>
                 <li><strong>Người xử lý:</strong> ${processedByName}</li>
                 <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
                 <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>
@@ -444,6 +443,52 @@ class reportController {
       return res.status(500).json({ error: error.message });
     }
   }
+
+
+
+
+  async getReportByUserId(req, res) {
+    try {
+      const reports = await Report.find({
+        reporter: req.user.userId,
+        reportType: { $in: ["review", "boardingHouse"] },
+      })
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "reporter",
+          select: "fullname email",
+        })
+        .populate({
+          path: "processedBy",
+          select: "fullname",
+        })
+        .populate({
+          path: "targetId",
+          select: "content name",
+        });
+
+      const formattedReports = reports.map((report) => ({
+        reporter: report.reporter.fullname,
+        reportType: report.reportType === "review" ? "Review" : "Boarding House",
+        target:
+          report.targetId && report.reportType === "review"
+            ? report.targetId.content
+            : report.targetId?.name || "N/A",
+        reason: report.reason,
+        status: report.status,
+        createdAt: new Date(report.createdAt).toLocaleDateString(),
+      }));
+
+      res.status(200).json({ success: true, data: formattedReports });
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      res.status(500).json({ success: false, message: "Lỗi khi lấy danh sách báo cáo." });
+    }
+  };
+
+
+
+
 }
 
 export default new reportController();
