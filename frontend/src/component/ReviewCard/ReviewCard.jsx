@@ -272,7 +272,7 @@ const ReviewCard = ({
   return (
     <Card style={{ marginBottom: 16 }}>
       <div style={{ position: "absolute", top: 10, right: 10 }}>
-        <Dropdown menu={menu} trigger={["click"]}>
+        <Dropdown overlay={menu} trigger={["click"]}>
           <Button type="text">
             <FontAwesomeIcon icon={faEllipsisV} className="text-gray-600" />
           </Button>

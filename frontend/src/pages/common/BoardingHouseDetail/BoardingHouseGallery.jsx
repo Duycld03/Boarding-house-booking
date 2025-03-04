@@ -113,7 +113,7 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
   return (
     <div className="flex flex-col mx-auto w-full md:w-3/4 relative">
       <div className="absolute top-10 right-14 z-10">
-        <Dropdown menu={menu} trigger={["click"]}>
+        <Dropdown overlay={menu} trigger={["click"]}>
           <button>
             <FontAwesomeIcon
               icon={faEllipsisV}
