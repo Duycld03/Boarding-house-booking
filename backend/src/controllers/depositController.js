@@ -1,4 +1,3 @@
-import https from "https";
 import moment from "moment";
 import querystring from "qs";
 import crypto from "crypto";
@@ -6,6 +5,7 @@ import axios from "axios";
 import { sortObject } from "../utils/algorithms.js";
 import DepositRoom from "../models/depositRoom.js";
 import dotenv from "dotenv";
+import { start } from "repl";
 dotenv.config();
 
 const config = {
@@ -58,6 +58,39 @@ class DepositController {
       }
     } catch (error) {
       console.error("Error depositing:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+  async getDepositedRoom(req, res) {
+    try {
+      const { userId } = req.user;
+      const deposits = await DepositRoom.find({ accountId: userId })
+        .populate({
+          path: "roomId",
+          populate: {
+            path: "boardingHouseId",
+          },
+        })
+        .sort({ createdAt: -1 })
+        .lean();
+      const result = deposits.map((deposit) => {
+        const { roomId } = deposit;
+        const { boardingHouseId } = roomId;
+        return {
+          _id: deposit._id,
+          name: boardingHouseId.name,
+          roomNumber: roomId.roomNumber,
+          amount: deposit.amount,
+          status: deposit.status,
+          startDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+          endDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+          rentalTime: 1,
+        };
+      });
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error getting deposited room:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
