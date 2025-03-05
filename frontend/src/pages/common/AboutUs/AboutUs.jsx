@@ -1,74 +1,105 @@
+import React from "react";
+import { TeamOutlined, AimOutlined, CodeOutlined } from "@ant-design/icons";
+
 function AboutUs() {
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10 px-5">
-      <div className="max-w-4xl text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">About Us</h1>
-        <p className="text-lg text-gray-600 mb-8">
-          Welcome to our website! We are passionate about delivering exceptional
-          services and creating meaningful experiences for our users. Our
-          mission is to innovate and provide the best solutions tailored to your
-          needs.
+    <div className="min-h-screen py-10 px-5">
+      <header
+        className="text-center mb-12 bg-cover bg-center bg-no-repeat py-20 px-4"
+        style={{
+          backgroundImage: `url('https://afamilycdn.com/150157425591193600/2022/9/30/hinh-anh-cac-sinh-vien-kien-truc-cung-nhau-lam-viec-nhom-16642466416561577942506-1664469958516-16644699587351209650787-1664506667990-1664506668496235501908.jpg')`,
+        }}
+      >
+        <h1 className="text-4xl sm:text-6xl lg:text-8xl font-extrabold text-white">
+          We Are MotelLease Tech
+        </h1>
+        <p className="text-white mt-8 max-w-xl mx-auto text-base sm:text-lg lg:text-xl">
+          At MotelLease Tech, we believe in simplifying the rental experience
+          for everyone. Our platform bridges the gap between landlords and
+          tenants by providing a seamless, efficient, and transparent rental
+          process. From helping tenants find their ideal rental properties to
+          giving landlords tools to manage their listings, we strive to make
+          the process stress-free and modern.
         </p>
-      </div>
+      </header>
 
-      <div className="flex flex-wrap justify-center gap-6 max-w-5xl">
-        <div className="bg-white rounded-lg shadow-md p-6 w-full sm:w-80">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Our Mission
-          </h3>
-          <p className="text-gray-600">
-            Our mission is to deliver high-quality services that help you
-            achieve your goals and dreams.
-          </p>
-        </div>
+      <div>
+        <h2 className="text-4xl font-bold text-blue-600 mb-4 text-center">
+          WHO ARE WE?
+        </h2>
+        <h2 className="text-6xl font-bold mb-4 text-center">
+          ABOUT MOTELLEASE TECH
+        </h2>
+        <hr className=" border-black mx-auto w-1/4 my-8" />
 
-        {/* Card 2 */}
-        <div className="bg-white rounded-lg shadow-md p-6 w-full sm:w-80">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Our Vision
-          </h3>
-          <p className="text-gray-600">
-            We strive to be the leading provider of innovative solutions,
-            trusted by our users worldwide.
-          </p>
-        </div>
-
-        {/* Card 3 */}
-        <div className="bg-white rounded-lg shadow-md p-6 w-full sm:w-80">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Our Values
-          </h3>
-          <p className="text-gray-600">
-            Integrity, innovation, and customer satisfaction are at the core of
-            everything we do.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Meet Our Team</h2>
-        <div className="flex flex-wrap justify-center gap-6">
-          {/* Team Member 1 */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-32 h-32 rounded-full bg-gray-300 mb-4"></div>
-            <h4 className="text-lg font-semibold text-gray-800">John Doe</h4>
-            <p className="text-gray-600">CEO & Founder</p>
+        <div className="flex flex-col lg:flex-row gap-6 mx-auto p-4">
+          <div className="bg-white p-8 rounded-lg shadow-md flex-1">
+            <div className="flex items-center justify-center mb-4">
+              <TeamOutlined className="text-blue-600 text-6xl" />
+            </div>
+            <h2 className="text-2xl font-bold text-blue-600 mb-4 text-center">
+              Meet Our Team
+            </h2>
+            <p className="text-gray-700 mt-4">
+              <strong>Members and Roles:</strong>
+            </p>
+            <ul className="list-disc ml-5 mt-2 text-gray-700 space-y-2">
+              <li>Doan Thanh Phuc - Team Leader</li>
+              <li>Nguyen Truong Duy - Backend Developer</li>
+              <li>Tran Gia Vy - Backend Developer</li>
+              <li>Duong My Tien - Frontend Developer</li>
+              <li>To Do Hong Y - Frontend Developer</li>
+            </ul>
+            <p className="text-gray-700 mt-4">
+              <strong>Our Goal:</strong> To create a platform that connects
+              tenants and landlords efficiently, using modern technology.
+            </p>
           </div>
 
-          {/* Team Member 2 */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-32 h-32 rounded-full bg-gray-300 mb-4"></div>
-            <h4 className="text-lg font-semibold text-gray-800">Jane Smith</h4>
-            <p className="text-gray-600">CTO</p>
+          <div className="bg-white p-8 rounded-lg shadow-md flex-1">
+            <div className="flex items-center justify-center mb-4">
+              <AimOutlined className="text-blue-600 text-6xl" />
+            </div>
+            <h2 className="text-2xl font-bold text-blue-600 mb-4 text-center">
+              Why This Project & Goals
+            </h2>
+            <ul className="list-disc ml-5 text-gray-700 space-y-2">
+              <li>
+                <strong>Why This Project?</strong> Addressing real-world
+                problems: Difficulty in finding and managing rental properties,
+                leveraging technology to optimize the rental process for both
+                tenants and landlords, and aligning with market trends and the
+                growing demand for digital platforms.
+              </li>
+              <li>
+                <strong>Project Goals:</strong> Build a platform that connects
+                landlords and tenants easily, provide features like online
+                booking, electronic payments, and contract management, and
+                enhance the rental experience by utilizing modern technologies.
+              </li>
+            </ul>
           </div>
 
-          {/* Team Member 3 */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-32 h-32 rounded-full bg-gray-300 mb-4"></div>
-            <h4 className="text-lg font-semibold text-gray-800">
-              Alex Johnson
-            </h4>
-            <p className="text-gray-600">Marketing Manager</p>
+          <div className="bg-white p-8 rounded-lg shadow-md flex-1">
+            <div className="flex items-center justify-center mb-4">
+              <CodeOutlined className="text-blue-600 text-6xl" />
+            </div>
+            <h2 className="text-2xl font-bold text-blue-600 mb-4 text-center">
+              Technologies & Future Vision
+            </h2>
+            <ul className="list-disc ml-5 text-gray-700 space-y-2">
+              <li>
+                <strong>Technologies Used:</strong> ReactJS, Node.js, MongoDB,
+                integration with electronic payment systems (Momo, VNPay), and
+                modern deployment and security tools (CI/CD, Cloud Hosting).
+              </li>
+              <li>
+                <strong>Vision & Future Development:</strong> Adding features
+                like user reviews and feedback, expanding the platform to cover
+                more regions, and enhancing user experience with AI-powered
+                rental recommendations.
+              </li>
+            </ul>
           </div>
         </div>
       </div>
