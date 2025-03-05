@@ -1,5 +1,9 @@
 import axios from './axios.config';
-
+export const filterBHUser = async (filterValue) => {
+  return axios.get(`/boardinghouse/filter`, {
+    params: filterValue,
+  });
+};
 export const getAllBoardingHDB = () => {
   return axios.get('/dashboard/boardinghouse');
 };
@@ -89,4 +93,10 @@ export const updateBoardingHouseDetailsOwner = (
       'Content-Type': 'multipart/form-data',
     },
   });
+};
+export const getAllBoardingHouseTypeUser = () => {
+  return axios.get('/boardinghousetype');
+};
+export const getMaxPriceBHUser = async () => {
+  return axios.get('/boardinghouse/chore/get-max');
 };

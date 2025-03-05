@@ -601,6 +601,7 @@ class boardingHouseController {
         ward,
         startDate,
         endDate,
+        rating
       } = req.query;
 
       let filter = {};
@@ -611,11 +612,33 @@ class boardingHouseController {
           boardingHouseType
         ); // Convert string to ObjectId
       }
+      if (rating) {
+        const ratings = rating.split(",").map(Number); // Split and convert to numbers
+        const validRatings = ratings.filter((r) => !isNaN(r) && r >= 0 && r <= 5); // Validate ratings
 
-      if (priceRange && priceRange.length === 2) {
-        filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
+        if (validRatings.length > 0) {
+          filter.rating = { $in: validRatings }; // Filter for ratings in the provided array
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid rating format. Each rating must be a number between 0 and 5.",
+          });
+        }
       }
-
+      // if (priceRange && priceRange.length === 2) {
+      //   filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
+      // }
+      if (priceRange) {
+        const prices = priceRange.split(',').map(Number);
+        if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
+          filter.priceRange = { $gte: prices[0], $lte: prices[1] };
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid price range format. Use 'priceRange=min,max'."
+          });
+        }
+      }
       if (startDate && endDate) {
         filter.createdAt = {
           $gte: new Date(startDate),
