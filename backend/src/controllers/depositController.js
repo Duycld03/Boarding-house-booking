@@ -5,7 +5,6 @@ import axios from "axios";
 import { sortObject } from "../utils/algorithms.js";
 import DepositRoom from "../models/depositRoom.js";
 import dotenv from "dotenv";
-import { start } from "repl";
 dotenv.config();
 
 const config = {
@@ -62,7 +61,7 @@ class DepositController {
     }
   }
 
-  async getDepositedRoom(req, res) {
+  async getDepositedRooms(req, res) {
     try {
       const { userId } = req.user;
       const deposits = await DepositRoom.find({ accountId: userId })
@@ -91,6 +90,49 @@ class DepositController {
       res.status(200).json(result);
     } catch (error) {
       console.error("Error getting deposited room:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+  async getDepositRoom(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+      const deposit = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: req.user.userId,
+      })
+        .populate({
+          path: "roomId",
+          select: "roomNumber images",
+          populate: [
+            {
+              path: "boardingHouseId",
+              select: "name",
+              populate: { path: "boardingHouseType", select: "name" },
+            },
+            {
+              path: "rentBy",
+              select: "fullname avatarImage",
+            },
+            {
+              path: "roomTypeId",
+              select: "price roomSize",
+            },
+          ],
+        })
+        .lean();
+
+      res.status(200).json({
+        boardingHouseName: deposit.roomId.boardingHouseId.name,
+        boardingHouseType:
+          deposit.roomId.boardingHouseId.boardingHouseType.name,
+        roomNumber: deposit.roomId.roomNumber,
+        images: deposit.roomId.images,
+        price: deposit.roomId.roomTypeId.price,
+        roomSize: deposit.roomId.roomTypeId.roomSize,
+        rentBy: deposit.roomId.rentBy,
+      });
+    } catch (error) {
       res.status(500).json({ message: "Server error", error });
     }
   }

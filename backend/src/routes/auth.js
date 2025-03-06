@@ -82,6 +82,10 @@ authRouter.delete(
 
 // deposit
 authRouter.post("/deposit", depositController.deposit);
-authRouter.get("/deposited-room", depositController.getDepositedRoom);
+authRouter.get("/deposited-room", depositController.getDepositedRooms);
+authRouter.get(
+  "/deposited-room/:depositRoomId",
+  depositController.getDepositRoom
+);
 
 export { authRouter };

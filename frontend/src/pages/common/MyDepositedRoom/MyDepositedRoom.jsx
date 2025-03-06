@@ -1,20 +1,24 @@
-import { Card, Spin } from "antd";
 import React, { useEffect, useState } from "react";
 import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
-import { toast } from "react-toastify";
-import { Tooltip } from "antd";
-import { getAllBHOwner } from "@/api/BoardingHManagement";
-
 import { FileTextOutlined } from "@ant-design/icons";
 import formatAmount from "../../../utils/formatAmount";
 import { useNavigate } from "react-router-dom";
-import { render } from "react-dom";
 import { getMyDepositedRoom } from "@/api/depositManagement";
+import { Loader } from "../../../component";
+import { Tag, Modal } from "antd";
+import MyDepositDetail from "./MyDepositDetail";
 
 function MyDepositedRoom() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [depositedRooms, setDepositedRooms] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [depositRoomId, setDepositRoomId] = useState("");
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    console.log("cancel");
+  };
 
   const columns = [
     {
@@ -37,6 +41,19 @@ function MyDepositedRoom() {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      render: (status) => (
+        <Tag
+          color={
+            status === "pending"
+              ? "orange"
+              : status === "accepted"
+              ? "green"
+              : "red"
+          }
+        >
+          {status}
+        </Tag>
+      ),
     },
     {
       title: "Rental Time",
@@ -58,17 +75,16 @@ function MyDepositedRoom() {
       key: "action",
       render: (_, record) => (
         <div className="flex gap-3">
-          {/* <Button
-            size="large"
-            btnDelete
-            title={"Delete"}
-            onClick={() => handleOpenDeleteModal(record)}
-          /> */}
           <Button
+            disabled={record.status == "pending"}
             size="large"
             title={"Detail"}
             icon={<FileTextOutlined />}
-            onClick={() => navigate(`/my-deposited-room/${record._id}`)}
+            // onClick={() => navigate(`/my-deposited-room/${record._id}`)}
+            onClick={() => {
+              setDepositRoomId(record._id);
+              setIsModalVisible(true);
+            }}
             className="text-white"
             bgColor="rgb(5 150 105)"
           />
@@ -77,7 +93,6 @@ function MyDepositedRoom() {
     },
   ];
   const fetchData = async () => {
-    setLoading(true);
     try {
       const res = await getMyDepositedRoom();
       setDepositedRooms(res);
@@ -93,8 +108,19 @@ function MyDepositedRoom() {
   }, []);
 
   return (
-    <div>
-      <Table loading={loading} columns={columns} data={depositedRooms} />
+    <div className="">
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <Table loading={loading} columns={columns} data={depositedRooms} />
+          <MyDepositDetail
+            depositRoomId={depositRoomId}
+            isModalVisible={isModalVisible}
+            handleCancel={handleCancel}
+          />
+        </>
+      )}
     </div>
   );
 }

@@ -141,11 +141,6 @@ const routes = [
     page: MyDepositedRoom,
     layout: ProfileLayout,
   },
-  {
-    path: "/my-deposited-room/:depositRoomId",
-    page: MyDepositedRoom,
-    layout: ProfileLayout,
-  },
 
   // dashBoard
   {

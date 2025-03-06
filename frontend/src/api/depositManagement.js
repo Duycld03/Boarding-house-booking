@@ -7,3 +7,7 @@ export const depositRoom = (data) => {
 export const getMyDepositedRoom = () => {
   return axios.get("auth/deposited-room");
 };
+
+export const getDepositRoom = (depositRoomId) => {
+  return axios.get(`auth/deposited-room/${depositRoomId}`);
+};
