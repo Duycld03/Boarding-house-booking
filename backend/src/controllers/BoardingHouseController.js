@@ -1070,47 +1070,9 @@ class boardingHouseController {
       });
     }
   }
-  // async getBhByArea(req, res) {
-  //   try {
-  //     const { province, district, ward } = req.query;
-  //     let result = [];
-
-  //     const boardingHData = await BoardingHouse.find(
-  //       { totalRooms: { $gt: 0 } },
-  //       { reviews: 0 }
-  //     );
-
-  //     result = boardingHData;
-
-  //     if (province) {
-  //       result = result.filter(
-  //         (bh) => bh.address?.province.includes(province) ?? false
-  //       );
-  //     }
-
-  //     if (district) {
-  //       result = result.filter(
-  //         (bh) => bh.address?.district.includes(district) ?? false
-  //       );
-  //     }
-
-  //     if (ward?.trim()) {
-  //       result = result.filter(
-  //         (bh) =>
-  //           bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) ??
-  //           false
-  //       );
-  //     }
-
-  //     res.status(200).json(result);
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).json({ message: 'Server error' });
-  //   }
-  // }
   async getBhByArea(req, res) {
     try {
-      const { province, district, ward, boardingHouseType, rating, priceRange } = req.query;
+      const { province, district, ward, boardingHouseType, rating, priceRange, name } = req.query;
       let result = [];
 
       let filter = { totalRooms: { $gt: 0 } };
@@ -1172,7 +1134,11 @@ class boardingHouseController {
           (bh) => bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) ?? false
         );
       }
-
+      if (name) {
+        result = result.filter((bh) => {
+          return bh.name && bh.name.toLowerCase().includes(name.toLowerCase());
+        });
+      }
       res.status(200).json(result);
     } catch (error) {
       console.error(error);

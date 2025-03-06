@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Form, Select, Slider, Checkbox, Drawer, Button } from "antd";
+import { Form, Select, Slider, Checkbox, Drawer, Button, Input } from "antd";
 import { FilterOutlined, StarFilled } from "@ant-design/icons";
 import { getAllBoardingHouseTypeUser, getMaxPriceBHUser, filterBHUser } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
@@ -16,6 +16,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
     const [loading, setLoading] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [openDrawer, setOpenDrawer] = useState(false);
+    const [nameFilter, setNameFilter] = useState("");
 
     useEffect(() => {
         fetchMaxPrice();
@@ -59,6 +60,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
         }
 
         const filters = {
+            name: nameFilter || null,
             priceRange: `${currentPrice[0]},${currentPrice[1]}`,
             boardingHouseType: selectedType || null,
             rating: selectedRatings.length > 0 ? selectedRatings.join(",") : null,
@@ -106,6 +108,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
         setCurrentPrice([priceRange.min, priceRange.max]);
         setSelectedType(null);
         setSelectedRatings([]);
+        setNameFilter("");
         form.resetFields();
         setFilterValue(null);
     };
@@ -147,38 +150,50 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                 width={320}
             >
                 <Form form={form} onFinish={handleSubmit} layout="vertical">
-                    <Form.Item label="Price" name="priceRange">
-                        <div className="flex justify-between text-sm mb-2">
-                            <span>{formatAmount(currentPrice[0])} VND</span>
-                            <span>{formatAmount(currentPrice[1])} VND</span>
-                        </div>
-                        <Slider
-                            range
-                            min={priceRange.min}
-                            max={priceRange.max}
-                            step={100000}
-                            value={currentPrice}
-                            onChange={setCurrentPrice}
-                        />
-                    </Form.Item>
+                    <div className="border-2 border p-4 rounded-md mb-4">
+                        <Form.Item label="Name" name="name">
+                            <Input
+                                placeholder="Enter name"
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
+                            />
+                        </Form.Item>
+                    </div>
 
-                    <Form.Item label="Boarding house type" name="boardingHouseType">
-                        <Select
-                            placeholder="Choose type"
-                            value={selectedType}
-                            onChange={setSelectedType}
-                            allowClear
-                            options={boardingHouseTypes}
-                        />
-                    </Form.Item>
+                    <div className="border-2 border p-4 rounded-md mb-4">
+                        <Form.Item label="Price">
+                            <Slider
+                                range
+                                min={priceRange.min}
+                                max={priceRange.max}
+                                step={100000}
+                                value={currentPrice}
+                                onChange={setCurrentPrice}
+                            />
+                        </Form.Item>
+                    </div>
 
-                    <Form.Item label="Rating" name="rating">
-                        <Checkbox.Group
-                            options={ratingOptions}
-                            onChange={setSelectedRatings}
-                            style={{ display: "flex", flexDirection: "column" }}
-                        />
-                    </Form.Item>
+                    <div className="border-2 border p-4 rounded-md mb-4">
+                        <Form.Item label="Boarding house type">
+                            <Select
+                                placeholder="Choose type"
+                                value={selectedType}
+                                onChange={setSelectedType}
+                                allowClear
+                                options={boardingHouseTypes}
+                            />
+                        </Form.Item>
+                    </div>
+
+                    <div className="border-2 border p-4 rounded-md mb-4">
+                        <Form.Item label="Rating">
+                            <Checkbox.Group
+                                options={ratingOptions}
+                                onChange={setSelectedRatings}
+                                style={{ display: "flex", flexDirection: "column" }}
+                            />
+                        </Form.Item>
+                    </div>
 
                     <div className="flex flex-col gap-2 mt-4">
                         <Button type="primary" htmlType="submit" loading={loading} block>
@@ -192,42 +207,58 @@ function FilterBoardingHouseUser({ setFilterValue }) {
             </Drawer>
 
             {!isMobile && (
-                <div className="w-full max-w-sm bg-white shadow-md rounded-xl  p-4">
-                    <Form form={form} onFinish={handleSubmit} layout="vertical">
-                        <Form.Item label="Price">
-                            <Slider
-                                range
-                                min={priceRange.min}
-                                max={priceRange.max}
-                                step={100000}
-                                value={currentPrice}
-                                onChange={setCurrentPrice}
-                            />
-                        </Form.Item>
+                <div className="w-full  ">
+                    <Form form={form} onFinish={handleSubmit} layout="vertical" >
+                        <div className="border-2 border p-4 rounded-md mb-4 bg-white">
+                            <Form.Item label="Name" name="name">
+                                <Input
+                                    placeholder="Enter name"
+                                    value={nameFilter}
+                                    onChange={(e) => setNameFilter(e.target.value)}
+                                />
+                            </Form.Item>
+                        </div>
 
-                        <Form.Item label="Boarding house type">
-                            <Select
-                                placeholder="Choose type"
-                                value={selectedType}
-                                onChange={setSelectedType}
-                                allowClear
-                                options={boardingHouseTypes}
-                            />
-                        </Form.Item>
+                        <div className="border-2 border p-4 rounded-md mb-4 bg-white">
+                            <Form.Item label="Price">
+                                <Slider
+                                    range
+                                    min={priceRange.min}
+                                    max={priceRange.max}
+                                    step={100000}
+                                    value={currentPrice}
+                                    onChange={setCurrentPrice}
+                                />
+                            </Form.Item>
+                        </div>
 
-                        <Form.Item label="Rating">
-                            <Checkbox.Group
-                                options={ratingOptions}
-                                onChange={setSelectedRatings}
-                                style={{ display: "flex", flexDirection: "column" }}
-                            />
-                        </Form.Item>
+                        <div className="border-2 border p-4 rounded-md mb-4 bg-white">
+                            <Form.Item label="Boarding house type">
+                                <Select
+                                    placeholder="Choose type"
+                                    value={selectedType}
+                                    onChange={setSelectedType}
+                                    allowClear
+                                    options={boardingHouseTypes}
+                                />
+                            </Form.Item>
+                        </div>
+
+                        <div className="border-2 border p-4 rounded-md mb-4 bg-white">
+                            <Form.Item label="Rating">
+                                <Checkbox.Group
+                                    options={ratingOptions}
+                                    onChange={setSelectedRatings}
+                                    style={{ display: "flex", flexDirection: "column" }}
+                                />
+                            </Form.Item>
+                        </div>
 
                         <div className="flex justify-between mt-4">
-                            <Button type="primary" htmlType="submit" loading={loading}>
+                            <Button type="primary" htmlType="submit" loading={loading} className="w-1/2 text-lg">
                                 Apply
                             </Button>
-                            <Button onClick={handleReset} className="bg-red-500 text-white">
+                            <Button onClick={handleReset} className="bg-red-500 text-white w-1/2">
                                 Reset
                             </Button>
                         </div>
