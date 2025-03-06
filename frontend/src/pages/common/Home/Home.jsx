@@ -91,20 +91,16 @@ function Home() {
     .slice(0, 10);
   const dataToShow = filteredData ?? originalData;
   return (
-    <div className="w-full">
-      {/* Thanh tìm kiếm */}
+    <div >
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
-
-      {/* Layout tổng thể */}
+      <div className="w-full md:w-[210px]">
+        <FilterBoardingHouseUser setFilterValue={setFilterValue} />
+      </div>
       <div className={cx("home-container")}>
-        {/* Filter chỉ nằm dưới Clear trên mobile */}
-        <div className="w-full md:w-[210px]">
-          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
-        </div>
 
-        {/* Nội dung chính */}
         <div className="">
           <div className={cx("content")}>
+
             <div className={cx("grid")}>
               {filteredData ? (
                 <BoardingHouseGrid data={filteredData} loading={loading} />
