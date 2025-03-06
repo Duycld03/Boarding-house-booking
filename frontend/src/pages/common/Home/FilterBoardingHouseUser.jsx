@@ -192,7 +192,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
             </Drawer>
 
             {!isMobile && (
-                <div className="w-full max-w-sm bg-white shadow-md rounded-md p-4">
+                <div className="w-full max-w-sm bg-white shadow-md rounded-xl  p-4">
                     <Form form={form} onFinish={handleSubmit} layout="vertical">
                         <Form.Item label="Price">
                             <Slider

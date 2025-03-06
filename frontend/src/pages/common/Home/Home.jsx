@@ -91,36 +91,43 @@ function Home() {
     .slice(0, 10);
   const dataToShow = filteredData ?? originalData;
   return (
-    <div >
+    <div className="container mx-auto px-4">
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
-      <div className="w-full md:w-[210px]">
-        <FilterBoardingHouseUser setFilterValue={setFilterValue} />
-      </div>
-      <div className={cx("home-container")}>
+      <div className="flex flex-col md:flex-row ">
 
-        <div className="">
-          <div className={cx("content")}>
+        <div className="hidden md:block w-[230px] mt-8 ">
+          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
+        </div>
+        <div className="md:hidden mt-4">
+          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
+        </div>
+        <div className={cx("home-container")}>
 
-            <div className={cx("grid")}>
-              {filteredData ? (
-                <BoardingHouseGrid data={filteredData} loading={loading} />
-              ) : (
-                <Tabs defaultActiveKey="all" onChange={setActiveTab}>
-                  <Tabs.TabPane tab="All" key="all">
-                    <BoardingHouseGrid data={dataToShow} loading={loading} />
-                  </Tabs.TabPane>
-                  <Tabs.TabPane tab="Newest" key="newest">
-                    <BoardingHouseGrid data={newestData} loading={loading} />
-                  </Tabs.TabPane>
-                  <Tabs.TabPane tab="High rating" key="highRating">
-                    <BoardingHouseGrid data={highRatingData} loading={loading} />
-                  </Tabs.TabPane>
-                </Tabs>
-              )}
+          <div className="">
+            <div className={cx("content")}>
+
+              <div className={cx("grid")}>
+                {filteredData ? (
+                  <BoardingHouseGrid data={filteredData} loading={loading} />
+                ) : (
+                  <Tabs defaultActiveKey="all" onChange={setActiveTab}>
+                    <Tabs.TabPane tab="All" key="all">
+                      <BoardingHouseGrid data={dataToShow} loading={loading} />
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="Newest" key="newest">
+                      <BoardingHouseGrid data={newestData} loading={loading} />
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="High rating" key="highRating">
+                      <BoardingHouseGrid data={highRatingData} loading={loading} />
+                    </Tabs.TabPane>
+                  </Tabs>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }
