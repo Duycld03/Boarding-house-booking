@@ -4,6 +4,7 @@ import { FilterOutlined, StarFilled } from "@ant-design/icons";
 import { getAllBoardingHouseTypeUser, getMaxPriceBHUser, filterBHUser } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import { toast } from "react-toastify";
+import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
 
 function FilterBoardingHouseUser({ setFilterValue }) {
     const [form] = Form.useForm();
@@ -65,7 +66,8 @@ function FilterBoardingHouseUser({ setFilterValue }) {
 
         setLoading(true);
         try {
-            const response = await filterBHUser(filters);
+            const response = await getBhByArea(filters);
+            console.log(response);
             if (!response || response?.success === false) {
                 throw new Error(response?.message || "Failed to apply filters.");
             }
@@ -90,6 +92,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                 setFilterValue?.([]);
                 toast.warning("No results found.");
             }
+            setFilterValue(filters);
             setOpenDrawer(false);
         } catch (error) {
             console.error("Filter error:", error);
@@ -119,18 +122,20 @@ function FilterBoardingHouseUser({ setFilterValue }) {
     }));
 
     return (
-        <div className="w-full">
+        <div className="">
             {isMobile && (
-                <Button
-                    type="primary"
-                    icon={<FilterOutlined />}
-                    onClick={() => setOpenDrawer(true)}
-                    block // Thêm thuộc tính này để nút chiếm toàn bộ chiều rộng
-                    size="large"
-                    style={{ backgroundColor: "#28a745", borderColor: "#28a745" }}
-                >
-                    Filter
-                </Button>
+                <div className="flex flex-col gap-2 ">
+                    <Button
+                        type="primary"
+                        icon={<FilterOutlined />}
+                        onClick={() => setOpenDrawer(true)}
+                        block
+                        size="large"
+                        className="bg-green-600 border-green-600 text-white"
+                    >
+                        Filter
+                    </Button>
+                </div>
             )}
 
             <Drawer
@@ -175,11 +180,11 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                         />
                     </Form.Item>
 
-                    <div className="flex justify-between mt-4">
-                        <Button type="primary" htmlType="submit" loading={loading}>
+                    <div className="flex flex-col gap-2 mt-4">
+                        <Button type="primary" htmlType="submit" loading={loading} block>
                             Apply
                         </Button>
-                        <Button onClick={handleReset} className="bg-red-500 text-white">
+                        <Button onClick={handleReset} className="bg-red-500 text-white" block>
                             Reset
                         </Button>
                     </div>

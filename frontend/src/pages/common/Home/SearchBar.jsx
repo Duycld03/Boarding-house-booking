@@ -1,4 +1,4 @@
-import { Form, Select, Button, Row, Col, message } from "antd";
+import { Form, Select, Button, Row, Col } from "antd";
 import { useEffect, useState } from "react";
 import {
   fetchDistricts,
@@ -6,26 +6,20 @@ import {
   fetchProvincesByName,
   fetchWards,
 } from "../../../api/apiAddress";
-import { filterBHUser } from "../../../api/BoardingHManagement";
-import formatAmount from "@/utils/formatAmount";
-import { toast } from "react-toastify";
-import FilterBoardingHouseUser from "./FilterBoardingHouseUser";
 
 const { Option } = Select;
 
-const SearchBar = ({ setSearchResults }) => {
+const SearchBar = ({ setSearchValue, searchValue }) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [form] = Form.useForm();
-  const [searchValue, setSearchValue] = useState({});
+  const [defaultProvince, setDefaultProvince] = useState("");
   const [loadingStates, setLoadingStates] = useState({
     provinces: false,
     districts: false,
     wards: false,
-    search: false,
   });
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     const loadProvinces = async () => {
@@ -36,12 +30,72 @@ const SearchBar = ({ setSearchResults }) => {
     };
 
     loadProvinces();
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+            const data = await response.json();
+            if (data.address) {
+              const detectedProvince =
+                data.address.state || data.address.city || "";
+              setDefaultProvince(detectedProvince);
+            }
+          } catch (error) {
+            console.error("Lỗi lấy vị trí:", error);
+          }
+        },
+        (err) => {
+          console.error("Không thể truy cập vị trí:", err);
+        }
+      );
+    }
   }, []);
+
+  const fetchDefaultProvince = async () => {
+    if (!defaultProvince) return; // Không làm gì nếu defaultProvince rỗng
+
+    try {
+      const selectedProvince = await fetchProvincesByName(defaultProvince);
+      if (!selectedProvince) return; // Không tìm thấy tỉnh phù hợp
+
+      form.setFieldsValue({ province: selectedProvince.name });
+
+      setSearchValue((prev) => ({
+        ...prev,
+        province: selectedProvince.name,
+        district: null,
+        ward: null,
+      }));
+
+      setLoadingStates((prev) => ({ ...prev, districts: true }));
+      const districtsData = await fetchDistricts(selectedProvince.code);
+      setDistricts(districtsData);
+      setWards([]);
+      setLoadingStates((prev) => ({ ...prev, districts: false }));
+    } catch (error) {
+      console.error("Lỗi khi lấy tỉnh mặc định:", error);
+    }
+  };
+
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    fetchDefaultProvince();
+  }, [defaultProvince]);
+
+  useEffect(() => {
+    if (defaultProvince && provinces.length > 0) {
+      const matchedProvince = provinces.find((p) => p.name === defaultProvince);
+      if (matchedProvince) {
+        form.setFieldsValue({ province: matchedProvince.name });
+        loadDistricts(matchedProvince.code);
+      }
+    }
+  }, [defaultProvince, provinces, form]);
+
   const loadDistricts = async (provinceCode) => {
     setLoadingStates((prev) => ({ ...prev, districts: true }));
     const districtsData = await fetchDistricts(provinceCode);
@@ -58,6 +112,7 @@ const SearchBar = ({ setSearchResults }) => {
 
   const handleProvinceChange = async (provinceName) => {
     const selectedProvince = provinces.find((p) => p.name === provinceName);
+
     setSearchValue((prev) => ({
       ...prev,
       province: selectedProvince?.name,
@@ -77,6 +132,7 @@ const SearchBar = ({ setSearchResults }) => {
 
   const handleDistrictChange = async (districtName) => {
     const selectedDistrict = districts.find((d) => d.name === districtName);
+
     setSearchValue((prev) => ({
       ...prev,
       district: selectedDistrict?.name,
@@ -91,88 +147,27 @@ const SearchBar = ({ setSearchResults }) => {
     }
   };
 
-  const handleSearch = async () => {
-    try {
-      setLoadingStates((prev) => ({ ...prev, search: true }));
-      const response = await filterBHUser(searchValue);
-      console.log("API Response:", response);
-
-      let searchResults = [];
-      if (Array.isArray(response)) {
-        searchResults = response;
-      } else if (response && Array.isArray(response.data)) {
-        searchResults = response.data;
-      } else {
-        throw new Error("Invalid response format from server");
-      }
-
-      const formattedData = searchResults.map((item) => ({
-        id: item._id?.$oid || item._id,
-        name: item.name,
-        price: formatAmount(item.priceRange),
-        detail: item.address?.province || "No address provided",
-        rating: item.rating || 0,
-        reviewCount: item.reviewCount || 0,
-        img: item.images?.find((img) => img.isPrimary)?.imageUrl || item.images?.[0]?.imageUrl || "",
-        updatedAt: item.updatedAt,
-      }));
-
-      if (formattedData.length > 0) {
-        setSearchResults(formattedData);
-        toast.success(`Founded boarding houses!`);
-      } else {
-        setSearchResults([]);
-        toast.warning("No results found.");
-      }
-    } catch (error) {
-      console.error("Search failed:", error);
-      toast.error(error.message || "Search failed. Please try again.");
-    } finally {
-      setLoadingStates((prev) => ({ ...prev, search: false }));
-    }
+  const handleSubmit = (values) => {
+    setSearchValue((prev) => ({
+      ...prev, // ✅ Giữ lại giá trị cũ
+      ...values, // ✅ Thêm giá trị mới
+    }));
   };
-  const handleClear = async () => {
-    try {
-      form.resetFields(); // Reset tất cả các trường trong form
-      setSearchValue({}); // Reset giá trị tìm kiếm
 
-      // Gọi API để lấy toàn bộ danh sách nhà trọ
-      const response = await filterBHUser({});
-
-      let allResults = [];
-      if (Array.isArray(response)) {
-        allResults = response;
-      } else if (response && Array.isArray(response.data)) {
-        allResults = response.data;
-      } else {
-        throw new Error("Invalid response format from server");
-      }
-
-      const formattedData = allResults.map((item) => ({
-        id: item._id?.$oid || item._id,
-        name: item.name,
-        price: formatAmount(item.priceRange),
-        detail: item.address?.province || "No address provided",
-        rating: item.rating || 0,
-        reviewCount: item.reviewCount || 0,
-        img: item.images?.find((img) => img.isPrimary)?.imageUrl || item.images?.[0]?.imageUrl || "",
-        updatedAt: item.updatedAt,
-      }));
-
-      setSearchResults(formattedData);
-    } catch (error) {
-      console.error("Clear failed:", error);
-      toast.error("Không thể lấy dữ liệu. Vui lòng thử lại.");
-    }
-  };
   return (
-    <Form form={form} className="md:max-w-[1200px] mx-auto" layout="vertical">
+    <Form
+      form={form}
+      className="md:max-w-[1200px] mx-auto"
+      layout="vertical"
+      onFinish={handleSubmit}
+    >
       <Row gutter={12} align="bottom">
         <Col xs={24} sm={12} md={6}>
           <Form.Item label="Province" name="province">
             <Select
               size="large"
               placeholder="Select province"
+              value={form.getFieldValue("province")}
               onChange={handleProvinceChange}
               allowClear
               loading={loadingStates.provinces}
@@ -227,38 +222,24 @@ const SearchBar = ({ setSearchResults }) => {
           </Form.Item>
         </Col>
 
-        <Col xs={24} sm={12} md={3}>
+        <Col xs={24} sm={12} md={6}>
           <Form.Item>
             <Button
               size="large"
               type="primary"
               block
-              onClick={handleSearch}
-              loading={loadingStates.search}
-            >
-              Search
-            </Button>
-          </Form.Item>
-        </Col>
-        <Col xs={24} sm={12} md={3}>
-          <Form.Item>
-            <Button
-              size="large"
-              type="default"
-              block
-              onClick={handleClear}
+              onClick={() => {
+                form.resetFields();
+                setSearchValue({ province: null, district: null, ward: null });
+                setDistricts([]);
+                setWards([]);
+              }}
             >
               Clear
             </Button>
           </Form.Item>
+
         </Col>
-        {isMobile && (
-          <Col xs={24} sm={12} md={3} >
-            <Form.Item>
-              <FilterBoardingHouseUser setFilterValue={setSearchResults} />
-            </Form.Item>
-          </Col>
-        )}
       </Row>
     </Form>
   );
