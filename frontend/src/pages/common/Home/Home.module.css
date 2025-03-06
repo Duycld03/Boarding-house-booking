@@ -24,7 +24,6 @@
   top: 0;
 }
 
-/* The grid now takes the remaining space */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -35,18 +34,8 @@
   border-radius: 8px;
   border-left: none;
   justify-content: center;
-
 }
 
 h2 {
   margin-bottom: 20px;
 }
-
-/* .card {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  min-width: 280px;
-  max-width: 400px;
-  width: 100%;
-} */
