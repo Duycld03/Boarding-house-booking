@@ -93,7 +93,7 @@ function Home() {
   return (
     <div className="container mx-auto px-4">
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
-      <div className="flex flex-col md:flex-row ">
+      <div className="flex flex-col md:flex-row gap-4">
 
         <div className="hidden md:block w-[230px] mt-8 ">
           <FilterBoardingHouseUser setFilterValue={setFilterValue} />
