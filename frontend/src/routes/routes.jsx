@@ -23,6 +23,7 @@ import {
   WatchLater,
   FacilitiesManagement,
   MyReportManagement,
+  MyDepositedRoom,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 import {
@@ -133,6 +134,11 @@ const routes = [
   {
     path: "/my-report-management",
     page: MyReportManagement,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/my-deposited-room",
+    page: MyDepositedRoom,
     layout: ProfileLayout,
   },
 

@@ -18,12 +18,15 @@ authRouter.get("/", (req, res) => {
   res.send("This is an auth router");
 });
 
-authRouter.get('/user', authController.getAccountFromToken);
-authRouter.get('/favorites', favoriteController.getFavorites);
-authRouter.post('/favorites/create', favoriteController.createFavorite);
-authRouter.delete('/favorites/:boardingHouseId', favoriteController.deleteFavorite);
-authRouter.post('/change-password', accountController.changePassword);
-authRouter.put('/profile', accountController.updateAccountFromProfile);
+authRouter.get("/user", authController.getAccountFromToken);
+authRouter.get("/favorites", favoriteController.getFavorites);
+authRouter.post("/favorites/create", favoriteController.createFavorite);
+authRouter.delete(
+  "/favorites/:boardingHouseId",
+  favoriteController.deleteFavorite
+);
+authRouter.post("/change-password", accountController.changePassword);
+authRouter.put("/profile", accountController.updateAccountFromProfile);
 
 authRouter.put(
   "/avatar",
@@ -49,7 +52,6 @@ authRouter.put(
   appointmentController.updateAppointmentStatus
 );
 
-
 authRouter.post(
   "/appointment/create-appointment/",
   appointmentController.createAppointment
@@ -65,9 +67,8 @@ authRouter.post(
 );
 authRouter.get("/reports", reportController.getReportByUserId);
 
-
 //review
-authRouter.put('/reviews/:reviewId', ReviewController.updateReview);
+authRouter.put("/reviews/:reviewId", ReviewController.updateReview);
 authRouter.get("/reviews", ReviewController.getReviewsUser);
 authRouter.delete("/reviews/:reviewId", ReviewController.softDeleteReview);
 
@@ -81,9 +82,10 @@ authRouter.delete(
 
 // deposit
 authRouter.post("/deposit", depositController.deposit);
-
-
-
-
+authRouter.get("/deposited-room", depositController.getDepositedRooms);
+authRouter.get(
+  "/deposited-room/:depositRoomId",
+  depositController.getDepositRoom
+);
 
 export { authRouter };
