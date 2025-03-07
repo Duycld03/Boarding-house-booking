@@ -24,7 +24,19 @@ function Home() {
   });
   const [filteredData, setFilteredData] = useState(null);
   const [filterValue, setFilterValue] = useState(null);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1366);
+  const [isTablet, setIsTablet] = useState(window.innerWidth >= 768 && window.innerWidth < 1366);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1366);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1366);
+      setIsMobile(window.innerWidth < 768);
+    };
 
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const fetchBhByArea = async () => {
     setLoading(true);
     try {
@@ -93,14 +105,25 @@ function Home() {
   return (
     <div className="container mx-auto ">
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
+      {isMobile && (
+        <div className="mb-4 block md:hidden">
+          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
+        </div>
+      )}
+
+      {isTablet && (
+        <div className="mb-4 hidden md:block xl:hidden max-w-[180px]">
+          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
+        </div>
+      )}
       <div className="flex flex-col md:flex-row max-w-[1200px] mx-auto">
 
-        <div className="hidden md:block lg:w-[350px]  mt-8">
-          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
-        </div>
-        <div className="md:hidden mt-4">
-          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
-        </div>
+        {isDesktop && (
+          <div className="lg:w-[300px] mt-8">
+            <FilterBoardingHouseUser setFilterValue={setFilterValue} />
+          </div>
+        )}
+
         <div className={cx("home-container")}>
 
           <div className={cx("content")}>

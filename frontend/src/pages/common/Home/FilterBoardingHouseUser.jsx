@@ -14,7 +14,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
     const [selectedType, setSelectedType] = useState(null);
     const [selectedRatings, setSelectedRatings] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1366);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [nameFilter, setNameFilter] = useState("");
 
@@ -50,7 +50,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
     };
 
     const handleResize = () => {
-        setIsMobile(window.innerWidth < 768);
+        setIsMobile(window.innerWidth <= 1366);
     };
 
     const handleSubmit = async () => {
@@ -92,7 +92,6 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                 toast.success(`Found boarding houses!`);
             } else {
                 setFilterValue?.([]);
-                toast.warning("No results found.");
             }
             setFilterValue(filters);
             setOpenDrawer(false);
@@ -105,11 +104,11 @@ function FilterBoardingHouseUser({ setFilterValue }) {
     };
 
     const handleReset = () => {
+        form.resetFields();
         setCurrentPrice([priceRange.min, priceRange.max]);
         setSelectedType(null);
         setSelectedRatings([]);
         setNameFilter("");
-        form.resetFields();
         setFilterValue(null);
     };
 
@@ -150,7 +149,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                 width={320}
             >
                 <Form form={form} onFinish={handleSubmit} layout="vertical">
-                    <div className="border-2 border p-4 rounded-md mb-4">
+                    <div className="border-2 border-gray-300 shadow-md p-4 rounded-md mb-4 bg-white">
                         <Form.Item label="Name" name="name">
                             <Input
                                 placeholder="Enter name"
@@ -160,8 +159,17 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                         </Form.Item>
                     </div>
 
-                    <div className="border-2 border p-4 rounded-md mb-4">
+                    <div className="border-2 border-gray-300 shadow-md p-4 rounded-md mb-4 bg-white">
+
                         <Form.Item label="Price">
+                            <div className="flex justify-between text-lg mt-1 mb-2 font-semibold">
+                                <p className="truncate max-w-[40%]">
+                                    Min: {formatAmount(currentPrice[0])}
+                                </p>
+                                <p className="truncate max-w-[40%] text-right">
+                                    Max: {formatAmount(currentPrice[1])}
+                                </p>
+                            </div>
                             <Slider
                                 range
                                 min={priceRange.min}
@@ -173,7 +181,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                         </Form.Item>
                     </div>
 
-                    <div className="border-2 border p-4 rounded-md mb-4">
+                    <div className="border-2 border-gray-300 shadow-md p-4 rounded-md mb-4 bg-white">
                         <Form.Item label="Boarding house type">
                             <Select
                                 placeholder="Choose type"
@@ -185,10 +193,11 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                         </Form.Item>
                     </div>
 
-                    <div className="border-2 border p-4 rounded-md mb-4">
+                    <div className="border-2 border-gray-300 shadow-md p-4 rounded-md mb-4 bg-white">
                         <Form.Item label="Rating">
                             <Checkbox.Group
                                 options={ratingOptions}
+                                value={selectedRatings}
                                 onChange={setSelectedRatings}
                                 style={{ display: "flex", flexDirection: "column" }}
                             />
@@ -207,9 +216,9 @@ function FilterBoardingHouseUser({ setFilterValue }) {
             </Drawer>
 
             {!isMobile && (
-                <div className="w-full  ">
+                <div className="w-full hidden lg:block">
                     <Form form={form} onFinish={handleSubmit} layout="vertical" >
-                        <div className="border-2 border p-4 rounded-md mb-4 bg-white">
+                        <div className="border-2 border-gray-300 shadow-md p-4 rounded-md mb-4 bg-white">
                             <Form.Item label="Name" name="name">
                                 <Input
                                     placeholder="Enter name"
@@ -219,8 +228,17 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                             </Form.Item>
                         </div>
 
-                        <div className="border-2 border p-4 rounded-md mb-4 bg-white">
+                        <div className="border-2 border-gray-300 shadow-md p-4 rounded-md mb-4 bg-white">
+
                             <Form.Item label="Price">
+                                <div className="flex justify-between text-lg mt-1 mb-2 font-semibold">
+                                    <p className="truncate max-w-[40%]">
+                                        Min: {formatAmount(currentPrice[0])}
+                                    </p>
+                                    <p className="truncate max-w-[40%] text-right">
+                                        Max: {formatAmount(currentPrice[1])}
+                                    </p>
+                                </div>
                                 <Slider
                                     range
                                     min={priceRange.min}
@@ -232,7 +250,7 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                             </Form.Item>
                         </div>
 
-                        <div className="border-2 border p-4 rounded-md mb-4 bg-white">
+                        <div className="border-2 border-gray-300 shadow-md p-4 rounded-md mb-4 bg-white">
                             <Form.Item label="Boarding house type">
                                 <Select
                                     placeholder="Choose type"
@@ -244,10 +262,11 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                             </Form.Item>
                         </div>
 
-                        <div className="border-2 border p-4 rounded-md mb-4 bg-white">
+                        <div className="border-2 border-gray-300 shadow-md p-4 rounded-md mb-4 bg-white">
                             <Form.Item label="Rating">
                                 <Checkbox.Group
                                     options={ratingOptions}
+                                    value={selectedRatings}
                                     onChange={setSelectedRatings}
                                     style={{ display: "flex", flexDirection: "column" }}
                                 />

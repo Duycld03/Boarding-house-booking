@@ -149,8 +149,8 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
 
   const handleSubmit = (values) => {
     setSearchValue((prev) => ({
-      ...prev, // ✅ Giữ lại giá trị cũ
-      ...values, // ✅ Thêm giá trị mới
+      ...prev,
+      ...values,
     }));
   };
 
