@@ -22,14 +22,14 @@ function FilterBoardingHouse({ setFilterValue }) {
     const handleStartDateChange = (date) => {
         setFilters((prev) => ({
             ...prev,
-            startDate: date ? date.format("YYYY-MM-DD") : null, // Use ISO format for filtering
+            startDate: date ? date.format("YYYY-MM-DD") : null,
         }));
     };
 
     const handleEndDateChange = (date) => {
         setFilters((prev) => ({
             ...prev,
-            endDate: date ? date.format("YYYY-MM-DD") : null, // Use ISO format for filtering
+            endDate: date ? date.format("YYYY-MM-DD") : null,
         }));
     };
 
@@ -53,7 +53,7 @@ function FilterBoardingHouse({ setFilterValue }) {
         }
 
         setFilterValue(filters);
-        setIsOpen(false);
+        setIsOpen(true);
     };
 
     const handleClear = () => {

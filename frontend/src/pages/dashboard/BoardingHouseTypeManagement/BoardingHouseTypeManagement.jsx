@@ -63,14 +63,13 @@ function BoardingHouseTypeManagement() {
                 }));
                 setData(formattedData);
             } else {
-                toast.warn("No results found for the current filter.");
                 setData([]);
             }
         } catch (error) {
-            toast.error(
-                error.response?.data?.message ||
-                "Failed to filter boarding house types. Please try again."
-            );
+            // toast.error(
+            //     error.response?.data?.message ||
+            //     "Failed to filter boarding house types. Please try again."
+            // );
             setData([]);
         } finally {
             setLoading(false);
