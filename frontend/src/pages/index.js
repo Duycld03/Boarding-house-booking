@@ -20,6 +20,7 @@ import {
   BHDetailOwner,
   WatchLater,
   MyReportManagement,
+  MyDepositedRoom,
 } from "./common";
 
 import {
@@ -54,11 +55,11 @@ export {
   MyAppointment,
   WatchLater,
   MyReportManagement,
+  MyDepositedRoom,
 
   // owner
   BHManagementOwner,
   BHDetailOwner,
-
 
   //dashboard
   BoardingHouseManagement,

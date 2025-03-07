@@ -1,4 +1,3 @@
-import https from "https";
 import moment from "moment";
 import querystring from "qs";
 import crypto from "crypto";
@@ -58,6 +57,82 @@ class DepositController {
       }
     } catch (error) {
       console.error("Error depositing:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+  async getDepositedRooms(req, res) {
+    try {
+      const { userId } = req.user;
+      const deposits = await DepositRoom.find({ accountId: userId })
+        .populate({
+          path: "roomId",
+          populate: {
+            path: "boardingHouseId",
+          },
+        })
+        .sort({ createdAt: -1 })
+        .lean();
+      const result = deposits.map((deposit) => {
+        const { roomId } = deposit;
+        const { boardingHouseId } = roomId;
+        return {
+          _id: deposit._id,
+          name: boardingHouseId.name,
+          roomNumber: roomId.roomNumber,
+          amount: deposit.amount,
+          status: deposit.status,
+          startDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+          endDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+          rentalTime: 1,
+        };
+      });
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error getting deposited room:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+  async getDepositRoom(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+      const deposit = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: req.user.userId,
+      })
+        .populate({
+          path: "roomId",
+          select: "roomNumber images",
+          populate: [
+            {
+              path: "boardingHouseId",
+              select: "name",
+              populate: { path: "boardingHouseType", select: "name" },
+            },
+            {
+              path: "rentBy",
+              select: "fullname avatarImage",
+            },
+            {
+              path: "roomTypeId",
+              select: "price roomSize",
+            },
+          ],
+        })
+        .lean();
+
+      res.status(200).json({
+        boardingHouseName: deposit.roomId.boardingHouseId.name,
+        boardingHouseType:
+          deposit.roomId.boardingHouseId.boardingHouseType.name,
+        roomNumber: deposit.roomId.roomNumber,
+        images: deposit.roomId.images,
+        price: deposit.roomId.roomTypeId.price,
+        roomSize: deposit.roomId.roomTypeId.roomSize,
+        rentBy: deposit.roomId.rentBy,
+      });
+    } catch (error) {
       res.status(500).json({ message: "Server error", error });
     }
   }
