@@ -11,3 +11,11 @@ export const getMyDepositedRoom = () => {
 export const getDepositRoom = (depositRoomId) => {
   return axios.get(`auth/deposited-room/${depositRoomId}`);
 };
+
+export const payRent = (data) => {
+  return axios.post("auth/pay-rent", data);
+};
+
+export const checkPayRentStatus = (depositRoomId) => {
+  return axios.get(`auth/pay-rent/${depositRoomId}`);
+};

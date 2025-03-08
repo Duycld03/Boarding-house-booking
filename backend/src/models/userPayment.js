@@ -2,9 +2,10 @@ import mongoose from "mongoose";
 
 const userPaymentSchema = new mongoose.Schema(
   {
-    billId: {
+    paymentBillId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "PaymentBill",
     },
     accountId: {
       type: mongoose.Schema.Types.ObjectId,

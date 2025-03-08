@@ -4,7 +4,9 @@ import crypto from "crypto";
 import axios from "axios";
 import { sortObject } from "../utils/algorithms.js";
 import DepositRoom from "../models/depositRoom.js";
+import PaymentBill from "../models/paymentBill.js";
 import dotenv from "dotenv";
+import UserPayment from "../models/userPayment.js";
 dotenv.config();
 
 const config = {
@@ -40,20 +42,12 @@ class DepositController {
         amount *= 12;
       }
 
-      const data = {
-        accountId: req.user.userId,
-        roomId,
-        amount,
-        boardingHouseId,
-        time: rentalTime,
-      };
+      const orderInfo = `deposit-${req.user.userId}-${roomId}-${boardingHouseId}-${rentalTime}`;
 
       if (payment === "vnpay") {
-        createVNPayUrl(req, res, data);
-        return;
+        createVNPayUrl(req, res, amount, orderInfo);
       } else if (payment === "momo") {
-        createMomoUrl(req, res, data);
-        return;
+        createMomoUrl(req, res, amount, orderInfo);
       }
     } catch (error) {
       console.error("Error depositing:", error);
@@ -83,7 +77,7 @@ class DepositController {
           amount: deposit.amount,
           status: deposit.status,
           startDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
-          endDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+          endDate: moment(deposit.updatedAt).format("DD/MM/YYYY"),
           rentalTime: 1,
         };
       });
@@ -141,11 +135,8 @@ class DepositController {
     let vnp_Params = req.query;
 
     let secureHash = vnp_Params["vnp_SecureHash"];
-    const orderInfo = vnp_Params["vnp_OrderInfo"];
-    const accountId = orderInfo.split("-")[0];
-    const roomId = orderInfo.split("-")[1];
-    const boardingHouseId = orderInfo.split("-")[2];
-    const time = orderInfo.split("-")[3];
+    const orderInfo = vnp_Params["vnp_OrderInfo"].split("-");
+    const type = orderInfo[0];
 
     delete vnp_Params["vnp_SecureHash"];
     delete vnp_Params["vnp_SecureHashType"];
@@ -159,24 +150,68 @@ class DepositController {
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
 
-    if (secureHash === signed) {
-      if (vnp_Params["vnp_TransactionStatus"] === "00") {
+    if (secureHash === signed && vnp_Params["vnp_ResponseCode"] === "00") {
+      if (type == "deposit") {
+        const accountId = orderInfo[1];
+        const roomId = orderInfo[2];
+        const boardingHouseId = orderInfo[3];
+        const rentalTime = orderInfo[4];
         const amount = vnp_Params["vnp_Amount"] / 100;
         await DepositRoom.create({
           accountId,
           roomId,
           amount,
         });
+
         const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=success`;
-        res.redirect(redirectUrl);
-      } else {
-        const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
-        res.redirect(redirectUrl);
+        return res.redirect(redirectUrl);
       }
-    } else {
-      const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
-      res.redirect(redirectUrl);
+      // pay rent
+      const userId = orderInfo[1];
+      const paymentBillId = orderInfo[2];
+
+      const userPayment = await UserPayment.findOne({
+        accountId: userId,
+        status: { $regex: /^pending$/i },
+        paymentBillId,
+      });
+      if (!userPayment) {
+        throw new Error("Payment not found");
+      }
+
+      userPayment.status = "Paid";
+      userPayment.paymentMethod = "VNPay";
+      await userPayment.save();
+
+      const allUserPayments = await UserPayment.find({
+        paymentBillId,
+      }).lean();
+
+      const allPaid =
+        allUserPayments.length > 0 &&
+        allUserPayments.every(
+          (payment) => payment.status.toLowerCase() === "paid"
+        );
+
+      if (allPaid) {
+        await PaymentBill.updateOne(
+          { _id: paymentBillId },
+          { $set: { status: "Paid" } }
+        );
+      }
+
+      const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+      return res.redirect(redirectUrl);
     }
+    //failed
+    if (type == "deposit") {
+      const boardingHouseId = orderInfo.split("-")[3];
+      const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
+      return res.redirect(redirectUrl);
+    }
+    // pay rent
+    const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+    res.redirect(redirectUrl);
   }
 
   async momoReturn(req, res) {
@@ -191,84 +226,158 @@ class DepositController {
         responseTime,
       } = req.query;
 
-      const accountId = orderInfo.split("-")[0];
-      const roomId = orderInfo.split("-")[1];
-      const boardingHouseId = orderInfo.split("-")[2];
-      const time = orderInfo.split("-")[3];
+      const type = orderInfo[0];
 
-      if (resultCode === "0") {
-        await DepositRoom.create({
-          accountId,
-          roomId,
-          amount,
+      if (resultCode == "0") {
+        if (type == "deposit") {
+          const accountId = orderInfo[1];
+          const roomId = orderInfo[2];
+          const boardingHouseId = orderInfo[3];
+          const rentalTime = orderInfo[4];
+          await DepositRoom.create({
+            accountId,
+            roomId,
+            amount,
+          });
+          const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=success`;
+          return res.redirect(redirectUrl);
+        }
+        // pay rent
+        const userId = orderInfo[1];
+        const paymentBillId = orderInfo[2];
+
+        const userPayment = await UserPayment.findOne({
+          accountId: userId,
+          status: { $regex: /^pending$/i },
+          paymentBillId,
         });
-        const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=success`;
-        res.redirect(redirectUrl);
-      } else {
-        const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
-        res.redirect(redirectUrl);
+        if (!userPayment) {
+          throw new Error("Payment not found");
+        }
+
+        userPayment.status = "Paid";
+        userPayment.paymentMethod = "Momo";
+        await userPayment.save();
+
+        const allUserPayments = await UserPayment.find({
+          paymentBillId,
+        }).lean();
+
+        const allPaid =
+          allUserPayments.length > 0 &&
+          allUserPayments.every(
+            (payment) => payment.status.toLowerCase() === "paid"
+          );
+
+        if (allPaid) {
+          await PaymentBill.updateOne(
+            { _id: paymentBillId },
+            { $set: { status: "Paid" } }
+          );
+        }
+        const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+        return res.redirect(redirectUrl);
       }
+      //failed
+      if (type == "deposit") {
+        const boardingHouseId = orderInfo[3];
+        const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
+        return res.redirect(redirectUrl);
+      }
+      // pay rent
+      const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+      res.redirect(redirectUrl);
     } catch (error) {
       console.log("Error momo return:", error);
-      const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
+      if (type == "deposit") {
+        // const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
+        // res.redirect(redirectUrl);
+        return res.status(500).json({ message: "Server error", error });
+      }
+      // pay rent
+      const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
       res.redirect(redirectUrl);
     }
   }
+
+  async payRent(req, res) {
+    try {
+      const { userId, depositRoomId, paymentMethod } = req.body;
+      const deposit = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: userId,
+      }).select("roomId");
+
+      if (!deposit) {
+        return res.status(400).json({ message: "Deposit room not found" });
+      }
+
+      const userPayment = await UserPayment.findOne({
+        accountId: userId,
+        status: { $regex: /^pending$/i },
+      })
+        .populate({
+          path: "paymentBillId",
+          match: { status: { $regex: /^pending$/i }, roomId: deposit.roomId },
+        })
+        .lean();
+
+      if (!userPayment || !userPayment.paymentBillId) {
+        return res.status(400).json({ message: "Payment not found" });
+      }
+
+      const orderInfo = `payRent-${userId}-${userPayment.paymentBillId._id}`;
+      if (paymentMethod === "vnpay") {
+        createVNPayUrl(req, res, userPayment.paymentAmount, orderInfo);
+      } else if (paymentMethod == "momo") {
+        createMomoUrl(req, res, userPayment.paymentAmount, orderInfo);
+      }
+    } catch (error) {
+      console.error("Error paying rent:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+  async checkPayRentStatus(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+
+      if (!depositRoomId) {
+        return res.status(400).json({ message: "Missing required parameters" });
+      }
+
+      const deposit = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: req.user.userId,
+      }).select("roomId");
+
+      if (!deposit) {
+        return res.status(400).json({ message: "Deposit room not found" });
+      }
+
+      const payment = await UserPayment.findOne({
+        accountId: req.user.userId,
+        status: { $regex: /^paid$/i },
+      })
+        .populate({
+          path: "paymentBillId",
+          match: { roomId: deposit.roomId },
+        })
+        .lean();
+
+      const isPaid = !!payment;
+
+      return res.json({ isPaid });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 }
-const createVNPayUrl = async (req, res, data) => {
-  const { amount, accountId, roomId, boardingHouseId, time } = data;
-  process.env.TZ = "Asia/Ho_Chi_Minh";
 
-  let date = new Date();
-  let createDate = moment(date).format("YYYYMMDDHHmmss");
-
-  let ipAddr =
-    req.headers["x-forwarded-for"] ||
-    req.connection.remoteAddress ||
-    req.socket.remoteAddress ||
-    req.connection.socket.remoteAddress;
-
-  let tmnCode = config.vnp_TmnCode;
-  let secretKey = config.vnp_HashSecret;
-  let vnpUrl = config.vnp_Url;
-  let returnUrl = config.vnp_ReturnUrl;
-  let orderId = moment(date).format("DDHHmmss");
-  // let amount = 100000;
-
-  let locale = "vn";
-  let currCode = "VND";
-  let vnp_Params = {};
-  vnp_Params["vnp_Version"] = "2.1.0";
-  vnp_Params["vnp_Command"] = "pay";
-  vnp_Params["vnp_TmnCode"] = tmnCode;
-  vnp_Params["vnp_Locale"] = locale;
-  vnp_Params["vnp_CurrCode"] = currCode;
-  vnp_Params["vnp_TxnRef"] = orderId;
-  vnp_Params["vnp_OrderInfo"] =
-    accountId + "-" + roomId + "-" + boardingHouseId + "-" + time;
-  vnp_Params["vnp_OrderType"] = "other";
-  vnp_Params["vnp_Amount"] = amount * 100;
-  vnp_Params["vnp_ReturnUrl"] = returnUrl;
-  vnp_Params["vnp_IpAddr"] = ipAddr;
-  vnp_Params["vnp_CreateDate"] = createDate;
-  //   vnp_Params["vnp_BankCode"] = "NCB";
-
-  vnp_Params = sortObject(vnp_Params);
-
-  let signData = querystring.stringify(vnp_Params, { encode: false });
-  let hmac = crypto.createHmac("sha512", secretKey);
-  let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
-  vnp_Params["vnp_SecureHash"] = signed;
-  vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
-
-  res.status(200).json({ code: "00", payUrl: vnpUrl });
-};
-
-const createMomoUrl = async (req, res, data) => {
-  const { amount, accountId, roomId, boardingHouseId, time } = data;
+const createMomoUrl = async (req, res, amount, orderInfo) => {
   var accessKey = "F8BBA842ECF85";
   var secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
-  var orderInfo = accountId + "-" + roomId + "-" + boardingHouseId + "-" + time;
   var partnerCode = "MOMO";
   var redirectUrl = "http://localhost:3000/deposit/momo-return";
   var ipnUrl = "http://localhost:3000/deposit/momo-return";
