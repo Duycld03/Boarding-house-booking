@@ -33,7 +33,7 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
     setLoading(true);
     try {
       const res = await checkPayRentStatus(depositRoomId);
-      setIsPaid(res);
+      setIsPaid(res.isPaid);
     } catch (error) {
       console.error(error);
     } finally {
