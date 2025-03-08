@@ -237,12 +237,15 @@ class boardingHouseController {
 
   async getAllBoardingHouseTypes(req, res) {
     try {
-      const boardingHouseTypes = await BoardingHouseType.find();
+      const boardingHouseTypes = await BoardingHouseType.find().sort({ createdAt: -1 });
       const formattedTypes = boardingHouseTypes.map((type) => ({
         value: type._id,
         label: type.name,
         roomSize: type.roomSize,
         peopleNumber: type.peopleNumber,
+        description: type.description,
+        createdAt: type.createdAt,
+        updatedAt: type.updatedAt,
       }));
 
       return res.status(200).json({
@@ -1083,6 +1086,208 @@ class boardingHouseController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server error' });
+    }
+  }
+  async createBoardingHouseType(req, res) {
+    try {
+      const { name, description } = req.body;
+
+      // Kiểm tra xem tên loại nhà trọ đã được cung cấp hay chưa
+      if (!name || name.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: "Name is required.",
+        });
+      }
+
+      // Kiểm tra xem loại nhà trọ có tồn tại hay không
+      const existingType = await BoardingHouseType.findOne({ name });
+      if (existingType) {
+        return res.status(400).json({
+          success: false,
+          message: "Boarding house type already exists.",
+        });
+      }
+
+      // Tạo mới loại nhà trọ
+      const newType = new BoardingHouseType({
+        name,
+        description,
+      });
+
+      // Lưu vào cơ sở dữ liệu
+      const savedType = await newType.save();
+
+      return res.status(201).json({
+        success: true,
+        message: "Boarding house type created successfully.",
+        data: savedType,
+      });
+    } catch (error) {
+      console.error("Error creating boarding house type:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create boarding house type.",
+        error: error.message,
+      });
+    }
+  }
+  async getBoardingHouseTypeDetails(req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          message: "Boarding house type ID is required.",
+        });
+      }
+
+      const boardingHouseType = await BoardingHouseType.findById(id);
+
+      if (!boardingHouseType) {
+        return res.status(404).json({
+          success: false,
+          message: "Boarding house type not found.",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: boardingHouseType,
+      });
+    } catch (error) {
+      console.error("Error fetching boarding house type details:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch boarding house type details.",
+        error: error.message,
+      });
+    }
+  }
+  async updateBoardingHouseType(req, res) {
+    try {
+      const { id } = req.params;
+      const { name, description } = req.body;
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          message: "Boarding house type ID is required.",
+        });
+      }
+      if (!name || name.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: "Name is required and cannot be empty.",
+        });
+      }
+
+      const existingType = await BoardingHouseType.findOne({
+        name: name.trim(),
+        _id: { $ne: id }, // Loại trừ loại nhà trọ hiện tại
+      });
+
+      if (existingType) {
+        return res.status(400).json({
+          success: false,
+          message: "A boarding house type with this name already exists.",
+        });
+      }
+
+      const updatedType = await BoardingHouseType.findByIdAndUpdate(
+        id,
+        { name: name.trim(), description },
+        { new: true, runValidators: true }
+      );
+      if (!updatedType) {
+        return res.status(404).json({
+          success: false,
+          message: "Boarding house type not found.",
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: "Boarding house type updated successfully.",
+        data: updatedType,
+      });
+    } catch (error) {
+      console.error("Error updating boarding house type:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update boarding house type.",
+        error: error.message,
+      });
+    }
+  }
+  async softDeleteBoardingHouseType(req, res) {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          message: "Boarding house type ID is required.",
+        });
+      }
+      const boardingHouseType = await BoardingHouseType.findById(id);
+      if (!boardingHouseType) {
+        return res.status(404).json({
+          success: false,
+          message: "Boarding house type not found.",
+        });
+      }
+
+      boardingHouseType.deleted = true;
+      await boardingHouseType.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Boarding house type soft deleted successfully.",
+      });
+    } catch (error) {
+      console.error("Error soft deleting boarding house type:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to soft delete boarding house type. Please try again later.",
+        error: error.message,
+      });
+    }
+  }
+  async filterBoardingHouseType(req, res) {
+    try {
+      const { name, startDate, endDate } = req.query;
+
+      const filter = {};
+      if (name) {
+        filter.name = { $regex: new RegExp(name, "i") };
+      }
+
+      if (startDate && endDate) {
+        filter.createdAt = {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
+        };
+      }
+      const boardingHouseTypes = await BoardingHouseType.find(filter).sort({
+        createdAt: -1,
+      });
+
+      if (!boardingHouseTypes || boardingHouseTypes.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No boarding house types found matching the criteria.",
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        data: boardingHouseTypes,
+      });
+    } catch (error) {
+      console.error("Error filtering boarding house types:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to filter boarding house types.",
+        error: error.message,
+      });
     }
   }
 }

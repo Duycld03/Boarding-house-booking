@@ -30,7 +30,8 @@ import {
   WithdrawalRequestManagement,
   AccountManagement,
   ReviewManagement,
-  FacilitiesManagement,
+  BoardingHouseTypeManagement,
+  FacilitiesManagement
 } from "./dashboard";
 
 export {
@@ -67,5 +68,6 @@ export {
   ReportReviewManagement,
   WithdrawalRequestManagement,
   ReviewManagement,
-  FacilitiesManagement,
+  BoardingHouseTypeManagement,
+  FacilitiesManagement
 };
