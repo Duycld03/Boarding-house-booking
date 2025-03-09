@@ -25,6 +25,7 @@ import {
 } from "../../../api/reportManagement";
 import { toast } from "react-toastify";
 import { addFavorite, getFavorite } from "../../../api/favoriteManagement";
+import LocationPicker from "@/component/LocationPicker";
 
 const { Content } = Layout;
 
@@ -336,6 +337,15 @@ function BoardingHouseDetail() {
                   )}
               </div>
             </div>
+            {/* Map */}
+            <LocationPicker
+              initialPosition={
+                boardingHouse?.location
+                  ? [boardingHouse.location?.lat, boardingHouse.location?.lon]
+                  : null
+              }
+              readOnly
+            />
             <Divider className="border-gray-500" />
 
             {/* Room Types */}

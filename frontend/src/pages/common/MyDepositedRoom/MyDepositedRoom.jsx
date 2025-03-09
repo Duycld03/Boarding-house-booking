@@ -5,7 +5,7 @@ import formatAmount from "../../../utils/formatAmount";
 import { useNavigate } from "react-router-dom";
 import { getMyDepositedRoom } from "@/api/depositManagement";
 import { Loader } from "../../../component";
-import { Tag, Modal } from "antd";
+import { Tag } from "antd";
 import MyDepositDetail from "./MyDepositDetail";
 
 function MyDepositedRoom() {
