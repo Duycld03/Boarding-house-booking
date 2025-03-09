@@ -89,7 +89,6 @@ function FilterBoardingHouseUser({ setFilterValue }) {
 
             if (formattedData.length > 0) {
                 setFilterValue?.(formattedData);
-                toast.success(`Found boarding houses!`);
             } else {
                 setFilterValue?.([]);
             }
