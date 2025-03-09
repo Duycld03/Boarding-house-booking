@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Form, Select, Slider, Checkbox, Drawer, Button, Input, Card } from "antd";
+import { Form, Select, Slider, Checkbox, Drawer, Button, Input } from "antd";
 import { FilterOutlined, StarFilled } from "@ant-design/icons";
 import { getAllBoardingHouseTypeUser, getMaxPriceBHUser, filterBHUser } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import { toast } from "react-toastify";
-import { getBhByArea } from "../../../api/ownerUser/boardingHouse";
+import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
 
 function FilterBoardingHouseUser({ setFilterValue }) {
     const [form] = Form.useForm();
@@ -125,28 +125,23 @@ function FilterBoardingHouseUser({ setFilterValue }) {
 
     return (
         <div className="">
-            <div className="w-full hidden lg:block">
-                <Form form={form} onFinish={handleSubmit} layout="vertical">
-                    <Card className="mb-6" bordered style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
-                        <Form.Item label="Name" name="name">
+            <div className="w-full hidden lg:block ">
+                <Form form={form} onFinish={handleSubmit} layout="vertical" >
+                    <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
+                        <Form.Item label={<span className="text-2xl mb-4">Name</span>}
+                            name="name">
                             <Input
                                 placeholder="Enter name"
                                 value={nameFilter}
                                 onChange={(e) => setNameFilter(e.target.value)}
-                                className="mt-4"
                             />
                         </Form.Item>
-                    </Card>
-                    <Card className="mb-6" bordered style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
-                        <Form.Item label="Price">
-                            <div className="flex justify-between text-lg mt-1 mb-2 font-semibold">
-                                <p className="truncate max-w-[40%] mt-4">
-                                    Min: {formatAmount(currentPrice[0])}
-                                </p>
-                                <p className="truncate max-w-[40%] text-right mt-4">
-                                    Max: {formatAmount(currentPrice[1])}
-                                </p>
-                            </div>
+                    </div>
+
+                    <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
+
+                        <Form.Item label={<span className="text-2xl ">Price</span>}>
+
                             <Slider
                                 range
                                 min={priceRange.min}
@@ -155,23 +150,31 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                                 value={currentPrice}
                                 onChange={setCurrentPrice}
                             />
+                            <div className="flex justify-between text-xl mt-1 mb-2 ">
+                                <p className="truncate max-w-[40%]">
+                                    Min: {formatAmount(currentPrice[0])}
+                                </p>
+                                <p className="truncate max-w-[40%] text-right">
+                                    Max: {formatAmount(currentPrice[1])}
+                                </p>
+                            </div>
                         </Form.Item>
-                    </Card>
-                    <Card className="mb-6" bordered style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
-                        <Form.Item label="Boarding house type">
+                    </div>
+
+                    <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
+                        <Form.Item label={<span className="text-2xl mb-4">Boarding House Type</span>}>
                             <Select
                                 placeholder="Choose type"
                                 value={selectedType}
                                 onChange={setSelectedType}
                                 allowClear
                                 options={boardingHouseTypes}
-                                className="mt-4"
-
                             />
                         </Form.Item>
-                    </Card>
-                    <Card className="mb-6" bordered style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
-                        <Form.Item label="Rating">
+                    </div>
+
+                    <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
+                        <Form.Item label={<span className="text-2xl mb-4">Rating</span>}>
                             <Checkbox.Group
                                 options={ratingOptions}
                                 value={selectedRatings}
@@ -179,7 +182,8 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                                 style={{ display: "flex", flexDirection: "column" }}
                             />
                         </Form.Item>
-                    </Card>
+                    </div>
+
                     <div className="flex justify-between mt-6">
                         <Button type="primary" htmlType="submit" loading={loading} className="w-1/2 text-lg">
                             Apply
