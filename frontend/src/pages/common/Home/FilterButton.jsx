@@ -4,9 +4,9 @@ import { FilterOutlined, StarFilled } from "@ant-design/icons";
 import { getAllBoardingHouseTypeUser, getMaxPriceBHUser, filterBHUser } from "../../../api/BoardingHManagement";
 import formatAmount from "../../../utils/formatAmount";
 import { toast } from "react-toastify";
-import { getBhByArea } from "../../../api/ownerUser/boardingHouse";
+import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
 
-function FilterBoardingHouseUser({ setFilterValue }) {
+function FilterButton({ setFilterValue }) {
     const [form] = Form.useForm();
     const [priceRange, setPriceRange] = useState({ min: 0, max: 50000000 });
     const [currentPrice, setCurrentPrice] = useState([0, 50000000]);
@@ -125,7 +125,26 @@ function FilterBoardingHouseUser({ setFilterValue }) {
 
     return (
         <div className="">
-            <div className="w-full hidden lg:block">
+            <div className="flex flex-col gap-2 lg:hidden w-full md:w-[200px]">
+                <Button
+                    type="primary"
+                    icon={<FilterOutlined />}
+                    onClick={() => setOpenDrawer(true)}
+                    block
+                    size="large"
+                    className="bg-green-600 border-green-600 text-white"
+                >
+                    Filter
+                </Button>
+            </div>
+            <Drawer
+                title="Filter"
+                placement="left"
+                closable={true}
+                onClose={() => setOpenDrawer(false)}
+                open={isMobile && openDrawer}
+                width={320}
+            >
                 <Form form={form} onFinish={handleSubmit} layout="vertical">
                     <Card className="mb-6" bordered style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
                         <Form.Item label="Name" name="name">
@@ -189,9 +208,9 @@ function FilterBoardingHouseUser({ setFilterValue }) {
                         </Button>
                     </div>
                 </Form>
-            </div>
+            </Drawer>
         </div>
     );
 }
 
-export default FilterBoardingHouseUser;
+export default FilterButton;

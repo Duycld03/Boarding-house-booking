@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import Styles from './Home.module.css';
 import BoardingHouseGrid from '../../../component/BoardingHouseCard';
-import { Tabs } from 'antd';
+import { Tabs, Button } from 'antd';
 import { toast } from 'react-toastify';
 import formatAmount from '@/utils/formatAmount';
 import { formatTimeAgo } from '../../../utils/timeUtils';
@@ -11,6 +11,8 @@ import SearchBar from './SearchBar';
 import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
 import useDebounce from '../../../hooks/useDebounce';
 import FilterBoardingHouseUser from './FilterBoardingHouseUser';
+import { FilterOutlined, StarFilled } from "@ant-design/icons";
+import FilterButton from './FilterButton';
 const cx = classNames.bind(Styles);
 
 function Home() {
@@ -24,19 +26,7 @@ function Home() {
   });
   const [filteredData, setFilteredData] = useState(null);
   const [filterValue, setFilterValue] = useState(null);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1366);
-  const [isTablet, setIsTablet] = useState(window.innerWidth >= 768 && window.innerWidth < 1366);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1366);
-      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1366);
-      setIsMobile(window.innerWidth < 768);
-    };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
   const fetchBhByArea = async () => {
     setLoading(true);
     try {
@@ -105,24 +95,16 @@ function Home() {
   return (
     <div className="container mx-auto ">
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
-      {isMobile && (
-        <div className="mb-4 block md:hidden">
-          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
-        </div>
-      )}
 
-      {isTablet && (
-        <div className="mb-4 hidden md:block xl:hidden max-w-[180px]">
-          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
-        </div>
-      )}
+      <div>
+        <FilterButton setFilterValue={setFilterValue} />
+      </div>
       <div className="flex flex-col md:flex-row max-w-[1200px] mx-auto">
 
-        {isDesktop && (
-          <div className="lg:w-[300px] mt-8">
-            <FilterBoardingHouseUser setFilterValue={setFilterValue} />
-          </div>
-        )}
+        <div className="mt-8 hidden lg:block w-[250px] ">
+          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
+        </div>
+
 
         <div className={cx("home-container")}>
 
