@@ -5,6 +5,7 @@ import {
   HomeFilled,
   VideoCameraOutlined,
   SnippetsOutlined,
+  ContainerOutlined,
 } from "@ant-design/icons";
 import { useCurrentUser } from "../../../context/userContext";
 import userRole from "../../../constants/userRole";
@@ -50,6 +51,12 @@ const getMenuItems = () => {
       key: "my-owner-report",
       label: <Link to="/my-report-management">My report management</Link>,
       icon: <SnippetsOutlined />,
+      visible: isUser,
+    },
+    {
+      key: "my-deposited-room",
+      label: <Link to="/my-deposited-room">My Deposited Room</Link>,
+      icon: <ContainerOutlined />,
       visible: isUser,
     },
   ];

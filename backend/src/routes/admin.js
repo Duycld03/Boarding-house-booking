@@ -116,6 +116,27 @@ adminRouter.post(
   '/boardinghouse/uploadFile',
   boardingHouseController.uploadFile
 );
+adminRouter.post(
+  '/boardinghousetype/create',
+  boardingHouseController.createBoardingHouseType
+);
+adminRouter.get(
+  '/boardinghousetype/filter',
+  boardingHouseController.filterBoardingHouseType
+);
+adminRouter.get(
+  '/boardinghousetype/:id',
+  boardingHouseController.getBoardingHouseTypeDetails
+);
+adminRouter.put(
+  '/boardinghousetype/:id',
+  boardingHouseController.updateBoardingHouseType
+);
+adminRouter.delete(
+  '/boardinghousetype/:id',
+  boardingHouseController.softDeleteBoardingHouseType
+);
+
 //Account
 adminRouter.get('/account', accountController.getAllAccount);
 adminRouter.delete('/account/:accountId', accountController.softDeleteAccount);

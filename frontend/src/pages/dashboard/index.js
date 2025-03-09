@@ -4,8 +4,8 @@ import ReportReviewManagement from "./ReportReviewManagement";
 import WithdrawalRequestManagement from "./WithdrawalRequestManagement";
 import BoardingHouseManagement from "./BoardingHouseManagement";
 import ReviewManagement from "./ReviewManagement";
+import BoardingHouseTypeManagement from "./BoardingHouseTypeManagement";
 import FacilitiesManagement from "./FacilitiesManagement";
-
 
 export {
     AccountManagement,
@@ -14,6 +14,7 @@ export {
     WithdrawalRequestManagement,
     BoardingHouseManagement,
     ReviewManagement,
-    FacilitiesManagement
+    FacilitiesManagement,
+    BoardingHouseTypeManagement
 }
 

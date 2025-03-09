@@ -23,6 +23,8 @@ import {
   WatchLater,
   FacilitiesManagement,
   MyReportManagement,
+  BoardingHouseTypeManagement,
+  MyDepositedRoom,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 import {
@@ -135,6 +137,11 @@ const routes = [
     page: MyReportManagement,
     layout: ProfileLayout,
   },
+  {
+    path: "/my-deposited-room",
+    page: MyDepositedRoom,
+    layout: ProfileLayout,
+  },
 
   // dashBoard
   {
@@ -174,6 +181,11 @@ const routes = [
     layout: HeaderOnly,
   },
   {
+    path: `${dashBoard}/boarding-house-type-management`,
+    page: BoardingHouseTypeManagement,
+    layout: null,
+  },
+   {
     path: `${dashBoard}/facilities-management`,
     page: FacilitiesManagement,
     layout: null,

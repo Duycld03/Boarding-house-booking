@@ -20,6 +20,7 @@ import {
   BHDetailOwner,
   WatchLater,
   MyReportManagement,
+  MyDepositedRoom,
 } from "./common";
 
 import {
@@ -29,6 +30,7 @@ import {
   WithdrawalRequestManagement,
   AccountManagement,
   ReviewManagement,
+  BoardingHouseTypeManagement,
   FacilitiesManagement
 } from "./dashboard";
 
@@ -53,11 +55,11 @@ export {
   MyAppointment,
   WatchLater,
   MyReportManagement,
+  MyDepositedRoom,
 
   // owner
   BHManagementOwner,
   BHDetailOwner,
-
 
   //dashboard
   BoardingHouseManagement,
@@ -66,5 +68,6 @@ export {
   ReportReviewManagement,
   WithdrawalRequestManagement,
   ReviewManagement,
+  BoardingHouseTypeManagement,
   FacilitiesManagement
 };
