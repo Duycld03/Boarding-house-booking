@@ -338,14 +338,22 @@ function BoardingHouseDetail() {
               </div>
             </div>
             {/* Map */}
-            <LocationPicker
-              initialPosition={
-                boardingHouse?.location
-                  ? [boardingHouse.location?.lat, boardingHouse.location?.lon]
-                  : null
-              }
-              readOnly
-            />
+            <div className="mt-14">
+              <p className="font-bold text-4xl">Location</p>
+              <div className="mt-3">
+                <LocationPicker
+                  initialPosition={
+                    boardingHouse?.location
+                      ? [
+                          boardingHouse.location?.lat,
+                          boardingHouse.location?.lon,
+                        ]
+                      : null
+                  }
+                  readOnly
+                />
+              </div>
+            </div>
             <Divider className="border-gray-500" />
 
             {/* Room Types */}
