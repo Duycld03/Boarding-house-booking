@@ -3,10 +3,17 @@ import { useEffect, useState } from "react";
 import { TableCustom as Table } from "@/component";
 import convertTimetap from "@/utils/convertTimetap";
 import { Tag, Tooltip } from "antd";
+import { Button } from "@/component";
+import { FileTextOutlined } from "@ant-design/icons";
+import DetailReportModal from "./DetailReportModal";
+import { getOwnReportReviewDetail } from "@/api/reportManagement";
+import { toast } from "react-toastify";
 
 function MyReport() {
   const [report, setReport] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
 
   const fetchReport = async () => {
     try {
@@ -80,11 +87,58 @@ function MyReport() {
       key: "createdAt",
       render: (text) => convertTimetap(text, false),
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <div className="flex gap-3">
+          <Button
+            size="large"
+            title={"Detail"}
+            icon={<FileTextOutlined />}
+            onClick={() => handleDetailModal(record)}
+            className="text-white"
+            bgColor="rgb(5 150 105)"
+          />
+        </div>
+      ),
+    },
   ];
+
+  const fetchReportDetail = async (reportId) => {
+    try {
+      const res = await getOwnReportReviewDetail(reportId);
+      console.log("Report deatil", res);
+
+      if (res) {
+        setSelectedData(res);
+      } else {
+        setSelectedData(null);
+      }
+    } catch (error) {
+      console.error("Failed to fetch report details:", error);
+      toast.error("Failed to fetch report details. Please try again later.");
+    }
+  };
+
+  const handleDetailModal = (record) => {
+    fetchReportDetail(record._id);
+    setIsDetailModalOpen(true);
+  };
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false);
+  };
 
   return (
     <div>
       <Table data={report} columns={columns} loading={loading} />
+      <DetailReportModal
+        isOpen={isDetailModalOpen}
+        onClose={closeDetailModal}
+        reportData={selectedData}
+      />
+      ;
     </div>
   );
 }
