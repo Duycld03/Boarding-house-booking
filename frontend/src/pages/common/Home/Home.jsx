@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import Styles from './Home.module.css';
 import BoardingHouseGrid from '../../../component/BoardingHouseCard';
-import { Tabs } from 'antd';
+import { Tabs, Button } from 'antd';
 import { toast } from 'react-toastify';
 import formatAmount from '@/utils/formatAmount';
 import { formatTimeAgo } from '../../../utils/timeUtils';
@@ -10,7 +10,9 @@ import truncateDetail from '../../../utils/truncateDetail';
 import SearchBar from './SearchBar';
 import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
 import useDebounce from '../../../hooks/useDebounce';
-
+import FilterBoardingHouseUser from './FilterBoardingHouseUser';
+import { FilterOutlined, StarFilled } from "@ant-design/icons";
+import FilterButton from './FilterButton';
 const cx = classNames.bind(Styles);
 
 function Home() {
@@ -22,11 +24,18 @@ function Home() {
     district: '',
     ward: '',
   });
+  const [filteredData, setFilteredData] = useState(null);
+  const [filterValue, setFilterValue] = useState(null);
 
   const fetchBhByArea = async () => {
     setLoading(true);
     try {
-      const res = await getBhByArea(searchValue);
+      const combinedFilters = {
+        ...searchValue,
+        ...filterValue,
+      };
+
+      const res = await getBhByArea(combinedFilters);
 
       const formattedData = res.map((item) => {
         const imgPath =
@@ -51,6 +60,7 @@ function Home() {
       });
 
       setOriginalData(formattedData);
+      setFilteredData(null);
     } catch (error) {
       console.error('Error fetching boarding houses:', error);
       toast.error('Failed to fetch boarding houses. Please try again later.');
@@ -62,7 +72,7 @@ function Home() {
 
   useEffect(() => {
     fetchBhByArea();
-  }, [searchValue, activeTab]);
+  }, [searchValue, filterValue]);
 
   const allData = [...originalData].sort((a, b) =>
     a.name.localeCompare(b.name)
@@ -81,31 +91,46 @@ function Home() {
       return b.rating - a.rating;
     })
     .slice(0, 10);
-
+  const dataToShow = filteredData ?? originalData;
   return (
-    <div>
+    <div className="container mx-auto ">
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
-      <div className={cx('home-container')}>
-        <div className={cx('content')}>
-          <div className={cx('filter')}>
-            <h2>Filter option</h2>
-          </div>
 
-          <div className={cx('grid')}>
-            <Tabs defaultActiveKey="all" onChange={setActiveTab}>
-              <Tabs.TabPane tab="All" key="all">
-                <BoardingHouseGrid data={allData} loading={loading} />
-              </Tabs.TabPane>
-              <Tabs.TabPane tab="Newest" key="newest">
-                <BoardingHouseGrid data={newestData} loading={loading} />
-              </Tabs.TabPane>
-              <Tabs.TabPane tab="High rating" key="highRating">
-                <BoardingHouseGrid data={highRatingData} loading={loading} />
-              </Tabs.TabPane>
-            </Tabs>
+      <div>
+        <FilterButton setFilterValue={setFilterValue} />
+      </div>
+      <div className="flex flex-col md:flex-row max-w-[1200px] mx-auto">
+
+        <div className="mt-8 hidden lg:block w-[250px] ">
+          <FilterBoardingHouseUser setFilterValue={setFilterValue} />
+        </div>
+
+
+        <div className={cx("home-container")}>
+
+          <div className={cx("content")}>
+
+            <div className={cx("grid")}>
+              {filteredData ? (
+                <BoardingHouseGrid data={filteredData} loading={loading} />
+              ) : (
+                <Tabs defaultActiveKey="all" onChange={setActiveTab}>
+                  <Tabs.TabPane tab="All" key="all">
+                    <BoardingHouseGrid data={dataToShow} loading={loading} />
+                  </Tabs.TabPane>
+                  <Tabs.TabPane tab="Newest" key="newest">
+                    <BoardingHouseGrid data={newestData} loading={loading} />
+                  </Tabs.TabPane>
+                  <Tabs.TabPane tab="High rating" key="highRating">
+                    <BoardingHouseGrid data={highRatingData} loading={loading} />
+                  </Tabs.TabPane>
+                </Tabs>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }

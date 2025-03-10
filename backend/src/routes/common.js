@@ -52,7 +52,16 @@ commonRouter.post("/send-otp-register", authController.sendOTPRegister);
 commonRouter.post("/verify-register", authController.verifyRegister);
 
 //boarding house
+commonRouter.get(
+  '/boardinghouse/filter',
+  boardingHouseController.filterBoardingHouse
+);
+commonRouter.get('/boardinghousetype', boardingHouseController.getAllBoardingHouseTypes);
 commonRouter.get("/boardinghouse", boardingHouseController.getAllBHOnHome);
+commonRouter.get(
+  '/boardinghouse/chore/get-max',
+  boardingHouseController.getMaxPriceBH
+);
 commonRouter.get(
   "/boardinghouse/:id",
   boardingHouseController.getBoardingHouseDetailInUser

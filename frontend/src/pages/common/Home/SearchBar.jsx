@@ -148,7 +148,10 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
   };
 
   const handleSubmit = (values) => {
-    setSearchValue(values);
+    setSearchValue((prev) => ({
+      ...prev,
+      ...values,
+    }));
   };
 
   return (
@@ -235,6 +238,7 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
               Clear
             </Button>
           </Form.Item>
+
         </Col>
       </Row>
     </Form>

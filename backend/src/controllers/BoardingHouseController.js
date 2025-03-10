@@ -604,6 +604,7 @@ class boardingHouseController {
         ward,
         startDate,
         endDate,
+        rating
       } = req.query;
 
       let filter = {};
@@ -614,11 +615,33 @@ class boardingHouseController {
           boardingHouseType
         ); // Convert string to ObjectId
       }
+      if (rating) {
+        const ratings = rating.split(",").map(Number); // Split and convert to numbers
+        const validRatings = ratings.filter((r) => !isNaN(r) && r >= 0 && r <= 5); // Validate ratings
 
-      if (priceRange && priceRange.length === 2) {
-        filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
+        if (validRatings.length > 0) {
+          filter.rating = { $in: validRatings }; // Filter for ratings in the provided array
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid rating format. Each rating must be a number between 0 and 5.",
+          });
+        }
       }
-
+      // if (priceRange && priceRange.length === 2) {
+      //   filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
+      // }
+      if (priceRange) {
+        const prices = priceRange.split(',').map(Number);
+        if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
+          filter.priceRange = { $gte: prices[0], $lte: prices[1] };
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid price range format. Use 'priceRange=min,max'."
+          });
+        }
+      }
       if (startDate && endDate) {
         filter.createdAt = {
           $gte: new Date(startDate),
@@ -1052,36 +1075,73 @@ class boardingHouseController {
   }
   async getBhByArea(req, res) {
     try {
-      const { province, district, ward } = req.query;
+      const { province, district, ward, boardingHouseType, rating, priceRange, name } = req.query;
       let result = [];
 
-      const boardingHData = await BoardingHouse.find(
-        { totalRooms: { $gt: 0 } },
-        { reviews: 0 }
-      );
+      let filter = { totalRooms: { $gt: 0 } };
+
+      // Nếu có loại nhà trọ, chuyển thành ObjectId
+      if (boardingHouseType) {
+        filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType);
+      }
+
+      // Nếu có rating, chuyển thành mảng số và kiểm tra hợp lệ
+      if (rating) {
+        const ratings = rating.split(",").map(Number);
+        const validRatings = ratings.filter(r => !isNaN(r) && r >= 0 && r <= 5);
+        if (validRatings.length > 0) {
+          filter.rating = { $in: validRatings };
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid rating format. Each rating must be a number between 0 and 5.",
+          });
+        }
+      }
+
+      // Nếu có priceRange, kiểm tra định dạng và áp dụng bộ lọc
+      if (priceRange) {
+        const prices = priceRange.split(',').map(Number);
+        if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
+          filter.priceRange = { $gte: prices[0], $lte: prices[1] };
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid price range format. Use 'priceRange=min,max'."
+          });
+        }
+      }
+
+      // Truy vấn cơ sở dữ liệu với bộ lọc
+      const boardingHData = await BoardingHouse.find(filter, { reviews: 0 });
 
       result = boardingHData;
 
+      // Lọc theo tỉnh/thành phố
       if (province) {
         result = result.filter(
-          (bh) => bh.address?.province.includes(province) ?? false
+          (bh) => bh.address?.province.toLowerCase().includes(province.toLowerCase()) ?? false
         );
       }
 
+      // Lọc theo quận/huyện
       if (district) {
         result = result.filter(
-          (bh) => bh.address?.district.includes(district) ?? false
+          (bh) => bh.address?.district.toLowerCase().includes(district.toLowerCase()) ?? false
         );
       }
 
+      // Lọc theo phường/xã
       if (ward?.trim()) {
         result = result.filter(
-          (bh) =>
-            bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) ??
-            false
+          (bh) => bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) ?? false
         );
       }
-
+      if (name) {
+        result = result.filter((bh) => {
+          return bh.name && bh.name.toLowerCase().includes(name.toLowerCase());
+        });
+      }
       res.status(200).json(result);
     } catch (error) {
       console.error(error);
