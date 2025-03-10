@@ -30,6 +30,7 @@ import CreateBoardingHouse from "./CreateBoardingHouse";
 import FilterBoardingHouse from "./FilterBoardingHouse";
 import { Form, Input, Select, Upload, InputNumber, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import axios from "axios";
 function BoardingHouseManagement(onClose) {
   const [boardingHData, setBoardingHData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +63,7 @@ function BoardingHouseManagement(onClose) {
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [filterValue, setFilterValue] = useState();
+  const [geoLocation, setGeoLocation] = useState(null);
   // Handle opening the delete modal
   const handleDeleteModal = (record) => {
     setSelectedRequest(record);
@@ -203,6 +205,28 @@ function BoardingHouseManagement(onClose) {
     fetchData();
   }, [formData?.address?.province, formData?.address?.district]);
 
+  const getLocation = async () => {
+    try {
+      const res = await axios.get(
+        "https://nominatim.openstreetmap.org/search",
+        {
+          params: {
+            format: "json",
+            q: `${formData.address.ward}, ${formData.address.district}, ${formData.address.province}`,
+            polygon_geojson: 1,
+          },
+        }
+      );
+      setGeoLocation(res.data[0]);
+    } catch (error) {
+      console.log("Error getting location:", error);
+    }
+  };
+
+  useEffect(() => {
+    getLocation();
+  }, [formData?.address?.ward]);
+
   // Xử lý thay đổi input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -308,6 +332,10 @@ function BoardingHouseManagement(onClose) {
         priceRange: formData.priceRange,
         electricityPrice: formData.electricityPrice,
         waterPrice: formData.waterPrice,
+        location: {
+          lat: geoLocation?.lat,
+          lon: geoLocation?.lon,
+        },
       };
 
       setLoading(true);
@@ -335,6 +363,7 @@ function BoardingHouseManagement(onClose) {
         toast.error("Failed to update boarding house. Please try again later.");
       }
     } finally {
+      setGeoLocation(null);
       setLoading(false);
     }
   };
@@ -539,6 +568,7 @@ function BoardingHouseManagement(onClose) {
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               handleCloseDetail();
+              setGeoLocation(null);
             }
           }}
         >
@@ -618,6 +648,9 @@ function BoardingHouseManagement(onClose) {
               onDistrictChange={handleInputChange}
               onInputChange={handleInputChange}
               formData={formData}
+              location={geoLocation}
+              initialPosition={formData?.location}
+              setGeoLocation={setGeoLocation}
             />
             <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
             {/* Primary Image */}
