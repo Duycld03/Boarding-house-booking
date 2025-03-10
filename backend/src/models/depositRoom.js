@@ -21,6 +21,14 @@ const DepositRoomSchema = new mongoose.Schema(
       type: String,
       default: "pending",
     },
+    rentalTime: {
+      type: Number,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+    },
   },
   {
     timestamps: true,

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
 import { FileTextOutlined } from "@ant-design/icons";
 import formatAmount from "../../../utils/formatAmount";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getMyDepositedRoom } from "@/api/depositManagement";
 import { Loader } from "../../../component";
 import { Tag } from "antd";
 import MyDepositDetail from "./MyDepositDetail";
+import { toast } from "react-toastify";
 
 function MyDepositedRoom() {
+  const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [depositedRooms, setDepositedRooms] = useState([]);
@@ -17,7 +19,6 @@ function MyDepositedRoom() {
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    console.log("cancel");
   };
 
   const columns = [
@@ -102,6 +103,21 @@ function MyDepositedRoom() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const status = params.get("status");
+
+    if (status === "success") {
+      toast.success("Pay rent successfully!");
+    } else if (status === "fail") {
+      toast.error("Pay rent failed!");
+    }
+    params.delete("status");
+    if (status) {
+      navigate(window.location.pathname, { replace: true });
+    }
+  }, [location]);
 
   useEffect(() => {
     fetchData();
