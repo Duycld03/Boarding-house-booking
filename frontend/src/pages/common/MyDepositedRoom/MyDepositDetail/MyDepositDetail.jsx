@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Modal, Card, Image, List, Avatar, Dropdown, Menu } from "antd";
-import { EllipsisOutlined } from "@ant-design/icons";
+import { DollarOutlined, EllipsisOutlined } from "@ant-design/icons";
 import { checkPayRentStatus, getDepositRoom } from "@/api/depositManagement";
 import formatAmount from "@/utils/formatAmount";
 import { useCurrentUser } from "@/context/userContext";
@@ -68,20 +68,25 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
       ? [
           {
             key: "pay_rent",
-            label: "Pay Rent",
+            label: (
+              <>
+                <DollarOutlined style={{ marginRight: 8 }} />
+                Pay Rent
+              </>
+            ),
             onClick: () => payRent(rentUser._id),
             disabled: isPaid,
           },
-          {
-            key: "refund_deposit",
-            label: "Refund Deposit",
-            onClick: () => refundDeposit(rentUser._id),
-          },
-          {
-            key: "extend_rent",
-            label: "Extend Rent",
-            onClick: () => extendRent(rentUser._id),
-          },
+          // {
+          //   key: "refund_deposit",
+          //   label: "Refund Deposit",
+          //   onClick: () => refundDeposit(rentUser._id),
+          // },
+          // {
+          //   key: "extend_rent",
+          //   label: "Extend Rent",
+          //   onClick: () => extendRent(rentUser._id),
+          // },
         ]
       : [
           {
@@ -124,14 +129,18 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
           renderItem={(item) => (
             <List.Item
               actions={[
-                <Dropdown
-                  menu={{ items: getDropdownItems(item) }}
-                  trigger={["click"]}
-                >
-                  <EllipsisOutlined
-                    style={{ fontSize: "24px", cursor: "pointer" }}
-                  />
-                </Dropdown>,
+                <>
+                  {user._id == item._id ? (
+                    <Dropdown
+                      menu={{ items: getDropdownItems(item) }}
+                      trigger={["click"]}
+                    >
+                      <EllipsisOutlined
+                        style={{ fontSize: "24px", cursor: "pointer" }}
+                      />
+                    </Dropdown>
+                  ) : null}
+                </>,
               ]}
             >
               <List.Item.Meta
