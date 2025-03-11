@@ -32,7 +32,6 @@ class RoomController {
 
 
 
-
 }
 
 export default new RoomController();
