@@ -45,11 +45,14 @@ function FacilitiesManagement() {
     if (!selectedFacility) return;
     try {
       await deleteFacility(selectedFacility._id);
+      toast.success("Delete facility successfully");
       await fetchFacilities();
     } catch (error) {
+      toast.error("Delete facility failed");
       console.error("Error deleting facility:", error);
     } finally {
       setIsDeleteModalOpen(false);
+
       setSelectedFacility(null);
     }
   };

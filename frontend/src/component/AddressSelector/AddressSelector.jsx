@@ -36,11 +36,6 @@ const AddressSelector = ({
   };
   return (
     <div className="col-span-2">
-      <LocationPicker
-        onChange={onLocationChange}
-        geoJson={location?.geojson}
-        initialPosition={currentLocation}
-      />
       <Form layout="vertical">
         {/* Province Selector */}
         <Form.Item label="Province" required className="mb-2">
@@ -128,6 +123,11 @@ const AddressSelector = ({
           />
         </Form.Item>
       </Form>
+      <LocationPicker
+        onChange={onLocationChange}
+        geoJson={location?.geojson}
+        initialPosition={currentLocation}
+      />
     </div>
   );
 };

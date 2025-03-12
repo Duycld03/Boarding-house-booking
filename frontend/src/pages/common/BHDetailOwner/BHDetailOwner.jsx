@@ -377,17 +377,6 @@ const BHDetailOwner = () => {
         <h2 className="text-3xl font-bold mb-4 mt-10 ">2. Address</h2>
         <Form.Item className="mb-4">
           {/* Province */}
-          <LocationPicker
-            geoJson={geoLocation?.geojson}
-            initialPosition={currentLocation ?? null}
-            onChange={(lat, lon) => {
-              setUpdatedData((prev) => ({
-                ...prev,
-                location: { lat, lon },
-              }));
-              setGeoLocation({ lat, lon });
-            }}
-          />
           <Form.Item
             label="Province"
             required
@@ -506,6 +495,17 @@ const BHDetailOwner = () => {
               rows={4}
             />
           </Form.Item>
+          <LocationPicker
+            geoJson={geoLocation?.geojson}
+            initialPosition={currentLocation ?? null}
+            onChange={(lat, lon) => {
+              setUpdatedData((prev) => ({
+                ...prev,
+                location: { lat, lon },
+              }));
+              setGeoLocation({ lat, lon });
+            }}
+          />
         </Form.Item>
         <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
         <Form.Item label="Primary Image" className="mb-4">
