@@ -362,14 +362,14 @@ const BHDetailOwner = () => {
                           return (
                             <StarFilled
                               key={index}
-                              className="text-yellow-500 text-xl"
+                              className="text-yellow-500 text-4xl"
                             />
                           );
                         } else {
                           return (
                             <StarOutlined
                               key={index}
-                              className="text-yellow-500 text-xl"
+                              className="text-yellow-500 text-4xl"
                             />
                           );
                         }
@@ -378,7 +378,7 @@ const BHDetailOwner = () => {
 
                     {/* Like */}
                     <div className="flex items-center gap-2">
-                      <HeartFilled className="text-red-500 text-xl" />
+                      <HeartFilled className="text-red-500 text-4xl" />
                       <span className="text-gray-600 text-lg">
                         {updatedData.likes
                           ? Number(updatedData.likes).toLocaleString('en-US')
