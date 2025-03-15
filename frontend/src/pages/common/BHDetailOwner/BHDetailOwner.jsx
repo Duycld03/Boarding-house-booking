@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { Form, Input, Select, Upload, InputNumber, Image, Button } from 'antd';
+import {
+  Form,
+  Input,
+  Select,
+  Upload,
+  InputNumber,
+  Image,
+  Button,
+  Tabs,
+} from 'antd';
 import {
   PlusOutlined,
   HeartFilled,
@@ -19,6 +28,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Back } from '../../../component';
 import axios from 'axios';
 import LocationPicker from '@/component/LocationPicker';
+import RoomType from '@/component/RoomType';
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -330,399 +340,452 @@ const BHDetailOwner = () => {
   }
 
   return (
-    <div className="mx-auto md:w-[60%] flex justify-center">
-      <Form
-        layout="vertical"
-        // onFinish={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full shadow-lg m-7"
-      >
-        <Form.Item>
-          <div className="flex flex-wrap min-[300px]:flex-nowrap justify-between items-center w-full gap-4">
-            {/* Bên trái: Rating & Like (luôn nằm bên trái) */}
-            <div className="flex flex-col items-start gap-2">
-              {/* Rating */}
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }, (_, index) => {
-                  if (index < Math.floor(updatedData.rating || 0)) {
-                    return (
-                      <StarFilled
-                        key={index}
-                        className="text-yellow-500 text-xl"
-                      />
-                    );
-                  } else {
-                    return (
-                      <StarOutlined
-                        key={index}
-                        className="text-yellow-500 text-xl"
-                      />
-                    );
-                  }
-                })}
-              </div>
-
-              {/* Like */}
-              <div className="flex items-center gap-2">
-                <HeartFilled className="text-red-500 text-xl" />
-                <span className="text-gray-600 text-lg">
-                  {updatedData.likes
-                    ? Number(updatedData.likes).toLocaleString('en-US')
-                    : '0'}
-                </span>
-              </div>
-            </div>
-
-            {/* Bên phải: Total Rooms & Available Rooms */}
-            <div className="text-left min-[300px]:text-right min-w-[150px]">
-              <div>Total Rooms: {updatedData.totalRooms || '0'}</div>
-              <div>Available Rooms: {updatedData.availableRooms || '0'}</div>
-            </div>
-          </div>
-        </Form.Item>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Information */}
-          <div className="flex flex-col flex-1">
-            <h2 className="text-3xl font-bold">1. Information</h2>
-            <Form.Item label="Name Boarding House" className="mb-2">
-              <Input
-                name="name"
-                value={updatedData.name || ''}
-                onChange={handleInputChange}
-              />
-            </Form.Item>
-
-            <Form.Item label="Boarding House Type" className="mb-2">
-              <Select
-                name="boardingHouseType"
-                value={updatedData.boardingHouseType?._id || ''}
-                onChange={(value) =>
-                  handleSelectedTypesChange({
-                    target: { name: 'boardingHouseType', value },
-                  })
-                }
-              >
-                {boardingHouseTypes.map((type) => (
-                  <Select.Option key={type.value} value={type.value}>
-                    {type.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item label="Description" className="flex-grow">
-              <Input.TextArea
-                name="description"
-                value={updatedData.description || ''}
-                onChange={handleInputChange}
-                rows={4}
-              />
-            </Form.Item>
-          </div>
-
-          {/* Price */}
-          <div className="flex flex-col flex-1">
-            <h2 className="text-3xl font-bold mb-4">2. Price</h2>
-            <Form.Item
-              label="Price Rent/month (VND)"
-              style={{ marginTop: '10px' }} // Sử dụng object-style đúng cách
-              className="mb-2"
+    <div className="mx-auto w-full back bg-white rounded-xl p-4">
+      {' '}
+      <Tabs defaultActiveKey="boardingHouseDetail">
+        {/* Tab: Boarding House Detail */}
+        <Tabs.TabPane tab="Boarding House Detail" key="boardingHouseDetail">
+          <div className="mx-auto md:w-[100%]">
+            <Form
+              layout="vertical"
+              // onFinish={handleSubmit}
+              className="p-6 *:m-7"
             >
-              <InputNumber
-                name="priceRange"
-                value={updatedData.priceRange || ''}
-                onChange={(value) =>
-                  handleInputChange({ target: { name: 'priceRange', value } })
-                }
-                formatter={(value) =>
-                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                }
-                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
-                className="w-full"
-                min={0}
-              />
-            </Form.Item>
+              <Form.Item>
+                <div className="flex flex-wrap min-[300px]:flex-nowrap justify-between items-center w-full gap-4">
+                  {/* Bên trái: Rating & Like (luôn nằm bên trái) */}
+                  <div className="flex flex-col items-start gap-2">
+                    {/* Rating */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }, (_, index) => {
+                        if (index < Math.floor(updatedData.rating || 0)) {
+                          return (
+                            <StarFilled
+                              key={index}
+                              className="text-yellow-500 text-xl"
+                            />
+                          );
+                        } else {
+                          return (
+                            <StarOutlined
+                              key={index}
+                              className="text-yellow-500 text-xl"
+                            />
+                          );
+                        }
+                      })}
+                    </div>
 
-            <Form.Item label="Electricity Price/kWh (VND)" className="mb-2">
-              <InputNumber
-                name="electricityPrice"
-                value={updatedData.electricityPrice || ''}
-                onChange={(value) =>
-                  handleInputChange({
-                    target: { name: 'electricityPrice', value },
-                  })
-                }
-                formatter={(value) =>
-                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                }
-                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
-                className="w-full"
-                min={0}
-              />
-            </Form.Item>
+                    {/* Like */}
+                    <div className="flex items-center gap-2">
+                      <HeartFilled className="text-red-500 text-xl" />
+                      <span className="text-gray-600 text-lg">
+                        {updatedData.likes
+                          ? Number(updatedData.likes).toLocaleString('en-US')
+                          : '0'}
+                      </span>
+                    </div>
+                  </div>
 
-            <Form.Item label="Water Price/m³ (VND)" className="mb-2 flex-grow">
-              <InputNumber
-                name="waterPrice"
-                value={updatedData.waterPrice || ''}
-                onChange={(value) =>
-                  handleInputChange({ target: { name: 'waterPrice', value } })
-                }
-                formatter={(value) =>
-                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                }
-                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
-                className="w-full"
-                min={0}
-              />
-            </Form.Item>
-          </div>
-        </div>
-        <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
-        <Form.Item label="Primary Image" className="mb-4">
-          <div className="flex flex-col gap-4">
-            {/* Check if a primary image exists */}
-            {updatedData.primaryImage ? (
-              <div className="relative">
-                <Image
-                  src={
-                    updatedData?.primaryImage?.imageUrl ||
-                    URL.createObjectURL(updatedData.primaryImage)
-                  }
-                  alt="Primary"
-                  className="object-cover border rounded"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '300px',
-                  }}
-                  preview={{
-                    mask: <span className="text-white">Preview</span>,
-                  }}
-                />
-                {/* Delete Button */}
-                <button
-                  type="button"
-                  onClick={handleRemovePrimaryImage}
-                  className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
-                >
-                  X
-                </button>
-              </div>
-            ) : (
-              <Upload
-                {...uploadProps}
-                listType="picture-card"
-                showUploadList={false}
-                className="custom-upload"
-                name="boardingHouse"
-              >
-                <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                  <PlusOutlined className="text-2xl text-gray-400" />
-                  <p className="text-gray-500 mt-2 text-sm font-medium">
-                    Add Primary Image
-                  </p>
-                  <p className="text-gray-400 text-xs">
-                    Drag-drop or click here to choose a file
-                  </p>
+                  {/* Bên phải: Total Rooms & Available Rooms */}
+                  <div className="text-left min-[300px]:text-right min-w-[150px]">
+                    <div>Total Rooms: {updatedData.totalRooms || '0'}</div>
+                    <div>
+                      Available Rooms: {updatedData.availableRooms || '0'}
+                    </div>
+                  </div>
                 </div>
-              </Upload>
-            )}
-          </div>
-        </Form.Item>
-        <Form.Item label="Other Images" className="mb-4">
-          <div className="mt-4 flex flex-wrap gap-4">
-            {/* Display Uploaded Other Images */}
-            {(updatedData.otherImages || []).map((file, index) => (
-              <div key={index} className="relative group">
-                <Image
-                  src={file?.imageUrl || URL.createObjectURL(file)}
-                  alt={`Other Image ${index + 1}`}
-                  className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-                  width={100}
-                  height={100}
-                  preview={{
-                    mask: <span className="text-white">Preview</span>,
-                  }}
-                />
-                {/* Delete Button */}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveOtherImage(index)}
-                  className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                >
-                  X
-                </button>
+              </Form.Item>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Information */}
+                <div className="flex flex-col flex-1">
+                  <h2 className="text-3xl font-bold">1. Information</h2>
+                  <Form.Item label="Name Boarding House" className="mb-2">
+                    <Input
+                      name="name"
+                      value={updatedData.name || ''}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Item>
+
+                  <Form.Item label="Boarding House Type" className="mb-2">
+                    <Select
+                      name="boardingHouseType"
+                      value={updatedData.boardingHouseType?._id || ''}
+                      onChange={(value) =>
+                        handleSelectedTypesChange({
+                          target: { name: 'boardingHouseType', value },
+                        })
+                      }
+                    >
+                      {boardingHouseTypes.map((type) => (
+                        <Select.Option key={type.value} value={type.value}>
+                          {type.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item label="Description" className="flex-grow">
+                    <Input.TextArea
+                      name="description"
+                      value={updatedData.description || ''}
+                      onChange={handleInputChange}
+                      rows={4}
+                    />
+                  </Form.Item>
+                </div>
+
+                {/* Price */}
+                <div className="flex flex-col flex-1">
+                  <h2 className="text-3xl font-bold mb-4">2. Price</h2>
+                  <Form.Item
+                    label="Price Rent/month (VND)"
+                    style={{ marginTop: '10px' }} // Sử dụng object-style đúng cách
+                    className="mb-2"
+                  >
+                    <InputNumber
+                      name="priceRange"
+                      value={updatedData.priceRange || ''}
+                      onChange={(value) =>
+                        handleInputChange({
+                          target: { name: 'priceRange', value },
+                        })
+                      }
+                      formatter={(value) =>
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      }
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                      className="w-full"
+                      min={0}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Electricity Price/kWh (VND)"
+                    className="mb-2"
+                  >
+                    <InputNumber
+                      name="electricityPrice"
+                      value={updatedData.electricityPrice || ''}
+                      onChange={(value) =>
+                        handleInputChange({
+                          target: { name: 'electricityPrice', value },
+                        })
+                      }
+                      formatter={(value) =>
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      }
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                      className="w-full"
+                      min={0}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Water Price/m³ (VND)"
+                    className="mb-2 flex-grow"
+                  >
+                    <InputNumber
+                      name="waterPrice"
+                      value={updatedData.waterPrice || ''}
+                      onChange={(value) =>
+                        handleInputChange({
+                          target: { name: 'waterPrice', value },
+                        })
+                      }
+                      formatter={(value) =>
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      }
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                      className="w-full"
+                      min={0}
+                    />
+                  </Form.Item>
+                </div>
               </div>
-            ))}
+              <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
+              <Form.Item label="Primary Image" className="mb-4">
+                <div className="flex flex-col gap-4">
+                  {/* Check if a primary image exists */}
+                  {updatedData.primaryImage ? (
+                    <div className="relative">
+                      <Image
+                        src={
+                          updatedData?.primaryImage?.imageUrl ||
+                          URL.createObjectURL(updatedData.primaryImage)
+                        }
+                        alt="Primary"
+                        className="object-cover border rounded"
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          maxHeight: '300px',
+                        }}
+                        preview={{
+                          mask: <span className="text-white">Preview</span>,
+                        }}
+                      />
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={handleRemovePrimaryImage}
+                        className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ) : (
+                    <Upload
+                      {...uploadProps}
+                      listType="picture-card"
+                      showUploadList={false}
+                      className="custom-upload"
+                      name="boardingHouse"
+                    >
+                      <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
+                        <PlusOutlined className="text-2xl text-gray-400" />
+                        <p className="text-gray-500 mt-2 text-sm font-medium">
+                          Add Primary Image
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          Drag-drop or click here to choose a file
+                        </p>
+                      </div>
+                    </Upload>
+                  )}
+                </div>
+              </Form.Item>
+              <Form.Item label="Other Images" className="mb-4">
+                <div className="mt-4 flex flex-wrap gap-4">
+                  {/* Display Uploaded Other Images */}
+                  {(updatedData.otherImages || []).map((file, index) => (
+                    <div key={index} className="relative group">
+                      <Image
+                        src={file?.imageUrl || URL.createObjectURL(file)}
+                        alt={`Other Image ${index + 1}`}
+                        className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+                        width={100}
+                        height={100}
+                        preview={{
+                          mask: <span className="text-white">Preview</span>,
+                        }}
+                      />
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveOtherImage(index)}
+                        className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      >
+                        X
+                      </button>
+                    </div>
+                  ))}
 
-            <Upload
-              {...uploadOtherImgProps}
-              listType="picture-card"
-              showUploadList={false}
-              name="boardingHouse"
-              className="custom-upload"
-            >
-              <div className="rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                <PlusOutlined className="text-2xl text-gray-400" />
-                <p className="text-gray-500 mt-2 text-sm font-medium">
-                  Add Other Image
-                </p>
-                <p className="text-gray-400 text-xs">
-                  Drag-drop or click here to choose a file
-                </p>
+                  <Upload
+                    {...uploadOtherImgProps}
+                    listType="picture-card"
+                    showUploadList={false}
+                    name="boardingHouse"
+                    className="custom-upload"
+                  >
+                    <div className="rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
+                      <PlusOutlined className="text-2xl text-gray-400" />
+                      <p className="text-gray-500 mt-2 text-sm font-medium">
+                        Add Other Image
+                      </p>
+                      <p className="text-gray-400 text-xs">
+                        Drag-drop or click here to choose a file
+                      </p>
+                    </div>
+                  </Upload>
+                </div>
+              </Form.Item>
+              <h2 className="text-3xl font-bold mb-4 mt-10">4. Address</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Các thông tin địa chỉ (bên trái trên màn hình lớn) */}
+                <div>
+                  <Form.Item className="mb-4">
+                    {/* Province */}
+                    <Form.Item
+                      label="Province"
+                      required
+                      rules={[
+                        { required: true, message: 'Province is required' },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Select Province"
+                        loading={!provinces.length}
+                        value={updatedData?.address?.province || null}
+                        onChange={(value) => {
+                          handleInputChange({
+                            target: { name: 'address.province', value },
+                          });
+                          setUpdatedData((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              province: value,
+                              district: null,
+                              ward: null,
+                            },
+                          }));
+                        }}
+                        allowClear
+                      >
+                        {provinces.map((province) => (
+                          <Select.Option
+                            key={province.code}
+                            value={province.name}
+                          >
+                            {province.name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+
+                    {/* District */}
+                    <Form.Item
+                      label="District"
+                      required
+                      rules={[
+                        { required: true, message: 'District is required' },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Select District"
+                        loading={
+                          !districts.length && updatedData?.address?.province
+                        }
+                        value={updatedData?.address?.district || null}
+                        onChange={(value) => {
+                          handleInputChange({
+                            target: { name: 'address.district', value },
+                          });
+                          setUpdatedData((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              district: value,
+                              ward: null,
+                            },
+                          }));
+                        }}
+                        disabled={!updatedData?.address?.province}
+                        allowClear
+                      >
+                        {districts.map((district) => (
+                          <Select.Option
+                            key={district.code}
+                            value={district.name}
+                          >
+                            {district.name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+
+                    {/* Ward */}
+                    <Form.Item
+                      label="Ward"
+                      required
+                      rules={[{ required: true, message: 'Ward is required' }]}
+                    >
+                      <Select
+                        placeholder="Select Ward"
+                        loading={
+                          !wards.length && updatedData?.address?.district
+                        }
+                        value={updatedData?.address?.ward || null}
+                        onChange={(value) => {
+                          handleInputChange({
+                            target: { name: 'address.ward', value },
+                          });
+                          setUpdatedData((prev) => ({
+                            ...prev,
+                            address: { ...prev.address, ward: value },
+                          }));
+                        }}
+                        disabled={!updatedData?.address?.district}
+                        allowClear
+                      >
+                        {wards.map((ward) => (
+                          <Select.Option key={ward.code} value={ward.name}>
+                            {ward.name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+
+                    {/* Detail Address */}
+                    <Form.Item label="Detail">
+                      <Input.TextArea
+                        name="address.detail"
+                        value={updatedData?.address?.detail || ''}
+                        onChange={handleInputChange}
+                        rows={4}
+                      />
+                    </Form.Item>
+                  </Form.Item>
+                </div>
+
+                {/* Bản đồ (bên phải trên màn hình lớn, xuống dưới trên mobile) */}
+                <div className="order-2 lg:order-1">
+                  <LocationPicker
+                    geoJson={geoLocation?.geojson}
+                    initialPosition={currentLocation ?? null}
+                    onChange={(lat, lon) => {
+                      setUpdatedData((prev) => ({
+                        ...prev,
+                        location: { lat, lon },
+                      }));
+                      setGeoLocation({ lat, lon });
+                    }}
+                  />
+                </div>
               </div>
-            </Upload>
-          </div>
-        </Form.Item>
-        <h2 className="text-3xl font-bold mb-4 mt-10">4. Address</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Các thông tin địa chỉ (bên trái trên màn hình lớn) */}
-          <div>
-            <Form.Item className="mb-4">
-              {/* Province */}
-              <Form.Item
-                label="Province"
-                required
-                rules={[{ required: true, message: 'Province is required' }]}
-              >
-                <Select
-                  placeholder="Select Province"
-                  loading={!provinces.length}
-                  value={updatedData?.address?.province || null}
-                  onChange={(value) => {
-                    handleInputChange({
-                      target: { name: 'address.province', value },
-                    });
-                    setUpdatedData((prev) => ({
-                      ...prev,
-                      address: {
-                        ...prev.address,
-                        province: value,
-                        district: null,
-                        ward: null,
-                      },
-                    }));
-                  }}
-                  allowClear
+              {/* </div> */}
+              <div className="flex justify-end gap-4 w-full md:mt-4">
+                <Button
+                  className="bg-red-500 text-white w-32"
+                  size="large"
+                  onClick={() => navigate('/bh-management-owner')} // Điều hướng về trang trước đó
+                  title="Back"
                 >
-                  {provinces.map((province) => (
-                    <Select.Option key={province.code} value={province.name}>
-                      {province.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
+                  Back
+                </Button>
 
-              {/* District */}
-              <Form.Item
-                label="District"
-                required
-                rules={[{ required: true, message: 'District is required' }]}
-              >
-                <Select
-                  placeholder="Select District"
-                  loading={!districts.length && updatedData?.address?.province}
-                  value={updatedData?.address?.district || null}
-                  onChange={(value) => {
-                    handleInputChange({
-                      target: { name: 'address.district', value },
-                    });
-                    setUpdatedData((prev) => ({
-                      ...prev,
-                      address: { ...prev.address, district: value, ward: null },
-                    }));
-                  }}
-                  disabled={!updatedData?.address?.province}
-                  allowClear
+                <Button
+                  className="bg-primary text-white w-32"
+                  size="large"
+                  loading={loading}
+                  onClick={handleSubmit}
+                  title="Update"
                 >
-                  {districts.map((district) => (
-                    <Select.Option key={district.code} value={district.name}>
-                      {district.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-
-              {/* Ward */}
-              <Form.Item
-                label="Ward"
-                required
-                rules={[{ required: true, message: 'Ward is required' }]}
-              >
-                <Select
-                  placeholder="Select Ward"
-                  loading={!wards.length && updatedData?.address?.district}
-                  value={updatedData?.address?.ward || null}
-                  onChange={(value) => {
-                    handleInputChange({
-                      target: { name: 'address.ward', value },
-                    });
-                    setUpdatedData((prev) => ({
-                      ...prev,
-                      address: { ...prev.address, ward: value },
-                    }));
-                  }}
-                  disabled={!updatedData?.address?.district}
-                  allowClear
-                >
-                  {wards.map((ward) => (
-                    <Select.Option key={ward.code} value={ward.name}>
-                      {ward.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-
-              {/* Detail Address */}
-              <Form.Item label="Detail">
-                <Input.TextArea
-                  name="address.detail"
-                  value={updatedData?.address?.detail || ''}
-                  onChange={handleInputChange}
-                  rows={4}
-                />
-              </Form.Item>
-            </Form.Item>
+                  Update
+                </Button>
+              </div>
+            </Form>
           </div>
+        </Tabs.TabPane>
 
-          {/* Bản đồ (bên phải trên màn hình lớn, xuống dưới trên mobile) */}
-          <div className="order-2 lg:order-1">
-            <LocationPicker
-              geoJson={geoLocation?.geojson}
-              initialPosition={currentLocation ?? null}
-              onChange={(lat, lon) => {
-                setUpdatedData((prev) => ({
-                  ...prev,
-                  location: { lat, lon },
-                }));
-                setGeoLocation({ lat, lon });
-              }}
-            />
-          </div>
-        </div>
-        {/* </div> */}
-        <div className="flex justify-end gap-4 w-full md:mt-4">
-          <Button
-            className="bg-red-500 text-white w-32"
-            size="large"
-            onClick={() => navigate('/bh-management-owner')} // Điều hướng về trang trước đó
-            title="Back"
-          >
-            Back
-          </Button>
+        {/* Tab: Room Type */}
+        <Tabs.TabPane tab="Room Type" key="roomType">
+          <RoomType />
+        </Tabs.TabPane>
 
-          <Button
-            className="bg-primary text-white w-32"
-            size="large"
-            loading={loading}
-            onClick={handleSubmit}
-            title="Update"
-          >
-            Update
-          </Button>
-        </div>
-      </Form>
+        {/* Tab: Room */}
+        <Tabs.TabPane tab="Room" key="room">
+          {/* <Room /> */}
+        </Tabs.TabPane>
+
+        {/* Tab: Deposit Management */}
+        <Tabs.TabPane tab="Deposit Management" key="depositManagement">
+          {/* <DepositManagement /> */}
+        </Tabs.TabPane>
+      </Tabs>
     </div>
   );
 };
