@@ -423,7 +423,11 @@ const BHDetailOwner = () => {
           {/* Price */}
           <div className="flex flex-col flex-1">
             <h2 className="text-3xl font-bold mb-4">2. Price</h2>
-            <Form.Item label="Price Rent/month (VND)" className="mb-2">
+            <Form.Item
+              label="Price Rent/month (VND)"
+              style={{ marginTop: '10px' }} // Sử dụng object-style đúng cách
+              className="mb-2"
+            >
               <InputNumber
                 name="priceRange"
                 value={updatedData.priceRange || ''}
@@ -698,10 +702,18 @@ const BHDetailOwner = () => {
           </div>
         </div>
         {/* </div> */}
-        <div className="flex justify-between w-full">
-          <Back />
+        <div className="flex justify-end gap-4 w-full md:mt-4">
           <Button
-            className="bg-primary text-white"
+            className="bg-red-500 text-white w-32"
+            size="large"
+            onClick={() => navigate('/bh-management-owner')} // Điều hướng về trang trước đó
+            title="Back"
+          >
+            Back
+          </Button>
+
+          <Button
+            className="bg-primary text-white w-32"
             size="large"
             loading={loading}
             onClick={handleSubmit}
