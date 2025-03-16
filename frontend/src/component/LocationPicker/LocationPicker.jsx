@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   MapContainer,
   TileLayer,
   Marker,
   useMapEvents,
   GeoJSON,
-} from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+} from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
 // Fix default marker icon issue in Leaflet
-import markerIconPng from "leaflet/dist/images/marker-icon.png";
-import markerShadowPng from "leaflet/dist/images/marker-shadow.png";
+import markerIconPng from 'leaflet/dist/images/marker-icon.png';
+import markerShadowPng from 'leaflet/dist/images/marker-shadow.png';
 
 const customIcon = L.icon({
   iconUrl: markerIconPng,
@@ -81,7 +81,7 @@ function LocationPicker({
         <MapContainer
           center={position}
           zoom={13}
-          style={{ height: "300px", width: "100%" }}
+          style={{ height: '380px', width: '100%' }}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {geoJsonLayer && <GeoJson />}

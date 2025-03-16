@@ -614,9 +614,9 @@ const BHDetailOwner = () => {
               </Form.Item>
               <h2 className="text-3xl font-bold mb-4 mt-10">4. Address</h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Các thông tin địa chỉ (bên trái trên màn hình lớn) */}
-                <div>
-                  <Form.Item className="mb-4">
+                {/* Các thông tin địa chỉ */}
+                <div className="flex flex-col h-full">
+                  <Form.Item className="mb-4 flex-1">
                     {/* Province */}
                     <Form.Item
                       label="Province"
@@ -741,9 +741,10 @@ const BHDetailOwner = () => {
                   </Form.Item>
                 </div>
 
-                {/* Bản đồ (bên phải trên màn hình lớn, xuống dưới trên mobile) */}
-                <div className="order-2 lg:order-1">
+                {/* Bản đồ (Map) */}
+                <div className="order-2 lg:order-1 h-full">
                   <LocationPicker
+                    className="h-full min-h-[500px] w-full"
                     geoJson={geoLocation?.geojson}
                     initialPosition={currentLocation ?? null}
                     onChange={(lat, lon) => {
@@ -756,10 +757,11 @@ const BHDetailOwner = () => {
                   />
                 </div>
               </div>
+
               {/* </div> */}
               <div className="flex justify-center gap-4 w-full md:mt-4">
                 <Button
-                  className="bg-red-500 text-white w-60"
+                  className="bg-red-500 text-white flex-1"
                   size="large"
                   onClick={() => navigate('/bh-management-owner')}
                   title="Back"
@@ -768,7 +770,7 @@ const BHDetailOwner = () => {
                 </Button>
 
                 <Button
-                  className="bg-primary text-white w-60"
+                  className="bg-primary text-white flex-1"
                   size="large"
                   loading={loading}
                   onClick={handleSubmit}
