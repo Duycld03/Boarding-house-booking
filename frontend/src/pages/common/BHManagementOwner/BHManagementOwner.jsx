@@ -80,7 +80,11 @@ function BHManagementOwner() {
             title={'Detail'}
             icon={<FileTextOutlined />}
             // onClick={() => openEditModal(record)}
-            onClick={() => navigate(`/bh-management-owner/${record._id}`)}
+            onClick={() =>
+              navigate(`/bh-management-owner/${record._id}`, {
+                state: { name: record.name },
+              })
+            }
             className="text-white"
             bgColor="rgb(5 150 105)"
           />

@@ -30,6 +30,7 @@ import axios from 'axios';
 import LocationPicker from '@/component/LocationPicker';
 import RoomType from '@/component/RoomType';
 import { HomeFilled } from '@ant-design/icons';
+import { useLocation } from 'react-router-dom';
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -43,6 +44,8 @@ const BHDetailOwner = () => {
   const [geoLocation, setGeoLocation] = useState(null); // Geo location
   const [currentLocation, setCurrentLocation] = useState(null); // Current location
   const navigate = useNavigate();
+  const location = useLocation();
+  const boardingHouseName = location.state?.name || 'Default Name';
 
   const fetchBoardingHouseDetails = async () => {
     if (!boardingHouseId) {
@@ -323,6 +326,7 @@ const BHDetailOwner = () => {
         toast.success(
           response.message || 'Boarding house updated successfully.'
         );
+        navigate('/bh-management-owner');
       } else {
         toast.error(response?.message || 'Failed to update boarding house.');
       }
@@ -345,7 +349,7 @@ const BHDetailOwner = () => {
       {' '}
       <h1 className="text-5xl flex items-center gap-2">
         <HomeFilled className="text-gray-500 text-6xl" />
-        {updatedData.name || 'Default Title'}
+        {boardingHouseName || 'Default Title'}
       </h1>
       <Tabs defaultActiveKey="boardingHouseDetail">
         {/* Tab: Boarding House Detail */}
