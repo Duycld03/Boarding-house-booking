@@ -181,6 +181,7 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
       fetchDataUserAppointment();
       toast.success("Đã gửi yêu cầu thành công!");
       handleClose();
+      navigate("/my-appointment");
     } catch (error) {
       toast.error("Lỗi khi gửi yêu cầu: " + error.message);
     } finally {

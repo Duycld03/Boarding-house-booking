@@ -6,7 +6,7 @@ import {
 import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
 import { toast } from "react-toastify";
 import convertTimetap from "../../../utils/convertTimetap";
-import { message, Tag, Tooltip } from "antd";
+import { Tag, Tooltip } from "antd";
 
 function MyAppointment() {
   const [appointmentData, setAppointmentData] = useState([]);
@@ -16,7 +16,7 @@ function MyAppointment() {
 
   const statusColors = {
     pending: "blue",
-    confirmed: "orange",
+    accepted: "orange",
     canceled: "red",
     completed: "green",
   };
