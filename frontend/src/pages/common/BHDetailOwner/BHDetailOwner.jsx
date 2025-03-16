@@ -357,7 +357,7 @@ const BHDetailOwner = () => {
               className="p-6 *:m-7"
             >
               <Form.Item>
-                <div className="flex flex-wrap min-[300px]:flex-nowrap justify-between items-center w-full gap-4">
+                <div className="flex flex-wrap min-[361px]:flex-nowrap justify-between items-center w-full gap-4">
                   {/* Bên trái: Rating & Like (luôn nằm bên trái) */}
                   <div className="flex flex-col items-start gap-2">
                     {/* Rating */}
