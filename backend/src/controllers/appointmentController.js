@@ -20,7 +20,7 @@ class AppointmentController {
                     path: 'boardingHouseId',
                     populate: { path: 'ownerId' }
                 }
-            }).lean();
+            }).sort({ createdAt: -1 }).lean()
 
 
             if (appointmentList.length === 0) {
@@ -37,7 +37,7 @@ class AppointmentController {
                     const appointmentDate = new Date(appointment.appointmentDate);
                     appointmentDate.setHours(0, 0, 0, 0);
 
-                    if (appointmentDate < today && appointment.status !== "completed") {
+                    if (appointmentDate < today && appointment.status !== "completed" && appointment.status !== "canceled") {
                         await ViewRoomRequest.findByIdAndUpdate(appointment._id, { status: "completed" });
                         appointment.status = "completed";
                     }
