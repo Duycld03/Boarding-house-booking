@@ -29,8 +29,9 @@ import { Back } from '../../../component';
 import axios from 'axios';
 import LocationPicker from '@/component/LocationPicker';
 import RoomType from '@/component/RoomType';
-import { HomeFilled } from '@ant-design/icons';
 import { useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHotel } from '@fortawesome/free-solid-svg-icons';
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -348,7 +349,7 @@ const BHDetailOwner = () => {
     <div className="mx-auto w-full back bg-white rounded-xl p-4">
       {' '}
       <h1 className="text-5xl flex items-center gap-2">
-        <HomeFilled className="text-gray-500 text-6xl" />
+        <FontAwesomeIcon icon={faHotel} className="text-gray-500 text-6xl" />{' '}
         {boardingHouseName || 'Default Title'}
       </h1>
       <Tabs defaultActiveKey="boardingHouseDetail">
