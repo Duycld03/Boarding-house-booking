@@ -29,6 +29,7 @@ import { Back } from '../../../component';
 import axios from 'axios';
 import LocationPicker from '@/component/LocationPicker';
 import RoomType from '@/component/RoomType';
+import { HomeFilled } from '@ant-design/icons';
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -342,6 +343,10 @@ const BHDetailOwner = () => {
   return (
     <div className="mx-auto w-full back bg-white rounded-xl p-4">
       {' '}
+      <h1 className="text-5xl flex items-center gap-2">
+        <HomeFilled className="text-gray-500 text-6xl" />
+        {updatedData.name || 'Default Title'}
+      </h1>
       <Tabs defaultActiveKey="boardingHouseDetail">
         {/* Tab: Boarding House Detail */}
         <Tabs.TabPane tab="Boarding House Detail" key="boardingHouseDetail">
@@ -747,18 +752,18 @@ const BHDetailOwner = () => {
                 </div>
               </div>
               {/* </div> */}
-              <div className="flex justify-end gap-4 w-full md:mt-4">
+              <div className="flex justify-center gap-4 w-full md:mt-4">
                 <Button
-                  className="bg-red-500 text-white w-32"
+                  className="bg-red-500 text-white w-60"
                   size="large"
-                  onClick={() => navigate('/bh-management-owner')} // Điều hướng về trang trước đó
+                  onClick={() => navigate('/bh-management-owner')}
                   title="Back"
                 >
                   Back
                 </Button>
 
                 <Button
-                  className="bg-primary text-white w-32"
+                  className="bg-primary text-white w-60"
                   size="large"
                   loading={loading}
                   onClick={handleSubmit}
