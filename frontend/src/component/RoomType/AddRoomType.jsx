@@ -174,8 +174,13 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         throw new Error(response?.message || 'Failed to add room type.');
       }
     } catch (error) {
-      console.error('❌ Error:', error);
-      toast.error(error.message || 'Failed to submit form.');
+      console.error('❌ API Error:', error.response?.data || error.message);
+
+      // ✅ Thử lấy lỗi từ `response.data.message` nếu có
+      const errorMessage =
+        error.response?.data?.message || 'Failed to submit form.';
+
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -192,6 +197,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         open={isModalVisible}
         onCancel={closeModal}
         footer={null}
+        destroyOnClose
       >
         <Form
           key={isModalVisible ? 'open' : 'closed'} // ✅ Key thay đổi khi mở/đóng modal

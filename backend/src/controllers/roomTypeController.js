@@ -45,6 +45,7 @@ class RoomTypeController {
       next(error);
     }
   }
+
   async addRoomTypeToBoardingHouse(req, res, next) {
     try {
       const { id } = req.params; // ID của BoardingHouse
@@ -56,9 +57,28 @@ class RoomTypeController {
         return res.status(404).json({ message: 'Boarding House not found' });
       }
 
+      // ✅ Kiểm tra typeName: Không chứa ký tự đặc biệt, không trùng
+      const typeNameRegex = /^[a-zA-Z0-9 ]+$/; // ✅ Chỉ cho phép chữ, số, khoảng trắng
+      if (!typeNameRegex.test(typeName)) {
+        return res
+          .status(400)
+          .json({ message: 'Type Name must not contain special characters.' });
+      }
+
+      // ✅ Kiểm tra typeName có trùng không
+      const existingRoomType = await RoomType.findOne({
+        boardingHouseId: id,
+        typeName,
+      });
+      if (existingRoomType) {
+        return res.status(400).json({
+          message: 'Type Name already exists for this Boarding House.',
+        });
+      }
+
       // ✅ Convert `facilities` từ string JSON thành array ObjectId
       if (!facilities || facilities === 'null' || facilities === '[]') {
-        facilities = []; // 👉 Nếu không có, gán mặc định là ["None"]
+        facilities = []; // 👉 Nếu không có, gán mặc định là []
       } else if (typeof facilities === 'string') {
         try {
           facilities = JSON.parse(facilities);
