@@ -25,3 +25,6 @@ export const updateRoomTypeToBoardingHouse = (roomTypeId, data) => {
     },
   });
 };
+export const softDeleteRoomType = (roomTypeId) => {
+  return axios.delete(`/owner/boardinghouse/roomtype/${roomTypeId}`);
+};

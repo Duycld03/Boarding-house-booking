@@ -51,5 +51,8 @@ ownerRouter.put(
   upload.single('roomType'), // Nếu có ảnh mới, upload lên Cloudinary
   roomTypeController.updateRoomTypeToBoardingHouse
 );
-
+ownerRouter.delete(
+  '/boardinghouse/roomtype/:roomTypeId/',
+  roomTypeController.softDeleteRoomType
+);
 export { ownerRouter };

@@ -225,6 +225,42 @@ class RoomTypeController {
       });
     }
   }
+  async softDeleteRoomType(req, res, next) {
+    try {
+      const { roomTypeId } = req.params;
+
+      // 🔥 Kiểm tra RoomType có tồn tại không
+      const roomType = await RoomType.findById(roomTypeId);
+      if (!roomType) {
+        return res.status(404).json({ message: 'Room Type not found' });
+      }
+
+      // ✅ Nếu đã bị xóa trước đó, thông báo lỗi
+      if (roomType.deleted) {
+        return res
+          .status(400)
+          .json({ message: 'Room Type has already been deleted.' });
+      }
+
+      // ✅ Cập nhật trạng thái `deleted` thành `true`
+      roomType.deleted = true;
+      roomType.deletedAt = new Date(); // Ghi lại thời gian xóa
+
+      // 🔥 Lưu vào database
+      await roomType.save();
+
+      return res.status(200).json({
+        message: 'Room Type deleted successfully (soft delete).',
+        data: roomType,
+      });
+    } catch (error) {
+      console.error('🔥 Error in softDeleteRoomType:', error);
+      return res.status(500).json({
+        message: 'An unexpected error occurred while deleting room type.',
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default new RoomTypeController();

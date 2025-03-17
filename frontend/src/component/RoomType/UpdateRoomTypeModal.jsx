@@ -47,18 +47,17 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
 
   // ✅ Cập nhật state khi `roomData` thay đổi
   useEffect(() => {
-    if (roomData) {
-      setFormData({
-        typeName: roomData.typeName || '',
-        facilities: roomData.facilities?.map((fac) => fac._id) || [],
-        roomSize: roomData.roomSize || '',
-        price: roomData.price || '',
-        peopleNumber: roomData.peopleNumber || '',
-        image: roomData.image?.imageUrl || null,
-      });
-      setImagePreview(roomData.image?.imageUrl || null);
-    }
-  }, [roomData, visible]);
+    if (!roomData) return; // 🔥 Fix: Chỉ update khi có dữ liệu
+    setFormData({
+      typeName: roomData.typeName || '',
+      facilities: roomData.facilities?.map((fac) => fac._id) || [],
+      roomSize: roomData.roomSize || '',
+      price: roomData.price || '',
+      peopleNumber: roomData.peopleNumber || '',
+      image: roomData.image?.imageUrl || null,
+    });
+    setImagePreview(roomData.image?.imageUrl || null);
+  }, [roomData]); // 🔥 Fix: Thêm dependency để tránh lặp vô hạn
 
   // ✅ Reset form khi modal đóng
   useEffect(() => {

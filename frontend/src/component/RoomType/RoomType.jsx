@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import Table from '@/component/Table';
-import { Button } from '@/component';
+import { Button, ConfirmModal } from '@/component';
 import { Avatar } from 'antd';
 import DefaultRoomImage from '@/assets/images/none_avatar.png';
 import { FileTextOutlined } from '@ant-design/icons';
-import { getRoomTypeByBhId } from '../../api/roomTypeManagement';
+import {
+  getRoomTypeByBhId,
+  softDeleteRoomType,
+} from '../../api/roomTypeManagement';
 import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom'; // 🔥 Lấy id từ URL
-import formatAmount from '@/utils/formatAmount'; // 🔥 Import hàm formatAmount
+import { useParams } from 'react-router-dom';
+import formatAmount from '@/utils/formatAmount';
 import AddRoomTypeModal from './AddRoomType';
 import UpdateRoomTypeModal from './UpdateRoomTypeModal';
 
@@ -17,8 +20,10 @@ const RoomType = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState(null);
 
-  // Hàm fetch dữ liệu từ API
+  // ✅ Fetch danh sách RoomType
   const fetchRoomTypes = async () => {
     if (!boardingHouseId) {
       toast.error('Boarding House ID is missing!');
@@ -27,7 +32,6 @@ const RoomType = () => {
     setLoading(true);
     try {
       const response = await getRoomTypeByBhId(boardingHouseId);
-
       if (Array.isArray(response.data)) {
         setRoomData(response.data);
       } else {
@@ -45,9 +49,10 @@ const RoomType = () => {
   useEffect(() => {
     fetchRoomTypes();
   }, [boardingHouseId]);
+
   const handleAddNewData = async () => {
-    await fetchRoomTypes(); // Refresh data after adding a new boarding house
-  }; // 👈 Gọi lại khi boardinghouseId thay đổi
+    await fetchRoomTypes();
+  };
 
   const handleOpenUpdateModal = (room) => {
     setSelectedRoom(room);
@@ -57,6 +62,48 @@ const RoomType = () => {
   const handleCloseUpdateModal = () => {
     setIsUpdateModalVisible(false);
     setSelectedRoom(null);
+  };
+
+  // ✅ Hiển thị popup xác nhận khi bấm Delete
+  const handleSelectDelete = (room) => {
+    setCurrentRecord(room);
+    setIsDeleteModalVisible(true);
+  };
+
+  // ✅ Xử lý xóa room sau khi xác nhận
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      if (!currentRecord?._id) {
+        toast.error('Invalid ID');
+        return;
+      }
+
+      console.log('🚀 Deleting Room Type ID:', currentRecord._id); // Debug log
+
+      const response = await softDeleteRoomType(currentRecord._id);
+
+      console.log('🔥 API Response:', response); // Debug log API Response
+
+      if (
+        response?.message === 'Room Type deleted successfully (soft delete).'
+      ) {
+        toast.success('Room Type deleted successfully!');
+        setRoomData(roomData.filter((room) => room._id !== currentRecord._id));
+        fetchRoomTypes(); // 🔥 Load lại danh sách sau khi xóa
+        setIsDeleteModalVisible(false);
+        setCurrentRecord(null);
+      }
+    } catch (error) {
+      console.error('❌ Delete Room Type Error:', error);
+      toast.error(
+        `Failed to delete Room Type: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const columns = [
@@ -95,7 +142,7 @@ const RoomType = () => {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      render: (price) => formatAmount(price), // 🔥 Gọi formatAmount
+      render: (price) => formatAmount(price),
     },
     {
       title: 'People Number',
@@ -119,16 +166,12 @@ const RoomType = () => {
             size="large"
             btnDelete
             title={'Delete'}
-            onClick={() => handleDelete(record)}
+            onClick={() => handleSelectDelete(record)}
           />
         </div>
       ),
     },
   ];
-
-  const handleDelete = (record) => {
-    setRoomData(roomData.filter((room) => room.id !== record.id));
-  };
 
   return (
     <div className="container mx-auto">
@@ -144,6 +187,14 @@ const RoomType = () => {
         onClose={handleCloseUpdateModal}
         roomData={selectedRoom}
         onUpdate={fetchRoomTypes}
+      />
+
+      <ConfirmModal
+        title="Confirm Deletion"
+        content="Do you want to delete this room type?"
+        onOk={handleDelete}
+        onCancel={() => setIsDeleteModalVisible(false)}
+        isOpen={isDeleteModalVisible}
       />
     </div>
   );
