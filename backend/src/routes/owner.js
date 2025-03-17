@@ -46,5 +46,10 @@ ownerRouter.post(
   roomTypeController.addRoomTypeToBoardingHouse
 );
 ownerRouter.get('/facilities', FacilitiesController.getAllFacilities);
+ownerRouter.put(
+  '/boardinghouse/roomtype/:roomTypeId/',
+  upload.single('roomType'), // Nếu có ảnh mới, upload lên Cloudinary
+  roomTypeController.updateRoomTypeToBoardingHouse
+);
 
 export { ownerRouter };
