@@ -1,8 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Table from '@/component/Table';
-import { Button } from '@/component';
+import { Button, ConfirmModal } from '@/component';
+import {
+  getTenantsByBoardingHouse,
+  deleteTenantsByBoardingHouse,
+} from '../../api/tenantManagement';
+import { toast } from 'react-toastify';
+import convertTimetap from '@/utils/convertTimetap';
 
 const TenantManagement = () => {
+  const { boardingHouseId } = useParams();
+  const [tenantData, setTenantData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState(null);
+
+  useEffect(() => {
+    const fetchTenantData = async () => {
+      setLoading(true);
+      try {
+        const data = await getTenantsByBoardingHouse(boardingHouseId);
+        setTenantData(data);
+      } catch (error) {
+        toast.error('Failed to fetch tenant data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTenantData();
+  }, [boardingHouseId]);
+
+  const handleDelete = async () => {
+    if (!selectedTenant) return;
+    setLoading(true);
+    try {
+      await deleteTenantsByBoardingHouse(selectedTenant._id);
+      setTenantData(tenantData.filter((t) => t._id !== selectedTenant._id));
+      toast.success('Tenant deleted successfully.');
+    } catch (error) {
+      toast.error('Failed to delete tenant.');
+    } finally {
+      setLoading(false);
+      setIsOpen(false);
+    }
+  };
+
   const columns = [
     {
       title: 'Tenant Name',
@@ -23,46 +67,41 @@ const TenantManagement = () => {
       title: 'Start Deposit Date',
       dataIndex: 'startDepositDate',
       key: 'startDepositDate',
+      render: (date) => convertTimetap(date),
     },
     {
       title: 'End Deposit Date',
       dataIndex: 'endDepositDate',
       key: 'endDepositDate',
+      render: (date) => convertTimetap(date),
     },
     {
       title: 'Action',
       key: 'action',
-      render: () => <Button size="large" btnDelete title="Delete" />,
-    },
-  ];
-
-  const tenantData = [
-    {
-      tenantName: 'Nguyễn Văn A',
-      roomNumber: 101,
-      totalDepositTime: '3 tháng',
-      startDepositDate: '10/01/2025',
-      endDepositDate: '10/04/2025',
-    },
-    {
-      tenantName: 'Trần Thị B',
-      roomNumber: 102,
-      totalDepositTime: '6 tháng',
-      startDepositDate: '15/02/2025',
-      endDepositDate: '15/08/2025',
-    },
-    {
-      tenantName: 'Lê Văn C',
-      roomNumber: 103,
-      totalDepositTime: '12 tháng',
-      startDepositDate: '20/03/2025',
-      endDepositDate: '20/03/2026',
+      render: (record) => (
+        <Button
+          size="large"
+          btnDelete
+          title="Delete"
+          onClick={() => {
+            setSelectedTenant(record);
+            setIsOpen(true);
+          }}
+        />
+      ),
     },
   ];
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <Table columns={columns} data={tenantData} />
+      <Table columns={columns} data={tenantData} loading={loading} />
+      <ConfirmModal
+        title="Confirm Deletion"
+        content="Are you sure you want to delete this tenant?"
+        isOpen={isOpen}
+        onOk={handleDelete}
+        onCancel={() => setIsOpen(false)}
+      />
     </div>
   );
 };

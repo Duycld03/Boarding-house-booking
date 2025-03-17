@@ -30,11 +30,14 @@ class TenantController {
       const tenants = [];
 
       for (const room of rooms) {
-        // Lấy thông tin đặt cọc của phòng
-        const depositInfo = await DepositRoom.findOne({ roomId: room._id });
+        for (const tenantAccount of room.rentBy) {
+          // Kiểm tra thông tin đặt cọc của tenant cụ thể trong phòng
+          const depositInfo = await DepositRoom.findOne({
+            roomId: room._id,
+            accountId: tenantAccount._id,
+          });
 
-        if (room.rentBy.length > 0 && depositInfo) {
-          room.rentBy.forEach((tenantAccount) => {
+          if (depositInfo) {
             tenants.push({
               tenantName: tenantAccount.fullname,
               roomNumber: room.roomNumber,
@@ -42,7 +45,7 @@ class TenantController {
               startDepositDate: depositInfo.createdAt,
               endDepositDate: depositInfo.endDate,
             });
-          });
+          }
         }
       }
 
@@ -50,6 +53,111 @@ class TenantController {
     } catch (error) {
       console.error('Error fetching tenants by boarding house:', error);
       res.status(500).json({ message: 'Server error', error });
+    }
+  }
+
+  async deleteTenantFromBoardingHouse(req, res) {
+    try {
+      const { boardingHouseId, accountId } = req.params;
+
+      // Kiểm tra ID hợp lệ
+      if (
+        !mongoose.Types.ObjectId.isValid(boardingHouseId) ||
+        !mongoose.Types.ObjectId.isValid(accountId)
+      ) {
+        return res
+          .status(400)
+          .json({ message: 'Invalid or missing parameters.' });
+      }
+
+      const accountObjectId = new mongoose.Types.ObjectId(accountId);
+      const boardingHouseObjectId = new mongoose.Types.ObjectId(
+        boardingHouseId
+      );
+
+      console.log(
+        '🔍 Searching for rooms in boarding house:',
+        boardingHouseObjectId
+      );
+      console.log('🔍 Looking for tenant with accountId:', accountObjectId);
+
+      // 🔍 Lấy tất cả phòng trong boarding house
+      const allRooms = await Room.find({
+        boardingHouseId: boardingHouseObjectId,
+      }).select('_id roomNumber rentBy');
+
+      console.log('📌 All rooms in boarding house:', allRooms);
+
+      // 🔥 Lọc ra phòng chứa tenant này
+      const rooms = allRooms.filter((room) =>
+        room.rentBy.some((tenantId) => tenantId.equals(accountObjectId))
+      );
+
+      if (!rooms.length) {
+        console.log('❌ Tenant not found in any rooms.');
+        return res
+          .status(404)
+          .json({ message: 'Tenant not found in any rooms.' });
+      }
+
+      console.log('✅ Rooms containing this tenant:', rooms);
+
+      const roomIds = rooms.map((room) => room._id);
+
+      // 🔍 Tìm deposit record của tenant này
+      const depositInfo = await DepositRoom.findOne({
+        roomId: { $in: roomIds },
+        accountId: accountObjectId,
+      });
+
+      if (!depositInfo) {
+        console.log('❌ No deposit record found for this tenant.');
+        return res
+          .status(404)
+          .json({ message: 'No deposit record found for this tenant.' });
+      }
+
+      console.log('📌 Deposit record found:', depositInfo);
+
+      // 🛠 Cập nhật trạng thái deposit thành "deleted"
+      await DepositRoom.updateMany(
+        { roomId: { $in: roomIds }, accountId: accountObjectId },
+        { $set: { status: 'deleted' } }
+      );
+
+      console.log('✅ Deposit status updated to "deleted" for this tenant.');
+
+      // 🔥 Kiểm tra rentBy trước khi xóa
+      const roomCheckBefore = await Room.find({ _id: { $in: roomIds } }).select(
+        '_id rentBy'
+      );
+      console.log('🔎 rentBy before deletion:', roomCheckBefore);
+
+      // ❌ Xóa tenant khỏi danh sách `rentBy` bằng cách cập nhật toàn bộ mảng (nếu $pull không hoạt động)
+      for (const room of rooms) {
+        const updatedRentBy = room.rentBy.filter(
+          (id) => !id.equals(accountObjectId)
+        );
+        await Room.updateOne(
+          { _id: room._id },
+          { $set: { rentBy: updatedRentBy } }
+        );
+      }
+
+      console.log('📌 Successfully removed tenant from rentBy.');
+
+      // 🔥 Kiểm tra lại sau khi xóa
+      const roomCheckAfter = await Room.find({ _id: { $in: roomIds } }).select(
+        '_id rentBy'
+      );
+      console.log('✅ rentBy after deletion:', roomCheckAfter);
+
+      res.status(200).json({
+        message: 'Tenant successfully removed from the boarding house.',
+      });
+    } catch (error) {
+      console.error('❌ Error deleting tenant from boarding house:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
 }

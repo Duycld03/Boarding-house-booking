@@ -39,5 +39,9 @@ ownerRouter.get(
   '/tenant/:boardingHouseId',
   tenantController.getTenantsByBoardingHouse
 );
+ownerRouter.delete(
+  '/tenant/:boardingHouseId/:accountId',
+  tenantController.deleteTenantFromBoardingHouse
+);
 
 export { ownerRouter };
