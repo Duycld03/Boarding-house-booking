@@ -96,28 +96,54 @@ class ReviewController {
     try {
       const { reviewId } = req.params;
 
-      // Tìm review bằng reviewId
+      // 🔥 Tìm review bằng reviewId
       const review = await Review.findById(reviewId);
-
       if (!review) {
         return res.status(404).json({ message: 'Review not found' });
       }
 
+      // 🔥 Lưu boardingHouseId để cập nhật sau khi xóa
+      const { boardingHouseId } = review;
+
+      // 🔥 Thực hiện soft delete
       review.deleted = true;
       review.deletedAt = new Date();
-
       await review.save();
 
-      return res.status(200).json({ message: 'Review deleted successfully' });
+      // 🔥 Lấy danh sách review còn tồn tại sau khi xóa (chưa bị soft delete)
+      const reviews = await Review.find({
+        boardingHouseId,
+        parentId: null, // Chỉ lấy review gốc
+        deleted: false, // Chỉ lấy review chưa bị soft delete
+      });
+
+      let averageRating = 0;
+      if (reviews.length > 0) {
+        const totalRating = reviews.reduce((sum, rev) => sum + rev.rating, 0);
+        averageRating = (totalRating / reviews.length).toFixed(1);
+      }
+
+      // 🔥 Cập nhật BoardingHouse với rating mới (không cập nhật `updatedAt`)
+      await BoardingHouse.findByIdAndUpdate(
+        boardingHouseId,
+        { rating: averageRating },
+        { new: true, timestamps: false } // Ngăn Mongoose cập nhật `updatedAt`
+      );
+
+      return res.status(200).json({
+        message: 'Review deleted successfully',
+        newRating: averageRating, // Trả về rating mới sau khi xóa review
+      });
     } catch (error) {
       console.error('Error soft deleting review:', error);
       return res.status(500).json({ message: 'Server Error' });
     }
   }
+
   async updateReview(req, res) {
     try {
       const { reviewId } = req.params;
-      const { content, rating, images } = req.body;
+      const { content, rating, images, boardingHouseId } = req.body;
       const accountId = req.user.userId;
 
       if (!accountId) {
@@ -133,17 +159,37 @@ class ReviewController {
           .json({ message: 'You are not authorized to update this review' });
       }
 
-      // Check if images array exists and its length exceeds the limit
-      if (images && images.length > 5) {
+      // Check nếu rating hợp lệ (1-5)
+      if (rating !== undefined && (rating < 1 || rating > 5)) {
         return res
           .status(400)
-          .json({ message: "You can't upload more than 5 images." });
+          .json({ message: 'Rating must be between 1 and 5.' });
       }
 
+      // Cập nhật review trước để rating mới được tính chính xác
       review.content = content !== undefined ? content : review.content;
-      review.rating = rating || review.rating;
-      review.images = images || review.images; //This will allow to remove images by sending an empty array.
+      review.rating = rating !== undefined ? rating : review.rating;
+      review.images = images !== undefined ? images : review.images; // Cho phép xóa ảnh bằng cách gửi array rỗng
       await review.save();
+
+      // 🔥 Truy vấn lại danh sách review sau khi cập nhật
+      const reviews = await Review.find({
+        boardingHouseId: review.boardingHouseId,
+        parentId: null, // Chỉ lấy review gốc
+        deleted: false,
+      });
+
+      if (reviews.length > 0) {
+        const totalRating = reviews.reduce((sum, rev) => sum + rev.rating, 0);
+        const averageRating = (totalRating / reviews.length).toFixed(1);
+
+        // 🔥 Cập nhật BoardingHouse nhưng không cập nhật `updatedAt`
+        await BoardingHouse.findByIdAndUpdate(
+          review.boardingHouseId,
+          { rating: averageRating },
+          { new: true, timestamps: false } // 🔥 Ngăn Mongoose cập nhật `updatedAt`
+        );
+      }
 
       return res
         .status(200)
@@ -153,6 +199,7 @@ class ReviewController {
       return res.status(500).json({ message: 'Server Error' });
     }
   }
+
   async getReviewsUser(req, res) {
     try {
       // 🔥 Lấy toàn bộ review gốc (không có parentId)
@@ -455,13 +502,12 @@ class ReviewController {
     }
   }
 
-
   async getReviewByBhId(req, res) {
     try {
       const { id } = req.params;
 
       if (!id) {
-        return res.status(400).json({ message: "bhId is required" });
+        return res.status(400).json({ message: 'bhId is required' });
       }
 
       // ✅ Lấy danh sách review gốc
@@ -470,20 +516,20 @@ class ReviewController {
         parentId: null, // Chỉ lấy review gốc
       })
         .populate({
-          path: "accountId",
-          select: "fullname avatarImage",
+          path: 'accountId',
+          select: 'fullname avatarImage',
         })
         .sort({ updatedAt: -1 });
 
       if (!allReviews.length) {
-        return res.status(404).json({ message: "No reviews found" });
+        return res.status(404).json({ message: 'No reviews found' });
       }
 
       // ✅ Duyệt qua từng review để lấy nội dung của reply (nếu có)
       const reviewsWithReply = await Promise.all(
         allReviews.map(async (review) => {
           const reply = await Review.findOne({ parentId: review._id }).select(
-            "content"
+            'content'
           );
 
           return {
@@ -495,11 +541,10 @@ class ReviewController {
 
       res.status(200).json(reviewsWithReply);
     } catch (error) {
-      console.error("🔥 Server Error:", error);
-      res.status(500).json({ message: "Server error", error: error.message });
+      console.error('🔥 Server Error:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
-
 }
 
 export default new ReviewController();
