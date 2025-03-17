@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { getAllFacilities } from '@/api/roomTypeManagement';
 import { updateRoomTypeToBoardingHouse } from '@/api/roomTypeManagement';
 
-const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
+const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
   const [formData, setFormData] = useState({
     typeName: '',
     facilities: [],
@@ -111,13 +111,25 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
       formDataToSend.append('roomType', formData.image);
     }
 
+    setLoading(true);
+
     try {
-      await updateRoomTypeToBoardingHouse(roomData._id, formDataToSend);
-      toast.success('Room Type updated successfully!');
-      onClose();
+      const response = await updateRoomTypeToBoardingHouse(
+        roomData._id,
+        formDataToSend
+      );
+
+      if (response?.message === 'Room Type updated successfully') {
+        toast.success('Room Type updated successfully!');
+
+        onClose(); // ✅ Đóng modal ngay khi update thành công
+        onUpdate(); // ✅ Gọi lại API để cập nhật danh sách Room Type
+      }
     } catch (error) {
-      console.error('Failed to update room type:', error);
+      console.error('❌ API Error:', error.response?.data || error.message);
       toast.error('Failed to update room type. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -143,6 +143,7 @@ const RoomType = () => {
         visible={isUpdateModalVisible}
         onClose={handleCloseUpdateModal}
         roomData={selectedRoom}
+        onUpdate={fetchRoomTypes}
       />
     </div>
   );
