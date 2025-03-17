@@ -112,7 +112,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         return;
       }
       if (!/^\d+x\d+$/.test(formData.roomSize)) {
-        toast.error('Room size must be in format 20x30.');
+        toast.error('Room size must be in format 20x30 or 30x40.');
         return;
       }
       if (
@@ -229,7 +229,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
           </Form.Item>
 
           {/* Room Size */}
-          <Form.Item label="Room Size (e.g., 20x30)" required>
+          <Form.Item label="Room Size (e.g., 20x30, 30x40)" required>
             <Input
               placeholder="Enter room size"
               name="roomSize"
