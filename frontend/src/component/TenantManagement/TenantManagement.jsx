@@ -4,7 +4,7 @@ import Table from '@/component/Table';
 import { Button, ConfirmModal } from '@/component';
 import {
   getTenantsByBoardingHouse,
-  deleteTenantsByBoardingHouse,
+  deleteTenantFromBoardingHouse,
 } from '../../api/tenantManagement';
 import { toast } from 'react-toastify';
 import convertTimetap from '@/utils/convertTimetap';
@@ -21,6 +21,7 @@ const TenantManagement = () => {
       setLoading(true);
       try {
         const data = await getTenantsByBoardingHouse(boardingHouseId);
+        console.log('🔥 Tenant Data:', data); // Kiểm tra dữ liệu
         setTenantData(data);
       } catch (error) {
         toast.error('Failed to fetch tenant data.');
@@ -33,14 +34,35 @@ const TenantManagement = () => {
   }, [boardingHouseId]);
 
   const handleDelete = async () => {
-    if (!selectedTenant) return;
+    if (!selectedTenant || !selectedTenant.accountId) {
+      toast.error('Error: Missing tenant accountId.');
+      return;
+    }
+
+    console.log(
+      `🚀 Deleting tenant with accountId: ${selectedTenant.accountId}`
+    );
+
     setLoading(true);
     try {
-      await deleteTenantsByBoardingHouse(selectedTenant._id);
-      setTenantData(tenantData.filter((t) => t._id !== selectedTenant._id));
+      await deleteTenantFromBoardingHouse(
+        boardingHouseId,
+        selectedTenant.accountId
+      );
+      setTenantData((prevTenants) =>
+        prevTenants.filter((t) => t.accountId !== selectedTenant.accountId)
+      );
       toast.success('Tenant deleted successfully.');
     } catch (error) {
-      toast.error('Failed to delete tenant.');
+      console.error(
+        '🔥 Delete Tenant Error:',
+        error.response?.data || error.message
+      );
+      toast.error(
+        `Failed to delete tenant: ${
+          error.response?.data?.message || 'Unknown error'
+        }`
+      );
     } finally {
       setLoading(false);
       setIsOpen(false);
@@ -84,6 +106,7 @@ const TenantManagement = () => {
           btnDelete
           title="Delete"
           onClick={() => {
+            console.log('🔥 Selected Tenant:', record);
             setSelectedTenant(record);
             setIsOpen(true);
           }}
