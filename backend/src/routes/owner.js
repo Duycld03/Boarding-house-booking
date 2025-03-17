@@ -3,6 +3,7 @@ import {
   authController,
   boardingHouseController,
   ReviewController,
+  tenantController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -34,5 +35,9 @@ ownerRouter.delete(
 );
 ownerRouter.post('/reply', ReviewController.replyReview);
 ownerRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
+ownerRouter.get(
+  '/tenant/:boardingHouseId',
+  tenantController.getTenantsByBoardingHouse
+);
 
 export { ownerRouter };
