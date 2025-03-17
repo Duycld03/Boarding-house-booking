@@ -149,7 +149,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
       );
 
       if (response?.message === 'Room Type added successfully') {
-        toast.success(response.message);
+        toast.success('Room type added successfully!');
         onAddData();
         setFormData({
           typeName: '',

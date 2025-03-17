@@ -178,8 +178,14 @@ class RoomTypeController {
         return res.status(400).json({ message: 'Facilities must be an array' });
       }
 
-      if (facilities[0] !== 'None') {
-        facilities = facilities.map((id) => new mongoose.Types.ObjectId(id));
+      // ✅ Nếu `facilities.length === 0`, cập nhật RoomType thành không có facilities
+      if (facilities.length === 0) {
+        roomType.facilities = []; // Xóa hết facilities
+      } else {
+        // Nếu vẫn còn facilities, chuyển đổi chúng thành ObjectId
+        roomType.facilities = facilities.map(
+          (id) => new mongoose.Types.ObjectId(id)
+        );
       }
 
       // ✅ Xử lý ảnh: Nếu có ảnh mới -> Xóa ảnh cũ trên Cloudinary, upload ảnh mới
@@ -199,8 +205,6 @@ class RoomTypeController {
 
       // ✅ Cập nhật RoomType
       roomType.typeName = typeName || roomType.typeName;
-      roomType.facilities =
-        facilities.length > 0 ? facilities : roomType.facilities;
       roomType.price = price || roomType.price;
       roomType.roomSize = roomSize || roomType.roomSize;
       roomType.peopleNumber = peopleNumber || roomType.peopleNumber;

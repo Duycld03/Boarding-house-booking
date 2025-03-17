@@ -3,8 +3,10 @@ import { Modal, Form, Input, Select, Upload, InputNumber, Image } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button } from '@/component';
 import { toast } from 'react-toastify';
-import { getAllFacilities } from '@/api/roomTypeManagement';
-import { updateRoomTypeToBoardingHouse } from '@/api/roomTypeManagement';
+import {
+  getAllFacilities,
+  updateRoomTypeToBoardingHouse,
+} from '@/api/roomTypeManagement';
 
 const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -15,35 +17,40 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
     peopleNumber: '',
     image: null,
   });
+
   const [facilitiesList, setFacilitiesList] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // ✅ Fetch danh sách facilities
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
         const response = await getAllFacilities();
-        if (response && response.data) {
-          setFacilitiesList(response.data);
-        } else {
-          setFacilitiesList([]);
-        }
+        setFacilitiesList(response?.data || []);
       } catch (error) {
         console.error('Failed to fetch facilities:', error);
         toast.error('Failed to fetch facilities.');
-        setFacilitiesList([]);
       }
     };
 
     fetchFacilities();
   }, []);
-
   useEffect(() => {
-    setLoading(true);
+    if (formData.facilities.length === 0) {
+      setFormData((prev) => ({
+        ...prev,
+        facilities: [], // ✅ Đảm bảo cập nhật chính xác, không giữ lại giá trị cũ
+      }));
+    }
+  }, [formData.facilities]);
+
+  // ✅ Cập nhật state khi `roomData` thay đổi
+  useEffect(() => {
     if (roomData) {
       setFormData({
         typeName: roomData.typeName || '',
-        facilities: roomData.facilities.map((fac) => fac._id) || [],
+        facilities: roomData.facilities?.map((fac) => fac._id) || [],
         roomSize: roomData.roomSize || '',
         price: roomData.price || '',
         peopleNumber: roomData.peopleNumber || '',
@@ -53,20 +60,40 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
     }
   }, [roomData, visible]);
 
+  // ✅ Reset form khi modal đóng
+  useEffect(() => {
+    if (!visible) {
+      setFormData({
+        typeName: '',
+        facilities: [],
+        roomSize: '',
+        price: '',
+        peopleNumber: '',
+        image: null,
+      });
+      setImagePreview(null);
+    }
+  }, [visible]);
+
+  // ✅ Xử lý thay đổi input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ✅ Xử lý chọn facilities
   const handleSelectChange = (selectedValues) => {
-    setFormData((prev) => ({ ...prev, facilities: selectedValues }));
+    setFormData((prev) => ({
+      ...prev,
+      facilities: selectedValues.length ? [...selectedValues] : [],
+    }));
   };
 
+  // ✅ Xử lý ảnh upload
   const uploadProps = {
     beforeUpload: (file) => {
       setFormData((prev) => ({ ...prev, image: file }));
-      const imageURL = URL.createObjectURL(file);
-      setImagePreview(imageURL);
+      setImagePreview(URL.createObjectURL(file));
       return false;
     },
     accept: 'image/*',
@@ -74,11 +101,13 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
     showUploadList: false,
   };
 
+  // ✅ Xóa ảnh
   const handleRemoveImage = () => {
     setFormData((prev) => ({ ...prev, image: null }));
     setImagePreview(null);
   };
 
+  // ✅ Gửi dữ liệu lên API
   const handleSubmit = async () => {
     if (!formData.typeName.trim()) {
       toast.error('Type Name is required.');
@@ -101,17 +130,21 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       return;
     }
 
+    setLoading(true);
+
     const formDataToSend = new FormData();
     formDataToSend.append('typeName', formData.typeName);
     formDataToSend.append('roomSize', formData.roomSize);
     formDataToSend.append('price', formData.price);
     formDataToSend.append('peopleNumber', formData.peopleNumber);
-    formDataToSend.append('facilities', JSON.stringify(formData.facilities));
+    formDataToSend.append(
+      'facilities',
+      JSON.stringify(formData.facilities || [])
+    );
+
     if (formData.image instanceof File) {
       formDataToSend.append('roomType', formData.image);
     }
-
-    setLoading(true);
 
     try {
       const response = await updateRoomTypeToBoardingHouse(
@@ -120,10 +153,9 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       );
 
       if (response?.message === 'Room Type updated successfully') {
-        toast.success('Room Type updated successfully!');
-
-        onClose(); // ✅ Đóng modal ngay khi update thành công
-        onUpdate(); // ✅ Gọi lại API để cập nhật danh sách Room Type
+        toast.success('Room type updated successfully!');
+        onClose();
+        onUpdate();
       }
     } catch (error) {
       console.error('❌ API Error:', error.response?.data || error.message);
@@ -155,7 +187,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
           <Select
             mode="multiple"
             placeholder="Select facilities"
-            value={formData.facilities}
+            value={formData.facilities || []}
             onChange={handleSelectChange}
           >
             {facilitiesList.map((facility) => (
@@ -235,9 +267,9 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
         <div className="flex justify-end mt-4">
           <Button btnCancel title="Cancel" onClick={onClose} className="mr-2" />
           <Button
-            className="bg-primary text-white flex items-center"
-            // loading={loading}
+            className="bg-primary text-white"
             title="Update"
+            loading={loading}
             onClick={handleSubmit}
           />
         </div>
