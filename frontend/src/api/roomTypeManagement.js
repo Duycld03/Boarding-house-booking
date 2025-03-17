@@ -18,3 +18,10 @@ export const addRoomTypeToBoardingHouse = (boardingHouseId, data) => {
 export const getAllFacilities = () => {
   return axios.get(`/owner/facilities`);
 };
+export const updateRoomTypeToBoardingHouse = (roomTypeId, data) => {
+  return axios.put(`/owner/boardinghouse/roomtype/${roomTypeId}`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};

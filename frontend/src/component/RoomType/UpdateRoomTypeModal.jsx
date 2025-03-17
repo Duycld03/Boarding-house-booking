@@ -4,6 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Button } from '@/component';
 import { toast } from 'react-toastify';
 import { getAllFacilities } from '@/api/roomTypeManagement';
+import { updateRoomTypeToBoardingHouse } from '@/api/roomTypeManagement';
 
 const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
     image: null,
   });
   const [facilitiesList, setFacilitiesList] = useState([]);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchFacilities = async () => {
@@ -36,6 +39,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     if (roomData) {
       setFormData({
         typeName: roomData.typeName || '',
@@ -45,6 +49,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
         peopleNumber: roomData.peopleNumber || '',
         image: roomData.image?.imageUrl || null,
       });
+      setImagePreview(roomData.image?.imageUrl || null);
     }
   }, [roomData, visible]);
 
@@ -60,6 +65,8 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
   const uploadProps = {
     beforeUpload: (file) => {
       setFormData((prev) => ({ ...prev, image: file }));
+      const imageURL = URL.createObjectURL(file);
+      setImagePreview(imageURL);
       return false;
     },
     accept: 'image/*',
@@ -69,9 +76,10 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
 
   const handleRemoveImage = () => {
     setFormData((prev) => ({ ...prev, image: null }));
+    setImagePreview(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.typeName.trim()) {
       toast.error('Type Name is required.');
       return;
@@ -92,8 +100,25 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
       toast.error('People number must be at least 1.');
       return;
     }
-    toast.success('Room Type updated successfully!');
-    onClose();
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('typeName', formData.typeName);
+    formDataToSend.append('roomSize', formData.roomSize);
+    formDataToSend.append('price', formData.price);
+    formDataToSend.append('peopleNumber', formData.peopleNumber);
+    formDataToSend.append('facilities', JSON.stringify(formData.facilities));
+    if (formData.image instanceof File) {
+      formDataToSend.append('roomType', formData.image);
+    }
+
+    try {
+      await updateRoomTypeToBoardingHouse(roomData._id, formDataToSend);
+      toast.success('Room Type updated successfully!');
+      onClose();
+    } catch (error) {
+      console.error('Failed to update room type:', error);
+      toast.error('Failed to update room type. Please try again.');
+    }
   };
 
   return (
@@ -167,7 +192,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
         </Form.Item>
 
         <Form.Item label="Room Image">
-          {!formData.image ? (
+          {!imagePreview ? (
             <Upload
               {...uploadProps}
               listType="picture-card"
@@ -181,7 +206,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
           ) : (
             <div className="relative">
               <Image
-                src={formData.image}
+                src={imagePreview}
                 alt="Room Image"
                 className="w-full rounded"
               />
@@ -199,6 +224,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData }) => {
           <Button btnCancel title="Cancel" onClick={onClose} className="mr-2" />
           <Button
             className="bg-primary text-white flex items-center"
+            // loading={loading}
             title="Update"
             onClick={handleSubmit}
           />
