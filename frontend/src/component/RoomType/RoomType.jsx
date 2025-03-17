@@ -9,11 +9,14 @@ import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom'; // 🔥 Lấy id từ URL
 import formatAmount from '@/utils/formatAmount'; // 🔥 Import hàm formatAmount
 import AddRoomTypeModal from './AddRoomType';
+import UpdateRoomTypeModal from './UpdateRoomTypeModal';
 
 const RoomType = () => {
   const { boardingHouseId } = useParams();
   const [roomData, setRoomData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
 
   // Hàm fetch dữ liệu từ API
   const fetchRoomTypes = async () => {
@@ -45,6 +48,16 @@ const RoomType = () => {
   const handleAddNewData = async () => {
     await fetchRoomTypes(); // Refresh data after adding a new boarding house
   }; // 👈 Gọi lại khi boardinghouseId thay đổi
+
+  const handleOpenUpdateModal = (room) => {
+    setSelectedRoom(room);
+    setIsUpdateModalVisible(true);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setIsUpdateModalVisible(false);
+    setSelectedRoom(null);
+  };
 
   const columns = [
     {
@@ -100,6 +113,7 @@ const RoomType = () => {
             icon={<FileTextOutlined />}
             className={'text-white'}
             bgColor={'rgb(5 150 105)'}
+            onClick={() => handleOpenUpdateModal(record)}
           />
           <Button
             size="large"
@@ -125,6 +139,11 @@ const RoomType = () => {
         />
       </div>
       <Table columns={columns} data={roomData} loading={loading} />
+      <UpdateRoomTypeModal
+        visible={isUpdateModalVisible}
+        onClose={handleCloseUpdateModal}
+        roomData={selectedRoom}
+      />
     </div>
   );
 };

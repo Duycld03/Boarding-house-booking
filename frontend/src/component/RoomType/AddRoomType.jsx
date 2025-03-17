@@ -67,7 +67,6 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
 
   // 🛠 Xử lý chọn tiện ích
   const handleSelectChange = (selectedValues) => {
-    console.log('🛠 Selected Facilities IDs:', selectedValues);
     setFormData((prev) => ({
       ...prev,
       facilities: selectedValues.length > 0 ? selectedValues : [], // ✅ Nếu không chọn gì thì gán mảng rỗng
@@ -132,10 +131,6 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         return;
       }
 
-      // ✅ Debug dữ liệu trước khi gửi
-      console.log('🔥 Sending Data:', formData);
-      console.log(boardingHouseId);
-
       // 🛠 Tạo FormData để gửi dữ liệu
       const payload = new FormData();
       payload.append('typeName', formData.typeName);
@@ -146,11 +141,6 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
 
       // ✅ Fix: Chuyển `facilities` thành JSON string để gửi đi
       payload.append('facilities', JSON.stringify(formData.facilities));
-
-      // ✅ Debug xem dữ liệu gửi đi có đúng không
-      for (const pair of payload.entries()) {
-        console.log('🛠 FormData:', pair[0], pair[1]);
-      }
 
       // 🛠 Gọi API tạo Room Type
       const response = await addRoomTypeToBoardingHouse(
