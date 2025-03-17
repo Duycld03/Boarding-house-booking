@@ -26,12 +26,15 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
     const fetchFacilities = async () => {
       try {
         const response = await getAllFacilities();
-        console.log(response);
-
-        setFacilities(response.data || []);
+        if (response && response.data) {
+          setFacilities(response.data);
+        } else {
+          setFacilities([]); // ✅ Đảm bảo không bị lỗi khi API không trả về dữ liệu
+        }
       } catch (error) {
         console.error('Failed to fetch facilities:', error);
         toast.error('Failed to fetch facilities.');
+        setFacilities([]); // ✅ Đảm bảo không bị lỗi nếu API fail
       }
     };
     fetchFacilities();
@@ -39,19 +42,20 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
 
   // 🛠 Reset form khi mở modal
   const openModal = () => {
-    setFormData({
-      typeName: '',
-      facilities: [],
-      roomSize: '',
-      price: '',
-      peopleNumber: '',
-      image: null,
-    });
     setIsModalVisible(true);
   };
 
   // 🛠 Đóng modal
   const closeModal = () => {
+    setFormData({
+      typeName: '',
+      facilities: [], // ✅ Reset facilities khi đóng modal
+      roomSize: '',
+      price: '',
+      peopleNumber: '',
+      image: null,
+    });
+
     setIsModalVisible(false);
   };
 
@@ -64,11 +68,9 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   // 🛠 Xử lý chọn tiện ích
   const handleSelectChange = (selectedValues) => {
     console.log('🛠 Selected Facilities IDs:', selectedValues);
-    console.log(boardingHouseId);
-    // ✅ Debug danh sách ID
     setFormData((prev) => ({
       ...prev,
-      facilities: selectedValues, // ✅ Chỉ lưu `_id`, không lưu object
+      facilities: selectedValues.length > 0 ? selectedValues : [], // ✅ Nếu không chọn gì thì gán mảng rỗng
     }));
   };
 
@@ -87,6 +89,18 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   const handleRemoveImage = () => {
     setFormData((prev) => ({ ...prev, image: null }));
   };
+  useEffect(() => {
+    if (isModalVisible) {
+      setFormData({
+        typeName: '',
+        facilities: [], // ✅ Reset lại facilities khi mở modal
+        roomSize: '',
+        price: '',
+        peopleNumber: '',
+        image: null,
+      });
+    }
+  }, [isModalVisible]); // Theo dõi trạng thái modal
 
   // 🛠 Gửi dữ liệu lên API
   const handleSubmit = async () => {
@@ -147,6 +161,14 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
       if (response?.message === 'Room Type added successfully') {
         toast.success(response.message);
         onAddData();
+        setFormData({
+          typeName: '',
+          facilities: [], // ✅ Reset lại facilities sau khi add thành công
+          roomSize: '',
+          price: '',
+          peopleNumber: '',
+          image: null,
+        });
         closeModal();
       } else {
         throw new Error(response?.message || 'Failed to add room type.');
@@ -171,7 +193,11 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         onCancel={closeModal}
         footer={null}
       >
-        <Form layout="vertical" onSubmitCapture={handleSubmit}>
+        <Form
+          key={isModalVisible ? 'open' : 'closed'} // ✅ Key thay đổi khi mở/đóng modal
+          layout="vertical"
+          onSubmitCapture={handleSubmit}
+        >
           {/* Type Name */}
           <Form.Item label="Room Type Name" required>
             <Input
@@ -185,7 +211,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
             <Select
               mode="multiple"
               placeholder="Select facilities"
-              value={formData.facilities}
+              value={formData.facilities.length > 0 ? formData.facilities : []} // ✅ Reset về [] khi modal đóng
               onChange={handleSelectChange}
             >
               {facilities.map((facility) => (
@@ -219,8 +245,6 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
               }
               parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
-              min={500000}
-              max={100000000}
               className="w-full"
             />
           </Form.Item>
@@ -234,7 +258,6 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               onChange={(value) =>
                 setFormData((prev) => ({ ...prev, peopleNumber: value }))
               }
-              min={1}
               className="w-full"
             />
           </Form.Item>

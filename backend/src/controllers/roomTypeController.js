@@ -49,8 +49,6 @@ class RoomTypeController {
     try {
       const { id } = req.params; // ID của BoardingHouse
       let { typeName, facilities, price, roomSize, peopleNumber } = req.body;
-      console.log('🔥 Received Data:', req.body); // ✅ Debug body nhận từ frontend
-      console.log('🖼️ Received File:', req.file);
 
       // 🔥 Kiểm tra BoardingHouse có tồn tại không
       const boardingHouse = await BoardingHouse.findById(id);
