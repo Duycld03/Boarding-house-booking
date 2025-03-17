@@ -4,6 +4,7 @@ import {
   boardingHouseController,
   ReviewController,
   roomTypeController,
+  FacilitiesController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -39,5 +40,11 @@ ownerRouter.get(
   '/boardinghouse/room-types/:id',
   roomTypeController.getRoomTypeByBhId
 );
+ownerRouter.post(
+  '/boardinghouse/roomtype/:id/create',
+  upload.single('roomType'),
+  roomTypeController.addRoomTypeToBoardingHouse
+);
+ownerRouter.get('/facilities', FacilitiesController.getAllFacilities);
 
 export { ownerRouter };

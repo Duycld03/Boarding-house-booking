@@ -8,12 +8,12 @@ import { getRoomTypeByBhId } from '../../api/roomTypeManagement';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom'; // 🔥 Lấy id từ URL
 import formatAmount from '@/utils/formatAmount'; // 🔥 Import hàm formatAmount
+import AddRoomTypeModal from './AddRoomType';
 
 const RoomType = () => {
   const { boardingHouseId } = useParams();
   const [roomData, setRoomData] = useState([]);
   const [loading, setLoading] = useState(true);
-  console.log('BH', boardingHouseId);
 
   // Hàm fetch dữ liệu từ API
   const fetchRoomTypes = async () => {
@@ -24,7 +24,6 @@ const RoomType = () => {
     setLoading(true);
     try {
       const response = await getRoomTypeByBhId(boardingHouseId);
-      console.log(response);
 
       if (Array.isArray(response.data)) {
         setRoomData(response.data);
@@ -42,7 +41,10 @@ const RoomType = () => {
 
   useEffect(() => {
     fetchRoomTypes();
-  }, [boardingHouseId]); // 👈 Gọi lại khi boardinghouseId thay đổi
+  }, [boardingHouseId]);
+  const handleAddNewData = async () => {
+    await fetchRoomTypes(); // Refresh data after adding a new boarding house
+  }; // 👈 Gọi lại khi boardinghouseId thay đổi
 
   const columns = [
     {
@@ -115,7 +117,13 @@ const RoomType = () => {
   };
 
   return (
-    <div className="container mx-auto mt-10 p-5">
+    <div className="container mx-auto">
+      <div className="flex justify-between">
+        <AddRoomTypeModal
+          onAddData={handleAddNewData}
+          boardingHouseId={boardingHouseId}
+        />
+      </div>
       <Table columns={columns} data={roomData} loading={loading} />
     </div>
   );
