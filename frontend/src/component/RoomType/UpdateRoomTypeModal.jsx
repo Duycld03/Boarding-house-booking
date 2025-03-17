@@ -159,7 +159,10 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       }
     } catch (error) {
       console.error('❌ API Error:', error.response?.data || error.message);
-      toast.error('Failed to update room type. Please try again.');
+      const errorMessage =
+        error.response?.data?.message || 'Failed to submit form.';
+
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
