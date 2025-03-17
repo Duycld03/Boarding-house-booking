@@ -79,18 +79,21 @@ const RoomType = () => {
         return;
       }
 
-      console.log('🚀 Deleting Room Type ID:', currentRecord._id); // Debug log
-
       const response = await softDeleteRoomType(currentRecord._id);
-
-      console.log('🔥 API Response:', response); // Debug log API Response
 
       if (
         response?.message === 'Room Type deleted successfully (soft delete).'
       ) {
         toast.success('Room Type deleted successfully!');
-        setRoomData(roomData.filter((room) => room._id !== currentRecord._id));
-        fetchRoomTypes(); // 🔥 Load lại danh sách sau khi xóa
+        setRoomData((prev) =>
+          prev.filter((room) => room._id !== currentRecord._id)
+        );
+
+        // 🔥 Chỉ gọi fetchRoomTypes nếu thực sự cần reload danh sách
+        if (roomData.length <= 1) {
+          fetchRoomTypes();
+        }
+
         setIsDeleteModalVisible(false);
         setCurrentRecord(null);
       }

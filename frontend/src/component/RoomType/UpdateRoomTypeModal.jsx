@@ -38,26 +38,45 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
   }, []);
   useEffect(() => {
     if (formData.facilities.length === 0) {
-      setFormData((prev) => ({
-        ...prev,
-        facilities: [], // ✅ Đảm bảo cập nhật chính xác, không giữ lại giá trị cũ
-      }));
+      setFormData((prev) => {
+        if (prev.facilities.length === 0) return prev; // ✅ Không cập nhật nếu đã rỗng
+        return { ...prev, facilities: [] };
+      });
     }
   }, [formData.facilities]);
 
   // ✅ Cập nhật state khi `roomData` thay đổi
   useEffect(() => {
-    if (!roomData) return; // 🔥 Fix: Chỉ update khi có dữ liệu
-    setFormData({
-      typeName: roomData.typeName || '',
-      facilities: roomData.facilities?.map((fac) => fac._id) || [],
-      roomSize: roomData.roomSize || '',
-      price: roomData.price || '',
-      peopleNumber: roomData.peopleNumber || '',
-      image: roomData.image?.imageUrl || null,
+    if (!roomData) return; // ✅ Tránh cập nhật khi `roomData` chưa có
+
+    setFormData((prev) => {
+      // 🔥 Kiểm tra nếu dữ liệu thực sự thay đổi mới setState
+      if (
+        prev.typeName === roomData.typeName &&
+        prev.roomSize === roomData.roomSize &&
+        prev.price === roomData.price &&
+        prev.peopleNumber === roomData.peopleNumber &&
+        prev.image === (roomData.image?.imageUrl || null) &&
+        JSON.stringify(prev.facilities) ===
+          JSON.stringify(roomData.facilities?.map((fac) => fac._id) || [])
+      ) {
+        return prev; // ✅ Nếu dữ liệu không thay đổi, không cập nhật state
+      }
+
+      return {
+        typeName: roomData.typeName || '',
+        facilities: roomData.facilities?.map((fac) => fac._id) || [],
+        roomSize: roomData.roomSize || '',
+        price: roomData.price || '',
+        peopleNumber: roomData.peopleNumber || '',
+        image: roomData.image?.imageUrl || null,
+      };
     });
+
     setImagePreview(roomData.image?.imageUrl || null);
-  }, [roomData]); // 🔥 Fix: Thêm dependency để tránh lặp vô hạn
+  }, [roomData]); // 🔥 Chỉ chạy khi `roomData` thay đổi
+
+  // 🔥 Đảm bảo chỉ chạy khi `roomData` thay đổi
 
   // ✅ Reset form khi modal đóng
   useEffect(() => {
@@ -72,7 +91,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       });
       setImagePreview(null);
     }
-  }, [visible]);
+  }, [visible]); // 🔥 Chỉ chạy khi `visible` thay đổi
 
   // ✅ Xử lý thay đổi input
   const handleInputChange = (e) => {
@@ -250,7 +269,10 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
               </div>
             </Upload>
           ) : (
-            <div className="relative">
+            <div
+              className="relative"
+              style={{ width: '200px', height: '200px' }}
+            >
               <Image
                 src={imagePreview}
                 alt="Room Image"

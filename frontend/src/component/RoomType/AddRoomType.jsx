@@ -272,7 +272,10 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
                 </div>
               </Upload>
             ) : (
-              <div className="relative">
+              <div
+                className="relative "
+                style={{ width: '200px', height: '200px' }}
+              >
                 <Image
                   src={URL.createObjectURL(formData.image)}
                   alt="Room Image"
