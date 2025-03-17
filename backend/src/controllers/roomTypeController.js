@@ -59,7 +59,9 @@ class RoomTypeController {
       }
 
       // ✅ Convert `facilities` từ string JSON thành array ObjectId
-      if (typeof facilities === 'string') {
+      if (!facilities || facilities === 'null' || facilities === '[]') {
+        facilities = []; // 👉 Nếu không có, gán mặc định là ["None"]
+      } else if (typeof facilities === 'string') {
         try {
           facilities = JSON.parse(facilities);
         } catch (error) {
@@ -71,7 +73,10 @@ class RoomTypeController {
         return res.status(400).json({ message: 'Facilities must be an array' });
       }
 
-      facilities = facilities.map((id) => new mongoose.Types.ObjectId(id));
+      // 👉 Nếu `facilities` không phải `["None"]`, convert sang `ObjectId`
+      if (facilities[0] !== 'None') {
+        facilities = facilities.map((id) => new mongoose.Types.ObjectId(id));
+      }
 
       // 🔥 Kiểm tra và xử lý ảnh upload lên Cloudinary
       if (!req.file) {

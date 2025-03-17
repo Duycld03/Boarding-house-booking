@@ -181,17 +181,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               onChange={handleInputChange}
             />
           </Form.Item>
-          <Form.Item
-            label="Facilities"
-            name="facilities"
-            rules={[
-              {
-                required: true,
-                message: 'Please select at least one facility',
-              },
-            ]}
-            className="mb-2"
-          >
+          <Form.Item label="Facilities" name="facilities" className="mb-2">
             <Select
               mode="multiple"
               placeholder="Select facilities"
