@@ -21,7 +21,6 @@ const TenantManagement = () => {
       setLoading(true);
       try {
         const data = await getTenantsByBoardingHouse(boardingHouseId);
-        console.log('🔥 Tenant Data:', data); // Kiểm tra dữ liệu
         setTenantData(data);
       } catch (error) {
         toast.error('Failed to fetch tenant data.');
@@ -38,10 +37,6 @@ const TenantManagement = () => {
       toast.error('Error: Missing tenant accountId.');
       return;
     }
-
-    console.log(
-      `🚀 Deleting tenant with accountId: ${selectedTenant.accountId}`
-    );
 
     setLoading(true);
     try {
@@ -106,7 +101,6 @@ const TenantManagement = () => {
           btnDelete
           title="Delete"
           onClick={() => {
-            console.log('🔥 Selected Tenant:', record);
             setSelectedTenant(record);
             setIsOpen(true);
           }}

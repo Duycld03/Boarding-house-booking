@@ -78,18 +78,10 @@ class TenantController {
         boardingHouseId
       );
 
-      console.log(
-        '🔍 Searching for rooms in boarding house:',
-        boardingHouseObjectId
-      );
-      console.log('🔍 Looking for tenant with accountId:', accountObjectId);
-
       // 🔍 Lấy tất cả phòng trong boarding house
       const allRooms = await Room.find({
         boardingHouseId: boardingHouseObjectId,
       }).select('_id roomNumber rentBy');
-
-      console.log('📌 All rooms in boarding house:', allRooms);
 
       // 🔥 Lọc ra phòng chứa tenant này
       const rooms = allRooms.filter((room) =>
@@ -97,13 +89,10 @@ class TenantController {
       );
 
       if (!rooms.length) {
-        console.log('❌ Tenant not found in any rooms.');
         return res
           .status(404)
           .json({ message: 'Tenant not found in any rooms.' });
       }
-
-      console.log('✅ Rooms containing this tenant:', rooms);
 
       const roomIds = rooms.map((room) => room._id);
 
@@ -114,13 +103,10 @@ class TenantController {
       });
 
       if (!depositInfo) {
-        console.log('❌ No deposit record found for this tenant.');
         return res
           .status(404)
           .json({ message: 'No deposit record found for this tenant.' });
       }
-
-      console.log('📌 Deposit record found:', depositInfo);
 
       // 🛠 Cập nhật trạng thái deposit thành "deleted"
       await DepositRoom.updateMany(
@@ -128,13 +114,10 @@ class TenantController {
         { $set: { status: 'deleted' } }
       );
 
-      console.log('✅ Deposit status updated to "deleted" for this tenant.');
-
       // 🔥 Kiểm tra rentBy trước khi xóa
       const roomCheckBefore = await Room.find({ _id: { $in: roomIds } }).select(
         '_id rentBy'
       );
-      console.log('🔎 rentBy before deletion:', roomCheckBefore);
 
       // ❌ Xóa tenant khỏi danh sách `rentBy` bằng cách cập nhật toàn bộ mảng (nếu $pull không hoạt động)
       for (const room of rooms) {
@@ -147,13 +130,10 @@ class TenantController {
         );
       }
 
-      console.log('📌 Successfully removed tenant from rentBy.');
-
       // 🔥 Kiểm tra lại sau khi xóa
       const roomCheckAfter = await Room.find({ _id: { $in: roomIds } }).select(
         '_id rentBy'
       );
-      console.log('✅ rentBy after deletion:', roomCheckAfter);
 
       res.status(200).json({
         message: 'Tenant successfully removed from the boarding house.',
