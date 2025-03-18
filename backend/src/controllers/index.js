@@ -11,6 +11,7 @@ import watchLaterController from "./watchLaterController.js";
 import depositController from "./depositController.js";
 import FacilitiesController from "./facilitiesController.js";
 import roomTypeController from "./roomTypeController.js";
+import userPaymentController from "./userPaymentController.js";
 
 export {
   authController,
@@ -25,5 +26,6 @@ export {
   watchLaterController,
   depositController,
   FacilitiesController,
-  roomTypeController
+  roomTypeController,
+  userPaymentController
 };

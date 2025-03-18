@@ -9,6 +9,7 @@ import {
   ReviewController,
   watchLaterController,
   depositController,
+  userPaymentController,
 } from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -93,5 +94,9 @@ authRouter.get(
   "/pay-rent/:depositRoomId",
   depositController.checkPayRentStatus
 );
+
+
+// userPayment
+authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
 
 export { authRouter };
