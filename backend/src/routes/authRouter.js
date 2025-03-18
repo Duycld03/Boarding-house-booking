@@ -9,7 +9,7 @@ import {
   ReviewController,
   watchLaterController,
   depositController,
-} from "./../controllers/index.js";
+} from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
 const authRouter = Router();

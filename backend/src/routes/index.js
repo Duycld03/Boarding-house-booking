@@ -3,10 +3,10 @@ import {
   ownerMiddleware,
   adminMiddleware,
 } from "../middlewares/index.js";
-import { commonRouter } from "./common.js";
-import { authRouter } from "./auth.js";
-import { ownerRouter } from "./owner.js";
-import { adminRouter } from "./admin.js";
+import { commonRouter } from "./commonRouter.js";
+import { authRouter } from "./authRouter.js";
+import { ownerRouter } from "./ownerRouter.js";
+import { adminRouter } from "./adminRouter.js";
 
 function routes(app) {
   app.use("/", commonRouter);
