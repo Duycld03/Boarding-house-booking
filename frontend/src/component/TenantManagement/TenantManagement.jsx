@@ -21,6 +21,8 @@ const TenantManagement = () => {
       setLoading(true);
       try {
         const data = await getTenantsByBoardingHouse(boardingHouseId);
+        console.log(data);
+
         setTenantData(data);
       } catch (error) {
         toast.error('Failed to fetch tenant data.');
@@ -44,9 +46,11 @@ const TenantManagement = () => {
         boardingHouseId,
         selectedTenant.accountId
       );
-      setTenantData((prevTenants) =>
-        prevTenants.filter((t) => t.accountId !== selectedTenant.accountId)
-      );
+
+      // Gọi lại API để cập nhật danh sách mới nhất
+      const updatedData = await getTenantsByBoardingHouse(boardingHouseId);
+      setTenantData(updatedData);
+
       toast.success('Tenant deleted successfully.');
     } catch (error) {
       console.error(
