@@ -37,6 +37,8 @@ import { toast } from 'react-toastify';
 import { useCurrentUser } from '../../context/userContext';
 import ReviewReply from '../ReviewReply/ReviewReply';
 
+import userRoles from "@/constants/userRole";
+
 dayjs.extend(relativeTime);
 dayjs.locale('en');
 
@@ -62,6 +64,9 @@ const ReviewCard = ({
     _id: reviewIdProp,
   } = reviewData;
 
+  const { hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRoles.owner);
+
   const [newContent, setNewContent] = useState(content);
   const [newRating, setNewRating] = useState(rating);
   const [replyContent, setReplyContent] = useState('');
@@ -79,7 +84,7 @@ const ReviewCard = ({
   const isCurrentUserReview = user?._id === accountId?._id;
   const isLoggedIn = Boolean(user);
   const [loadingDelete, setLoadingDelete] = useState(false);
-  const isOwner = user?._id === boardingHouse?.ownerId._id;
+  const isOwnerBH = user?._id === boardingHouse?.ownerId._id;
   const hasReply = Boolean(reviewData?.replyContent);
   const [isReplying, setIsReplying] = useState(false);
 
@@ -220,7 +225,11 @@ const ReviewCard = ({
       )}
 
       {(!isLoggedIn || !isCurrentUserReview) && (
-        <Menu.Item key="report" onClick={handleReport} disabled={isReported}>
+        <Menu.Item
+          key="report"
+          onClick={handleReport}
+          disabled={isOwner || isReported}
+        >
           <Tooltip
             placement="left"
             title={
@@ -237,7 +246,7 @@ const ReviewCard = ({
           </Tooltip>
         </Menu.Item>
       )}
-      {isOwner && (
+      {isOwnerBH && (
         <>
           <Menu.Item key="reply" onClick={handleReply}>
             <Tooltip
