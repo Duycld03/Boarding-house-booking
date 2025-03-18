@@ -175,6 +175,7 @@ const ReviewReply = ({
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
               height: '100px',
+              fontSize: '16px',
             }}
           />
           <div className="mt-2 flex flex-wrap gap-4">
