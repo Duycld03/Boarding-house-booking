@@ -28,8 +28,13 @@ import {
   createWatchLater,
 } from "../../../api/watchLaterManagement.js";
 import { useParams, useNavigate } from "react-router-dom";
+import { useCurrentUser } from "@/context/userContext.jsx";
+import userRoles from "@/constants/userRole.js";
 
 const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
+  const { hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRoles.owner);
+
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -79,7 +84,11 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
 
   const menu = (
     <Menu>
-      <Menu.Item key="save" onClick={handleSaveClick} disabled={loading}>
+      <Menu.Item
+        key="save"
+        onClick={handleSaveClick}
+        disabled={isOwner || loading}
+      >
         <Tooltip
           placement="left"
           title={isSaved ? "Saved!" : "Save this boarding house"}
@@ -91,7 +100,11 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
           <span className="ml-2">{isSaved ? "Saved" : "Save"}</span>
         </Tooltip>
       </Menu.Item>
-      <Menu.Item key="report" onClick={() => onReport()} disabled={isReported}>
+      <Menu.Item
+        key="report"
+        onClick={() => onReport()}
+        disabled={isOwner || isReported}
+      >
         <Tooltip
           placement="left"
           title={
