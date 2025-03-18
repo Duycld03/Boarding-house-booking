@@ -393,28 +393,26 @@ class DepositController {
       const deposits = await DepositRoom.find({ roomId: { $in: roomIds } })
         .populate({
           path: 'roomId',
-          populate: {
-            path: 'boardingHouseId', // Populate thêm boarding house
-            select: 'name', // Chỉ lấy trường name
-          },
+          select: 'roomNumber', // Chỉ lấy số phòng
+        })
+        .populate({
+          path: 'accountId', // Liên kết đến người đặt cọc
+          select: 'fullname', // Chỉ lấy tên của người đặt cọc
         })
         .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo mới nhất
         .lean();
 
       // Format kết quả trả về
-      const result = deposits.map((deposit) => {
-        const { roomId } = deposit;
-        return {
-          _id: deposit._id,
-          name: roomId.boardingHouseId?.name || 'Unknown', // Lấy tên boarding house
-          roomNumber: roomId.roomNumber,
-          amount: deposit.amount,
-          status: deposit.status,
-          startDate: moment(deposit.createdAt).format('DD/MM/YYYY'),
-          endDate: moment(deposit.endDate).format('DD/MM/YYYY'),
-          rentalTime: deposit.rentalTime,
-        };
-      });
+      const result = deposits.map((deposit) => ({
+        _id: deposit._id,
+        name: deposit.accountId?.fullname || 'Unknown', // Lấy tên người đặt cọc
+        roomNumber: deposit.roomId?.roomNumber || 'N/A',
+        amount: deposit.amount,
+        status: deposit.status,
+        startDate: moment(deposit.createdAt).format('DD/MM/YYYY'),
+        endDate: moment(deposit.endDate).format('DD/MM/YYYY'),
+        rentalTime: deposit.rentalTime,
+      }));
 
       res.status(200).json(result);
     } catch (error) {
