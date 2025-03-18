@@ -545,6 +545,59 @@ class ReviewController {
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
+  async updateReplyReview(req, res) {
+    try {
+      const accountId = req.user?.userId;
+      if (!accountId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Account ID not found.',
+        });
+      }
+
+      const { replyId, content } = req.body;
+
+      if (!content) {
+        return res.status(400).json({
+          success: false,
+          message: 'Reply content is required.',
+        });
+      }
+
+      // Kiểm tra reply có tồn tại không
+      const reply = await Review.findById(replyId);
+      if (!reply) {
+        return res.status(404).json({
+          success: false,
+          message: 'Reply not found.',
+        });
+      }
+
+      // Đảm bảo chỉ chủ sở hữu hoặc admin mới có thể chỉnh sửa
+      if (reply.accountId.toString() !== accountId) {
+        return res.status(403).json({
+          success: false,
+          message: 'You do not have permission to update this reply.',
+        });
+      }
+
+      // Cập nhật nội dung reply
+      reply.content = content.trim();
+      await reply.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'Reply updated successfully.',
+        reply,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Server error. Please try again later.',
+        error: error.message, // Trả về lỗi cụ thể nếu cần
+      });
+    }
+  }
 }
 
 export default new ReviewController();

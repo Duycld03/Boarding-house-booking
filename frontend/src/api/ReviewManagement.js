@@ -54,3 +54,9 @@ export const getReplyContent = (reviewId) => {
 export const getReviewDetail = (reviewId) => {
   return axios.get(`dashboard/review/${reviewId}`);
 };
+export const updateReplyReview = ({ replyId, content }) => {
+  return axios.put('/owner/review/updatereply', {
+    replyId,
+    content,
+  });
+};

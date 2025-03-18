@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Button, Card, Dropdown, Menu, Tooltip, Modal } from 'antd';
 import { toast } from 'react-toastify';
-import {
-  replyReview,
-  // updateReviewReply,
-  // deleteReviewReply,
-} from '../../api/ReviewManagement';
+import { replyReview, updateReplyReview } from '../../api/ReviewManagement';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faEdit,
@@ -29,6 +25,34 @@ const ReviewReply = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  // ✅ Call API updateReplyReview
+  const handleUpdateReply = async () => {
+    if (!replyContent.trim()) {
+      toast.error('Reply content cannot be empty.');
+      return;
+    }
+
+    console.log('Correct Reply ID:', reviewId);
+    console.log('Updated Content:', replyContent);
+
+    setLoading(true);
+    try {
+      await updateReplyReview({
+        replyId: reviewId, // Phải là ID của reply, không phải parentId
+        content: replyContent.trim(),
+      });
+
+      toast.success('Reply updated successfully!');
+      onReviewUpdated();
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update reply:', error);
+      toast.error(error.response?.data?.message || 'Failed to update reply.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const submitReply = async () => {
     if (!replyContent.trim()) {
       toast.error('Reply content cannot be empty.');
@@ -49,9 +73,14 @@ const ReviewReply = ({
     }
   };
 
-  const handleCancelEdit = () => {
-    setReplyContent(currentReply);
-    setIsEditing(false);
+  const handleCancel = () => {
+    if (isEditing) {
+      setReplyContent(currentReply);
+      setIsEditing(false);
+    } else {
+      setReplyContent('');
+      setIsReplying(false);
+    }
   };
 
   const menu = (
@@ -116,14 +145,14 @@ const ReviewReply = ({
           <div className="mt-2 flex flex-wrap gap-4">
             <Button
               type="primary"
-              onClick={submitReply}
+              onClick={isEditing ? handleUpdateReply : submitReply}
               loading={loading}
               className="rounded-md px-4 py-2"
             >
               {isEditing ? 'Update Reply' : 'Send Reply'}
             </Button>
             <Button
-              onClick={handleCancelEdit}
+              onClick={handleCancel}
               disabled={loading}
               className="bg-red-500 border-red-500 text-white rounded-md px-4 py-2"
             >

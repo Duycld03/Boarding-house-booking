@@ -100,6 +100,7 @@ const ReviewCard = ({
   const handleRemoveFile = (file) => {
     setNewFiles((prev) => prev.filter((f) => f.uid !== file.uid));
   };
+  console.log('Review Data:', reviewData);
 
   const uploadProps = {
     multiple: true,
@@ -328,7 +329,8 @@ const ReviewCard = ({
       )}
       {(isReplying || hasReply) && (
         <ReviewReply
-          reviewId={reviewIdProp}
+          reviewId={reviewData?.reply?._id}
+          // reviewId={reviewIdProp}
           currentReply={reviewData?.replyContent}
           onReviewUpdated={onReviewUpdated}
           onCancelReply={handleCancelReply}
