@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, Button, Card, Dropdown, Menu, Tooltip, Modal } from 'antd';
+import { Input, Button, Card, Dropdown, Menu } from 'antd';
 import { toast } from 'react-toastify';
 import {
   replyReview,
@@ -12,6 +12,7 @@ import {
   faTrash,
   faEllipsisV,
 } from '@fortawesome/free-solid-svg-icons';
+import { ConfirmModal } from '@/component';
 
 const MAX_LENGTH = 100;
 
@@ -20,7 +21,6 @@ const ReviewReply = ({
   replyId,
   currentReply = '',
   onReviewUpdated,
-  onCancelReply,
   isReplying,
   setIsReplying,
   isOwner,
@@ -29,8 +29,7 @@ const ReviewReply = ({
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
-  console.log('🔍 Reply ID:', replyId); // Debug để kiểm tra
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // ✅ Xóa mềm reply
   const handleDeleteReply = async () => {
@@ -39,35 +38,22 @@ const ReviewReply = ({
       return;
     }
 
-    Modal.confirm({
-      title: 'Confirm Delete',
-      content: 'Are you sure you want to delete this reply?',
-      okText: 'Delete',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        setLoading(true);
-        try {
-          const response = await softDeleteReplyReview(replyId);
-
-          console.log('🟢 API Response:', response); // Debug API response
-
-          if (response.success === true) {
-            // Kiểm tra chính xác `true`
-            toast.success('Reply deleted successfully.');
-            onReviewUpdated(); // Cập nhật lại danh sách review
-          } else {
-            toast.error(response.data?.message || 'Failed to delete reply.');
-          }
-        } catch (error) {
-          console.error('❌ Failed to delete reply:', error);
-          toast.error(
-            error.response?.data?.message || 'Failed to delete reply.'
-          );
-        } finally {
-          setLoading(false);
-        }
-      },
-    });
+    setLoading(true);
+    try {
+      const response = await softDeleteReplyReview(replyId);
+      if (response.success) {
+        toast.success('Reply deleted successfully.');
+        onReviewUpdated();
+      } else {
+        toast.error(response.data?.message || 'Failed to delete reply.');
+      }
+    } catch (error) {
+      console.error('❌ Failed to delete reply:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete reply.');
+    } finally {
+      setLoading(false);
+      setIsDeleteModalOpen(false);
+    }
   };
 
   const handleUpdateReply = async () => {
@@ -75,7 +61,6 @@ const ReviewReply = ({
       toast.error('Reply content cannot be empty.');
       return;
     }
-
     if (!replyId) {
       toast.error('Reply ID is missing.');
       return;
@@ -84,7 +69,7 @@ const ReviewReply = ({
     setLoading(true);
     try {
       await updateReplyReview({
-        replyId, // ✅ Bây giờ đã có ID của phản hồi
+        replyId,
         content: replyContent.trim(),
       });
 
@@ -135,7 +120,7 @@ const ReviewReply = ({
         <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
         <span className="ml-2">Edit Reply</span>
       </Menu.Item>
-      <Menu.Item key="delete" onClick={handleDeleteReply}>
+      <Menu.Item key="delete" onClick={() => setIsDeleteModalOpen(true)}>
         <FontAwesomeIcon icon={faTrash} className="text-red-500 text-xl" />
         <span className="ml-2">Delete Reply</span>
       </Menu.Item>
@@ -146,10 +131,10 @@ const ReviewReply = ({
     <div className="mt-2 max-w-full">
       {currentReply && !isEditing && (
         <Card className="bg-gray-100 rounded-lg border-l-4 border-blue-500 p-3 mb-3 max-w-full break-words">
-          <div className="flex justify-between items-center relative">
+          <div className="flex justify-between items-center">
             <strong className="text-blue-500">Owner Reply:</strong>
             {isOwner && (
-              <div className="absolute top-0 right-0 mt-[-27px] mr-[-36px]">
+              <div className="absolute top-0 right-0 mt-[-2px] mr-[-5px]">
                 <Dropdown overlay={menu} trigger={['click']}>
                   <Button type="text">
                     <FontAwesomeIcon
@@ -186,7 +171,11 @@ const ReviewReply = ({
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             className="mt-2 rounded-lg border border-gray-300 p-2 text-sm w-full max-w-full"
-            style={{ wordWrap: 'break-word', whiteSpace: 'pre-wrap' }}
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+              height: '100px',
+            }}
           />
           <div className="mt-2 flex flex-wrap gap-4">
             <Button
@@ -207,6 +196,15 @@ const ReviewReply = ({
           </div>
         </>
       )}
+
+      {/* Modal xác nhận xóa */}
+      <ConfirmModal
+        title="Confirm Deletion"
+        content="Are you sure you want to delete this reply?"
+        onOk={handleDeleteReply}
+        onCancel={() => setIsDeleteModalOpen(false)}
+        isOpen={isDeleteModalOpen}
+      />
     </div>
   );
 };
