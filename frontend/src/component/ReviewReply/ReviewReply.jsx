@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
-import { Input, Button, Card } from 'antd';
+import { Input, Button, Card, Dropdown, Menu, Tooltip, Modal } from 'antd';
 import { toast } from 'react-toastify';
-import { replyReview } from '../../api/ReviewManagement';
+import {
+  replyReview,
+  // updateReviewReply,
+  // deleteReviewReply,
+} from '../../api/ReviewManagement';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faEdit,
+  faTrash,
+  faEllipsisV,
+} from '@fortawesome/free-solid-svg-icons';
 
 const MAX_LENGTH = 100;
 
@@ -11,11 +21,13 @@ const ReviewReply = ({
   onReviewUpdated,
   onCancelReply,
   isReplying,
-  setIsReplying, // Nhận hàm từ ReviewCard
+  setIsReplying,
+  isOwner,
 }) => {
   const [replyContent, setReplyContent] = useState(currentReply || '');
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const submitReply = async () => {
     if (!replyContent.trim()) {
@@ -28,7 +40,7 @@ const ReviewReply = ({
       await replyReview({ parentId: reviewId, content: replyContent.trim() });
       toast.success('Reply sent successfully!');
       onReviewUpdated();
-      setIsReplying(false); // Ẩn ô nhập sau khi gửi thành công
+      setIsReplying(false);
     } catch (error) {
       console.error('Failed to send reply:', error);
       toast.error('Failed to send reply. Please try again later.');
@@ -37,11 +49,43 @@ const ReviewReply = ({
     }
   };
 
+  const handleCancelEdit = () => {
+    setReplyContent(currentReply);
+    setIsEditing(false);
+  };
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="edit" onClick={() => setIsEditing(true)}>
+        <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
+        <span className="ml-2">Edit Reply</span>
+      </Menu.Item>
+      <Menu.Item key="delete">
+        <FontAwesomeIcon icon={faTrash} className="text-red-500 text-xl" />
+        <span className="ml-2">Delete Reply</span>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <div className="mt-2 max-w-full">
-      {currentReply && (
+      {currentReply && !isEditing && (
         <Card className="bg-gray-100 rounded-lg border-l-4 border-blue-500 p-3 mb-3 max-w-full break-words">
-          <strong className="text-blue-500">Owner Reply:</strong>
+          <div className="flex justify-between items-center relative">
+            <strong className="text-blue-500">Owner Reply:</strong>
+            {isOwner && (
+              <div className="absolute top-0 right-0 mt-[-27px] mr-[-36px]">
+                <Dropdown overlay={menu} trigger={['click']}>
+                  <Button type="text">
+                    <FontAwesomeIcon
+                      icon={faEllipsisV}
+                      className="text-gray-600"
+                    />
+                  </Button>
+                </Dropdown>
+              </div>
+            )}
+          </div>
           <p className="mt-1 text-gray-800 text-justify break-words">
             {isExpanded ? currentReply : currentReply.slice(0, MAX_LENGTH)}
             {currentReply.length > MAX_LENGTH && (
@@ -59,7 +103,7 @@ const ReviewReply = ({
         </Card>
       )}
 
-      {isReplying && (
+      {(isReplying || isEditing) && (
         <>
           <Input.TextArea
             rows={3}
@@ -76,10 +120,10 @@ const ReviewReply = ({
               loading={loading}
               className="rounded-md px-4 py-2"
             >
-              Send Reply
+              {isEditing ? 'Update Reply' : 'Send Reply'}
             </Button>
             <Button
-              onClick={() => setIsReplying(false)}
+              onClick={handleCancelEdit}
               disabled={loading}
               className="bg-red-500 border-red-500 text-white rounded-md px-4 py-2"
             >

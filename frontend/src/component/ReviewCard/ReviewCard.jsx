@@ -333,7 +333,8 @@ const ReviewCard = ({
           onReviewUpdated={onReviewUpdated}
           onCancelReply={handleCancelReply}
           isReplying={isReplying} // Truyền state xuống
-          setIsReplying={setIsReplying} // Truyền hàm setState xuống
+          setIsReplying={setIsReplying}
+          isOwner={isOwner} // Truyền hàm setState xuống
         />
       )}
       <Divider className="border-gray-700" />
