@@ -391,8 +391,14 @@ class DepositController {
 
       // Tìm tất cả các khoản đặt cọc liên quan đến các phòng trong boarding house
       const deposits = await DepositRoom.find({ roomId: { $in: roomIds } })
-        .populate('roomId')
-        .sort({ createdAt: -1 })
+        .populate({
+          path: 'roomId',
+          populate: {
+            path: 'boardingHouseId', // Populate thêm boarding house
+            select: 'name', // Chỉ lấy trường name
+          },
+        })
+        .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo mới nhất
         .lean();
 
       // Format kết quả trả về
@@ -400,6 +406,7 @@ class DepositController {
         const { roomId } = deposit;
         return {
           _id: deposit._id,
+          name: roomId.boardingHouseId?.name || 'Unknown', // Lấy tên boarding house
           roomNumber: roomId.roomNumber,
           amount: deposit.amount,
           status: deposit.status,

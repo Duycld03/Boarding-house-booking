@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Tag } from 'antd';
+import { Button, Tag } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { getAllDepositRooms } from '../../api/depositManagement';
 import { useParams } from 'react-router-dom';
+import Table from '@/component/Table';
+import formatAmount from '@/utils/formatAmount';
 
 const DepositRoom = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -16,21 +18,27 @@ const DepositRoom = () => {
     setIsModalVisible(false);
   };
 
-  // Fetch data from API
   useEffect(() => {
     const fetchDepositedRooms = async () => {
       try {
         const response = await getAllDepositRooms(boardingHouseId);
-        setDepositedRooms(response);
+        console.log('Fetched response:', response);
+
+        // Đảm bảo response luôn là mảng
+        setDepositedRooms(Array.isArray(response) ? response : []);
       } catch (error) {
         console.error('Error fetching deposit rooms:', error);
         toast.error('Failed to fetch deposit rooms');
+        setDepositedRooms([]); // Nếu có lỗi, gán giá trị rỗng để tránh lỗi map()
       } finally {
         setLoading(false);
       }
     };
-    fetchDepositedRooms();
-  }, []);
+
+    if (boardingHouseId) {
+      fetchDepositedRooms();
+    }
+  }, [boardingHouseId]);
 
   const columns = [
     {
@@ -47,7 +55,7 @@ const DepositRoom = () => {
       title: 'Amount',
       dataIndex: 'amount',
       key: 'amount',
-      render: (price) => (price ? `${price.toLocaleString()} VND` : 'N/A'),
+      render: (price) => (price ? formatAmount(price) : 'N/A'),
     },
     {
       title: 'Status',
@@ -87,17 +95,26 @@ const DepositRoom = () => {
     {
       title: 'Action',
       key: 'action',
+      //   render: (_, record) => (
+      //     <Button
+      //       disabled={record.status === 'pending'}
+      //       size="large"
+      //       title="Detail"
+      //       icon={<FileTextOutlined />}
+      //       onClick={() => {
+      //         setDepositRoomId(record._id);
+      //         setIsModalVisible(true);
+      //       }}
+      //       className="text-white"
+      //       style={{ backgroundColor: 'rgb(5 150 105)', color: 'white' }}
+      //     />
+      //   ),
     },
   ];
 
   return (
     <div>
-      <Table
-        columns={columns}
-        dataSource={depositedRooms}
-        rowKey="_id"
-        loading={loading}
-      />
+      <Table columns={columns} data={depositedRooms || []} loading={loading} />
     </div>
   );
 };
