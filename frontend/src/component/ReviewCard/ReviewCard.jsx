@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Card,
   Avatar,
@@ -12,10 +12,10 @@ import {
   Upload,
   Tooltip,
   Divider,
-} from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFlag } from "@fortawesome/free-regular-svg-icons";
+} from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFlag } from '@fortawesome/free-regular-svg-icons';
 
 import {
   faEdit,
@@ -25,20 +25,20 @@ import {
   faFlag as faFlagSolid,
   faEllipsisV,
   faReply,
-} from "@fortawesome/free-solid-svg-icons";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+} from '@fortawesome/free-solid-svg-icons';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import {
   updateReview,
   updateReviewImage,
   deleteReviewUser,
-} from "../../api/ReviewManagement";
-import { toast } from "react-toastify";
-import { useCurrentUser } from "../../context/userContext";
-import ReviewReply from "../ReviewReply/ReviewReply";
+} from '../../api/ReviewManagement';
+import { toast } from 'react-toastify';
+import { useCurrentUser } from '../../context/userContext';
+import ReviewReply from '../ReviewReply/ReviewReply';
 
 dayjs.extend(relativeTime);
-dayjs.locale("en");
+dayjs.locale('en');
 
 const MAX_IMAGES = 5;
 const MAX_DESCRIPTION_LENGTH = 100;
@@ -55,7 +55,7 @@ const ReviewCard = ({
 
   const {
     accountId = {},
-    content = "",
+    content = '',
     rating,
     images = [],
     updatedAt,
@@ -64,7 +64,7 @@ const ReviewCard = ({
 
   const [newContent, setNewContent] = useState(content);
   const [newRating, setNewRating] = useState(rating);
-  const [replyContent, setReplyContent] = useState("");
+  const [replyContent, setReplyContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newImages, setNewImages] = useState(
@@ -74,7 +74,7 @@ const ReviewCard = ({
 
   const formattedRelativeTime = updatedAt
     ? dayjs(updatedAt).fromNow()
-    : "undefined";
+    : 'undefined';
   const { user } = useCurrentUser();
   const isCurrentUserReview = user?._id === accountId?._id;
   const isLoggedIn = Boolean(user);
@@ -88,7 +88,7 @@ const ReviewCard = ({
   const truncateText = (text, maxLength) => {
     if (text.length <= maxLength) return text;
     const truncated = text.substring(0, maxLength);
-    return truncated.substring(0, truncated.lastIndexOf(" ")) + "...";
+    return truncated.substring(0, truncated.lastIndexOf(' ')) + '...';
   };
 
   const handleRemoveImage = (index) => {
@@ -112,7 +112,7 @@ const ReviewCard = ({
     fileList: newFiles.map((file) => ({
       uid: file.uid,
       name: file.name,
-      status: "done",
+      status: 'done',
       url: URL.createObjectURL(file),
     })),
   };
@@ -138,17 +138,17 @@ const ReviewCard = ({
       ];
 
       await updateReview(reviewIdProp, {
-        content: newContent.trim() === "" ? null : newContent.trim(),
+        content: newContent.trim() === '' ? null : newContent.trim(),
         rating: newRating,
         images: allImageUrls.map((imageUrl) => ({ imageUrl })),
       });
 
       setIsModalVisible(false);
-      toast.success("Review updated successfully!");
+      toast.success('Review updated successfully!');
       onReviewUpdated();
     } catch (error) {
-      console.error("Failed to update review:", error);
-      toast.error(error.response.data.message || "Failed to update review.");
+      console.error('Failed to update review:', error);
+      toast.error(error.response.data.message || 'Failed to update review.');
     } finally {
       setLoading(false);
     }
@@ -156,19 +156,19 @@ const ReviewCard = ({
 
   const handleDelete = () => {
     Modal.confirm({
-      title: "Confirm Delete",
-      content: "Are you sure you want to delete this review?",
-      okText: "Delete",
-      cancelText: "Cancel",
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this review?',
+      okText: 'Delete',
+      cancelText: 'Cancel',
       onOk: async () => {
         setLoadingDelete(true);
         try {
           await deleteReviewUser(reviewIdProp);
-          toast.success("Review deleted successfully.");
+          toast.success('Review deleted successfully.');
           onReviewUpdated();
         } catch (error) {
-          console.error("Error deleting review:", error);
-          toast.error("Failed to delete review.");
+          console.error('Error deleting review:', error);
+          toast.error('Failed to delete review.');
         } finally {
           setLoadingDelete(false);
         }
@@ -224,8 +224,8 @@ const ReviewCard = ({
             placement="left"
             title={
               isReported
-                ? "You have reported this review. Please wait for admin to process."
-                : "Report this review"
+                ? 'You have reported this review. Please wait for admin to process.'
+                : 'Report this review'
             }
           >
             <FontAwesomeIcon
@@ -243,23 +243,23 @@ const ReviewCard = ({
               placement="left"
               title={
                 hasReply
-                  ? "You have replied to this review."
-                  : "Reply to this review"
+                  ? 'You have replied to this review.'
+                  : 'Reply to this review'
               }
             >
               <div className="flex items-center">
                 <FontAwesomeIcon
                   icon={faReply}
                   className={`text-xl ${
-                    hasReply ? "text-blue-500" : "text-gray-500"
+                    hasReply ? 'text-blue-500' : 'text-gray-500'
                   }`}
                 />
                 <span
                   className={`ml-2 ${
-                    hasReply ? "text-gray-400 opacity-50" : "text-black"
+                    hasReply ? 'text-gray-400 opacity-50' : 'text-black'
                   }`}
                 >
-                  {hasReply ? "Replied" : "Reply"}
+                  {hasReply ? 'Replied' : 'Reply'}
                 </span>
               </div>
             </Tooltip>
@@ -271,8 +271,8 @@ const ReviewCard = ({
 
   return (
     <Card style={{ marginBottom: 16 }}>
-      <div style={{ position: "absolute", top: 10, right: 10 }}>
-        <Dropdown overlay={menu} trigger={["click"]}>
+      <div style={{ position: 'absolute', top: 10, right: 10 }}>
+        <Dropdown overlay={menu} trigger={['click']}>
           <Button type="text">
             <FontAwesomeIcon icon={faEllipsisV} className="text-gray-600" />
           </Button>
@@ -280,11 +280,11 @@ const ReviewCard = ({
       </div>
       <Card.Meta
         avatar={<Avatar src={accountId?.avatarImage?.url} size="large" />}
-        title={accountId?.fullname || "Anonymous"}
+        title={accountId?.fullname || 'Anonymous'}
         description={
           <>
             <Rate disabled value={rating} />
-            <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
+            <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
               {dayjs(updatedAt).fromNow()}
             </div>
           </>
@@ -292,7 +292,7 @@ const ReviewCard = ({
       />
       <p
         className={`mt-2 text-gray-600 text-justify 
-    ${isExpanded ? "max-h-[300px] overflow-auto" : "overflow-hidden"} 
+    ${isExpanded ? 'max-h-[300px] overflow-auto' : 'overflow-hidden'} 
     break-words leading-relaxed`}
       >
         {isExpanded ? content : content.slice(0, MAX_DESCRIPTION_LENGTH)}
@@ -301,7 +301,7 @@ const ReviewCard = ({
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-blue-500 ml-1 cursor-pointer bg-none border-none"
           >
-            {isExpanded ? "Show less" : "Read more"}
+            {isExpanded ? 'Show less' : 'Read more'}
           </button>
         )}
       </p>
@@ -309,10 +309,10 @@ const ReviewCard = ({
       {images.length > 0 && (
         <div
           style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "8px",
-            marginTop: "10px",
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            marginTop: '10px',
           }}
         >
           {images.map((image, index) => (
@@ -321,7 +321,7 @@ const ReviewCard = ({
               src={image.imageUrl}
               width={100}
               height={100}
-              style={{ objectFit: "cover", borderRadius: "8px" }}
+              style={{ objectFit: 'cover', borderRadius: '8px' }}
             />
           ))}
         </div>
@@ -330,15 +330,16 @@ const ReviewCard = ({
         <ReviewReply
           reviewId={reviewIdProp}
           currentReply={reviewData?.replyContent}
-          onReplyUpdated={onReviewUpdated}
-          onClick={handleReply}
+          onReviewUpdated={onReviewUpdated}
           onCancelReply={handleCancelReply}
+          isReplying={isReplying} // Truyền state xuống
+          setIsReplying={setIsReplying} // Truyền hàm setState xuống
         />
       )}
       <Divider className="border-gray-700" />
       <Modal
         title={
-          <span style={{ color: "#333", fontSize: 20, fontWeight: "bold" }}>
+          <span style={{ color: '#333', fontSize: 20, fontWeight: 'bold' }}>
             Update Review
           </span>
         }
@@ -358,7 +359,7 @@ const ReviewCard = ({
           </Button>,
         ]}
       >
-        <h2 style={{ fontWeight: "bold", fontSize: 16, marginBottom: 10 }}>
+        <h2 style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 10 }}>
           Description
         </h2>
         <Input.TextArea
@@ -369,7 +370,7 @@ const ReviewCard = ({
         />
         <h2
           style={{
-            fontWeight: "bold",
+            fontWeight: 'bold',
             fontSize: 16,
             marginTop: 16,
             marginBottom: 10,
@@ -380,13 +381,13 @@ const ReviewCard = ({
         <Rate
           value={newRating}
           onChange={(value) => setNewRating(value)}
-          style={{ marginBottom: "16px" }}
+          style={{ marginBottom: '16px' }}
         />
         <div className="flex flex-col">
           <div className="flex flex-col mb-4">
             <h2
               style={{
-                fontWeight: "bold",
+                fontWeight: 'bold',
                 fontSize: 16,
                 marginTop: 16,
                 marginBottom: 10,
@@ -404,7 +405,7 @@ const ReviewCard = ({
                       style={{
                         width: 96,
                         height: 96,
-                        borderRadius: "8px",
+                        borderRadius: '8px',
                       }}
                     >
                       <Image

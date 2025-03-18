@@ -1,56 +1,40 @@
-import React, { useState } from "react";
-import { Input, Button, Card } from "antd";
-import { toast } from "react-toastify";
-import { replyReview } from "../../api/ReviewManagement";
-
-interface ReviewReplyProps {
-  reviewId: string;
-  currentReply?: string;
-  onReplyUpdated: () => void;
-  onCancelReply?: () => void;
-}
+import React, { useState } from 'react';
+import { Input, Button, Card } from 'antd';
+import { toast } from 'react-toastify';
+import { replyReview } from '../../api/ReviewManagement';
 
 const MAX_LENGTH = 100;
 
-const ReviewReply: React.FC<ReviewReplyProps> = ({
+const ReviewReply = ({
   reviewId,
-  currentReply = "",
-  onReplyUpdated,
+  currentReply = '',
+  onReviewUpdated,
   onCancelReply,
+  isReplying,
+  setIsReplying, // Nhận hàm từ ReviewCard
 }) => {
-  const [replyContent, setReplyContent] = useState<string>(currentReply || "");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [isReplying, setIsReplying] = useState<boolean>(!Boolean(currentReply));
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [replyContent, setReplyContent] = useState(currentReply || '');
+  const [loading, setLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const submitReply = async () => {
     if (!replyContent.trim()) {
-      toast.error("Reply content cannot be empty.");
+      toast.error('Reply content cannot be empty.');
       return;
     }
 
     setLoading(true);
     try {
-      await replyReview({
-        parentId: reviewId,
-        content: replyContent.trim(),
-      });
-
-      toast.success("Reply sent successfully!");
-      onReplyUpdated();
-      setIsReplying(false);
+      await replyReview({ parentId: reviewId, content: replyContent.trim() });
+      toast.success('Reply sent successfully!');
+      onReviewUpdated();
+      setIsReplying(false); // Ẩn ô nhập sau khi gửi thành công
     } catch (error) {
-      console.error("Failed to send reply:", error);
-      toast.error("Failed to send reply. Please try again later.");
+      console.error('Failed to send reply:', error);
+      toast.error('Failed to send reply. Please try again later.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCancel = () => {
-    setReplyContent(currentReply);
-    setIsReplying(false);
-    onCancelReply?.();
   };
 
   return (
@@ -67,7 +51,7 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="text-blue-500 ml-2 hover:underline"
                 >
-                  {isExpanded ? "See less" : "See more"}
+                  {isExpanded ? 'See less' : 'See more'}
                 </button>
               </>
             )}
@@ -83,7 +67,7 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             className="mt-2 rounded-lg border border-gray-300 p-2 text-sm w-full max-w-full"
-            style={{ wordWrap: "break-word", whiteSpace: "pre-wrap" }}
+            style={{ wordWrap: 'break-word', whiteSpace: 'pre-wrap' }}
           />
           <div className="mt-2 flex flex-wrap gap-4">
             <Button
@@ -95,7 +79,7 @@ const ReviewReply: React.FC<ReviewReplyProps> = ({
               Send Reply
             </Button>
             <Button
-              onClick={handleCancel}
+              onClick={() => setIsReplying(false)}
               disabled={loading}
               className="bg-red-500 border-red-500 text-white rounded-md px-4 py-2"
             >
