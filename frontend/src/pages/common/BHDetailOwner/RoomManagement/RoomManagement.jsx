@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { TableCustom as Table, Button, ConfirmModal } from "@/component";
 import { getRoomsByBoardingHouse } from "@/api/room";
-import { Space } from "antd";
+import { Image, Space } from "antd";
 import covertTimetap from "@/utils/convertTimetap";
 import convertTimetap from "@/utils/convertTimetap";
 function RoomManagement({ boardingHouseId }) {
@@ -24,11 +24,11 @@ function RoomManagement({ boardingHouseId }) {
   const columns = [
     {
       title: "Image",
-      dataIndex: "roomImage",
-      key: "roomImage",
+      dataIndex: "images",
+      key: "images",
       render: (image) => (
-        <img
-          src={image}
+        <Image
+          src={image?.imageUrl}
           alt="Room"
           style={{ width: 50, height: 50, objectFit: "cover" }}
         />
@@ -41,8 +41,11 @@ function RoomManagement({ boardingHouseId }) {
     },
     {
       title: "Tenants",
-      dataIndex: "tenants",
+      dataIndex: "rentBy",
       key: "tenants",
+      render: (tenants) => (
+        <span>{tenants.map((tenant) => tenant.fullname).join(", ")}</span>
+      ),
     },
     {
       title: "Availability",

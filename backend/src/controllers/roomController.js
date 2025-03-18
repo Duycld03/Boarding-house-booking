@@ -38,7 +38,11 @@ class RoomController {
                 return res.status(400).json({ message: "Missing required parameters" });
             }
 
-            const rooms = await Room.find({ boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId) }).populate("roomTypeId");
+            const rooms = await Room.find({ boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId) })
+                .populate("roomTypeId")
+                .populate("rentBy")
+                .sort({ createdAt: -1 })
+
 
             res.status(200).json(rooms);
         } catch (error) {
