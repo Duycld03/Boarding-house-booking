@@ -32,7 +32,7 @@ import RoomType from "@/component/RoomType";
 import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHotel } from "@fortawesome/free-solid-svg-icons";
-import RoomManagement from "./RoomManagement";
+import RoomManagement from "./RoomManagement/RoomManagement";
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -791,6 +791,7 @@ const BHDetailOwner = () => {
 
         {/* Tab: Room */}
         <Tabs.TabPane tab="Room" key="room">
+          {/* <Room /> */}
           <RoomManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
 

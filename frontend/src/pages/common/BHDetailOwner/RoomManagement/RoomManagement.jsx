@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { TableCustom as Table, Button, ConfirmModal } from "@/component";
 import { getRoomsByBoardingHouse } from "@/api/room";
 import { Image, Space } from "antd";
-import covertTimetap from "@/utils/convertTimetap";
 import convertTimetap from "@/utils/convertTimetap";
 function RoomManagement({ boardingHouseId }) {
   const [rooms, setRooms] = useState([]);

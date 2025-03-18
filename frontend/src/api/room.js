@@ -6,5 +6,5 @@ export const getRoomsByRoomType = (roomTypeId) => {
 };
 
 export const getRoomsByBoardingHouse = (boardingHouseId) => {
-    return axios.get(`owner/room/boarding-house/${boardingHouseId}`);
+    return axios.get(`/owner/room/boarding-house/${boardingHouseId}`);
 }

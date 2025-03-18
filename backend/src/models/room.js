@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 
-
 const RoomSchema = new mongoose.Schema(
   {
     boardingHouseId: {
@@ -37,10 +36,6 @@ const RoomSchema = new mongoose.Schema(
         type: String,
         default: "",
       },
-    },
-    isPrimary: {
-      type: Boolean,
-      required: true,
     },
     roomTypeId: {
       type: mongoose.Schema.Types.ObjectId,
