@@ -84,8 +84,6 @@ class TenantController {
         rentBy: { $elemMatch: { $eq: accountObjectId } }, // Kiểm tra nếu tenant thực sự ở đây
       }).select('_id roomNumber rentBy');
 
-      console.log('🔍 Tenant is in these rooms:', tenantRooms);
-
       if (!tenantRooms.length) {
         return res.status(404).json({
           message: 'Tenant is not renting any rooms in this boarding house.',
@@ -100,8 +98,6 @@ class TenantController {
         accountId: accountObjectId,
         status: { $ne: 'deleted' }, // Chỉ lấy deposit còn hiệu lực
       });
-
-      console.log('🔍 Deposit found:', deposit);
 
       if (!deposit) {
         return res.status(404).json({
