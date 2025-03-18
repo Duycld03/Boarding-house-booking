@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Input, Button, Card, Dropdown, Menu, Tooltip, Modal } from 'antd';
 import { toast } from 'react-toastify';
-import { replyReview, updateReplyReview } from '../../api/ReviewManagement';
+import {
+  replyReview,
+  updateReplyReview,
+  softDeleteReplyReview,
+} from '../../api/ReviewManagement';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faEdit,
@@ -27,6 +31,44 @@ const ReviewReply = ({
   const [isEditing, setIsEditing] = useState(false);
 
   console.log('🔍 Reply ID:', replyId); // Debug để kiểm tra
+
+  // ✅ Xóa mềm reply
+  const handleDeleteReply = async () => {
+    if (!replyId) {
+      toast.error('Reply ID is missing.');
+      return;
+    }
+
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this reply?',
+      okText: 'Delete',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        setLoading(true);
+        try {
+          const response = await softDeleteReplyReview(replyId);
+
+          console.log('🟢 API Response:', response); // Debug API response
+
+          if (response.success === true) {
+            // Kiểm tra chính xác `true`
+            toast.success('Reply deleted successfully.');
+            onReviewUpdated(); // Cập nhật lại danh sách review
+          } else {
+            toast.error(response.data?.message || 'Failed to delete reply.');
+          }
+        } catch (error) {
+          console.error('❌ Failed to delete reply:', error);
+          toast.error(
+            error.response?.data?.message || 'Failed to delete reply.'
+          );
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
+  };
 
   const handleUpdateReply = async () => {
     if (!replyContent.trim()) {
@@ -76,7 +118,6 @@ const ReviewReply = ({
       setLoading(false);
     }
   };
-  console.log('REview Reply', ReviewReply);
 
   const handleCancel = () => {
     if (isEditing) {
@@ -94,7 +135,7 @@ const ReviewReply = ({
         <FontAwesomeIcon icon={faEdit} className="text-blue-500 text-xl" />
         <span className="ml-2">Edit Reply</span>
       </Menu.Item>
-      <Menu.Item key="delete">
+      <Menu.Item key="delete" onClick={handleDeleteReply}>
         <FontAwesomeIcon icon={faTrash} className="text-red-500 text-xl" />
         <span className="ml-2">Delete Reply</span>
       </Menu.Item>

@@ -60,3 +60,8 @@ export const updateReplyReview = ({ replyId, content }) => {
     content,
   });
 };
+export const softDeleteReplyReview = (replyId) => {
+  return axios.delete('/owner/review/reply', {
+    data: { replyId }, // ✅ Đặt `replyId` vào `data`
+  });
+};

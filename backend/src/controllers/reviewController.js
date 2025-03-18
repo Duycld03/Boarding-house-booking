@@ -599,6 +599,58 @@ class ReviewController {
       });
     }
   }
+  async softDeleteReplyReview(req, res) {
+    try {
+      const accountId = req.user?.userId;
+      if (!accountId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Account ID not found.',
+        });
+      }
+
+      const { replyId } = req.body; // Lấy replyId từ params
+
+      if (!replyId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Reply ID is required.',
+        });
+      }
+
+      // Kiểm tra xem reply có tồn tại không
+      const reply = await Review.findById(replyId);
+      if (!reply) {
+        return res.status(404).json({
+          success: false,
+          message: 'Reply not found.',
+        });
+      }
+
+      // Đảm bảo chỉ chủ sở hữu hoặc admin mới có thể xóa
+      if (reply.accountId.toString() !== accountId) {
+        return res.status(403).json({
+          success: false,
+          message: 'You do not have permission to delete this reply.',
+        });
+      }
+
+      // Đánh dấu reply là "đã xóa"
+      reply.deleted = true;
+      await reply.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'Reply deleted successfully (soft delete).',
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Server error. Please try again later.',
+        error: error.message,
+      });
+    }
+  }
 }
 
 export default new ReviewController();
