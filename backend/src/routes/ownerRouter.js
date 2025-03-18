@@ -3,6 +3,7 @@ import {
   authController,
   boardingHouseController,
   ReviewController,
+  appointmentController
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -34,5 +35,12 @@ ownerRouter.delete(
 );
 ownerRouter.post('/reply', ReviewController.replyReview);
 ownerRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
-
+ownerRouter.get(
+  "/:boardingHouseId",
+  appointmentController.getAppointmentsByBoardingHouseId
+);
+ownerRouter.get(
+  "/appointment/:appointmentId",
+  appointmentController.getAppointmentDetailForOwner
+);
 export { ownerRouter };

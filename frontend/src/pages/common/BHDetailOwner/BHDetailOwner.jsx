@@ -32,7 +32,7 @@ import RoomType from '@/component/RoomType';
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHotel } from '@fortawesome/free-solid-svg-icons';
-
+import ViewListAppointmentOwner from "@/component/ViewListAppointmentOwner";
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
 
@@ -334,8 +334,8 @@ const BHDetailOwner = () => {
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-          error.message ||
-          'Failed to update the boarding house.'
+        error.message ||
+        'Failed to update the boarding house.'
       );
     } finally {
       setLoading(false);
@@ -796,6 +796,10 @@ const BHDetailOwner = () => {
         {/* Tab: Deposit Management */}
         <Tabs.TabPane tab="Deposit Management" key="depositManagement">
           {/* <DepositManagement /> */}
+        </Tabs.TabPane>
+
+        <Tabs.TabPane tab="Viewing Room Request" key="viewingroomrequest">
+          <ViewListAppointmentOwner />
         </Tabs.TabPane>
       </Tabs>
     </div>

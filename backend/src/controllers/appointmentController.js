@@ -148,8 +148,91 @@ class AppointmentController {
     }
 
 
+    async getAppointmentsByBoardingHouseId(req, res) {
+        try {
+            const { boardingHouseId } = req.params;
+            const rooms = await Room.find({ boardingHouseId }).select("_id");
+            if (!rooms.length) {
+                return res.status(404).json({ success: false, message: "No rooms found for this boarding house" });
+            }
+            const appointments = await ViewRoomRequest.find({
+                roomId: { $in: rooms.map(room => room._id) }
+            })
+                .populate({
+                    path: "accountId",
+                    select: "fullname email",
+                })
+                .populate({
+                    path: "roomId",
+                    select: "roomNumber",
+                })
+                .sort({ appointmentDate: -1 })
+                .lean();
 
+            res.status(200).json({
+                success: true,
+                count: appointments.length,
+                data: appointments,
+            });
+        } catch (error) {
+            console.error("Error fetching viewing appointments:", error);
+            res.status(500).json({ success: false, message: "Server error", error: error.message });
+        }
+    }
 
+    async getAppointmentDetailForOwner(req, res) {
+        try {
+            const { appointmentId } = req.params;
+            const { userId } = req.user;
+
+            const appointment = await ViewRoomRequest.findById(appointmentId)
+                .populate({
+                    path: "roomId",
+                    populate: {
+                        path: "boardingHouseId",
+                        populate: { path: "ownerId", select: "fullname email" }
+                    }
+                })
+                .populate({ path: "accountId", select: "fullname email phoneNumber avatarImage" })
+                .lean();
+
+            if (!appointment) {
+                return res.status(404).json({ message: "Appointment not found" });
+            }
+
+            if (!appointment.roomId) {
+                return res.status(404).json({ message: "Room not found for this appointment" });
+            }
+
+            const ownerId = appointment.roomId?.boardingHouseId?.ownerId?._id.toString();
+            if (ownerId !== userId) {
+                return res.status(403).json({ message: "You do not have permission to view this appointment" });
+            }
+
+            return res.status(200).json({
+                _id: appointment._id,
+                tenant: {
+                    avatarImage: appointment.accountId?.avatarImage || null,
+                    fullName: appointment.accountId?.fullname || "Unknown",
+                    email: appointment.accountId?.email || "Unknown",
+                    phoneNumber: appointment.accountId?.phoneNumber || "Unknown",
+                },
+                room: {
+                    id: appointment.roomId?._id,
+                    number: appointment.roomId?.roomNumber || "Unknown",
+                },
+                appointmentDate: appointment.appointmentDate,
+                status: appointment.status,
+                reasonForCancel: appointment.reasonForCancel || null,
+                userNote: appointment.note || "",
+                createdAt: appointment.createdAt,
+            });
+
+        } catch (error) {
+            console.error("Error fetching appointment details:", error);
+            return res.status(500).json({ message: "Server error", error: error.message });
+        }
+    }
 }
 
 export default new AppointmentController()
