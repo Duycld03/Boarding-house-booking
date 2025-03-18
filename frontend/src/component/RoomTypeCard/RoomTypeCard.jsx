@@ -9,11 +9,14 @@ import { toast } from "react-toastify";
 import { useCurrentUser } from "../../context/userContext";
 import { useNavigate } from "react-router-dom";
 import DepositPopup from "./DepositPopup";
+import userRoles from "@/constants/userRole";
 
 const { Title, Paragraph, Text } = Typography;
 
 const RoomCard = ({ roomData, boardingHouse }) => {
-  const { isLogin } = useCurrentUser();
+  const { isLogin, hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRoles.owner);
+
   const navigate = useNavigate();
   const [listRoomData, setListRoomData] = useState([]);
   const [depositPopupVisible, setDepositPopupVisible] = useState(false);
@@ -101,7 +104,7 @@ const RoomCard = ({ roomData, boardingHouse }) => {
                 className="bg-primary text-white md:min-w-[200px]  py-2 px-4 rounded-xl"
                 size="large"
                 onClick={handleOpen}
-                disabled={roomData?.availableRoom == 0}
+                disabled={isOwner || roomData?.availableRoom == 0}
               >
                 Deposit
               </Button>
