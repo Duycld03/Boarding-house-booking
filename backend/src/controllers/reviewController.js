@@ -529,11 +529,12 @@ class ReviewController {
       const reviewsWithReply = await Promise.all(
         allReviews.map(async (review) => {
           const reply = await Review.findOne({ parentId: review._id }).select(
-            'content'
+            '_id content'
           );
 
           return {
             ...review.toObject(),
+            replyId: reply ? reply._id : null,
             replyContent: reply ? reply.content : null, // Lưu nội dung phản hồi vào object
           };
         })

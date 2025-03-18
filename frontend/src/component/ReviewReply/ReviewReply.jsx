@@ -13,6 +13,7 @@ const MAX_LENGTH = 100;
 
 const ReviewReply = ({
   reviewId,
+  replyId,
   currentReply = '',
   onReviewUpdated,
   onCancelReply,
@@ -25,20 +26,23 @@ const ReviewReply = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // ✅ Call API updateReplyReview
+  console.log('🔍 Reply ID:', replyId); // Debug để kiểm tra
+
   const handleUpdateReply = async () => {
     if (!replyContent.trim()) {
       toast.error('Reply content cannot be empty.');
       return;
     }
 
-    console.log('Correct Reply ID:', reviewId);
-    console.log('Updated Content:', replyContent);
+    if (!replyId) {
+      toast.error('Reply ID is missing.');
+      return;
+    }
 
     setLoading(true);
     try {
       await updateReplyReview({
-        replyId: reviewId, // Phải là ID của reply, không phải parentId
+        replyId, // ✅ Bây giờ đã có ID của phản hồi
         content: replyContent.trim(),
       });
 
@@ -46,7 +50,7 @@ const ReviewReply = ({
       onReviewUpdated();
       setIsEditing(false);
     } catch (error) {
-      console.error('Failed to update reply:', error);
+      console.error('❌ Failed to update reply:', error);
       toast.error(error.response?.data?.message || 'Failed to update reply.');
     } finally {
       setLoading(false);
@@ -72,6 +76,7 @@ const ReviewReply = ({
       setLoading(false);
     }
   };
+  console.log('REview Reply', ReviewReply);
 
   const handleCancel = () => {
     if (isEditing) {
