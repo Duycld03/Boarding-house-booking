@@ -5,6 +5,7 @@ import {
   ReviewController,
   roomTypeController,
   FacilitiesController,
+  depositController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -55,4 +56,9 @@ ownerRouter.delete(
   '/boardinghouse/roomtype/:roomTypeId/',
   roomTypeController.softDeleteRoomType
 );
+
+  '/boardinghouse/deposit/:boardingHouseId',
+  depositController.getAllDepositRooms
+);
+
 export { ownerRouter };

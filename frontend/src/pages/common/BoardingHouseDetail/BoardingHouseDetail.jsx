@@ -26,10 +26,14 @@ import {
 import { toast } from "react-toastify";
 import { addFavorite, getFavorite } from "../../../api/favoriteManagement";
 import LocationPicker from "@/component/LocationPicker";
+import userRoles from "@/constants/userRole";
 
 const { Content } = Layout;
 
 function BoardingHouseDetail() {
+  const { hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRoles.owner);
+
   const location = useLocation();
   const { isLogin } = useCurrentUser();
   const { id } = useParams();
@@ -270,7 +274,11 @@ function BoardingHouseDetail() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 cursor-pointer select-none text-4xl mt-5 sm:mt-0">
-                  <button onClick={handleLike} className="focus:outline-none">
+                  <button
+                    onClick={handleLike}
+                    disabled={isOwner}
+                    className="focus:outline-none"
+                  >
                     {isLiked ? (
                       <HeartFilled className="text-red-500 transition-transform duration-300 scale-110" />
                     ) : (
@@ -377,6 +385,7 @@ function BoardingHouseDetail() {
               <Button
                 className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
                 onClick={handleOpenAddReview}
+                disabled={isOwner}
               >
                 Write a Review
               </Button>
