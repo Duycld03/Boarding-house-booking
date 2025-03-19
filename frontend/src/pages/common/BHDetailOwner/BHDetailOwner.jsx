@@ -25,13 +25,13 @@ import {
 import { getBoardingHouseDetail } from "../../../api/ownerUser/boardingHouse";
 import { updateBoardingHouseDetailsOwner } from "../../../api/BoardingHManagement";
 import { useNavigate, useParams } from "react-router-dom";
-import { Back } from "../../../component";
 import axios from "axios";
 import LocationPicker from "@/component/LocationPicker";
 import RoomType from "@/component/RoomType";
 import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHotel } from "@fortawesome/free-solid-svg-icons";
+import DepositManagement from "@/component/DepositManagement";
 import RoomManagement from "./RoomManagement/RoomManagement";
 
 const BHDetailOwner = () => {
@@ -797,7 +797,7 @@ const BHDetailOwner = () => {
 
         {/* Tab: Deposit Management */}
         <Tabs.TabPane tab="Deposit Management" key="depositManagement">
-          {/* <DepositManagement /> */}
+          <DepositManagement />
         </Tabs.TabPane>
       </Tabs>
     </div>
