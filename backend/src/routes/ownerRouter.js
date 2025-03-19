@@ -57,6 +57,7 @@ ownerRouter.delete(
   roomTypeController.softDeleteRoomType
 );
 
+ownerRouter.get(
   '/boardinghouse/deposit/:boardingHouseId',
   depositController.getAllDepositRooms
 );
