@@ -379,48 +379,80 @@ class DepositController {
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   }
-  async getAllDepositRooms(req, res) {
+
+
+  async getDepositByBhId(req, res) {
     try {
-      const { boardingHouseId } = req.params; // Lấy boardingHouseId từ request params
+      const { boardingHouseId } = req.params;
+      const { status, roomNumber, minAmount, maxAmount, rentalTime, startDate, endDate } = req.query;
 
-      // Tìm tất cả các phòng trong boarding house
-      const rooms = await Room.find({ boardingHouseId }).select('_id');
+      const rooms = await Room.find({ boardingHouseId }).select("_id roomNumber");
+      const roomMap = new Map(rooms.map(room => [room._id.toString(), room.roomNumber]));
 
-      // Lấy danh sách ID của các phòng
-      const roomIds = rooms.map((room) => room._id);
+      let filter = { roomId: { $in: [...roomMap.keys()] } };
 
-      // Tìm tất cả các khoản đặt cọc liên quan đến các phòng trong boarding house
-      const deposits = await DepositRoom.find({ roomId: { $in: roomIds } })
-        .populate({
-          path: 'roomId',
-          select: 'roomNumber', // Chỉ lấy số phòng
-        })
-        .populate({
-          path: 'accountId', // Liên kết đến người đặt cọc
-          select: 'fullname', // Chỉ lấy tên của người đặt cọc
-        })
-        .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo mới nhất
+      if (status) filter.status = status;
+      if (minAmount || maxAmount) filter.amount = { ...(minAmount && { $gte: minAmount }), ...(maxAmount && { $lte: maxAmount }) };
+      if (rentalTime) filter.rentalTime = { $gte: Number(rentalTime) };
+      if (startDate) filter.createdAt = { $gte: new Date(startDate) };
+      if (endDate) filter.endDate = { $lte: new Date(endDate) };
+
+      if (roomNumber) {
+        const selectedRoomIds = [...roomMap.entries()]
+          .filter(([id, num]) => roomNumber.split(",").includes(num.toString()))
+          .map(([id]) => id);
+        filter.roomId = { $in: selectedRoomIds };
+      }
+
+      const deposits = await DepositRoom.find(filter)
+        .populate({ path: "accountId", select: "fullname" })
+        .sort({ createdAt: -1 })
         .lean();
 
-      // Format kết quả trả về
-      const result = deposits.map((deposit) => ({
+      const result = deposits.map(deposit => ({
         _id: deposit._id,
-        name: deposit.accountId?.fullname || 'Unknown', // Lấy tên người đặt cọc
-        roomNumber: deposit.roomId?.roomNumber || 'N/A',
+        name: deposit.accountId?.fullname || "Unknown",
+        roomNumber: roomMap.get(deposit.roomId.toString()) || "N/A",
         amount: deposit.amount,
         status: deposit.status,
-        startDate: moment(deposit.createdAt).format('DD/MM/YYYY'),
-        endDate: moment(deposit.endDate).format('DD/MM/YYYY'),
+        startDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+        endDate: moment(deposit.endDate).format("DD/MM/YYYY"),
         rentalTime: deposit.rentalTime,
       }));
 
       res.status(200).json(result);
     } catch (error) {
-      console.error('Error getting all deposited rooms:', error);
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Error getting deposits:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
+  async getMaxDeposit(req, res) {
+    try {
+      const { boardingHouseId } = req.params;
+
+      // Lấy danh sách các phòng thuộc boardingHouseId
+      const rooms = await Room.find({ boardingHouseId }).select("_id");
+      const roomIds = rooms.map(room => room._id);
+
+      if (!roomIds.length) {
+        return res.status(200).json(0);
+      }
+
+      const maxDeposit = await DepositRoom.findOne({ roomId: { $in: roomIds } })
+        .sort({ amount: -1 }) // Sắp xếp giảm dần theo số tiền đặt cọc
+        .select("amount"); // Chỉ lấy trường amount
+
+      res.status(200).json(maxDeposit?.amount || 0);
+    } catch (error) {
+      console.error("Error getting max deposit:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+
+
 }
+
 const createVNPayUrl = async (req, res, amount, orderInfo) => {
   process.env.TZ = 'Asia/Ho_Chi_Minh';
 

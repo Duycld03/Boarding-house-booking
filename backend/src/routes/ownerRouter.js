@@ -36,12 +36,18 @@ ownerRouter.delete(
 );
 ownerRouter.post('/reply', ReviewController.replyReview);
 ownerRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
+
+
+// deposit
 ownerRouter.get(
   '/boardinghouse/deposit/:boardingHouseId',
-  depositController.getAllDepositRooms
+  depositController.getDepositByBhId
 );
 
-
+ownerRouter.get(
+  '/boardinghouse/deposit/max-deposit/:boardingHouseId',
+  depositController.getMaxDeposit
+);
 // room
 ownerRouter.get('/room/boarding-house/:boardingHouseId', roomController.getRoomsByBoardingHouse);
 
