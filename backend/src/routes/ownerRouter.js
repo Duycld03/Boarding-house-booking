@@ -5,6 +5,7 @@ import {
   ReviewController,
   roomTypeController,
   FacilitiesController,
+  roomController,
   depositController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
@@ -61,5 +62,9 @@ ownerRouter.get(
   '/boardinghouse/deposit/:boardingHouseId',
   depositController.getAllDepositRooms
 );
+
+
+// room
+ownerRouter.get('/room/boarding-house/:boardingHouseId', roomController.getRoomsByBoardingHouse);
 
 export { ownerRouter };
