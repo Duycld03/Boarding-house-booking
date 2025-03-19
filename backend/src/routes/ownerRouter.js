@@ -58,6 +58,10 @@ ownerRouter.get(
   '/boardinghouse/deposit/max-deposit/:boardingHouseId',
   depositController.getMaxDeposit
 );
+ownerRouter.get(
+  '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
+  depositController.getMaxRentTime
+);
 // room
 ownerRouter.get('/room/boarding-house/:boardingHouseId', roomController.getRoomsByBoardingHouse);
 

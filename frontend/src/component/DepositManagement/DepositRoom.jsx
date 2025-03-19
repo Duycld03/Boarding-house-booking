@@ -8,6 +8,7 @@ import Table from "@/component/Table";
 import formatAmount from "@/utils/formatAmount";
 import FilterDeposit from "./FilterDeposite";
 import { getRoomsByBoardingHouse } from "@/api/room";
+import { render } from "react-dom";
 
 const DepositRoom = () => {
   const [depositedRooms, setDepositedRooms] = useState([]);
@@ -46,6 +47,8 @@ const DepositRoom = () => {
     if (boardingHouseId) {
       fetchDepositedRooms();
     }
+
+    console.log("filterValue", filterValue);
   }, [filterValue]);
 
   useEffect(() => {
@@ -70,6 +73,22 @@ const DepositRoom = () => {
       render: (price) => (price ? formatAmount(price) : "N/A"),
     },
     {
+      title: "Rental Time",
+      dataIndex: "rentalTime",
+      key: "rentalTime",
+      render: (time) => (time ? `${time} months` : "N/A"),
+    },
+    {
+      title: "Start Date",
+      dataIndex: "startDate",
+      key: "startDate",
+    },
+    {
+      title: "End Date",
+      dataIndex: "endDate",
+      key: "endDate",
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
@@ -88,21 +107,6 @@ const DepositRoom = () => {
           {status}
         </Tag>
       ),
-    },
-    {
-      title: "Rental Time",
-      dataIndex: "rentalTime",
-      key: "rentalTime",
-    },
-    {
-      title: "Start Date",
-      dataIndex: "startDate",
-      key: "startDate",
-    },
-    {
-      title: "End Date",
-      dataIndex: "endDate",
-      key: "endDate",
     },
     {
       title: "Action",
@@ -127,7 +131,7 @@ const DepositRoom = () => {
   return (
     <div className="min-h-screen ">
       <div className="flex justify-end">
-        <FilterDeposit setFilterValue={(setFilterValue, listRoom)} />
+        <FilterDeposit setFilterValue={setFilterValue} listRoom={listRoom} />
       </div>
       <Table columns={columns} data={depositedRooms || []} loading={loading} />
     </div>

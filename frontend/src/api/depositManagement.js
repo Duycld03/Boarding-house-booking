@@ -27,3 +27,7 @@ export const getDepositByBhId = (boardingHouseId, filters = {}) => {
 export const getMaxDeposit = (boardingHouseId) => {
   return axios.get(`owner/boardinghouse/deposit/max-deposit/${boardingHouseId}`);
 };
+
+export const getRentTime = (boardingHouseId) => {
+  return axios.get(`owner/boardinghouse/deposit/max-rent-time/${boardingHouseId}`);
+}

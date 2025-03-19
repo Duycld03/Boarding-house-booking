@@ -384,24 +384,88 @@ class DepositController {
   async getDepositByBhId(req, res) {
     try {
       const { boardingHouseId } = req.params;
-      const { status, roomNumber, minAmount, maxAmount, rentalTime, startDate, endDate } = req.query;
+      const { status, priceRange, endDate, roomId, rentalTime } = req.query;
 
       const rooms = await Room.find({ boardingHouseId }).select("_id roomNumber");
       const roomMap = new Map(rooms.map(room => [room._id.toString(), room.roomNumber]));
 
       let filter = { roomId: { $in: [...roomMap.keys()] } };
 
-      if (status) filter.status = status;
-      if (minAmount || maxAmount) filter.amount = { ...(minAmount && { $gte: minAmount }), ...(maxAmount && { $lte: maxAmount }) };
-      if (rentalTime) filter.rentalTime = { $gte: Number(rentalTime) };
-      if (startDate) filter.createdAt = { $gte: new Date(startDate) };
-      if (endDate) filter.endDate = { $lte: new Date(endDate) };
+      if (roomId && roomId !== "" && roomMap.has(roomId)) {
+        filter.roomId = roomId;
+      }
 
-      if (roomNumber) {
-        const selectedRoomIds = [...roomMap.entries()]
-          .filter(([id, num]) => roomNumber.split(",").includes(num.toString()))
-          .map(([id]) => id);
-        filter.roomId = { $in: selectedRoomIds };
+      if (endDate) {
+        try {
+          if (typeof endDate === 'string' && endDate.includes(',')) {
+            const [startDate, endDate] = endDate.split(',');
+            filter.endDate = {
+              $gte: new Date(startDate),
+              $lte: new Date(endDate),
+            };
+          }
+          else if (Array.isArray(endDate) && endDate.length === 2) {
+            filter.endDate = {
+              $gte: new Date(endDate[0]),
+              $lte: new Date(endDate[1]),
+            };
+          }
+          else if (endDate) {
+            filter.endDate = new Date(endDate);
+          }
+        } catch (e) {
+          console.error("Error parsing endDate:", e);
+        }
+      }
+
+      if (status && status !== "") {
+        filter.status = status;
+      }
+
+      if (priceRange) {
+        try {
+          if (typeof priceRange === 'string' && priceRange.includes(',')) {
+            const [min, max] = priceRange.split(',').map(Number);
+            if (!isNaN(min) && !isNaN(max)) {
+              filter.amount = { $gte: min, $lte: max };
+            }
+          }
+          else if (Array.isArray(priceRange) && priceRange.length === 2) {
+            const [min, max] = priceRange.map(Number);
+            if (!isNaN(min) && !isNaN(max)) {
+              filter.amount = { $gte: min, $lte: max };
+            }
+          }
+        } catch (e) {
+          console.error("Error parsing priceRange:", e);
+        }
+      }
+
+      if (rentalTime) {
+        try {
+          if (typeof rentalTime === 'string') {
+            if (rentalTime.includes(',')) {
+              const [min, max] = rentalTime.split(',').map(Number);
+              if (!isNaN(min) && !isNaN(max)) {
+                filter.rentalTime = { $gte: min, $lte: max };
+              }
+            }
+            else {
+              const value = Number(rentalTime);
+              if (!isNaN(value)) {
+                filter.rentalTime = value;
+              }
+            }
+          }
+          else if (Array.isArray(rentalTime) && rentalTime.length === 2) {
+            const [min, max] = rentalTime.map(Number);
+            if (!isNaN(min) && !isNaN(max)) {
+              filter.rentalTime = { $gte: min, $lte: max };
+            }
+          }
+        } catch (e) {
+          console.error("Error parsing rentalTime:", e);
+        }
       }
 
       const deposits = await DepositRoom.find(filter)
@@ -426,11 +490,12 @@ class DepositController {
       res.status(500).json({ message: "Server error", error });
     }
   }
+
+
   async getMaxDeposit(req, res) {
     try {
       const { boardingHouseId } = req.params;
 
-      // Lấy danh sách các phòng thuộc boardingHouseId
       const rooms = await Room.find({ boardingHouseId }).select("_id");
       const roomIds = rooms.map(room => room._id);
 
@@ -447,6 +512,29 @@ class DepositController {
       console.error("Error getting max deposit:", error);
       res.status(500).json({ message: "Server error", error });
     }
+  }
+
+  async getMaxRentTime(req, res) {
+    try {
+      const { boardingHouseId } = req.params;
+
+      const rooms = await Room.find({ boardingHouseId }).select("_id");
+      const roomIds = rooms.map(room => room._id);
+
+      if (!roomIds.length) {
+        return res.status(200).json(0);
+      }
+
+      const maxRentTime = await DepositRoom.findOne({ roomId: { $in: roomIds } })
+        .sort({ rentalTime: -1 })
+        .select("rentalTime");
+
+      res.status(200).json(maxRentTime?.rentalTime || 0);
+    } catch (error) {
+      console.error("Error getting max rent time:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+
   }
 
 
