@@ -10,21 +10,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { addFavorite, getFavorite } from "../../api/favoriteManagement"; // Import API
-
-interface BoardingHouseCardProps {
-  id: string;
-  name: string;
-  price: string | number;
-  detail: string;
-  rating: number;
-  img: string;
-  timeAgo: string;
-  isFavorite?: boolean;
-}
-
-interface BoardingHouseGridProps {
-  data: BoardingHouseCardProps[];
-}
+import { useCurrentUser } from "@/context/userContext";
+import userRoles from "@/constants/userRole";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -37,7 +24,10 @@ const BoardingHouseCard = ({
   img,
   timeAgo,
   isFavorite: initialFavorite = false,
-}: BoardingHouseCardProps) => {
+}) => {
+  const { hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRoles.owner);
+
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
@@ -48,7 +38,7 @@ const BoardingHouseCard = ({
   };
 
   // Xử lý thêm/xóa yêu thích
-  const handleFavoriteClick = async (event: React.MouseEvent) => {
+  const handleFavoriteClick = async (event) => {
     event.stopPropagation(); // Ngăn chặn click vào card
 
     try {
@@ -148,6 +138,7 @@ const BoardingHouseCard = ({
           <Button
             type="text"
             onClick={handleFavoriteClick}
+            disabled={isOwner}
             icon={
               isFavorite ? (
                 <HeartFilled style={{ color: "red", fontSize: "22px" }} />
@@ -162,9 +153,9 @@ const BoardingHouseCard = ({
   );
 };
 
-const BoardingHouseGrid = ({ data }: BoardingHouseGridProps) => {
+const BoardingHouseGrid = ({ data }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Gọi API lấy danh sách phòng yêu thích khi trang tải

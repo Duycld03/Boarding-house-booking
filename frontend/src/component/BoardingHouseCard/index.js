@@ -1,1 +1,1 @@
-export { default } from './BoardingHouseCard';
+export { default } from "./BoardingHouseCard";
