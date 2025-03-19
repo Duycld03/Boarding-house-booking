@@ -54,3 +54,14 @@ export const getReplyContent = (reviewId) => {
 export const getReviewDetail = (reviewId) => {
   return axios.get(`dashboard/review/${reviewId}`);
 };
+export const updateReplyReview = ({ replyId, content }) => {
+  return axios.put('/owner/review/updatereply', {
+    replyId,
+    content,
+  });
+};
+export const softDeleteReplyReview = (replyId) => {
+  return axios.delete('/owner/review/reply', {
+    data: { replyId }, // ✅ Đặt `replyId` vào `data`
+  });
+};

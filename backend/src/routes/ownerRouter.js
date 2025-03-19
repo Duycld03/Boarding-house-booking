@@ -37,6 +37,8 @@ ownerRouter.delete(
 );
 ownerRouter.post('/reply', ReviewController.replyReview);
 ownerRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
+ownerRouter.put('/review/updatereply', ReviewController.updateReplyReview);
+ownerRouter.delete('/review/reply', ReviewController.softDeleteReplyReview);
 ownerRouter.get(
   '/tenant/:boardingHouseId',
   tenantController.getTenantsByBoardingHouse
