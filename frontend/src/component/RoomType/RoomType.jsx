@@ -160,7 +160,7 @@ const RoomType = () => {
           <Button
             size="large"
             title={'Update'}
-            icon={<FileTextOutlined />}
+            btnUpdate
             className={'text-white'}
             bgColor={'rgb(5 150 105)'}
             onClick={() => handleOpenUpdateModal(record)}
