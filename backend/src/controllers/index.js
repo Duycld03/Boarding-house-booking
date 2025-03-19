@@ -12,6 +12,8 @@ import depositController from "./depositController.js";
 import FacilitiesController from "./facilitiesController.js";
 import roomTypeController from "./roomTypeController.js";
 import userPaymentController from "./userPaymentController.js";
+import roomTypeController from './roomTypeController.js';
+import tenantController from './tenantController.js';
 
 export {
   authController,
@@ -28,4 +30,5 @@ export {
   FacilitiesController,
   roomTypeController,
   userPaymentController
+  tenantController,
 };
