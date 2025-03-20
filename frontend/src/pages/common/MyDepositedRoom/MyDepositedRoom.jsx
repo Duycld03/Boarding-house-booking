@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
-import { FileTextOutlined } from "@ant-design/icons";
+import {
+  DollarCircleFilled,
+  DollarOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
 import formatAmount from "../../../utils/formatAmount";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMyDepositedRoom } from "@/api/depositManagement";
@@ -8,17 +12,21 @@ import { Loader } from "../../../component";
 import { Tag } from "antd";
 import MyDepositDetail from "./MyDepositDetail";
 import { toast } from "react-toastify";
+import PayDepositPopup from "./MyDepositDetail/PayDepositPopup";
 
 function MyDepositedRoom() {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [depositedRooms, setDepositedRooms] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isPayRentModalVisible, setIsPayRentModalVisible] = useState(false);
   const [depositRoomId, setDepositRoomId] = useState("");
+  const [isPayDepositPopupVisible, setIsPayDepositPopupVisible] =
+    useState(false);
+  const [depositRoom, setDepositRoom] = useState({});
 
   const handleCancel = () => {
-    setIsModalVisible(false);
+    setIsPayRentModalVisible(false);
   };
 
   const columns = [
@@ -48,6 +56,8 @@ function MyDepositedRoom() {
             status === "pending"
               ? "orange"
               : status === "accepted"
+              ? "cyan"
+              : status === "confirmed"
               ? "green"
               : "red"
           }
@@ -76,19 +86,33 @@ function MyDepositedRoom() {
       key: "action",
       render: (_, record) => (
         <div className="flex gap-3">
-          <Button
-            disabled={record.status == "pending"}
-            size="large"
-            title={"Detail"}
-            icon={<FileTextOutlined />}
-            // onClick={() => navigate(`/my-deposited-room/${record._id}`)}
-            onClick={() => {
-              setDepositRoomId(record._id);
-              setIsModalVisible(true);
-            }}
-            className="text-white"
-            bgColor="rgb(5 150 105)"
-          />
+          {record.status == "confirmed" && (
+            <Button
+              size="large"
+              title={"Detail"}
+              icon={<FileTextOutlined />}
+              onClick={() => {
+                setDepositRoomId(record._id);
+                setIsPayRentModalVisible(true);
+              }}
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+            />
+          )}
+          {record.status == "accepted" && (
+            <Button
+              size="large"
+              title={"Pay"}
+              icon={<DollarOutlined />}
+              onClick={() => {
+                // setDepositRoomId(record._id);
+                setDepositRoom(record);
+                setIsPayDepositPopupVisible(true);
+              }}
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+            />
+          )}
         </div>
       ),
     },
@@ -109,9 +133,9 @@ function MyDepositedRoom() {
     const status = params.get("status");
 
     if (status === "success") {
-      toast.success("Pay rent successfully!");
+      toast.success("Pay successfully!");
     } else if (status === "fail") {
-      toast.error("Pay rent failed!");
+      toast.error("Pay failed!");
     }
     params.delete("status");
     if (status) {
@@ -132,8 +156,13 @@ function MyDepositedRoom() {
           <Table loading={loading} columns={columns} data={depositedRooms} />
           <MyDepositDetail
             depositRoomId={depositRoomId}
-            isModalVisible={isModalVisible}
+            isModalVisible={isPayRentModalVisible}
             handleCancel={handleCancel}
+          />
+          <PayDepositPopup
+            isVisible={isPayDepositPopupVisible}
+            setVisible={setIsPayDepositPopupVisible}
+            payDepositData={depositRoom}
           />
         </>
       )}
