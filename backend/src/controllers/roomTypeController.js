@@ -75,6 +75,13 @@ class RoomTypeController {
           message: 'Type Name already exists for this Boarding House.',
         });
       }
+      // ✅ Kiểm tra Room Size: Chỉ chấp nhận "20x30" hoặc "30x40"
+      const validRoomSizes = ['20x30', '30x40'];
+      if (!validRoomSizes.includes(roomSize)) {
+        return res.status(400).json({
+          message: 'Room size must be either "20x30" or "30x40".',
+        });
+      }
 
       // ✅ Convert `facilities` từ string JSON thành array ObjectId
       if (!facilities || facilities === 'null' || facilities === '[]') {
@@ -160,6 +167,12 @@ class RoomTypeController {
       if (existingRoomType) {
         return res.status(400).json({
           message: 'Type Name already exists for this Boarding House.',
+        });
+      }
+      const validRoomSizes = ['20x30', '30x40'];
+      if (!validRoomSizes.includes(roomSize)) {
+        return res.status(400).json({
+          message: 'Room size must be either "20x30" or "30x40".',
         });
       }
 
