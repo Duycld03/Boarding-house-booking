@@ -7,7 +7,7 @@ import { FileTextOutlined } from '@ant-design/icons';
 import {
   getRoomTypeByBhId,
   softDeleteRoomType,
-} from '../../api/roomTypeManagement';
+} from '@/api/roomTypeManagement';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import formatAmount from '@/utils/formatAmount';

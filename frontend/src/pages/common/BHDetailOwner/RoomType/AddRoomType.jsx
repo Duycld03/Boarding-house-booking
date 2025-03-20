@@ -6,7 +6,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import {
   addRoomTypeToBoardingHouse,
   getAllFacilities,
-} from '../../api/roomTypeManagement';
+} from '@/api/roomTypeManagement';
 
 const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
