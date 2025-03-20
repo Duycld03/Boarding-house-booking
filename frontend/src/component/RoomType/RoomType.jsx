@@ -142,7 +142,7 @@ const RoomType = () => {
       key: 'roomSize',
     },
     {
-      title: 'Price',
+      title: 'Rent/month',
       dataIndex: 'price',
       key: 'price',
       render: (price) => formatAmount(price),

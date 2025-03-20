@@ -16,6 +16,8 @@ const ownerRouter = Router();
 ownerRouter.get('/', (req, res) => {
   res.send('This is a owner router');
 });
+
+//boarding house
 ownerRouter.get('/boardinghouseowner', boardingHouseController.getAllBHOwner);
 ownerRouter.get(
   '/boardinghouse/:id',
@@ -37,10 +39,14 @@ ownerRouter.delete(
   '/boardinghouse/:id/softDelete',
   boardingHouseController.softDeleteBoardingHouse
 );
+
+//review
 ownerRouter.post('/reply', ReviewController.replyReview);
 ownerRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
 ownerRouter.put('/review/updatereply', ReviewController.updateReplyReview);
 ownerRouter.delete('/review/reply', ReviewController.softDeleteReplyReview);
+
+//tenant
 ownerRouter.get(
   '/tenant/:boardingHouseId',
   tenantController.getTenantsByBoardingHouse
@@ -49,6 +55,11 @@ ownerRouter.delete(
   '/tenant/:boardingHouseId/:accountId',
   tenantController.deleteTenantFromBoardingHouse
 );
+
+//facilities
+ownerRouter.get('/facilities', FacilitiesController.getAllFacilities);
+
+//roomtype
 ownerRouter.get(
   '/boardinghouse/room-types/:id',
   roomTypeController.getRoomTypeByBhId
@@ -58,7 +69,6 @@ ownerRouter.post(
   upload.single('roomType'),
   roomTypeController.addRoomTypeToBoardingHouse
 );
-ownerRouter.get('/facilities', FacilitiesController.getAllFacilities);
 ownerRouter.put(
   '/boardinghouse/roomtype/:roomTypeId/',
   upload.single('roomType'), // Nếu có ảnh mới, upload lên Cloudinary
@@ -69,13 +79,16 @@ ownerRouter.delete(
   roomTypeController.softDeleteRoomType
 );
 
+//deposit
 ownerRouter.get(
   '/boardinghouse/deposit/:boardingHouseId',
   depositController.getAllDepositRooms
 );
 
-
 // room
-ownerRouter.get('/room/boarding-house/:boardingHouseId', roomController.getRoomsByBoardingHouse);
+ownerRouter.get(
+  '/room/boarding-house/:boardingHouseId',
+  roomController.getRoomsByBoardingHouse
+);
 
 export { ownerRouter };

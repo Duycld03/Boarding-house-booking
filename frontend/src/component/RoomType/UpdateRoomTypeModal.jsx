@@ -135,16 +135,24 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       toast.error('Room size must be in format 20x30 or 30x40.');
       return;
     }
-    if (
-      !formData.price ||
-      formData.price < 500000 ||
-      formData.price > 100000000
-    ) {
-      toast.error('Price must be between 500,000 and 100,000,000 VND.');
+    // if (
+    //   !formData.price ||
+    //   formData.price < 500000 ||
+    //   formData.price > 100000000
+    // ) {
+    //   toast.error('Price must be between 500,000 and 100,000,000 VND.');
+    //   return;
+    // }
+    if (!formData.price || isNaN(Number(formData.price))) {
+      toast.error('Please enter a valid number for rent/month!');
       return;
     }
     if (!formData.peopleNumber || formData.peopleNumber < 1) {
       toast.error('People number must be at least 1.');
+      return;
+    }
+    if (!formData.image) {
+      toast.error('You must upload an image.');
       return;
     }
 
@@ -195,7 +203,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       destroyOnClose
     >
       <Form layout="vertical">
-        <Form.Item label="Room Type Name" required>
+        <Form.Item label="Room Type Name" required className="mb-2">
           <Input
             placeholder="Enter room type name"
             name="typeName"
@@ -204,7 +212,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
           />
         </Form.Item>
 
-        <Form.Item label="Facilities">
+        <Form.Item label="Facilities" className="mb-2">
           <Select
             mode="multiple"
             placeholder="Select facilities"
@@ -219,7 +227,11 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Room Size (e.g., 20x30, 30x40)" required>
+        <Form.Item
+          label="Room Size (e.g., 20x30, 30x40)"
+          required
+          className="mb-2"
+        >
           <Input
             placeholder="Enter room size"
             name="roomSize"
@@ -228,11 +240,11 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
           />
         </Form.Item>
 
-        <Form.Item label="Price (VND)" required>
+        <Form.Item label="Rent/month" required className="mb-2">
           <InputNumber
-            placeholder="Enter price"
+            placeholder="Enter rent/month"
             name="price"
-            value={formData.price}
+            value={formData.price ? Number(formData.price) : undefined} // Đảm bảo là số hoặc undefined
             onChange={(value) =>
               setFormData((prev) => ({ ...prev, price: value }))
             }
@@ -244,7 +256,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
           />
         </Form.Item>
 
-        <Form.Item label="People Number" required>
+        <Form.Item label="People Number" required className="mb-2">
           <InputNumber
             placeholder="Enter number of people"
             name="peopleNumber"
@@ -256,7 +268,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
           />
         </Form.Item>
 
-        <Form.Item label="Room Image">
+        <Form.Item label="Room Image" className="mb-2">
           {!imagePreview ? (
             <Upload
               {...uploadProps}

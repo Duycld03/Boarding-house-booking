@@ -114,12 +114,16 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         toast.error('Room size must be in format 20x30 or 30x40.');
         return;
       }
-      if (
-        !formData.price ||
-        formData.price < 500000 ||
-        formData.price > 100000000
-      ) {
-        toast.error('Price must be between 500,000 and 100,000,000 VND.');
+      // if (
+      //   !formData.price ||
+      //   formData.price < 500000 ||
+      //   formData.price > 100000000
+      // ) {
+      //   toast.error('Price must be between 500,000 and 100,000,000 VND.');
+      //   return;
+      // }
+      if (!formData.price || formData.price < 0) {
+        toast.error('Please enter rent/month valid!');
         return;
       }
       if (!formData.peopleNumber || formData.peopleNumber < 1) {
@@ -195,7 +199,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
           onSubmitCapture={handleSubmit}
         >
           {/* Type Name */}
-          <Form.Item label="Room Type Name" required>
+          <Form.Item label="Room Type Name" required className="mb-2">
             <Input
               placeholder="Enter room type name"
               name="typeName"
@@ -203,7 +207,12 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               onChange={handleInputChange}
             />
           </Form.Item>
-          <Form.Item label="Facilities" name="facilities" className="mb-2">
+          <Form.Item
+            label="Facilities"
+            name="facilities"
+            className="mb-2"
+            // style={{ marginBottom: 24 }}
+          >
             <Select
               mode="multiple"
               placeholder="Select facilities"
@@ -219,7 +228,11 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
           </Form.Item>
 
           {/* Room Size */}
-          <Form.Item label="Room Size (e.g., 20x30, 30x40)" required>
+          <Form.Item
+            label="Room Size (e.g., 20x30, 30x40)"
+            required
+            className="mb-2"
+          >
             <Input
               placeholder="Enter room size"
               name="roomSize"
@@ -229,9 +242,9 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
           </Form.Item>
 
           {/* Price */}
-          <Form.Item label="Price (VND)" required>
+          <Form.Item label="Rent/month" required className="mb-2">
             <InputNumber
-              placeholder="Enter price"
+              placeholder="Enter rent/month"
               name="price"
               value={formData.price}
               onChange={(value) =>
@@ -246,7 +259,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
           </Form.Item>
 
           {/* People Number */}
-          <Form.Item label="People Number" required>
+          <Form.Item label="People Number" required className="mb-2">
             <InputNumber
               placeholder="Enter number of people"
               name="peopleNumber"
@@ -259,7 +272,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
           </Form.Item>
 
           {/* Image Upload */}
-          <Form.Item label="Room Image" required>
+          <Form.Item label="Room Image" required className="mb-2">
             {!formData.image ? (
               <Upload
                 {...uploadProps}
