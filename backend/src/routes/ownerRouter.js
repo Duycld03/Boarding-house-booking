@@ -58,11 +58,14 @@ ownerRouter.get(
   '/room/boarding-house/:boardingHouseId',
   roomController.getRoomsByBoardingHouse
 );
+//renewal
 ownerRouter.get(
   '/renewal/boarding-house/:boardingHouseId',
   renewalRequesrController.getRenewalRequestByBhID
 );
-
-//renewal
+ownerRouter.put(
+  '/renewal/:requestId',
+  renewalRequesrController.acceptExtensionRequest
+);
 
 export { ownerRouter };

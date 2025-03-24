@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import Room from '../models/room.js';
 import ExtensionRequest from '../models/extensionRequest.js';
 import BoardingHouse from '../models/boardingHouse.js';
+import DepositRoom from '../models/depositRoom.js';
+
 import Account from '../models/account.js'; // import model Account
 
 class RenewalRequestController {
@@ -73,6 +75,56 @@ class RenewalRequestController {
     } catch (error) {
       // Nếu có lỗi, chuyển qua middleware error handling
       next(error);
+    }
+  }
+  async acceptExtensionRequest(req, res, next) {
+    const { requestId } = req.params; // ExtensionRequest ID
+
+    try {
+      // Step 1: Find the extension request by ID
+      const extensionRequest = await ExtensionRequest.findById(requestId)
+        .populate('roomId')
+        .populate('accountId');
+
+      if (!extensionRequest) {
+        return res.status(404).json({ message: 'Extension request not found' });
+      }
+
+      // Step 2: Check if the request is pending
+      if (extensionRequest.status !== 'pending') {
+        return res
+          .status(400)
+          .json({ message: 'Only pending requests can be accepted' });
+      }
+
+      // Step 3: Update the status of the extension request to 'accepted'
+      extensionRequest.status = 'accepted';
+      await extensionRequest.save();
+
+      // Step 4: Find the corresponding DepositRoom and update the endDate
+      const deposit = await DepositRoom.findOne({
+        accountId: extensionRequest.accountId,
+        roomId: extensionRequest.roomId,
+      });
+
+      if (!deposit) {
+        return res
+          .status(404)
+          .json({ message: 'Deposit record not found for the room' });
+      }
+
+      // Update the deposit's endDate to the requested end date from ExtensionRequest
+      deposit.endDate = extensionRequest.requestedEndDate;
+      await deposit.save();
+
+      // Step 5: Respond with success
+      res.status(200).json({
+        message: 'Extension request accepted and deposit updated successfully',
+        data: extensionRequest,
+      });
+    } catch (error) {
+      console.error('Error accepting extension request:', error);
+      res.status(500).json({ message: 'Server error' });
     }
   }
 }
