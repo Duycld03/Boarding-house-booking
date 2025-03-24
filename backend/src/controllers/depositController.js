@@ -508,6 +508,73 @@ class DepositController {
       res.status(500).json({ message: 'Server error', error });
     }
   }
+  async rejectDepositRoom(req, res) {
+    try {
+      const { depositId } = req.params;
+      const { reasonForCancel } = req.body; // Lấy lý do hủy từ request body
+
+      if (!reasonForCancel) {
+        return res
+          .status(400)
+          .json({ error: 'Reason for rejection is required' });
+      }
+
+      // Lấy thông tin khoản đặt cọc
+      const deposit = await DepositRoom.findById(depositId)
+        .populate({ path: 'accountId', select: 'fullname email' })
+        .populate({ path: 'roomId', select: 'roomNumber' });
+
+      if (!deposit) {
+        return res.status(404).json({ error: 'Không tìm thấy khoản đặt cọc' });
+      }
+
+      // Cập nhật status thành 'rejected' và thêm lý do hủy
+      deposit.status = 'rejected';
+      deposit.reasonForCancel = reasonForCancel; // Thêm lý do hủy vào đối tượng deposit
+      await deposit.save();
+
+      // Config mail server (nhớ đổi tài khoản của bạn)
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'todohongy@gmail.com', // Thay bằng email của bạn
+          pass: 'ersq syrb ihov ilvx', // Thay bằng App Password
+        },
+      });
+
+      const mailOptions = {
+        from: 'support@example.com',
+        to: deposit.accountId.email,
+        subject: 'Đặt cọc phòng trọ đã bị từ chối ❌',
+        html: `
+        <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
+        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> đã bị <span style="color:red;"><strong>từ chối</strong></span>.</p>
+        <ul>
+          <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
+          <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
+          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format('DD/MM/YYYY')}</li>
+          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format('DD/MM/YYYY')}</li>
+          <li><strong>Lý do từ chối:</strong> ${reasonForCancel}</li>
+        </ul>
+        <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại.</p>
+        <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
+      `,
+      };
+
+      // Gửi mail
+      await transporter.sendMail(mailOptions);
+
+      return res.status(200).json({
+        message: 'Đã từ chối khoản đặt cọc và gửi email thành công.',
+        depositId: deposit._id,
+      });
+    } catch (error) {
+      console.error('Error rejecting deposit room:', error);
+      return res
+        .status(500)
+        .json({ error: 'Đã có lỗi xảy ra', detail: error.message });
+    }
+  }
 }
 const createVNPayUrl = async (req, res, amount, orderInfo) => {
   process.env.TZ = 'Asia/Ho_Chi_Minh';

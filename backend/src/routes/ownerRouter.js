@@ -55,6 +55,10 @@ ownerRouter.put(
   '/acceptdeposit/:depositId',
   depositController.acceptDepositRoom
 );
+ownerRouter.put(
+  '/rejectdeposit/:depositId',
+  depositController.rejectDepositRoom
+);
 
 // room
 ownerRouter.get(
