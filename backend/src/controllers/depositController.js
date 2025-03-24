@@ -8,6 +8,7 @@ import Room from '../models/room.js';
 import PaymentBill from '../models/paymentBill.js';
 import dotenv from 'dotenv';
 import UserPayment from '../models/userPayment.js';
+import nodemailer from 'nodemailer';
 dotenv.config();
 
 const config = {
@@ -407,6 +408,77 @@ class DepositController {
     } catch (error) {
       console.error('Error getting all deposited rooms:', error);
       res.status(500).json({ message: 'Server error', error });
+    }
+  }
+  async acceptDepositRoom(req, res) {
+    try {
+      const { depositId } = req.params;
+
+      // Lấy thông tin khoản đặt cọc
+      const deposit = await DepositRoom.findById(depositId)
+        .populate({ path: 'accountId', select: 'fullname email' })
+        .populate({ path: 'roomId', select: 'roomNumber' });
+
+      if (!deposit) {
+        return res.status(404).json({ error: 'Không tìm thấy khoản đặt cọc' });
+      }
+
+      // Cập nhật status thành 'accepted'
+      deposit.status = 'accepted';
+      await deposit.save();
+      // Cập nhật rentBy trong Room
+      const room = await Room.findById(deposit.roomId);
+      if (!room) {
+        return res.status(404).json({ error: 'Không tìm thấy phòng trọ' });
+      }
+
+      // Kiểm tra nếu accountId chưa có trong rentBy thì thêm vào
+      if (!room.rentBy.includes(deposit.accountId._id)) {
+        // Cập nhật rentBy mà không thay đổi các trường khác trong Room
+        await Room.updateOne(
+          { _id: deposit.roomId },
+          { $addToSet: { rentBy: deposit.accountId._id } } // Sử dụng $addToSet để thêm nếu chưa có
+        );
+      }
+      // Config mail server (nhớ đổi tài khoản của bạn)
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'todohongy@gmail.com',
+          pass: 'ersq syrb ihov ilvx', // App Password
+        },
+      });
+
+      const mailOptions = {
+        from: 'support@example.com',
+        to: deposit.accountId.email,
+        subject: 'Đặt cọc phòng trọ đã được chấp nhận ✅',
+        html: `
+        <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
+        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> đã được <span style="color:green;"><strong>chấp nhận</strong></span> thành công.</p>
+        <ul>
+          <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
+          <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
+          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format('DD/MM/YYYY')}</li>
+          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format('DD/MM/YYYY')}</li>
+        </ul>
+        <p>Hãy giữ liên lạc với chủ nhà để hoàn tất thủ tục tiếp theo nhé!</p>
+        <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
+      `,
+      };
+
+      // Gửi mail
+      await transporter.sendMail(mailOptions);
+
+      return res.status(200).json({
+        message: 'Đã chấp nhận khoản đặt cọc và gửi email thành công.',
+        depositId: deposit._id,
+      });
+    } catch (error) {
+      console.error('Error accepting deposit room:', error);
+      return res
+        .status(500)
+        .json({ error: 'Đã có lỗi xảy ra', detail: error.message });
     }
   }
 

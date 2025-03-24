@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Tag } from 'antd';
+import { Tag } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import { getAllDepositRooms } from '../../../../api/depositManagement';
 import { useParams } from 'react-router-dom';
 import Table from '@/component/Table';
 import formatAmount from '@/utils/formatAmount';
+import { Button } from '@/component';
 
 const DepositRoom = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -94,21 +95,28 @@ const DepositRoom = () => {
     },
     {
       title: 'Action',
-      key: 'action',
-      //   render: (_, record) => (
-      //     <Button
-      //       disabled={record.status === 'pending'}
-      //       size="large"
-      //       title="Detail"
-      //       icon={<FileTextOutlined />}
-      //       onClick={() => {
-      //         setDepositRoomId(record._id);
-      //         setIsModalVisible(true);
-      //       }}
-      //       className="text-white"
-      //       style={{ backgroundColor: 'rgb(5 150 105)', color: 'white' }}
-      //     />
-      //   ),
+      render: (record) =>
+        record.status === 'pending' && (
+          <div className="flex gap-3 items-center">
+            <Button
+              title={'Reject'}
+              iconPosition="left"
+              btnReject
+              size="large"
+              style={{ backgroundColor: 'red', color: 'white', border: 'none' }}
+              // onClick={() => handleReject(record)} // Open reject modal
+            ></Button>
+
+            <Button
+              title={'Accept'}
+              size="large"
+              btnAccept
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+              // onClick={() => handleAccept(record)} // Trigger accept action
+            ></Button>
+          </div>
+        ),
     },
   ];
 

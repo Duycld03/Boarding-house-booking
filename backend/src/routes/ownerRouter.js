@@ -51,9 +51,15 @@ ownerRouter.get(
   '/boardinghouse/deposit/:boardingHouseId',
   depositController.getAllDepositRooms
 );
-
+ownerRouter.put(
+  '/acceptdeposit/:depositId',
+  depositController.acceptDepositRoom
+);
 
 // room
-ownerRouter.get('/room/boarding-house/:boardingHouseId', roomController.getRoomsByBoardingHouse);
+ownerRouter.get(
+  '/room/boarding-house/:boardingHouseId',
+  roomController.getRoomsByBoardingHouse
+);
 
 export { ownerRouter };
