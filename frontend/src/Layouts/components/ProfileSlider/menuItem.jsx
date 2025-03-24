@@ -69,6 +69,7 @@ const getMenuItems = () => {
       icon: <FontAwesomeIcon icon={faMoneyBill} />,
       visible: isUser,
     },
+    {
       key: "my-deposit-refund-request",
       label: (
         <Link to="/my-deposit-refund-request">My Deposit Refund Request</Link>
@@ -84,7 +85,6 @@ const getMenuItems = () => {
       icon: <RollbackOutlined />,
       visible: isOwner,
     },
-
   ];
 
   return menuItems.filter((item) => item.visible);
