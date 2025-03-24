@@ -293,6 +293,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
                   src={URL.createObjectURL(formData.image)}
                   alt="Room Image"
                   className="w-full rounded"
+                  style={{ width: '200px', height: '200px' }}
                 />
                 <button
                   onClick={handleRemoveImage}

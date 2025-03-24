@@ -289,6 +289,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
                 src={imagePreview}
                 alt="Room Image"
                 className="w-full rounded"
+                style={{ width: '200px', height: '200px' }}
               />
               <button
                 onClick={handleRemoveImage}
