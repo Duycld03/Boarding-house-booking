@@ -29,7 +29,7 @@ export {
   depositController,
   FacilitiesController,
   roomTypeController,
-  userPaymentController
+  userPaymentController,
   tenantController,
   refundRequestController,
 };

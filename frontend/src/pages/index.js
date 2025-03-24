@@ -21,7 +21,7 @@ import {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
-  MyRentPayment
+  MyRentPayment,
   MyDepositRefundRequest,
   DepositRefundRequestOwner,
 } from "./common";

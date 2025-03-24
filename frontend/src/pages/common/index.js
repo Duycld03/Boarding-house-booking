@@ -29,7 +29,7 @@ export {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
-  MyRentPayment
+  MyRentPayment,
   MyDepositRefundRequest,
   DepositRefundRequestOwner,
 };
