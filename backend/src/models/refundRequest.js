@@ -23,7 +23,6 @@ const refundRequestSchema = new mongoose.Schema(
     },
     reason: {
       type: String,
-      required: true,
     },
     reasonForCancel: {
       type: String,
