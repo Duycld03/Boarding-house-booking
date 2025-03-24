@@ -72,7 +72,7 @@ class RefundRequestController {
     }
   }
   async cancelRefundRequestsForOwner(req, res) {
-    const { cancelReason } = req.body; // Lý do hủy nhận từ body
+    const { reasonForCancel } = req.body; // Lý do hủy nhận từ body
     const { refundRequestId } = req.params; // ID yêu cầu hoàn tiền nhận từ params
 
     try {
@@ -102,7 +102,7 @@ class RefundRequestController {
 
       // Cập nhật trạng thái và lý do hủy, các trường khác giữ nguyên
       refundRequest.status = 'canceled';
-      refundRequest.reasonForCancel = cancelReason || ''; // Lưu lý do hủy (có thể là chuỗi rỗng nếu không có lý do)
+      refundRequest.reasonForCancel = reasonForCancel || ''; // Lưu lý do hủy (có thể là chuỗi rỗng nếu không có lý do)
 
       // Lưu thay đổi vào database
       await refundRequest.save();
