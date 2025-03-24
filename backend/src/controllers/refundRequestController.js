@@ -11,6 +11,10 @@ class RefundRequestController {
           path: 'depositRoomId',
           populate: {
             path: 'roomId',
+            populate: {
+              path: 'boardingHouseId', // Populate boardingHouseId để lấy thông tin tên
+              select: 'name', // Chỉ lấy trường 'name' của boardingHouse
+            },
           },
         })
         .sort({ createdAt: -1 });
@@ -25,9 +29,12 @@ class RefundRequestController {
           amountRefunded: refundRequest.amountRefunded,
           status: refundRequest.status,
           reason: refundRequest.reason,
+          boardingHouseName:
+            refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || 'N/A', // Thêm tên boardingHouse vào
           createdAt: moment(refundRequest.createdAt).format('DD/MM/YYYY'),
         };
       });
+
       return res.json(data);
     } catch (error) {
       console.log('Error getting refund requests:', error);
@@ -44,6 +51,7 @@ class RefundRequestController {
           populate: {
             path: 'boardingHouseId',
             match: { ownerId: req.user.userId },
+            select: 'name',
           },
         },
       });
@@ -60,6 +68,8 @@ class RefundRequestController {
             'DD/MM/YYYY'
           ),
           amountRefunded: refundRequest.amountRefunded,
+          boardingHouseName:
+            refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || 'N/A', // Lấy tên của boardingHouse
           status: refundRequest.status,
           reason: refundRequest.reason,
           createdAt: moment(refundRequest.createdAt).format('DD/MM/YYYY'),

@@ -23,6 +23,11 @@ function DepositRefundRequestOwner() {
 
   const columns = [
     {
+      title: 'Boarding House Name',
+      dataIndex: 'boardingHouseName',
+      key: 'boardingHouseName',
+    },
+    {
       title: 'Room Number',
       dataIndex: 'roomNumber',
       key: 'roomNumber',
