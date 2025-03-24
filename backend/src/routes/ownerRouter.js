@@ -6,6 +6,7 @@ import {
   tenantController,
   roomController,
   depositController,
+  refundRequestController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -62,7 +63,21 @@ ownerRouter.get(
   '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
   depositController.getMaxRentTime
 );
+
 // room
-ownerRouter.get('/room/boarding-house/:boardingHouseId', roomController.getRoomsByBoardingHouse);
+ownerRouter.get(
+  '/room/boarding-house/:boardingHouseId',
+  roomController.getRoomsByBoardingHouse
+);
+
+// refund request
+ownerRouter.get(
+  '/refund-requests',
+  refundRequestController.getRefundRequestsForOwner
+);
+ownerRouter.put(
+  '/refund-request/:refundRequestId',
+  refundRequestController.cancelRefundRequestsForOwner
+);
 
 export { ownerRouter };
