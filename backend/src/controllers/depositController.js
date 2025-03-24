@@ -427,19 +427,7 @@ class DepositController {
       deposit.status = 'accepted';
       await deposit.save();
       // Cập nhật rentBy trong Room
-      const room = await Room.findById(deposit.roomId);
-      if (!room) {
-        return res.status(404).json({ error: 'Không tìm thấy phòng trọ' });
-      }
-
-      // Kiểm tra nếu accountId chưa có trong rentBy thì thêm vào
-      if (!room.rentBy.includes(deposit.accountId._id)) {
-        // Cập nhật rentBy mà không thay đổi các trường khác trong Room
-        await Room.updateOne(
-          { _id: deposit.roomId },
-          { $addToSet: { rentBy: deposit.accountId._id } } // Sử dụng $addToSet để thêm nếu chưa có
-        );
-      }
+     
       // Config mail server (nhớ đổi tài khoản của bạn)
       const transporter = nodemailer.createTransport({
         service: 'gmail',
