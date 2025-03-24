@@ -16,6 +16,7 @@ const DepositRoom = () => {
   const [depositedRooms, setDepositedRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false); // State for confirmation modal visibility
+  const [confirmLoading, setConfirmLoading] = useState(false); // State to manage loading in confirm modal
   const [selectedRoom, setSelectedRoom] = useState(null); // Store selected room for accept action
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false); // State for reject modal visibility
   const [reasonForCancel, setReasonForCancel] = useState(''); // Store rejection reason
@@ -46,12 +47,14 @@ const DepositRoom = () => {
   };
 
   const handleConfirmAccept = async () => {
-    try {
-      if (!selectedRoom) {
-        toast.error('No room selected!');
-        return;
-      }
+    if (!selectedRoom) {
+      toast.error('No room selected!');
+      return;
+    }
 
+    setConfirmLoading(true); // Start loading when accepting the room
+
+    try {
       await acceptDepositRoom(selectedRoom._id); // Assuming you pass room ID to accept
 
       toast.success('Deposit room accepted successfully.');
@@ -60,6 +63,8 @@ const DepositRoom = () => {
     } catch (error) {
       console.error('Error accepting deposit room:', error);
       toast.error('An error occurred while accepting the deposit room.');
+    } finally {
+      setConfirmLoading(false); // Stop loading after the action is completed
     }
   };
 
@@ -168,6 +173,7 @@ const DepositRoom = () => {
               size="large"
               style={{ backgroundColor: 'red', color: 'white', border: 'none' }}
               onClick={() => handleReject(record)} // Open reject modal
+              loading={rejectLoading} // Add loading indicator to the reject button
             ></Button>
 
             <Button
@@ -176,7 +182,8 @@ const DepositRoom = () => {
               btnAccept
               className="text-white"
               bgColor="rgb(5 150 105)"
-              onClick={() => handleAccept(record)} // Trigger accept action
+              onClick={() => handleAccept(record)}
+              loading={confirmLoading} // Add loading indicator to the reject button
             ></Button>
           </div>
         ),
@@ -192,7 +199,9 @@ const DepositRoom = () => {
         onOk={handleConfirmAccept}
         onCancel={handleCancelModal}
         isOpen={isModalVisible}
+        confirmLoading={confirmLoading} // Make sure to pass confirmLoading here
       />
+
       <Modal
         title="Reject Deposit Request"
         visible={isRejectModalOpen}
@@ -200,7 +209,7 @@ const DepositRoom = () => {
         onCancel={handleCancelRejectModal}
         okText="Reject"
         width="400px"
-        confirmLoading={rejectLoading} // Add confirm loading to modal
+        confirmLoading={rejectLoading} // Add confirm loading to reject modal
       >
         <Form layout="vertical">
           <Form.Item
