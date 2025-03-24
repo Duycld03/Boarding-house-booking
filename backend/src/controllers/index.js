@@ -10,8 +10,9 @@ import roomController from "./roomController.js";
 import watchLaterController from "./watchLaterController.js";
 import depositController from "./depositController.js";
 import FacilitiesController from "./facilitiesController.js";
-import roomTypeController from "./roomTypeController.js";
-import tenantController from "./tenantController.js";
+import userPaymentController from "./userPaymentController.js";
+import roomTypeController from './roomTypeController.js';
+import tenantController from './tenantController.js';
 import refundRequestController from "./refundRequestController.js";
 
 export {
@@ -28,6 +29,7 @@ export {
   depositController,
   FacilitiesController,
   roomTypeController,
+  userPaymentController
   tenantController,
   refundRequestController,
 };

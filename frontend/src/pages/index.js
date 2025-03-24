@@ -21,6 +21,7 @@ import {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRentPayment
   MyDepositRefundRequest,
   DepositRefundRequestOwner,
 } from "./common";
@@ -58,6 +59,7 @@ export {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRentPayment,
   MyDepositRefundRequest,
 
   // owner

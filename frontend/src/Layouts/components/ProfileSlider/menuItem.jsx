@@ -11,6 +11,9 @@ import {
 import { useCurrentUser } from "../../../context/userContext";
 import userRole from "../../../constants/userRole";
 
+import { faMoneyBill } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 const getMenuItems = () => {
   const { hasRole } = useCurrentUser(); // Lấy thông tin user từ context
 
@@ -61,6 +64,11 @@ const getMenuItems = () => {
       visible: isUser,
     },
     {
+      key: "my-rent-room",
+      label: <Link to="/my-rent-payment">My Rent Payment</Link>,
+      icon: <FontAwesomeIcon icon={faMoneyBill} />,
+      visible: isUser,
+    },
       key: "my-deposit-refund-request",
       label: (
         <Link to="/my-deposit-refund-request">My Deposit Refund Request</Link>
@@ -76,6 +84,7 @@ const getMenuItems = () => {
       icon: <RollbackOutlined />,
       visible: isOwner,
     },
+
   ];
 
   return menuItems.filter((item) => item.visible);

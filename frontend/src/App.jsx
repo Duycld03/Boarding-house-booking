@@ -28,7 +28,7 @@ function App() {
             />
           );
         })}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/error-page" replace />} />
       </Routes>
       <ToastContainer />
     </div>
