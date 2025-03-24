@@ -128,6 +128,34 @@ class RenewalRequestController {
       res.status(500).json({ message: 'Server error' });
     }
   }
+  async rejectExtensionRequest(req, res, next) {
+    const { requestId } = req.params; // ExtensionRequest ID
+    const { reasonForCancel } = req.body; // Reason for cancellation when rejecting
+
+    try {
+      // Step 1: Find the extension request by ID
+      const extensionRequest = await ExtensionRequest.findById(requestId)
+        .populate('roomId')
+        .populate('accountId');
+
+      if (!extensionRequest) {
+        return res.status(404).json({ message: 'Extension request not found' });
+      }
+      // Step 3: Reject the request
+      extensionRequest.status = 'rejected';
+      extensionRequest.reasonForCancel = reasonForCancel; // Store the reason for rejection
+      await extensionRequest.save();
+
+      // Step 4: Respond with success
+      res.status(200).json({
+        message: 'Extension request rejected successfully',
+        data: extensionRequest,
+      });
+    } catch (error) {
+      console.error('Error rejecting extension request:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
 }
 
 export default new RenewalRequestController();

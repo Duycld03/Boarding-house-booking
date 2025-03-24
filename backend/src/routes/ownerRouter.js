@@ -67,5 +67,8 @@ ownerRouter.put(
   '/renewal/:requestId',
   renewalRequesrController.acceptExtensionRequest
 );
-
+ownerRouter.put(
+  '/rejectrenewal/:requestId',
+  renewalRequesrController.rejectExtensionRequest
+);
 export { ownerRouter };
