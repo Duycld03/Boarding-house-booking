@@ -51,12 +51,16 @@ class RenewalRequestController {
             room.boardingHouseId
           );
 
+          // Lấy status của yêu cầu gia hạn
+          const status = request.status || 'pending'; // Default to 'pending' if no status
+
           return {
             tenantName: tenant, // Tên người tạo yêu cầu
             roomNumber: roomNumber, // Số phòng
             boardingHouseName: boardingHouse ? boardingHouse.name : 'Unknown',
             currentEndDate: request.currentEndDate,
             requestedEndDate: request.requestedEndDate,
+            status: status, // Trả về trạng thái của yêu cầu
           };
         })
       );

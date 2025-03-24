@@ -806,7 +806,7 @@ const BHDetailOwner = () => {
           <TenantManagement />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Renewal Management" key="Renewal Request Management">
-          <RenewalRequest />
+          <RenewalRequest boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
       </Tabs>
     </div>
