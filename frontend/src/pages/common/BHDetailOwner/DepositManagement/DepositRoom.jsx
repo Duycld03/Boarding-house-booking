@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Tag } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
-import { getAllDepositRooms } from '../../api/depositManagement';
+import { getAllDepositRooms } from '../../../../api/depositManagement';
 import { useParams } from 'react-router-dom';
 import Table from '@/component/Table';
 import formatAmount from '@/utils/formatAmount';
