@@ -6,6 +6,7 @@ import {
   VideoCameraOutlined,
   SnippetsOutlined,
   ContainerOutlined,
+  RollbackOutlined,
 } from "@ant-design/icons";
 import { useCurrentUser } from "../../../context/userContext";
 import userRole from "../../../constants/userRole";
@@ -68,6 +69,22 @@ const getMenuItems = () => {
       icon: <FontAwesomeIcon icon={faMoneyBill} />,
       visible: isUser,
     },
+      key: "my-deposit-refund-request",
+      label: (
+        <Link to="/my-deposit-refund-request">My Deposit Refund Request</Link>
+      ),
+      icon: <RollbackOutlined />,
+      visible: isUser,
+    },
+    {
+      key: "refund-request-management",
+      label: (
+        <Link to="/refund-request-management">Deposit Refund Management</Link>
+      ),
+      icon: <RollbackOutlined />,
+      visible: isOwner,
+    },
+
   ];
 
   return menuItems.filter((item) => item.visible);
