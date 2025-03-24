@@ -3,8 +3,13 @@ import { TableCustom as Table, Button } from '@/component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import convertTimetap from '@/utils/convertTimetap';
-import { getRenewalRequestByBhID } from '@/api/renewalRequestManagement';
+import {
+  getRenewalRequestByBhID,
+  acceptExtensionRequest,
+} from '@/api/renewalRequestManagement';
 import { Tag } from 'antd';
+import ConfirmModal from '@/component/ConfirmModal';
+import { toast } from 'react-toastify';
 
 const RenewalRequest = ({ boardingHouseId }) => {
   // Status colors
@@ -14,38 +19,39 @@ const RenewalRequest = ({ boardingHouseId }) => {
     rejected: 'red',
   };
 
-  // State for storing requests
+  // State for storing requests and modal
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   // Fetch renewal requests when component mounts
-  useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const response = await getRenewalRequestByBhID(boardingHouseId);
-        console.log('API Response:', response); // Log the entire response to check if the structure is correct
+  const fetchRequests = async () => {
+    try {
+      const response = await getRenewalRequestByBhID(boardingHouseId);
+      console.log('API Response:', response);
 
-        if (response?.data?.length > 0) {
-          setRequests(response.data); // Set the fetched data to state
-        } else {
-          setRequests([]); // If no data or failure
-        }
-
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch renewal requests:', error);
-        setLoading(false); // Set loading to false even in case of error
+      if (response?.data?.length > 0) {
+        setRequests(response.data);
+      } else {
+        setRequests([]);
       }
-    };
 
+      setLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch renewal requests:', error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchRequests();
-  }, [boardingHouseId]); // Trigger the effect whenever boardingHouseId changes
+  }, [boardingHouseId]);
 
   // Handle Reject action
   const handleReject = (record) => {
     const updatedRequests = requests.map((request) =>
       request.roomNumber === record.roomNumber
-        ? { ...request, status: 'rejected' } // Update status to rejected
+        ? { ...request, status: 'rejected' }
         : request
     );
     setRequests(updatedRequests);
@@ -54,13 +60,33 @@ const RenewalRequest = ({ boardingHouseId }) => {
 
   // Handle Accept action
   const handleAccept = (record) => {
-    const updatedRequests = requests.map((request) =>
-      request.roomNumber === record.roomNumber
-        ? { ...request, status: 'accepted' } // Update status to accepted
-        : request
-    );
-    setRequests(updatedRequests);
-    console.log(`Accepted request for room: ${record.roomNumber}`);
+    setSelectedRequest(record); // Ensure selectedRequest includes requestId
+    setIsModalOpen(true); // Open the confirmation modal
+  };
+
+  // Confirm accept action from modal
+  const handleConfirmAccept = async () => {
+    try {
+      if (!selectedRequest?.requestId) {
+        console.error('Request ID is missing');
+        return;
+      }
+
+      // Make the API call to accept the extension request
+      await acceptExtensionRequest(selectedRequest?.requestId);
+      toast.success('Accepted renewal request successfully.');
+      setIsModalOpen(false);
+      fetchRequests();
+    } catch (error) {
+      console.error('Error accepting renewal request:', error);
+      toast.error('An error occurred while accepting the renewal request.');
+    }
+  };
+
+  // Cancel modal
+  const handleCancelModal = () => {
+    setIsModalOpen(false);
+    setSelectedRequest(null); // Reset the selected request
   };
 
   const columns = [
@@ -100,15 +126,15 @@ const RenewalRequest = ({ boardingHouseId }) => {
     {
       title: 'Action',
       render: (record) =>
-        record.status === 'pending' && ( // Only show buttons for "pending" status
+        record.status === 'pending' && (
           <div className="flex gap-3 items-center">
             <Button
               title={'Reject'}
               iconPosition="left"
               btnReject
               size="large"
-              style={{ backgroundColor: 'red', color: 'white', border: 'none' }} // Button style for red background and white text
-              onClick={() => handleReject(record)} // Trigger reject action
+              style={{ backgroundColor: 'red', color: 'white', border: 'none' }}
+              onClick={() => handleReject(record)}
             >
               <FontAwesomeIcon icon={faTimes} /> Reject
             </Button>
@@ -130,10 +156,15 @@ const RenewalRequest = ({ boardingHouseId }) => {
 
   return (
     <div>
-      <Table
-        data={requests} // Ensure you're using dataSource for Ant Design Table
-        columns={columns}
-        loading={loading}
+      <Table data={requests} columns={columns} loading={loading} />
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        title="Confirm Acceptance"
+        content={`Are you sure you want to accept the renewal request for room ${selectedRequest?.roomNumber}?`}
+        onOk={handleConfirmAccept}
+        onCancel={handleCancelModal}
+        isOpen={isModalOpen}
       />
     </div>
   );

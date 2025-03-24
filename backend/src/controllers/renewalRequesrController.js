@@ -57,6 +57,7 @@ class RenewalRequestController {
           const status = request.status || 'pending'; // Default to 'pending' if no status
 
           return {
+            requestId: request._id,
             tenantName: tenant, // Tên người tạo yêu cầu
             roomNumber: roomNumber, // Số phòng
             boardingHouseName: boardingHouse ? boardingHouse.name : 'Unknown',
