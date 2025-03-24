@@ -8,6 +8,7 @@ import Room from "../models/room.js";
 import PaymentBill from "../models/paymentBill.js";
 import dotenv from "dotenv";
 import UserPayment from "../models/userPayment.js";
+import { query } from "express";
 dotenv.config();
 
 const config = {
@@ -46,7 +47,7 @@ class DepositController {
         amount: price,
         rentalTime: rentalTimeNumber,
         startDate: rentalDate[0],
-        endDate: rentalDate[1],
+        endDate: rentalDate,
       });
 
       res.status(200).json({ message: "Deposit successfully" });
@@ -153,7 +154,7 @@ class DepositController {
 
     if (secureHash === signed && vnp_Params["vnp_ResponseCode"] === "00") {
       if (type == "deposit") {
-        const accountId = orderInfo[1];
+        const accountId = orderInfo;
         const depositRoomId = orderInfo[2];
 
         const depositRoom = await DepositRoom.findOne({
@@ -173,7 +174,7 @@ class DepositController {
         return res.redirect(redirectUrl);
       }
       // pay rent
-      const userId = orderInfo[1];
+      const userId = orderInfo;
       const paymentBillId = orderInfo[2];
 
       const userPayment = await UserPayment.findOne({
@@ -230,7 +231,7 @@ class DepositController {
 
       if (resultCode == "0") {
         if (type == "deposit") {
-          const accountId = orderInfo[1];
+          const accountId = orderInfo;
           const depositRoomId = orderInfo[2];
 
           const depositRoom = await DepositRoom.findOne({
@@ -250,7 +251,7 @@ class DepositController {
           return res.redirect(redirectUrl);
         }
         // pay rent
-        const userId = orderInfo[1];
+        const userId = orderInfo;
         const paymentBillId = orderInfo[2];
 
         const userPayment = await UserPayment.findOne({
@@ -375,6 +376,17 @@ class DepositController {
       const { boardingHouseId } = req.params;
       const { status, priceRange, endDate, roomId, rentalTime } = req.query;
 
+      const defaultFilter = {
+        status: '',
+        priceRange: ['0', '3000000'],
+        rentalTime: ['1', '2'],
+        roomId: ''
+      }
+
+      if (req.query === defaultFilter) {
+
+      }
+
       const rooms = await Room.find({ boardingHouseId }).select("_id roomNumber");
       const roomMap = new Map(rooms.map(room => [room._id.toString(), room.roomNumber]));
       let filter = { roomId: { $in: [...roomMap.keys()] } };
@@ -394,7 +406,7 @@ class DepositController {
           else if (Array.isArray(endDate) && endDate.length === 2) {
             filter.endDate = {
               $gte: new Date(endDate[0]),
-              $lte: new Date(endDate[1]),
+              $lte: new Date(endDate),
             };
           }
           else if (endDate) {
@@ -474,7 +486,6 @@ class DepositController {
       res.status(200).json(result);
     } catch (error) {
       console.error("Error getting deposits:", error);
-
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -492,8 +503,8 @@ class DepositController {
       }
 
       const maxDeposit = await DepositRoom.findOne({ roomId: { $in: roomIds } })
-        .sort({ amount: -1 }) // Sắp xếp giảm dần theo số tiền đặt cọc
-        .select("amount"); // Chỉ lấy trường amount
+        .sort({ amount: -1 })
+        .select("amount");
 
       res.status(200).json(maxDeposit?.amount || 0);
     } catch (error) {
