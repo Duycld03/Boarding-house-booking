@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Tag, Input, Modal, Form } from 'antd';
-import { FileTextOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import {
   getAllDepositRooms,
@@ -20,6 +19,7 @@ const DepositRoom = () => {
   const [selectedRoom, setSelectedRoom] = useState(null); // Store selected room for accept action
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false); // State for reject modal visibility
   const [reasonForCancel, setReasonForCancel] = useState(''); // Store rejection reason
+  const [rejectLoading, setRejectLoading] = useState(false); // State to manage reject button loading state
   const { boardingHouseId } = useParams();
 
   const fetchDepositedRooms = async () => {
@@ -78,15 +78,25 @@ const DepositRoom = () => {
       toast.error('Please provide a reason for rejection');
       return;
     }
-    await rejectDepositRoom(selectedRoom._id, reasonForCancel);
 
-    // Here, implement the rejection logic (e.g., API call to reject the room)
-    toast.success(
-      `Renewal request for room ${selectedRoom.roomNumber} has been rejected.`
-    );
-    setIsRejectModalOpen(false);
-    setReasonForCancel('');
-    fetchDepositedRooms();
+    setRejectLoading(true); // Set loading to true when the rejection is processing
+
+    try {
+      await rejectDepositRoom(selectedRoom._id, reasonForCancel);
+
+      // Implement the rejection logic (e.g., API call to reject the room)
+      toast.success(
+        `Deposit request for room ${selectedRoom.roomNumber} has been rejected.`
+      );
+      setIsRejectModalOpen(false);
+      setReasonForCancel('');
+      fetchDepositedRooms();
+    } catch (error) {
+      console.error('Error rejecting deposit room:', error);
+      toast.error('An error occurred while rejecting the deposit room.');
+    } finally {
+      setRejectLoading(false); // Set loading back to false once the rejection is done
+    }
   };
 
   const handleCancelRejectModal = () => {
@@ -178,18 +188,19 @@ const DepositRoom = () => {
       <Table columns={columns} data={depositedRooms || []} loading={loading} />
       <ConfirmModal
         title="Confirm Acceptance"
-        content={`Are you sure you want to accept the deposit for room ${selectedRoom?.roomNumber}?`}
+        content={`Are you sure you want to accept the deposit request for room ${selectedRoom?.roomNumber}?`}
         onOk={handleConfirmAccept}
         onCancel={handleCancelModal}
         isOpen={isModalVisible}
       />
       <Modal
-        title="Reject Deposit Room"
+        title="Reject Deposit Request"
         visible={isRejectModalOpen}
         onOk={handleRejectConfirm}
         onCancel={handleCancelRejectModal}
         okText="Reject"
         width="400px"
+        confirmLoading={rejectLoading} // Add confirm loading to modal
       >
         <Form layout="vertical">
           <Form.Item
