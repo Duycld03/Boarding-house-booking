@@ -25,12 +25,14 @@ import {
   MyReportManagement,
   BoardingHouseTypeManagement,
   MyDepositedRoom,
+  MyDepositRefundRequest,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 import {
   BHManagementOwner,
   BHDetailOwner,
   FavouriteList,
+  DepositRefundRequestOwner,
 } from "../pages/common";
 
 const dashBoard = "/dashboard";
@@ -142,6 +144,16 @@ const routes = [
     page: MyDepositedRoom,
     layout: ProfileLayout,
   },
+  {
+    path: "/my-deposit-refund-request",
+    page: MyDepositRefundRequest,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/refund-request-management",
+    page: DepositRefundRequestOwner,
+    layout: ProfileLayout,
+  },
 
   // dashBoard
   {
@@ -185,7 +197,7 @@ const routes = [
     page: BoardingHouseTypeManagement,
     layout: null,
   },
-   {
+  {
     path: `${dashBoard}/facilities-management`,
     page: FacilitiesManagement,
     layout: null,

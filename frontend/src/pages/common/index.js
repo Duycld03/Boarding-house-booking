@@ -11,6 +11,8 @@ import FavouriteList from "./FavouriteList";
 import WatchLater from "./WatchLater";
 import MyReportManagement from "./MyReport";
 import MyDepositedRoom from "./MyDepositedRoom";
+import MyDepositRefundRequest from "./MyDepositRefundRequest";
+import DepositRefundRequestOwner from "./DepositRefundRequestOwner";
 
 export {
   AboutUs,
@@ -26,4 +28,6 @@ export {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyDepositRefundRequest,
+  DepositRefundRequestOwner,
 };

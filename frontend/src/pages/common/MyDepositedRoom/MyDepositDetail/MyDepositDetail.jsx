@@ -47,7 +47,7 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
   }, [depositRoomId]);
 
   const payRent = async (userId) => {
-    setPayRentData({ userId, depositRoomId });
+    setPayRentData({ userId, depositRoomId, amount: depositRoom.price });
     setPayRentVisible(true);
   };
 
