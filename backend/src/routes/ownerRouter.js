@@ -3,7 +3,12 @@ import {
   authController,
   boardingHouseController,
   ReviewController,
-  appointmentController
+  appointmentController,
+  tenantController,
+  roomController,
+  depositController,
+  renewalRequestController,
+  refundRequestController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -43,4 +48,48 @@ ownerRouter.get(
   "/appointment/:appointmentId",
   appointmentController.getAppointmentDetailForOwner
 );
+ownerRouter.put('/review/updatereply', ReviewController.updateReplyReview);
+ownerRouter.delete('/review/reply', ReviewController.softDeleteReplyReview);
+ownerRouter.get(
+  '/tenant/:boardingHouseId',
+  tenantController.getTenantsByBoardingHouse
+);
+ownerRouter.delete(
+  '/tenant/:boardingHouseId/:accountId',
+  tenantController.deleteTenantFromBoardingHouse
+);
+ownerRouter.get(
+  '/boardinghouse/deposit/:boardingHouseId',
+  depositController.getAllDepositRooms
+);
+
+// room
+ownerRouter.get(
+  '/room/boarding-house/:boardingHouseId',
+  roomController.getRoomsByBoardingHouse
+);
+//renewal
+ownerRouter.get(
+  '/renewal/boarding-house/:boardingHouseId',
+  renewalRequestController.getRenewalRequestByBhID
+);
+ownerRouter.put(
+  '/renewal/:requestId',
+  renewalRequestController.acceptExtensionRequest
+);
+ownerRouter.put(
+  '/rejectrenewal/:requestId',
+  renewalRequestController.rejectExtensionRequest
+);
+
+// refund request
+ownerRouter.get(
+  '/refund-requests',
+  refundRequestController.getRefundRequestsForOwner
+);
+ownerRouter.put(
+  '/refund-request/:refundRequestId',
+  refundRequestController.cancelRefundRequestsForOwner
+);
+
 export { ownerRouter };

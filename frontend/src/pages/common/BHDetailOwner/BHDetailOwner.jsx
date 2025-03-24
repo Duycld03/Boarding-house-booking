@@ -33,6 +33,11 @@ import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHotel } from '@fortawesome/free-solid-svg-icons';
 import ViewListAppointmentOwner from "@/component/ViewListAppointmentOwner";
+import TenantManagement from '@/component/TenantManagement';
+import DepositManagement from '@/component/DepositManagement';
+import RoomManagement from './RoomManagement/RoomManagement';
+import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
+
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
 
@@ -791,11 +796,18 @@ const BHDetailOwner = () => {
         {/* Tab: Room */}
         <Tabs.TabPane tab="Room" key="room">
           {/* <Room /> */}
+          <RoomManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
 
         {/* Tab: Deposit Management */}
         <Tabs.TabPane tab="Deposit Management" key="depositManagement">
-          {/* <DepositManagement /> */}
+          <DepositManagement />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Tenant Management" key="Tenant Management">
+          <TenantManagement />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Renewal Management" key="Renewal Request Management">
+          <RenewalRequest boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab="Viewing Room Request" key="viewingroomrequest">

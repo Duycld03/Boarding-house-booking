@@ -4,6 +4,7 @@ import crypto from "crypto";
 import axios from "axios";
 import { sortObject } from "../utils/algorithms.js";
 import DepositRoom from "../models/depositRoom.js";
+import Room from "../models/room.js";
 import PaymentBill from "../models/paymentBill.js";
 import dotenv from "dotenv";
 import UserPayment from "../models/userPayment.js";
@@ -20,9 +21,8 @@ const config = {
 class DepositController {
   async deposit(req, res) {
     try {
-      const { roomId, rentalTime, timeType, payment, price, boardingHouseId } =
-        req.body;
-      if (!roomId || !rentalTime || !timeType || !payment || !price) {
+      const { roomId, rentalTime, timeType, rentalDate, price } = req.body;
+      if (!roomId || !rentalTime || !timeType || !price || !rentalDate) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
       const existDeposit = await DepositRoom.findOne({
@@ -36,19 +36,20 @@ class DepositController {
           .json({ message: "You have already deposited for this room" });
       }
 
-      let amount = rentalTime * price;
+      const rentalTimeNumber = parseInt(
+        rentalTime * (timeType === "month" ? 1 : 12)
+      );
 
-      if (timeType == "year") {
-        amount *= 12;
-      }
+      await DepositRoom.create({
+        accountId: req.user.userId,
+        roomId,
+        amount: price,
+        rentalTime: rentalTimeNumber,
+        startDate: rentalDate[0],
+        endDate: rentalDate[1],
+      });
 
-      const orderInfo = `deposit-${req.user.userId}-${roomId}-${boardingHouseId}-${rentalTime}`;
-
-      if (payment === "vnpay") {
-        createVNPayUrl(req, res, amount, orderInfo);
-      } else if (payment === "momo") {
-        createMomoUrl(req, res, amount, orderInfo);
-      }
+      res.status(200).json({ message: "Deposit successfully" });
     } catch (error) {
       console.error("Error depositing:", error);
       res.status(500).json({ message: "Server error", error });
@@ -76,7 +77,7 @@ class DepositController {
           roomNumber: roomId.roomNumber,
           amount: deposit.amount,
           status: deposit.status,
-          startDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+          startDate: moment(deposit.startDate).format("DD/MM/YYYY"),
           endDate: moment(deposit.endDate).format("DD/MM/YYYY"),
           rentalTime: deposit.rentalTime,
         };
@@ -153,19 +154,22 @@ class DepositController {
     if (secureHash === signed && vnp_Params["vnp_ResponseCode"] === "00") {
       if (type == "deposit") {
         const accountId = orderInfo[1];
-        const roomId = orderInfo[2];
-        const boardingHouseId = orderInfo[3];
-        const rentalTime = orderInfo[4];
-        const amount = vnp_Params["vnp_Amount"] / 100;
-        await DepositRoom.create({
+        const depositRoomId = orderInfo[2];
+
+        const depositRoom = await DepositRoom.findOne({
+          _id: depositRoomId,
           accountId,
-          roomId,
-          amount,
-          rentalTime,
-          endDate: moment().add(rentalTime, "months").toDate(),
+          status: { $regex: /^accepted$/i },
         });
 
-        const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=success`;
+        if (!depositRoom) {
+          throw new Error("Deposit room not found");
+        }
+
+        depositRoom.status = "confirmed";
+        await depositRoom.save();
+
+        const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
         return res.redirect(redirectUrl);
       }
       // pay rent
@@ -206,12 +210,6 @@ class DepositController {
       return res.redirect(redirectUrl);
     }
     //failed
-    if (type == "deposit") {
-      const boardingHouseId = orderInfo.split("-")[3];
-      const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
-      return res.redirect(redirectUrl);
-    }
-    // pay rent
     const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
     res.redirect(redirectUrl);
   }
@@ -233,18 +231,22 @@ class DepositController {
       if (resultCode == "0") {
         if (type == "deposit") {
           const accountId = orderInfo[1];
-          const roomId = orderInfo[2];
-          const boardingHouseId = orderInfo[3];
-          const rentalTime = orderInfo[4];
-          await DepositRoom.create({
+          const depositRoomId = orderInfo[2];
+
+          const depositRoom = await DepositRoom.findOne({
+            _id: depositRoomId,
             accountId,
-            roomId,
-            amount,
-            rentalTime,
-            endDate: moment().add(rentalTime, "months").toDate(),
+            status: { $regex: /^accepted$/i },
           });
 
-          const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=success`;
+          if (!depositRoom) {
+            throw new Error("Deposit room not found");
+          }
+
+          depositRoom.status = "confirmed";
+          await depositRoom.save();
+
+          const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
           return res.redirect(redirectUrl);
         }
         // pay rent
@@ -284,22 +286,10 @@ class DepositController {
         return res.redirect(redirectUrl);
       }
       //failed
-      if (type == "deposit") {
-        const boardingHouseId = orderInfo[3];
-        const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
-        return res.redirect(redirectUrl);
-      }
-      // pay rent
       const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
       res.redirect(redirectUrl);
     } catch (error) {
       console.log("Error momo return:", error);
-      if (type == "deposit") {
-        // const redirectUrl = `${process.env.CLIENT_URL}/boarding-house/${boardingHouseId}?status=fail`;
-        // res.redirect(redirectUrl);
-        return res.status(500).json({ message: "Server error", error });
-      }
-      // pay rent
       const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
       res.redirect(redirectUrl);
     }
@@ -376,6 +366,74 @@ class DepositController {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+  async getAllDepositRooms(req, res) {
+    try {
+      const { boardingHouseId } = req.params; // Lấy boardingHouseId từ request params
+
+      // Tìm tất cả các phòng trong boarding house
+      const rooms = await Room.find({ boardingHouseId }).select("_id");
+
+      // Lấy danh sách ID của các phòng
+      const roomIds = rooms.map((room) => room._id);
+
+      // Tìm tất cả các khoản đặt cọc liên quan đến các phòng trong boarding house
+      const deposits = await DepositRoom.find({ roomId: { $in: roomIds } })
+        .populate({
+          path: "roomId",
+          select: "roomNumber", // Chỉ lấy số phòng
+        })
+        .populate({
+          path: "accountId", // Liên kết đến người đặt cọc
+          select: "fullname", // Chỉ lấy tên của người đặt cọc
+        })
+        .sort({ createdAt: -1 }) // Sắp xếp theo thời gian tạo mới nhất
+        .lean();
+
+      // Format kết quả trả về
+      const result = deposits.map((deposit) => ({
+        _id: deposit._id,
+        name: deposit.accountId?.fullname || "Unknown", // Lấy tên người đặt cọc
+        roomNumber: deposit.roomId?.roomNumber || "N/A",
+        amount: deposit.amount,
+        status: deposit.status,
+        startDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+        endDate: moment(deposit.endDate).format("DD/MM/YYYY"),
+        rentalTime: deposit.rentalTime,
+      }));
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error getting all deposited rooms:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+  async payDeposit(req, res) {
+    try {
+      const { depositRoomId, paymentMethod } = req.body;
+      const depositRoom = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: req.user.userId,
+        status: { $regex: /^accepted$/i },
+      });
+
+      if (!depositRoom) {
+        return res.status(400).json({ message: "Deposit room not found" });
+      }
+      const { amount } = depositRoom;
+
+      const orderInfo = `deposit-${req.user.userId}-${depositRoomId}`;
+
+      if (paymentMethod === "vnpay") {
+        createVNPayUrl(req, res, amount, orderInfo);
+      } else if (paymentMethod === "momo") {
+        createMomoUrl(req, res, amount, orderInfo);
+      }
+    } catch (error) {
+      console.error("Error confirming deposit:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
 }

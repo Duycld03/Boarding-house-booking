@@ -1,25 +1,5 @@
 import mongoose from "mongoose";
 
-const ImagesSchema = new mongoose.Schema({
-  _id: {
-    type: mongoose.Schema.Types.ObjectId,
-    auto: true,
-  },
-  image: {
-    imageUrl: {
-      type: String,
-      required: true,
-    },
-    publicId: {
-      type: String,
-      default: "",
-    },
-  },
-  isPrimary: {
-    type: Boolean,
-    required: true,
-  },
-});
 
 const RoomSchema = new mongoose.Schema(
   {
@@ -47,7 +27,16 @@ const RoomSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
-    images: [ImagesSchema],
+    images: {
+      imageUrl: {
+        type: String,
+        required: true,
+      },
+      publicId: {
+        type: String,
+        default: "",
+      },
+    },
     roomTypeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "RoomType",

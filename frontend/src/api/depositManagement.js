@@ -19,3 +19,10 @@ export const payRent = (data) => {
 export const checkPayRentStatus = (depositRoomId) => {
   return axios.get(`auth/pay-rent/${depositRoomId}`);
 };
+export const getAllDepositRooms = (boardingHouseId) => {
+  return axios.get(`owner/boardinghouse/deposit/${boardingHouseId}`);
+};
+
+export const payDeposit = (data) => {
+  return axios.post("auth/pay-deposit", data);
+};
