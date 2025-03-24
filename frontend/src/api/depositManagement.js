@@ -1,11 +1,11 @@
-import axios from "./axios.config";
+import axios from './axios.config';
 
 export const depositRoom = (data) => {
-  return axios.post("auth/deposit", data);
+  return axios.post('auth/deposit', data);
 };
 
 export const getMyDepositedRoom = () => {
-  return axios.get("auth/deposited-room");
+  return axios.get('auth/deposited-room');
 };
 
 export const getDepositRoom = (depositRoomId) => {
@@ -13,7 +13,7 @@ export const getDepositRoom = (depositRoomId) => {
 };
 
 export const payRent = (data) => {
-  return axios.post("auth/pay-rent", data);
+  return axios.post('auth/pay-rent', data);
 };
 
 export const checkPayRentStatus = (depositRoomId) => {
@@ -22,7 +22,10 @@ export const checkPayRentStatus = (depositRoomId) => {
 export const getAllDepositRooms = (boardingHouseId) => {
   return axios.get(`owner/boardinghouse/deposit/${boardingHouseId}`);
 };
+export const acceptDepositRoom = (depositId) => {
+  return axios.put(`owner/acceptdeposit/${depositId}`);
+};
 
 export const payDeposit = (data) => {
-  return axios.post("auth/pay-deposit", data);
+  return axios.post('auth/pay-deposit', data);
 };

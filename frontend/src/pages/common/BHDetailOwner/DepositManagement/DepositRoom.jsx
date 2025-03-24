@@ -2,44 +2,72 @@ import React, { useState, useEffect } from 'react';
 import { Tag } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
-import { getAllDepositRooms } from '../../../../api/depositManagement';
+import {
+  getAllDepositRooms,
+  acceptDepositRoom,
+} from '../../../../api/depositManagement';
 import { useParams } from 'react-router-dom';
 import Table from '@/component/Table';
 import formatAmount from '@/utils/formatAmount';
 import { Button } from '@/component';
+import ConfirmModal from '@/component/ConfirmModal'; // Import ConfirmModal
 
 const DepositRoom = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [depositRoomId, setDepositRoomId] = useState('');
   const [depositedRooms, setDepositedRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false); // State for confirmation modal visibility
+  const [selectedRoom, setSelectedRoom] = useState(null); // Store selected room for accept action
   const { boardingHouseId } = useParams();
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const fetchDepositedRooms = async () => {
+    try {
+      const response = await getAllDepositRooms(boardingHouseId);
+      setDepositedRooms(Array.isArray(response) ? response : []);
+    } catch (error) {
+      console.error('Error fetching deposit rooms:', error);
+      toast.error('Failed to fetch deposit rooms');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Fetch all deposited rooms
   useEffect(() => {
-    const fetchDepositedRooms = async () => {
-      try {
-        const response = await getAllDepositRooms(boardingHouseId);
-        console.log('Fetched response:', response);
-
-        // Đảm bảo response luôn là mảng
-        setDepositedRooms(Array.isArray(response) ? response : []);
-      } catch (error) {
-        console.error('Error fetching deposit rooms:', error);
-        toast.error('Failed to fetch deposit rooms');
-        setDepositedRooms([]); // Nếu có lỗi, gán giá trị rỗng để tránh lỗi map()
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (boardingHouseId) {
       fetchDepositedRooms();
     }
   }, [boardingHouseId]);
+
+  // Handle Accept action
+  const handleAccept = (record) => {
+    setSelectedRoom(record); // Store the selected room
+    setIsModalVisible(true); // Open the confirmation modal
+  };
+
+  // Confirm accept action (update status to accepted)
+  const handleConfirmAccept = async () => {
+    try {
+      if (!selectedRoom) {
+        toast.error('No room selected!');
+        return;
+      }
+
+      // API call to update deposit status to accepted
+      await acceptDepositRoom(selectedRoom._id); // Assuming you pass room ID to accept
+
+      toast.success('Deposit room accepted successfully.');
+      setIsModalVisible(false); // Close modal
+      fetchDepositedRooms(); // Refresh the list of rooms after accepting
+    } catch (error) {
+      console.error('Error accepting deposit room:', error);
+      toast.error('An error occurred while accepting the deposit room.');
+    }
+  };
+
+  // Handle cancel modal
+  const handleCancelModal = () => {
+    setIsModalVisible(false); // Close modal
+    setSelectedRoom(null); // Reset selected room
+  };
 
   const columns = [
     {
@@ -113,7 +141,7 @@ const DepositRoom = () => {
               btnAccept
               className="text-white"
               bgColor="rgb(5 150 105)"
-              // onClick={() => handleAccept(record)} // Trigger accept action
+              onClick={() => handleAccept(record)} // Trigger accept action
             ></Button>
           </div>
         ),
@@ -123,6 +151,13 @@ const DepositRoom = () => {
   return (
     <div>
       <Table columns={columns} data={depositedRooms || []} loading={loading} />
+      <ConfirmModal
+        title="Confirm Acceptance"
+        content={`Are you sure you want to accept the renewal request for room ${selectedRoom?.roomNumber}?`}
+        onOk={handleConfirmAccept}
+        onCancel={handleCancelModal}
+        isOpen={isModalVisible}
+      />
     </div>
   );
 };
