@@ -9,6 +9,7 @@ import {
   ReviewController,
   watchLaterController,
   depositController,
+  refundRequestController,
 } from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -94,5 +95,8 @@ authRouter.get(
   depositController.checkPayRentStatus
 );
 authRouter.post("/pay-deposit", depositController.payDeposit);
+
+// refund request
+authRouter.get("/refund-requests", refundRequestController.getRefundRequests);
 
 export { authRouter };
