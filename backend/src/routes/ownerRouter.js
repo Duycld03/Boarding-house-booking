@@ -6,6 +6,7 @@ import {
   tenantController,
   roomController,
   depositController,
+  renewalRequesrController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -52,8 +53,16 @@ ownerRouter.get(
   depositController.getAllDepositRooms
 );
 
-
 // room
-ownerRouter.get('/room/boarding-house/:boardingHouseId', roomController.getRoomsByBoardingHouse);
+ownerRouter.get(
+  '/room/boarding-house/:boardingHouseId',
+  roomController.getRoomsByBoardingHouse
+);
+ownerRouter.get(
+  '/renewal/boarding-house/:boardingHouseId',
+  renewalRequesrController.getRenewalRequestByBhID
+);
+
+//renewal
 
 export { ownerRouter };
