@@ -35,9 +35,7 @@ import { faHotel } from '@fortawesome/free-solid-svg-icons';
 import TenantManagement from '@/component/TenantManagement';
 import DepositManagement from '@/pages/common/BHDetailOwner/DepositManagement';
 import RoomManagement from './RoomManagement/RoomManagement';
-import RoomManagement from './RoomManagement/RoomManagement';
 import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
-
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
