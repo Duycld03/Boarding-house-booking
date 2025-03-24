@@ -173,7 +173,6 @@ const DepositRoom = () => {
               size="large"
               style={{ backgroundColor: 'red', color: 'white', border: 'none' }}
               onClick={() => handleReject(record)} // Open reject modal
-              loading={rejectLoading} // Add loading indicator to the reject button
             ></Button>
 
             <Button
@@ -183,7 +182,6 @@ const DepositRoom = () => {
               className="text-white"
               bgColor="rgb(5 150 105)"
               onClick={() => handleAccept(record)}
-              loading={confirmLoading} // Add loading indicator to the reject button
             ></Button>
           </div>
         ),
