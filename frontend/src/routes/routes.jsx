@@ -25,6 +25,7 @@ import {
   MyReportManagement,
   BoardingHouseTypeManagement,
   MyDepositedRoom,
+  MyRenewalRequest,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 import {
@@ -142,6 +143,11 @@ const routes = [
     page: MyDepositedRoom,
     layout: ProfileLayout,
   },
+  {
+    path: "/my-renewal-request",
+    page: MyRenewalRequest,
+    layout: ProfileLayout,
+  },
 
   // dashBoard
   {
@@ -185,7 +191,7 @@ const routes = [
     page: BoardingHouseTypeManagement,
     layout: null,
   },
-   {
+  {
     path: `${dashBoard}/facilities-management`,
     page: FacilitiesManagement,
     layout: null,

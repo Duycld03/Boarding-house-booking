@@ -21,6 +21,7 @@ import {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRenewalRequest
 } from "./common";
 
 import {
@@ -56,6 +57,7 @@ export {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRenewalRequest,
 
   // owner
   BHManagementOwner,

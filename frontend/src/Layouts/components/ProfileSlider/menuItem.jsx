@@ -6,9 +6,14 @@ import {
   VideoCameraOutlined,
   SnippetsOutlined,
   ContainerOutlined,
+  HeartFilled,
+  HeartOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import { useCurrentUser } from "../../../context/userContext";
 import userRole from "../../../constants/userRole";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
 
 const getMenuItems = () => {
   const { hasRole } = useCurrentUser(); // Lấy thông tin user từ context
@@ -32,13 +37,13 @@ const getMenuItems = () => {
     {
       key: "favourite-list",
       label: <Link to="/favourite-list">My favourite</Link>,
-      icon: <ScheduleOutlined />,
+      icon: <HeartOutlined />,
       visible: isUser, // Chỉ User
     },
     {
       key: "watch-later",
       label: <Link to="/watch-later">Watch later</Link>,
-      icon: <VideoCameraOutlined />,
+      icon: <EyeOutlined />,
       visible: isUser, // Chỉ User
     },
     {
@@ -57,6 +62,12 @@ const getMenuItems = () => {
       key: "my-deposited-room",
       label: <Link to="/my-deposited-room">My Deposited Room</Link>,
       icon: <ContainerOutlined />,
+      visible: isUser,
+    },
+    {
+      key: "my-renewal-request",
+      label: <Link to="/my-renewal-request">My Renewal Request</Link>,
+      icon: <FontAwesomeIcon icon={faEnvelope} />,
       visible: isUser,
     },
   ];

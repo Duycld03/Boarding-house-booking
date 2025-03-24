@@ -8,6 +8,9 @@ import { Loader } from "../../../component";
 import { Tag } from "antd";
 import MyDepositDetail from "./MyDepositDetail";
 import { toast } from "react-toastify";
+import ActionDropdown from "./ActionDropdown";
+import RenewalRequestForm from "./RenewalRequestForm";
+import { getExtensionRequests } from "@/api/extensionRequest";
 
 function MyDepositedRoom() {
   const location = useLocation();
@@ -16,6 +19,20 @@ function MyDepositedRoom() {
   const [depositedRooms, setDepositedRooms] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [depositRoomId, setDepositRoomId] = useState("");
+
+  //Renewal Request Form
+  const [isRenewalOpen, setIsRenewalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [existingRequest, setExistingRequest] = useState(null);
+
+  const fetchExtensionRequests = async () => {
+    try {
+      const response = await getExtensionRequests();
+      setExistingRequest(response);
+    } catch (error) {
+      console.error("API error:", error);
+    }
+  };
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -75,21 +92,17 @@ function MyDepositedRoom() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <div className="flex gap-3">
-          <Button
-            disabled={record.status == "pending"}
-            size="large"
-            title={"Detail"}
-            icon={<FileTextOutlined />}
-            // onClick={() => navigate(`/my-deposited-room/${record._id}`)}
-            onClick={() => {
-              setDepositRoomId(record._id);
-              setIsModalVisible(true);
-            }}
-            className="text-white"
-            bgColor="rgb(5 150 105)"
-          />
-        </div>
+        <ActionDropdown
+          record={record}
+          onDetailClick={(id) => {
+            setDepositRoomId(id);
+            setIsModalVisible(true);
+          }}
+          onRenewalClick={(record) => {
+            setSelectedRecord(record);
+            setIsRenewalOpen(true);
+          }}
+        />
       ),
     },
   ];
@@ -121,6 +134,7 @@ function MyDepositedRoom() {
 
   useEffect(() => {
     fetchData();
+    fetchExtensionRequests();
   }, []);
 
   return (
@@ -136,6 +150,15 @@ function MyDepositedRoom() {
             handleCancel={handleCancel}
           />
         </>
+      )}
+      {selectedRecord && (
+        <RenewalRequestForm
+          visible={isRenewalOpen}
+          onClose={() => setIsRenewalOpen(false)}
+          mode="tenant"
+          existingRequest={existingRequest}
+          renewalData={selectedRecord}
+        />
       )}
     </div>
   );
