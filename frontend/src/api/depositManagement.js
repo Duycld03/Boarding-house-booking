@@ -29,3 +29,6 @@ export const acceptDepositRoom = (depositId) => {
 export const payDeposit = (data) => {
   return axios.post('auth/pay-deposit', data);
 };
+export const rejectDepositRoom = (depositId, reasonForCancel) => {
+  return axios.put(`owner/rejectdeposit/${depositId}`, { reasonForCancel });
+};
