@@ -5,3 +5,6 @@ export const getRenewalRequestByBhID = (boardingHouseId) => {
 export const acceptExtensionRequest = (requestId) => {
   return axios.put(`owner/renewal/${requestId}`);
 };
+export const rejectExtensionRequest = (requestId, reasonForCancel) => {
+  return axios.put(`owner/rejectrenewal/${requestId}`, { reasonForCancel });
+};
