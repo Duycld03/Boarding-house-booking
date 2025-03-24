@@ -278,7 +278,6 @@ class accountController {
   }
 
   async updateAvatar(req, res) {
-    console.log(req.body);
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
