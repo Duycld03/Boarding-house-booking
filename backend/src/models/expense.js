@@ -1,5 +1,5 @@
 // models/UtilitiesExpense.js
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const OtherExpenseSchema = new mongoose.Schema({
     feeName: {
@@ -24,12 +24,7 @@ const MeterReadingSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0,
-        validate: {
-            validator: function (value) {
-                return value >= this.oldNumber;
-            },
-            message: 'New meter reading must be greater than or equal to old reading'
-        }
+
     },
     quantityConsumed: {
         type: Number,
@@ -68,11 +63,7 @@ const UtilitiesExpenseSchema = new mongoose.Schema({
         required: true
     },
     otherExpenses: [OtherExpenseSchema],
-    // Add additional fields for metadata
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
+
 
 }, {
     timestamps: true,
@@ -101,4 +92,6 @@ UtilitiesExpenseSchema.pre('save', function (next) {
     next();
 });
 
-module.exports = mongoose.model('Expense', UtilitiesExpenseSchema);
+
+const Expense = mongoose.model('Expense', UtilitiesExpenseSchema);
+export default Expense;

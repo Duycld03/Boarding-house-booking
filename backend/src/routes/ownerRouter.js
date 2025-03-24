@@ -6,6 +6,7 @@ import {
   tenantController,
   roomController,
   depositController,
+  expenseController
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -55,5 +56,10 @@ ownerRouter.get(
 
 // room
 ownerRouter.get('/room/boarding-house/:boardingHouseId', roomController.getRoomsByBoardingHouse);
+
+
+//expense
+ownerRouter.get('/expense', expenseController.getExpensesByTime);
+ownerRouter.put('/expense/:expenseId', expenseController.updateExpense);
 
 export { ownerRouter };

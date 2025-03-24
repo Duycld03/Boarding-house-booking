@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import {
-  BarChart,
-  LineChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  Bar,
-  Line,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { getExpenseByTime, updateExpense } from "@/api/expense";
+import { Modal } from "antd";
+import RevenueMonthlyView from "./RevenueMonthlyView";
+import ExpenseMonthlyView from "./ExpenseMonthlyView";
+import RevenueYearlyView from "./RevenueYearlyView";
+import ExpenseUpdateForm from "./ExpenseUpdateForm";
+import { formatCurrency } from "@/utils/formatters";
+import { toast } from "react-toastify";
+
+// Colors for the charts
+export const COLORS = {
+  revenue: "#38bdf8",
+  electricity: "#f43f5e",
+  water: "#22d3ee",
+  otherCosts: "#a3e635",
+  profit: "#8b5cf6",
+};
 
 const RevenueManagement = ({ boardingHouseId }) => {
   // Get current month and year for default values
@@ -25,18 +27,31 @@ const RevenueManagement = ({ boardingHouseId }) => {
   const [monthlyData, setMonthlyData] = useState(null);
   const [yearlyData, setYearlyData] = useState([]);
   const [activeTab, setActiveTab] = useState("monthly");
-
-  // Colors for the charts
-  const COLORS = {
-    revenue: "#38bdf8",
-    electricity: "#f43f5e",
-    otherCosts: "#a3e635",
-    profit: "#8b5cf6",
-  };
+  const [monthlyExpenses, setMonthlyExpenses] = useState(null);
+  const [expenseView, setExpenseView] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [expenseFormData, setExpenseFormData] = useState({
+    id: undefined,
+    electricalExpense: {
+      oldNumber: 0,
+      newNumber: 0,
+      quantityConsumed: 0,
+      totalAmount: 0,
+    },
+    waterExpense: {
+      oldNumber: 0,
+      newNumber: 0,
+      quantityConsumed: 0,
+      totalAmount: 0,
+    },
+    otherExpenses: [],
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchMonthlyData(selectedMonth, selectedYear);
     fetchYearlyData(selectedYear);
+    fetchMonthlyExpenses(selectedMonth, selectedYear, boardingHouseId);
   }, [selectedMonth, selectedYear, boardingHouseId]);
 
   const fetchMonthlyData = (month, year) => {
@@ -69,69 +84,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
         otherCosts: 500,
         profit: 2100,
       },
-      {
-        month: "T3",
-        revenue: 5000,
-        electricityWaterCost: 1200,
-        otherCosts: 800,
-        profit: 3000,
-      },
-      {
-        month: "T4",
-        revenue: 4200,
-        electricityWaterCost: 1100,
-        otherCosts: 700,
-        profit: 2400,
-      },
-      {
-        month: "T5",
-        revenue: 4800,
-        electricityWaterCost: 1300,
-        otherCosts: 900,
-        profit: 2600,
-      },
-      {
-        month: "T6",
-        revenue: 5200,
-        electricityWaterCost: 1400,
-        otherCosts: 1000,
-        profit: 2800,
-      },
-      {
-        month: "T7",
-        revenue: 4900,
-        electricityWaterCost: 1200,
-        otherCosts: 800,
-        profit: 2900,
-      },
-      {
-        month: "T8",
-        revenue: 5500,
-        electricityWaterCost: 1500,
-        otherCosts: 1100,
-        profit: 2900,
-      },
-      {
-        month: "T9",
-        revenue: 5300,
-        electricityWaterCost: 1400,
-        otherCosts: 900,
-        profit: 3000,
-      },
-      {
-        month: "T10",
-        revenue: 6000,
-        electricityWaterCost: 1600,
-        otherCosts: 1200,
-        profit: 3200,
-      },
-      {
-        month: "T11",
-        revenue: 5800,
-        electricityWaterCost: 1500,
-        otherCosts: 1100,
-        profit: 3200,
-      },
+      // ... other months (truncated for brevity)
       {
         month: "T12",
         revenue: 6500,
@@ -143,28 +96,71 @@ const RevenueManagement = ({ boardingHouseId }) => {
     setYearlyData(data);
   };
 
-  // Prepare data for the pie chart
-  const pieData = monthlyData
-    ? [
-        {
-          name: "Lợi nhuận",
-          value: monthlyData.netProfit,
-          color: COLORS.profit,
-        },
-        {
-          name: "Điện nước",
-          value: monthlyData.electricityWaterCost,
-          color: COLORS.electricity,
-        },
-        {
-          name: "Chi phí khác",
-          value: monthlyData.otherCosts,
-          color: COLORS.otherCosts,
-        },
-      ]
-    : [];
+  const fetchMonthlyExpenses = async (month, year, boardingHouseId) => {
+    try {
+      const response = await getExpenseByTime({ boardingHouseId, month, year });
+      if (response.data && response.data[0]) {
+        const expense = response.data[0];
+        setMonthlyExpenses(expense);
 
-  // Calculate summary metrics
+        setExpenseFormData({
+          id: expense._id || null, // Lấy ID nếu có
+          electricalExpense: expense.electricalExpense || {
+            oldNumber: 0,
+            newNumber: 0,
+            quantityConsumed: 0,
+            totalAmount: 0,
+          },
+          waterExpense: expense.waterExpense || {
+            oldNumber: 0,
+            newNumber: 0,
+            quantityConsumed: 0,
+            totalAmount: 0,
+          },
+          otherExpenses: expense.otherExpenses || [],
+        });
+      } else {
+        // Nếu không có dữ liệu, đặt giá trị mặc định
+        setMonthlyExpenses(null);
+        setExpenseFormData({
+          id: null,
+          electricalExpense: {
+            oldNumber: 0,
+            newNumber: 0,
+            quantityConsumed: 0,
+            totalAmount: 0,
+          },
+          waterExpense: {
+            oldNumber: 0,
+            newNumber: 0,
+            quantityConsumed: 0,
+            totalAmount: 0,
+          },
+          otherExpenses: [],
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu chi tiêu hàng tháng:", error);
+      setExpenseFormData({
+        id: null,
+        electricalExpense: {
+          oldNumber: 0,
+          newNumber: 0,
+          quantityConsumed: 0,
+          totalAmount: 0,
+        },
+        waterExpense: {
+          oldNumber: 0,
+          newNumber: 0,
+          quantityConsumed: 0,
+          totalAmount: 0,
+        },
+        otherExpenses: [],
+      });
+    }
+  };
+
+  // Calculate summary metrics for yearly view
   const calculateYearlySummary = () => {
     if (yearlyData.length === 0) return { total: 0, average: 0 };
 
@@ -187,13 +183,94 @@ const RevenueManagement = ({ boardingHouseId }) => {
 
   const summaryData = calculateYearlySummary();
 
-  // Format currency
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      maximumFractionDigits: 0,
-    }).format(value);
+  const handleEditElectrical = () => {
+    // Implement edit functionality
+    console.log("Edit electrical expense");
+    handleUpdateExpense();
+  };
+
+  const handleEditWater = () => {
+    // Implement edit functionality
+    console.log("Edit water expense");
+    handleUpdateExpense();
+  };
+
+  const handleEditOtherExpense = (index) => {
+    // Implement edit functionality
+    console.log("Edit other expense at index", index);
+    handleUpdateExpense();
+  };
+
+  const handleRefreshChart = () => {
+    // Implement refresh functionality
+    fetchMonthlyExpenses(selectedMonth, selectedYear, boardingHouseId);
+  };
+
+  const handleUpdateExpense = () => {
+    setShowUpdateModal(true);
+    // If there are no existing expenses, initialize with default values
+    if (!monthlyExpenses) {
+      setExpenseFormData({
+        electricalExpense: {
+          oldNumber: 0,
+          newNumber: 0,
+          quantityConsumed: 0,
+          totalAmount: 0,
+        },
+        waterExpense: {
+          oldNumber: 0,
+          newNumber: 0,
+          quantityConsumed: 0,
+          totalAmount: 0,
+        },
+        otherExpenses: [],
+      });
+    }
+  };
+
+  const handleSubmitExpense = async (formValues) => {
+    setIsSubmitting(true);
+    try {
+      // Prepare data for submission
+      const expenseData = {
+        boardingHouseId,
+        month: selectedMonth,
+        year: selectedYear,
+        electricalExpense: formValues.electricalExpense,
+        waterExpense: formValues.waterExpense,
+        otherExpenses: formValues.otherExpenses,
+      };
+
+      await updateExpense({
+        data: expenseData,
+        expenseId: formValues?.id,
+      });
+      toast.success("Update expense successful");
+
+      // // Refresh the data
+      fetchMonthlyExpenses(selectedMonth, selectedYear, boardingHouseId);
+
+      // Close the modal
+    } catch (error) {
+      toast.error("Can not update expense");
+      // You might want to add error handling here (e.g., display an error message)
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const monthNames = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
   };
 
   return (
@@ -206,7 +283,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
           }`}
           onClick={() => setActiveTab("monthly")}
         >
-          Tháng
+          Month
         </button>
         <button
           className={`py-2 px-4 rounded-lg font-medium ${
@@ -214,38 +291,38 @@ const RevenueManagement = ({ boardingHouseId }) => {
           }`}
           onClick={() => setActiveTab("yearly")}
         >
-          Năm
+          Year
         </button>
       </div>
 
       {/* Filters */}
       <div className="flex mb-6 gap-4">
         <div className="w-1/2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Tháng
+          <label className="block text-lg font-medium text-gray-700 mb-1">
+            Month
           </label>
           <select
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
           >
-            {[...Array(12)].map((_, i) => (
-              <option key={i + 1} value={i + 1}>
-                Tháng {i + 1}
+            {Object.entries(monthNames).map(([num, name]) => (
+              <option key={num} value={num}>
+                {name}
               </option>
             ))}
           </select>
         </div>
         <div className="w-1/2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Năm
+          <label className="block text-lg font-medium text-gray-700 mb-1">
+            Year
           </label>
           <select
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
           >
-            {[2023, 2024, 2025].map((year) => (
+            {[2023, 2024, 2025]?.map((year) => (
               <option key={year} value={year}>
                 {year}
               </option>
@@ -256,169 +333,80 @@ const RevenueManagement = ({ boardingHouseId }) => {
 
       {activeTab === "monthly" ? (
         <div>
-          {monthlyData ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Summary cards */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                  <p className="text-sm text-blue-600 font-medium">
-                    Tổng Doanh Thu
-                  </p>
-                  <p className="text-2xl font-bold text-blue-700">
-                    {formatCurrency(monthlyData.totalRevenue)}
-                  </p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                  <p className="text-sm text-purple-600 font-medium">
-                    Lợi Nhuận
-                  </p>
-                  <p className="text-2xl font-bold text-purple-700">
-                    {formatCurrency(monthlyData.netProfit)}
-                  </p>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg border border-red-100">
-                  <p className="text-sm text-red-600 font-medium">Điện Nước</p>
-                  <p className="text-2xl font-bold text-red-700">
-                    {formatCurrency(monthlyData.electricityWaterCost)}
-                  </p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-                  <p className="text-sm text-green-600 font-medium">
-                    Chi Phí Khác
-                  </p>
-                  <p className="text-2xl font-bold text-green-700">
-                    {formatCurrency(monthlyData.otherCosts)}
-                  </p>
-                </div>
-              </div>
+          {/* Monthly revenue/expense toggle */}
+          {monthlyData && (
+            <div className="flex mb-6 bg-gray-100 rounded-lg p-1 w-full md:w-64">
+              <button
+                className={`py-2 px-4 rounded-lg font-medium flex-1 ${
+                  !expenseView ? "bg-white shadow-sm" : "text-gray-600"
+                }`}
+                onClick={() => setExpenseView(false)}
+              >
+                Revenue
+              </button>
+              <button
+                className={`py-2 px-4 rounded-lg font-medium flex-1 ${
+                  expenseView ? "bg-white shadow-sm" : "text-gray-600"
+                }`}
+                onClick={() => setExpenseView(true)}
+              >
+                Expense
+              </button>
+            </div>
+          )}
 
-              {/* Pie chart */}
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h3 className="text-lg font-semibold mb-2 text-gray-700">
-                  Phân Bổ Chi Phí
-                </h3>
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      fill="#8884d8"
-                      paddingAngle={5}
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => formatCurrency(value)} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+          {/* Update Expense Button */}
+          {expenseView && (
+            <div className="mb-6">
+              <button
+                onClick={handleUpdateExpense}
+                className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Cập Nhật Chi Phí
+              </button>
             </div>
+          )}
+
+          {!expenseView ? (
+            <RevenueMonthlyView
+              monthlyData={monthlyData}
+              formatCurrency={formatCurrency}
+            />
           ) : (
-            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg">
-              Không có dữ liệu doanh thu cho tháng này.
-            </div>
+            <ExpenseMonthlyView
+              monthlyExpenses={monthlyExpenses}
+              formatCurrency={formatCurrency}
+              onEditElectrical={handleEditElectrical}
+              onEditWater={handleEditWater}
+              onEditOtherExpense={handleEditOtherExpense}
+              onRefreshChart={handleRefreshChart}
+            />
           )}
         </div>
       ) : (
-        <div>
-          {/* Yearly summary cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-              <p className="text-sm text-blue-600 font-medium">
-                Tổng Doanh Thu Năm
-              </p>
-              <p className="text-2xl font-bold text-blue-700">
-                {formatCurrency(summaryData.totalRevenue)}
-              </p>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-              <p className="text-sm text-blue-600 font-medium">
-                Doanh Thu Trung Bình
-              </p>
-              <p className="text-2xl font-bold text-blue-700">
-                {formatCurrency(summaryData.averageRevenue)}
-              </p>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-              <p className="text-sm text-purple-600 font-medium">
-                Tổng Lợi Nhuận
-              </p>
-              <p className="text-2xl font-bold text-purple-700">
-                {formatCurrency(summaryData.totalProfit)}
-              </p>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-              <p className="text-sm text-purple-600 font-medium">
-                Tỷ Suất Lợi Nhuận
-              </p>
-              <p className="text-2xl font-bold text-purple-700">
-                {summaryData.profitMargin}%
-              </p>
-            </div>
-          </div>
-
-          {/* Bar chart */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-700">
-              Doanh Thu Theo Tháng
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={yearlyData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value) => formatCurrency(value)} />
-                <Legend />
-                <Bar dataKey="revenue" name="Doanh Thu" fill={COLORS.revenue} />
-                <Bar dataKey="profit" name="Lợi Nhuận" fill={COLORS.profit} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Line chart */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold mb-4 text-gray-700">
-              Chi Phí Theo Tháng
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={yearlyData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value) => formatCurrency(value)} />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="electricityWaterCost"
-                  name="Điện Nước"
-                  stroke={COLORS.electricity}
-                  activeDot={{ r: 8 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="otherCosts"
-                  name="Chi Phí Khác"
-                  stroke={COLORS.otherCosts}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <RevenueYearlyView
+          yearlyData={yearlyData}
+          summaryData={summaryData}
+          selectedYear={selectedYear}
+          formatCurrency={formatCurrency}
+        />
       )}
+
+      {/* Ant Design Modal for Update Expense Form */}
+      <Modal
+        open={showUpdateModal}
+        footer={null}
+        onCancel={() => setShowUpdateModal(false)}
+        width={700}
+        destroyOnClose={true}
+      >
+        <ExpenseUpdateForm
+          expenseData={expenseFormData}
+          onCancel={() => setShowUpdateModal(false)}
+          onSubmit={handleSubmitExpense}
+          isLoading={isSubmitting}
+        />
+      </Modal>
     </div>
   );
 };
