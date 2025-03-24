@@ -1,8 +1,11 @@
-import { Form, Modal, InputNumber, Select, Radio } from "antd";
+import { Form, Modal, InputNumber, Select, Radio, DatePicker } from "antd";
 import React, { useState } from "react";
 import formatAmount from "../../utils/formatAmount";
 import { depositRoom } from "../../api/depositManagement";
 import { toast } from "react-toastify";
+import dayjs, { Dayjs } from "dayjs";
+
+const { RangePicker } = DatePicker;
 
 function DepositPopup({
   visible,
@@ -13,16 +16,18 @@ function DepositPopup({
 }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [dates, setDates] = useState([dayjs(), dayjs().add(1, "month")]);
+
   const onCancel = () => {
     form.resetFields();
     toggleVisible(false);
   };
+
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const data = { boardingHouseId: boardingHouse._id, ...values };
-      const res = await depositRoom(data);
-      window.location.href = res.payUrl;
+      const res = await depositRoom(values);
+      toast.success(res.message);
     } catch (error) {
       toast.warning(error?.response?.data?.message);
     } finally {
@@ -30,6 +35,36 @@ function DepositPopup({
       onCancel();
     }
   };
+
+  const disabledDate = (current) => {
+    return current && current < dayjs().startOf("day");
+  };
+
+  const handleRentalTimeChange = (value) => {
+    if (value <= 0) return;
+    const timeType = form.getFieldValue("timeType");
+    const rentalDate = form.getFieldValue("rentalDate");
+    form.setFieldsValue({
+      rentalDate: [rentalDate[0], rentalDate[0].add(value, timeType)],
+    });
+  };
+
+  const handleRentalTypeChange = (value) => {
+    const rentalTime = form.getFieldValue("rentalTime");
+    const rentalDate = form.getFieldValue("rentalDate");
+    form.setFieldsValue({
+      rentalDate: [rentalDate[0], rentalDate[0].add(rentalTime, value)],
+    });
+  };
+
+  const handleRentalDateChange = (dates) => {
+    const timeType = form.getFieldValue("timeType");
+    const rentalTime = form.getFieldValue("rentalTime");
+    form.setFieldsValue({
+      rentalDate: [dates[0], dates[0].add(rentalTime, timeType)],
+    });
+  };
+
   return (
     <Modal
       open={visible}
@@ -50,6 +85,7 @@ function DepositPopup({
           roomType: roomData?.typeName,
           price: roomData?.price,
           rentalTime: 1,
+          rentalDate: dates,
           timeType: "month",
           payment: "vnpay",
         }}
@@ -75,6 +111,21 @@ function DepositPopup({
             ))}
           </Select>
         </Form.Item>
+        <Form.Item
+          label="Rental date"
+          name="rentalDate"
+          className="mb-2"
+          rules={[{ required: true }]}
+        >
+          <RangePicker
+            disabledDate={disabledDate}
+            onChange={handleRentalDateChange}
+            format={"DD/MM/YYYY"}
+            disabled={[false, true]}
+            allowEmpty={[false, true]}
+            onClick={() => form.setFieldsValue({ rentalDate: [] })}
+          />
+        </Form.Item>
         <Form.Item label="Rental time" className="mb-2" required>
           <div className="flex space-x-2">
             <Form.Item
@@ -89,11 +140,16 @@ function DepositPopup({
                 },
               ]}
             >
-              <InputNumber placeholder="Enter rental time" className="w-full" />
+              <InputNumber
+                placeholder="Enter rental time"
+                className="w-full"
+                onChange={handleRentalTimeChange}
+              />
             </Form.Item>
             <Form.Item name="timeType" className="w-[30%]" required>
               <Select
                 placeholder="Select type of time"
+                onChange={handleRentalTypeChange}
                 rules={[{ required: true }]}
               >
                 <Select.Option value="month">Month</Select.Option>
@@ -101,12 +157,6 @@ function DepositPopup({
               </Select>
             </Form.Item>
           </div>
-        </Form.Item>
-        <Form.Item name="payment" label="Payment method" required>
-          <Radio.Group className="mb-2" rules={[{ required: true }]}>
-            <Radio value="vnpay">VNPay</Radio>
-            <Radio value="momo">Momo</Radio>
-          </Radio.Group>
         </Form.Item>
       </Form>
     </Modal>

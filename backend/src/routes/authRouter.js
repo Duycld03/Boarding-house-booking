@@ -93,5 +93,6 @@ authRouter.get(
   "/pay-rent/:depositRoomId",
   depositController.checkPayRentStatus
 );
+authRouter.post("/pay-deposit", depositController.payDeposit);
 
 export { authRouter };

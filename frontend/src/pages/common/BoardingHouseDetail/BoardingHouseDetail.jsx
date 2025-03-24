@@ -154,21 +154,6 @@ function BoardingHouseDetail() {
     }
   }, [id]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const status = params.get("status");
-
-    if (status === "success") {
-      toast.success("Deposit successfully!");
-    } else if (status === "fail") {
-      toast.error("Deposit failed!");
-    }
-    params.delete("status");
-    if (status) {
-      navigate(window.location.pathname, { replace: true });
-    }
-  }, [location]);
-
   // Xử lý submit review
   const handleAddReview = async (formData) => {
     try {
