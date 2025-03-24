@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const refundRequestSchema = new mongoose.Schema(
   {
     depositRoomId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "DepositRoom",
+      ref: 'DepositRoom',
       required: true,
     },
     accountId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
+      ref: 'Account',
       required: true,
     },
     amountRefunded: {
@@ -19,11 +19,15 @@ const refundRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "pending",
+      default: 'pending',
     },
     reason: {
       type: String,
       required: true,
+    },
+    reasonForCancel: {
+      type: String,
+      default: '',
     },
   },
   {
@@ -31,5 +35,5 @@ const refundRequestSchema = new mongoose.Schema(
   }
 );
 
-const RefundRequest = mongoose.model("RefundRequest", refundRequestSchema);
+const RefundRequest = mongoose.model('RefundRequest', refundRequestSchema);
 export default RefundRequest;
