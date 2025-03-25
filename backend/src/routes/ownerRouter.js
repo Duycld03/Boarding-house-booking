@@ -149,6 +149,10 @@ ownerRouter.put(
   "/refund-request/:refundRequestId",
   refundRequestController.cancelRefundRequestsForOwner
 );
+ownerRouter.post(
+  "/refund-request/:refundRequestId",
+  depositController.acceptRefundRequestForOwner
+);
 
 //expense
 ownerRouter.get("/expense", expenseController.getExpensesByTime);
