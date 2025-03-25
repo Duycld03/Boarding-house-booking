@@ -99,6 +99,15 @@ ownerRouter.get(
   '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
   depositController.getMaxRentTime
 );
+ownerRouter.put(
+  '/acceptdeposit/:depositId',
+  depositController.acceptDepositRoom
+);
+ownerRouter.put(
+  '/rejectdeposit/:depositId',
+  depositController.rejectDepositRoom
+);
+
 
 // room
 ownerRouter.get(
