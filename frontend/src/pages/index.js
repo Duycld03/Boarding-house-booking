@@ -21,6 +21,7 @@ import {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRenewalRequest,
   MyRentPayment,
   MyDepositRefundRequest,
   DepositRefundRequestOwner,
@@ -59,9 +60,9 @@ export {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRenewalRequest,
   MyRentPayment,
   MyDepositRefundRequest,
-
   // owner
   BHManagementOwner,
   BHDetailOwner,

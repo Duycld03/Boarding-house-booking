@@ -76,6 +76,7 @@ class DepositController {
           _id: deposit._id,
           name: boardingHouseId.name,
           roomNumber: roomId.roomNumber,
+          roomId: roomId._id,
           amount: deposit.amount,
           status: deposit.status,
           startDate: moment(deposit.startDate).format("DD/MM/YYYY"),
