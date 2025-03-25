@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import {
   Form,
   Input,
@@ -9,14 +9,14 @@ import {
   Image,
   Button,
   Tabs,
-} from "antd";
+} from 'antd';
 import {
   PlusOutlined,
   HeartFilled,
   StarFilled,
   StarOutlined,
-} from "@ant-design/icons";
-import { getAllBoardingHouseTypesOwner } from "../../../api/BoardingHManagement";
+} from '@ant-design/icons';
+import { getAllBoardingHouseTypesOwner } from '../../../api/BoardingHManagement';
 import {
   fetchProvinces,
   fetchDistricts,
@@ -32,9 +32,11 @@ import RoomType from '@/component/RoomType';
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHotel } from '@fortawesome/free-solid-svg-icons';
-import TenantManagement from '@/component/TenantManagement';
-import DepositManagement from "@/component/DepositManagement";
-import RoomManagement from "./RoomManagement/RoomManagement";
+import TenantManagement from './TenantManagement/TenantManagement';
+import RoomManagement from './RoomManagement/RoomManagement';
+import DepositManagement from '@/component/DepositManagement';
+import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
+
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -49,12 +51,12 @@ const BHDetailOwner = () => {
   const [currentLocation, setCurrentLocation] = useState(null); // Current location
   const navigate = useNavigate();
   const location = useLocation();
-  const boardingHouseName = location.state?.name || "Default Name";
+  const boardingHouseName = location.state?.name || 'Default Name';
 
   const fetchBoardingHouseDetails = async () => {
     if (!boardingHouseId) {
-      toast.error("Boarding house ID not found.");
-      navigate("/bh-management-owner");
+      toast.error('Boarding house ID not found.');
+      navigate('/bh-management-owner');
     }
     try {
       const response = await getBoardingHouseDetail(boardingHouseId);
@@ -63,8 +65,8 @@ const BHDetailOwner = () => {
       setUpdatedData({ ...response, primaryImage, otherImages });
       setCurrentLocation([response?.location?.lat, response?.location?.lon]);
     } catch (error) {
-      console.error("Failed to fetch boarding house data:", error);
-      toast.error("Failed to fetch boarding house data.");
+      console.error('Failed to fetch boarding house data:', error);
+      toast.error('Failed to fetch boarding house data.');
     }
   };
   useEffect(() => {
@@ -105,8 +107,8 @@ const BHDetailOwner = () => {
           }
         }
       } catch (error) {
-        console.error("Error fetching address data:", error);
-        toast.error("Failed to fetch address data.");
+        console.error('Error fetching address data:', error);
+        toast.error('Failed to fetch address data.');
       }
     };
 
@@ -122,8 +124,8 @@ const BHDetailOwner = () => {
         const response = await getAllBoardingHouseTypesOwner();
         setBoardingHouseTypes(response.data || []);
       } catch (error) {
-        console.error("Failed to fetch boarding house types:", error);
-        toast.error("Failed to fetch boarding house types.");
+        console.error('Failed to fetch boarding house types:', error);
+        toast.error('Failed to fetch boarding house types.');
       }
     };
 
@@ -133,7 +135,7 @@ const BHDetailOwner = () => {
   // Update form data on input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const keys = name.split("."); // Split by dot notation for nested fields (e.g., "address.detail")
+    const keys = name.split('.'); // Split by dot notation for nested fields (e.g., "address.detail")
 
     if (keys.length === 2) {
       // Handle nested fields (e.g., "address.detail")
@@ -163,7 +165,7 @@ const BHDetailOwner = () => {
     }
 
     if (updatedData.otherImages.length >= 15) {
-      toast.error("You can only upload up to 15 other images.");
+      toast.error('You can only upload up to 15 other images.');
       return;
     }
 
@@ -184,7 +186,7 @@ const BHDetailOwner = () => {
       ...prev,
       otherImages: prev.otherImages.filter((_, i) => i !== index),
     }));
-    toast.success("Temporary image removed.");
+    toast.success('Temporary image removed.');
   };
 
   const handleSelectedTypesChange = (event) => {
@@ -200,14 +202,14 @@ const BHDetailOwner = () => {
       return false; // Prevent auto-upload
     },
     multiple: true,
-    accept: "image/*",
+    accept: 'image/*',
   };
   const uploadProps = {
     beforeUpload: (file) => {
       handleFileChange({ target: { files: [file] } }, true);
       return false; // Prevent auto-upload
     },
-    accept: "image/*",
+    accept: 'image/*',
     maxCount: 1,
     showUploadList: false,
   };
@@ -215,10 +217,10 @@ const BHDetailOwner = () => {
   const getLocation = async () => {
     try {
       const res = await axios.get(
-        "https://nominatim.openstreetmap.org/search",
+        'https://nominatim.openstreetmap.org/search',
         {
           params: {
-            format: "json",
+            format: 'json',
             q: `${updatedData.address.ward}, ${updatedData.address.district}, ${updatedData.address.province}`,
             polygon_geojson: 1,
           },
@@ -226,7 +228,7 @@ const BHDetailOwner = () => {
       );
       setGeoLocation(res.data[0]);
     } catch (error) {
-      console.log("Error getting location:", error);
+      console.log('Error getting location:', error);
     }
   };
 
@@ -242,84 +244,84 @@ const BHDetailOwner = () => {
 
       const payload = new FormData();
       if (!updatedData.boardingHouseType) {
-        toast.error("Please select a boarding house type.");
+        toast.error('Please select a boarding house type.');
         return;
       }
       if (!updatedData.name) {
-        toast.error("Please enter a boarding house name.");
+        toast.error('Please enter a boarding house name.');
         return;
       }
       if (!updatedData.address.province) {
-        toast.error("Please select a boarding house province.");
+        toast.error('Please select a boarding house province.');
         return;
       }
       if (!updatedData.address.district) {
-        toast.error("Please select a boarding house district.");
+        toast.error('Please select a boarding house district.');
         return;
       }
       if (!updatedData.address.ward) {
-        toast.error("Please select a boarding house ward.");
+        toast.error('Please select a boarding house ward.');
         return;
       }
       if (!updatedData.address.detail) {
-        toast.error("Please enter a boarding house details.");
+        toast.error('Please enter a boarding house details.');
         return;
       }
       if (!updatedData.priceRange) {
-        toast.error("Please enter price range.");
+        toast.error('Please enter price range.');
         return;
       }
       if (!updatedData.electricityPrice) {
-        toast.error("Please enter electricity price.");
+        toast.error('Please enter electricity price.');
         return;
       }
       if (!updatedData.waterPrice) {
-        toast.error("Please enter water price.");
+        toast.error('Please enter water price.');
         return;
       }
 
       // Append basic form fields
       payload.append(
-        "boardingHouseType",
+        'boardingHouseType',
         updatedData.boardingHouseType?._id || updatedData.boardingHouseType
       );
-      payload.append("name", updatedData.name);
-      payload.append("description", updatedData.description);
-      payload.append("priceRange", updatedData.priceRange);
-      payload.append("electricityPrice", updatedData.electricityPrice);
-      payload.append("waterPrice", updatedData.waterPrice);
-      payload.append("address[province]", updatedData.address.province);
-      payload.append("address[district]", updatedData.address.district);
-      payload.append("address[ward]", updatedData.address.ward);
-      payload.append("address[detail]", updatedData.address.detail);
-      payload.append("location[lat]", updatedData.location.lat);
-      payload.append("location[lon]", updatedData.location.lon);
+      payload.append('name', updatedData.name);
+      payload.append('description', updatedData.description);
+      payload.append('priceRange', updatedData.priceRange);
+      payload.append('electricityPrice', updatedData.electricityPrice);
+      payload.append('waterPrice', updatedData.waterPrice);
+      payload.append('address[province]', updatedData.address.province);
+      payload.append('address[district]', updatedData.address.district);
+      payload.append('address[ward]', updatedData.address.ward);
+      payload.append('address[detail]', updatedData.address.detail);
+      payload.append('location[lat]', updatedData.location.lat);
+      payload.append('location[lon]', updatedData.location.lon);
 
       // Append primary image (new or existing)
       const oldImg = [];
 
       if (updatedData.primaryImage) {
         if (updatedData.primaryImage instanceof File) {
-          payload.append("boardingHouse", updatedData.primaryImage);
+          payload.append('boardingHouse', updatedData.primaryImage);
         } else {
           oldImg.push(updatedData.primaryImage);
         }
       } else {
-        toast.error("A primary image is required.");
+        toast.error('A primary image is required.');
         return;
       }
 
       if (updatedData.otherImages) {
         updatedData.otherImages.forEach((file) => {
           if (file instanceof File) {
-            payload.append("boardingHouse", file);
+            payload.append('boardingHouse', file);
           } else {
             oldImg.push(file);
           }
         });
       }
       if (oldImg.length > 0) {
-        payload.append("boardingHouse", JSON.stringify(oldImg));
+        payload.append('boardingHouse', JSON.stringify(oldImg));
       }
       const response = await updateBoardingHouseDetailsOwner(
         updatedData._id, // Boarding house ID
@@ -328,17 +330,17 @@ const BHDetailOwner = () => {
 
       if (response?.success) {
         toast.success(
-          response.message || "Boarding house updated successfully."
+          response.message || 'Boarding house updated successfully.'
         );
-        navigate("/bh-management-owner");
+        navigate('/bh-management-owner');
       } else {
-        toast.error(response?.message || "Failed to update boarding house.");
+        toast.error(response?.message || 'Failed to update boarding house.');
       }
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "Failed to update the boarding house."
+          'Failed to update the boarding house.'
       );
     } finally {
       setLoading(false);
@@ -350,10 +352,10 @@ const BHDetailOwner = () => {
 
   return (
     <div className="mx-auto w-full back bg-white rounded-xl p-4">
-      {" "}
+      {' '}
       <h1 className="text-5xl flex items-center gap-2">
-        <FontAwesomeIcon icon={faHotel} className="text-gray-500 text-6xl" />{" "}
-        {boardingHouseName || "Default Title"}
+        <FontAwesomeIcon icon={faHotel} className="text-gray-500 text-6xl" />{' '}
+        {boardingHouseName || 'Default Title'}
       </h1>
       <Tabs defaultActiveKey="boardingHouseDetail">
         {/* Tab: Boarding House Detail */}
@@ -394,17 +396,17 @@ const BHDetailOwner = () => {
                       <HeartFilled className="text-red-500 text-4xl" />
                       <span className="text-gray-600 text-lg">
                         {updatedData.likes
-                          ? Number(updatedData.likes).toLocaleString("en-US")
-                          : "0"}
+                          ? Number(updatedData.likes).toLocaleString('en-US')
+                          : '0'}
                       </span>
                     </div>
                   </div>
 
                   {/* Bên phải: Total Rooms & Available Rooms */}
                   <div className="text-left min-[300px]:text-right min-w-[150px]">
-                    <div>Total Rooms: {updatedData.totalRooms || "0"}</div>
+                    <div>Total Rooms: {updatedData.totalRooms || '0'}</div>
                     <div>
-                      Available Rooms: {updatedData.availableRooms || "0"}
+                      Available Rooms: {updatedData.availableRooms || '0'}
                     </div>
                   </div>
                 </div>
@@ -417,7 +419,7 @@ const BHDetailOwner = () => {
                   <Form.Item label="Name Boarding House" className="mb-2">
                     <Input
                       name="name"
-                      value={updatedData.name || ""}
+                      value={updatedData.name || ''}
                       onChange={handleInputChange}
                     />
                   </Form.Item>
@@ -425,10 +427,10 @@ const BHDetailOwner = () => {
                   <Form.Item label="Boarding House Type" className="mb-2">
                     <Select
                       name="boardingHouseType"
-                      value={updatedData.boardingHouseType?._id || ""}
+                      value={updatedData.boardingHouseType?._id || ''}
                       onChange={(value) =>
                         handleSelectedTypesChange({
-                          target: { name: "boardingHouseType", value },
+                          target: { name: 'boardingHouseType', value },
                         })
                       }
                     >
@@ -443,7 +445,7 @@ const BHDetailOwner = () => {
                   <Form.Item label="Description" className="flex-grow">
                     <Input.TextArea
                       name="description"
-                      value={updatedData.description || ""}
+                      value={updatedData.description || ''}
                       onChange={handleInputChange}
                       rows={4}
                     />
@@ -455,21 +457,21 @@ const BHDetailOwner = () => {
                   <h2 className="text-3xl font-bold mb-4">2. Price</h2>
                   <Form.Item
                     label="Price Rent/month (VND)"
-                    style={{ marginTop: "10px" }} // Sử dụng object-style đúng cách
+                    style={{ marginTop: '10px' }} // Sử dụng object-style đúng cách
                     className="mb-2"
                   >
                     <InputNumber
                       name="priceRange"
-                      value={updatedData.priceRange || ""}
+                      value={updatedData.priceRange || ''}
                       onChange={(value) =>
                         handleInputChange({
-                          target: { name: "priceRange", value },
+                          target: { name: 'priceRange', value },
                         })
                       }
                       formatter={(value) =>
-                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                       }
-                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                       className="w-full"
                       min={0}
                     />
@@ -481,16 +483,16 @@ const BHDetailOwner = () => {
                   >
                     <InputNumber
                       name="electricityPrice"
-                      value={updatedData.electricityPrice || ""}
+                      value={updatedData.electricityPrice || ''}
                       onChange={(value) =>
                         handleInputChange({
-                          target: { name: "electricityPrice", value },
+                          target: { name: 'electricityPrice', value },
                         })
                       }
                       formatter={(value) =>
-                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                       }
-                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                       className="w-full"
                       min={0}
                     />
@@ -502,16 +504,16 @@ const BHDetailOwner = () => {
                   >
                     <InputNumber
                       name="waterPrice"
-                      value={updatedData.waterPrice || ""}
+                      value={updatedData.waterPrice || ''}
                       onChange={(value) =>
                         handleInputChange({
-                          target: { name: "waterPrice", value },
+                          target: { name: 'waterPrice', value },
                         })
                       }
                       formatter={(value) =>
-                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                       }
-                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                       className="w-full"
                       min={0}
                     />
@@ -532,9 +534,9 @@ const BHDetailOwner = () => {
                         alt="Primary"
                         className="object-cover border rounded"
                         style={{
-                          width: "100%",
-                          height: "auto",
-                          maxHeight: "300px",
+                          width: '100%',
+                          height: 'auto',
+                          maxHeight: '300px',
                         }}
                         preview={{
                           mask: <span className="text-white">Preview</span>,
@@ -625,7 +627,7 @@ const BHDetailOwner = () => {
                       label="Province"
                       required
                       rules={[
-                        { required: true, message: "Province is required" },
+                        { required: true, message: 'Province is required' },
                       ]}
                     >
                       <Select
@@ -634,7 +636,7 @@ const BHDetailOwner = () => {
                         value={updatedData?.address?.province || null}
                         onChange={(value) => {
                           handleInputChange({
-                            target: { name: "address.province", value },
+                            target: { name: 'address.province', value },
                           });
                           setUpdatedData((prev) => ({
                             ...prev,
@@ -664,7 +666,7 @@ const BHDetailOwner = () => {
                       label="District"
                       required
                       rules={[
-                        { required: true, message: "District is required" },
+                        { required: true, message: 'District is required' },
                       ]}
                     >
                       <Select
@@ -675,7 +677,7 @@ const BHDetailOwner = () => {
                         value={updatedData?.address?.district || null}
                         onChange={(value) => {
                           handleInputChange({
-                            target: { name: "address.district", value },
+                            target: { name: 'address.district', value },
                           });
                           setUpdatedData((prev) => ({
                             ...prev,
@@ -704,7 +706,7 @@ const BHDetailOwner = () => {
                     <Form.Item
                       label="Ward"
                       required
-                      rules={[{ required: true, message: "Ward is required" }]}
+                      rules={[{ required: true, message: 'Ward is required' }]}
                     >
                       <Select
                         placeholder="Select Ward"
@@ -714,7 +716,7 @@ const BHDetailOwner = () => {
                         value={updatedData?.address?.ward || null}
                         onChange={(value) => {
                           handleInputChange({
-                            target: { name: "address.ward", value },
+                            target: { name: 'address.ward', value },
                           });
                           setUpdatedData((prev) => ({
                             ...prev,
@@ -736,7 +738,7 @@ const BHDetailOwner = () => {
                     <Form.Item label="Detail">
                       <Input.TextArea
                         name="address.detail"
-                        value={updatedData?.address?.detail || ""}
+                        value={updatedData?.address?.detail || ''}
                         onChange={handleInputChange}
                         rows={4}
                       />
@@ -766,7 +768,7 @@ const BHDetailOwner = () => {
                 <Button
                   className="bg-red-500 text-white flex-1"
                   size="large"
-                  onClick={() => navigate("/bh-management-owner")}
+                  onClick={() => navigate('/bh-management-owner')}
                   title="Back"
                 >
                   Back
@@ -803,6 +805,9 @@ const BHDetailOwner = () => {
         </Tabs.TabPane>
         <Tabs.TabPane tab="Tenant Management" key="Tenant Management">
           <TenantManagement />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Renewal Management" key="Renewal Request Management">
+          <RenewalRequest boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
       </Tabs>
     </div>

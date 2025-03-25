@@ -25,6 +25,7 @@ import {
   MyReportManagement,
   BoardingHouseTypeManagement,
   MyDepositedRoom,
+  MyRentPayment,
   MyDepositRefundRequest,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
@@ -142,6 +143,11 @@ const routes = [
   {
     path: "/my-deposited-room",
     page: MyDepositedRoom,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/my-rent-payment",
+    page: MyRentPayment,
     layout: ProfileLayout,
   },
   {

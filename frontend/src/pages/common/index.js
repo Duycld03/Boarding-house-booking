@@ -11,6 +11,7 @@ import FavouriteList from "./FavouriteList";
 import WatchLater from "./WatchLater";
 import MyReportManagement from "./MyReport";
 import MyDepositedRoom from "./MyDepositedRoom";
+import MyRentPayment from "./MyRentPayment";
 import MyDepositRefundRequest from "./MyDepositRefundRequest";
 import DepositRefundRequestOwner from "./DepositRefundRequestOwner";
 
@@ -28,6 +29,7 @@ export {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRentPayment,
   MyDepositRefundRequest,
   DepositRefundRequestOwner,
 };
