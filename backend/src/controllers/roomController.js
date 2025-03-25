@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { v2 as cloudinary } from "cloudinary";
 import Room from "../models/room.js";
 
 class RoomController {
@@ -55,7 +56,7 @@ class RoomController {
     try {
       const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
 
-      if (!roomNumber || !boardingHouseId || !roomTypeId) {
+      if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
@@ -90,7 +91,55 @@ class RoomController {
       res.status(500).json({ message: "Server error", error });
     }
   }
-  async updateRoom(req, res) {}
+  async updateRoom(req, res) {
+    try {
+      const { roomId } = req.params;
+      const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
+
+      if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
+        return res.status(400).json({ message: "Missing required parameters" });
+      }
+
+      const room = await Room.findById(roomId);
+      if (!room) {
+        return res.status(400).json({ message: "Room not found" });
+      }
+
+      if (room.roomNumber != roomNumber) {
+        const existingRoom = await Room.findOne({
+          roomNumber,
+          boardingHouseId,
+        });
+
+        if (existingRoom) {
+          return res.status(400).json({ message: "Room already exists" });
+        }
+        room.roomNumber = roomNumber;
+      }
+
+      room.description = description;
+      room.roomTypeId = roomTypeId;
+      // room.isAvailable = true;
+      // room.boardingHouseId = boardingHouseId;
+
+      if (req.file) {
+        if (room?.images?.publicId) {
+          await cloudinary.uploader.destroy(room.images.publicId);
+        }
+
+        room.images = {
+          imageUrl: req.file.path,
+          publicId: req.file.filename,
+        };
+      }
+
+      await room.save();
+      res.status(201).json({ message: "Room added successfully" });
+    } catch (error) {
+      console.error("Error adding room:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
   async deleteRoom(req, res) {
     try {
       const { roomId } = req.params;

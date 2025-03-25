@@ -6,11 +6,15 @@ import convertTimetap from "@/utils/convertTimetap";
 import AddRoom from "./AddRoom";
 import { toast } from "react-toastify";
 import { deleteRoom } from "@/api/ownerUser/boardingHouse";
+import UpdateRoom from "./UpdateRoom";
+
 function RoomManagement({ boardingHouseId }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectRoomId, setSelectRoomId] = useState(null);
+  const [selectRoomData, setSelectRoomData] = useState(null);
+  const [visibleUpdateRoom, setVisibleUpdateRoom] = useState(false);
 
   //fetch data
   const fetchRooms = async () => {
@@ -87,7 +91,15 @@ function RoomManagement({ boardingHouseId }) {
               setSelectRoomId(record._id);
             }}
           />
-          <Button btnUpdate title="Update" size="large" />
+          <Button
+            btnUpdate
+            title="Update"
+            size="large"
+            onClick={() => {
+              setSelectRoomData(record);
+              setVisibleUpdateRoom(true);
+            }}
+          />
         </div>
       ),
     },
@@ -119,6 +131,13 @@ function RoomManagement({ boardingHouseId }) {
           setIsOpenDeleteModal(false);
         }}
         isOpen={isOpenDeleteModal}
+      />
+      <UpdateRoom
+        visible={visibleUpdateRoom}
+        setVisible={setVisibleUpdateRoom}
+        boardingHouseId={boardingHouseId}
+        refreshRoomData={fetchRooms}
+        roomData={selectRoomData}
       />
     </div>
   );

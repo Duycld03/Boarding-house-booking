@@ -8,8 +8,8 @@ import {
   depositController,
   renewalRequestController,
   refundRequestController,
-} from '../controllers/index.js';
-import { upload } from '../config/cloudinary.config.js';
+} from "../controllers/index.js";
+import { upload } from "../config/cloudinary.config.js";
 
 const ownerRouter = Router();
 
@@ -64,30 +64,34 @@ ownerRouter.post(
   upload.single("Room"),
   roomController.addRoom
 );
-ownerRouter.put("/room/boarding-house/:roomId", roomController.updateRoom);
+ownerRouter.put(
+  "/room/boarding-house/:roomId",
+  upload.single("Room"),
+  roomController.updateRoom
+);
 ownerRouter.delete("/room/boarding-house/:roomId", roomController.deleteRoom);
 
 //renewal
 ownerRouter.get(
-  '/renewal/boarding-house/:boardingHouseId',
+  "/renewal/boarding-house/:boardingHouseId",
   renewalRequestController.getRenewalRequestByBhID
 );
 ownerRouter.put(
-  '/renewal/:requestId',
+  "/renewal/:requestId",
   renewalRequestController.acceptExtensionRequest
 );
 ownerRouter.put(
-  '/rejectrenewal/:requestId',
+  "/rejectrenewal/:requestId",
   renewalRequestController.rejectExtensionRequest
 );
 
 // refund request
 ownerRouter.get(
-  '/refund-requests',
+  "/refund-requests",
   refundRequestController.getRefundRequestsForOwner
 );
 ownerRouter.put(
-  '/refund-request/:refundRequestId',
+  "/refund-request/:refundRequestId",
   refundRequestController.cancelRefundRequestsForOwner
 );
 
