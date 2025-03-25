@@ -33,8 +33,10 @@ import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHotel } from '@fortawesome/free-solid-svg-icons';
 import TenantManagement from './TenantManagement/TenantManagement';
-import DepositManagement from '@/component/DepositManagement';
 import RoomManagement from './RoomManagement/RoomManagement';
+import DepositManagement from '@/component/DepositManagement';
+import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
+
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -803,6 +805,9 @@ const BHDetailOwner = () => {
         </Tabs.TabPane>
         <Tabs.TabPane tab="Tenant Management" key="Tenant Management">
           <TenantManagement />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Renewal Management" key="Renewal Request Management">
+          <RenewalRequest boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
       </Tabs>
     </div>
