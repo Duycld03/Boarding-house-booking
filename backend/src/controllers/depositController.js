@@ -9,6 +9,7 @@ import Room from '../models/room.js';
 import PaymentBill from '../models/paymentBill.js';
 import dotenv from 'dotenv';
 import UserPayment from '../models/userPayment.js';
+import BoardingHouse from '../models/boardingHouse.js';
 import { query } from 'express';
 dotenv.config();
 
@@ -492,19 +493,30 @@ class DepositController {
     try {
       const { depositId } = req.params;
 
-      // Lấy thông tin khoản đặt cọc
+      // Lấy thông tin khoản đặt cọc, bao gồm cả boardingHouseName
       const deposit = await DepositRoom.findById(depositId)
         .populate({ path: 'accountId', select: 'fullname email' })
-        .populate({ path: 'roomId', select: 'roomNumber' });
+        .populate({
+          path: 'roomId',
+          select: 'roomNumber boardingHouseId', // Lấy boardingHouseId từ roomId
+          populate: {
+            path: 'boardingHouseId', // Populate boardingHouseId trong roomId
+            select: 'name', // Lấy trường name của boardingHouse
+          },
+        });
 
       if (!deposit) {
         return res.status(404).json({ error: 'Không tìm thấy khoản đặt cọc' });
       }
 
+      // Lấy tên nhà trọ từ boardingHouseId đã populate
+      const boardingHouseName = deposit.roomId.boardingHouseId
+        ? deposit.roomId.boardingHouseId.name
+        : 'Không có tên nhà trọ';
+
       // Cập nhật status thành 'accepted'
       deposit.status = 'accepted';
       await deposit.save();
-      // Cập nhật rentBy trong Room
 
       // Config mail server (nhớ đổi tài khoản của bạn)
       const transporter = nodemailer.createTransport({
@@ -521,7 +533,7 @@ class DepositController {
         subject: 'Đặt cọc phòng trọ đã được chấp nhận ✅',
         html: `
         <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
-        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> đã được <span style="color:green;"><strong>chấp nhận</strong></span> thành công.</p>
+        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã được <span style="color:green;"><strong>chấp nhận</strong></span> thành công.</p>
         <ul>
           <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
           <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
@@ -630,14 +642,26 @@ class DepositController {
           .json({ error: 'Reason for rejection is required' });
       }
 
-      // Lấy thông tin khoản đặt cọc
+      // Lấy thông tin khoản đặt cọc, bao gồm cả boardingHouseName
       const deposit = await DepositRoom.findById(depositId)
         .populate({ path: 'accountId', select: 'fullname email' })
-        .populate({ path: 'roomId', select: 'roomNumber' });
+        .populate({
+          path: 'roomId',
+          select: 'roomNumber boardingHouseId', // Lấy boardingHouseId từ roomId
+          populate: {
+            path: 'boardingHouseId', // Populate boardingHouseId trong roomId
+            select: 'name', // Lấy trường name của boardingHouse
+          },
+        });
 
       if (!deposit) {
         return res.status(404).json({ error: 'Không tìm thấy khoản đặt cọc' });
       }
+
+      // Lấy tên nhà trọ từ boardingHouseId đã populate
+      const boardingHouseName = deposit.roomId.boardingHouseId
+        ? deposit.roomId.boardingHouseId.name
+        : 'Không có tên nhà trọ';
 
       // Cập nhật status thành 'rejected' và thêm lý do hủy
       deposit.status = 'rejected';
@@ -659,7 +683,7 @@ class DepositController {
         subject: 'Đặt cọc phòng trọ đã bị từ chối ❌',
         html: `
         <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
-        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> đã bị <span style="color:red;"><strong>từ chối</strong></span>.</p>
+        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã bị <span style="color:red;"><strong>từ chối</strong></span>.</p>
         <ul>
           <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
           <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
