@@ -1,10 +1,10 @@
-import { payRent } from "@/api/depositManagement";
+import { payDeposit, payRent } from "@/api/depositManagement";
 import formatAmount from "@/utils/formatAmount";
 import { Form, Modal, Radio } from "antd";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
-function PayRentPopup({ isVisible, setVisible, payRentData }) {
+function PayDepositPopup({ isVisible, setVisible, payDepositData }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -15,9 +15,9 @@ function PayRentPopup({ isVisible, setVisible, payRentData }) {
 
   const onFinish = async (values) => {
     setLoading(true);
-    const payload = { ...payRentData, ...values };
+    const payload = { depositRoomId: payDepositData._id, ...values };
     try {
-      const res = await payRent(payload);
+      const res = await payDeposit(payload);
       window.location.href = res.payUrl;
     } catch (error) {
       toast.error(error.response.data.message);
@@ -29,7 +29,7 @@ function PayRentPopup({ isVisible, setVisible, payRentData }) {
 
   return (
     <Modal
-      title="Select a payment"
+      title="Pay Deposit"
       open={isVisible}
       onCancel={handleCancel}
       confirmLoading={loading}
@@ -45,10 +45,11 @@ function PayRentPopup({ isVisible, setVisible, payRentData }) {
         <Form.Item name="amount" className="mb-2">
           Amount:
           <span className="font-semibold">
-            {` ${formatAmount(payRentData.amount)}`} VND
+            {` ${formatAmount(payDepositData.amount)}`} VND
           </span>
         </Form.Item>
-        <Form.Item name="paymentMethod">
+
+        <Form.Item label="Select a payment" name="paymentMethod">
           <Radio.Group>
             <Radio value="vnpay">VNPay</Radio>
             <Radio value="momo">Momo</Radio>
@@ -59,4 +60,4 @@ function PayRentPopup({ isVisible, setVisible, payRentData }) {
   );
 }
 
-export default PayRentPopup;
+export default PayDepositPopup;

@@ -21,6 +21,9 @@ import {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRentPayment,
+  MyDepositRefundRequest,
+  DepositRefundRequestOwner,
 } from "./common";
 
 import {
@@ -31,7 +34,7 @@ import {
   AccountManagement,
   ReviewManagement,
   BoardingHouseTypeManagement,
-  FacilitiesManagement
+  FacilitiesManagement,
 } from "./dashboard";
 
 export {
@@ -56,10 +59,13 @@ export {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
+  MyRentPayment,
+  MyDepositRefundRequest,
 
   // owner
   BHManagementOwner,
   BHDetailOwner,
+  DepositRefundRequestOwner,
 
   //dashboard
   BoardingHouseManagement,
@@ -69,5 +75,5 @@ export {
   WithdrawalRequestManagement,
   ReviewManagement,
   BoardingHouseTypeManagement,
-  FacilitiesManagement
+  FacilitiesManagement,
 };

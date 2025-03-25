@@ -15,11 +15,12 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
   const [isPaid, setIsPaid] = useState(false);
 
   const fetchDepositRoom = async () => {
+    debugger;
     if (!depositRoomId) return;
     setLoading(true);
     try {
       const res = await getDepositRoom(depositRoomId);
-      res.primaryImage = res.images.find((image) => image.isPrimary);
+      res.primaryImage = res.images;
       setDepositRoom(res);
     } catch (error) {
       console.error(error);
@@ -47,7 +48,7 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
   }, [depositRoomId]);
 
   const payRent = async (userId) => {
-    setPayRentData({ userId, depositRoomId });
+    setPayRentData({ userId, depositRoomId, amount: depositRoom.price });
     setPayRentVisible(true);
   };
 

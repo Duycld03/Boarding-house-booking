@@ -14,6 +14,9 @@ import roomTypeController from './roomTypeController.js';
 import tenantController from './tenantController.js';
 import expenseController from './expenseController.js';
 import revenueController from './revenueController.js';
+import renewalRequestController from './renewalRequesrController.js'; // Fixed typo here
+import userPaymentController from './userPaymentController.js';
+import refundRequestController from './refundRequestController.js'; // Fixed typo here
 
 export {
   authController,
@@ -29,7 +32,10 @@ export {
   depositController,
   FacilitiesController,
   roomTypeController,
+  userPaymentController,
   tenantController,
   expenseController,
-  revenueController
+  revenueController,
+  renewalRequestController, // Added here
+  refundRequestController,
 };
