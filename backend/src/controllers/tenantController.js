@@ -36,7 +36,7 @@ class TenantController {
           const depositInfo = await DepositRoom.findOne({
             roomId: room._id,
             accountId: tenant._id,
-            status: 'accepted', // Chỉ lấy deposit đã được chấp nhận
+            status: 'confirmed', // Chỉ lấy deposit đã được chấp nhận
           });
 
           if (depositInfo) {
