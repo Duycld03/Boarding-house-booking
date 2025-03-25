@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Modal, Upload, Select, InputNumber } from "antd";
+import { Form, Input, Modal, Upload, Select } from "antd";
 import { Button } from "@/component";
 import { PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
@@ -21,7 +21,6 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
     setLoadingSubmit(true);
     const formData = new FormData();
     formData.append("roomNumber", values.roomNumber);
-    formData.append("roomSize", values.roomSize);
     formData.append("boardingHouseId", boardingHouseId);
     formData.append("description", values.description);
     formData.append("roomTypeId", values.roomType);
@@ -90,30 +89,29 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
         onCancel={onCancel}
         open={visible}
         onOk={form.submit}
+        okText="Add Room"
         destroyOnClose
       >
         <Form layout="vertical" form={form} onFinish={onFinish}>
+          <Form.Item
+            label="Room Type"
+            name="roomType"
+            rules={[{ required: true, message: "Please select room type!" }]}
+          >
+            <Select size="large" placeholder="Select room type">
+              {roomTypes.map((roomType) => (
+                <Select.Option key={roomType._id} value={roomType._id}>
+                  {roomType.typeName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
           <Form.Item
             label="Room Number"
             name="roomNumber"
             rules={[{ required: true, message: "Please enter room number!" }]}
           >
             <Input size="large" placeholder="Enter room number" />
-          </Form.Item>
-
-          <Form.Item
-            label="Room Size (m²)"
-            name="roomSize"
-            rules={[
-              { required: true, message: "Please enter room size!" },
-              { type: "number", message: "Room size must be a number!" },
-            ]}
-          >
-            <InputNumber
-              size="large"
-              placeholder="Enter room size"
-              className="w-full"
-            />
           </Form.Item>
 
           <Form.Item
@@ -128,20 +126,6 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
               placeholder="Enter room description"
               autoSize={{ minRows: 3 }}
             />
-          </Form.Item>
-
-          <Form.Item
-            label="Room Type"
-            name="roomType"
-            rules={[{ required: true, message: "Please select room type!" }]}
-          >
-            <Select size="large" placeholder="Select room type">
-              {roomTypes.map((roomType) => (
-                <Select.Option key={roomType._id} value={roomType._id}>
-                  {roomType.typeName}
-                </Select.Option>
-              ))}
-            </Select>
           </Form.Item>
 
           <Form.Item label="Room Image" name="image">

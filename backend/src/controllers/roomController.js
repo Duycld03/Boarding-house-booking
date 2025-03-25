@@ -53,10 +53,9 @@ class RoomController {
 
   async addRoom(req, res) {
     try {
-      const { roomNumber, roomSize, boardingHouseId, description, roomTypeId } =
-        req.body;
+      const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
 
-      if (!roomNumber || !roomSize || !boardingHouseId || !roomTypeId) {
+      if (!roomNumber || !boardingHouseId || !roomTypeId) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
@@ -71,7 +70,6 @@ class RoomController {
 
       const room = new Room({
         roomNumber,
-        roomSize,
         boardingHouseId,
         description,
         roomTypeId,
