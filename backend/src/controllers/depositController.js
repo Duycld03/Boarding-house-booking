@@ -376,18 +376,10 @@ class DepositController {
       const { boardingHouseId } = req.params;
       const { status, priceRange, endDate, roomId, rentalTime } = req.query;
 
-      const defaultFilter = {
-        status: '',
-        priceRange: ['0', '3000000'],
-        rentalTime: ['1', '2'],
-        roomId: ''
-      }
-
-      if (req.query === defaultFilter) {
-
-      }
 
       const rooms = await Room.find({ boardingHouseId }).select("_id roomNumber");
+
+
       const roomMap = new Map(rooms.map(room => [room._id.toString(), room.roomNumber]));
       let filter = { roomId: { $in: [...roomMap.keys()] } };
       if (roomId && roomId !== "" && roomMap.has(roomId)) {
@@ -439,26 +431,23 @@ class DepositController {
           console.error("Error parsing priceRange:", e);
         }
       }
-
       if (rentalTime) {
         try {
           if (typeof rentalTime === 'string') {
             if (rentalTime.includes(',')) {
-              const [min, max] = rentalTime.split(',').map(Number);
-              if (!isNaN(min) && !isNaN(max)) {
+              let [min, max] = rentalTime.split(',').map(Number);
+              if (!isNaN(min) && !isNaN(max) && min <= max) {
                 filter.rentalTime = { $gte: min, $lte: max };
               }
-            }
-            else {
+            } else {
               const value = Number(rentalTime);
               if (!isNaN(value)) {
                 filter.rentalTime = value;
               }
             }
-          }
-          else if (Array.isArray(rentalTime) && rentalTime.length === 2) {
-            const [min, max] = rentalTime.map(Number);
-            if (!isNaN(min) && !isNaN(max)) {
+          } else if (Array.isArray(rentalTime) && rentalTime.length === 2) {
+            let [min, max] = rentalTime.map(Number);
+            if (!isNaN(min) && !isNaN(max) && min <= max) {
               filter.rentalTime = { $gte: min, $lte: max };
             }
           }
@@ -466,6 +455,7 @@ class DepositController {
           console.error("Error parsing rentalTime:", e);
         }
       }
+
 
       const deposits = await DepositRoom.find(filter)
         .populate({ path: "accountId", select: "fullname" })
