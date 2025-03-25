@@ -1,8 +1,5 @@
-import React from "react";
-
 const OtherExpensesTable = ({
   otherExpenses,
-  onAdd,
   calculateTotal,
   formatCurrency,
 }) => {

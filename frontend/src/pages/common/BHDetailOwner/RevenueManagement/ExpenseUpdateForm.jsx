@@ -55,7 +55,12 @@ const ExpenseUpdateForm = ({
     const totalAmount = quantityConsumed * price;
 
     form.setFieldsValue({
-      [field]: { ...values[field], quantityConsumed, totalAmount },
+      [field]: {
+        oldNumber,
+        newNumber,
+        quantityConsumed,
+        totalAmount,
+      },
     });
   };
 
@@ -97,6 +102,12 @@ const ExpenseUpdateForm = ({
               >
                 <InputNumber
                   min={0}
+                  formatter={(value) =>
+                    value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                  }
+                  parser={(value) =>
+                    value?.replace(/\./g, "").replace(",", ".")
+                  }
                   style={{ width: "100%" }}
                   onChange={() =>
                     calculateQuantity("electricalExpense", ELECTRICITY_PRICE)
@@ -115,6 +126,12 @@ const ExpenseUpdateForm = ({
               >
                 <InputNumber
                   min={0}
+                  formatter={(value) =>
+                    value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                  }
+                  parser={(value) =>
+                    value?.replace(/\./g, "").replace(",", ".")
+                  }
                   style={{ width: "100%" }}
                   disabled={field === "quantityConsumed"}
                 />
@@ -136,6 +153,12 @@ const ExpenseUpdateForm = ({
                 <InputNumber
                   min={0}
                   style={{ width: "100%" }}
+                  formatter={(value) =>
+                    value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                  }
+                  parser={(value) =>
+                    value?.replace(/\./g, "").replace(",", ".")
+                  }
                   onChange={() =>
                     calculateQuantity("waterExpense", WATER_PRICE)
                   }
@@ -153,6 +176,12 @@ const ExpenseUpdateForm = ({
               >
                 <InputNumber
                   min={0}
+                  formatter={(value) =>
+                    value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                  }
+                  parser={(value) =>
+                    value?.replace(/\./g, "").replace(",", ".")
+                  }
                   style={{ width: "100%" }}
                   disabled={field === "quantityConsumed"}
                 />
@@ -185,6 +214,14 @@ const ExpenseUpdateForm = ({
                     >
                       <InputNumber
                         min={0}
+                        formatter={(value) =>
+                          value
+                            ?.toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                        }
+                        parser={(value) =>
+                          value?.replace(/\./g, "").replace(",", ".")
+                        }
                         placeholder="Amount"
                         style={{ width: "100%" }}
                         addonAfter="VND"

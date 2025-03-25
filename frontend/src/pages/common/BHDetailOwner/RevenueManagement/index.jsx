@@ -7,6 +7,11 @@ import RevenueYearlyView from "./RevenueYearlyView";
 import ExpenseUpdateForm from "./ExpenseUpdateForm";
 import { formatCurrency } from "@/utils/formatters";
 import { toast } from "react-toastify";
+import {
+  getRevenueByYear,
+  getAvailableYears,
+  getRevenueByTime,
+} from "@/api/revenueManagement";
 
 // Colors for the charts
 export const COLORS = {
@@ -30,6 +35,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
   const [monthlyExpenses, setMonthlyExpenses] = useState(null);
   const [expenseView, setExpenseView] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [availableYear, setAvailableYear] = useState([]);
   const [expenseFormData, setExpenseFormData] = useState({
     id: undefined,
     electricalExpense: {
@@ -48,27 +54,59 @@ const RevenueManagement = ({ boardingHouseId }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const fetchAvailableYear = async (boardingHouseId) => {
+    try {
+      if (!boardingHouseId) return; // Ensure boardingHouseId is valid before calling API
+
+      const response = await getAvailableYears(boardingHouseId);
+
+      if (response) {
+        setAvailableYear(response);
+      }
+    } catch (error) {
+      console.error("Error fetching available years:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (boardingHouseId) {
+      fetchAvailableYear(boardingHouseId);
+    }
+  }, [boardingHouseId]);
+
   useEffect(() => {
     fetchMonthlyData(selectedMonth, selectedYear);
     fetchYearlyData(selectedYear);
     fetchMonthlyExpenses(selectedMonth, selectedYear, boardingHouseId);
-  }, [selectedMonth, selectedYear, boardingHouseId]);
+  }, [selectedMonth, selectedYear]);
 
-  const fetchMonthlyData = (month, year) => {
-    // Simulated API call - replace with actual API call
-    const data = {
-      totalRevenue: 5000,
-      transactionCount: 10,
-      transactions: ["txn1", "txn2"],
-      electricityWaterCost: 1200,
-      otherCosts: 800,
-      netProfit: 3000,
-    };
-    setMonthlyData(data);
+  const fetchMonthlyData = async (month, year) => {
+    try {
+      const response = await getRevenueByTime({
+        boardingHouseId,
+        month,
+        year,
+      });
+
+      // Check if response is valid and has required data
+      if (
+        response &&
+        response.transactions &&
+        response.transactions.length > 0
+      ) {
+        setMonthlyData(response);
+      } else {
+        // Handle case with no data
+        setMonthlyData(null);
+        console.warn("No monthly data found");
+      }
+    } catch (error) {
+      console.error("Error fetching revenue data:", error);
+      setMonthlyData(null);
+    }
   };
 
   const fetchYearlyData = (year) => {
-    // Simulated API call - replace with actual API call
     const data = [
       {
         month: "T1",
@@ -258,6 +296,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
       setIsSubmitting(false);
     }
   };
+
   const monthNames = {
     1: "January",
     2: "February",
@@ -285,14 +324,14 @@ const RevenueManagement = ({ boardingHouseId }) => {
         >
           Month
         </button>
-        <button
+        {/* <button
           className={`py-2 px-4 rounded-lg font-medium ${
             activeTab === "yearly" ? "bg-white shadow-sm" : "text-gray-600"
           }`}
           onClick={() => setActiveTab("yearly")}
         >
           Year
-        </button>
+        </button> */}
       </div>
 
       {/* Filters */}
@@ -322,7 +361,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
           >
-            {[2023, 2024, 2025]?.map((year) => (
+            {[availableYear]?.map((year) => (
               <option key={year} value={year}>
                 {year}
               </option>
@@ -362,7 +401,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
                 onClick={handleUpdateExpense}
                 className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
-                Cập Nhật Chi Phí
+                Update expense
               </button>
             </div>
           )}
@@ -371,6 +410,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
             <RevenueMonthlyView
               monthlyData={monthlyData}
               formatCurrency={formatCurrency}
+              monthlyExpenses={monthlyExpenses}
             />
           ) : (
             <ExpenseMonthlyView

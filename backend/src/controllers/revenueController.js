@@ -2,13 +2,15 @@ import mongoose from "mongoose";
 import Revenue from "../models/revenue.js";
 
 class RevenueController {
+
     async getRevenue(req, res) {
         try {
             const { boardingHouseId, month, year } = req.query;
+
+
             if (!boardingHouseId || !month || !year) {
                 return res.status(400).json({ message: "Missing required parameters" });
             }
-
             const revenue = await Revenue.findOne({
                 boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId),
                 month: parseInt(month),
@@ -41,15 +43,22 @@ class RevenueController {
     }
 
     async getAvailableYears(req, res) {
-        try {
-            const years = await Revenue.distinct("year");
-            years.sort((a, b) => b - a);
+        const { boardingHouseId } = req.query;
 
-            res.status(200).json({ years });
+        try {
+            if (!boardingHouseId) {
+                return res.status(400).json({ message: "Missing required parameter: boardingHouseId" });
+            }
+            const years = await Revenue.distinct("year", {
+                boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId)
+            });
+            years.sort((a, b) => b - a);
+            res.status(200).json(years);
         } catch (error) {
             res.status(500).json({ message: "Server error", error: error.message });
         }
     }
+
 
     async getRevenueByYear(req, res) {
         try {
