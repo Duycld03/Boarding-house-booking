@@ -1,3 +1,4 @@
+
 import favoriteController from "./favoriteController.js";
 import authController from "./authController.js";
 import ReviewController from "./reviewController.js";
@@ -15,6 +16,10 @@ import tenantController from "./tenantController.js";
 import renewalRequestController from "./renewalRequesrController.js"; // Fixed typo here
 import userPaymentController from "./userPaymentController.js";
 import refundRequestController from "./refundRequestController.js";
+import renewalController from './renewalController.js';
+import expenseController from './expenseController.js';
+import revenueController from './revenueController.js';
+
 
 export {
   authController,
@@ -32,6 +37,9 @@ export {
   roomTypeController,
   userPaymentController,
   tenantController,
-  renewalRequestController, // Added here
+  renewalController,
+  expenseController,
+  revenueController,
+  renewalRequestController,
   refundRequestController,
 };

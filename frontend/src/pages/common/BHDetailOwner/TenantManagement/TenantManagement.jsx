@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Table from '@/component/Table';
-import { Button, ConfirmModal } from '@/component';
+import { TableCustom as Table, Button, ConfirmModal } from '@/component';
 import {
   getTenantsByBoardingHouse,
   deleteTenantFromBoardingHouse,
-} from '../../api/tenantManagement';
+} from '@/api/tenantManagement';
 import { toast } from 'react-toastify';
 import convertTimetap from '@/utils/convertTimetap';
+import { Avatar } from 'antd';
+import DefaultAvatar from '@/assets/images/none_avatar.png';
 
 const TenantManagement = () => {
   const { boardingHouseId } = useParams();
@@ -70,6 +71,20 @@ const TenantManagement = () => {
 
   const columns = [
     {
+      title: 'Avatar',
+      dataIndex: 'avatarImage',
+      key: 'avatarImage',
+      render: (avatarImage) => {
+        return (
+          <Avatar
+            src={avatarImage?.url ?? DefaultAvatar}
+            shape="circle"
+            size="large"
+          />
+        );
+      },
+    },
+    {
       title: 'Tenant Name',
       dataIndex: 'tenantName',
       key: 'tenantName',
@@ -80,21 +95,19 @@ const TenantManagement = () => {
       key: 'roomNumber',
     },
     {
-      title: 'Total Deposit Time',
-      dataIndex: 'totalDepositTime',
-      key: 'totalDepositTime',
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
     },
     {
-      title: 'Start Deposit Date',
-      dataIndex: 'startDepositDate',
-      key: 'startDepositDate',
-      render: (date) => convertTimetap(date),
+      title: 'Phone number',
+      dataIndex: 'phoneNumber',
+      key: 'phoneNumber',
     },
     {
-      title: 'End Deposit Date',
-      dataIndex: 'endDepositDate',
-      key: 'endDepositDate',
-      render: (date) => convertTimetap(date),
+      title: 'Gender',
+      dataIndex: 'gender',
+      key: 'gender',
     },
     {
       title: 'Action',
