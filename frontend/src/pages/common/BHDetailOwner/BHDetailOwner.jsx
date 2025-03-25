@@ -32,8 +32,8 @@ import RoomType from '@/component/RoomType';
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHotel } from '@fortawesome/free-solid-svg-icons';
-import TenantManagement from '@/component/TenantManagement';
 import DepositManagement from '@/pages/common/BHDetailOwner/DepositManagement';
+import TenantManagement from './TenantManagement/TenantManagement';
 import RoomManagement from './RoomManagement/RoomManagement';
 import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
 

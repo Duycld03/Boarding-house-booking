@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tag, Input, Modal, Form } from 'antd';
 import { toast } from 'react-toastify';
 import {
-  getAllDepositRooms,
+  getDepositByBhId,
   acceptDepositRoom,
   rejectDepositRoom,
 } from '../../../../api/depositManagement';
@@ -25,7 +25,7 @@ const DepositRoom = () => {
 
   const fetchDepositedRooms = async () => {
     try {
-      const response = await getAllDepositRooms(boardingHouseId);
+      const response = await getDepositByBhId(boardingHouseId);
       setDepositedRooms(Array.isArray(response) ? response : []);
     } catch (error) {
       console.error('Error fetching deposit rooms:', error);
