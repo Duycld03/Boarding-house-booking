@@ -3,9 +3,18 @@ import {
   FileTextOutlined,
   DownOutlined,
   SyncOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 
-const ActionDropdown = ({ record, onDetailClick, onRenewalClick }) => {
+const ActionDropdown = ({
+  record,
+  onDetailClick,
+  onRenewalClick,
+  setDepositRoom,
+  setIsPayDepositPopupVisible,
+  setDepositRoomId,
+  setIsPayRentModalVisible,
+}) => {
   const menuItems = [
     {
       key: "detail",
@@ -14,16 +23,31 @@ const ActionDropdown = ({ record, onDetailClick, onRenewalClick }) => {
       disabled: record.status === "pending",
       onClick: () => onDetailClick(record._id),
     },
-
     {
       key: "renewal",
       label: "Create renewal request",
       icon: <SyncOutlined />,
       onClick: () => onRenewalClick(record),
     },
-  ];
-
-  console.log("record", record);
+    record.status === "confirmed" && {
+      key: "viewDetail",
+      label: "View Detail",
+      icon: <FileTextOutlined />,
+      onClick: () => {
+        setDepositRoomId(record._id);
+        setIsPayRentModalVisible(true);
+      },
+    },
+    record.status === "accepted" && {
+      key: "pay",
+      label: "Pay",
+      icon: <DollarOutlined />,
+      onClick: () => {
+        setDepositRoom(record);
+        setIsPayDepositPopupVisible(true);
+      },
+    },
+  ].filter(Boolean); // Loại bỏ các phần tử `false` hoặc `undefined`
 
   return (
     <Dropdown

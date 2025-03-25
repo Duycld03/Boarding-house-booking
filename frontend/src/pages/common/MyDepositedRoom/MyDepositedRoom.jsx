@@ -32,6 +32,7 @@ function MyDepositedRoom() {
   const [isRenewalOpen, setIsRenewalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [existingRequest, setExistingRequest] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const fetchExtensionRequests = async () => {
     try {
@@ -43,7 +44,7 @@ function MyDepositedRoom() {
   };
 
   const handleCancel = () => {
-    setIsPayRentModalVisible(false);
+    setIsModalVisible(false);
   };
 
   const columns = [
@@ -112,36 +113,11 @@ function MyDepositedRoom() {
             setSelectedRecord(record);
             setIsRenewalOpen(true);
           }}
+          setDepositRoom={setDepositRoom}
+          setIsPayDepositPopupVisible={setIsPayDepositPopupVisible}
+          setDepositRoomId={setDepositRoomId}
+          setIsPayRentModalVisible={setIsPayRentModalVisible}
         />
-        <div className="flex gap-3">
-          {record.status == "confirmed" && (
-            <Button
-              size="large"
-              title={"Detail"}
-              icon={<FileTextOutlined />}
-              onClick={() => {
-                setDepositRoomId(record._id);
-                setIsPayRentModalVisible(true);
-              }}
-              className="text-white"
-              bgColor="rgb(5 150 105)"
-            />
-          )}
-          {record.status == "accepted" && (
-            <Button
-              size="large"
-              title={"Pay"}
-              icon={<DollarOutlined />}
-              onClick={() => {
-                // setDepositRoomId(record._id);
-                setDepositRoom(record);
-                setIsPayDepositPopupVisible(true);
-              }}
-              className="text-white"
-              bgColor="rgb(5 150 105)"
-            />
-          )}
-        </div>
       ),
     },
   ];
@@ -185,7 +161,7 @@ function MyDepositedRoom() {
           <Table loading={loading} columns={columns} data={depositedRooms} />
           <MyDepositDetail
             depositRoomId={depositRoomId}
-            isModalVisible={isPayRentModalVisible}
+            isModalVisible={isModalVisible}
             handleCancel={handleCancel}
           />
           <PayDepositPopup

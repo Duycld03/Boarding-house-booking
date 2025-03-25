@@ -35,9 +35,9 @@ export {
   roomTypeController,
   userPaymentController,
   tenantController,
-  renewalController
+  renewalController,
   expenseController,
   revenueController,
-  renewalRequestController, 
+  renewalRequestController,
   refundRequestController,
 };

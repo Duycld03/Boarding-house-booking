@@ -30,7 +30,7 @@ export {
   WatchLater,
   MyReportManagement,
   MyDepositedRoom,
-  MyRenewalRequest
+  MyRenewalRequest,
   MyRentPayment,
   MyDepositRefundRequest,
   DepositRefundRequestOwner,

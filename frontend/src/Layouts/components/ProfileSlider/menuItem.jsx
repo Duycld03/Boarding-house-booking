@@ -3,10 +3,8 @@ import {
   UserOutlined,
   ScheduleOutlined,
   HomeFilled,
-  VideoCameraOutlined,
   SnippetsOutlined,
   ContainerOutlined,
-  HeartFilled,
   HeartOutlined,
   EyeOutlined,
   RollbackOutlined,
@@ -17,7 +15,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
 
 import { faMoneyBill } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const getMenuItems = () => {
   const { hasRole } = useCurrentUser(); // Lấy thông tin user từ context
@@ -74,6 +71,7 @@ const getMenuItems = () => {
       icon: <FontAwesomeIcon icon={faEnvelope} />,
       visible: isUser,
     },
+    {
       key: "my-rent-room",
       label: <Link to="/my-rent-payment">My Rent Payment</Link>,
       icon: <FontAwesomeIcon icon={faMoneyBill} />,
