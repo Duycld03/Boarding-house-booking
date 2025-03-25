@@ -19,10 +19,20 @@ export const payRent = (data) => {
 export const checkPayRentStatus = (depositRoomId) => {
   return axios.get(`auth/pay-rent/${depositRoomId}`);
 };
-export const getAllDepositRooms = (boardingHouseId) => {
-  return axios.get(`owner/boardinghouse/deposit/${boardingHouseId}`);
+
+export const getDepositByBhId = (boardingHouseId, filters = {}) => {
+  return axios.get(`owner/boardinghouse/deposit/${boardingHouseId}`, { params: filters });
 };
+
+export const getMaxDeposit = (boardingHouseId) => {
+  return axios.get(`owner/boardinghouse/deposit/max-deposit/${boardingHouseId}`);
+};
+
+export const getRentTime = (boardingHouseId) => {
+  return axios.get(`owner/boardinghouse/deposit/max-rent-time/${boardingHouseId}`);
+}
 
 export const payDeposit = (data) => {
   return axios.post("auth/pay-deposit", data);
 };
+
