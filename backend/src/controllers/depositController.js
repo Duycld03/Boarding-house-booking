@@ -167,6 +167,11 @@ class DepositController {
         }
 
         depositRoom.status = "confirmed";
+
+        const room = await Room.findById(depositRoom.roomId);
+        room.rentBy.push(accountId);
+        await room.save();
+
         await depositRoom.save();
 
         const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
@@ -226,12 +231,14 @@ class DepositController {
         responseTime,
       } = req.query;
 
-      const type = orderInfo[0];
+      const info = orderInfo.split("-");
 
-      if (resultCode == "0") {
+      const type = info[0];
+
+      if (resultCode == "7002" || resultCode == "0") {
         if (type == "deposit") {
-          const accountId = orderInfo[1];
-          const depositRoomId = orderInfo[2];
+          const accountId = info[1];
+          const depositRoomId = info[2];
 
           const depositRoom = await DepositRoom.findOne({
             _id: depositRoomId,
@@ -244,14 +251,19 @@ class DepositController {
           }
 
           depositRoom.status = "confirmed";
+
+          const room = await Room.findById(depositRoom.roomId);
+          room.rentBy.push(accountId);
+          await room.save();
+
           await depositRoom.save();
 
           const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
           return res.redirect(redirectUrl);
         }
         // pay rent
-        const userId = orderInfo[1];
-        const paymentBillId = orderInfo[2];
+        const userId = info[1];
+        const paymentBillId = info[2];
 
         const userPayment = await UserPayment.findOne({
           accountId: userId,
@@ -285,9 +297,6 @@ class DepositController {
         const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
         return res.redirect(redirectUrl);
       }
-      //failed
-      const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
-      res.redirect(redirectUrl);
     } catch (error) {
       console.log("Error momo return:", error);
       const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
