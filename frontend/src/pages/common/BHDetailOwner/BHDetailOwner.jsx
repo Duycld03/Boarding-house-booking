@@ -28,7 +28,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Back } from '../../../component';
 import axios from 'axios';
 import LocationPicker from '@/component/LocationPicker';
-import RoomType from '@/component/RoomType';
+import RoomType from './RoomType/RoomType';
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHotel } from '@fortawesome/free-solid-svg-icons';
