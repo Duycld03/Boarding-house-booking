@@ -32,10 +32,11 @@ import RoomType from '@/component/RoomType';
 import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHotel } from '@fortawesome/free-solid-svg-icons';
-import TenantManagement from '@/component/TenantManagement';
-import DepositManagement from '@/component/DepositManagement';
+import TenantManagement from './TenantManagement/TenantManagement';
 import RoomManagement from './RoomManagement/RoomManagement';
+import DepositManagement from '@/component/DepositManagement';
 import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
+
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
