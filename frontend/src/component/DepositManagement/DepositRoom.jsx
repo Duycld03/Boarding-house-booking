@@ -1,76 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Tag } from 'antd';
-import { FileTextOutlined } from '@ant-design/icons';
-import { toast } from 'react-toastify';
-import { getAllDepositRooms } from '../../api/depositManagement';
-import { useParams } from 'react-router-dom';
-import Table from '@/component/Table';
-import formatAmount from '@/utils/formatAmount';
+import React, { useState, useEffect } from "react";
+import { Tag } from "antd";
+
+import { toast } from "react-toastify";
+import { getDepositByBhId } from "../../api/depositManagement";
+import { useParams } from "react-router-dom";
+import Table from "@/component/Table";
+import formatAmount from "@/utils/formatAmount";
+import FilterDeposit from "./FilterDeposite";
+import { getRoomsByBoardingHouse } from "@/api/room";
+import { render } from "react-dom";
 
 const DepositRoom = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [depositRoomId, setDepositRoomId] = useState('');
   const [depositedRooms, setDepositedRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const { boardingHouseId } = useParams();
+  const [listRoom, setListRoom] = useState([]);
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const [filterValue, setFilterValue] = useState({});
+
+  const getRoomsByBoardingHouseId = async () => {
+    try {
+      const response = await getRoomsByBoardingHouse(boardingHouseId);
+      setListRoom(Array.isArray(response) ? response : []);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+      toast.error("Failed to fetch rooms");
+      setListRoom([]);
+    }
+  };
+
+  const fetchDepositedRooms = async () => {
+    try {
+      const response = await getDepositByBhId(boardingHouseId, filterValue);
+
+      setDepositedRooms(Array.isArray(response) ? response : []);
+    } catch (error) {
+      console.error("Error fetching deposit rooms:", error);
+      toast.error("Failed to fetch deposit rooms");
+      setDepositedRooms([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchDepositedRooms = async () => {
-      try {
-        const response = await getAllDepositRooms(boardingHouseId);
-        console.log('Fetched response:', response);
-
-        // Đảm bảo response luôn là mảng
-        setDepositedRooms(Array.isArray(response) ? response : []);
-      } catch (error) {
-        console.error('Error fetching deposit rooms:', error);
-        toast.error('Failed to fetch deposit rooms');
-        setDepositedRooms([]); // Nếu có lỗi, gán giá trị rỗng để tránh lỗi map()
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (boardingHouseId) {
       fetchDepositedRooms();
     }
-  }, [boardingHouseId]);
+
+    console.log("filterValue", filterValue);
+  }, [filterValue]);
+
+  useEffect(() => {
+    getRoomsByBoardingHouseId();
+  }, []);
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: 'Room Number',
-      dataIndex: 'roomNumber',
-      key: 'roomNumber',
+      title: "Room Number",
+      dataIndex: "roomNumber",
+      key: "roomNumber",
     },
     {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (price) => (price ? formatAmount(price) : 'N/A'),
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Rental Time",
+      dataIndex: "rentalTime",
+      key: "rentalTime",
+      render: (time) => (time ? `${time} months` : "N/A"),
+    },
+    {
+      title: "Start Date",
+      dataIndex: "startDate",
+      key: "startDate",
+    },
+    {
+      title: "End Date",
+      dataIndex: "endDate",
+      key: "endDate",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (status) => (
         <Tag
           color={
-            status === 'pending'
-              ? 'orange'
-              : status === 'accepted'
-              ? 'green'
-              : status === 'deleted'
-              ? 'volcano'
-              : 'red'
+            status === "pending"
+              ? "orange"
+              : status === "accepted"
+              ? "green"
+              : status === "deleted"
+              ? "volcano"
+              : "red"
           }
         >
           {status}
@@ -78,23 +109,8 @@ const DepositRoom = () => {
       ),
     },
     {
-      title: 'Rental Time',
-      dataIndex: 'rentalTime',
-      key: 'rentalTime',
-    },
-    {
-      title: 'Start Date',
-      dataIndex: 'startDate',
-      key: 'startDate',
-    },
-    {
-      title: 'End Date',
-      dataIndex: 'endDate',
-      key: 'endDate',
-    },
-    {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       //   render: (_, record) => (
       //     <Button
       //       disabled={record.status === 'pending'}
@@ -113,7 +129,10 @@ const DepositRoom = () => {
   ];
 
   return (
-    <div>
+    <div className="min-h-screen ">
+      <div className="flex justify-end">
+        <FilterDeposit setFilterValue={setFilterValue} listRoom={listRoom} />
+      </div>
       <Table columns={columns} data={depositedRooms || []} loading={loading} />
     </div>
   );

@@ -26,12 +26,15 @@ import {
   BoardingHouseTypeManagement,
   MyDepositedRoom,
   MyRenewalRequest,
+  MyRentPayment,
+  MyDepositRefundRequest,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
 import {
   BHManagementOwner,
   BHDetailOwner,
   FavouriteList,
+  DepositRefundRequestOwner,
 } from "../pages/common";
 
 const dashBoard = "/dashboard";
@@ -146,6 +149,21 @@ const routes = [
   {
     path: "/my-renewal-request",
     page: MyRenewalRequest,
+    layout: ProfileLayout,
+  },
+    {
+    path: "/my-rent-payment",
+    page: MyRentPayment,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/my-deposit-refund-request",
+    page: MyDepositRefundRequest,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/refund-request-management",
+    page: DepositRefundRequestOwner,
     layout: ProfileLayout,
   },
 

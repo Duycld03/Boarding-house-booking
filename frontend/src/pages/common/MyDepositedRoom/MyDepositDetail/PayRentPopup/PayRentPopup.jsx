@@ -1,12 +1,10 @@
 import { payRent } from "@/api/depositManagement";
+import formatAmount from "@/utils/formatAmount";
 import { Form, Modal, Radio } from "antd";
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 function PayRentPopup({ isVisible, setVisible, payRentData }) {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -44,6 +42,12 @@ function PayRentPopup({ isVisible, setVisible, payRentData }) {
         onFinish={onFinish}
         initialValues={{ paymentMethod: "vnpay" }}
       >
+        <Form.Item name="amount" className="mb-2">
+          Amount:
+          <span className="font-semibold">
+            {` ${formatAmount(payRentData.amount)}`} VND
+          </span>
+        </Form.Item>
         <Form.Item name="paymentMethod">
           <Radio.Group>
             <Radio value="vnpay">VNPay</Radio>

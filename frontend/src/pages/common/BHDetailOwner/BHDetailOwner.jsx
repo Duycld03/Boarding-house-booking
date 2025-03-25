@@ -21,20 +21,22 @@ import {
   fetchProvinces,
   fetchDistricts,
   fetchWards,
-} from '../../../api/apiAddress';
-import { getBoardingHouseDetail } from '../../../api/ownerUser/boardingHouse';
-import { updateBoardingHouseDetailsOwner } from '../../../api/BoardingHManagement';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Back } from '../../../component';
-import axios from 'axios';
-import LocationPicker from '@/component/LocationPicker';
-import RoomType from '@/component/RoomType';
-import { useLocation } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHotel } from '@fortawesome/free-solid-svg-icons';
-import TenantManagement from '@/component/TenantManagement';
-import DepositManagement from "@/component/DepositManagement";
+} from "../../../api/apiAddress";
+import { getBoardingHouseDetail } from "../../../api/ownerUser/boardingHouse";
+import { updateBoardingHouseDetailsOwner } from "../../../api/BoardingHManagement";
+import { useNavigate, useParams } from "react-router-dom";
+import { Back } from "../../../component";
+import axios from "axios";
+import LocationPicker from "@/component/LocationPicker";
+import RoomType from "./RoomType/RoomType";
+import { useLocation } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHotel } from "@fortawesome/free-solid-svg-icons";
+import TenantManagement from "./TenantManagement/TenantManagement";
 import RoomManagement from "./RoomManagement/RoomManagement";
+import RenewalRequest from "./RenewalRequestManagement/RenewalRequest";
+import DepositManagement from "@/component/DepositManagement";
+import RevenueManagement from "./RevenueManagement";
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -803,6 +805,13 @@ const BHDetailOwner = () => {
         </Tabs.TabPane>
         <Tabs.TabPane tab="Tenant Management" key="Tenant Management">
           <TenantManagement />
+        </Tabs.TabPane>
+
+        <Tabs.TabPane tab="Revenue Management" key="Revenue Management">
+          <RevenueManagement boardingHouseId={boardingHouseId} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Renewal Management" key="Renewal Request Management">
+          <RenewalRequest boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
       </Tabs>
     </div>

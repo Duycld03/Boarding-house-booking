@@ -9,11 +9,15 @@ import {
   HeartFilled,
   HeartOutlined,
   EyeOutlined,
+  RollbackOutlined,
 } from "@ant-design/icons";
 import { useCurrentUser } from "../../../context/userContext";
 import userRole from "../../../constants/userRole";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
+
+import { faMoneyBill } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const getMenuItems = () => {
   const { hasRole } = useCurrentUser(); // Lấy thông tin user từ context
@@ -70,8 +74,28 @@ const getMenuItems = () => {
       icon: <FontAwesomeIcon icon={faEnvelope} />,
       visible: isUser,
     },
+      key: "my-rent-room",
+      label: <Link to="/my-rent-payment">My Rent Payment</Link>,
+      icon: <FontAwesomeIcon icon={faMoneyBill} />,
+      visible: isUser,
+    },
+    {
+      key: "my-deposit-refund-request",
+      label: (
+        <Link to="/my-deposit-refund-request">My Deposit Refund Request</Link>
+      ),
+      icon: <RollbackOutlined />,
+      visible: isUser,
+    },
+    {
+      key: "refund-request-management",
+      label: (
+        <Link to="/refund-request-management">Deposit Refund Management</Link>
+      ),
+      icon: <RollbackOutlined />,
+      visible: isOwner,
+    },
   ];
-
   return menuItems.filter((item) => item.visible);
 };
 

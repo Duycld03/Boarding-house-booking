@@ -1,16 +1,16 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const extensionRequestSchema = new mongoose.Schema(
   {
     accountId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "Account",
+      ref: 'Account',
     },
     roomId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "Room",
+      ref: 'Room',
     },
     depositRoomId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -28,15 +28,19 @@ const extensionRequestSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["Pending", "Approved", "Rejected"],
+      enum: ['pending', 'accepted', 'rejected'],
     },
     ownerNote: {
       type: String,
-      default: "",
+      default: '',
     },
     tenantNote: {
       type: String,
-      default: "",
+      default: '',
+    },
+    reasonForCancel: {
+      type: String,
+      default: '',
     },
   },
   {
@@ -45,7 +49,7 @@ const extensionRequestSchema = new mongoose.Schema(
 );
 
 const ExtensionRequest = mongoose.model(
-  "ExtensionRequest",
+  'ExtensionRequest',
   extensionRequestSchema
 );
 
