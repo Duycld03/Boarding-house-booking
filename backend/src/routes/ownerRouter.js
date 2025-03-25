@@ -8,6 +8,8 @@ import {
   tenantController,
   roomController,
   depositController,
+  expenseController,
+  revenueController,
   renewalRequestController,
   refundRequestController,
 } from '../controllers/index.js';
@@ -127,5 +129,18 @@ ownerRouter.put(
   '/refund-request/:refundRequestId',
   refundRequestController.cancelRefundRequestsForOwner
 );
+
+
+//expense
+ownerRouter.get('/expense', expenseController.getExpensesByTime);
+ownerRouter.put('/expense/:expenseId', expenseController.updateExpense);
+
+
+//revenue
+ownerRouter.get('/revenue', revenueController.getRevenue);
+ownerRouter.get('/revenue/years', revenueController.getAvailableYears);
+ownerRouter.get('/revenue/year', revenueController.getRevenueByYear);
+
+
 
 export { ownerRouter };
