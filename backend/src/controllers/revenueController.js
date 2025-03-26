@@ -87,28 +87,39 @@ class RevenueController {
       if (!month || !year) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
-      const revenue = await Revenue.findOne({
+
+      const revenues = await Revenue.find({
         month: parseInt(month),
         year: parseInt(year),
       }).populate("transactions");
 
-      if (!revenue) {
-        return res.status(404).json({ message: "Revenue not found" });
+      if (!revenues.length) {
+        return res.status(404).json({ message: "No revenue records found" });
       }
 
-      const totalRevenue = revenue.transactions.reduce((sum, transaction) => {
-        if (transaction.status === "paid") {
-          return sum + (transaction.paymentAmount || 0);
+      let totalRevenue = 0;
+      let allTransactions = [];
+
+      revenues.forEach((revenue) => {
+        const revenueTotal = revenue.transactions.reduce((sum, transaction) => {
+          return transaction.status === "paid"
+            ? sum + (transaction.paymentAmount || 0)
+            : sum;
+        }, 0);
+
+        if (revenue.totalRevenue !== revenueTotal) {
+          revenue.totalRevenue = revenueTotal;
+          revenue.save();
         }
-        return sum;
-      }, 0);
 
-      if (revenue.totalRevenue !== totalRevenue) {
-        revenue.totalRevenue = totalRevenue;
-        await revenue.save();
-      }
+        totalRevenue += revenueTotal;
+        allTransactions.push(...revenue.transactions);
+      });
 
-      res.status(200).json(revenue);
+      res.status(200).json({
+        totalRevenue,
+        transactions: allTransactions,
+      });
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
     }
