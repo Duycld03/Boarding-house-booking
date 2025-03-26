@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import expense from "../models/expense.js";
 import Expense from "../models/expense.js";
+import BoardingHouse from "../models/boardingHouse.js";
 
 class ExpenseController {
   async getExpensesByTime(req, res) {
@@ -49,13 +50,41 @@ class ExpenseController {
   }
 
   async getTotalExpensesByTime(req, res) {
-    const { month, year } = req.query;
-
     try {
-      const data = await expense.find({ month, year });
-      res.status(200).json({ success: true, data: data });
+      const { month, year } = req.query;
+      const ownerId = req.user.userId;
+
+      if (!month || !year) {
+        return res.status(400).json({ message: "Missing required parameters" });
+      }
+
+      // Tìm tất cả boarding houses của owner
+      const boardingHouses = await BoardingHouse.find({ ownerId }).select(
+        "_id"
+      );
+
+      if (!boardingHouses.length) {
+        return res
+          .status(404)
+          .json({ message: "No boarding houses found for this owner" });
+      }
+
+      const boardingHouseIds = boardingHouses.map((house) => house._id);
+
+      // Lấy tất cả chi phí có `boardingHouseId` thuộc danh sách trên
+      const expenses = await Expense.find({
+        boardingHouseId: { $in: boardingHouseIds },
+        month,
+        year,
+      });
+
+      res.status(200).json({ success: true, data: expenses });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Lỗi server", error });
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message,
+      });
     }
   }
 }

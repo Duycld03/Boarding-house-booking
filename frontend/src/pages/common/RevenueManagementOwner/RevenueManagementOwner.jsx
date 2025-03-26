@@ -8,7 +8,6 @@ import {
   getTotalRevenueByTime,
 } from "@/api/revenueManagement";
 import { getTotalExpenseByTime } from "@/api/expense";
-import ExpenseUpdateForm from "../BHDetailOwner/RevenueManagement/ExpenseUpdateForm";
 
 // Colors for the charts
 export const COLORS = {
@@ -132,41 +131,9 @@ const RevenueManagementOwner = () => {
       } else {
         // Nếu không có dữ liệu, đặt giá trị mặc định
         setMonthlyExpenses(null);
-        setExpenseFormData({
-          id: null,
-          electricalExpense: {
-            oldNumber: 0,
-            newNumber: 0,
-            quantityConsumed: 0,
-            totalAmount: 0,
-          },
-          waterExpense: {
-            oldNumber: 0,
-            newNumber: 0,
-            quantityConsumed: 0,
-            totalAmount: 0,
-          },
-          otherExpenses: [],
-        });
       }
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu chi tiêu hàng tháng:", error);
-      setExpenseFormData({
-        id: null,
-        electricalExpense: {
-          oldNumber: 0,
-          newNumber: 0,
-          quantityConsumed: 0,
-          totalAmount: 0,
-        },
-        waterExpense: {
-          oldNumber: 0,
-          newNumber: 0,
-          quantityConsumed: 0,
-          totalAmount: 0,
-        },
-        otherExpenses: [],
-      });
     }
   };
 

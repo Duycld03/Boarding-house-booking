@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Revenue from "../models/revenue.js";
+import BoardingHouse from "../models/boardingHouse.js";
 
 class RevenueController {
   async getRevenue(req, res) {
@@ -83,12 +84,28 @@ class RevenueController {
   async getTotalRevenue(req, res) {
     try {
       const { month, year } = req.query;
+      const ownerId = req.user.userId;
 
       if (!month || !year) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
+      // Tìm tất cả boarding houses của owner
+      const boardingHouses = await BoardingHouse.find({ ownerId }).select(
+        "_id"
+      );
+
+      if (!boardingHouses.length) {
+        return res
+          .status(404)
+          .json({ message: "No boarding houses found for this owner" });
+      }
+
+      const boardingHouseIds = boardingHouses.map((house) => house._id);
+
+      // Lấy doanh thu có `boardingHouseId` thuộc danh sách trên
       const revenues = await Revenue.find({
+        boardingHouseId: { $in: boardingHouseIds },
         month: parseInt(month),
         year: parseInt(year),
       }).populate("transactions");
@@ -125,10 +142,38 @@ class RevenueController {
     }
   }
 
+  // async getTotalAvailableYears(req, res) {
+  //   try {
+  //     const years = await Revenue.distinct("year", {});
+  //     years.sort((a, b) => b - a);
+  //     res.status(200).json(years);
+  //   } catch (error) {
+  //     res.status(500).json({ message: "Server error", error: error.message });
+  //   }
+  // }
   async getTotalAvailableYears(req, res) {
     try {
-      const years = await Revenue.distinct("year", {});
+      const ownerId = req.user.userId;
+
+      // Lấy danh sách boarding houses của owner
+      const boardingHouses = await BoardingHouse.find({ ownerId }).select(
+        "_id"
+      );
+
+      if (!boardingHouses.length) {
+        return res
+          .status(404)
+          .json({ message: "No boarding houses found for this owner" });
+      }
+
+      const boardingHouseIds = boardingHouses.map((house) => house._id);
+
+      // Lấy danh sách năm có doanh thu của owner
+      const years = await Revenue.distinct("year", {
+        boardingHouseId: { $in: boardingHouseIds },
+      });
       years.sort((a, b) => b - a);
+
       res.status(200).json(years);
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
@@ -138,12 +183,29 @@ class RevenueController {
   async getTotalRevenueByYear(req, res) {
     try {
       const { year } = req.query;
+      const ownerId = req.user.userId;
+
       if (!year) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
+      // Lấy danh sách boarding houses của owner
+      const boardingHouses = await BoardingHouse.find({ ownerId }).select(
+        "_id"
+      );
+
+      if (!boardingHouses.length) {
+        return res
+          .status(404)
+          .json({ message: "No boarding houses found for this owner" });
+      }
+
+      const boardingHouseIds = boardingHouses.map((house) => house._id);
+
+      // Lấy doanh thu của owner theo năm
       const revenues = await Revenue.find({
         year: parseInt(year),
+        boardingHouseId: { $in: boardingHouseIds },
       }).populate("transactions");
 
       if (!revenues.length) {
