@@ -1,5 +1,7 @@
 import React from "react";
 import { Card, Avatar, Tag, Typography, Form } from "antd";
+import { Button } from '@/component';
+
 import moment from "moment";
 import DefaultAccount from "@/assets/images/none_avatar.png";
 
@@ -34,8 +36,8 @@ const AppointmentDetail = ({ appointment }) => {
     };
 
     return (
-        <Card className="max-w-2xl mx-auto p-4">
-            <Form.Item style={{ marginBottom: 8 }}>
+        <Card className="max-w-2xl mx-auto p-4 border-none shadow-none" bordered={false} style={{ border: "none", boxShadow: "none", background: "transparent" }}>
+            <Form.Item style={{ marginBottom: 8 }} >
                 <div className="flex flex-col items-center text-center">
                     <Avatar
                         src={tenant?.accountId?.avatarImage?.url ?? DefaultAccount}
@@ -80,6 +82,24 @@ const AppointmentDetail = ({ appointment }) => {
                     </Form.Item>
                 )}
             </Form>
+            <div className="flex gap-3 items-center justify-between">
+                <Button
+                    title={'Accept'}
+                    size="large"
+                    btnAccept
+                    className="text-white"
+                    bgColor="rgb(5 150 105)"
+                // onClick={() => handleAccept(record)} // Trigger accept action
+                ></Button>
+                <Button
+                    title={'Reject'}
+                    iconPosition="left"
+                    btnReject
+                    size="large"
+                    style={{ backgroundColor: 'red', color: 'white', border: 'none' }}
+                // onClick={() => handleReject(record)} // Open reject modal
+                ></Button>
+            </div>
         </Card>
     );
 };

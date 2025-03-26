@@ -60,7 +60,6 @@ const ViewListAppointmentOwner = () => {
         }
     };
     useEffect(() => {
-        console.log("Modal Open State:", isModalOpen);
     }, [isModalOpen]);
     // const handleUpdateStatus = async () => {  
     // };
@@ -77,7 +76,7 @@ const ViewListAppointmentOwner = () => {
             dataIndex: ["accountId", "fullname"],
             key: "fullname",
             render: (text) => text || "Không có tên",
-            width: 150,
+            width: 160,
 
         },
         {
@@ -92,7 +91,7 @@ const ViewListAppointmentOwner = () => {
             dataIndex: "appointmentDate",
             key: "appointmentDate",
             render: (date) => moment(date).format("DD/MM/YYYY HH:mm"),
-            width: 200,
+            width: 210,
 
         },
         {
@@ -104,7 +103,7 @@ const ViewListAppointmentOwner = () => {
                     {text && text.length > 50 ? `${text.substring(0, 50)}...` : text}
                 </Tooltip>
             ),
-            width: 250,
+            width: 260,
 
         },
         {
@@ -125,38 +124,38 @@ const ViewListAppointmentOwner = () => {
                 </Tag>
             ),
         },
-        {
-            title: "Actions",
-            key: "action",
+        // {
+        //     title: "Actions",
+        //     key: "action",
 
-            render: (_, record) => (
-                <div style={{ display: "flex", gap: "8px" }}>
-                    <Button
-                        type="primary"
-                        onClick={() => handleUpdateStatus(record._id, "accepted")}
-                        disabled={record.status === "accepted"}
-                    >
-                        Accept
-                    </Button>
-                    <Button
-                        type="default"
-                        danger
-                        onClick={() => handleUpdateStatus(record._id, "cancelled")}
-                        disabled={record.status === "cancelled"}
-                    >
-                        Cancel
-                    </Button>
+        //     render: (_, record) => (
+        //         <div style={{ display: "flex", gap: "8px" }}>
+        //             <Button
+        //                 type="primary"
+        //                 onClick={() => handleUpdateStatus(record._id, "accepted")}
+        //                 disabled={record.status === "accepted"}
+        //             >
+        //                 Accept
+        //             </Button>
+        //             <Button
+        //                 type="default"
+        //                 danger
+        //                 onClick={() => handleUpdateStatus(record._id, "cancelled")}
+        //                 disabled={record.status === "cancelled"}
+        //             >
+        //                 Cancel
+        //             </Button>
 
-                    <Button
-                        title="Detail"
-                        style={{ backgroundColor: "rgb(5, 150, 105)", color: "white", width: "80px" }}
-                        onClick={() => fetchAppointmentDetail(record._id)}
-                    >
-                        Detail
-                    </Button>
-                </div>
-            ),
-        },
+        //             <Button
+        //                 title="Detail"
+        //                 style={{ backgroundColor: "rgb(5, 150, 105)", color: "white", width: "80px" }}
+        //                 onClick={() => fetchAppointmentDetail(record._id)}
+        //             >
+        //                 Detail
+        //             </Button>
+        //         </div>
+        //     ),
+        // },
     ];
 
     return (
@@ -168,6 +167,9 @@ const ViewListAppointmentOwner = () => {
                 loading={loading}
                 rowKey="_id"
                 pagination={{ pageSize: 10 }}
+                onRow={(record) => ({
+                    onClick: () => fetchAppointmentDetail(record._id),
+                })}
             />
             <Modal
                 title="Appointment Details"
