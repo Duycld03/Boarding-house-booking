@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const RoomSchema = new mongoose.Schema(
   {
     boardingHouseId: {
@@ -16,10 +15,6 @@ const RoomSchema = new mongoose.Schema(
       },
     ],
     roomNumber: {
-      type: String,
-      required: true,
-    },
-    roomSize: {
       type: String,
       required: true,
     },

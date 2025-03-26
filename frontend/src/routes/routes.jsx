@@ -25,6 +25,7 @@ import {
   MyReportManagement,
   BoardingHouseTypeManagement,
   MyDepositedRoom,
+  MyRenewalRequest,
   MyRentPayment,
   MyDepositRefundRequest,
 } from "../pages";
@@ -146,6 +147,11 @@ const routes = [
     layout: ProfileLayout,
   },
   {
+    path: "/my-renewal-request",
+    page: MyRenewalRequest,
+    layout: ProfileLayout,
+  },
+    {
     path: "/my-rent-payment",
     page: MyRentPayment,
     layout: ProfileLayout,
