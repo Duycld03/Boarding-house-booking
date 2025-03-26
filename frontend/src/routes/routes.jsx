@@ -35,6 +35,7 @@ import {
   BHDetailOwner,
   FavouriteList,
   DepositRefundRequestOwner,
+  RevenueManagementOwner,
 } from "../pages/common";
 
 const dashBoard = "/dashboard";
@@ -151,7 +152,7 @@ const routes = [
     page: MyRenewalRequest,
     layout: ProfileLayout,
   },
-    {
+  {
     path: "/my-rent-payment",
     page: MyRentPayment,
     layout: ProfileLayout,
@@ -164,6 +165,11 @@ const routes = [
   {
     path: "/refund-request-management",
     page: DepositRefundRequestOwner,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/revenue-management-owner",
+    page: RevenueManagementOwner,
     layout: ProfileLayout,
   },
 

@@ -8,6 +8,7 @@ import {
   HeartOutlined,
   EyeOutlined,
   RollbackOutlined,
+  DollarCircleOutlined,
 } from "@ant-design/icons";
 import { useCurrentUser } from "../../../context/userContext";
 import userRole from "../../../constants/userRole";
@@ -91,6 +92,12 @@ const getMenuItems = () => {
         <Link to="/refund-request-management">Deposit Refund Management</Link>
       ),
       icon: <RollbackOutlined />,
+      visible: isOwner,
+    },
+    {
+      key: "revenue-management-owner",
+      label: <Link to="/revenue-management-owner">Revenue Management</Link>,
+      icon: <DollarCircleOutlined />,
       visible: isOwner,
     },
   ];
