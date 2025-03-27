@@ -8,6 +8,7 @@ class AppointmentController {
         try {
             const { userId } = req.user;
 
+
             if (!userId) {
                 return res.status(403).json({ message: 'User not found' });
             }

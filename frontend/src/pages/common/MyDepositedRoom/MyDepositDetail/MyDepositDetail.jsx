@@ -15,12 +15,11 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
   const [isPaid, setIsPaid] = useState(false);
 
   const fetchDepositRoom = async () => {
-    debugger;
     if (!depositRoomId) return;
     setLoading(true);
     try {
       const res = await getDepositRoom(depositRoomId);
-      res.primaryImage = res.images;
+      res.primaryImage = res.images.find((image) => image.isPrimary);
       setDepositRoom(res);
     } catch (error) {
       console.error(error);

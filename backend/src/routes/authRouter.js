@@ -9,9 +9,9 @@ import {
   ReviewController,
   watchLaterController,
   depositController,
-  renewalController,
   userPaymentController,
   refundRequestController,
+
 } from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -104,12 +104,5 @@ authRouter.get("/refund-requests", refundRequestController.getRefundRequests);
 
 // userPayment
 authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
-
-
-//renewal
-authRouter.get("/renewal", renewalController.getExtensionRequests);
-authRouter.post("/renewal", renewalController.createExtensionRequest);
-authRouter.put("/renewal/:requestId", renewalController.updateExtensionRequest);
-
 
 export { authRouter };

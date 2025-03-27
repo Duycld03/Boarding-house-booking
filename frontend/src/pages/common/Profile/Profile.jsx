@@ -34,6 +34,8 @@ const beforeUpload = (file) => {
 };
 
 function Profile() {
+  const navigate = useNavigate();
+
   const [form] = Form.useForm();
   const [formEmail] = Form.useForm();
   const [profileLoading, setProfileLoading] = useState(true);

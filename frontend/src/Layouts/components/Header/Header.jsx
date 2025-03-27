@@ -7,6 +7,7 @@ import {
   Dropdown,
   Space,
   Drawer,
+  Grid,
   Divider,
 } from "antd";
 import classNames from "classnames/bind";
@@ -27,6 +28,7 @@ import userRole from "../../../constants/userRole";
 import getMenuItems from "../ProfileSlider/menuItem";
 
 const cx = classNames.bind(Styles);
+const { useBreakpoint } = Grid;
 const { Header } = Layout;
 
 const CustomHeader = () => {
@@ -34,19 +36,19 @@ const CustomHeader = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [avatar, setAvatar] = useState(UserAvatar);
   const navigate = useNavigate();
+  const screens = useBreakpoint();
   const { contextLogout, hasRole } = useCurrentUser();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    (async () => {
       try {
         const res = await getUser();
-        setAvatar(res?.avatarImage?.url || UserAvatar);
+        setAvatar(res.avatarImage?.url || UserAvatar);
         setIsLoggedIn(true);
-      } catch {
+      } catch (error) {
         setIsLoggedIn(false);
       }
-    };
-    fetchUser();
+    })();
   }, []);
 
   const logout = () => {
@@ -84,13 +86,18 @@ const CustomHeader = () => {
   ];
 
   return (
-    <Header className={cx("flex justify-between items-center bg-white px-4")}>
+    <Header className={cx("flex justify-between items-center bg-white")}>
       {/* Logo */}
       <Link
         to={hasRole(userRole.admin) ? "/dashboard/account-management" : "/"}
-        className="flex items-center"
+        className="flex items-center bg-white"
       >
-        <img src={Icon} alt="Logo" className="h-12 cursor-pointer" />
+        <img
+          src={Icon}
+          alt="Logo"
+          className="h-12 cursor-pointer"
+          onClick={() => navigate("/")}
+        />
         <p className={cx("logo-txt font-body text-3xl font-extrabold ml-2")}>
           MOTELLEASE TECH
         </p>
@@ -98,14 +105,11 @@ const CustomHeader = () => {
 
       {/* Main Menu (Desktop) */}
       <Menu
-        className="hidden lg:block"
+        className="lg:block hidden"
         theme="light"
         mode="horizontal"
         defaultSelectedKeys={["home"]}
-        items={menuItems.map(({ key, label, onClick }) => ({
-          key,
-          label: <span onClick={onClick}>{label}</span>,
-        }))}
+        items={menuItems}
       />
 
       {/* User Section */}
@@ -127,26 +131,7 @@ const CustomHeader = () => {
           </Button>
         </Space>
       ) : (
-        <Dropdown
-          menu={{
-            items: userMenuItems.map(({ key, label, icon, onClick }) => ({
-              key,
-              label: (
-                <span
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onClick();
-                  }}
-                >
-                  {icon} {label}
-                </span>
-              ),
-            })),
-          }}
-          placement="bottomRight"
-          arrow
-          trigger={["click"]}
-        >
+        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>
           <Avatar
             src={avatar}
             size={60}
@@ -159,7 +144,7 @@ const CustomHeader = () => {
       <Button
         type="text"
         icon={<MenuOutlined />}
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen(!open)}
         className="lg:hidden"
       />
 
@@ -168,7 +153,7 @@ const CustomHeader = () => {
         title={
           isLoggedIn ? (
             <div className="flex items-center">
-              <Avatar src={avatar || UserAvatar} size={60} className="mr-3" />
+              <Avatar src={avatar} size={60} className="mr-3" />
               <span className={cx("user-name")}>User Name</span>
             </div>
           ) : (
@@ -197,12 +182,7 @@ const CustomHeader = () => {
       >
         <Menu
           mode="vertical"
-          items={(hasRole(userRole.admin) ? adminMenu : menuItems).map(
-            ({ key, label, onClick }) => ({
-              key,
-              label: <span onClick={onClick}>{label}</span>,
-            })
-          )}
+          items={hasRole(userRole.admin) ? adminMenu : menuItems}
           style={{ border: "none", marginBottom: 20 }}
         />
 
@@ -213,12 +193,9 @@ const CustomHeader = () => {
                 <Divider className="bg-gray-400" />
                 <Menu
                   mode="vertical"
-                  items={getMenuItems()
-                    .filter((item) => item.key !== "profile")
-                    .map(({ key, label, onClick }) => ({
-                      key,
-                      label: <span onClick={onClick}>{label}</span>,
-                    }))}
+                  items={getMenuItems().filter(
+                    (item) => item.key !== "profile"
+                  )}
                   style={{ border: "none" }}
                 />
               </>
@@ -226,14 +203,7 @@ const CustomHeader = () => {
             <Divider className="bg-gray-400" />
             <Menu
               mode="vertical"
-              items={userMenuItems.map(({ key, label, icon, onClick }) => ({
-                key,
-                label: (
-                  <span onClick={onClick}>
-                    {icon} {label}
-                  </span>
-                ),
-              }))}
+              items={userMenuItems}
               style={{ border: "none" }}
             />
           </>

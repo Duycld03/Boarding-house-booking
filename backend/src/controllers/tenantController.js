@@ -17,9 +17,9 @@ class TenantController {
           .json({ message: 'Invalid or missing boardingHouseId' });
       }
 
-      // 🔍 Lấy danh sách phòng trong boarding house
+      // 🔍 Lấy tất cả phòng trong boarding house
       const rooms = await Room.find({ boardingHouseId })
-        .populate('rentBy', 'fullname email phoneNumber avatarImage gender') // Thêm thông tin cần thiết
+        .populate('rentBy', 'fullname email phoneNumber') // Thêm email, phone nếu cần
         .select('_id roomNumber rentBy');
 
       if (!rooms.length) {
@@ -28,25 +28,21 @@ class TenantController {
           .json({ message: 'No rooms found for this boarding house.' });
       }
 
-      // 🚀 Lấy danh sách tenants với thông tin chi tiết
+      // 🔥 Lấy danh sách tenantId từ phòng
       const tenants = [];
-
       for (const room of rooms) {
-        for (const tenant of room.rentBy) {
+        for (const tenantAccount of room.rentBy) {
+          // Kiểm tra thông tin đặt cọc có **status: "accept"**
           const depositInfo = await DepositRoom.findOne({
             roomId: room._id,
-            accountId: tenant._id,
-            status: 'confirmed', // Chỉ lấy deposit đã được chấp nhận
+            accountId: tenantAccount._id,
+            status: 'accepted', // 🎯 Chỉ lấy những deposit đã được accept
           });
 
           if (depositInfo) {
             tenants.push({
-              accountId: tenant._id,
-              tenantName: tenant.fullname,
-              email: tenant.email,
-              phoneNumber: tenant.phoneNumber,
-              avatarImage: tenant.avatarImage,
-              gender: tenant.gender,
+              accountId: tenantAccount._id, // ⚡️ Thêm accountId để dùng khi xóa
+              tenantName: tenantAccount.fullname,
               roomNumber: room.roomNumber,
               totalDepositTime: depositInfo.rentalTime,
               startDepositDate: depositInfo.createdAt,

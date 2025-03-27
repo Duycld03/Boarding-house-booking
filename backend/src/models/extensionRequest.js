@@ -12,11 +12,6 @@ const extensionRequestSchema = new mongoose.Schema(
       required: true,
       ref: 'Room',
     },
-    depositRoomId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "DepositRoom",
-    },
     currentEndDate: {
       type: Date,
       required: true,

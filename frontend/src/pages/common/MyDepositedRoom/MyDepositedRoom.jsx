@@ -12,9 +12,6 @@ import { Loader } from "../../../component";
 import { Tag } from "antd";
 import MyDepositDetail from "./MyDepositDetail";
 import { toast } from "react-toastify";
-import ActionDropdown from "./ActionDropdown";
-import RenewalRequestForm from "./RenewalRequestForm";
-import { getExtensionRequests } from "@/api/extensionRequest";
 import PayDepositPopup from "./MyDepositDetail/PayDepositPopup";
 
 function MyDepositedRoom() {
@@ -28,23 +25,8 @@ function MyDepositedRoom() {
     useState(false);
   const [depositRoom, setDepositRoom] = useState({});
 
-  //Renewal Request Form
-  const [isRenewalOpen, setIsRenewalOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState(null);
-  const [existingRequest, setExistingRequest] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const fetchExtensionRequests = async () => {
-    try {
-      const response = await getExtensionRequests();
-      setExistingRequest(response);
-    } catch (error) {
-      console.error("API error:", error);
-    }
-  };
-
   const handleCancel = () => {
-    setIsModalVisible(false);
+    setIsPayRentModalVisible(false);
   };
 
   const columns = [
@@ -103,21 +85,35 @@ function MyDepositedRoom() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <ActionDropdown
-          record={record}
-          onDetailClick={(id) => {
-            setDepositRoomId(id);
-            setIsModalVisible(true);
-          }}
-          onRenewalClick={(record) => {
-            setSelectedRecord(record);
-            setIsRenewalOpen(true);
-          }}
-          setDepositRoom={setDepositRoom}
-          setIsPayDepositPopupVisible={setIsPayDepositPopupVisible}
-          setDepositRoomId={setDepositRoomId}
-          setIsPayRentModalVisible={setIsPayRentModalVisible}
-        />
+        <div className="flex gap-3">
+          {record.status == "confirmed" && (
+            <Button
+              size="large"
+              title={"Detail"}
+              icon={<FileTextOutlined />}
+              onClick={() => {
+                setDepositRoomId(record._id);
+                setIsPayRentModalVisible(true);
+              }}
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+            />
+          )}
+          {record.status == "accepted" && (
+            <Button
+              size="large"
+              title={"Pay"}
+              icon={<DollarOutlined />}
+              onClick={() => {
+                // setDepositRoomId(record._id);
+                setDepositRoom(record);
+                setIsPayDepositPopupVisible(true);
+              }}
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+            />
+          )}
+        </div>
       ),
     },
   ];
@@ -149,7 +145,6 @@ function MyDepositedRoom() {
 
   useEffect(() => {
     fetchData();
-    fetchExtensionRequests();
   }, []);
 
   return (
@@ -161,7 +156,7 @@ function MyDepositedRoom() {
           <Table loading={loading} columns={columns} data={depositedRooms} />
           <MyDepositDetail
             depositRoomId={depositRoomId}
-            isModalVisible={isModalVisible}
+            isModalVisible={isPayRentModalVisible}
             handleCancel={handleCancel}
           />
           <PayDepositPopup
@@ -170,15 +165,6 @@ function MyDepositedRoom() {
             payDepositData={depositRoom}
           />
         </>
-      )}
-      {selectedRecord && (
-        <RenewalRequestForm
-          visible={isRenewalOpen}
-          onClose={() => setIsRenewalOpen(false)}
-          mode="tenant"
-          existingRequest={existingRequest}
-          renewalData={selectedRecord}
-        />
       )}
     </div>
   );

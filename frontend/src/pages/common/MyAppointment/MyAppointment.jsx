@@ -139,7 +139,7 @@ function MyAppointment() {
         onCancel={() => setIsOpen(false)}
         onOk={handleCancel}
         title="Confirm Cancellation"
-        content={"Are you sure you want to cancel this appointment?"}
+        message="Are you sure you want to cancel this appointment?"
       />
     </div>
   );
