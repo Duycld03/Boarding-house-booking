@@ -40,6 +40,5 @@ export {
   renewalController,
   expenseController,
   revenueController,
-  renewalRequestController,
   refundRequestController,
 };

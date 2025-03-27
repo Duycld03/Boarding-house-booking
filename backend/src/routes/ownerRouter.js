@@ -10,10 +10,10 @@ import {
   depositController,
   expenseController,
   revenueController,
-  renewalRequestController,
   refundRequestController,
-} from "../controllers/index.js";
-import { upload } from "../config/cloudinary.config.js";
+  renewalController,
+} from '../controllers/index.js';
+import { upload } from '../config/cloudinary.config.js';
 
 const ownerRouter = Router();
 
@@ -149,6 +149,7 @@ ownerRouter.put(
   "/refund-request/:refundRequestId",
   refundRequestController.cancelRefundRequestsForOwner
 );
+
 ownerRouter.post(
   "/refund-request/:refundRequestId",
   depositController.acceptRefundRequestForOwner
@@ -162,5 +163,6 @@ ownerRouter.put("/expense/:expenseId", expenseController.updateExpense);
 ownerRouter.get("/revenue", revenueController.getRevenue);
 ownerRouter.get("/revenue/years", revenueController.getAvailableYears);
 ownerRouter.get("/revenue/year", revenueController.getRevenueByYear);
+
 
 export { ownerRouter };
