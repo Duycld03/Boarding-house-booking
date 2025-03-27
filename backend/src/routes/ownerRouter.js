@@ -12,8 +12,8 @@ import {
   revenueController,
   refundRequestController,
   renewalController,
-} from '../controllers/index.js';
-import { upload } from '../config/cloudinary.config.js';
+} from "../controllers/index.js";
+import { upload } from "../config/cloudinary.config.js";
 
 const ownerRouter = Router();
 
@@ -129,15 +129,15 @@ ownerRouter.delete("/room/boarding-house/:roomId", roomController.deleteRoom);
 //renewal
 ownerRouter.get(
   "/renewal/boarding-house/:boardingHouseId",
-  renewalRequestController.getRenewalRequestByBhID
+  renewalController.getRenewalRequestByBhID
 );
 ownerRouter.put(
   "/renewal/:requestId",
-  renewalRequestController.acceptExtensionRequest
+  renewalController.acceptExtensionRequest
 );
 ownerRouter.put(
   "/rejectrenewal/:requestId",
-  renewalRequestController.rejectExtensionRequest
+  renewalController.rejectExtensionRequest
 );
 
 // refund request
@@ -163,6 +163,5 @@ ownerRouter.put("/expense/:expenseId", expenseController.updateExpense);
 ownerRouter.get("/revenue", revenueController.getRevenue);
 ownerRouter.get("/revenue/years", revenueController.getAvailableYears);
 ownerRouter.get("/revenue/year", revenueController.getRevenueByYear);
-
 
 export { ownerRouter };
