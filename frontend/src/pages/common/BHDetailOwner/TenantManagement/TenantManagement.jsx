@@ -26,7 +26,7 @@ const TenantManagement = () => {
 
         setTenantData(data);
       } catch (error) {
-        toast.error('Failed to fetch tenant data.');
+        // toast.error('Failed to fetch tenant data.');
       } finally {
         setLoading(false);
       }

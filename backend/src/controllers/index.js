@@ -20,7 +20,6 @@ import renewalController from './renewalController.js';
 import expenseController from './expenseController.js';
 import revenueController from './revenueController.js';
 
-
 export {
   authController,
   withdrawalRequestsController,
@@ -40,6 +39,5 @@ export {
   renewalController,
   expenseController,
   revenueController,
-  renewalRequestController,
   refundRequestController,
 };

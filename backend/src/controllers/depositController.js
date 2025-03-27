@@ -388,9 +388,12 @@ class DepositController {
       const { boardingHouseId } = req.params;
       const { status, priceRange, endDate, roomId, rentalTime } = req.query;
 
+
       const rooms = await Room.find({ boardingHouseId }).select(
-        '_id roomNumber'
+        '_id'
       );
+
+
 
       const roomMap = new Map(
         rooms.map((room) => [room._id.toString(), room.roomNumber])
