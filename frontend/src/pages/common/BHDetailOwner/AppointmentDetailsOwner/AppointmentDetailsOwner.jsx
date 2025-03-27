@@ -36,12 +36,13 @@ const AppointmentDetail = ({ appointment }) => {
     };
 
     return (
-        <Card className="max-w-2xl mx-auto p-4 border-none shadow-none" bordered={false} style={{ border: "none", boxShadow: "none", background: "transparent" }}>
+        <Card className="max-w-xl mx-auto  border-none shadow-none" bordered={false} style={{ border: "none", boxShadow: "none", background: "transparent" }}>
             <Form.Item style={{ marginBottom: 8 }} >
                 <div className="flex flex-col items-center text-center">
                     <Avatar
-                        src={tenant?.accountId?.avatarImage?.url ?? DefaultAccount}
-                        size={50}
+                        src={tenant?.avatarImage?.url || DefaultAccount}
+                        size={64}
+                        alt="Avatar"
                     />
                     <Title level={4} className="mt-2">
                         {tenant?.fullName || "Không có tên"}
@@ -82,7 +83,7 @@ const AppointmentDetail = ({ appointment }) => {
                     </Form.Item>
                 )}
             </Form>
-            <div className="flex gap-3 items-center justify-between">
+            <div className="flex gap-3 items-center justify-between mt-8">
                 <Button
                     title={'Accept'}
                     size="large"

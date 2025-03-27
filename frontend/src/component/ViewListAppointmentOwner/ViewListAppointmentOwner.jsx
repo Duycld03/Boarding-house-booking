@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Table, Tag, Button, Tooltip, message, Modal } from "antd";
 import { getAppointmentsByBoardingHouseId, getAppointmentDetailForOwner } from "../../api/appointment";
 import moment from "moment";
-import AppointmentDetail from "../AppointmentDetailsOwner";
+import AppointmentDetail from "../../pages/common/BHDetailOwner/AppointmentDetailsOwner";
 
 const ViewListAppointmentOwner = () => {
     const [appointments, setAppointments] = useState([]);
@@ -41,14 +41,14 @@ const ViewListAppointmentOwner = () => {
     const fetchAppointmentDetail = async (appointmentId) => {
         try {
             const res = await getAppointmentDetailForOwner(appointmentId);
-
+            console.log(res)
             const formattedAppointment = {
                 tenant: res.tenant ? { ...res.tenant } : {},
                 room: res.room ? { ...res.room } : {},
                 appointmentDate: res.appointmentDate ? moment(res.appointmentDate).format("YYYY-MM-DD HH:mm") : "Không có ngày hẹn",
                 userNote: res.userNote || "Không có ghi chú",
                 status: res.status || "unknown",
-                reasonForCancel: res.reasonForCancel || null
+                reasonForCancel: res.reasonForCancel || null,
             };
 
             setAppointment(formattedAppointment);
@@ -172,13 +172,16 @@ const ViewListAppointmentOwner = () => {
                 })}
             />
             <Modal
-                title="Appointment Details"
+                title={
+                    <span style={{ fontSize: "16px", fontWeight: "bold" }}>
+                        Appointment Details
+                    </span>
+                }
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 footer={null}
                 width="400px"
                 style={{ top: 20 }}
-                bodyStyle={{ padding: "20px" }}
             >
                 {appointment ? (
                     <AppointmentDetail appointment={appointment} />
