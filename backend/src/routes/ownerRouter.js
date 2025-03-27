@@ -10,10 +10,10 @@ import {
   depositController,
   expenseController,
   revenueController,
-  renewalRequestController,
   refundRequestController,
-} from "../controllers/index.js";
-import { upload } from "../config/cloudinary.config.js";
+  renewalController,
+} from '../controllers/index.js';
+import { upload } from '../config/cloudinary.config.js';
 
 const ownerRouter = Router();
 
