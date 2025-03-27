@@ -10,8 +10,8 @@ import {
   depositController,
   expenseController,
   revenueController,
-  renewalRequestController,
   refundRequestController,
+  renewalController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -108,7 +108,6 @@ ownerRouter.put(
   depositController.rejectDepositRoom
 );
 
-
 // room
 ownerRouter.get(
   '/room/boarding-house/:boardingHouseId',
@@ -118,15 +117,15 @@ ownerRouter.get(
 //renewal
 ownerRouter.get(
   '/renewal/boarding-house/:boardingHouseId',
-  renewalRequestController.getRenewalRequestByBhID
+  renewalController.getRenewalRequestByBhID
 );
 ownerRouter.put(
   '/renewal/:requestId',
-  renewalRequestController.acceptExtensionRequest
+  renewalController.acceptExtensionRequest
 );
 ownerRouter.put(
   '/rejectrenewal/:requestId',
-  renewalRequestController.rejectExtensionRequest
+  renewalController.rejectExtensionRequest
 );
 
 // refund request
@@ -139,17 +138,13 @@ ownerRouter.put(
   refundRequestController.cancelRefundRequestsForOwner
 );
 
-
 //expense
 ownerRouter.get('/expense', expenseController.getExpensesByTime);
 ownerRouter.put('/expense/:expenseId', expenseController.updateExpense);
-
 
 //revenue
 ownerRouter.get('/revenue', revenueController.getRevenue);
 ownerRouter.get('/revenue/years', revenueController.getAvailableYears);
 ownerRouter.get('/revenue/year', revenueController.getRevenueByYear);
-
-
 
 export { ownerRouter };
