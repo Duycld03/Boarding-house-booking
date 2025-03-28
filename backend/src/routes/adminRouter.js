@@ -6,6 +6,7 @@ import {
   boardingHouseController,
   reportController,
   ReviewController,
+  depositController
 } from '../controllers/index.js';
 import reviewController from '../controllers/reviewController.js';
 import facilitiesController from '../controllers/facilitiesController.js';

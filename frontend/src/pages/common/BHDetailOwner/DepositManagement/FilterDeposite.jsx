@@ -39,7 +39,6 @@ function FilterDeposit({ setFilterValue, listRoom }) {
       status: values.status || "",
       priceRange: values.priceRange || [0, maxAmount],
       rentalTime: values.rentalTime || [1, maxRentalTime],
-      endDate: values.endDate ? [values.endDate[0], values.endDate[1]] : null,
       roomId: values.roomId || "",
     });
   };
@@ -117,10 +116,6 @@ function FilterDeposit({ setFilterValue, listRoom }) {
                   form.setFieldsValue({ rentalTime: value });
                 }}
               />
-            </Form.Item>
-
-            <Form.Item className="mb-2" label="End Date Range" name="endDate">
-              <DatePicker.RangePicker className="w-full" allowClear />
             </Form.Item>
 
             <Form.Item label="Room Number" name="roomId">
