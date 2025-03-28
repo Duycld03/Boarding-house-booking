@@ -4,12 +4,14 @@ import {
   DownOutlined,
   SyncOutlined,
   DollarOutlined,
+  RollbackOutlined,
 } from "@ant-design/icons";
 
 const ActionDropdown = ({
   record,
   onDetailClick,
   onRenewalClick,
+  onDepositRefundClick,
   setDepositRoom,
   setIsPayDepositPopupVisible,
   setDepositRoomId,
@@ -28,6 +30,12 @@ const ActionDropdown = ({
       label: "Create renewal request",
       icon: <SyncOutlined />,
       onClick: () => onRenewalClick(record),
+    },
+    record.status === "confirm" && {
+      key: "create-deposit-refund",
+      label: "Create deposit refund request",
+      icon: <RollbackOutlined />,
+      onClick: () => onDepositRefundClick(record),
     },
     record.status === "confirmed" && {
       key: "viewDetail",
