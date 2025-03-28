@@ -5,18 +5,21 @@ import { generateToken, verifyToken } from "../utils/functions.js";
 import { v2 as cloudinary } from "cloudinary";
 
 class accountController {
-  async getAllAccount(req, res, next) {
+  async getAllAccount(req, res) {
     try {
-      const accountData = await Account.find().sort({ createdAt: 1 });
-      if (accountData) {
-        return res.status(200).json(accountData);
-      } else {
-        return res.status(404).json({ message: "No accounts found" });
-      }
+      const accountData = await Account.find().sort({ createdAt: -1 });
+
+      return res.status(200).json(
+        accountData);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
     }
   }
+
 
   async softDeleteAccount(req, res, next) {
     try {
