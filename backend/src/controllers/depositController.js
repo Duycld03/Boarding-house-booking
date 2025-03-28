@@ -386,13 +386,12 @@ class DepositController {
   async getDepositByBhId(req, res) {
     try {
       const { boardingHouseId } = req.params;
-      const { status, priceRange, endDate, roomId, rentalTime } = req.query;
+      const { status, priceRange, roomId, rentalTime } = req.query;
 
 
-      const rooms = await Room.find({ boardingHouseId }).select(
-        '_id'
-      );
 
+
+      const rooms = await Room.find({ boardingHouseId })
 
 
       const roomMap = new Map(
@@ -403,26 +402,7 @@ class DepositController {
         filter.roomId = roomId;
       }
 
-      if (endDate) {
-        try {
-          if (typeof endDate === 'string' && endDate.includes(',')) {
-            const [startDate, endDate] = endDate.split(',');
-            filter.endDate = {
-              $gte: new Date(startDate),
-              $lte: new Date(endDate),
-            };
-          } else if (Array.isArray(endDate) && endDate.length === 2) {
-            filter.endDate = {
-              $gte: new Date(endDate[0]),
-              $lte: new Date(endDate),
-            };
-          } else if (endDate) {
-            filter.endDate = new Date(endDate);
-          }
-        } catch (e) {
-          console.error('Error parsing endDate:', e);
-        }
-      }
+
 
       if (status && status !== '') {
         filter.status = status;

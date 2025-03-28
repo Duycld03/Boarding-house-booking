@@ -6,6 +6,7 @@ import {
   acceptDepositRoom,
   rejectDepositRoom,
 } from "../../../../api/depositManagement";
+import { getRoomsByBoardingHouse } from "@/api/room";
 import { useParams } from "react-router-dom";
 import Table from "@/component/Table";
 import formatAmount from "@/utils/formatAmount";
@@ -24,6 +25,18 @@ const DepositRoom = () => {
   const [rejectLoading, setRejectLoading] = useState(false); // State to manage reject button loading state
   const { boardingHouseId } = useParams();
   const [filterValue, setFilterValue] = useState(null);
+  const [listRoom, setListRoom] = useState([]);
+
+  const fetchListRoom = async () => {
+    try {
+      const response = await getRoomsByBoardingHouse(boardingHouseId);
+      setListRoom(Array.isArray(response) ? response : []);
+    } catch (error) {
+      toast.error("Failed to fetch deposit rooms");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchDepositedRooms = async () => {
     try {
@@ -40,6 +53,7 @@ const DepositRoom = () => {
   useEffect(() => {
     if (boardingHouseId) {
       fetchDepositedRooms();
+      fetchListRoom();
     }
   }, [boardingHouseId, filterValue]);
 
@@ -193,7 +207,7 @@ const DepositRoom = () => {
   return (
     <div>
       <div className="flex justify-end">
-        <FilterDeposit setFilterValue={setFilterValue} />
+        <FilterDeposit setFilterValue={setFilterValue} listRoom={listRoom} />
       </div>
       <Table columns={columns} data={depositedRooms || []} loading={loading} />
       <ConfirmModal
