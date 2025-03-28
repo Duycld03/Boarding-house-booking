@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   authController,
   boardingHouseController,
@@ -17,134 +17,147 @@ import { upload } from '../config/cloudinary.config.js';
 
 const ownerRouter = Router();
 
-ownerRouter.get('/', (req, res) => {
-  res.send('This is a owner router');
+ownerRouter.get("/", (req, res) => {
+  res.send("This is a owner router");
 });
 
 //boarding house
-ownerRouter.get('/boardinghouseowner', boardingHouseController.getAllBHOwner);
+ownerRouter.get("/boardinghouseowner", boardingHouseController.getAllBHOwner);
 ownerRouter.get(
-  '/boardinghouse/:id',
+  "/boardinghouse/:id",
   boardingHouseController.getBoardingHouseDetails
 );
 ownerRouter.put(
-  '/boardinghouse/:id',
-  upload.array('boardingHouse'),
+  "/boardinghouse/:id",
+  upload.array("boardingHouse"),
   boardingHouseController.updateBoardingHouseDetailsOwner
 );
 
-ownerRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
+ownerRouter.get("/types", boardingHouseController.getAllBoardingHouseTypes);
 ownerRouter.post(
-  '/boardinghouse',
-  upload.array('boardingHouse'), // Cho phép tối đa 16 ảnh trong 1 lần upload
+  "/boardinghouse",
+  upload.array("boardingHouse"), // Cho phép tối đa 16 ảnh trong 1 lần upload
   boardingHouseController.createBoardingHouseOwner
 );
 ownerRouter.delete(
-  '/boardinghouse/:id/softDelete',
+  "/boardinghouse/:id/softDelete",
   boardingHouseController.softDeleteBoardingHouse
 );
 
 //review
-ownerRouter.post('/reply', ReviewController.replyReview);
-ownerRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
+ownerRouter.post("/reply", ReviewController.replyReview);
+ownerRouter.get("/reviews/:reviewId", ReviewController.getReviewContent);
 
 // deposit
-ownerRouter.put('/review/updatereply', ReviewController.updateReplyReview);
-ownerRouter.delete('/review/reply', ReviewController.softDeleteReplyReview);
+ownerRouter.put("/review/updatereply", ReviewController.updateReplyReview);
+ownerRouter.delete("/review/reply", ReviewController.softDeleteReplyReview);
 
 //tenant
 ownerRouter.get(
-  '/tenant/:boardingHouseId',
+  "/tenant/:boardingHouseId",
   tenantController.getTenantsByBoardingHouse
 );
 ownerRouter.delete(
-  '/tenant/:boardingHouseId/:accountId',
+  "/tenant/:boardingHouseId/:accountId",
   tenantController.deleteTenantFromBoardingHouse
 );
 
 //facilities
-ownerRouter.get('/facilities', FacilitiesController.getAllFacilities);
+ownerRouter.get("/facilities", FacilitiesController.getAllFacilities);
 
 //roomtype
 ownerRouter.get(
-  '/boardinghouse/room-types/:id',
+  "/boardinghouse/room-types/:id",
   roomTypeController.getRoomTypeByBhId
 );
 ownerRouter.post(
-  '/boardinghouse/roomtype/:id/create',
-  upload.single('roomType'),
+  "/boardinghouse/roomtype/:id/create",
+  upload.single("roomType"),
   roomTypeController.addRoomTypeToBoardingHouse
 );
 ownerRouter.put(
-  '/boardinghouse/roomtype/:roomTypeId/',
-  upload.single('roomType'), // Nếu có ảnh mới, upload lên Cloudinary
+  "/boardinghouse/roomtype/:roomTypeId/",
+  upload.single("roomType"), // Nếu có ảnh mới, upload lên Cloudinary
   roomTypeController.updateRoomTypeToBoardingHouse
 );
 ownerRouter.delete(
-  '/boardinghouse/roomtype/:roomTypeId/',
+  "/boardinghouse/roomtype/:roomTypeId/",
   roomTypeController.softDeleteRoomType
 );
 
 //deposit
 ownerRouter.get(
-  '/boardinghouse/deposit/:boardingHouseId',
+  "/boardinghouse/deposit/:boardingHouseId",
   depositController.getDepositByBhId
 );
 
 ownerRouter.get(
-  '/boardinghouse/deposit/max-deposit/:boardingHouseId',
+  "/boardinghouse/deposit/max-deposit/:boardingHouseId",
   depositController.getMaxDeposit
 );
 ownerRouter.get(
-  '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
+  "/boardinghouse/deposit/max-rent-time/:boardingHouseId",
   depositController.getMaxRentTime
 );
 ownerRouter.put(
-  '/acceptdeposit/:depositId',
+  "/acceptdeposit/:depositId",
   depositController.acceptDepositRoom
 );
 ownerRouter.put(
-  '/rejectdeposit/:depositId',
+  "/rejectdeposit/:depositId",
   depositController.rejectDepositRoom
 );
 
 // room
 ownerRouter.get(
-  '/room/boarding-house/:boardingHouseId',
+  "/room/boarding-house/:boardingHouseId",
   roomController.getRoomsByBoardingHouse
 );
 
+ownerRouter.post(
+  "/room/boarding-house",
+  upload.single("Room"),
+  roomController.addRoom
+);
+ownerRouter.put(
+  "/room/boarding-house/:roomId",
+  upload.single("Room"),
+  roomController.updateRoom
+);
+ownerRouter.delete("/room/boarding-house/:roomId", roomController.deleteRoom);
+
 //renewal
 ownerRouter.get(
-  '/renewal/boarding-house/:boardingHouseId',
+  "/renewal/boarding-house/:boardingHouseId",
   renewalController.getRenewalRequestByBhID
 );
 ownerRouter.put(
-  '/renewal/:requestId',
+  "/renewal/:requestId",
   renewalController.acceptExtensionRequest
 );
 ownerRouter.put(
-  '/rejectrenewal/:requestId',
+  "/rejectrenewal/:requestId",
   renewalController.rejectExtensionRequest
 );
 
 // refund request
 ownerRouter.get(
-  '/refund-requests',
+  "/refund-requests",
   refundRequestController.getRefundRequestsForOwner
 );
 ownerRouter.put(
-  '/refund-request/:refundRequestId',
+  "/refund-request/:refundRequestId",
   refundRequestController.cancelRefundRequestsForOwner
 );
 
 //expense
-ownerRouter.get('/expense', expenseController.getExpensesByTime);
-ownerRouter.put('/expense/:expenseId', expenseController.updateExpense);
+ownerRouter.get("/expense", expenseController.getExpensesByTime);
+ownerRouter.put("/expense/:expenseId", expenseController.updateExpense);
 
 //revenue
-ownerRouter.get('/revenue', revenueController.getRevenue);
-ownerRouter.get('/revenue/years', revenueController.getAvailableYears);
-ownerRouter.get('/revenue/year', revenueController.getRevenueByYear);
+ownerRouter.get("/revenue", revenueController.getRevenue);
+ownerRouter.get("/revenue/years", revenueController.getAvailableYears);
+ownerRouter.get("/revenue/year", revenueController.getRevenueByYear);
+
 
 export { ownerRouter };
