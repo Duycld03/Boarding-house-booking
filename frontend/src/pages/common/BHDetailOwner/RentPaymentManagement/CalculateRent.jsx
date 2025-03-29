@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Button, Table, Select } from "antd";
+import { getAvailableRooms } from "@/api/ownerUser/roomManagement";
 
-const RentCalculationModal = ({ visible, onClose, onSave }) => {
+const CalculateRent = ({ visible, setVisible, boardingHouseId }) => {
   const [form] = Form.useForm();
   const [additionalFees, setAdditionalFees] = useState([]);
   const [electricalBill, setElectricalBill] = useState({
@@ -9,7 +10,18 @@ const RentCalculationModal = ({ visible, onClose, onSave }) => {
     newNumber: 0,
   });
   const [waterBill, setWaterBill] = useState({ oldNumber: 0, newNumber: 0 });
-  const availableRooms = ["101", "102", "103", "104"]; // Danh sách phòng mẫu
+  const [availableRooms, setAvailableRooms] = useState([]);
+
+  const onClose = () => {
+    setVisible(false);
+    setAdditionalFees([]);
+    setElectricalBill({ oldNumber: 0, newNumber: 0 });
+    setWaterBill({ oldNumber: 0, newNumber: 0 });
+  };
+
+  const onSave = (values) => {
+    console.log(values);
+  };
 
   const handleAddFee = () => {
     setAdditionalFees([
@@ -38,6 +50,22 @@ const RentCalculationModal = ({ visible, onClose, onSave }) => {
     calculateAmount(waterBill) +
     additionalFees.reduce((sum, fee) => sum + Number(fee.amount), 0);
 
+  const fetchAvailableRooms = async () => {
+    try {
+      const res = await getAvailableRooms(boardingHouseId);
+      setAvailableRooms(res);
+    } catch (error) {
+      setAvailableRooms([]);
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    if (boardingHouseId) {
+      fetchAvailableRooms();
+    }
+  }, [boardingHouseId]);
+
   return (
     <Modal
       title="Calculate Rent"
@@ -51,10 +79,10 @@ const RentCalculationModal = ({ visible, onClose, onSave }) => {
           name="roomNumber"
           rules={[{ required: true }]}
         >
-          <Select placeholder="Chọn phòng">
+          <Select placeholder="Select Room">
             {availableRooms.map((room) => (
-              <Select.Option key={room} value={room}>
-                {room}
+              <Select.Option key={room._id} value={room.roomNumber}>
+                {room.roomNumber}
               </Select.Option>
             ))}
           </Select>
@@ -161,4 +189,4 @@ const RentCalculationModal = ({ visible, onClose, onSave }) => {
   );
 };
 
-export default RentCalculationModal;
+export default CalculateRent;

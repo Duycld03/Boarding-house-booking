@@ -107,7 +107,14 @@ const RentPaymentManagement = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-4">
-        <Button btnAdd title="Calculate monthly" size="large" />
+        <Button
+          btnAdd
+          title="Calculate monthly"
+          size="large"
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        />
       </div>
 
       <Table
@@ -115,7 +122,11 @@ const RentPaymentManagement = () => {
         data={rentPaymentData?.length > 0 ? rentPaymentData : []}
         loading={loading}
       />
-      <CalculateRent visible={false} setVisible={() => {}} />
+      <CalculateRent
+        visible={isOpen}
+        setVisible={setIsOpen}
+        boardingHouseId={boardingHouseId}
+      />
     </div>
   );
 };

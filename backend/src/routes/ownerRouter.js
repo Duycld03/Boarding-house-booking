@@ -162,4 +162,9 @@ ownerRouter.get(
   paymentBillController.getPaymentBillByBoardingHouseId
 );
 
+ownerRouter.get(
+  "/unpaid-rooms/:boardingHouseId",
+  roomController.getUnpaidRoomsByBoardingHouse
+);
+
 export { ownerRouter };

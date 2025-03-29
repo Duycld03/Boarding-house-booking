@@ -43,9 +43,9 @@ class PaymentBillController {
           rentMonth: `${bill.month}/${bill.year}`,
           status: bill.status,
           additionalFee: totalFee,
-          electricalBill: bill.electricalBill?.totalAmount || 0, // Tiền điện (VND)
-          waterBill: bill.waterBill?.totalAmount || 0, // Tiền nước (VND)
-          paymentAmount: bill.paymentAmount || 0, // Tổng tiền thanh toán (VND)
+          electricalBill: bill.electricalBill?.totalAmount || 0,
+          waterBill: bill.waterBill?.totalAmount || 0,
+          paymentAmount: bill.paymentAmount || 0,
         };
       });
 
