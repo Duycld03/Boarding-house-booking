@@ -601,20 +601,21 @@ class boardingHouseController {
           });
         }
       }
-      // if (priceRange && priceRange.length === 2) {
-      //   filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
-      // }
-      if (priceRange) {
-        const prices = priceRange.split(",").map(Number);
-        if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
-          filter.priceRange = { $gte: prices[0], $lte: prices[1] };
-        } else {
-          return res.status(400).json({
-            success: false,
-            message: "Invalid price range format. Use 'priceRange=min,max'.",
-          });
-        }
+      if (priceRange && priceRange.length === 2) {
+        filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
       }
+      // if (priceRange) {
+      //   console.log("Price range:", priceRange);
+      //   const prices = priceRange.split(",").map(Number);
+      //   if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
+      //     filter.priceRange = { $gte: prices[0], $lte: prices[1] };
+      //   } else {
+      //     return res.status(400).json({
+      //       success: false,
+      //       message: "Invalid price range format. Use 'priceRange=min,max'.",
+      //     });
+      //   }
+      // }
       if (startDate && endDate) {
         filter.createdAt = {
           $gte: new Date(startDate),
