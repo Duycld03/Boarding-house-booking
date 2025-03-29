@@ -11,6 +11,7 @@ import dotenv from "dotenv";
 import UserPayment from "../models/userPayment.js";
 import BoardingHouse from "../models/boardingHouse.js";
 import { query } from "express";
+import RefundRequest from "../models/refundRequest.js";
 dotenv.config();
 
 const config = {
@@ -184,65 +185,96 @@ class DepositController {
 
         const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
         return res.redirect(redirectUrl);
-      }
-      // pay rent
-      const userId = orderInfo[1];
-      const paymentBillId = orderInfo[2];
+      } else if (type == "payRent") {
+        const userId = orderInfo[1];
+        const paymentBillId = orderInfo[2];
 
-      const userPayment = await UserPayment.findOne({
-        accountId: userId,
+        const userPayment = await UserPayment.findOne({
+          accountId: userId,
+          status: { $regex: /^pending$/i },
+          paymentBillId,
+        });
+        if (!userPayment) {
+          throw new Error("Payment not found");
+        }
+
+        userPayment.status = "Paid";
+        userPayment.paymentMethod = "VNPay";
+        await userPayment.save();
+
+        const allUserPayments = await UserPayment.find({
+          paymentBillId,
+        }).lean();
+
+        const allPaid =
+          allUserPayments.length > 0 &&
+          allUserPayments.every(
+            (payment) => payment.status.toLowerCase() === "paid"
+          );
+
+        if (allPaid) {
+          await PaymentBill.updateOne(
+            { _id: paymentBillId },
+            { $set: { status: "Paid" } }
+          );
+        }
+
+        const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+        return res.redirect(redirectUrl);
+      }
+      // refund
+      const accountId = orderInfo[1];
+      const refundRequestId = orderInfo[2];
+
+      const refundRequest = await RefundRequest.findOne({
+        _id: refundRequestId,
+        accountId,
         status: { $regex: /^pending$/i },
-        paymentBillId,
-      });
-      if (!userPayment) {
-        throw new Error("Payment not found");
+      }).populate("depositRoomId");
+
+      if (!refundRequest) {
+        throw new Error("Refund request not found");
       }
 
-      userPayment.status = "paid";
-      userPayment.paymentMethod = "VNPay";
-      await userPayment.save();
+      refundRequest.status = "accepted";
 
-      const allUserPayments = await UserPayment.find({
-        paymentBillId,
-      }).lean();
+      const depositRoom = await DepositRoom.findById(
+        refundRequest.depositRoomId
+      );
+      depositRoom.status = "refunded";
+      await depositRoom.save();
 
-      const allPaid =
-        allUserPayments.length > 0 &&
-        allUserPayments.every(
-          (payment) => payment.status.toLowerCase() === "paid"
-        );
+      const room = await Room.findById(depositRoom.roomId);
+      room.rentBy = room.rentBy.filter((id) => id.toString() !== accountId);
+      await room.save();
 
-      if (allPaid) {
-        await PaymentBill.updateOne(
-          { _id: paymentBillId },
-          { $set: { status: "Paid" } }
-        );
-      }
+      await refundRequest.save();
 
-      const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+      const redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=success`;
       return res.redirect(redirectUrl);
     }
     //failed
-    const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+    let redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+    if (type == "refund") {
+      redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=fail`;
+    }
     res.redirect(redirectUrl);
   }
 
   async momoReturn(req, res) {
+    const {
+      orderId,
+      amount,
+      orderInfo,
+      resultCode,
+      message,
+      transId,
+      responseTime,
+    } = req.query;
+
+    const info = orderInfo.split("-");
+    const type = info[0];
     try {
-      const {
-        orderId,
-        amount,
-        orderInfo,
-        resultCode,
-        message,
-        transId,
-        responseTime,
-      } = req.query;
-
-      const info = orderInfo.split("-");
-
-      const type = info[0];
-
       if (resultCode == "7002" || resultCode == "0") {
         if (type == "deposit") {
           const accountId = info[1];
@@ -268,47 +300,81 @@ class DepositController {
 
           const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
           return res.redirect(redirectUrl);
+        } else if (type == "payRent") {
+          const userId = info[1];
+          const paymentBillId = info[2];
+
+          const userPayment = await UserPayment.findOne({
+            accountId: userId,
+            status: { $regex: /^pending$/i },
+            paymentBillId,
+          });
+          if (!userPayment) {
+            throw new Error("Payment not found");
+          }
+
+          userPayment.status = "Paid";
+          userPayment.paymentMethod = "VNPay";
+          await userPayment.save();
+
+          const allUserPayments = await UserPayment.find({
+            paymentBillId,
+          }).lean();
+
+          const allPaid =
+            allUserPayments.length > 0 &&
+            allUserPayments.every(
+              (payment) => payment.status.toLowerCase() === "paid"
+            );
+
+          if (allPaid) {
+            await PaymentBill.updateOne(
+              { _id: paymentBillId },
+              { $set: { status: "Paid" } }
+            );
+          }
+
+          const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+          return res.redirect(redirectUrl);
         }
-        // pay rent
+        // refund
+        const accountId = orderInfo[1];
+        const refundRequestId = orderInfo[2];
 
-        const userId = info[1];
-        const paymentBillId = info[2];
-
-        const userPayment = await UserPayment.findOne({
-          accountId: userId,
+        const refundRequest = await RefundRequest.findOne({
+          _id: refundRequestId,
+          accountId,
           status: { $regex: /^pending$/i },
-          paymentBillId,
-        });
-        if (!userPayment) {
-          throw new Error("Payment not found");
+        }).populate("depositRoomId");
+
+        if (!refundRequest) {
+          throw new Error("Refund request not found");
         }
 
-        userPayment.status = "Paid";
-        userPayment.paymentMethod = "Momo";
-        await userPayment.save();
+        refundRequest.status = "accepted";
 
-        const allUserPayments = await UserPayment.find({
-          paymentBillId,
-        }).lean();
+        const depositRoom = await DepositRoom.findById(
+          refundRequest.depositRoomId
+        );
+        depositRoom.status = "refunded";
+        await depositRoom.save();
 
-        const allPaid =
-          allUserPayments.length > 0 &&
-          allUserPayments.every(
-            (payment) => payment.status.toLowerCase() === "paid"
-          );
+        const room = await Room.findById(depositRoom.roomId);
+        room.rentBy = room.rentBy.filter((id) => id.toString() !== accountId);
+        await room.save();
 
-        if (allPaid) {
-          await PaymentBill.updateOne(
-            { _id: paymentBillId },
-            { $set: { status: "Paid" } }
-          );
-        }
-        const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+        await refundRequest.save();
+
+        const redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=success`;
         return res.redirect(redirectUrl);
       }
     } catch (error) {
       console.log("Error momo return:", error);
-      const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+
+      let redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+      if (type == "refund") {
+        redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=fail`;
+      }
       res.redirect(redirectUrl);
     }
   }
@@ -390,9 +456,8 @@ class DepositController {
   async getDepositByBhId(req, res) {
     try {
       const { boardingHouseId } = req.params;
-      const { status, priceRange, endDate, roomId, rentalTime } = req.query;
-
-      const rooms = await Room.find({ boardingHouseId }).select("_id");
+      const { status, priceRange, roomId, rentalTime } = req.query;
+      const rooms = await Room.find({ boardingHouseId })
 
       const roomMap = new Map(
         rooms.map((room) => [room._id.toString(), room.roomNumber])
@@ -400,27 +465,6 @@ class DepositController {
       let filter = { roomId: { $in: [...roomMap.keys()] } };
       if (roomId && roomId !== "" && roomMap.has(roomId)) {
         filter.roomId = roomId;
-      }
-
-      if (endDate) {
-        try {
-          if (typeof endDate === "string" && endDate.includes(",")) {
-            const [startDate, endDate] = endDate.split(",");
-            filter.endDate = {
-              $gte: new Date(startDate),
-              $lte: new Date(endDate),
-            };
-          } else if (Array.isArray(endDate) && endDate.length === 2) {
-            filter.endDate = {
-              $gte: new Date(endDate[0]),
-              $lte: new Date(endDate),
-            };
-          } else if (endDate) {
-            filter.endDate = new Date(endDate);
-          }
-        } catch (e) {
-          console.error("Error parsing endDate:", e);
-        }
       }
 
       if (status && status !== "") {
@@ -711,6 +755,33 @@ class DepositController {
       return res
         .status(500)
         .json({ error: "Đã có lỗi xảy ra", detail: error.message });
+
+    }
+  }
+  async acceptRefundRequestForOwner(req, res) {
+    try {
+      const { refundRequestId } = req.params;
+      const { paymentMethod } = req.body;
+      const existRefundRequest = await RefundRequest.findOne({
+        _id: refundRequestId,
+        status: { $regex: /^pending$/i },
+      });
+
+      if (!existRefundRequest) {
+        return res.status(400).json({ message: "Refund request not found" });
+      }
+
+      const { amountRefunded, accountId } = existRefundRequest;
+      const orderInfo = `refund-${accountId}-${refundRequestId}`;
+
+      if (paymentMethod === "vnpay") {
+        createVNPayUrl(req, res, amountRefunded, orderInfo);
+      } else if (paymentMethod === "momo") {
+        createMomoUrl(req, res, amountRefunded, orderInfo);
+      }
+    } catch (error) {
+      console.error("Error paying deposit refund:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
 }

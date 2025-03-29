@@ -19,13 +19,12 @@ const RentPaymentDetailModal = ({ payment, onClose }) => {
     overdue: "red",
   };
 
-  const formattedDate = new Date(payment.createdAt).toLocaleDateString(
-    "en-US",
-    {
-      month: "long",
-      year: "numeric",
-    }
-  );
+  const formattedDate = new Date(
+    payment?.paymentBillId?.createdAt
+  ).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <Modal

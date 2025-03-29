@@ -16,6 +16,7 @@ import {
 } from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
+
 const ownerRouter = Router();
 
 ownerRouter.get("/", (req, res) => {
@@ -115,6 +116,18 @@ ownerRouter.get(
   roomController.getRoomsByBoardingHouse
 );
 
+ownerRouter.post(
+  "/room/boarding-house",
+  upload.single("Room"),
+  roomController.addRoom
+);
+ownerRouter.put(
+  "/room/boarding-house/:roomId",
+  upload.single("Room"),
+  roomController.updateRoom
+);
+ownerRouter.delete("/room/boarding-house/:roomId", roomController.deleteRoom);
+
 //renewal
 ownerRouter.get(
   "/renewal/boarding-house/:boardingHouseId",
@@ -139,10 +152,16 @@ ownerRouter.put(
   refundRequestController.cancelRefundRequestsForOwner
 );
 
+ownerRouter.post(
+  "/refund-request/:refundRequestId",
+  depositController.acceptRefundRequestForOwner
+);
+
 //expense
 ownerRouter.get("/expense", expenseController.getExpensesByTime);
 ownerRouter.put("/expense/:expenseId", expenseController.updateExpense);
 ownerRouter.get("/total-expense", expenseController.getTotalExpensesByTime);
+
 
 //revenue
 ownerRouter.get("/revenue", revenueController.getRevenue);
@@ -177,5 +196,6 @@ ownerRouter.post(
   "/calculate-monthly-bill",
   paymentBillController.calculateMonthlyRoomRent
 );
+
 
 export { ownerRouter };
