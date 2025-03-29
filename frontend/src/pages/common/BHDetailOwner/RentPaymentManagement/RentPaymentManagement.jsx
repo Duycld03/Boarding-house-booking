@@ -1,87 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { TableCustom as Table, Button, ConfirmModal } from "@/component";
-import {
-  getTenantsByBoardingHouse,
-  deleteTenantFromBoardingHouse,
-} from "@/api/tenantManagement";
 import { toast } from "react-toastify";
 import convertTimetap from "@/utils/convertTimetap";
-import { Avatar, Tag } from "antd";
-import DefaultAvatar from "@/assets/images/none_avatar.png";
+import { Tag } from "antd";
 import formatAmount from "@/utils/formatAmount";
 import CalculateRent from "./CalculateRent";
+import { getPaymentBillByBoardingHouseId } from "@/api/ownerUser/paymentBillManagement";
 
 const RentPaymentManagement = () => {
   const { boardingHouseId } = useParams();
-  const [tenantData, setTenantData] = useState([]);
-  const [rentPaymentData, setRentPaymentData] = useState([
-    {
-      roomNumber: "101",
-      monthlyRent: 2,
-      status: "pending",
-      additionalFee: 50000,
-      electricalBill: 20000,
-      waterBill: 10000,
-      paymentAmount: 80000,
-    },
-    // Thêm các dữ liệu khác nếu cần
-  ]);
+  const [rentPaymentData, setRentPaymentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedTenant, setSelectedTenant] = useState(null);
 
-  useEffect(() => {
-    const fetchTenantData = async () => {
-      setLoading(true);
-      try {
-        const data = await getTenantsByBoardingHouse(boardingHouseId);
-        console.log(data);
-
-        setTenantData(data);
-      } catch (error) {
-        // toast.error('Failed to fetch tenant data.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTenantData();
-  }, [boardingHouseId]);
-
-  const handleDelete = async () => {
-    if (!selectedTenant || !selectedTenant.accountId) {
-      toast.error("Error: Missing tenant accountId.");
-      return;
-    }
-
+  const fetchRentPaymentData = async () => {
+    if (!boardingHouseId) return;
     setLoading(true);
     try {
-      await deleteTenantFromBoardingHouse(
-        boardingHouseId,
-        selectedTenant.accountId
-      );
-
-      // Gọi lại API để cập nhật danh sách mới nhất
-      const updatedData = await getTenantsByBoardingHouse(boardingHouseId);
-      setTenantData(updatedData);
-
-      toast.success("Tenant deleted successfully.");
+      const res = await getPaymentBillByBoardingHouseId(boardingHouseId);
+      setRentPaymentData(res);
     } catch (error) {
-      console.error(
-        "🔥 Delete Tenant Error:",
-        error.response?.data || error.message
-      );
-      toast.error(
-        `Failed to delete tenant: ${
-          error.response?.data?.message || "Unknown error"
-        }`
-      );
+      console.log(error);
+      setRentPaymentData([]);
     } finally {
       setLoading(false);
-      setIsOpen(false);
     }
   };
+
+  useEffect(() => {
+    fetchRentPaymentData();
+  }, [boardingHouseId]);
 
   const columns = [
     {
@@ -91,8 +40,8 @@ const RentPaymentManagement = () => {
     },
     {
       title: "Monthly rent",
-      dataIndex: "monthlyRent",
-      key: "monthlyRent",
+      dataIndex: "rentMonth",
+      key: "rentMonth",
     },
     {
       title: "Status",
@@ -118,7 +67,7 @@ const RentPaymentManagement = () => {
       title: "Additional Fee",
       dataIndex: "additionalFee",
       key: "additionalFee",
-      render: (price) => (price ? formatAmount(price) : "N/A"),
+      render: (price) => (price ? formatAmount(price) : 0),
     },
     {
       title: "Electrical Bill",
@@ -161,15 +110,12 @@ const RentPaymentManagement = () => {
         <Button btnAdd title="Calculate monthly" size="large" />
       </div>
 
-      <Table columns={columns} data={rentPaymentData} loading={loading} />
-      <ConfirmModal
-        title="Confirm Deletion"
-        content="Are you sure you want to delete this tenant?"
-        isOpen={isOpen}
-        onOk={handleDelete}
-        onCancel={() => setIsOpen(false)}
+      <Table
+        columns={columns}
+        data={rentPaymentData?.length > 0 ? rentPaymentData : []}
+        loading={loading}
       />
-      <CalculateRent visible={true} setVisible={() => {}} />
+      <CalculateRent visible={false} setVisible={() => {}} />
     </div>
   );
 };
