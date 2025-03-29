@@ -15,6 +15,7 @@ import MyRenewalRequest from "./MyRenewalRequest";
 import MyRentPayment from "./MyRentPayment";
 import MyDepositRefundRequest from "./MyDepositRefundRequest";
 import DepositRefundRequestOwner from "./DepositRefundRequestOwner";
+import RevenueManagementOwner from "./RevenueManagementOwner";
 
 export {
   AboutUs,
@@ -34,4 +35,5 @@ export {
   MyRentPayment,
   MyDepositRefundRequest,
   DepositRefundRequestOwner,
+  RevenueManagementOwner,
 };
