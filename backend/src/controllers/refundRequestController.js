@@ -1,5 +1,5 @@
-import moment from 'moment';
-import RefundRequest from '../models/refundRequest.js';
+import moment from "moment";
+import RefundRequest from "../models/refundRequest.js";
 
 class RefundRequestController {
   async getRefundRequests(req, res) {
@@ -8,12 +8,12 @@ class RefundRequestController {
         accountId: req.user.userId,
       })
         .populate({
-          path: 'depositRoomId',
+          path: "depositRoomId",
           populate: {
-            path: 'roomId',
+            path: "roomId",
             populate: {
-              path: 'boardingHouseId', // Populate boardingHouseId để lấy thông tin tên
-              select: 'name', // Chỉ lấy trường 'name' của boardingHouse
+              path: "boardingHouseId", // Populate boardingHouseId để lấy thông tin tên
+              select: "name", // Chỉ lấy trường 'name' của boardingHouse
             },
           },
         })
@@ -24,20 +24,20 @@ class RefundRequestController {
           _id: refundRequest._id,
           roomNumber: refundRequest.depositRoomId.roomId.roomNumber,
           endDate: moment(refundRequest.depositRoomId.endDate).format(
-            'DD/MM/YYYY'
+            "DD/MM/YYYY"
           ),
           amountRefunded: refundRequest.amountRefunded,
           status: refundRequest.status,
           reason: refundRequest.reason,
           boardingHouseName:
-            refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || 'N/A', // Thêm tên boardingHouse vào
-          createdAt: moment(refundRequest.createdAt).format('DD/MM/YYYY'),
+            refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || "N/A", // Thêm tên boardingHouse vào
+          createdAt: moment(refundRequest.createdAt).format("DD/MM/YYYY"),
         };
       });
 
       return res.json(data);
     } catch (error) {
-      console.log('Error getting refund requests:', error);
+      console.log("Error getting refund requests:", error);
       return res.status(500).json(error);
     }
   }
@@ -45,13 +45,13 @@ class RefundRequestController {
   async getRefundRequestsForOwner(req, res) {
     try {
       const refundRequests = await RefundRequest.find().populate({
-        path: 'depositRoomId',
+        path: "depositRoomId",
         populate: {
-          path: 'roomId',
+          path: "roomId",
           populate: {
-            path: 'boardingHouseId',
+            path: "boardingHouseId",
             match: { ownerId: req.user.userId },
-            select: 'name',
+            select: "name",
           },
         },
       });
@@ -65,19 +65,19 @@ class RefundRequestController {
           _id: refundRequest._id,
           roomNumber: refundRequest.depositRoomId.roomId.roomNumber,
           endDate: moment(refundRequest.depositRoomId.endDate).format(
-            'DD/MM/YYYY'
+            "DD/MM/YYYY"
           ),
           amountRefunded: refundRequest.amountRefunded,
           boardingHouseName:
-            refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || 'N/A', // Lấy tên của boardingHouse
+            refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || "N/A", // Lấy tên của boardingHouse
           status: refundRequest.status,
           reason: refundRequest.reason,
-          createdAt: moment(refundRequest.createdAt).format('DD/MM/YYYY'),
+          createdAt: moment(refundRequest.createdAt).format("DD/MM/YYYY"),
         };
       });
       return res.json(data);
     } catch (error) {
-      console.log('Error getting refund requests:', error);
+      console.log("Error getting refund requests:", error);
       return res.status(500).json(error);
     }
   }
@@ -90,11 +90,11 @@ class RefundRequestController {
       const refundRequest = await RefundRequest.findById(
         refundRequestId
       ).populate({
-        path: 'depositRoomId',
+        path: "depositRoomId",
         populate: {
-          path: 'roomId',
+          path: "roomId",
           populate: {
-            path: 'boardingHouseId',
+            path: "boardingHouseId",
             match: { ownerId: req.user.userId }, // Kiểm tra xem chủ sở hữu có phải là người yêu cầu không
           },
         },
@@ -106,24 +106,47 @@ class RefundRequestController {
         !refundRequest.depositRoomId?.roomId?.boardingHouseId
       ) {
         return res.status(404).json({
-          message: 'Refund request not found or you are not the owner.',
+          message: "Refund request not found or you are not the owner.",
         });
       }
 
       // Cập nhật trạng thái và lý do hủy, các trường khác giữ nguyên
-      refundRequest.status = 'canceled';
-      refundRequest.reasonForCancel = reasonForCancel || ''; // Lưu lý do hủy (có thể là chuỗi rỗng nếu không có lý do)
+      refundRequest.status = "canceled";
+      refundRequest.reasonForCancel = reasonForCancel || ""; // Lưu lý do hủy (có thể là chuỗi rỗng nếu không có lý do)
 
       // Lưu thay đổi vào database
       await refundRequest.save();
 
-      return res.json({ message: 'Refund request canceled successfully.' });
+      return res.json({ message: "Refund request canceled successfully." });
     } catch (error) {
-      console.log('Error canceling refund request:', error);
+      console.log("Error canceling refund request:", error);
       return res.status(500).json({
-        message: 'An error occurred while canceling the refund request.',
+        message: "An error occurred while canceling the refund request.",
         error,
       });
+    }
+  }
+
+  async createRefundRequest(req, res) {
+    try {
+      const { depositRoomId, reason, amountRefunded } = req.body;
+      if (!depositRoomId || !reason || !amountRefunded) {
+        return res.status(400).json({ message: "Missing required fields." });
+      }
+
+      const refundRequest = await RefundRequest.create({
+        depositRoomId,
+        reason,
+        status: "pending",
+        amountRefunded,
+        accountId: req.user.userId,
+      });
+      return res
+        .status(201)
+        .json({ message: "Refund request created successfully." });
+    } catch (error) {
+      console.log("Error creating refund request:", error);
+      return res.status(500).json(error);
     }
   }
 }

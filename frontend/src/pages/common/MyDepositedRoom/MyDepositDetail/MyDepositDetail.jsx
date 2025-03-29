@@ -15,7 +15,6 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
   const [isPaid, setIsPaid] = useState(false);
 
   const fetchDepositRoom = async () => {
-    debugger;
     if (!depositRoomId) return;
     setLoading(true);
     try {

@@ -31,7 +31,7 @@ const ActionDropdown = ({
       icon: <SyncOutlined />,
       onClick: () => onRenewalClick(record),
     },
-    record.status === "confirm" && {
+    record.status === "confirmed" && {
       key: "create-deposit-refund",
       label: "Create deposit refund request",
       icon: <RollbackOutlined />,
@@ -60,18 +60,23 @@ const ActionDropdown = ({
   return (
     <Dropdown
       menu={{
-        items: menuItems.map(({ key, label, icon, onClick, disabled }) => ({
-          key,
-          label: (
-            <span
-              className={disabled ? "text-gray-400 cursor-not-allowed" : ""}
-              onClick={disabled ? undefined : onClick}
-            >
-              {icon} {label}
-            </span>
-          ),
-          disabled,
-        })),
+        items:
+          record.status === "refunded"
+            ? []
+            : menuItems.map(({ key, label, icon, onClick, disabled }) => ({
+                key,
+                label: (
+                  <span
+                    className={
+                      disabled ? "text-gray-400 cursor-not-allowed" : ""
+                    }
+                    onClick={disabled ? undefined : onClick}
+                  >
+                    {icon} {label}
+                  </span>
+                ),
+                disabled,
+              })),
       }}
     >
       <Button>
