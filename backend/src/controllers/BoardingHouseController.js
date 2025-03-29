@@ -61,7 +61,6 @@ class boardingHouseController {
     }
   }
 
-
   async getBoardingHouseDetailInUser(req, res, next) {
     try {
       const { id } = req.params;
@@ -575,7 +574,7 @@ class boardingHouseController {
         ward,
         startDate,
         endDate,
-        rating
+        rating,
       } = req.query;
 
       let filter = {};
@@ -588,14 +587,17 @@ class boardingHouseController {
       }
       if (rating) {
         const ratings = rating.split(",").map(Number); // Split and convert to numbers
-        const validRatings = ratings.filter((r) => !isNaN(r) && r >= 0 && r <= 5); // Validate ratings
+        const validRatings = ratings.filter(
+          (r) => !isNaN(r) && r >= 0 && r <= 5
+        ); // Validate ratings
 
         if (validRatings.length > 0) {
           filter.rating = { $in: validRatings }; // Filter for ratings in the provided array
         } else {
           return res.status(400).json({
             success: false,
-            message: "Invalid rating format. Each rating must be a number between 0 and 5.",
+            message:
+              "Invalid rating format. Each rating must be a number between 0 and 5.",
           });
         }
       }
@@ -603,13 +605,13 @@ class boardingHouseController {
       //   filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
       // }
       if (priceRange) {
-        const prices = priceRange.split(',').map(Number);
+        const prices = priceRange.split(",").map(Number);
         if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
           filter.priceRange = { $gte: prices[0], $lte: prices[1] };
         } else {
           return res.status(400).json({
             success: false,
-            message: "Invalid price range format. Use 'priceRange=min,max'."
+            message: "Invalid price range format. Use 'priceRange=min,max'.",
           });
         }
       }
@@ -749,7 +751,6 @@ class boardingHouseController {
       });
     }
   }
-
 
   async getAllBHOwner(req, res, next) {
     try {
@@ -1005,39 +1006,52 @@ class boardingHouseController {
   }
   async getBhByArea(req, res) {
     try {
-      const { province, district, ward, boardingHouseType, rating, priceRange, name } = req.query;
+      const {
+        province,
+        district,
+        ward,
+        boardingHouseType,
+        rating,
+        priceRange,
+        name,
+      } = req.query;
       let result = [];
 
       let filter = { totalRooms: { $gt: 0 } };
 
       // Nếu có loại nhà trọ, chuyển thành ObjectId
       if (boardingHouseType) {
-        filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType);
+        filter.boardingHouseType = new mongoose.Types.ObjectId(
+          boardingHouseType
+        );
       }
 
       // Nếu có rating, chuyển thành mảng số và kiểm tra hợp lệ
       if (rating) {
         const ratings = rating.split(",").map(Number);
-        const validRatings = ratings.filter(r => !isNaN(r) && r >= 0 && r <= 5);
+        const validRatings = ratings.filter(
+          (r) => !isNaN(r) && r >= 0 && r <= 5
+        );
         if (validRatings.length > 0) {
           filter.rating = { $in: validRatings };
         } else {
           return res.status(400).json({
             success: false,
-            message: "Invalid rating format. Each rating must be a number between 0 and 5.",
+            message:
+              "Invalid rating format. Each rating must be a number between 0 and 5.",
           });
         }
       }
 
       // Nếu có priceRange, kiểm tra định dạng và áp dụng bộ lọc
       if (priceRange) {
-        const prices = priceRange.split(',').map(Number);
+        const prices = priceRange.split(",").map(Number);
         if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
           filter.priceRange = { $gte: prices[0], $lte: prices[1] };
         } else {
           return res.status(400).json({
             success: false,
-            message: "Invalid price range format. Use 'priceRange=min,max'."
+            message: "Invalid price range format. Use 'priceRange=min,max'.",
           });
         }
       }
@@ -1050,21 +1064,29 @@ class boardingHouseController {
       // Lọc theo tỉnh/thành phố
       if (province) {
         result = result.filter(
-          (bh) => bh.address?.province.toLowerCase().includes(province.toLowerCase()) ?? false
+          (bh) =>
+            bh.address?.province
+              .toLowerCase()
+              .includes(province.toLowerCase()) ?? false
         );
       }
 
       // Lọc theo quận/huyện
       if (district) {
         result = result.filter(
-          (bh) => bh.address?.district.toLowerCase().includes(district.toLowerCase()) ?? false
+          (bh) =>
+            bh.address?.district
+              .toLowerCase()
+              .includes(district.toLowerCase()) ?? false
         );
       }
 
       // Lọc theo phường/xã
       if (ward?.trim()) {
         result = result.filter(
-          (bh) => bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) ?? false
+          (bh) =>
+            bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) ??
+            false
         );
       }
       if (name) {
@@ -1277,6 +1299,30 @@ class boardingHouseController {
       return res.status(500).json({
         success: false,
         message: "Failed to filter boarding house types.",
+        error: error.message,
+      });
+    }
+  }
+
+  async getElectricalAndWaterPrice(req, res) {
+    try {
+      const { boardingHouseId } = req.params;
+      if (!boardingHouseId) {
+        return res.status(400).json({ message: "boardingHouseId is required" });
+      }
+      const boardingHouse = await BoardingHouse.findById(boardingHouseId);
+      if (!boardingHouse) {
+        return res.status(404).json({ message: "Boarding house not found" });
+      }
+      const { electricityPrice, waterPrice } = boardingHouse;
+      res.status(200).json({
+        electricityPrice,
+        waterPrice,
+      });
+    } catch (error) {
+      console.error("Error fetching prices:", error);
+      res.status(500).json({
+        message: "An error occurred while fetching prices",
         error: error.message,
       });
     }

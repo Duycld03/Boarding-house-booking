@@ -126,6 +126,7 @@ const RentPaymentManagement = () => {
         visible={isOpen}
         setVisible={setIsOpen}
         boardingHouseId={boardingHouseId}
+        fetchRentPaymentData={fetchRentPaymentData}
       />
     </div>
   );

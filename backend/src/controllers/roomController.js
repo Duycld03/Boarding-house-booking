@@ -77,7 +77,9 @@ class RoomController {
       const unpaidRooms = await Room.find({
         _id: { $nin: paidRooms },
         boardingHouseId: boardingHouseId,
-      }).sort({ roomNumber: 1 });
+      })
+        .populate("roomTypeId")
+        .sort({ roomNumber: 1 });
 
       //   const roomNumbers = unpaidRooms.map((room) => room.roomNumber);
 

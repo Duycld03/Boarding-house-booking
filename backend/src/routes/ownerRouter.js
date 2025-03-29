@@ -167,4 +167,15 @@ ownerRouter.get(
   roomController.getUnpaidRoomsByBoardingHouse
 );
 
+// get electrical and water price
+ownerRouter.get(
+  "/electrical-water-price/:boardingHouseId",
+  boardingHouseController.getElectricalAndWaterPrice
+);
+
+ownerRouter.post(
+  "/calculate-monthly-bill",
+  paymentBillController.calculateMonthlyRoomRent
+);
+
 export { ownerRouter };
