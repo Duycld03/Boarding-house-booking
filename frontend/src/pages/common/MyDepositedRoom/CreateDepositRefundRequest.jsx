@@ -12,6 +12,7 @@ function CreateDepositRefundRequest({ isVisible, setVisible, depositRoom }) {
     setLoading(true);
     if (!reasonForRefund) {
       toast.error("Please enter a reason for the refund request");
+      setLoading(false);
       return;
     }
 

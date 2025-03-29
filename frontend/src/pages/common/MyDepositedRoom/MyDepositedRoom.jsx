@@ -118,8 +118,8 @@ function MyDepositedRoom() {
           }}
           setDepositRoom={setDepositRoom}
           setIsPayDepositPopupVisible={setIsPayDepositPopupVisible}
-          setDepositRoomId={setDepositRoomId}
-          setIsPayRentModalVisible={setIsPayRentModalVisible}
+          // setDepositRoomId={setDepositRoomId}
+          // setIsPayRentModalVisible={setIsPayRentModalVisible}
           onDepositRefundClick={(record) => {
             setDepositRoom(record);
             setIsVisibleDepositRefund(true);

@@ -1,5 +1,6 @@
 import moment from "moment";
 import RefundRequest from "../models/refundRequest.js";
+import DepositRoom from "../models/depositRoom.js";
 
 class RefundRequestController {
   async getRefundRequests(req, res) {
@@ -134,6 +135,36 @@ class RefundRequestController {
         return res.status(400).json({ message: "Missing required fields." });
       }
 
+      const depositRoom = await DepositRoom.findById(depositRoomId);
+      if (!depositRoom) {
+        return res.status(404).json({ message: "Deposit room not found." });
+      }
+
+      const currentDate = new Date();
+      const endDate = new Date(depositRoom.endDate);
+      const daysDiff = Math.ceil(
+        (endDate - currentDate) / (1000 * 60 * 60 * 24)
+      );
+
+      if (daysDiff > 7) {
+        return res.status(400).json({
+          message:
+            "Refund request can only be created 7 days before the deposit end date.",
+        });
+      }
+
+      const existingRequest = await RefundRequest.findOne({
+        depositRoomId,
+        accountId: req.user.userId,
+        status: { $ne: "rejected" },
+      });
+
+      if (existingRequest) {
+        return res.status(400).json({
+          message: "A refund request already exists for this deposit.",
+        });
+      }
+
       const refundRequest = await RefundRequest.create({
         depositRoomId,
         reason,
@@ -141,9 +172,11 @@ class RefundRequestController {
         amountRefunded,
         accountId: req.user.userId,
       });
-      return res
-        .status(201)
-        .json({ message: "Refund request created successfully." });
+
+      return res.status(201).json({
+        message: "Refund request created successfully.",
+        refundRequest,
+      });
     } catch (error) {
       console.log("Error creating refund request:", error);
       return res.status(500).json(error);

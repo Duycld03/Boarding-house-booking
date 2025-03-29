@@ -14,8 +14,8 @@ const ActionDropdown = ({
   onDepositRefundClick,
   setDepositRoom,
   setIsPayDepositPopupVisible,
-  setDepositRoomId,
-  setIsPayRentModalVisible,
+  // setDepositRoomId,
+  // setIsPayRentModalVisible,
 }) => {
   const menuItems = [
     {
@@ -37,15 +37,15 @@ const ActionDropdown = ({
       icon: <RollbackOutlined />,
       onClick: () => onDepositRefundClick(record),
     },
-    record.status === "confirmed" && {
-      key: "viewDetail",
-      label: "View Detail",
-      icon: <FileTextOutlined />,
-      onClick: () => {
-        setDepositRoomId(record._id);
-        setIsPayRentModalVisible(true);
-      },
-    },
+    // record.status === "confirmed" && {
+    //   key: "viewDetail",
+    //   label: "View Detail",
+    //   icon: <FileTextOutlined />,
+    //   onClick: () => {
+    //     setDepositRoomId(record._id);
+    //     setIsPayRentModalVisible(true);
+    //   },
+    // },
     record.status === "accepted" && {
       key: "pay",
       label: "Pay",
