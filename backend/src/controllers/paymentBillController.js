@@ -30,13 +30,16 @@ class PaymentBillController {
           .json({ message: "No payment bills found for this boarding house." });
       }
 
-      const formattedBills = paymentBills.map((bill) => {
+      for (const bill of paymentBills) {
+        console.log(bill);
         if (!bill.month || !bill.year) {
           return res.status(400).json({
             message: `Invalid month/year for room ${bill.roomId?.roomNumber}`,
           });
         }
+      }
 
+      const formattedBills = paymentBills.map((bill) => {
         let totalFee = 0;
         bill.additionalFee.forEach((fee) => {
           totalFee += fee.feeAmount || 0;
