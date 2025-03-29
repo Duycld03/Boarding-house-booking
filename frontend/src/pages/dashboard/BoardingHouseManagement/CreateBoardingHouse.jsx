@@ -211,48 +211,60 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
       return;
     }
 
-    const imagesData = [];
-    const payloadPrimary = new FormData();
-    payloadPrimary.append("file", formData.primaryImage);
-    try {
-      // Gửi file đến BE để lưu
-      const responsePrimary = await uploadFile(payloadPrimary);
+    // const imagesData = [];
+    // const payloadPrimary = new FormData();
+    // payloadPrimary.append("file", formData.primaryImage);
+    // try {
+    //   // Gửi file đến BE để lưu
+    //   const responsePrimary = await uploadFile(payloadPrimary);
 
-      imagesData.push({
-        imageUrl: responsePrimary.filePath, // Đường dẫn trả về từ BE
-        isPrimary: true,
-      });
-    } catch (error) {
-      console.error("Failed to upload image:", error);
-      toast.error("Please upload primary image.");
+    //   imagesData.push({
+    //     imageUrl: responsePrimary.filePath, // Đường dẫn trả về từ BE
+    //     isPrimary: true,
+    //   });
+    // } catch (error) {
+    //   console.error("Failed to upload image:", error);
+    //   toast.error("Please upload primary image.");
+    //   return;
+    // }
+
+    // for (const image of formData.otherImages) {
+    //   const payload = new FormData();
+    //   payload.append("file", image);
+    //   try {
+    //     // Gửi file đến BE để lưu
+    //     const response = await uploadFile(payload);
+
+    //     imagesData.push({
+    //       imageUrl: response.filePath, // Đường dẫn trả về từ BE
+    //       isPrimary: false,
+    //     });
+    //   } catch (error) {
+    //     console.error("Failed to upload image:", error);
+    //     toast.error("Please upload other image.");
+    //     return;
+    //   }
+    // }
+    const allImages = [];
+    if (formData.primaryImage) allImages.push(formData.primaryImage);
+    if (formData.otherImages.length > 15) {
+      toast.error("You can't upload more than 15 other images.");
+      return;
+    }
+    allImages.push(...formData.otherImages);
+
+    if (allImages.length === 0) {
+      toast.error("You must upload at least one image.");
       return;
     }
 
-    for (const image of formData.otherImages) {
-      const payload = new FormData();
-      payload.append("file", image);
-      try {
-        // Gửi file đến BE để lưu
-        const response = await uploadFile(payload);
 
-        imagesData.push({
-          imageUrl: response.filePath, // Đường dẫn trả về từ BE
-          isPrimary: false,
-        });
-      } catch (error) {
-        console.error("Failed to upload image:", error);
-        toast.error("Please upload other image.");
-        return;
-      }
-    }
-
-    const form = {
+    let form = {
       ownerUsername: formData.owner,
       boardingHouseType: formData.boardingHouseType,
       name: formData.name,
       address: formData.address,
       description: formData.description,
-      images: imagesData,
       priceRange: formData.priceRange,
       electricityPrice: formData.electricityPrice,
       waterPrice: formData.waterPrice,
@@ -264,7 +276,10 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
       // totalRooms: formData.totalRooms
     };
     // const form = { ...formData }
-
+    allImages.forEach((file, index) => {
+      // form.append("boardingHouse", file);
+      form = { ...form, boardingHouse: file }
+    });
     // for (let [key, value] of formData.entries()) {
     //     form[key] = value;
     // }

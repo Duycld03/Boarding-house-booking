@@ -51,7 +51,12 @@ export const getBoardingHouseImages = async (boardingHouseId) => {
   return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
 };
 export const createBoardingHouse = (data) => {
-  return axios.post('/dashboard/boardinghouse/create', data);
+  return axios.post('/dashboard/boardinghouse/create', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
 };
 export const uploadFile = (data) => {
   return axios.post('/dashboard/boardinghouse/uploadFile', data, {
@@ -80,6 +85,7 @@ export const getAllBoardingHouseTypesOwner = () => {
   return axios.get('/owner/types');
 };
 export const createBoardingHouseOwner = (data) => {
+  console.log("mtiennn", data)
   return axios.post('owner/boardinghouse', data, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -105,7 +111,7 @@ export const getAllBoardingHouseTypeUser = () => {
 export const getMaxPriceBHUser = async () => {
   return axios.get('/boardinghouse/chore/get-max');
 };
-  export const createBoardingHouseType = (data) => {
+export const createBoardingHouseType = (data) => {
   return axios.post('/dashboard/boardinghousetype/create', data);
 };
 export const getBoardingHouseTypeDetails = (boardingHouseTypeId) => {

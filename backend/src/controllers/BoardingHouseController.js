@@ -389,7 +389,7 @@ class boardingHouseController {
         address,
         location,
         description,
-        images,
+        // images,
         priceRange,
         electricityPrice,
         waterPrice,
@@ -454,20 +454,37 @@ class boardingHouseController {
       }
 
       // Validate images
-      const primaryImageCount = images.filter((img) => img.isPrimary).length;
-      if (primaryImageCount !== 1) {
-        console.error("Invalid primary images count:", primaryImageCount);
-        return res
-          .status(400)
-          .json({ message: "You must upload exactly one primary image." });
-      }
-      if (images.length > 15) {
-        console.error("Too many images:", images.length);
-        return res.status(400).json({
-          message: "You can't upload more than 15 images for other image.",
+      // const primaryImageCount = images.filter((img) => img.isPrimary).length;
+      // if (primaryImageCount !== 1) {
+      //   console.error("Invalid primary images count:", primaryImageCount);
+      //   return res
+      //     .status(400)
+      //     .json({ message: "You must upload exactly one primary image." });
+      // }
+      // if (images.length > 15) {
+      //   console.error("Too many images:", images.length);
+      //   return res.status(400).json({
+      //     message: "You can't upload more than 15 images for other image.",
+      //   });
+      // }
+      const images = [];
+      if (req.files && req.files.length > 0) {
+        console.log(req.files)
+        req.files.forEach((file) => {
+          images.push({
+            imageUrl: file.path,
+            publicId: file.filename,
+            isPrimary: images.length === 0, // First image is primary
+          });
         });
       }
 
+      if (images.length === 0) {
+        console.error("No images uploaded.");
+        return res
+          .status(400)
+          .json({ message: "You must upload at least one image." });
+      }
       // Validate price fields
       if (priceRange <= 0 || electricityPrice <= 0 || waterPrice <= 0) {
         console.error("Invalid price fields:", {
@@ -796,7 +813,6 @@ class boardingHouseController {
         totalRooms = 0,
         availableRooms = 0,
       } = req.body;
-
       console.log("Validating boarding house type...");
       const boardingHouseTypeExists =
         await BoardingHouseType.findById(boardingHouseType);
@@ -835,7 +851,7 @@ class boardingHouseController {
           images.push({
             imageUrl: file.path,
             publicId: file.filename,
-            isPrimary: images.length === 0, // First image is primary
+            isPrimary: images.length === 0,
           });
         });
       }
