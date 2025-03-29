@@ -68,15 +68,17 @@ function MyRentPayment() {
     },
     {
       title: "Month's Rent",
-      dataIndex: "createdAt",
+      dataIndex: ["paymentBillId", "createdAt"],
       key: "createdAt",
       render: (text) => {
         const date = new Date(text);
-        date.setMonth(date.getMonth() - 1);
+        date.setMonth(date.getMonth());
         return date.toLocaleString("en-US", { month: "long", year: "numeric" });
       },
     },
   ];
+
+  console.log(rentPayment);
 
   return (
     <>

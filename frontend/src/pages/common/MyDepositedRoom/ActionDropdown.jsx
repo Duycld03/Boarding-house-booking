@@ -20,7 +20,7 @@ const ActionDropdown = ({
       key: "detail",
       label: "Detail",
       icon: <FileTextOutlined />,
-      disabled: record.status === "pending",
+      disabled: record.status === "pending" || record.status === "refunded",
       onClick: () => onDetailClick(record._id),
     },
     {

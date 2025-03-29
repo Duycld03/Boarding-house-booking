@@ -25,6 +25,7 @@ import {
   MyRentPayment,
   MyDepositRefundRequest,
   DepositRefundRequestOwner,
+  RevenueManagementOwner,
 } from "./common";
 
 import {
@@ -77,4 +78,5 @@ export {
   ReviewManagement,
   BoardingHouseTypeManagement,
   FacilitiesManagement,
+  RevenueManagementOwner,
 };
