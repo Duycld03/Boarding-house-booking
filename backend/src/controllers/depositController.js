@@ -161,7 +161,7 @@ class DepositController {
 
     if (secureHash === signed && vnp_Params["vnp_ResponseCode"] === "00") {
       if (type == "deposit") {
-        const accountId = orderInfo;
+        const accountId = orderInfo[1];
         const depositRoomId = orderInfo[2];
 
         const depositRoom = await DepositRoom.findOne({
@@ -186,7 +186,7 @@ class DepositController {
         return res.redirect(redirectUrl);
       }
       // pay rent
-      const userId = orderInfo;
+      const userId = orderInfo[1];
       const paymentBillId = orderInfo[2];
 
       const userPayment = await UserPayment.findOne({
@@ -198,7 +198,7 @@ class DepositController {
         throw new Error("Payment not found");
       }
 
-      userPayment.status = "Paid";
+      userPayment.status = "paid";
       userPayment.paymentMethod = "VNPay";
       await userPayment.save();
 

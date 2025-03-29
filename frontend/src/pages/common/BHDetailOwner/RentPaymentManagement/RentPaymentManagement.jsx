@@ -52,7 +52,7 @@ const RentPaymentManagement = () => {
           color={
             status === "pending"
               ? "orange"
-              : status === "accepted"
+              : status === "paid"
               ? "green"
               : status === "deleted"
               ? "volcano"

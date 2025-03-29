@@ -20,7 +20,9 @@ class PaymentBillController {
 
       const paymentBills = await PaymentBill.find({
         roomId: { $in: roomIds },
-      }).populate("roomId");
+      })
+        .populate("roomId")
+        .sort({ createdAt: -1 });
 
       if (!paymentBills.length) {
         return res
@@ -85,11 +87,17 @@ class PaymentBillController {
         return res.status(404).json({ message: "Not found room" });
       }
 
+      console.log(additionalFees);
+
+      const additionalFee = additionalFees.map((fee) => {
+        return { feeName: fee.name, feeAmount: fee.amount };
+      });
+
       // Tạo PaymentBill
       const newPaymentBill = await PaymentBill.create({
         roomId,
         paymentAmount,
-        status: "Pending",
+        status: "pending",
         electricalBill: {
           oldNumber: electricalBill.oldNumber,
           newNumber: electricalBill.newNumber,
@@ -102,7 +110,7 @@ class PaymentBillController {
           quantityConsumed: waterBill.newNumber - waterBill.oldNumber,
           totalAmount: waterBill.totalAmount,
         },
-        additionalFee: additionalFees,
+        additionalFee: additionalFee,
         month,
         year,
       });
