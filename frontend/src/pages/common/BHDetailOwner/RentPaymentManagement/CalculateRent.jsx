@@ -196,8 +196,17 @@ const CalculateRent = ({
 
   useEffect(() => {
     const selectedRoom = availableRooms.find((room) => room._id === selectRoom);
+    debugger;
     if (selectedRoom) {
       setRoomPrice(selectedRoom?.roomTypeId?.price);
+      setElectricalBill({
+        oldNumber: selectedRoom.previousElectricityReading,
+        newNumber: 0,
+      });
+      setWaterBill({
+        oldNumber: selectedRoom.previousWaterReading,
+        newNumber: 0,
+      });
     }
   }, [selectRoom]);
 
