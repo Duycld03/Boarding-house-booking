@@ -15,6 +15,7 @@ import {
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
+
 const ownerRouter = Router();
 
 ownerRouter.get("/", (req, res) => {
@@ -148,6 +149,11 @@ ownerRouter.get(
 ownerRouter.put(
   "/refund-request/:refundRequestId",
   refundRequestController.cancelRefundRequestsForOwner
+);
+
+ownerRouter.post(
+  "/refund-request/:refundRequestId",
+  depositController.acceptRefundRequestForOwner
 );
 
 //expense

@@ -1,24 +1,25 @@
-import nodemailer from 'nodemailer';
-import moment from 'moment';
-import querystring from 'qs';
-import crypto from 'crypto';
-import axios from 'axios';
-import { sortObject } from '../utils/algorithms.js';
-import DepositRoom from '../models/depositRoom.js';
-import Room from '../models/room.js';
-import PaymentBill from '../models/paymentBill.js';
-import dotenv from 'dotenv';
-import UserPayment from '../models/userPayment.js';
-import BoardingHouse from '../models/boardingHouse.js';
-import { query } from 'express';
+import nodemailer from "nodemailer";
+import moment from "moment";
+import querystring from "qs";
+import crypto from "crypto";
+import axios from "axios";
+import { sortObject } from "../utils/algorithms.js";
+import DepositRoom from "../models/depositRoom.js";
+import Room from "../models/room.js";
+import PaymentBill from "../models/paymentBill.js";
+import dotenv from "dotenv";
+import UserPayment from "../models/userPayment.js";
+import BoardingHouse from "../models/boardingHouse.js";
+import { query } from "express";
+import RefundRequest from "../models/refundRequest.js";
 dotenv.config();
 
 const config = {
-  vnp_TmnCode: '1NH5FYBW',
-  vnp_HashSecret: '4RMXXWH9GZAR4QPBVJN8OLADH87F8BQ8',
-  vnp_Url: 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
-  vnp_Api: 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction',
-  vnp_ReturnUrl: 'http://localhost:3000/deposit/vnpay-return',
+  vnp_TmnCode: "1NH5FYBW",
+  vnp_HashSecret: "4RMXXWH9GZAR4QPBVJN8OLADH87F8BQ8",
+  vnp_Url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
+  vnp_Api: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction",
+  vnp_ReturnUrl: "http://localhost:3000/deposit/vnpay-return",
 };
 
 class DepositController {
@@ -26,7 +27,7 @@ class DepositController {
     try {
       const { roomId, rentalTime, timeType, rentalDate, price } = req.body;
       if (!roomId || !rentalTime || !timeType || !price || !rentalDate) {
-        return res.status(400).json({ message: 'Missing required parameters' });
+        return res.status(400).json({ message: "Missing required parameters" });
       }
       const existDeposit = await DepositRoom.findOne({
         accountId: req.user.userId,
@@ -36,11 +37,11 @@ class DepositController {
       if (existDeposit) {
         return res
           .status(400)
-          .json({ message: 'You have already deposited for this room' });
+          .json({ message: "You have already deposited for this room" });
       }
 
       const rentalTimeNumber = parseInt(
-        rentalTime * (timeType === 'month' ? 1 : 12)
+        rentalTime * (timeType === "month" ? 1 : 12)
       );
 
       await DepositRoom.create({
@@ -49,13 +50,13 @@ class DepositController {
         amount: price,
         rentalTime: rentalTimeNumber,
         startDate: rentalDate[0],
-        endDate: rentalDate,
+        endDate: rentalDate[1],
       });
 
-      res.status(200).json({ message: 'Deposit successfully' });
+      res.status(200).json({ message: "Deposit successfully" });
     } catch (error) {
-      console.error('Error depositing:', error);
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Error depositing:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
 
@@ -64,9 +65,9 @@ class DepositController {
       const { userId } = req.user;
       const deposits = await DepositRoom.find({ accountId: userId })
         .populate({
-          path: 'roomId',
+          path: "roomId",
           populate: {
-            path: 'boardingHouseId',
+            path: "boardingHouseId",
           },
         })
         .sort({ createdAt: -1 })
@@ -81,15 +82,15 @@ class DepositController {
           roomId: roomId._id,
           amount: deposit.amount,
           status: deposit.status,
-          startDate: moment(deposit.startDate).format('DD/MM/YYYY'),
-          endDate: moment(deposit.endDate).format('DD/MM/YYYY'),
+          startDate: moment(deposit.startDate).format("DD/MM/YYYY"),
+          endDate: moment(deposit.endDate).format("DD/MM/YYYY"),
           rentalTime: deposit.rentalTime,
         };
       });
       res.status(200).json(result);
     } catch (error) {
-      console.error('Error getting deposited room:', error);
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Error getting deposited room:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
 
@@ -101,21 +102,21 @@ class DepositController {
         accountId: req.user.userId,
       })
         .populate({
-          path: 'roomId',
-          select: 'roomNumber images',
+          path: "roomId",
+          select: "roomNumber images",
           populate: [
             {
-              path: 'boardingHouseId',
-              select: 'name',
-              populate: { path: 'boardingHouseType', select: 'name' },
+              path: "boardingHouseId",
+              select: "name",
+              populate: { path: "boardingHouseType", select: "name" },
             },
             {
-              path: 'rentBy',
-              select: 'fullname avatarImage',
+              path: "rentBy",
+              select: "fullname avatarImage",
             },
             {
-              path: 'roomTypeId',
-              select: 'price roomSize',
+              path: "roomTypeId",
+              select: "price roomSize",
             },
           ],
         })
@@ -132,19 +133,19 @@ class DepositController {
         rentBy: deposit.roomId.rentBy,
       });
     } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+      res.status(500).json({ message: "Server error", error });
     }
   }
 
   async vnpayReturn(req, res) {
     let vnp_Params = req.query;
 
-    let secureHash = vnp_Params['vnp_SecureHash'];
-    const orderInfo = vnp_Params['vnp_OrderInfo'].split('-');
+    let secureHash = vnp_Params["vnp_SecureHash"];
+    const orderInfo = vnp_Params["vnp_OrderInfo"].split("-");
     const type = orderInfo[0];
 
-    delete vnp_Params['vnp_SecureHash'];
-    delete vnp_Params['vnp_SecureHashType'];
+    delete vnp_Params["vnp_SecureHash"];
+    delete vnp_Params["vnp_SecureHashType"];
 
     vnp_Params = sortObject(vnp_Params);
 
@@ -152,11 +153,11 @@ class DepositController {
     let secretKey = config.vnp_HashSecret;
 
     let signData = querystring.stringify(vnp_Params, { encode: false });
-    let hmac = crypto.createHmac('sha512', secretKey);
-    let signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
+    let hmac = crypto.createHmac("sha512", secretKey);
+    let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
 
-    if (secureHash === signed && vnp_Params['vnp_ResponseCode'] === '00') {
-      if (type == 'deposit') {
+    if (secureHash === signed && vnp_Params["vnp_ResponseCode"] === "00") {
+      if (type == "deposit") {
         const accountId = orderInfo;
         const depositRoomId = orderInfo[2];
 
@@ -167,10 +168,10 @@ class DepositController {
         });
 
         if (!depositRoom) {
-          throw new Error('Deposit room not found');
+          throw new Error("Deposit room not found");
         }
 
-        depositRoom.status = 'confirmed';
+        depositRoom.status = "confirmed";
 
         const room = await Room.findById(depositRoom.roomId);
         room.rentBy.push(accountId);
@@ -180,67 +181,98 @@ class DepositController {
 
         const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
         return res.redirect(redirectUrl);
-      }
-      // pay rent
-      const userId = orderInfo;
-      const paymentBillId = orderInfo[2];
+      } else if (type == "payRent") {
+        const userId = orderInfo[1];
+        const paymentBillId = orderInfo[2];
 
-      const userPayment = await UserPayment.findOne({
-        accountId: userId,
+        const userPayment = await UserPayment.findOne({
+          accountId: userId,
+          status: { $regex: /^pending$/i },
+          paymentBillId,
+        });
+        if (!userPayment) {
+          throw new Error("Payment not found");
+        }
+
+        userPayment.status = "Paid";
+        userPayment.paymentMethod = "VNPay";
+        await userPayment.save();
+
+        const allUserPayments = await UserPayment.find({
+          paymentBillId,
+        }).lean();
+
+        const allPaid =
+          allUserPayments.length > 0 &&
+          allUserPayments.every(
+            (payment) => payment.status.toLowerCase() === "paid"
+          );
+
+        if (allPaid) {
+          await PaymentBill.updateOne(
+            { _id: paymentBillId },
+            { $set: { status: "Paid" } }
+          );
+        }
+
+        const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+        return res.redirect(redirectUrl);
+      }
+      // refund
+      const accountId = orderInfo[1];
+      const refundRequestId = orderInfo[2];
+
+      const refundRequest = await RefundRequest.findOne({
+        _id: refundRequestId,
+        accountId,
         status: { $regex: /^pending$/i },
-        paymentBillId,
-      });
-      if (!userPayment) {
-        throw new Error('Payment not found');
+      }).populate("depositRoomId");
+
+      if (!refundRequest) {
+        throw new Error("Refund request not found");
       }
 
-      userPayment.status = 'Paid';
-      userPayment.paymentMethod = 'VNPay';
-      await userPayment.save();
+      refundRequest.status = "accepted";
 
-      const allUserPayments = await UserPayment.find({
-        paymentBillId,
-      }).lean();
+      const depositRoom = await DepositRoom.findById(
+        refundRequest.depositRoomId
+      );
+      depositRoom.status = "refunded";
+      await depositRoom.save();
 
-      const allPaid =
-        allUserPayments.length > 0 &&
-        allUserPayments.every(
-          (payment) => payment.status.toLowerCase() === 'paid'
-        );
+      const room = await Room.findById(depositRoom.roomId);
+      room.rentBy = room.rentBy.filter((id) => id.toString() !== accountId);
+      await room.save();
 
-      if (allPaid) {
-        await PaymentBill.updateOne(
-          { _id: paymentBillId },
-          { $set: { status: 'Paid' } }
-        );
-      }
+      await refundRequest.save();
 
-      const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+      const redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=success`;
       return res.redirect(redirectUrl);
     }
     //failed
-    const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+    let redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+    if (type == "refund") {
+      redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=fail`;
+    }
     res.redirect(redirectUrl);
   }
 
   async momoReturn(req, res) {
+    const {
+      orderId,
+      amount,
+      orderInfo,
+      resultCode,
+      message,
+      transId,
+      responseTime,
+    } = req.query;
+
+    const info = orderInfo.split("-");
+    const type = info[0];
     try {
-      const {
-        orderId,
-        amount,
-        orderInfo,
-        resultCode,
-        message,
-        transId,
-        responseTime,
-      } = req.query;
-
-      const info = orderInfo.split('-');
-
-      const type = info[0];
-
-      if (resultCode == '7002' || resultCode == '0') {
-        if (type == 'deposit') {
+      if (resultCode == "7002" || resultCode == "0") {
+        if (type == "deposit") {
           const accountId = info[1];
           const depositRoomId = info[2];
 
@@ -251,10 +283,10 @@ class DepositController {
           });
 
           if (!depositRoom) {
-            throw new Error('Deposit room not found');
+            throw new Error("Deposit room not found");
           }
 
-          depositRoom.status = 'confirmed';
+          depositRoom.status = "confirmed";
 
           const room = await Room.findById(depositRoom.roomId);
           room.rentBy.push(accountId);
@@ -264,47 +296,82 @@ class DepositController {
 
           const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
           return res.redirect(redirectUrl);
+        } else if (type == "payRent") {
+          const userId = info[1];
+          const paymentBillId = info[2];
+
+          const userPayment = await UserPayment.findOne({
+            accountId: userId,
+            status: { $regex: /^pending$/i },
+            paymentBillId,
+          });
+          if (!userPayment) {
+            throw new Error("Payment not found");
+          }
+
+          userPayment.status = "Paid";
+          userPayment.paymentMethod = "VNPay";
+          await userPayment.save();
+
+          const allUserPayments = await UserPayment.find({
+            paymentBillId,
+          }).lean();
+
+          const allPaid =
+            allUserPayments.length > 0 &&
+            allUserPayments.every(
+              (payment) => payment.status.toLowerCase() === "paid"
+            );
+
+          if (allPaid) {
+            await PaymentBill.updateOne(
+              { _id: paymentBillId },
+              { $set: { status: "Paid" } }
+            );
+          }
+
+          const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+          return res.redirect(redirectUrl);
         }
-        // pay rent
+        // refund
+        const accountId = orderInfo[1];
+        const refundRequestId = orderInfo[2];
 
-        const userId = info[1];
-        const paymentBillId = info[2];
-
-        const userPayment = await UserPayment.findOne({
-          accountId: userId,
+        const refundRequest = await RefundRequest.findOne({
+          _id: refundRequestId,
+          accountId,
           status: { $regex: /^pending$/i },
-          paymentBillId,
-        });
-        if (!userPayment) {
-          throw new Error('Payment not found');
+        }).populate("depositRoomId");
+
+        if (!refundRequest) {
+          throw new Error("Refund request not found");
         }
 
-        userPayment.status = 'Paid';
-        userPayment.paymentMethod = 'Momo';
-        await userPayment.save();
+        refundRequest.status = "accepted";
 
-        const allUserPayments = await UserPayment.find({
-          paymentBillId,
-        }).lean();
+        const depositRoom = await DepositRoom.findById(
+          refundRequest.depositRoomId
+        );
+        depositRoom.status = "refunded";
+        await depositRoom.save();
 
-        const allPaid =
-          allUserPayments.length > 0 &&
-          allUserPayments.every(
-            (payment) => payment.status.toLowerCase() === 'paid'
-          );
+        const room = await Room.findById(depositRoom.roomId);
+        room.rentBy = room.rentBy.filter((id) => id.toString() !== accountId);
+        await room.save();
 
-        if (allPaid) {
-          await PaymentBill.updateOne(
-            { _id: paymentBillId },
-            { $set: { status: 'Paid' } }
-          );
-        }
-        const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+        await refundRequest.save();
+
+        const redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=success`;
         return res.redirect(redirectUrl);
       }
     } catch (error) {
-      console.log('Error momo return:', error);
-      const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+      console.log("Error momo return:", error);
+
+      let redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+      if (type == "refund") {
+        redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=fail`;
+      }
+
       res.redirect(redirectUrl);
     }
   }
@@ -315,10 +382,10 @@ class DepositController {
       const deposit = await DepositRoom.findOne({
         _id: depositRoomId,
         accountId: userId,
-      }).select('roomId');
+      }).select("roomId");
 
       if (!deposit) {
-        return res.status(400).json({ message: 'Deposit room not found' });
+        return res.status(400).json({ message: "Deposit room not found" });
       }
 
       const userPayment = await UserPayment.findOne({
@@ -326,24 +393,24 @@ class DepositController {
         status: { $regex: /^pending$/i },
       })
         .populate({
-          path: 'paymentBillId',
+          path: "paymentBillId",
           match: { status: { $regex: /^pending$/i }, roomId: deposit.roomId },
         })
         .lean();
 
       if (!userPayment || !userPayment.paymentBillId) {
-        return res.status(400).json({ message: 'Payment not found' });
+        return res.status(400).json({ message: "Payment not found" });
       }
 
       const orderInfo = `payRent-${userId}-${userPayment.paymentBillId._id}`;
-      if (paymentMethod === 'vnpay') {
+      if (paymentMethod === "vnpay") {
         createVNPayUrl(req, res, userPayment.paymentAmount, orderInfo);
-      } else if (paymentMethod == 'momo') {
+      } else if (paymentMethod == "momo") {
         createMomoUrl(req, res, userPayment.paymentAmount, orderInfo);
       }
     } catch (error) {
-      console.error('Error paying rent:', error);
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Error paying rent:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
 
@@ -352,16 +419,16 @@ class DepositController {
       const { depositRoomId } = req.params;
 
       if (!depositRoomId) {
-        return res.status(400).json({ message: 'Missing required parameters' });
+        return res.status(400).json({ message: "Missing required parameters" });
       }
 
       const deposit = await DepositRoom.findOne({
         _id: depositRoomId,
         accountId: req.user.userId,
-      }).select('roomId');
+      }).select("roomId");
 
       if (!deposit) {
-        return res.status(400).json({ message: 'Deposit room not found' });
+        return res.status(400).json({ message: "Deposit room not found" });
       }
 
       const payment = await UserPayment.findOne({
@@ -369,7 +436,7 @@ class DepositController {
         status: { $regex: /^paid$/i },
       })
         .populate({
-          path: 'paymentBillId',
+          path: "paymentBillId",
           match: { roomId: deposit.roomId },
         })
         .lean();
@@ -379,7 +446,7 @@ class DepositController {
       return res.json({ isPaid });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: "Internal Server Error" });
     }
   }
 
@@ -398,20 +465,19 @@ class DepositController {
         rooms.map((room) => [room._id.toString(), room.roomNumber])
       );
       let filter = { roomId: { $in: [...roomMap.keys()] } };
-      if (roomId && roomId !== '' && roomMap.has(roomId)) {
+      if (roomId && roomId !== "" && roomMap.has(roomId)) {
         filter.roomId = roomId;
       }
 
 
-
-      if (status && status !== '') {
+      if (status && status !== "") {
         filter.status = status;
       }
 
       if (priceRange) {
         try {
-          if (typeof priceRange === 'string' && priceRange.includes(',')) {
-            const [min, max] = priceRange.split(',').map(Number);
+          if (typeof priceRange === "string" && priceRange.includes(",")) {
+            const [min, max] = priceRange.split(",").map(Number);
             if (!isNaN(min) && !isNaN(max)) {
               filter.amount = { $gte: min, $lte: max };
             }
@@ -422,14 +488,14 @@ class DepositController {
             }
           }
         } catch (e) {
-          console.error('Error parsing priceRange:', e);
+          console.error("Error parsing priceRange:", e);
         }
       }
       if (rentalTime) {
         try {
-          if (typeof rentalTime === 'string') {
-            if (rentalTime.includes(',')) {
-              let [min, max] = rentalTime.split(',').map(Number);
+          if (typeof rentalTime === "string") {
+            if (rentalTime.includes(",")) {
+              let [min, max] = rentalTime.split(",").map(Number);
               if (!isNaN(min) && !isNaN(max) && min <= max) {
                 filter.rentalTime = { $gte: min, $lte: max };
               }
@@ -446,30 +512,30 @@ class DepositController {
             }
           }
         } catch (e) {
-          console.error('Error parsing rentalTime:', e);
+          console.error("Error parsing rentalTime:", e);
         }
       }
 
       const deposits = await DepositRoom.find(filter)
-        .populate({ path: 'accountId', select: 'fullname' })
+        .populate({ path: "accountId", select: "fullname" })
         .sort({ createdAt: -1 })
         .lean();
 
       const result = deposits.map((deposit) => ({
         _id: deposit._id,
-        name: deposit.accountId?.fullname || 'Unknown',
-        roomNumber: roomMap.get(deposit.roomId.toString()) || 'N/A',
+        name: deposit.accountId?.fullname || "Unknown",
+        roomNumber: roomMap.get(deposit.roomId.toString()) || "N/A",
         amount: deposit.amount,
         status: deposit.status,
-        startDate: moment(deposit.createdAt).format('DD/MM/YYYY'),
-        endDate: moment(deposit.endDate).format('DD/MM/YYYY'),
+        startDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
+        endDate: moment(deposit.endDate).format("DD/MM/YYYY"),
         rentalTime: deposit.rentalTime,
       }));
 
       res.status(200).json(result);
     } catch (error) {
-      console.error('Error getting deposits:', error);
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Error getting deposits:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
 
@@ -479,50 +545,50 @@ class DepositController {
 
       // Lấy thông tin khoản đặt cọc, bao gồm cả boardingHouseName
       const deposit = await DepositRoom.findById(depositId)
-        .populate({ path: 'accountId', select: 'fullname email' })
+        .populate({ path: "accountId", select: "fullname email" })
         .populate({
-          path: 'roomId',
-          select: 'roomNumber boardingHouseId', // Lấy boardingHouseId từ roomId
+          path: "roomId",
+          select: "roomNumber boardingHouseId", // Lấy boardingHouseId từ roomId
           populate: {
-            path: 'boardingHouseId', // Populate boardingHouseId trong roomId
-            select: 'name', // Lấy trường name của boardingHouse
+            path: "boardingHouseId", // Populate boardingHouseId trong roomId
+            select: "name", // Lấy trường name của boardingHouse
           },
         });
 
       if (!deposit) {
-        return res.status(404).json({ error: 'Không tìm thấy khoản đặt cọc' });
+        return res.status(404).json({ error: "Không tìm thấy khoản đặt cọc" });
       }
 
       // Lấy tên nhà trọ từ boardingHouseId đã populate
       const boardingHouseName = deposit.roomId.boardingHouseId
         ? deposit.roomId.boardingHouseId.name
-        : 'Không có tên nhà trọ';
+        : "Không có tên nhà trọ";
 
       // Cập nhật status thành 'accepted'
-      deposit.status = 'accepted';
+      deposit.status = "accepted";
       await deposit.save();
 
       // Config mail server (nhớ đổi tài khoản của bạn)
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         auth: {
-          user: 'todohongy@gmail.com',
-          pass: 'ersq syrb ihov ilvx', // App Password
+          user: "todohongy@gmail.com",
+          pass: "ersq syrb ihov ilvx", // App Password
         },
       });
 
       const mailOptions = {
-        from: 'support@example.com',
+        from: "support@example.com",
         to: deposit.accountId.email,
-        subject: 'Đặt cọc phòng trọ đã được chấp nhận ✅',
+        subject: "Đặt cọc phòng trọ đã được chấp nhận ✅",
         html: `
         <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
         <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã được <span style="color:green;"><strong>chấp nhận</strong></span> thành công.</p>
         <ul>
           <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
           <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
-          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format('DD/MM/YYYY')}</li>
-          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format('DD/MM/YYYY')}</li>
+          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format("DD/MM/YYYY")}</li>
+          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format("DD/MM/YYYY")}</li>
         </ul>
         <p>Hãy giữ liên lạc với chủ nhà để hoàn tất thủ tục tiếp theo nhé!</p>
         <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
@@ -533,14 +599,14 @@ class DepositController {
       await transporter.sendMail(mailOptions);
 
       return res.status(200).json({
-        message: 'Đã chấp nhận khoản đặt cọc và gửi email thành công.',
+        message: "Đã chấp nhận khoản đặt cọc và gửi email thành công.",
         depositId: deposit._id,
       });
     } catch (error) {
-      console.error('Error accepting deposit room:', error);
+      console.error("Error accepting deposit room:", error);
       return res
         .status(500)
-        .json({ error: 'Đã có lỗi xảy ra', detail: error.message });
+        .json({ error: "Đã có lỗi xảy ra", detail: error.message });
     }
   }
 
@@ -548,7 +614,7 @@ class DepositController {
     try {
       const { boardingHouseId } = req.params;
 
-      const rooms = await Room.find({ boardingHouseId }).select('_id');
+      const rooms = await Room.find({ boardingHouseId }).select("_id");
       const roomIds = rooms.map((room) => room._id);
 
       if (!roomIds.length) {
@@ -557,12 +623,12 @@ class DepositController {
 
       const maxDeposit = await DepositRoom.findOne({ roomId: { $in: roomIds } })
         .sort({ amount: -1 })
-        .select('amount');
+        .select("amount");
 
       res.status(200).json(maxDeposit?.amount || 0);
     } catch (error) {
-      console.error('Error getting max deposit:', error);
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Error getting max deposit:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
 
@@ -570,7 +636,7 @@ class DepositController {
     try {
       const { boardingHouseId } = req.params;
 
-      const rooms = await Room.find({ boardingHouseId }).select('_id');
+      const rooms = await Room.find({ boardingHouseId }).select("_id");
       const roomIds = rooms.map((room) => room._id);
 
       if (!roomIds.length) {
@@ -581,11 +647,11 @@ class DepositController {
         roomId: { $in: roomIds },
       })
         .sort({ rentalTime: -1 })
-        .select('rentalTime');
+        .select("rentalTime");
 
       res.status(200).json(maxRentTime?.rentalTime || 0);
     } catch (error) {
-      console.error('Error getting max rent time:', error);
+      console.error("Error getting max rent time:", error);
     }
   }
 
@@ -599,20 +665,20 @@ class DepositController {
       });
 
       if (!depositRoom) {
-        return res.status(400).json({ message: 'Deposit room not found' });
+        return res.status(400).json({ message: "Deposit room not found" });
       }
       const { amount } = depositRoom;
 
       const orderInfo = `deposit-${req.user.userId}-${depositRoomId}`;
 
-      if (paymentMethod === 'vnpay') {
+      if (paymentMethod === "vnpay") {
         createVNPayUrl(req, res, amount, orderInfo);
-      } else if (paymentMethod === 'momo') {
+      } else if (paymentMethod === "momo") {
         createMomoUrl(req, res, amount, orderInfo);
       }
     } catch (error) {
-      console.error('Error confirming deposit:', error);
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Error confirming deposit:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
   async rejectDepositRoom(req, res) {
@@ -623,56 +689,56 @@ class DepositController {
       if (!reasonForCancel) {
         return res
           .status(400)
-          .json({ error: 'Reason for rejection is required' });
+          .json({ error: "Reason for rejection is required" });
       }
 
       // Lấy thông tin khoản đặt cọc, bao gồm cả boardingHouseName
       const deposit = await DepositRoom.findById(depositId)
-        .populate({ path: 'accountId', select: 'fullname email' })
+        .populate({ path: "accountId", select: "fullname email" })
         .populate({
-          path: 'roomId',
-          select: 'roomNumber boardingHouseId', // Lấy boardingHouseId từ roomId
+          path: "roomId",
+          select: "roomNumber boardingHouseId", // Lấy boardingHouseId từ roomId
           populate: {
-            path: 'boardingHouseId', // Populate boardingHouseId trong roomId
-            select: 'name', // Lấy trường name của boardingHouse
+            path: "boardingHouseId", // Populate boardingHouseId trong roomId
+            select: "name", // Lấy trường name của boardingHouse
           },
         });
 
       if (!deposit) {
-        return res.status(404).json({ error: 'Không tìm thấy khoản đặt cọc' });
+        return res.status(404).json({ error: "Không tìm thấy khoản đặt cọc" });
       }
 
       // Lấy tên nhà trọ từ boardingHouseId đã populate
       const boardingHouseName = deposit.roomId.boardingHouseId
         ? deposit.roomId.boardingHouseId.name
-        : 'Không có tên nhà trọ';
+        : "Không có tên nhà trọ";
 
       // Cập nhật status thành 'rejected' và thêm lý do hủy
-      deposit.status = 'rejected';
+      deposit.status = "rejected";
       deposit.reasonForCancel = reasonForCancel; // Thêm lý do hủy vào đối tượng deposit
       await deposit.save();
 
       // Config mail server (nhớ đổi tài khoản của bạn)
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         auth: {
-          user: 'todohongy@gmail.com', // Thay bằng email của bạn
-          pass: 'ersq syrb ihov ilvx', // Thay bằng App Password
+          user: "todohongy@gmail.com", // Thay bằng email của bạn
+          pass: "ersq syrb ihov ilvx", // Thay bằng App Password
         },
       });
 
       const mailOptions = {
-        from: 'support@example.com',
+        from: "support@example.com",
         to: deposit.accountId.email,
-        subject: 'Đặt cọc phòng trọ đã bị từ chối ❌',
+        subject: "Đặt cọc phòng trọ đã bị từ chối ❌",
         html: `
         <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
         <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã bị <span style="color:red;"><strong>từ chối</strong></span>.</p>
         <ul>
           <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
           <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
-          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format('DD/MM/YYYY')}</li>
-          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format('DD/MM/YYYY')}</li>
+          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format("DD/MM/YYYY")}</li>
+          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format("DD/MM/YYYY")}</li>
           <li><strong>Lý do từ chối:</strong> ${reasonForCancel}</li>
         </ul>
         <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại.</p>
@@ -684,26 +750,52 @@ class DepositController {
       await transporter.sendMail(mailOptions);
 
       return res.status(200).json({
-        message: 'Đã từ chối khoản đặt cọc và gửi email thành công.',
+        message: "Đã từ chối khoản đặt cọc và gửi email thành công.",
         depositId: deposit._id,
       });
     } catch (error) {
-      console.error('Error rejecting deposit room:', error);
+      console.error("Error rejecting deposit room:", error);
       return res
         .status(500)
-        .json({ error: 'Đã có lỗi xảy ra', detail: error.message });
+        .json({ error: "Đã có lỗi xảy ra", detail: error.message });
+    }
+  }
+  async acceptRefundRequestForOwner(req, res) {
+    try {
+      const { refundRequestId } = req.params;
+      const { paymentMethod } = req.body;
+      const existRefundRequest = await RefundRequest.findOne({
+        _id: refundRequestId,
+        status: { $regex: /^pending$/i },
+      });
+
+      if (!existRefundRequest) {
+        return res.status(400).json({ message: "Refund request not found" });
+      }
+
+      const { amountRefunded, accountId } = existRefundRequest;
+      const orderInfo = `refund-${accountId}-${refundRequestId}`;
+
+      if (paymentMethod === "vnpay") {
+        createVNPayUrl(req, res, amountRefunded, orderInfo);
+      } else if (paymentMethod === "momo") {
+        createMomoUrl(req, res, amountRefunded, orderInfo);
+      }
+    } catch (error) {
+      console.error("Error paying deposit refund:", error);
+      res.status(500).json({ message: "Server error", error });
     }
   }
 }
 
 const createVNPayUrl = async (req, res, amount, orderInfo) => {
-  process.env.TZ = 'Asia/Ho_Chi_Minh';
+  process.env.TZ = "Asia/Ho_Chi_Minh";
 
   let date = new Date();
-  let createDate = moment(date).format('YYYYMMDDHHmmss');
+  let createDate = moment(date).format("YYYYMMDDHHmmss");
 
   let ipAddr =
-    req.headers['x-forwarded-for'] ||
+    req.headers["x-forwarded-for"] ||
     req.connection.remoteAddress ||
     req.socket.remoteAddress ||
     req.connection.socket.remoteAddress;
@@ -712,85 +804,85 @@ const createVNPayUrl = async (req, res, amount, orderInfo) => {
   let secretKey = config.vnp_HashSecret;
   let vnpUrl = config.vnp_Url;
   let returnUrl = config.vnp_ReturnUrl;
-  let orderId = moment(date).format('DDHHmmss');
+  let orderId = moment(date).format("DDHHmmss");
   // let amount = 100000;
 
-  let locale = 'vn';
-  let currCode = 'VND';
+  let locale = "vn";
+  let currCode = "VND";
   let vnp_Params = {};
-  vnp_Params['vnp_Version'] = '2.1.0';
-  vnp_Params['vnp_Command'] = 'pay';
-  vnp_Params['vnp_TmnCode'] = tmnCode;
-  vnp_Params['vnp_Locale'] = locale;
-  vnp_Params['vnp_CurrCode'] = currCode;
-  vnp_Params['vnp_TxnRef'] = orderId;
-  vnp_Params['vnp_OrderInfo'] = orderInfo;
-  vnp_Params['vnp_OrderType'] = 'other';
-  vnp_Params['vnp_Amount'] = amount * 100;
-  vnp_Params['vnp_ReturnUrl'] = returnUrl;
-  vnp_Params['vnp_IpAddr'] = ipAddr;
-  vnp_Params['vnp_CreateDate'] = createDate;
+  vnp_Params["vnp_Version"] = "2.1.0";
+  vnp_Params["vnp_Command"] = "pay";
+  vnp_Params["vnp_TmnCode"] = tmnCode;
+  vnp_Params["vnp_Locale"] = locale;
+  vnp_Params["vnp_CurrCode"] = currCode;
+  vnp_Params["vnp_TxnRef"] = orderId;
+  vnp_Params["vnp_OrderInfo"] = orderInfo;
+  vnp_Params["vnp_OrderType"] = "other";
+  vnp_Params["vnp_Amount"] = amount * 100;
+  vnp_Params["vnp_ReturnUrl"] = returnUrl;
+  vnp_Params["vnp_IpAddr"] = ipAddr;
+  vnp_Params["vnp_CreateDate"] = createDate;
   //   vnp_Params["vnp_BankCode"] = "NCB";
 
   vnp_Params = sortObject(vnp_Params);
 
   let signData = querystring.stringify(vnp_Params, { encode: false });
-  let hmac = crypto.createHmac('sha512', secretKey);
-  let signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
-  vnp_Params['vnp_SecureHash'] = signed;
-  vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
+  let hmac = crypto.createHmac("sha512", secretKey);
+  let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+  vnp_Params["vnp_SecureHash"] = signed;
+  vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
 
-  res.status(200).json({ code: '00', payUrl: vnpUrl });
+  res.status(200).json({ code: "00", payUrl: vnpUrl });
 };
 
 const createMomoUrl = async (req, res, amount, orderInfo) => {
-  var accessKey = 'F8BBA842ECF85';
-  var secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
-  var partnerCode = 'MOMO';
-  var redirectUrl = 'http://localhost:3000/deposit/momo-return';
-  var ipnUrl = 'http://localhost:3000/deposit/momo-return';
-  var requestType = 'payWithMethod';
+  var accessKey = "F8BBA842ECF85";
+  var secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+  var partnerCode = "MOMO";
+  var redirectUrl = "http://localhost:3000/deposit/momo-return";
+  var ipnUrl = "http://localhost:3000/deposit/momo-return";
+  var requestType = "payWithMethod";
   var orderId = partnerCode + new Date().getTime();
   var requestId = orderId;
-  var extraData = '';
+  var extraData = "";
   var paymentCode =
-    'T8Qii53fAXyUftPV3m9ysyRhEanUs9KlOPfHgpMR0ON50U10Bh+vZdpJU7VY4z+Z2y77fJHkoDc69scwwzLuW5MzeUKTwPo3ZMaB29imm6YulqnWfTkgzqRaion+EuD7FN9wZ4aXE1+mRt0gHsU193y+yxtRgpmY7SDMU9hCKoQtYyHsfFR5FUAOAKMdw2fzQqpToei3rnaYvZuYaxolprm9+/+WIETnPUDlxCYOiw7vPeaaYQQH0BF0TxyU3zu36ODx980rJvPAgtJzH1gUrlxcSS1HQeQ9ZaVM1eOK/jl8KJm6ijOwErHGbgf/hVymUQG65rHU2MWz9U8QUjvDWA==';
-  var orderGroupId = '';
+    "T8Qii53fAXyUftPV3m9ysyRhEanUs9KlOPfHgpMR0ON50U10Bh+vZdpJU7VY4z+Z2y77fJHkoDc69scwwzLuW5MzeUKTwPo3ZMaB29imm6YulqnWfTkgzqRaion+EuD7FN9wZ4aXE1+mRt0gHsU193y+yxtRgpmY7SDMU9hCKoQtYyHsfFR5FUAOAKMdw2fzQqpToei3rnaYvZuYaxolprm9+/+WIETnPUDlxCYOiw7vPeaaYQQH0BF0TxyU3zu36ODx980rJvPAgtJzH1gUrlxcSS1HQeQ9ZaVM1eOK/jl8KJm6ijOwErHGbgf/hVymUQG65rHU2MWz9U8QUjvDWA==";
+  var orderGroupId = "";
   var autoCapture = true;
-  var lang = 'vi';
+  var lang = "vi";
 
   var rawSignature =
-    'accessKey=' +
+    "accessKey=" +
     accessKey +
-    '&amount=' +
+    "&amount=" +
     amount +
-    '&extraData=' +
+    "&extraData=" +
     extraData +
-    '&ipnUrl=' +
+    "&ipnUrl=" +
     ipnUrl +
-    '&orderId=' +
+    "&orderId=" +
     orderId +
-    '&orderInfo=' +
+    "&orderInfo=" +
     orderInfo +
-    '&partnerCode=' +
+    "&partnerCode=" +
     partnerCode +
-    '&redirectUrl=' +
+    "&redirectUrl=" +
     redirectUrl +
-    '&requestId=' +
+    "&requestId=" +
     requestId +
-    '&requestType=' +
+    "&requestType=" +
     requestType;
   //signature
   var signature = crypto
-    .createHmac('sha256', secretKey)
+    .createHmac("sha256", secretKey)
     .update(rawSignature)
-    .digest('hex');
+    .digest("hex");
 
   //json object send to MoMo endpoint
   const requestBody = JSON.stringify({
     partnerCode: partnerCode,
-    partnerName: 'Test',
-    storeId: 'MomoTestStore',
+    partnerName: "Test",
+    storeId: "MomoTestStore",
     requestId: requestId,
     amount: amount,
     orderId: orderId,
@@ -806,12 +898,12 @@ const createMomoUrl = async (req, res, amount, orderInfo) => {
   });
 
   const options = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(requestBody),
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(requestBody),
     },
-    url: 'https://test-payment.momo.vn/v2/gateway/api/create',
+    url: "https://test-payment.momo.vn/v2/gateway/api/create",
     data: requestBody,
   };
 
@@ -819,7 +911,7 @@ const createMomoUrl = async (req, res, amount, orderInfo) => {
     const response = await axios(options);
     return res.status(200).json(response.data);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 

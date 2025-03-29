@@ -25,6 +25,7 @@ const DepositRoom = () => {
   const [rejectLoading, setRejectLoading] = useState(false); // State to manage reject button loading state
   const { boardingHouseId } = useParams();
   const [filterValue, setFilterValue] = useState(null);
+
   const [listRoom, setListRoom] = useState([]);
 
   const fetchListRoom = async () => {
