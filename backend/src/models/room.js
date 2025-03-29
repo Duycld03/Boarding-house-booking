@@ -41,6 +41,12 @@ const RoomSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    previousElectricityReading: {
+      type: Number,
+    },
+    previousWaterReading: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
