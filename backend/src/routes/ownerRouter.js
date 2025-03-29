@@ -12,6 +12,7 @@ import {
   revenueController,
   refundRequestController,
   renewalController,
+  appointmentController
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -32,7 +33,22 @@ ownerRouter.put(
   upload.array('boardingHouse'),
   boardingHouseController.updateBoardingHouseDetailsOwner
 );
-
+ownerRouter.get(
+  "/:boardingHouseId",
+  appointmentController.getAppointmentsByBoardingHouseId
+);
+ownerRouter.get(
+  "/appointment/:appointmentId",
+  appointmentController.getAppointmentDetailForOwner
+);
+ownerRouter.post(
+  "/appointments/accept/:appointmentId",
+  appointmentController.acceptViewingRequest
+);
+ownerRouter.post(
+  "/appointments/reject/:appointmentId",
+  appointmentController.rejectViewingRequest
+);
 ownerRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
 ownerRouter.post(
   '/boardinghouse',

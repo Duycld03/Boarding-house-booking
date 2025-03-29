@@ -37,6 +37,7 @@ import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
 import TenantManagement from './TenantManagement/TenantManagement';
 import RoomManagement from './RoomManagement/RoomManagement';
 import RevenueManagement from './RevenueManagement';
+import ViewListAppointmentOwner from '@/component/ListAppoinmentOwner';
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -339,8 +340,8 @@ const BHDetailOwner = () => {
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-          error.message ||
-          'Failed to update the boarding house.'
+        error.message ||
+        'Failed to update the boarding house.'
       );
     } finally {
       setLoading(false);
@@ -812,6 +813,9 @@ const BHDetailOwner = () => {
         </Tabs.TabPane>
         <Tabs.TabPane tab="Renewal Management" key="Renewal Request Management">
           <RenewalRequest boardingHouseId={boardingHouseId} />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Viewing room request" key="Viewing room request">
+          <ViewListAppointmentOwner />
         </Tabs.TabPane>
       </Tabs>
     </div>

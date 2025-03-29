@@ -17,6 +17,8 @@ import expenseController from './expenseController.js';
 import revenueController from './revenueController.js';
 import userPaymentController from './userPaymentController.js';
 import refundRequestController from './refundRequestController.js'; // Fixed typo here
+import getAppointmentsByBoardingHouseId from './appointmentController.js';
+import getAppointmentDetailForOwner from './appointmentController.js';
 
 export {
   authController,
@@ -38,4 +40,6 @@ export {
   expenseController,
   revenueController,
   refundRequestController,
+  getAppointmentsByBoardingHouseId,
+  getAppointmentDetailForOwner
 };

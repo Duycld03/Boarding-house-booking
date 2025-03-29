@@ -23,8 +23,11 @@ const ViewRoomRequestSchema = new mongoose.Schema(
     appointmentDate: {
       type: Date,
       required: true
+    },
+    reasonForCancel: {
+      type: String,
+      default: ""
     }
-
   },
   { timestamps: true }
 );
