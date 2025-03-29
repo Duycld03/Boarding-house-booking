@@ -100,16 +100,17 @@ authRouter.post("/pay-deposit", depositController.payDeposit);
 
 // refund request
 authRouter.get("/refund-requests", refundRequestController.getRefundRequests);
-
+authRouter.post(
+  "/refund-requests",
+  refundRequestController.createRefundRequest
+);
 
 // userPayment
 authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
-
 
 //renewal
 authRouter.get("/renewal", renewalController.getExtensionRequests);
 authRouter.post("/renewal", renewalController.createExtensionRequest);
 authRouter.put("/renewal/:requestId", renewalController.updateExtensionRequest);
-
 
 export { authRouter };

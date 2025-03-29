@@ -12,6 +12,7 @@ import {
   revenueController,
   refundRequestController,
   renewalController,
+  paymentBillController,
 } from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -173,6 +174,28 @@ ownerRouter.get(
   revenueController.getTotalAvailableYears
 );
 ownerRouter.get("/total-revenue/year", revenueController.getTotalRevenueByYear);
+
+//rent payment
+ownerRouter.get(
+  "/rent-payment/:boardingHouseId",
+  paymentBillController.getPaymentBillByBoardingHouseId
+);
+
+ownerRouter.get(
+  "/unpaid-rooms/:boardingHouseId",
+  roomController.getUnpaidRoomsByBoardingHouse
+);
+
+// get electrical and water price
+ownerRouter.get(
+  "/electrical-water-price/:boardingHouseId",
+  boardingHouseController.getElectricalAndWaterPrice
+);
+
+ownerRouter.post(
+  "/calculate-monthly-bill",
+  paymentBillController.calculateMonthlyRoomRent
+);
 
 
 export { ownerRouter };
