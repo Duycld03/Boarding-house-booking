@@ -20,6 +20,10 @@ export const getBhByArea = async (filterValue) => {
   });
 };
 
+export const getElectricalAndWaterPrice = (boardingHouseId) => {
+  return axios.get(`/owner/electrical-water-price/${boardingHouseId}`);
+}
+
 export const addRoom = async (data) => {
   return axios.post(`/owner/room/boarding-house`, data, {
     headers: {

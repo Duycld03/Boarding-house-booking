@@ -34,12 +34,25 @@ const paymentBillSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    additionalFee: {
-      type: Number,
-      default: 0,
-    },
+    additionalFee: [
+      {
+        feeName: {
+          type: String,
+        },
+        feeAmount: {
+          type: Number,
+          default: 0,
+        },
+      },
+    ],
     electricalBill: BillSchema,
     waterBill: BillSchema,
+    month: {
+      type: String,
+    },
+    year: {
+      type: String,
+    },
   },
   {
     timestamps: {

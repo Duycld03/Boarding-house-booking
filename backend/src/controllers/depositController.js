@@ -72,12 +72,16 @@ class DepositController {
         })
         .sort({ createdAt: -1 })
         .lean();
+
+      if (deposits.length === 0) {
+        return res.status(200).json([]);
+      }
+
       const result = deposits.map((deposit) => {
         const { roomId } = deposit;
-        const { boardingHouseId } = roomId;
         return {
           _id: deposit._id,
-          name: boardingHouseId.name,
+          name: roomId?.boardingHouseId?.name,
           roomNumber: roomId.roomNumber,
           roomId: roomId._id,
           amount: deposit.amount,
@@ -158,7 +162,7 @@ class DepositController {
 
     if (secureHash === signed && vnp_Params["vnp_ResponseCode"] === "00") {
       if (type == "deposit") {
-        const accountId = orderInfo;
+        const accountId = orderInfo[1];
         const depositRoomId = orderInfo[2];
 
         const depositRoom = await DepositRoom.findOne({
@@ -371,7 +375,6 @@ class DepositController {
       if (type == "refund") {
         redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=fail`;
       }
-
       res.redirect(redirectUrl);
     }
   }
@@ -454,12 +457,7 @@ class DepositController {
     try {
       const { boardingHouseId } = req.params;
       const { status, priceRange, roomId, rentalTime } = req.query;
-
-
-
-
       const rooms = await Room.find({ boardingHouseId })
-
 
       const roomMap = new Map(
         rooms.map((room) => [room._id.toString(), room.roomNumber])
@@ -468,7 +466,6 @@ class DepositController {
       if (roomId && roomId !== "" && roomMap.has(roomId)) {
         filter.roomId = roomId;
       }
-
 
       if (status && status !== "") {
         filter.status = status;
@@ -758,6 +755,7 @@ class DepositController {
       return res
         .status(500)
         .json({ error: "Đã có lỗi xảy ra", detail: error.message });
+
     }
   }
   async acceptRefundRequestForOwner(req, res) {

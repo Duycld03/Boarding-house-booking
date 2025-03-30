@@ -16,6 +16,7 @@ import ActionDropdown from "./ActionDropdown";
 import RenewalRequestForm from "./RenewalRequestForm";
 import { getExtensionRequests } from "@/api/extensionRequest";
 import PayDepositPopup from "./MyDepositDetail/PayDepositPopup";
+import CreateDepositRefundRequest from "./CreateDepositRefundRequest";
 
 function MyDepositedRoom() {
   const location = useLocation();
@@ -33,6 +34,8 @@ function MyDepositedRoom() {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [existingRequest, setExistingRequest] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [isVisibleDepositRefund, setIsVisibleDepositRefund] = useState(false);
 
   const fetchExtensionRequests = async () => {
     try {
@@ -115,8 +118,12 @@ function MyDepositedRoom() {
           }}
           setDepositRoom={setDepositRoom}
           setIsPayDepositPopupVisible={setIsPayDepositPopupVisible}
-          setDepositRoomId={setDepositRoomId}
-          setIsPayRentModalVisible={setIsPayRentModalVisible}
+          // setDepositRoomId={setDepositRoomId}
+          // setIsPayRentModalVisible={setIsPayRentModalVisible}
+          onDepositRefundClick={(record) => {
+            setDepositRoom(record);
+            setIsVisibleDepositRefund(true);
+          }}
         />
       ),
     },
@@ -180,6 +187,12 @@ function MyDepositedRoom() {
           renewalData={selectedRecord}
         />
       )}
+
+      <CreateDepositRefundRequest
+        isVisible={isVisibleDepositRefund}
+        setVisible={setIsVisibleDepositRefund}
+        depositRoom={depositRoom}
+      />
     </div>
   );
 }

@@ -4,16 +4,18 @@ import {
   DownOutlined,
   SyncOutlined,
   DollarOutlined,
+  RollbackOutlined,
 } from "@ant-design/icons";
 
 const ActionDropdown = ({
   record,
   onDetailClick,
   onRenewalClick,
+  onDepositRefundClick,
   setDepositRoom,
   setIsPayDepositPopupVisible,
-  setDepositRoomId,
-  setIsPayRentModalVisible,
+  // setDepositRoomId,
+  // setIsPayRentModalVisible,
 }) => {
   const menuItems = [
     {
@@ -30,14 +32,20 @@ const ActionDropdown = ({
       onClick: () => onRenewalClick(record),
     },
     record.status === "confirmed" && {
-      key: "viewDetail",
-      label: "View Detail",
-      icon: <FileTextOutlined />,
-      onClick: () => {
-        setDepositRoomId(record._id);
-        setIsPayRentModalVisible(true);
-      },
+      key: "create-deposit-refund",
+      label: "Create deposit refund request",
+      icon: <RollbackOutlined />,
+      onClick: () => onDepositRefundClick(record),
     },
+    // record.status === "confirmed" && {
+    //   key: "viewDetail",
+    //   label: "View Detail",
+    //   icon: <FileTextOutlined />,
+    //   onClick: () => {
+    //     setDepositRoomId(record._id);
+    //     setIsPayRentModalVisible(true);
+    //   },
+    // },
     record.status === "accepted" && {
       key: "pay",
       label: "Pay",
@@ -52,18 +60,23 @@ const ActionDropdown = ({
   return (
     <Dropdown
       menu={{
-        items: menuItems.map(({ key, label, icon, onClick, disabled }) => ({
-          key,
-          label: (
-            <span
-              className={disabled ? "text-gray-400 cursor-not-allowed" : ""}
-              onClick={disabled ? undefined : onClick}
-            >
-              {icon} {label}
-            </span>
-          ),
-          disabled,
-        })),
+        items:
+          record.status === "refunded"
+            ? []
+            : menuItems.map(({ key, label, icon, onClick, disabled }) => ({
+                key,
+                label: (
+                  <span
+                    className={
+                      disabled ? "text-gray-400 cursor-not-allowed" : ""
+                    }
+                    onClick={disabled ? undefined : onClick}
+                  >
+                    {icon} {label}
+                  </span>
+                ),
+                disabled,
+              })),
       }}
     >
       <Button>

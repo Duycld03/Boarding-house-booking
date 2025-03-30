@@ -12,13 +12,14 @@ import depositController from "./depositController.js";
 import FacilitiesController from "./facilitiesController.js";
 import roomTypeController from "./roomTypeController.js";
 import tenantController from "./tenantController.js";
-import userPaymentController from "./userPaymentController.js";
-import refundRequestController from "./refundRequestController.js";
 import renewalController from "./renewalController.js";
 import expenseController from "./expenseController.js";
 import revenueController from "./revenueController.js";
 import getAppointmentsByBoardingHouseId from './appointmentController.js';
 import getAppointmentDetailForOwner from './appointmentController.js';
+import userPaymentController from "./userPaymentController.js";
+import refundRequestController from "./refundRequestController.js"; // Fixed typo here
+import paymentBillController from "./paymentBillController.js";
 
 export {
   authController,
@@ -41,5 +42,6 @@ export {
   revenueController,
   refundRequestController,
   getAppointmentsByBoardingHouseId,
-  getAppointmentDetailForOwner
+  getAppointmentDetailForOwner,
+  paymentBillController,
 };
