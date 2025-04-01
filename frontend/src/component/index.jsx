@@ -7,7 +7,7 @@ import FormReplayPopup from "./FormReplayPopup";
 import Back from "./Back";
 
 export {
-  TableCustom,
+  TableCustom as Table,
   ButtonCustom as Button,
   ConfirmModal,
   CustomInput as Input,

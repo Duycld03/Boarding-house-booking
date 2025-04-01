@@ -26,16 +26,12 @@ export const addReview = (reviewData) => {
 export const updateReviewImage = async (imageFile) => {
     const formData = new FormData();
     formData.append("review", imageFile);
-
-    // console.log("Image File:", imageFile); 
-
     try {
         const response = await axios.put("/auth/review", formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
         });
-        // console.log("Upload Response:", response);
         return response.data;
     } catch (error) {
         console.error("Upload Error:", error);
