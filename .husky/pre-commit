@@ -1,4 +1,4 @@
-set -e
+﻿set -e
 
 npm run pre-commit:server || { echo "Server failed"; exit 1; }
 

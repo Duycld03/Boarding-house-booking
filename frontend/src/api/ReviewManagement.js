@@ -32,6 +32,7 @@ export const updateReviewImage = async (imageFile) => {
                 "Content-Type": "multipart/form-data",
             },
         });
+        // console.log("Upload Response:", response);
         return response.data;
     } catch (error) {
         console.error("Upload Error:", error);
