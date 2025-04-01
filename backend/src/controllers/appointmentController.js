@@ -31,7 +31,7 @@ class AppointmentController {
             today.setHours(0, 0, 0, 0);
 
 
-
+            //update appointment
             const updatedAppointments = await Promise.all(
                 appointmentList.map(async (appointment) => {
                     const appointmentDate = new Date(appointment.appointmentDate);
