@@ -1,6 +1,6 @@
-import { Layout, Menu } from 'antd';
-import { useState } from 'react';
-import getMenuItems from './menuItem';
+import { Layout, Menu } from "antd";
+import { useState } from "react";
+import getMenuItems from "./menuItem";
 
 const { Sider } = Layout;
 
@@ -11,10 +11,10 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
   return (
     <Sider
       width={width}
-      collapsible
       collapsed={collapsed}
       onCollapse={() => setCollapsed(!collapsed)}
-      style={{ background: '#fff' }}
+      className="lg:block hidden"
+      style={{ background: "#fff" }}
       {...props}
     >
       <Menu mode="inline" items={menuItems} />

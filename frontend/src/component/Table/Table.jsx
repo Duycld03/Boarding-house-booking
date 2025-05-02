@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Divider, Table as AntTable, Button, Select } from "antd";
+import { Divider, Table as AntTable, Button, Select, Grid } from "antd";
 import PropTypes from "prop-types";
 
 const { Option } = Select;
@@ -13,6 +13,7 @@ const TableCustom = ({
   enableCount = true,
   loading = false,
   onRowClick,
+  scrollY = null,
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -23,6 +24,10 @@ const TableCustom = ({
     setSelectedRowKeys(newSelectedRowKeys);
     setSelectedRows(newSelectedRows);
   };
+
+  const { useBreakpoint } = Grid;
+
+  const screens = useBreakpoint();
 
   const handleSelectChange = (value) => {
     setDynamicSelect(value);
@@ -82,16 +87,14 @@ const TableCustom = ({
   });
 
   return (
-    <div>
+    <div className="w-full p-2">
       {checkbox && <Divider />}
       {checkbox && (
-        <div
-          style={{ marginBottom: 16, display: "flex", alignItems: "center" }}
-        >
-          <label style={{ marginRight: 8 }}>Select Option:</label>
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <label className="mb-2 sm:mb-0 text-sm">Select Option:</label>
           <Select
             placeholder="Select an option"
-            style={{ width: 200, marginRight: 8 }}
+            className="w-full sm:w-[200px]"
             value={dynamicSelect}
             onChange={handleSelectChange}
           >
@@ -105,26 +108,32 @@ const TableCustom = ({
             type="primary"
             onClick={handleProcessData}
             disabled={isSubmitDisabled}
+            className="mt-2 sm:mt-0"
           >
             Submit
           </Button>
         </div>
       )}
-      <AntTable
-        pagination={true}
-        loading={loading}
-        bordered
-        rowKey="_id"
-        rowSelection={checkbox ? rowSelection : null}
-        columns={numberedColumns}
-        dataSource={numberedData}
-        onRow={onRow}
-      />
+      <div className="w-full">
+        <div className="max-w-full">
+          <AntTable
+            pagination={{ pageSize: 10 }}
+            scroll={{
+              x: "max-content",
+            }}
+            className="text-xs sm:text-sm md:text-base"
+            rowKey="_id"
+            rowSelection={checkbox ? rowSelection : null}
+            columns={numberedColumns}
+            dataSource={numberedData}
+            onRow={onRow}
+          />
+        </div>
+      </div>
     </div>
   );
 };
 
-// Adding PropTypes for better type checking
 TableCustom.propTypes = {
   columns: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,

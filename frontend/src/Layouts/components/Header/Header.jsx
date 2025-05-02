@@ -7,7 +7,6 @@ import {
   Dropdown,
   Space,
   Drawer,
-  Grid,
   Divider,
 } from "antd";
 import classNames from "classnames/bind";
@@ -23,34 +22,32 @@ import {
 } from "@ant-design/icons";
 import { getUser } from "../../../api/authManagement";
 import { useCurrentUser } from "../../../context/userContext";
+import adminMenu from "../Slider/menuItem";
+import userRole from "../../../constants/userRole";
+import getMenuItems from "../ProfileSlider/menuItem";
 
 const cx = classNames.bind(Styles);
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-const { useBreakpoint } = Grid;
 const { Header } = Layout;
 
 const CustomHeader = () => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [avatar, setAvatar] = useState(UserAvatar);
   const navigate = useNavigate();
-  const screens = useBreakpoint();
-  const { contextLogout } = useCurrentUser();
+  const { contextLogout, hasRole } = useCurrentUser();
 
-  const checkUser = async () => {
-    try {
-      const res = await getUser();
-      if (res.avatarImage) {
-        setAvatar(res.avatarImage.url);
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUser();
+        setAvatar(res?.avatarImage?.url || UserAvatar);
+        setIsLoggedIn(true);
+      } catch {
+        setIsLoggedIn(false);
       }
-
-      if (res.role === "admin") {
-        setIsAdmin(true);
-      }
-      setIsLoggedIn(true);
-    } catch (error) {}
-  };
+    };
+    fetchUser();
+  }, []);
 
   const logout = () => {
     localStorage.removeItem("access_token");
@@ -59,86 +56,122 @@ const CustomHeader = () => {
     navigate("/");
   };
 
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  // Menu items for navigation
   const menuItems = [
     { key: "home", label: "Home", onClick: () => navigate("/") },
     { key: "about", label: "About Us", onClick: () => navigate("/about-us") },
     { key: "contact", label: "Contact", onClick: () => navigate("/contact") },
   ];
 
-  // User menu for dropdown
-
-  const userMenu = (
-    <Menu
-      items={[
-        {
-          key: "profile",
-          icon: <UserOutlined />,
-          label: "Profile",
-          onClick: () => navigate("/profile"),
-        },
-        {
-          key: "change-password",
-          icon: <LockOutlined />, // Icon cho Change Password
-          label: "Change Password",
-          onClick: () => navigate("/change-password"),
-        },
-        {
-          key: "logout",
-          icon: <LogoutOutlined />, // Icon cho Logout
-          label: "Logout",
-          onClick: logout,
-        },
-      ]}
-    />
-  );
-
-  // Toggle Drawer state
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
+  const userMenuItems = [
+    {
+      key: "profile",
+      icon: <UserOutlined />,
+      label: "Profile",
+      onClick: () => navigate("/profile"),
+    },
+    {
+      key: "change-password",
+      icon: <LockOutlined />,
+      label: "Change Password",
+      onClick: () => navigate("/change-password"),
+    },
+    {
+      key: "logout",
+      icon: <LogoutOutlined />,
+      label: "Logout",
+      onClick: logout,
+    },
+  ];
 
   return (
-    <Header className={cx("flex justify-between items-center bg-white")}>
-      {/* Logo Section */}
+    <Header className={cx("flex justify-between items-center bg-white px-4")}>
+      {/* Logo */}
       <Link
-        to={isAdmin ? "/dashboard/account-management" : "/"}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "white",
-        }}
+        to={hasRole(userRole.admin) ? "/dashboard/account-management" : "/"}
+        className="flex items-center"
       >
-        <img
-          src={Icon}
-          alt="Logo"
-          style={{ height: "50px", cursor: "pointer" }}
-          onClick={() => navigate("/")}
-        />
+        <img src={Icon} alt="Logo" className="h-12 cursor-pointer" />
         <p className={cx("logo-txt font-body text-3xl font-extrabold ml-2")}>
           MOTELLEASE TECH
         </p>
       </Link>
 
-      {/* Menu Section (for large screens) */}
-      {!isAdmin && screens.lg && (
-        <Menu
-          theme="light"
-          mode="horizontal"
-          defaultSelectedKeys={["home"]}
-          items={menuItems}
-        />
-      )}
+      {/* Main Menu (Desktop) */}
+      <Menu
+        className="hidden lg:block"
+        theme="light"
+        mode="horizontal"
+        defaultSelectedKeys={["home"]}
+        items={menuItems.map(({ key, label, onClick }) => ({
+          key,
+          label: <span onClick={onClick}>{label}</span>,
+        }))}
+      />
 
       {/* User Section */}
       {!isLoggedIn ? (
-        screens.lg && (
-          <div className={cx("btn-wrapper")}>
+        <Space size={10} className="hidden lg:flex">
+          <Button
+            size="large"
+            type="primary"
+            onClick={() => navigate("/login")}
+          >
+            Login
+          </Button>
+          <Button
+            size="large"
+            className={cx("btn-register")}
+            onClick={() => navigate("/register")}
+          >
+            Register
+          </Button>
+        </Space>
+      ) : (
+        <Dropdown
+          menu={{
+            items: userMenuItems.map(({ key, label, icon, onClick }) => ({
+              key,
+              label: (
+                <span
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onClick();
+                  }}
+                >
+                  {icon} {label}
+                </span>
+              ),
+            })),
+          }}
+          placement="bottomRight"
+          arrow
+          trigger={["click"]}
+        >
+          <Avatar
+            src={avatar}
+            size={60}
+            className="hidden lg:block cursor-pointer mr-5"
+          />
+        </Dropdown>
+      )}
+
+      {/* Mobile Menu Toggle */}
+      <Button
+        type="text"
+        icon={<MenuOutlined />}
+        onClick={() => setOpen(true)}
+        className="lg:hidden"
+      />
+
+      {/* Drawer (Mobile Menu) */}
+      <Drawer
+        title={
+          isLoggedIn ? (
+            <div className="flex items-center">
+              <Avatar src={avatar || UserAvatar} size={60} className="mr-3" />
+              <span className={cx("user-name")}>User Name</span>
+            </div>
+          ) : (
             <Space size={10}>
               <Button
                 size="large"
@@ -155,111 +188,57 @@ const CustomHeader = () => {
                 Register
               </Button>
             </Space>
-          </div>
-        )
-      ) : (
-        <Dropdown
-          overlay={userMenu}
-          placement="bottomRight"
-          arrow
-          overlayStyle={{
-            fontSize: "16px",
-            padding: "8px",
-            width: 200,
-          }}
-        >
-          {screens.lg && (
-            <Avatar
-              src={avatar}
-              size={60}
-              style={{ cursor: "pointer", marginRight: 20 }}
-            />
+          )
+        }
+        placement="right"
+        closable
+        onClose={() => setOpen(false)}
+        open={open}
+      >
+        <Menu
+          mode="vertical"
+          items={(hasRole(userRole.admin) ? adminMenu : menuItems).map(
+            ({ key, label, onClick }) => ({
+              key,
+              label: <span onClick={onClick}>{label}</span>,
+            })
           )}
-        </Dropdown>
-      )}
+          style={{ border: "none", marginBottom: 20 }}
+        />
 
-      {!screens.lg && (
-        <>
-          <Button
-            type="text"
-            icon={<MenuOutlined />}
-            onClick={toggleDrawer}
-            className={cx("drawer-toggle-btn")}
-          />
-
-          <Drawer
-            title={
-              <div style={{ display: "flex", alignItems: "center" }}>
-                {!isLoggedIn ? (
-                  <div className={cx("ml-5")}>
-                    <Space size={10}>
-                      <Button
-                        size="large"
-                        type="primary"
-                        onClick={() => navigate("/login")}
-                      >
-                        Login
-                      </Button>
-                      <Button
-                        size="large"
-                        className={cx("btn-register")}
-                        onClick={() => navigate("/register")}
-                      >
-                        Register
-                      </Button>
-                    </Space>
-                  </div>
-                ) : (
-                  <>
-                    <Avatar
-                      src={UserAvatar}
-                      size={60}
-                      style={{ cursor: "pointer", marginRight: 20 }}
-                    />
-                    <span className={cx("user-name")}>User Name</span>
-                  </>
-                )}
-              </div>
-            }
-            placement="right"
-            closable
-            onClose={toggleDrawer}
-            open={open}
-          >
-            <Menu
-              mode="vertical"
-              items={menuItems}
-              style={{ border: "none", marginBottom: 20 }}
-            />
-            {isLoggedIn && (
+        {isLoggedIn && (
+          <>
+            {!hasRole(userRole.admin) && (
               <>
                 <Divider className="bg-gray-400" />
                 <Menu
                   mode="vertical"
-                  items={[
-                    {
-                      key: "profile",
-                      label: "Profile",
-                      onClick: () => navigate("/profile"),
-                    },
-                    {
-                      key: "change-password",
-                      label: "Change Password",
-                      onClick: () => navigate("/change-password"),
-                    },
-                    {
-                      key: "logout",
-                      label: "Logout",
-                      onClick: logout,
-                    },
-                  ]}
+                  items={getMenuItems()
+                    .filter((item) => item.key !== "profile")
+                    .map(({ key, label, onClick }) => ({
+                      key,
+                      label: <span onClick={onClick}>{label}</span>,
+                    }))}
                   style={{ border: "none" }}
                 />
               </>
             )}
-          </Drawer>
-        </>
-      )}
+            <Divider className="bg-gray-400" />
+            <Menu
+              mode="vertical"
+              items={userMenuItems.map(({ key, label, icon, onClick }) => ({
+                key,
+                label: (
+                  <span onClick={onClick}>
+                    {icon} {label}
+                  </span>
+                ),
+              }))}
+              style={{ border: "none" }}
+            />
+          </>
+        )}
+      </Drawer>
     </Header>
   );
 };

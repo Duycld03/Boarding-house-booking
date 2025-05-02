@@ -19,7 +19,6 @@ const ReviewSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
-      required: true,
     },
     images: [
       {
@@ -29,10 +28,14 @@ const ReviewSchema = new mongoose.Schema(
         },
         publicId: {
           type: String,
-          default: "",
+          default: '',
         },
-      }
+      },
     ],
+    parentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Review',
+    },
   },
   { timestamps: true }
 );

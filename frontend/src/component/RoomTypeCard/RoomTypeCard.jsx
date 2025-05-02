@@ -9,11 +9,14 @@ import { toast } from "react-toastify";
 import { useCurrentUser } from "../../context/userContext";
 import { useNavigate } from "react-router-dom";
 import DepositPopup from "./DepositPopup";
+import userRoles from "@/constants/userRole";
 
 const { Title, Paragraph, Text } = Typography;
 
 const RoomCard = ({ roomData, boardingHouse }) => {
-  const { isLogin } = useCurrentUser();
+  const { isLogin, hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRoles.owner);
+
   const navigate = useNavigate();
   const [listRoomData, setListRoomData] = useState([]);
   const [depositPopupVisible, setDepositPopupVisible] = useState(false);
@@ -52,11 +55,11 @@ const RoomCard = ({ roomData, boardingHouse }) => {
 
   return (
     <>
-      <Card className=" w-5/6 mx-auto  mt-6 rounded-lg shadow-md" hoverable>
+      <Card className=" sm:w-5/6 mx-auto  mt-6 rounded-lg shadow-md" hoverable>
         {/* image */}
         <div className="w-full flex flex-wrap gap-10">
           <img
-            className="max-h-[400px] md:w-1/2 sm:w-full object-cover rounded-lg"
+            className="max-h-[400px] w-full xl:w-1/2 object-cover rounded-lg"
             src={roomData?.image?.imageUrl}
           />
 
@@ -101,7 +104,7 @@ const RoomCard = ({ roomData, boardingHouse }) => {
                 className="bg-primary text-white md:min-w-[200px]  py-2 px-4 rounded-xl"
                 size="large"
                 onClick={handleOpen}
-                disabled={roomData?.availableRoom == 0}
+                disabled={isOwner || roomData?.availableRoom == 0}
               >
                 Deposit
               </Button>

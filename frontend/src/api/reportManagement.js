@@ -37,3 +37,10 @@ export const checkReportExist = (reviewIds, boardingHouseId) => {
     params: { reviewIds, boardingHouseId },
   });
 };
+export const getReportReviewDetail = (reportId) => {
+  return axios.get(`/dashboard/reportReview/${reportId}`);
+};
+
+export const getOwnReportReviewDetail = (reportId) => {
+  return axios.get(`/auth/reports/${reportId}`);
+};

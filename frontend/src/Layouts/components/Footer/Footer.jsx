@@ -1,19 +1,14 @@
 import Layout from "antd/es/layout/layout";
 import classnames from "classnames/bind";
 import Styles from "./Footer.module.css";
-import { useNavigate } from "react-router-dom";
 import Icon from "../../../assets/images/Icon.svg";
-
-const cx = classnames.bind(Styles);
 
 const { Footer } = Layout;
 
 function FooterComponent() {
-  const navigate = useNavigate();
-
   return (
     <Footer className="bg-white">
-      <div className="mx-auto max-w-screen-xl space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">
+      <div className="mx-auto max-w-full space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">
         <div className="sm:flex sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 font-body font-bold">
             <img src={Icon} alt="Footer-icon" />

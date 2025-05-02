@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import AddressSelector from '../../../component/AddressSelector';
-import { getAllBoardingHouseTypesOwner } from '../../../api/BoardingHManagement';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import AddressSelector from "../../../component/AddressSelector";
+import { getAllBoardingHouseTypesOwner } from "../../../api/BoardingHManagement";
 import {
   fetchProvinces,
   fetchDistricts,
   fetchWards,
-} from '../../../api/apiAddress';
-import { Button } from '../../../component';
+} from "../../../api/apiAddress";
+import { Button } from "../../../component";
 import {
   Form,
   Input,
@@ -17,52 +17,54 @@ import {
   Image,
   Modal,
   Spin,
-} from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { createBoardingHouseOwner } from '../../../api/BoardingHManagement';
+} from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { createBoardingHouseOwner } from "../../../api/BoardingHManagement";
+import axios from "axios";
 
 const AddBHModal = ({ onAddData }) => {
   // State management
   const [isModalVisible, setIsModalVisible] = useState(false); // Controls modal visibility
   const [formData, setFormData] = useState({
-    boardingHouseType: '',
-    name: '',
+    boardingHouseType: "",
+    name: "",
     address: {
-      province: '',
-      district: '',
-      ward: '',
-      detail: '',
+      province: "",
+      district: "",
+      ward: "",
+      detail: "",
     },
-    description: '',
+    description: "",
     primaryImage: null,
     otherImages: [],
-    priceRange: '',
-    electricityPrice: '',
-    waterPrice: '',
+    priceRange: "",
+    electricityPrice: "",
+    waterPrice: "",
   });
   const [loading, setLoading] = useState(false); // Loading state
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
+  const [geoLocation, setGeoLocation] = useState(null);
 
   // Function to reset form data
   const resetFormData = () => {
     setFormData({
-      boardingHouseType: '',
-      name: '',
+      boardingHouseType: "",
+      name: "",
       address: {
-        province: '',
-        district: '',
-        ward: '',
-        detail: '',
+        province: "",
+        district: "",
+        ward: "",
+        detail: "",
       },
-      description: '',
+      description: "",
       primaryImage: null,
       otherImages: [],
-      priceRange: '',
-      electricityPrice: '',
-      waterPrice: '',
+      priceRange: "",
+      electricityPrice: "",
+      waterPrice: "",
     });
     setDistricts([]); // Clear districts
     setWards([]); // Clear wards
@@ -107,7 +109,7 @@ const AddBHModal = ({ onAddData }) => {
           }
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
     fetchData();
@@ -118,8 +120,8 @@ const AddBHModal = ({ onAddData }) => {
       const response = await getAllBoardingHouseTypesOwner();
       setBoardingHouseTypes(response.data || []);
     } catch (error) {
-      console.error('Failed to fetch boarding house types:', error);
-      toast.error('Failed to fetch boarding house types.');
+      console.error("Failed to fetch boarding house types:", error);
+      toast.error("Failed to fetch boarding house types.");
     }
   };
 
@@ -129,7 +131,7 @@ const AddBHModal = ({ onAddData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const keys = name.split('.');
+    const keys = name.split(".");
     if (keys.length === 2) {
       setFormData((prev) => ({
         ...prev,
@@ -148,7 +150,7 @@ const AddBHModal = ({ onAddData }) => {
       return false;
     },
     multiple: true,
-    accept: 'image/*',
+    accept: "image/*",
   };
 
   const uploadProps = {
@@ -156,7 +158,7 @@ const AddBHModal = ({ onAddData }) => {
       handleFileChange({ target: { files: [file] } }, true);
       return false;
     },
-    accept: 'image/*',
+    accept: "image/*",
     maxCount: 1,
     showUploadList: false,
   };
@@ -189,62 +191,90 @@ const AddBHModal = ({ onAddData }) => {
     }));
   };
 
+  const getLocation = async () => {
+    try {
+      const res = await axios.get(
+        "https://nominatim.openstreetmap.org/search",
+        {
+          params: {
+            format: "json",
+            q: `${formData.address.ward}, ${formData.address.district}, ${formData.address.province}`,
+            polygon_geojson: 1,
+          },
+        }
+      );
+      setGeoLocation(res.data[0]);
+    } catch (error) {
+      console.log("Error getting location:", error);
+    }
+  };
+
+  useEffect(() => {
+    getLocation();
+  }, [formData?.address?.ward]);
+
   const handleSubmit = async () => {
     try {
       setLoading(true); // Show loading spinner
 
       const payload = new FormData();
       if (!formData.boardingHouseType) {
-        toast.error('Please select a boarding house type.');
+        toast.error("Please select a boarding house type.");
         return;
       }
       if (!formData.name) {
-        toast.error('Please enter a boarding house name.');
+        toast.error("Please enter a boarding house name.");
         return;
       }
       if (!formData.address.province) {
-        toast.error('Please select a boarding house province.');
+        toast.error("Please select a boarding house province.");
         return;
       }
       if (!formData.address.district) {
-        toast.error('Please select a boarding house district.');
+        toast.error("Please select a boarding house district.");
         return;
       }
       if (!formData.address.ward) {
-        toast.error('Please select a boarding house ward.');
+        toast.error("Please select a boarding house ward.");
         return;
       }
       if (!formData.address.detail) {
-        toast.error('Please enter a boarding house details.');
+        toast.error("Please enter a boarding house details.");
         return;
       }
       if (!formData.primaryImage) {
-        toast.error('You must upload a primary image.');
+        toast.error("You must upload a primary image.");
         return;
       }
       if (!formData.priceRange) {
-        toast.error('Please enter price range.');
+        toast.error("Please enter price range.");
         return;
       }
       if (!formData.electricityPrice) {
-        toast.error('Please enter electricity price.');
+        toast.error("Please enter electricity price.");
         return;
       }
       if (!formData.waterPrice) {
-        toast.error('Please enter water price.');
+        toast.error("Please enter water price.");
+        return;
+      }
+      if (!geoLocation) {
+        toast.error("Please mark the location on the map.");
         return;
       }
 
-      payload.append('boardingHouseType', formData.boardingHouseType);
-      payload.append('name', formData.name);
-      payload.append('description', formData.description);
-      payload.append('priceRange', formData.priceRange);
-      payload.append('electricityPrice', formData.electricityPrice);
-      payload.append('waterPrice', formData.waterPrice);
-      payload.append('address[province]', formData.address.province);
-      payload.append('address[district]', formData.address.district);
-      payload.append('address[ward]', formData.address.ward);
-      payload.append('address[detail]', formData.address.detail);
+      payload.append("boardingHouseType", formData.boardingHouseType);
+      payload.append("name", formData.name);
+      payload.append("description", formData.description);
+      payload.append("priceRange", formData.priceRange);
+      payload.append("electricityPrice", formData.electricityPrice);
+      payload.append("waterPrice", formData.waterPrice);
+      payload.append("address[province]", formData.address.province);
+      payload.append("address[district]", formData.address.district);
+      payload.append("address[ward]", formData.address.ward);
+      payload.append("address[detail]", formData.address.detail);
+      payload.append("location[lat]", geoLocation.lat);
+      payload.append("location[lon]", geoLocation.lon);
 
       // Ensure only one primary image and a maximum of 15 other images
       const allImages = [];
@@ -256,31 +286,32 @@ const AddBHModal = ({ onAddData }) => {
       allImages.push(...formData.otherImages);
 
       if (allImages.length === 0) {
-        toast.error('You must upload at least one image.');
+        toast.error("You must upload at least one image.");
         return;
       }
 
       allImages.forEach((file, index) => {
-        payload.append('boardingHouse', file);
+        payload.append("boardingHouse", file);
       });
 
       const response = await createBoardingHouseOwner(payload);
 
-      if (response?.message === 'Boarding house created successfully!') {
+      if (response?.message === "Boarding house created successfully!") {
         toast.success(response.message);
         onAddData(); // Refresh parent data
         closeModal(); // Close modal
       } else {
-        throw new Error(response?.message || 'Failed to add boarding house.');
+        throw new Error(response?.message || "Failed to add boarding house.");
       }
     } catch (error) {
-      console.error('Error submitting boarding house:', error);
+      console.error("Error submitting boarding house:", error);
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          'Failed to submit the form.'
+          "Failed to submit the form."
       );
     } finally {
+      setGeoLocation(null); // Reset location
       setLoading(false); // Hide loading spinner
     }
   };
@@ -316,7 +347,7 @@ const AddBHModal = ({ onAddData }) => {
             rules={[
               {
                 required: true,
-                message: 'Please select a boarding house type',
+                message: "Please select a boarding house type",
               },
             ]}
             className="mb-2"
@@ -343,7 +374,7 @@ const AddBHModal = ({ onAddData }) => {
             rules={[
               {
                 required: true,
-                message: 'Please enter the boarding house name',
+                message: "Please enter the boarding house name",
               },
             ]}
             className="mb-2"
@@ -376,6 +407,8 @@ const AddBHModal = ({ onAddData }) => {
             onDistrictChange={handleInputChange}
             onInputChange={handleInputChange}
             formData={formData}
+            location={geoLocation}
+            setGeoLocation={setGeoLocation}
           />
           <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
           {/* Primary Image */}
@@ -410,9 +443,9 @@ const AddBHModal = ({ onAddData }) => {
                     alt="Primary"
                     className="object-cover border rounded"
                     style={{
-                      width: '100%',
-                      height: 'auto',
-                      maxHeight: '300px',
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: "300px",
                     }}
                     preview={{
                       mask: <span className="text-white">Preview</span>,
@@ -505,7 +538,7 @@ const AddBHModal = ({ onAddData }) => {
           <Form.Item
             label="Price Rent/month (VND)"
             name="priceRange"
-            rules={[{ required: true, message: 'Please enter the price rent' }]}
+            rules={[{ required: true, message: "Please enter the price rent" }]}
             className="mb-2"
           >
             <InputNumber
@@ -513,12 +546,12 @@ const AddBHModal = ({ onAddData }) => {
               name="priceRange"
               value={formData.priceRange}
               onChange={(value) =>
-                handleInputChange({ target: { name: 'priceRange', value } })
+                handleInputChange({ target: { name: "priceRange", value } })
               }
               formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               } // Thêm dấu phẩy ngăn cách hàng nghìn
-              parser={(value) => value.replace(/\$\s?|(,*)/g, '')} // Loại bỏ dấu phẩy khi nhập
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")} // Loại bỏ dấu phẩy khi nhập
               className="w-full"
               min={0}
             />
@@ -529,7 +562,7 @@ const AddBHModal = ({ onAddData }) => {
             label="Electricity Price/kWh (VND)"
             name="electricityPrice"
             rules={[
-              { required: true, message: 'Please enter the electricity price' },
+              { required: true, message: "Please enter the electricity price" },
             ]}
             className="mb-2"
           >
@@ -539,13 +572,13 @@ const AddBHModal = ({ onAddData }) => {
               value={formData.electricityPrice}
               onChange={(value) =>
                 handleInputChange({
-                  target: { name: 'electricityPrice', value },
+                  target: { name: "electricityPrice", value },
                 })
               }
               formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
               className="w-full"
               min={0}
             />
@@ -556,7 +589,7 @@ const AddBHModal = ({ onAddData }) => {
             label="Water Price/m³ (VND)"
             name="waterPrice"
             rules={[
-              { required: true, message: 'Please enter the water price' },
+              { required: true, message: "Please enter the water price" },
             ]}
             className="mb-2"
           >
@@ -565,12 +598,12 @@ const AddBHModal = ({ onAddData }) => {
               name="waterPrice"
               value={formData.waterPrice}
               onChange={(value) =>
-                handleInputChange({ target: { name: 'waterPrice', value } })
+                handleInputChange({ target: { name: "waterPrice", value } })
               }
               formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
               className="w-full"
               min={0}
             />

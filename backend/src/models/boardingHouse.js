@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import mongoose_delete from 'mongoose-delete';
+import mongoose from "mongoose";
+import mongoose_delete from "mongoose-delete";
 
 const ImagesSchema = new mongoose.Schema({
   _id: {
@@ -12,7 +12,7 @@ const ImagesSchema = new mongoose.Schema({
   },
   publicId: {
     type: String,
-    default: '',
+    default: "",
   },
   isPrimary: {
     type: Boolean,
@@ -20,11 +20,22 @@ const ImagesSchema = new mongoose.Schema({
   },
 });
 
+const LocationSchema = new mongoose.Schema({
+  lat: {
+    type: Number,
+    required: true,
+  },
+  lon: {
+    type: Number,
+    required: true,
+  },
+});
+
 const BoardingHouseSchema = new mongoose.Schema(
   {
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Account',
+      ref: "Account",
       required: true,
     },
     name: {
@@ -33,7 +44,7 @@ const BoardingHouseSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default: '',
+      default: "",
     },
     priceRange: {
       type: Number,
@@ -73,7 +84,7 @@ const BoardingHouseSchema = new mongoose.Schema(
     },
     boardingHouseType: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'BoardingHouseType',
+      ref: "BoardingHouseType",
       required: true,
     },
     address: {
@@ -91,10 +102,11 @@ const BoardingHouseSchema = new mongoose.Schema(
       },
       detail: {
         type: String,
-        default: '',
+        default: "",
       },
     },
     images: [ImagesSchema],
+    location: LocationSchema,
   },
   { timestamps: true }
 );
@@ -104,5 +116,5 @@ BoardingHouseSchema.plugin(mongoose_delete, {
   overrideMethods: true,
 });
 
-const BoardingHouse = mongoose.model('BoardingHouse', BoardingHouseSchema);
+const BoardingHouse = mongoose.model("BoardingHouse", BoardingHouseSchema);
 export default BoardingHouse;

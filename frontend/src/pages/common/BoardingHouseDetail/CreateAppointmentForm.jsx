@@ -11,6 +11,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { useCurrentUser } from "../../../context/userContext";
 import { useNavigate } from "react-router-dom";
+import userRoles from "@/constants/userRole";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -23,7 +24,8 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
   const [submitting, setSubmitting] = useState(false);
   const [userAppointment, setUsrAppointment] = useState([]);
 
-  const { isLogin } = useCurrentUser();
+  const { isLogin, hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRoles.owner);
   const navigate = useNavigate();
 
   const handleOpen = () => {
@@ -181,6 +183,7 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
       fetchDataUserAppointment();
       toast.success("Đã gửi yêu cầu thành công!");
       handleClose();
+      navigate("/my-appointment");
     } catch (error) {
       toast.error("Lỗi khi gửi yêu cầu: " + error.message);
     } finally {
@@ -191,7 +194,7 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
   return (
     <>
       <Button
-        disabled={listRoomData?.length > 0 ? false : true}
+        disabled={isOwner || listRoomData?.length == 0}
         onClick={handleOpen}
         size="large"
         className="bg-red-400 md:min-w-[200px] text-white py-2 px-4 rounded-xl"

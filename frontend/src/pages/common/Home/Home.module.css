@@ -1,7 +1,10 @@
 .home-container {
-  display: flex;
-  justify-content: center;
+  /* display: flex;
+  justify-content: center; */
   padding: 20px;
+  width: 100%;
+  max-width: 100%;
+  padding-right: 0;
 }
 
 .content {
@@ -21,12 +24,16 @@
   top: 0;
 }
 
-/* The grid now takes the remaining space */
 .grid {
-  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  width: 100%;
+  gap: 20px;
   background: white;
   padding: 20px;
   border-radius: 8px;
+  border-left: none;
+  justify-content: center;
 }
 
 h2 {

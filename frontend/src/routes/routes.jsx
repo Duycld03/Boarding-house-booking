@@ -21,9 +21,22 @@ import {
   ErrorPage,
   MyAppointment,
   WatchLater,
+  FacilitiesManagement,
+  MyReportManagement,
+  BoardingHouseTypeManagement,
+  MyDepositedRoom,
+  MyRenewalRequest,
+  MyRentPayment,
+  MyDepositRefundRequest,
 } from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
-import { BHManagementOwner, BHDetailOwner, FavouriteList } from "../pages/common";
+import {
+  BHManagementOwner,
+  BHDetailOwner,
+  FavouriteList,
+  DepositRefundRequestOwner,
+  RevenueManagementOwner,
+} from "../pages/common";
 
 const dashBoard = "/dashboard";
 
@@ -124,6 +137,41 @@ const routes = [
     page: BHDetailOwner,
     layout: ProfileLayout,
   },
+  {
+    path: "/my-report-management",
+    page: MyReportManagement,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/my-deposited-room",
+    page: MyDepositedRoom,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/my-renewal-request",
+    page: MyRenewalRequest,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/my-rent-payment",
+    page: MyRentPayment,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/my-deposit-refund-request",
+    page: MyDepositRefundRequest,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/refund-request-management",
+    page: DepositRefundRequestOwner,
+    layout: ProfileLayout,
+  },
+  {
+    path: "/revenue-management-owner",
+    page: RevenueManagementOwner,
+    layout: ProfileLayout,
+  },
 
   // dashBoard
   {
@@ -161,6 +209,16 @@ const routes = [
     path: "/boarding-house/:id",
     page: BoardingHouseDetail,
     layout: HeaderOnly,
+  },
+  {
+    path: `${dashBoard}/boarding-house-type-management`,
+    page: BoardingHouseTypeManagement,
+    layout: null,
+  },
+  {
+    path: `${dashBoard}/facilities-management`,
+    page: FacilitiesManagement,
+    layout: null,
   },
 ];
 

@@ -24,10 +24,16 @@ import {
   getReviewReports,
 } from "../../../api/reportManagement";
 import { toast } from "react-toastify";
+import { addFavorite, getFavorite } from "../../../api/favoriteManagement";
+import LocationPicker from "@/component/LocationPicker";
+import userRoles from "@/constants/userRole";
 
 const { Content } = Layout;
 
 function BoardingHouseDetail() {
+  const { hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRoles.owner);
+
   const location = useLocation();
   const { isLogin } = useCurrentUser();
   const { id } = useParams();
@@ -45,9 +51,41 @@ function BoardingHouseDetail() {
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
 
   const roomTypeRef = useRef(null);
+  useEffect(() => {
+    const fetchFavoriteStatus = async () => {
+      try {
+        const response = await getFavorite();
+        if (response && Array.isArray(response.favorites)) {
+          setIsLiked(response.favorites.some((fav) => fav.id === id));
+        }
+      } catch (error) {
+        console.error("Error fetching favorite status:", error);
+      }
+    };
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
+    if (id) {
+      fetchFavoriteStatus();
+    }
+  }, [id]);
+
+  const handleLike = async () => {
+    try {
+      const response = await addFavorite(id); // Gọi API để toggle favorite
+      if (response && typeof response.isFavorite !== "undefined") {
+        setIsLiked(response.isFavorite); // Cập nhật trạng thái icon heart
+
+        // Cập nhật số lượng likes ngay lập tức
+        setBoardingHouse((prev) => ({
+          ...prev,
+          likes: response.isFavorite ? prev.likes + 1 : prev.likes - 1,
+        }));
+      } else {
+        console.error("Invalid response structure:", response);
+        toast.error("Dữ liệu phản hồi không hợp lệ!");
+      }
+    } catch (error) {
+      navigate(`/login`);
+    }
   };
 
   // Fetch dữ liệu boarding house
@@ -116,21 +154,6 @@ function BoardingHouseDetail() {
     }
   }, [id]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const status = params.get("status");
-
-    if (status === "success") {
-      toast.success("Deposit successfully!");
-    } else if (status === "fail") {
-      toast.error("Deposit failed!");
-    }
-    params.delete("status");
-    if (status) {
-      navigate(window.location.pathname, { replace: true });
-    }
-  }, [location]);
-
   // Xử lý submit review
   const handleAddReview = async (formData) => {
     try {
@@ -139,7 +162,6 @@ function BoardingHouseDetail() {
         message.success("Review added successfully!");
         setIsModalOpen(false);
         await fetchReviews();
-
       } else {
         message.error(response.data.message || "Failed to add review.");
       }
@@ -200,15 +222,13 @@ function BoardingHouseDetail() {
             isReported={reportedBoardingHouse}
           />
 
-          <div className="mt-8 px-10">
+          <div className="mt-8 px-5 sm:px-10">
             {/* Header */}
-            <div className="flex justify-between items-start gap-4 w-full">
-              <p className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold">
-                {boardingHouse?.name}
-              </p>
+            <div className="flex justify-between lg:gap-0 md:gap-0 sm:gap-[100px] flex-wrap items-start w-full">
+              <p className="text-4xl font-bold">{boardingHouse?.name}</p>
 
-              <div className="flex items-start sm:items-center gap-2 sm:gap-4">
-                <p className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold text-orange-500">
+              <div className="flex items-center md:mt-0 sm:mt-0 mt-5 gap-4 sm:gap-5">
+                <p className="lg:text-4xl md:text-3xl sm:text-xl sm:gap-3 font-bold text-orange-500">
                   {formatAmount(boardingHouse?.priceRange) + "(VND)/month"}
                 </p>
                 <Button
@@ -222,7 +242,7 @@ function BoardingHouseDetail() {
             </div>
 
             {/* Address and Owner */}
-            <div className="flex flex-wrap justify-between ">
+            <div className="flex flex-wrap justify-between mt-5 sm:mt-0">
               <div>
                 <Tag color="blue" className="md:text-2xl md:mt-3">
                   {boardingHouse?.boardingHouseType?.name}
@@ -238,21 +258,26 @@ function BoardingHouseDetail() {
                       : "Address not available"}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 cursor-pointer select-none text-lg sm:text-xl md:text-4xl md:mt-7">
-                  <button onClick={handleLike} className="focus:outline-none">
+                <div className="flex items-center gap-2 cursor-pointer select-none text-4xl mt-5 sm:mt-0">
+                  <button
+                    onClick={handleLike}
+                    disabled={isOwner}
+                    className="focus:outline-none"
+                  >
                     {isLiked ? (
                       <HeartFilled className="text-red-500 transition-transform duration-300 scale-110" />
                     ) : (
                       <HeartOutlined className="text-gray-600 hover:text-red-500 transition-colors duration-300" />
                     )}
                   </button>
+
                   <span className="text-gray-700 font-semibold">
                     {formatAmount(boardingHouse?.likes)}
                   </span>
                 </div>
               </div>
               <div className="flex gap-4 font-bold items-center">
-                <Tag color="#f50" className="text-3xl">
+                <Tag color="#f50" className="text-lg sm:text-3xl">
                   Owner:
                 </Tag>
                 <OwnerInfo ownerData={boardingHouse?.ownerId} />
@@ -281,12 +306,13 @@ function BoardingHouseDetail() {
             </div>
 
             {/* Description */}
-            <div className="md:mt-14">
+            <div className="mt-14">
               <p className="font-bold text-4xl">Description</p>
               <div className="bg-gray-300 p-4 rounded-lg mt-3">
                 <div
-                  className={`text-gray-800 text-sm sm:text-base md:text-2xl leading-relaxed text-justify transition-all duration-300 ${expanded ? "max-h-full" : "max-h-60 overflow-hidden"
-                    }`}
+                  className={`text-gray-800 text-lg sm:text-2xl leading-relaxed text-justify transition-all duration-300 ${
+                    expanded ? "max-h-full" : "max-h-60 overflow-hidden"
+                  }`}
                 >
                   {boardingHouse?.description || "No description available."}
                 </div>
@@ -304,10 +330,27 @@ function BoardingHouseDetail() {
                   )}
               </div>
             </div>
+            {/* Map */}
+            <div className="mt-14">
+              <p className="font-bold text-4xl">Location</p>
+              <div className="mt-3">
+                <LocationPicker
+                  initialPosition={
+                    boardingHouse?.location
+                      ? [
+                          boardingHouse.location?.lat,
+                          boardingHouse.location?.lon,
+                        ]
+                      : null
+                  }
+                  readOnly
+                />
+              </div>
+            </div>
             <Divider className="border-gray-500" />
 
             {/* Room Types */}
-            <div className="md:mt-14" ref={roomTypeRef}>
+            <div className="mt-14" ref={roomTypeRef}>
               <p className="font-bold text-4xl">
                 Available room type in boarding house
               </p>
@@ -322,11 +365,12 @@ function BoardingHouseDetail() {
             <Divider className="border-gray-500" />
 
             {/* Reviews Section */}
-            <div className="md:my-14">
+            <div className="my-14">
               <p className="font-bold mb-10 text-4xl">Rating & Review</p>
               <Button
                 className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
                 onClick={handleOpenAddReview}
+                disabled={isOwner}
               >
                 Write a Review
               </Button>
@@ -338,6 +382,7 @@ function BoardingHouseDetail() {
                 setReviewId={setReviewId}
                 reportedReviews={reportedReviews}
                 fetchReviews={fetchReviews}
+                boardingHouse={boardingHouse}
               />
             </div>
           </div>

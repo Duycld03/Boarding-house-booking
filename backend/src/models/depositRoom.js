@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const DepositRoomSchema = new mongoose.Schema(
   {
     accountId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
+      ref: 'Account',
       required: true,
     },
     roomId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Room",
+      ref: 'Room',
       required: true,
     },
     amount: {
@@ -19,7 +19,23 @@ const DepositRoomSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "pending",
+      default: 'pending',
+    },
+    rentalTime: {
+      type: Number,
+      required: true,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+    },
+    reasonForCancel: {
+      type: String,
+      default: '',
     },
   },
   {
@@ -27,5 +43,5 @@ const DepositRoomSchema = new mongoose.Schema(
   }
 );
 
-const DepositRoom = mongoose.model("DepositRoom", DepositRoomSchema);
+const DepositRoom = mongoose.model('DepositRoom', DepositRoomSchema);
 export default DepositRoom;

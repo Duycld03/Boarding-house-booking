@@ -2,7 +2,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCreditCard,
   faClipboardList,
-  faCalendarCheck
+  faCalendarCheck,
+  faTools,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import {
@@ -57,6 +58,15 @@ const menuItems = [
     icon: <HomeOutlined />,
   },
   {
+    key: "boarding-house-type-management",
+    label: (
+      <Link to={dashBoard + "/boarding-house-type-management"}>
+        Boarding House Type Management
+      </Link>
+    ),
+    icon: <HomeOutlined />,
+  },
+  {
     key: "withdrawal-requests-management",
     label: (
       <Link to={dashBoard + "/withdrawal-requests-management"}>
@@ -73,6 +83,15 @@ const menuItems = [
       </Link>
     ),
     icon: <FontAwesomeIcon icon={faCalendarCheck} />,
+  },
+  {
+    key: "Facilities-management",
+    label: (
+      <Link to={dashBoard + "/Facilities-management"}>
+        Facilities Management
+      </Link>
+    ),
+    icon: <FontAwesomeIcon icon={faTools} />,
   },
 ];
 

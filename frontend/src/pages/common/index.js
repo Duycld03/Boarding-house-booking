@@ -9,6 +9,13 @@ import BHManagementOwner from "./BHManagementOwner";
 import BHDetailOwner from "./BHDetailOwner";
 import FavouriteList from "./FavouriteList";
 import WatchLater from "./WatchLater";
+import MyReportManagement from "./MyReport";
+import MyDepositedRoom from "./MyDepositedRoom";
+import MyRenewalRequest from "./MyRenewalRequest";
+import MyRentPayment from "./MyRentPayment";
+import MyDepositRefundRequest from "./MyDepositRefundRequest";
+import DepositRefundRequestOwner from "./DepositRefundRequestOwner";
+import RevenueManagementOwner from "./RevenueManagementOwner";
 
 export {
   AboutUs,
@@ -22,4 +29,11 @@ export {
   BHDetailOwner,
   FavouriteList,
   WatchLater,
+  MyReportManagement,
+  MyDepositedRoom,
+  MyRenewalRequest,
+  MyRentPayment,
+  MyDepositRefundRequest,
+  DepositRefundRequestOwner,
+  RevenueManagementOwner,
 };
