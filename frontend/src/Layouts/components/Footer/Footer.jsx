@@ -7,10 +7,10 @@ const { Footer } = Layout;
 
 function FooterComponent() {
   return (
-    <Footer className="bg-white">
+    <Footer className="bg-white dark:bg-gray-800">
       <div className="mx-auto max-w-full space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">
         <div className="sm:flex sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 font-body font-bold">
+          <div className="flex items-center gap-2 font-body font-bold dark:text-white">
             <img src={Icon} alt="Footer-icon" />
             <p>MOTELLEASE TECH</p>
           </div>
@@ -21,7 +21,7 @@ function FooterComponent() {
                 href="#"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:opacity-75"
+                className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
               >
                 <span className="sr-only">Facebook</span>
 
@@ -45,7 +45,7 @@ function FooterComponent() {
                 href="#"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:opacity-75"
+                className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
               >
                 <span className="sr-only">Instagram</span>
 
@@ -69,7 +69,7 @@ function FooterComponent() {
                 href="#"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:opacity-75"
+                className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
               >
                 <span className="sr-only">Twitter</span>
 
@@ -89,7 +89,7 @@ function FooterComponent() {
                 href="#"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:opacity-75"
+                className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
               >
                 <span className="sr-only">GitHub</span>
 
@@ -113,7 +113,7 @@ function FooterComponent() {
                 href="#"
                 rel="noreferrer"
                 target="_blank"
-                className="text-gray-700 transition hover:opacity-75"
+                className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
               >
                 <span className="sr-only">Dribbble</span>
 
@@ -134,15 +134,17 @@ function FooterComponent() {
           </ul>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 border-t border-gray-100 pt-8 sm:grid-cols-2 lg:grid-cols-4 lg:pt-16">
+        <div className="grid grid-cols-1 gap-8 border-t border-gray-100 dark:border-gray-700 pt-8 sm:grid-cols-2 lg:grid-cols-4 lg:pt-16">
           <div>
-            <p className="font-medium text-3xl text-gray-900">Services</p>
+            <p className="font-medium text-3xl text-gray-900 dark:text-white">
+              Services
+            </p>
 
             <ul className="mt-6 space-y-4 text-xl">
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   1on1 Coaching
                 </a>
@@ -151,7 +153,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Company Review
                 </a>
@@ -160,7 +162,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Accounts Review
                 </a>
@@ -169,7 +171,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   HR Consulting
                 </a>
@@ -178,7 +180,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   SEO Optimisation
                 </a>
@@ -187,13 +189,15 @@ function FooterComponent() {
           </div>
 
           <div>
-            <p className="font-medium text-3xl text-gray-900">Company</p>
+            <p className="font-medium text-3xl text-gray-900 dark:text-white">
+              Company
+            </p>
 
             <ul className="mt-6 space-y-4 text-xl">
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   About
                 </a>
@@ -202,7 +206,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Meet the Team
                 </a>
@@ -211,7 +215,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Accounts Review
                 </a>
@@ -220,13 +224,15 @@ function FooterComponent() {
           </div>
 
           <div>
-            <p className="font-medium text-3xl text-gray-900">Helpful Links</p>
+            <p className="font-medium text-3xl text-gray-900 dark:text-white">
+              Helpful Links
+            </p>
 
             <ul className="mt-6 space-y-4 text-xl">
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Contact
                 </a>
@@ -235,7 +241,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   FAQs
                 </a>
@@ -244,7 +250,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Live Chat
                 </a>
@@ -253,13 +259,15 @@ function FooterComponent() {
           </div>
 
           <div>
-            <p className="font-medium text-3xl text-gray-900">Legal</p>
+            <p className="font-medium text-3xl text-gray-900 dark:text-white">
+              Legal
+            </p>
 
             <ul className="mt-6 space-y-4 text-xl">
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Accessibility
                 </a>
@@ -268,7 +276,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Returns Policy
                 </a>
@@ -277,7 +285,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Refund Policy
                 </a>
@@ -286,7 +294,7 @@ function FooterComponent() {
               <li>
                 <a
                   href="#"
-                  className="text-gray-700 transition hover:opacity-75"
+                  className="text-gray-700 dark:text-gray-300 transition hover:opacity-75"
                 >
                   Hiring Statistics
                 </a>
@@ -295,7 +303,7 @@ function FooterComponent() {
           </div>
         </div>
 
-        <p className="text-lg text-gray-500">
+        <p className="text-lg text-gray-500 dark:text-gray-400">
           &copy; 2025. Company Name. All rights reserved.
         </p>
       </div>

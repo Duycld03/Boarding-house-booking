@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react';
-import classNames from 'classnames/bind';
-import Styles from './Home.module.css';
-import BoardingHouseGrid from '../../../component/BoardingHouseCard';
-import { Tabs, Button } from 'antd';
-import { toast } from 'react-toastify';
-import formatAmount from '@/utils/formatAmount';
-import { formatTimeAgo } from '../../../utils/timeUtils';
-import truncateDetail from '../../../utils/truncateDetail';
-import SearchBar from './SearchBar';
-import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
-import useDebounce from '../../../hooks/useDebounce';
-import FilterBoardingHouseUser from './FilterBoardingHouseUser';
+import { useState, useEffect } from "react";
+import classNames from "classnames/bind";
+import Styles from "./Home.module.css";
+import BoardingHouseGrid from "../../../component/BoardingHouseCard";
+import { Tabs, Button } from "antd";
+import { toast } from "react-toastify";
+import formatAmount from "@/utils/formatAmount";
+import { formatTimeAgo } from "../../../utils/timeUtils";
+import truncateDetail from "../../../utils/truncateDetail";
+import SearchBar from "./SearchBar";
+import { getBhByArea } from "../../../api/ownerUser/boardingHouse";
+import useDebounce from "../../../hooks/useDebounce";
+import FilterBoardingHouseUser from "./FilterBoardingHouseUser";
 import { FilterOutlined, StarFilled } from "@ant-design/icons";
-import FilterButton from './FilterButton';
+import FilterButton from "./FilterButton";
 const cx = classNames.bind(Styles);
 
 function Home() {
   const [originalData, setOriginalData] = useState([]);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState("all");
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState({
-    province: '',
-    district: '',
-    ward: '',
+    province: "",
+    district: "",
+    ward: "",
   });
   const [filteredData, setFilteredData] = useState(null);
   const [filterValue, setFilterValue] = useState(null);
@@ -41,15 +41,15 @@ function Home() {
         const imgPath =
           item.images?.find((img) => img.isPrimary)?.imageUrl ||
           item.images?.[0]?.imageUrl ||
-          '';
-        const imgUrl = imgPath ? `${imgPath}` : '';
+          "";
+        const imgUrl = imgPath ? `${imgPath}` : "";
 
         return {
           id: item._id?.$oid || item._id,
           name: item.name,
           price: formatAmount(item.priceRange),
           detail: truncateDetail(
-            item.address?.province || 'No address provided'
+            item.address?.province || "No address provided"
           ),
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0,
@@ -62,8 +62,8 @@ function Home() {
       setOriginalData(formattedData);
       setFilteredData(null);
     } catch (error) {
-      console.error('Error fetching boarding houses:', error);
-      toast.error('Failed to fetch boarding houses. Please try again later.');
+      console.error("Error fetching boarding houses:", error);
+      toast.error("Failed to fetch boarding houses. Please try again later.");
       setOriginalData([]);
     } finally {
       setLoading(false);
@@ -93,23 +93,18 @@ function Home() {
     .slice(0, 10);
   const dataToShow = filteredData ?? originalData;
   return (
-    <div className="container mx-auto ">
+    <div className="container mx-auto bg-gray-100 dark:bg-gray-700 dark:text-white">
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
 
       <div>
         <FilterButton setFilterValue={setFilterValue} />
       </div>
       <div className="flex flex-col md:flex-row max-w-[1200px] mx-auto">
-
         <div className="mt-8 hidden lg:block w-[250px] ">
           <FilterBoardingHouseUser setFilterValue={setFilterValue} />
         </div>
-
-
         <div className={cx("home-container")}>
-
           <div className={cx("content")}>
-
             <div className={cx("grid")}>
               {filteredData ? (
                 <BoardingHouseGrid data={filteredData} loading={loading} />
@@ -122,7 +117,10 @@ function Home() {
                     <BoardingHouseGrid data={newestData} loading={loading} />
                   </Tabs.TabPane>
                   <Tabs.TabPane tab="High rating" key="highRating">
-                    <BoardingHouseGrid data={highRatingData} loading={loading} />
+                    <BoardingHouseGrid
+                      data={highRatingData}
+                      loading={loading}
+                    />
                   </Tabs.TabPane>
                 </Tabs>
               )}
@@ -130,7 +128,6 @@ function Home() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

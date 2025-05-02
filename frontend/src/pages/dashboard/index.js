@@ -1,20 +1,9 @@
-import AccountManagement from "./AccountManagement";
-import ReportBoardingHouse from "./ReportBoardingHouse";
-import ReportReviewManagement from "./ReportReviewManagement";
-import WithdrawalRequestManagement from "./WithdrawalRequestManagement";
-import BoardingHouseManagement from "./BoardingHouseManagement";
-import ReviewManagement from "./ReviewManagement";
-import BoardingHouseTypeManagement from "./BoardingHouseTypeManagement";
-import FacilitiesManagement from "./FacilitiesManagement";
-
-export {
-    AccountManagement,
-    ReportBoardingHouse,
-    ReportReviewManagement,
-    WithdrawalRequestManagement,
-    BoardingHouseManagement,
-    ReviewManagement,
-    FacilitiesManagement,
-    BoardingHouseTypeManagement
-}
-
+// Re-export tất cả các components trong thư mục dashboard
+export { default as BoardingHouseManagement } from './BoardingHouseManagement';
+export { default as AccountManagement } from './AccountManagement';
+export { default as ReportBoardingHouse } from './ReportBoardingHouse';
+export { default as ReportReviewManagement } from './ReportReviewManagement';
+export { default as WithdrawalRequestManagement } from './WithdrawalRequestManagement';
+export { default as ReviewManagement } from './ReviewManagement';
+export { default as BoardingHouseTypeManagement } from './BoardingHouseTypeManagement';
+export { default as FacilitiesManagement } from './FacilitiesManagement';

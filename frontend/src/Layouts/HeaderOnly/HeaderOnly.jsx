@@ -11,7 +11,9 @@ function HeaderOnly({ children, isLoggedIn }) {
   return (
     <Layout className={cx("layout-container")}>
       <Header isLoggedIn={isLoggedIn} />
-      <Content className={cx("layout-content")}>{children}</Content>
+      <Content className={cx("layout-content", "bg-gray-300 dark:bg-gray-700")}>
+        {children}
+      </Content>
       <FooterComponent />
     </Layout>
   );
