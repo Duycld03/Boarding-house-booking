@@ -1,223 +1,187 @@
-import {
-  Login,
-  Home,
-  BoardingHouseManagement,
-  AccountManagement,
-  ReportBoardingHouse,
-  ReportReviewManagement,
-  WithdrawalRequestManagement,
-  Contact,
-  AboutUs,
-  ReviewManagement,
-  Register,
-  RegisterWithGoogle,
-  VerifyRegister,
-  ForgotPassword,
-  ResetPassword,
-  ChangePassword,
-  Profile,
-  BoardingHouseDetail,
-  VerifyChangeEmail,
-  ErrorPage,
-  MyAppointment,
-  WatchLater,
-  FacilitiesManagement,
-  MyReportManagement,
-  BoardingHouseTypeManagement,
-  MyDepositedRoom,
-  MyRenewalRequest,
-  MyRentPayment,
-  MyDepositRefundRequest,
-} from "../pages";
 import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
-import {
-  BHManagementOwner,
-  BHDetailOwner,
-  FavouriteList,
-  DepositRefundRequestOwner,
-  RevenueManagementOwner,
-} from "../pages/common";
 
-const dashBoard = "/dashboard";
+// Namespace imports
+import * as AuthPages from "../pages/auth";
+import * as CommonPages from "../pages/common";
+import * as DashboardPages from "../pages/dashboard";
+
+const DASHBOARD_PATH = "/dashboard";
 
 const routes = [
-  //auth
+  // Auth routes
   {
     path: "/login",
-    page: Login,
+    page: AuthPages.Login,
     layout: AuthLayout,
   },
-
   {
     path: "/register",
-    page: Register,
+    page: AuthPages.Register,
     layout: AuthLayout,
   },
   {
     path: "/register-with-google",
-    page: RegisterWithGoogle,
+    page: AuthPages.RegisterWithGoogle,
     layout: AuthLayout,
   },
   {
     path: "/verify-register",
-    page: VerifyRegister,
+    page: AuthPages.VerifyRegister,
     layout: AuthLayout,
   },
   {
     path: "/forgot-password",
-    page: ForgotPassword,
+    page: AuthPages.ForgotPassword,
     layout: AuthLayout,
   },
   {
     path: "/reset-password/:token",
-    page: ResetPassword,
+    page: AuthPages.ResetPassword,
     layout: AuthLayout,
   },
   {
     path: "/change-password",
-    page: ChangePassword,
+    page: AuthPages.ChangePassword,
     layout: AuthLayout,
   },
   {
     path: "/verify-change-email/",
-    page: VerifyChangeEmail,
+    page: AuthPages.VerifyChangeEmail,
     layout: AuthLayout,
   },
 
-  //common
+  // Common routes
   {
     path: "/",
     label: "Home",
-    page: Home,
+    page: CommonPages.Home,
     layout: HeaderOnly,
   },
   {
     path: "/contact",
-    page: Contact,
+    page: CommonPages.Contact,
     layout: HeaderOnly,
   },
   {
-    path: "about-us",
-    page: AboutUs,
+    path: "/about-us",
+    page: CommonPages.AboutUs,
     layout: HeaderOnly,
   },
   {
-    path: "profile",
-    page: Profile,
+    path: "/profile",
+    page: CommonPages.Profile,
     layout: ProfileLayout,
   },
   {
     path: "/error-page",
-    page: ErrorPage,
+    page: CommonPages.ErrorPage,
     layout: AuthLayout,
   },
-
   {
     path: "/my-appointment",
-    page: MyAppointment,
+    page: CommonPages.MyAppointment,
     layout: ProfileLayout,
   },
   {
     path: "/favourite-list",
-    page: FavouriteList,
+    page: CommonPages.FavouriteList,
     layout: ProfileLayout,
   },
   {
     path: "/watch-later",
-    page: WatchLater,
+    page: CommonPages.WatchLater,
     layout: ProfileLayout,
   },
   {
     path: "/bh-management-owner",
-    page: BHManagementOwner,
+    page: CommonPages.BHManagementOwner,
     layout: ProfileLayout,
   },
   {
     path: "/bh-management-owner/:boardingHouseId",
-    page: BHDetailOwner,
+    page: CommonPages.BHDetailOwner,
     layout: ProfileLayout,
   },
   {
     path: "/my-report-management",
-    page: MyReportManagement,
+    page: CommonPages.MyReportManagement,
     layout: ProfileLayout,
   },
   {
     path: "/my-deposited-room",
-    page: MyDepositedRoom,
+    page: CommonPages.MyDepositedRoom,
     layout: ProfileLayout,
   },
   {
     path: "/my-renewal-request",
-    page: MyRenewalRequest,
+    page: CommonPages.MyRenewalRequest,
     layout: ProfileLayout,
   },
   {
     path: "/my-rent-payment",
-    page: MyRentPayment,
+    page: CommonPages.MyRentPayment,
     layout: ProfileLayout,
   },
   {
     path: "/my-deposit-refund-request",
-    page: MyDepositRefundRequest,
+    page: CommonPages.MyDepositRefundRequest,
     layout: ProfileLayout,
   },
   {
     path: "/refund-request-management",
-    page: DepositRefundRequestOwner,
+    page: CommonPages.DepositRefundRequestOwner,
     layout: ProfileLayout,
   },
   {
     path: "/revenue-management-owner",
-    page: RevenueManagementOwner,
+    page: CommonPages.RevenueManagementOwner,
     layout: ProfileLayout,
-  },
-
-  // dashBoard
-  {
-    path: `${dashBoard}/boarding-house-management`,
-    page: BoardingHouseManagement,
-    layout: null,
-  },
-  {
-    path: `${dashBoard}/account-management`,
-    page: AccountManagement,
-    layout: null,
-  },
-  {
-    path: `${dashBoard}/report-boarding-house-management`,
-    page: ReportBoardingHouse,
-    layout: null,
-  },
-  {
-    path: `${dashBoard}/report-review-management`,
-    page: ReportReviewManagement,
-    layout: null,
-  },
-  {
-    path: `${dashBoard}/withdrawal-requests-management`,
-    page: WithdrawalRequestManagement,
-    layout: null,
-  },
-
-  {
-    path: `${dashBoard}/list-boarding-house-reviews`,
-    page: ReviewManagement,
-    layout: null,
   },
   {
     path: "/boarding-house/:id",
-    page: BoardingHouseDetail,
+    page: CommonPages.BoardingHouseDetail,
     layout: HeaderOnly,
   },
+
+  // Dashboard routes
   {
-    path: `${dashBoard}/boarding-house-type-management`,
-    page: BoardingHouseTypeManagement,
+    path: `${DASHBOARD_PATH}/boarding-house-management`,
+    page: DashboardPages.BoardingHouseManagement,
     layout: null,
   },
   {
-    path: `${dashBoard}/facilities-management`,
-    page: FacilitiesManagement,
+    path: `${DASHBOARD_PATH}/account-management`,
+    page: DashboardPages.AccountManagement,
+    layout: null,
+  },
+  {
+    path: `${DASHBOARD_PATH}/report-boarding-house-management`,
+    page: DashboardPages.ReportBoardingHouse,
+    layout: null,
+  },
+  {
+    path: `${DASHBOARD_PATH}/report-review-management`,
+    page: DashboardPages.ReportReviewManagement,
+    layout: null,
+  },
+  {
+    path: `${DASHBOARD_PATH}/withdrawal-requests-management`,
+    page: DashboardPages.WithdrawalRequestManagement,
+    layout: null,
+  },
+  {
+    path: `${DASHBOARD_PATH}/list-boarding-house-reviews`,
+    page: DashboardPages.ReviewManagement,
+    layout: null,
+  },
+  {
+    path: `${DASHBOARD_PATH}/boarding-house-type-management`,
+    page: DashboardPages.BoardingHouseTypeManagement,
+    layout: null,
+  },
+  {
+    path: `${DASHBOARD_PATH}/facilities-management`,
+    page: DashboardPages.FacilitiesManagement,
     layout: null,
   },
 ];

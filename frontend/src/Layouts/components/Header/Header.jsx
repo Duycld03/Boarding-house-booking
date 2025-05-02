@@ -8,6 +8,7 @@ import {
   Space,
   Drawer,
   Divider,
+  Switch,
 } from "antd";
 import classNames from "classnames/bind";
 import Styles from "./Header.module.css";
@@ -19,12 +20,15 @@ import {
   LogoutOutlined,
   MenuOutlined,
   UserOutlined,
+  BulbOutlined,
+  BulbFilled,
 } from "@ant-design/icons";
 import { getUser } from "../../../api/authManagement";
 import { useCurrentUser } from "../../../context/userContext";
 import adminMenu from "../Slider/menuItem";
 import userRole from "../../../constants/userRole";
 import getMenuItems from "../ProfileSlider/menuItem";
+import { useTheme } from "../../../context/themeContext"; // Import theme context
 
 const cx = classNames.bind(Styles);
 const { Header } = Layout;
@@ -35,6 +39,7 @@ const CustomHeader = () => {
   const [avatar, setAvatar] = useState(UserAvatar);
   const navigate = useNavigate();
   const { contextLogout, hasRole } = useCurrentUser();
+  const { darkMode, toggleDarkMode } = useTheme(); // Use theme context
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -76,6 +81,16 @@ const CustomHeader = () => {
       onClick: () => navigate("/change-password"),
     },
     {
+      key: "dark-mode",
+      icon: darkMode ? (
+        <BulbFilled style={{ color: "#fadb14" }} />
+      ) : (
+        <BulbOutlined />
+      ),
+      label: darkMode ? "Light Mode" : "Dark Mode",
+      onClick: toggleDarkMode,
+    },
+    {
       key: "logout",
       icon: <LogoutOutlined />,
       label: "Logout",
@@ -84,14 +99,22 @@ const CustomHeader = () => {
   ];
 
   return (
-    <Header className={cx("flex justify-between items-center bg-white px-4")}>
+    <Header
+      className={cx(
+        "flex justify-between items-center px-4 dark:bg-gray-800 dark:text-white bg-white text-gray-800 transition-colors duration-200"
+      )}
+    >
       {/* Logo */}
       <Link
         to={hasRole(userRole.admin) ? "/dashboard/account-management" : "/"}
         className="flex items-center"
       >
-        <img src={Icon} alt="Logo" className="h-12 cursor-pointer" />
-        <p className={cx("logo-txt font-body text-3xl font-extrabold ml-2")}>
+        <img src={Icon} alt="Logo" className="h-20 cursor-pointer" />
+        <p
+          className={cx(
+            "logo-txt font-body text-3xl font-extrabold ml-2 dark:text-white text-gray-800"
+          )}
+        >
           MOTELLEASE TECH
         </p>
       </Link>
@@ -99,69 +122,82 @@ const CustomHeader = () => {
       {/* Main Menu (Desktop) */}
       <Menu
         className="hidden lg:block"
-        theme="light"
+        theme={darkMode ? "dark" : "light"}
         mode="horizontal"
         defaultSelectedKeys={["home"]}
         items={menuItems.map(({ key, label, onClick }) => ({
           key,
           label: <span onClick={onClick}>{label}</span>,
         }))}
+        style={{
+          backgroundColor: darkMode ? "#1f2937" : "#fff",
+          borderBottom: "none",
+        }}
       />
 
       {/* User Section */}
-      {!isLoggedIn ? (
-        <Space size={10} className="hidden lg:flex">
-          <Button
-            size="large"
-            type="primary"
-            onClick={() => navigate("/login")}
+      <div className="hidden lg:flex items-center">
+        {!isLoggedIn ? (
+          <Space size={10}>
+            <Button
+              size="large"
+              type="primary"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </Button>
+            <Button
+              size="large"
+              className={cx(
+                "btn-register",
+                darkMode
+                  ? "border-white text-white hover:text-white hover:border-blue-400"
+                  : ""
+              )}
+              onClick={() => navigate("/register")}
+            >
+              Register
+            </Button>
+          </Space>
+        ) : (
+          <Dropdown
+            menu={{
+              items: userMenuItems.map(({ key, label, icon, onClick }) => ({
+                key,
+                label: (
+                  <span
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onClick && onClick();
+                    }}
+                    className={"text-gray-800 dark:text-white"}
+                  >
+                    {icon} {label}
+                  </span>
+                ),
+              })),
+              style: {
+                backgroundColor: darkMode ? "#1f2937" : "#fff",
+              },
+            }}
+            placement="bottomRight"
+            arrow
+            trigger={["click"]}
           >
-            Login
-          </Button>
-          <Button
-            size="large"
-            className={cx("btn-register")}
-            onClick={() => navigate("/register")}
-          >
-            Register
-          </Button>
-        </Space>
-      ) : (
-        <Dropdown
-          menu={{
-            items: userMenuItems.map(({ key, label, icon, onClick }) => ({
-              key,
-              label: (
-                <span
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onClick();
-                  }}
-                >
-                  {icon} {label}
-                </span>
-              ),
-            })),
-          }}
-          placement="bottomRight"
-          arrow
-          trigger={["click"]}
-        >
-          <Avatar
-            src={avatar}
-            size={60}
-            className="hidden lg:block cursor-pointer mr-5"
-          />
-        </Dropdown>
-      )}
+            <Avatar src={avatar} size={60} className="cursor-pointer mr-5" />
+          </Dropdown>
+        )}
+      </div>
 
       {/* Mobile Menu Toggle */}
-      <Button
-        type="text"
-        icon={<MenuOutlined />}
-        onClick={() => setOpen(true)}
-        className="lg:hidden"
-      />
+      <div className="lg:hidden flex items-center">
+        <Button
+          type="text"
+          icon={<MenuOutlined className={"text-gray-700 dark:text-white"} />}
+          onClick={() => setOpen(true)}
+          className={darkMode ? "text-white" : ""}
+        />
+      </div>
 
       {/* Drawer (Mobile Menu) */}
       <Drawer
@@ -182,7 +218,7 @@ const CustomHeader = () => {
               </Button>
               <Button
                 size="large"
-                className={cx("btn-register")}
+                className="btn-register dark:bg-gray-900 dark:text-white dark:border-white"
                 onClick={() => navigate("/register")}
               >
                 Register
@@ -194,38 +230,57 @@ const CustomHeader = () => {
         closable
         onClose={() => setOpen(false)}
         open={open}
+        bodyStyle={{
+          backgroundColor: darkMode ? "#1f2937" : "#fff",
+          padding: "12px 0",
+        }}
+        headerStyle={{
+          backgroundColor: darkMode ? "#1f2937" : "#fff",
+          color: darkMode ? "#fff" : "inherit",
+          borderBottom: darkMode ? "1px solid #4b5563" : "1px solid #f0f0f0",
+        }}
       >
         <Menu
           mode="vertical"
+          theme={darkMode ? "dark" : "light"}
           items={(hasRole(userRole.admin) ? adminMenu : menuItems).map(
             ({ key, label, onClick }) => ({
               key,
               label: <span onClick={onClick}>{label}</span>,
             })
           )}
-          style={{ border: "none", marginBottom: 20 }}
+          style={{
+            border: "none",
+            marginBottom: 20,
+            backgroundColor: darkMode ? "#1f2937" : "#fff",
+          }}
         />
 
         {isLoggedIn && (
           <>
             {!hasRole(userRole.admin) && (
               <>
-                <Divider className="bg-gray-400" />
+                <Divider className={darkMode ? "bg-gray-600" : "bg-gray-400"} />
                 <Menu
                   mode="vertical"
+                  theme={darkMode ? "dark" : "light"}
                   items={getMenuItems()
                     .filter((item) => item.key !== "profile")
                     .map(({ key, label, onClick }) => ({
                       key,
                       label: <span onClick={onClick}>{label}</span>,
                     }))}
-                  style={{ border: "none" }}
+                  style={{
+                    border: "none",
+                    backgroundColor: darkMode ? "#1f2937" : "#fff",
+                  }}
                 />
               </>
             )}
-            <Divider className="bg-gray-400" />
+            <Divider className={darkMode ? "bg-gray-600" : "bg-gray-400"} />
             <Menu
               mode="vertical"
+              theme={darkMode ? "dark" : "light"}
               items={userMenuItems.map(({ key, label, icon, onClick }) => ({
                 key,
                 label: (
@@ -234,7 +289,10 @@ const CustomHeader = () => {
                   </span>
                 ),
               }))}
-              style={{ border: "none" }}
+              style={{
+                border: "none",
+                backgroundColor: darkMode ? "#1f2937" : "#fff",
+              }}
             />
           </>
         )}

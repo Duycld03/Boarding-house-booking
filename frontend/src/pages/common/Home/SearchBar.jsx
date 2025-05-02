@@ -9,7 +9,7 @@ import {
 
 const { Option } = Select;
 
-const SearchBar = ({ setSearchValue, searchValue }) => {
+const SearchBar = ({ setSearchValue }) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -154,16 +154,31 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
     }));
   };
 
+  const formItemLabelStyles = {
+    color: "inherit",
+  };
+
   return (
     <Form
       form={form}
-      className="md:max-w-[1200px] mx-auto"
+      className="md:max-w-[1200px] mx-auto dark:bg-gray-700 dark:text-white"
       layout="vertical"
       onFinish={handleSubmit}
     >
+      {/* Apply global styles for dark mode labels */}
+      <style jsx global>{`
+        .dark .ant-form-item-label > label {
+          color: #e5e7eb !important; /* text-gray-200 equivalent */
+        }
+      `}</style>
+
       <Row gutter={12} align="bottom">
         <Col xs={24} sm={12} md={6}>
-          <Form.Item label="Province" name="province">
+          <Form.Item
+            label="Province"
+            name="province"
+            labelCol={{ style: formItemLabelStyles }}
+          >
             <Select
               size="large"
               placeholder="Select province"
@@ -171,6 +186,7 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
               onChange={handleProvinceChange}
               allowClear
               loading={loadingStates.provinces}
+              className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
               {provinces.map((province) => (
                 <Option key={province.code} value={province.name}>
@@ -182,13 +198,18 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
         </Col>
 
         <Col xs={24} sm={12} md={6}>
-          <Form.Item label="District" name="district">
+          <Form.Item
+            label="District"
+            name="district"
+            labelCol={{ style: formItemLabelStyles }}
+          >
             <Select
               size="large"
               placeholder="Select district"
               onChange={handleDistrictChange}
               allowClear
               loading={loadingStates.districts}
+              className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
             >
               {districts.map((district) => (
                 <Option key={district.code} value={district.name}>
@@ -200,7 +221,11 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
         </Col>
 
         <Col xs={24} sm={12} md={6}>
-          <Form.Item label="Ward" name="ward">
+          <Form.Item
+            label="Ward"
+            name="ward"
+            labelCol={{ style: formItemLabelStyles }}
+          >
             <Select
               size="large"
               placeholder="Select ward"
@@ -214,7 +239,11 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
               loading={loadingStates.wards}
             >
               {wards.map((ward) => (
-                <Option key={ward.code} value={ward.name}>
+                <Option
+                  key={ward.code}
+                  value={ward.name}
+                  className="dark:bg-gray-700 dark:text-white"
+                >
                   {ward.name}
                 </Option>
               ))}
@@ -234,11 +263,11 @@ const SearchBar = ({ setSearchValue, searchValue }) => {
                 setDistricts([]);
                 setWards([]);
               }}
+              className="dark:bg-blue-600 dark:hover:bg-blue-700 dark:border-blue-700"
             >
               Clear
             </Button>
           </Form.Item>
-
         </Col>
       </Row>
     </Form>
