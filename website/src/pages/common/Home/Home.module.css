@@ -1,0 +1,41 @@
+.home-container {
+  /* display: flex;
+  justify-content: center; */
+  padding: 20px;
+  width: 100%;
+  max-width: 100%;
+  padding-right: 0;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.filter {
+  width: 250px;
+  background: grey;
+  padding: 20px;
+  border-radius: 8px;
+  margin-right: 20px;
+  height: 100%;
+  position: sticky;
+  top: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  width: 100%;
+  gap: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: none;
+  justify-content: center;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
