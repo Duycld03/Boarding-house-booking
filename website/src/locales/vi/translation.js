@@ -9,6 +9,9 @@ const vi = {
     lightMode: 'Chế độ sáng',
     logout: 'Đăng xuất',
   },
+  sidebar: {
+    profile: 'Cá Nhân',
+  },
 };
 
 export default vi;

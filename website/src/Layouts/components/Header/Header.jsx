@@ -82,7 +82,7 @@ const CustomHeader = () => {
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: 'Profile',
+      label: t('sidebar.profile'),
       onClick: () => navigate('/profile'),
     },
     {

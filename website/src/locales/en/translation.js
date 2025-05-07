@@ -9,6 +9,9 @@ const en = {
     lightMode: 'Light Mode',
     logout: 'Logout',
   },
+  sidebar: {
+    profile: 'Profile',
+  },
 };
 
 export default en;
