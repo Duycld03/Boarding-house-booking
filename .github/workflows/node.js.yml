@@ -38,8 +38,8 @@ jobs:
           echo "JWT_EXPIRE=1d" >> $GITHUB_ENV
           echo "GOOGLE_CLIENT_ID=480377782126-c36ime4tr9j9iiq9ld0vhh6pnpgn44i0.apps.googleusercontent.com" >> $GITHUB_ENV
           echo "CLIENT_URL=http://localhost:5173" >> $GITHUB_ENV
-      # 📌 Thiết lập biến môi trường từ .env (frontend)
-      - name: Set environment variables (frontend)
+      # 📌 Thiết lập biến môi trường từ .env (website)
+      - name: Set environment variables (website)
         run: |
           echo "VITE_BASE_URL=http://localhost:3000/" >> $GITHUB_ENV
           echo "VITE_GOOGLE_CLIENT_ID=480377782126-c36ime4tr9j9iiq9ld0vhh6pnpgn44i0.apps.googleusercontent.com" >> $GITHUB_ENV
@@ -53,9 +53,9 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
-      # Install dependencies for frontend
-      - name: Install frontend dependencies
-        working-directory: ./frontend
+      # Install dependencies for website
+      - name: Install website dependencies
+        working-directory: ./website
         run: npm ci
 
       # Build and start backend
@@ -63,9 +63,9 @@ jobs:
         working-directory: ./backend
         run: npm start &
 
-      # Build and start frontend
-      - name: Start frontend client
-        working-directory: ./frontend
+      # Build and start website
+      - name: Start website client
+        working-directory: ./website
         run: npm run dev &
 
     # Run tests (optional)

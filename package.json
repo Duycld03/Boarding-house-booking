@@ -5,25 +5,32 @@
   "main": "index.js",
   "scripts": {
     "prepare": "npx husky install",
-    "client": "cd frontend && npm run dev",
+    "client": "cd website && npm run dev",
     "server": "cd backend && npm start",
-    "start": "concurrently \"npm run client\" \"npm run server\"",
+    "mobile": "cd mobile && npm start",
+    "dashboard": "cd dashboard && npm run dev",
+    "start": "concurrently \"npm run client\" \"npm run server\" \"npm run mobile\" \"npm run dashboard\"",
     "pre-commit:server": "cd backend && npm run build-babel",
-    "pre-commit:client": "cd frontend && npm run build",
+    "pre-commit:client": "cd website && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/runtime": "^7.27.1",
     "@emailjs/browser": "^4.4.1",
     "antd-img-crop": "^4.24.0",
     "concurrently": "^9.0.1",
+    "nativewind": "^4.1.23",
+    "react-native-date-picker": "^5.0.12",
     "react-router-dom": "^7.1.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "tailwindcss": "^3.4.17",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.27.1",
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
     "husky": "^9.1.7"
