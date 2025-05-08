@@ -150,10 +150,12 @@ const CustomHeader = () => {
           marginLeft: 330,
         }}
       />
+      <div className="lg:block mr-4">
+        <LanguageSwitcher />
+      </div>
 
       {/* User Section */}
       <div className="hidden lg:flex items-center gap-4">
-        <LanguageSwitcher />
         {!isLoggedIn ? (
           <Space size={10}>
             <Button

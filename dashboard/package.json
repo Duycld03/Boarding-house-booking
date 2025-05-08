@@ -23,6 +23,7 @@
     "classnames": "^2.5.1",
     "customize-cra": "^1.0.0",
     "dayjs": "^1.11.13",
+    "flag-icons": "^7.3.2",
     "font-awesome-icons": "^1.6.0",
     "i18next": "^21.9.1",
     "leaflet": "^1.9.4",
