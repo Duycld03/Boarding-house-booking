@@ -143,6 +143,11 @@ const CustomHeader = () => {
         style={{
           backgroundColor: darkMode ? '#1f2937' : '#fff',
           borderBottom: 'none',
+          flex: 1,
+          minWidth: 0,
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          marginLeft: 330,
         }}
       />
 
