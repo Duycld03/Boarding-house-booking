@@ -150,12 +150,10 @@ const CustomHeader = () => {
           marginLeft: 330,
         }}
       />
-      <div className="lg:block mr-4">
-        <LanguageSwitcher />
-      </div>
 
       {/* User Section */}
       <div className="hidden lg:flex items-center gap-4">
+        <LanguageSwitcher />
         {!isLoggedIn ? (
           <Space size={10}>
             <Button
@@ -222,27 +220,37 @@ const CustomHeader = () => {
       <Drawer
         title={
           isLoggedIn ? (
-            <div className="flex items-center">
-              <Avatar src={avatar || UserAvatar} size={60} className="mr-3" />
-              <span className={cx('user-name')}>User Name</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Avatar src={avatar || UserAvatar} size={60} className="mr-3" />
+                <span className={cx('user-name')}>User Name</span>
+              </div>
+              <div className="w-[120px] mr-4">
+                <LanguageSwitcher />
+              </div>
             </div>
           ) : (
-            <Space size={10}>
-              <Button
-                size="large"
-                type="primary"
-                onClick={() => navigate('/login')}
-              >
-                Login
-              </Button>
-              <Button
-                size="large"
-                className="btn-register dark:bg-gray-900 dark:text-white dark:border-white"
-                onClick={() => navigate('/register')}
-              >
-                Register
-              </Button>
-            </Space>
+            <div className="flex items-center justify-between w-full">
+              <Space size={10}>
+                <Button
+                  size="large"
+                  type="primary"
+                  onClick={() => navigate('/login')}
+                >
+                  Login
+                </Button>
+                <Button
+                  size="large"
+                  className="btn-register dark:bg-gray-900 dark:text-white dark:border-white mr-2"
+                  onClick={() => navigate('/register')}
+                >
+                  Register
+                </Button>
+              </Space>
+              <div className="w-[120px] mr-4">
+                <LanguageSwitcher />
+              </div>{' '}
+            </div>
           )
         }
         placement="right"
