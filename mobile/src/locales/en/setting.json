@@ -1,0 +1,13 @@
+{
+  "settings": "Settings",
+  "appearance": "Appearance",
+  "dark_mode": "Dark mode",
+  "dark_mode_description": "Choose between light and dark mode",
+  "language": "Language",
+  "select_display_language": "Select display language",
+  "notifications": "Notifications",
+  "push_notifications": "Push Notifications",
+  "push_notifications_desc": "Receive alerts from the app",
+  "notification_sound": "Notification Sound",
+  "notification_sound_desc": "Play sound for new alerts"
+}

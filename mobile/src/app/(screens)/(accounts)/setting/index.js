@@ -1,13 +1,15 @@
 import React from 'react';
-import { View, Text, Switch, Pressable } from 'react-native';
+import { View, Text, Switch } from 'react-native';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import LanguagePicker from '@/components/languagepicker/LanguagePicker';
+import { useTranslation } from 'react-i18next';
 
 export default function Setting() {
   const { isDarkMode, toggleTheme } = useTheme();
   const { themedClasses } = useThemedClasses();
+  const { t } = useTranslation();
 
   const cardStyle = themedClasses(
     'rounded-2xl bg-white border border-[#E5EAF2] overflow-hidden mb-6',
@@ -34,11 +36,6 @@ export default function Setting() {
     'text-sm text-[#A0A0A0]'
   );
 
-  const rightTextStyle = themedClasses(
-    'text-sm text-[#223263]',
-    'text-sm text-white'
-  );
-
   return (
     <View
       className={themedClasses(
@@ -52,17 +49,17 @@ export default function Setting() {
           'text-2xl font-bold text-white mb-4'
         )}
       >
-        Settings
+        {t('settings')}
       </Text>
 
       {/* Appearance Section */}
       <View className={cardStyle}>
         <View className={cardHeaderStyle}>
           <Text
-            className={titleTextStyle}
             style={{ fontFamily: 'Poppins-SemiBold' }}
+            className={titleTextStyle}
           >
-            APPEARANCE
+            {t('appearance')}
           </Text>
         </View>
 
@@ -75,16 +72,16 @@ export default function Setting() {
             />
             <View>
               <Text
-                className={labelStyle}
                 style={{ fontFamily: 'Poppins-SemiBold' }}
+                className={labelStyle}
               >
-                Dark mode
+                {t('dark_mode')}
               </Text>
               <Text
-                className={subLabelStyle}
                 style={{ fontFamily: 'Poppins-Regular' }}
+                className={subLabelStyle}
               >
-                Choose between light and dark mode
+                {t('dark_mode_description')}
               </Text>
             </View>
           </View>
@@ -92,13 +89,14 @@ export default function Setting() {
         </View>
       </View>
 
+      {/* Language Section */}
       <View className={cardStyle}>
         <View className={cardHeaderStyle}>
           <Text
-            className={titleTextStyle}
             style={{ fontFamily: 'Poppins-SemiBold' }}
+            className={titleTextStyle}
           >
-            LANGUAGE
+            {t('language')}
           </Text>
         </View>
 
@@ -110,7 +108,6 @@ export default function Setting() {
             justifyContent: 'space-between',
           }}
         >
-          {/* Left: icon + label */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <FontAwesome
               name="globe"
@@ -125,7 +122,7 @@ export default function Setting() {
                   color: isDarkMode ? '#FFF' : '#000',
                 }}
               >
-                Language
+                {t('language')}
               </Text>
               <Text
                 style={{
@@ -134,12 +131,10 @@ export default function Setting() {
                   color: isDarkMode ? '#A0A0A0' : '#9098B1',
                 }}
               >
-                Select display language
+                {t('select_display_language')}
               </Text>
             </View>
           </View>
-
-          {/* Right: language picker component */}
           <LanguagePicker />
         </View>
       </View>
@@ -148,10 +143,10 @@ export default function Setting() {
       <View className={cardStyle}>
         <View className={cardHeaderStyle}>
           <Text
-            className={titleTextStyle}
             style={{ fontFamily: 'Poppins-SemiBold' }}
+            className={titleTextStyle}
           >
-            NOTIFICATIONS
+            {t('notifications')}
           </Text>
         </View>
 
@@ -170,16 +165,16 @@ export default function Setting() {
             />
             <View>
               <Text
-                className={labelStyle}
                 style={{ fontFamily: 'Poppins-SemiBold' }}
+                className={labelStyle}
               >
-                Push Notifications
+                {t('push_notifications')}
               </Text>
               <Text
-                className={subLabelStyle}
                 style={{ fontFamily: 'Poppins-Regular' }}
+                className={subLabelStyle}
               >
-                Receive alerts from the app
+                {t('push_notifications_desc')}
               </Text>
             </View>
           </View>
@@ -196,16 +191,16 @@ export default function Setting() {
             />
             <View>
               <Text
-                className={labelStyle}
                 style={{ fontFamily: 'Poppins-SemiBold' }}
+                className={labelStyle}
               >
-                Notification Sound
+                {t('notification_sound')}
               </Text>
               <Text
-                className={subLabelStyle}
                 style={{ fontFamily: 'Poppins-Regular' }}
+                className={subLabelStyle}
               >
-                Play sound for new alerts
+                {t('notification_sound_desc')}
               </Text>
             </View>
           </View>

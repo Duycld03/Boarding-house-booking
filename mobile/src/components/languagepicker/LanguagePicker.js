@@ -8,16 +8,21 @@ import {
   StyleSheet,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '@/config-translation/config-translation';
+import { useTranslation } from 'react-i18next';
 
 export default function LanguagePicker() {
   const [language, setLanguage] = useState('en');
   const [modalVisible, setModalVisible] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    // Khi component mount -> đọc language đã lưu
     const loadLanguage = async () => {
       const savedLang = await AsyncStorage.getItem('appLanguage');
-      if (savedLang) setLanguage(savedLang);
+      if (savedLang) {
+        setLanguage(savedLang);
+        i18n.changeLanguage(savedLang);
+      }
     };
     loadLanguage();
   }, []);
@@ -25,7 +30,8 @@ export default function LanguagePicker() {
   const handleSelect = async (value: string) => {
     setLanguage(value);
     setModalVisible(false);
-    await AsyncStorage.setItem('appLanguage', value); // Lưu lại
+    await AsyncStorage.setItem('appLanguage', value);
+    i18n.changeLanguage(value);
   };
 
   return (
@@ -53,7 +59,7 @@ export default function LanguagePicker() {
       <Modal transparent visible={modalVisible} animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>🌐 Select Language</Text>
+            <Text style={styles.modalTitle}>🌐 {t('language')}</Text>
             <TouchableOpacity
               style={styles.option}
               onPress={() => handleSelect('en')}
