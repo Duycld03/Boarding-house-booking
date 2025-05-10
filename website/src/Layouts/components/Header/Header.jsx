@@ -65,15 +65,15 @@ const CustomHeader = () => {
   };
 
   const menuItems = [
-    { key: 'home', label: t('menu.home'), onClick: () => navigate('/') },
+    { key: 'home', label: t('home'), onClick: () => navigate('/') },
     {
       key: 'about',
-      label: t('menu.about'),
+      label: t('about'),
       onClick: () => navigate('/about-us'),
     },
     {
       key: 'contact',
-      label: t('menu.contact'),
+      label: t('contact'),
       onClick: () => navigate('/contact'),
     },
   ];
@@ -82,7 +82,7 @@ const CustomHeader = () => {
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: t('sidebar.profile'),
+      label: t('profile'),
       onClick: () => navigate('/profile'),
     },
     {
