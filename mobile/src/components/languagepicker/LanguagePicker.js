@@ -93,7 +93,7 @@ export default function LanguagePicker() {
                   styles.optionText,
                   {
                     fontWeight: language === 'en' ? '700' : '400',
-                    color: isDarkMode ? '#ffffff' : '#9098B1',
+                    color: isDarkMode ? Color.white : '#333',
                   },
                 ]}
               >
