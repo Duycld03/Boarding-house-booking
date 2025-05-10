@@ -5,32 +5,38 @@ import { useThemedClasses } from '@/utils/useTheme';
 import { useTheme } from '@/context/ThemeProvider';
 import Color from '@/constants/styles/color';
 import Font from '@/constants/styles/fonts';
+import { useTranslation } from 'react-i18next';
 
-const accountOptions = [
-  { label: 'Profile', icon: 'user', path: '/profile' },
-  { label: 'My Appointment', icon: 'calendar', path: '/myappointment' },
-  { label: 'My Favourite', icon: 'heart', path: '/myfavorite' },
-  { label: 'Watch Later', icon: 'clock-o', path: '/watchlater' },
-  {
-    label: 'My Report Management',
-    icon: 'file-text',
-    path: '/myreportmanagement',
-  },
-  { label: 'My Deposited Room', icon: 'home', path: '/mydepositedroom' },
-  { label: 'My Renewal Request', icon: 'repeat', path: '/myrenewalrequest' },
-  { label: 'My Rent Payment', icon: 'dollar', path: '/myrentpayment' },
-  {
-    label: 'My Deposit Refund Request',
-    icon: 'undo',
-    path: '/mydepositrefundrequest',
-  },
-  { label: 'Setting', icon: 'cog', path: '/setting' },
-];
-
-export default function Account() {
+const Account = () => {
   const router = useRouter();
   const { themedClasses } = useThemedClasses();
   const { isDarkMode } = useTheme();
+  const { t } = useTranslation('account');
+
+  const accountOptions = [
+    { label: t('profile'), icon: 'user', path: '/profile' },
+    { label: t('my_appointment'), icon: 'calendar', path: '/myappointment' },
+    { label: t('my_favorite'), icon: 'heart', path: '/myfavorite' },
+    { label: t('watch_later'), icon: 'clock-o', path: '/watchlater' },
+    {
+      label: t('my_report_management'),
+      icon: 'file-text',
+      path: '/myreportmanagement',
+    },
+    { label: t('my_deposited_room'), icon: 'home', path: '/mydepositedroom' },
+    {
+      label: t('my_renewal_request'),
+      icon: 'repeat',
+      path: '/myrenewalrequest',
+    },
+    { label: t('my_rent_payment'), icon: 'dollar', path: '/myrentpayment' },
+    {
+      label: t('my_deposit_refund_request'),
+      icon: 'undo',
+      path: '/mydepositrefundrequest',
+    },
+    { label: t('setting'), icon: 'cog', path: '/setting' },
+  ];
 
   const handleNavigate = (path: string) => {
     router.push(path);
@@ -48,7 +54,7 @@ export default function Account() {
           )}
           style={{ fontFamily: Font.pBold }}
         >
-          Account
+          {t('account')}
         </Text>
 
         {accountOptions.map((item, index) => (
@@ -76,4 +82,6 @@ export default function Account() {
       </View>
     </ScrollView>
   );
-}
+};
+
+export default Account;
