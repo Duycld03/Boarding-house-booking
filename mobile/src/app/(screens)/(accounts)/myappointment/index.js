@@ -1,7 +1,7 @@
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import { Text, View } from 'react-native';
 
-function Favorite() {
+function Myappointment() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text
@@ -12,10 +12,10 @@ function Favorite() {
           backgroundColor: '#F5FCFF',
         }}
       >
-        Favorite
+        Appointment
       </Text>
     </View>
   );
 }
 
-export default Favorite;
+export default Myappointment;
