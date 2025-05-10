@@ -3,6 +3,7 @@ import { View, Text, Switch, Pressable } from 'react-native';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import LanguagePicker from '@/components/languagepicker/LanguagePicker';
 
 export default function Setting() {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -91,7 +92,6 @@ export default function Setting() {
         </View>
       </View>
 
-      {/* Language Section */}
       <View className={cardStyle}>
         <View className={cardHeaderStyle}>
           <Text
@@ -102,8 +102,16 @@ export default function Setting() {
           </Text>
         </View>
 
-        <Pressable className="flex-row items-center justify-between px-4 py-4">
-          <View className="flex-row items-center gap-4">
+        <View
+          className="px-4 py-4"
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Left: icon + label */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <FontAwesome
               name="globe"
               size={20}
@@ -111,26 +119,29 @@ export default function Setting() {
             />
             <View>
               <Text
-                className={labelStyle}
-                style={{ fontFamily: 'Poppins-SemiBold' }}
+                style={{
+                  fontSize: 16,
+                  fontFamily: 'Poppins-SemiBold',
+                  color: isDarkMode ? '#FFF' : '#000',
+                }}
               >
                 Language
               </Text>
               <Text
-                className={subLabelStyle}
-                style={{ fontFamily: 'Poppins-Regular' }}
+                style={{
+                  fontSize: 13,
+                  fontFamily: 'Poppins-Regular',
+                  color: isDarkMode ? '#A0A0A0' : '#9098B1',
+                }}
               >
-                Select your language
+                Select display language
               </Text>
             </View>
           </View>
-          <Text
-            className={rightTextStyle}
-            style={{ fontFamily: 'Poppins-Medium' }}
-          >
-            English ›
-          </Text>
-        </Pressable>
+
+          {/* Right: language picker component */}
+          <LanguagePicker />
+        </View>
       </View>
 
       {/* Notifications Section */}
