@@ -10,11 +10,17 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from '@/config-translation/config-translation';
 import { useTranslation } from 'react-i18next';
+import { useThemedClasses } from '@/utils/useTheme';
+import { useTheme } from '@/context/ThemeProvider';
+import Color from '@/constants/styles/color';
+import Font from '@/constants/styles/fonts';
 
 export default function LanguagePicker() {
   const [language, setLanguage] = useState('en');
   const [modalVisible, setModalVisible] = useState(false);
   const { t } = useTranslation();
+  const { isDarkMode } = useTheme();
+  const { themedClasses } = useThemedClasses();
 
   useEffect(() => {
     const loadLanguage = async () => {
@@ -48,8 +54,8 @@ export default function LanguagePicker() {
         <Text
           style={{
             fontSize: 14,
-            color: '#9098B1',
-            fontFamily: 'Poppins-Regular',
+            color: isDarkMode ? '#ffffff' : '#9098B1',
+            fontFamily: Font.pRegular,
           }}
         >
           {language === 'vi' ? 'Tiếng Việt' : 'English'} {' ›'}
@@ -58,8 +64,26 @@ export default function LanguagePicker() {
 
       <Modal transparent visible={modalVisible} animationType="fade">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>🌐 {t('language')}</Text>
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: isDarkMode ? '#2b2b2e' : '#fff',
+              },
+            ]}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                fontFamily: Font.pSemiBold,
+                textAlign: 'center',
+                marginBottom: 20,
+                color: isDarkMode ? Color.white : Color.title,
+              }}
+            >
+              🌐 {t('language')}
+            </Text>
+
             <TouchableOpacity
               style={styles.option}
               onPress={() => handleSelect('en')}
@@ -67,12 +91,16 @@ export default function LanguagePicker() {
               <Text
                 style={[
                   styles.optionText,
-                  language === 'en' && styles.selected,
+                  {
+                    fontWeight: language === 'en' ? '700' : '400',
+                    color: isDarkMode ? '#ffffff' : '#9098B1',
+                  },
                 ]}
               >
                 English
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.option}
               onPress={() => handleSelect('vi')}
@@ -80,7 +108,10 @@ export default function LanguagePicker() {
               <Text
                 style={[
                   styles.optionText,
-                  language === 'vi' && styles.selected,
+                  {
+                    fontWeight: language === 'vi' ? '700' : '400',
+                    color: isDarkMode ? Color.white : '#333',
+                  },
                 ]}
               >
                 Tiếng Việt
@@ -103,7 +134,6 @@ const styles = StyleSheet.create({
   },
   modalCard: {
     width: 280,
-    backgroundColor: '#fff',
     borderRadius: 16,
     paddingVertical: 24,
     paddingHorizontal: 20,
@@ -112,26 +142,12 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 10,
   },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 20,
-    fontFamily: 'Poppins-SemiBold',
-  },
   option: {
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
   },
   optionText: {
     fontSize: 14,
     textAlign: 'center',
-    fontFamily: 'Poppins-Regular',
-    color: '#333',
-  },
-  selected: {
-    fontWeight: '700',
-    color: '#5C61F4',
+    fontFamily: Font.pRegular,
   },
 });
