@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 export default function Setting() {
   const { isDarkMode, toggleTheme } = useTheme();
   const { themedClasses } = useThemedClasses();
-  const { t } = useTranslation();
+  const { t } = useTranslation('setting');
 
   const cardStyle = themedClasses(
     'rounded-2xl bg-white border border-[#E5EAF2] overflow-hidden mb-6',
@@ -117,7 +117,6 @@ export default function Setting() {
             <View>
               <Text
                 style={{
-                  fontSize: 16,
                   fontFamily: 'Poppins-SemiBold',
                   color: isDarkMode ? '#FFF' : '#000',
                 }}
