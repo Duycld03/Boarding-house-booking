@@ -138,7 +138,7 @@ export default function Setting() {
           <View className="h-8" />
 
           {/* Nút Back */}
-          <View className="items-center pt-2">
+          <View className="items-center">
             <Button
               onPress={() => navigation.goBack()}
               fullWidth={false}
@@ -149,7 +149,7 @@ export default function Setting() {
             >
               <Ionicons
                 name="arrow-back"
-                size={14}
+                size={12}
                 color="#fff"
                 style={{ marginRight: 6, transform: [{ translateY: 1 }] }}
               />
