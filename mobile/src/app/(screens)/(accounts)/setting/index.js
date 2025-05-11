@@ -9,11 +9,14 @@ import Text from '@/components/ui/Text';
 import { ScreenContainer } from '@/components/layout';
 import Color from '@/constants/styles/color';
 import Font from '@/constants/styles/fonts';
+import Button from '@/components/ui/Button';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Setting() {
   const { isDarkMode, toggleTheme } = useTheme();
   const { themedClasses } = useThemedClasses();
   const { t } = useTranslation('setting');
+  const navigation = useNavigation();
 
   const primaryColor = isDarkMode ? '#60a5fa' : '#3b82f6';
 
@@ -40,13 +43,16 @@ export default function Setting() {
   };
 
   return (
-    <ScreenContainer withPadding={false}>
+    <ScreenContainer
+      withPadding={false}
+      className={themedClasses('bg-background-light', 'bg-background-dark')}
+    >
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="p-5">
-          {/* Header */}
+          {/* Tiêu đề Setting */}
           <View
             className={themedClasses(
               'mb-6 border-b border-gray-200 pb-3',
@@ -65,7 +71,7 @@ export default function Setting() {
             </Text>
           </View>
 
-          {/* Appearance Section */}
+          {/* Giao diện - Appearance */}
           <View className={cardStyle}>
             <View className={cardHeaderStyle}>
               <Text
@@ -93,7 +99,7 @@ export default function Setting() {
             </View>
           </View>
 
-          {/* Language Section */}
+          {/* Ngôn ngữ */}
           <View className={cardStyle}>
             <View className={cardHeaderStyle}>
               <Text
@@ -130,6 +136,35 @@ export default function Setting() {
           </View>
 
           <View className="h-8" />
+
+          {/* Nút Back */}
+          <View className="items-center pt-2">
+            <Button
+              onPress={() => navigation.goBack()}
+              fullWidth={false}
+              className={themedClasses(
+                'flex-row items-center justify-center px-5 py-2 rounded-full bg-primary-light',
+                'flex-row items-center justify-center px-5 py-2 rounded-full bg-primary-dark'
+              )}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={14}
+                color="#fff"
+                style={{ marginRight: 6, transform: [{ translateY: 1 }] }}
+              />
+              <Text
+                style={{
+                  fontFamily: Font.pSemiBold,
+                  fontSize: 14,
+                  lineHeight: 18,
+                  color: '#fff',
+                }}
+              >
+                {t('back', { defaultValue: 'Quay lại' })}
+              </Text>
+            </Button>
+          </View>
         </View>
       </ScrollView>
     </ScreenContainer>

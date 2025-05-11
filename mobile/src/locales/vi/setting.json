@@ -9,5 +9,7 @@
   "push_notifications": "Thông báo đẩy",
   "push_notifications_desc": "Nhận thông báo từ ứng dụng",
   "notification_sound": "Âm thanh thông báo",
-  "notification_sound_desc": "Phát âm thanh khi có thông báo mới"
+  "notification_sound_desc": "Phát âm thanh khi có thông báo mới",
+  "back": "Quay lại"
+
 }

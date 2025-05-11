@@ -9,5 +9,7 @@
   "push_notifications": "Push Notifications",
   "push_notifications_desc": "Receive alerts from the app",
   "notification_sound": "Notification Sound",
-  "notification_sound_desc": "Play sound for new alerts"
+  "notification_sound_desc": "Play sound for new alerts",
+  "back": "Back"
+
 }
