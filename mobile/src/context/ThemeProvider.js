@@ -37,7 +37,6 @@ export const ThemeProvider = ({ children }) => {
                 console.log('Error loading theme', error);
             }
         };
-
         loadTheme();
     }, []);
 

@@ -13,14 +13,35 @@ export default {
         black: '#373737',
       },
       colors: {
-        primary: '#40BFFF'
-      }
-
+        background: {
+          light: '#ffffff',
+          dark: '#111827',
+        },
+        text: {
+          light: '#111827',
+          dark: '#f9fafb',
+        },
+      },
+      "fonts": [
+        {
+          "asset": "./src/assets/fonts/Poppins-Regular.ttf",
+          "family": "Poppins-Regular"
+        },
+        {
+          "asset": "./src/assets/fonts/Poppins-Medium.ttf",
+          "family": "Poppins-Medium"
+        },
+        {
+          "asset": "./src/assets/fonts/Poppins-SemiBold.ttf",
+          "family": "Poppins-SemiBold"
+        },
+        {
+          "asset": "./src/assets/fonts/Poppins-Bold.ttf",
+          "family": "Poppins-Bold"
+        }
+      ]
     },
   },
   plugins: [],
   darkMode: 'class',
-  server: {
-    port: 4000,
-  },
 }
