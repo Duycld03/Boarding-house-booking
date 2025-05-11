@@ -1,11 +1,11 @@
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { View, Text, Pressable, ScrollView, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import { useThemedClasses } from '@/utils/useTheme';
 import { useTheme } from '@/context/ThemeProvider';
-import Color from '@/constants/styles/color';
-import Font from '@/constants/styles/fonts';
 import { useTranslation } from 'react-i18next';
+import { useRef } from 'react';
+import { ScreenContainer, ScrollContainer } from '@/components/layout';
 
 const Account = () => {
   const router = useRouter();
@@ -13,74 +13,167 @@ const Account = () => {
   const { isDarkMode } = useTheme();
   const { t } = useTranslation('account');
 
+  const animatedValues = useRef(Array(10).fill(0).map(() => new Animated.Value(1))).current;
+
   const accountOptions = [
-    { label: t('profile'), icon: 'user', path: '/profile' },
-    { label: t('my_appointment'), icon: 'calendar', path: '/myappointment' },
-    { label: t('my_favorite'), icon: 'heart', path: '/myfavorite' },
-    { label: t('watch_later'), icon: 'clock-o', path: '/watchlater' },
+    {
+      label: t('profile'),
+      icon: 'user',
+      path: '/profile',
+      color: isDarkMode ? '#60a5fa' : '#3b82f6'
+    },
+    {
+      label: t('my_appointment'),
+      icon: 'calendar',
+      path: '/myappointment',
+      color: '#EA4335'
+    },
+    {
+      label: t('my_favorite'),
+      icon: 'heart',
+      path: '/myfavorite',
+      color: '#FBBC05'
+    },
+    {
+      label: t('watch_later'),
+      icon: 'clock-o',
+      path: '/watchlater',
+      color: '#34A853'
+    },
     {
       label: t('my_report_management'),
       icon: 'file-text',
       path: '/myreportmanagement',
+      color: '#7E57C2'
     },
-    { label: t('my_deposited_room'), icon: 'home', path: '/mydepositedroom' },
+    {
+      label: t('my_deposited_room'),
+      icon: 'home',
+      path: '/mydepositedroom',
+      color: '#FF7043'
+    },
     {
       label: t('my_renewal_request'),
       icon: 'repeat',
       path: '/myrenewalrequest',
+      color: '#26A69A'
     },
-    { label: t('my_rent_payment'), icon: 'dollar', path: '/myrentpayment' },
+    {
+      label: t('my_rent_payment'),
+      icon: 'dollar',
+      path: '/myrentpayment',
+      color: '#42A5F5'
+    },
     {
       label: t('my_deposit_refund_request'),
       icon: 'undo',
       path: '/mydepositrefundrequest',
+      color: '#EC407A'
     },
-    { label: t('setting'), icon: 'cog', path: '/setting' },
+    {
+      label: t('setting'),
+      icon: 'cog',
+      path: '/setting',
+      color: '#78909C'
+    },
   ];
 
-  const handleNavigate = (path: string) => {
-    router.push(path);
+  const handleNavigate = (path, index) => {
+    Animated.sequence([
+      Animated.timing(animatedValues[index], {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true
+      }),
+      Animated.timing(animatedValues[index], {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true
+      })
+    ]).start(() => {
+      router.push(path);
+    });
   };
 
   return (
-    <ScrollView
-      className={themedClasses('flex-1 bg-white', 'flex-1 bg-background-dark')}
+    <ScreenContainer
+      withPadding={false}
     >
-      <View className="p-5">
-        <Text
-          className={themedClasses(
-            'text-[22px] font-bold text-title border-b border-gray-200 mb-5',
-            'text-[22px] font-bold text-white border-b border-gray-700 mb-5'
-          )}
-          style={{ fontFamily: Font.pBold }}
-        >
-          {t('account')}
-        </Text>
-
-        {accountOptions.map((item, index) => (
-          <Pressable
-            key={index}
-            onPress={() => handleNavigate(item.path)}
-            className="flex-row items-center py-3 gap-3"
-          >
-            <FontAwesome
-              name={item.icon}
-              size={20}
-              color={isDarkMode ? Color.white : Color.blue}
-            />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <View className="p-5">
+          <View className={themedClasses(
+            'mb-6 border-b border-gray-200 pb-3',
+            'mb-6 border-b border-gray-700 pb-3'
+          )}>
             <Text
               className={themedClasses(
-                'text-[16px] text-title',
-                'text-[16px] text-white'
+                'text-2xl text-text-light',
+                'text-2xl text-text-dark'
               )}
-              style={{ fontFamily: Font.pSemiBold }}
+              style={{ fontFamily: 'Poppins-Bold' }}
             >
-              {item.label}
+              {t('account')}
             </Text>
-          </Pressable>
-        ))}
-      </View>
-    </ScrollView>
+
+          </View>
+
+          <View className="gap-3">
+            {accountOptions.map((item, index) => (
+              <Animated.View
+                key={index}
+                style={{
+                  transform: [{ scale: animatedValues[index] }],
+                }}
+              >
+                <Pressable
+                  onPress={() => handleNavigate(item.path, index)}
+                  className={themedClasses(
+                    'flex-row items-center p-4 rounded-xl bg-card-light border border-gray-100 shadow-sm',
+                    'flex-row items-center p-4 rounded-xl bg-card-dark border border-gray-700'
+                  )}
+                  android_ripple={{ color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}
+                >
+                  <View
+                    style={{
+                      backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                      borderRadius: 12,
+                      padding: 10,
+                    }}
+                  >
+                    <FontAwesome
+                      name={item.icon}
+                      size={20}
+                      color={item.color}
+                    />
+                  </View>
+                  <View className="ml-4 flex-1">
+                    <Text
+                      className={themedClasses(
+                        'text-base text-text-light',
+                        'text-base text-text-dark'
+                      )}
+                      style={{ fontFamily: 'Poppins-SemiBold' }}
+                    >
+                      {item.label}
+                    </Text>
+                  </View>
+                  <FontAwesome
+                    name="chevron-right"
+                    size={16}
+                    color={isDarkMode ? '#9ca3af' : '#6b7280'}
+                  />
+                </Pressable>
+              </Animated.View>
+            ))}
+          </View>
+        </View>
+
+        <View className="h-8" />
+      </ScrollView>
+    </ScreenContainer>
   );
 };
 

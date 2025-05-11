@@ -1,4 +1,5 @@
 import ScreenContainer from './ScreenContainer';
+import ScrollContainer from './ScreenContainer';
 
-export { ScreenContainer };
+export { ScreenContainer, ScrollContainer };
 
