@@ -7,6 +7,8 @@ import LanguagePicker from './LanguagePicker';
 import { useTranslation } from 'react-i18next';
 import Text from '@/components/ui/Text';
 import { ScreenContainer } from '@/components/layout';
+import Color from '@/constants/styles/color';
+import Font from '@/constants/styles/fonts';
 
 export default function Setting() {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -25,15 +27,17 @@ export default function Setting() {
     'border-b border-[#3A3A3A] px-4 py-2'
   );
 
-  const labelStyle = themedClasses(
-    'text-base font-semibold text-black',
-    'text-base font-semibold text-white'
-  );
+  const labelStyle = {
+    fontFamily: Font.pSemiBold,
+    fontSize: 16,
+    color: isDarkMode ? Color.white : Color.title,
+  };
 
-  const subLabelStyle = themedClasses(
-    'text-sm text-[#9098B1]',
-    'text-sm text-[#A0A0A0]'
-  );
+  const subLabelStyle = {
+    fontFamily: Font.pRegular,
+    fontSize: 13,
+    color: isDarkMode ? Color.gray : Color.text,
+  };
 
   return (
     <ScreenContainer withPadding={false}>
@@ -42,6 +46,7 @@ export default function Setting() {
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="p-5">
+          {/* Header */}
           <View
             className={themedClasses(
               'mb-6 border-b border-gray-200 pb-3',
@@ -49,14 +54,11 @@ export default function Setting() {
             )}
           >
             <Text
-              className={themedClasses(
-                'text-2xl text-text-light',
-                'text-2xl text-text-dark'
-              )}
               style={{
-                fontFamily: 'Poppins-Bold',
+                fontFamily: Font.pBold,
                 fontSize: 20,
                 lineHeight: 30,
+                color: isDarkMode ? Color.white : Color.title,
               }}
             >
               {t('settings')}
@@ -68,7 +70,7 @@ export default function Setting() {
             <View className={cardHeaderStyle}>
               <Text
                 style={{
-                  fontFamily: 'Poppins-SemiBold',
+                  fontFamily: Font.pSemiBold,
                   fontSize: 14,
                   color: primaryColor,
                 }}
@@ -81,16 +83,8 @@ export default function Setting() {
               <View className="flex-row items-center gap-4">
                 <Ionicons name="moon-outline" size={20} color={primaryColor} />
                 <View>
-                  <Text
-                    style={{ fontFamily: 'Poppins-SemiBold' }}
-                    className={labelStyle}
-                  >
-                    {t('dark_mode')}
-                  </Text>
-                  <Text
-                    style={{ fontFamily: 'Poppins-Regular' }}
-                    className={subLabelStyle}
-                  >
+                  <Text style={labelStyle}>{t('dark_mode')}</Text>
+                  <Text style={subLabelStyle}>
                     {t('dark_mode_description')}
                   </Text>
                 </View>
@@ -104,7 +98,7 @@ export default function Setting() {
             <View className={cardHeaderStyle}>
               <Text
                 style={{
-                  fontFamily: 'Poppins-SemiBold',
+                  fontFamily: Font.pSemiBold,
                   fontSize: 14,
                   color: primaryColor,
                 }}
@@ -119,20 +113,14 @@ export default function Setting() {
                 <View>
                   <Text
                     style={{
-                      fontFamily: 'Poppins-SemiBold',
+                      fontFamily: Font.pSemiBold,
                       fontSize: 15,
-                      color: isDarkMode ? '#fff' : '#000',
+                      color: isDarkMode ? Color.white : Color.title,
                     }}
                   >
                     {t('language')}
                   </Text>
-                  <Text
-                    style={{
-                      fontFamily: 'Poppins-Regular',
-                      fontSize: 13,
-                      color: isDarkMode ? '#A0A0A0' : '#9098B1',
-                    }}
-                  >
+                  <Text style={subLabelStyle}>
                     {t('select_display_language')}
                   </Text>
                 </View>

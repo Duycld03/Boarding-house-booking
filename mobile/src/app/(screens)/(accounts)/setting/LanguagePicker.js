@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   Pressable,
   Modal,
   TouchableOpacity,
@@ -14,6 +13,7 @@ import { useThemedClasses } from '@/utils/useTheme';
 import { useTheme } from '@/context/ThemeProvider';
 import Color from '@/constants/styles/color';
 import Font from '@/constants/styles/fonts';
+import Text from '@/components/ui/Text';
 
 export default function LanguagePicker() {
   const [language, setLanguage] = useState('en');
