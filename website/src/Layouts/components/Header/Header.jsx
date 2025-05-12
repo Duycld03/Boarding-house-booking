@@ -89,13 +89,13 @@ const CustomHeader = () => {
     {
       key: "change-password",
       icon: <LockOutlined />,
-      label: "Change Password",
+      label: t("changePassword"),
       onClick: () => navigate("/change-password"),
     },
     {
       key: "logout",
       icon: <LogoutOutlined />,
-      label: "Logout",
+      label: t("logout"),
       onClick: logout,
     },
   ];
