@@ -1,0 +1,29 @@
+{
+  "title": "Hồ sơ cá nhân",
+  "fullname": {
+    "label": "Họ và tên",
+    "placeholder": "Nhập họ và tên",
+    "required": "Vui lòng nhập họ và tên"
+  },
+  "phone": {
+    "label": "Số điện thoại",
+    "placeholder": "Nhập số điện thoại",
+    "required": "Vui lòng nhập số điện thoại"
+  },
+  "gender": {
+    "label": "Giới tính",
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác"
+  },
+  "button": {
+    "save": "Lưu thay đổi"
+  },
+  "success": {
+    "update": "Cập nhật hồ sơ thành công!"
+  },
+  "error": {
+    "update": "Cập nhật hồ sơ thất bại",
+    "fetch": "Không thể tải thông tin hồ sơ"
+  }
+}

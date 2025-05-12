@@ -1,213 +1,205 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
-import { BackHeader } from '@/components/navigation/CustomHeader';
+import React, { useEffect, useState } from 'react';
+import { View, Image, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import { useTranslation } from 'react-i18next';
+import ScreenContainer, {
+  ScrollContainer,
+} from '@/components/layout/ScreenContainer';
+import { BackHeader } from '@/components/navigation/CustomHeader';
 import Text from '@/components/ui/Text';
-
-const MOCK_USER = {
-  username: 'johndoe',
-  fullname: 'John Doe',
-  phoneNumber: '0987654321',
-  gender: 'male',
-  email: 'johndoe@example.com',
-  role: 'owner',
-  accountBalance: 1500000,
-  avatarImage: null,
-};
+import Button from '@/components/ui/Button';
+import { FormField } from '@/components/form/index';
+import { getUser } from '@/API/authManagement';
+import { updateAccountFromProfile } from '@/API/AccountManagement';
+import { useNotification } from '@/context/NotificationProvider';
 
 const genders = ['male', 'female', 'other'];
+const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 export default function Profile() {
+  const { t } = useTranslation('profile');
+  const router = useRouter();
+  const { showSuccess, showError } = useNotification();
+
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(MOCK_USER);
-  const [avatar, setAvatar] = useState(MOCK_USER.avatarImage);
-  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [formData, setFormData] = useState({
+    fullname: '',
+    phoneNumber: '',
+    gender: 'male',
+    email: '',
+    username: '',
+  });
+  const [avatar, setAvatar] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      showError('Permission to access gallery is required!');
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaType.IMAGE,
       quality: 1,
     });
+
     if (!result.canceled) {
       setAvatar(result.assets[0].uri);
     }
   };
 
-  return (
-    <ScrollView style={styles.container}>
-      <BackHeader title="Profile" />
-      <View style={styles.avatarContainer}>
-        <TouchableOpacity onPress={pickImage}>
-          <Image
-            source={{
-              uri:
-                avatar ||
-                'https://cdn-icons-png.flaticon.com/512/847/847969.png',
-            }}
-            style={styles.avatar}
-          />
-        </TouchableOpacity>
-        <Text style={styles.username}>@{user.username}</Text>
-      </View>
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
 
-      <View style={styles.formBox}>
-        <Text style={styles.label}>Email</Text>
-        <View style={styles.row}>
-          <TextInput style={styles.input} value={user.email} editable={false} />
-          <TouchableOpacity
-            style={styles.changeButton}
-            onPress={() => setShowEmailModal(true)}
-          >
-            <Text style={styles.changeButtonText}>Change Email</Text>
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    if (!formData.fullname.trim()) {
+      newErrors.fullname = { message: t('fullname.required') };
+      isValid = false;
+    }
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = { message: t('phone.required') };
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const loadUser = async () => {
+    try {
+      const user = await getUser();
+      setFormData({
+        fullname: user.fullname,
+        phoneNumber: user.phoneNumber,
+        gender: user.gender || 'male',
+        email: user.email,
+        username: user.username,
+      });
+      setAvatar(user.avatarImage?.url || null);
+    } catch (err) {
+      showError(t('error.fetch'));
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+    try {
+      setLoading(true);
+      const res = await updateAccountFromProfile(formData);
+      showSuccess(t('success.update'));
+    } catch (err) {
+      showError(err?.response?.data?.message || t('error.update'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  return (
+    <ScreenContainer>
+      <BackHeader title={t('title')} onBackPress={() => router.back()} />
+
+      <ScrollContainer keyboardAvoiding className="px-4">
+        <View className="items-center mt-4">
+          <TouchableOpacity onPress={pickImage}>
+            <Image
+              source={{ uri: avatar || DEFAULT_AVATAR }}
+              style={{ width: 100, height: 100, borderRadius: 50 }}
+            />
           </TouchableOpacity>
+          <Text className="mt-2 text-lg font-semibold">
+            @{formData.username}
+          </Text>
         </View>
 
-        <Text style={styles.label}>Full Name</Text>
-        <TextInput
-          style={styles.input}
-          value={user.fullname}
-          placeholder="Enter your fullname"
+        <View className="">
+          <Text className="text-sm font-medium text-gray-700 mb-1">Email</Text>
+
+          <View className="flex-row items-start">
+            <FormField
+              name="email"
+              value={formData.email}
+              editable={false}
+              inputType="email"
+              className="flex-1"
+            />
+            <TouchableOpacity
+              className="ml-2 h-12 px-4 justify-center rounded bg-blue-500"
+              onPress={() => setShowEmailModal(true)}
+            >
+              <Text className="text-white font-semibold text-sm">
+                Change Email
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <FormField
+          name="fullname"
+          label={t('fullname.label')}
+          placeholder={t('fullname.placeholder')}
+          value={formData.fullname}
+          onChange={handleChange}
+          error={errors}
+          required
         />
 
-        <Text style={styles.label}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          value={user.phoneNumber}
-          keyboardType="number-pad"
-          placeholder="Enter your phone number"
+        <FormField
+          name="phoneNumber"
+          label={t('phone.label')}
+          placeholder={t('phone.placeholder')}
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          error={errors}
+          keyboardType="phone-pad"
+          required
         />
 
-        <Text style={styles.label}>Gender</Text>
-        <View style={styles.genderRow}>
+        <Text className="text-sm font-medium text-gray-700">
+          {t('gender.label')}
+        </Text>
+        <View className="flex-row justify-between mb-4">
           {genders.map((g) => (
             <TouchableOpacity
               key={g}
-              style={styles.radioItem}
-              onPress={() => setUser({ ...user, gender: g })}
+              onPress={() => handleChange('gender', g)}
+              className="flex-row items-center"
             >
-              <View style={styles.radioCircle}>
-                {user.gender === g && <View style={styles.radioDot} />}
+              <View
+                className={`w-5 h-5 rounded-full border-2 ${
+                  formData.gender === g ? 'border-blue-500' : 'border-gray-300'
+                } items-center justify-center mr-2`}
+              >
+                {formData.gender === g && (
+                  <View className="w-2.5 h-2.5 bg-blue-500 rounded-full" />
+                )}
               </View>
-              <Text style={styles.radioLabel}>
-                {g.charAt(0).toUpperCase() + g.slice(1)}
-              </Text>
+              <Text>{t(`gender.${g}`)}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <TouchableOpacity style={styles.saveButton}>
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.saveButtonText}>Save</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <Button
+          onPress={handleSubmit}
+          loading={loading}
+          fullWidth
+          className="mt-4 py-2 px-6 w-32 self-center rounded-md"
+        >
+          {t('button.save')}
+        </Button>
+      </ScrollContainer>
+    </ScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', padding: 16 },
-  avatarContainer: { alignItems: 'center', marginBottom: 20 },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#ccc',
-  },
-  username: { fontSize: 24, fontWeight: 'bold', marginTop: 10 },
-  balanceBox: { marginVertical: 10 },
-  label: { fontSize: 16, fontWeight: '500', marginBottom: 6 },
-  value: { fontSize: 16 },
-  formBox: { marginTop: 10 },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-    gap: 10,
-  },
-
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    flex: 1,
-  },
-
-  changeButton: {
-    height: 48, // ✅ chiều cao cố định giống với TextInput
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    backgroundColor: '#1677ff',
-  },
-
-  changeButtonText: { color: '#fff', fontWeight: '600' },
-  genderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-
-  radioButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-
-  genderSelected: { color: '#1677ff', fontWeight: 'bold' },
-  genderUnselected: { color: '#666' },
-  saveButton: {
-    backgroundColor: '#1677ff',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginTop: 16,
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-
-  saveButtonText: { color: '#fff', fontWeight: '600' },
-  radioItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-
-  radioCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#1677ff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#1677ff',
-  },
-
-  radioLabel: {
-    fontSize: 16,
-    color: '#000',
-  },
-});

@@ -1,0 +1,29 @@
+{
+  "title": "My Profile",
+  "fullname": {
+    "label": "Full Name",
+    "placeholder": "Enter your full name",
+    "required": "Full name is required"
+  },
+  "phone": {
+    "label": "Phone Number",
+    "placeholder": "Enter your phone number",
+    "required": "Phone number is required"
+  },
+  "gender": {
+    "label": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other"
+  },
+  "button": {
+    "save": "Save"
+  },
+  "success": {
+    "update": "Profile updated successfully!"
+  },
+  "error": {
+    "update": "Failed to update profile",
+    "fetch": "Failed to fetch profile"
+  }
+}
