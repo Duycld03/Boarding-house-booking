@@ -3,16 +3,19 @@ import { View, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
+
 import ScreenContainer, {
   ScrollContainer,
 } from '@/components/layout/ScreenContainer';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import Text from '@/components/ui/Text';
 import Button from '@/components/ui/Button';
-import { FormField } from '@/components/form/index';
+import { FormField } from '@/components/form';
 import { getUser } from '@/API/authManagement';
 import { updateAccountFromProfile } from '@/API/AccountManagement';
 import { useNotification } from '@/context/NotificationProvider';
+import { useTheme } from '@/context/ThemeProvider';
+import { useThemedClasses } from '@/utils/useTheme';
 
 const genders = ['male', 'female', 'other'];
 const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
@@ -21,6 +24,8 @@ export default function Profile() {
   const { t } = useTranslation('profile');
   const router = useRouter();
   const { showSuccess, showError } = useNotification();
+  const { isDarkMode } = useTheme();
+  const { themedClasses } = useThemedClasses();
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -36,7 +41,7 @@ export default function Profile() {
   const pickImage = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       showError('Permission to access gallery is required!');
       return;
     }
@@ -51,7 +56,7 @@ export default function Profile() {
     }
   };
 
-  const handleChange = (name, value) => {
+  const handleChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
@@ -59,7 +64,7 @@ export default function Profile() {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: any = {};
     let isValid = true;
 
     if (!formData.fullname.trim()) {
@@ -95,7 +100,7 @@ export default function Profile() {
     if (!validateForm()) return;
     try {
       setLoading(true);
-      const res = await updateAccountFromProfile(formData);
+      await updateAccountFromProfile(formData);
       showSuccess(t('success.update'));
     } catch (err) {
       showError(err?.response?.data?.message || t('error.update'));
@@ -109,7 +114,7 @@ export default function Profile() {
   }, []);
 
   return (
-    <ScreenContainer>
+    <ScreenContainer className={themedClasses.bg}>
       <BackHeader title={t('title')} onBackPress={() => router.back()} />
 
       <ScrollContainer keyboardAvoiding className="px-4">
@@ -120,32 +125,36 @@ export default function Profile() {
               style={{ width: 100, height: 100, borderRadius: 50 }}
             />
           </TouchableOpacity>
-          <Text className="mt-2 text-lg font-semibold">
+          <Text className={`mt-2 text-lg font-semibold ${themedClasses.text}`}>
             @{formData.username}
           </Text>
         </View>
 
-        <View className="">
-          <Text className="text-sm font-medium text-gray-700 mb-1">Email</Text>
-
+        {/* Email Section */}
+        <View className="mt-4 mb-4">
+          <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
+            Email
+          </Text>
           <View className="flex-row items-start">
             <FormField
               name="email"
               value={formData.email}
               editable={false}
               inputType="email"
-              className="flex-1"
+              className={`flex-1 ${themedClasses.input}`}
             />
             <TouchableOpacity
               className="ml-2 h-12 px-4 justify-center rounded bg-blue-500"
-              onPress={() => setShowEmailModal(true)}
+              onPress={() => {}}
             >
-              <Text className="text-white font-semibold text-sm">
+              <Text className="font-semibold text-sm" style={{ color: '#fff' }}>
                 Change Email
               </Text>
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Full Name */}
         <FormField
           name="fullname"
           label={t('fullname.label')}
@@ -156,6 +165,7 @@ export default function Profile() {
           required
         />
 
+        {/* Phone Number */}
         <FormField
           name="phoneNumber"
           label={t('phone.label')}
@@ -167,7 +177,8 @@ export default function Profile() {
           required
         />
 
-        <Text className="text-sm font-medium text-gray-700">
+        {/* Gender */}
+        <Text className={`text-sm font-medium mt-4 mb-1 ${themedClasses.text}`}>
           {t('gender.label')}
         </Text>
         <View className="flex-row justify-between mb-4">
@@ -186,7 +197,7 @@ export default function Profile() {
                   <View className="w-2.5 h-2.5 bg-blue-500 rounded-full" />
                 )}
               </View>
-              <Text>{t(`gender.${g}`)}</Text>
+              <Text className={themedClasses.text}>{t(`gender.${g}`)}</Text>
             </TouchableOpacity>
           ))}
         </View>
