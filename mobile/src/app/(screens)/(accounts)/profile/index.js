@@ -39,20 +39,26 @@ export default function Profile() {
   const [errors, setErrors] = useState({});
 
   const pickImage = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      showError('Permission to access gallery is required!');
-      return;
-    }
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        showError(t('error.permission'));
+        return;
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.IMAGE,
-      quality: 1,
-    });
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        quality: 1,
+        allowsEditing: true,
+      });
 
-    if (!result.canceled) {
-      setAvatar(result.assets[0].uri);
+      if (!result.canceled && result.assets?.length > 0) {
+        setAvatar(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('ImagePicker Error:', error);
+      showError('Không thể chọn ảnh');
     }
   };
 
