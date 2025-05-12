@@ -17,10 +17,14 @@
     "other": "Khác"
   },
   "button": {
-    "save": "Lưu"
+    "save": "Lưu",
+    "changeEmail": "Thay đổi"
+
   },
   "success": {
-    "update": "Cập nhật hồ sơ thành công!"
+    "update": "Cập nhật hồ sơ thành công!",
+    "avatar": "Cập nhật ảnh đại diện thành công"
+
   },
   "error": {
     "update": "Cập nhật hồ sơ thất bại",

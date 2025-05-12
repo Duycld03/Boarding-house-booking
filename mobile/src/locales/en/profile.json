@@ -17,10 +17,13 @@
     "other": "Other"
   },
   "button": {
-    "save": "Save"
+    "save": "Save",
+    "changeEmail": "Change Email"
   },
   "success": {
-    "update": "Profile updated successfully!"
+    "update": "Profile updated successfully!",
+    "avatar": "Avatar updated successfully"
+
   },
   "error": {
     "update": "Failed to update profile",

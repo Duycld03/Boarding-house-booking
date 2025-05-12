@@ -74,7 +74,7 @@ export default function Profile() {
         setLoading(true);
         try {
           const response = await updateAvatar(formData); // API như trên web
-          showSuccess(response.message || 'Cập nhật ảnh thành công');
+          showSuccess(t('success.avatar') || 'Cập nhật ảnh thành công');
           setAvatar(uri); // Cập nhật ảnh hiển thị
         } catch (err) {
           showError(err?.response?.data?.message || 'Không thể cập nhật ảnh');
@@ -180,7 +180,7 @@ export default function Profile() {
               onPress={() => {}}
             >
               <Text className="font-semibold text-sm" style={{ color: '#fff' }}>
-                Change Email
+                {t('button.changeEmail')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -237,8 +237,7 @@ export default function Profile() {
         <Button
           onPress={handleSubmit}
           loading={loading}
-          fullWidth
-          className="mt-4 py-2 px-6 w-32 self-center rounded-md"
+          className="mt-4 py-1.5 px-4 w-20 self-center text-sm rounded-md"
         >
           {t('button.save')}
         </Button>
