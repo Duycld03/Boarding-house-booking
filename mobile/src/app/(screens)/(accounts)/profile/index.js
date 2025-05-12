@@ -12,7 +12,10 @@ import Text from '@/components/ui/Text';
 import Button from '@/components/ui/Button';
 import { FormField } from '@/components/form';
 import { getUser } from '@/API/authManagement';
-import { updateAccountFromProfile } from '@/API/AccountManagement';
+import {
+  updateAccountFromProfile,
+  updateAvatar,
+} from '@/API/AccountManagement';
 import { useNotification } from '@/context/NotificationProvider';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
@@ -48,13 +51,36 @@ export default function Profile() {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'images',
-        quality: 1,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        quality: 1,
       });
 
       if (!result.canceled && result.assets?.length > 0) {
-        setAvatar(result.assets[0].uri);
+        const uri = result.assets[0].uri;
+        const fileName = uri.split('/').pop();
+        const match = /\.(\w+)$/.exec(fileName || '');
+        const type = match ? `image/${match[1]}` : `image`;
+
+        const photo: any = {
+          uri,
+          name: fileName,
+          type,
+        };
+
+        const formData = new FormData();
+        formData.append('avatar', photo);
+
+        setLoading(true);
+        try {
+          const response = await updateAvatar(formData); // API như trên web
+          showSuccess(response.message || 'Cập nhật ảnh thành công');
+          setAvatar(uri); // Cập nhật ảnh hiển thị
+        } catch (err) {
+          showError(err?.response?.data?.message || 'Không thể cập nhật ảnh');
+        } finally {
+          setLoading(false);
+        }
       }
     } catch (error) {
       console.error('ImagePicker Error:', error);
