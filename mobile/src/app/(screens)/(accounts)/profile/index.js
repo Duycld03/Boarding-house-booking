@@ -131,7 +131,7 @@ export default function Profile() {
         </View>
 
         {/* Email Section */}
-        <View className="mt-4 mb-4">
+        <View className="mt-4">
           <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
             Email
           </Text>
@@ -178,7 +178,7 @@ export default function Profile() {
         />
 
         {/* Gender */}
-        <Text className={`text-sm font-medium mt-4 mb-1 ${themedClasses.text}`}>
+        <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
           {t('gender.label')}
         </Text>
         <View className="flex-row justify-between mb-4">
