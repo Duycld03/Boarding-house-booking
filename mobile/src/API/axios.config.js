@@ -11,7 +11,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
     async function (config) {
         // Do something before request is sent
-        const accessToken = await AsyncStorage.getItem('access_token');
+        const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2EyYmVlNmI3NjM0NjYwMjI0MGUxMjAiLCJ1c2VybmFtZSI6Im93bmVyMTIzIiwicm9sZSI6Im93bmVyIiwiaWF0IjoxNzQ3MDE2NjA1LCJleHAiOjE3NDcxMDMwMDV9.zJ1RtXr8_Svmqg0zsAv7bsy2SSwvDTKBihnL5JzfWaY";
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }

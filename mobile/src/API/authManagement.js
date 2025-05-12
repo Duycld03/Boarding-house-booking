@@ -31,3 +31,7 @@ export const forgotPassword = (data) => {
 export const resetPassword = (data) => {
   return axios.post("/reset-password", data);
 };
+
+export const changePassword = (data) => {
+  return axios.post("auth/change-password", data);
+};

@@ -39,6 +39,12 @@ function Home() {
       >
         Welcome to My App
       </Text>
+      <Button
+        variant="primary"
+        onPress={() => router.push('/(screens)/profile/ChangePassword')}
+      >
+        ChangePassword
+      </Button>
 
       <TouchableOpacity
         onPress={toggleTheme}
