@@ -28,5 +28,7 @@
   "error": {
     "update": "Failed to update profile",
     "fetch": "Failed to fetch profile"
-  }
+  },
+      "submitButton": "Change Password"
+
 }

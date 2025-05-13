@@ -29,5 +29,7 @@
   "error": {
     "update": "Cập nhật hồ sơ thất bại",
     "fetch": "Không thể tải thông tin hồ sơ"
-  }
+  },
+      "submitButton": "Đổi Mật Khẩu"
+
 }

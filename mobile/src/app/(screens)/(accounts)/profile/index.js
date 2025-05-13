@@ -10,7 +10,7 @@ import ScreenContainer, {
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import Text from '@/components/ui/Text';
 import Button from '@/components/ui/Button';
-import { FormField } from '@/components/form';
+import { FormField, CustomRadio } from '@/components/form/index';
 import { getUser } from '@/API/authManagement';
 import {
   updateAccountFromProfile,
@@ -40,6 +40,11 @@ export default function Profile() {
   });
   const [avatar, setAvatar] = useState(null);
   const [errors, setErrors] = useState({});
+  const genderOptions = [
+    { value: 'male', label: t('gender.male') },
+    { value: 'female', label: t('gender.female') },
+    { value: 'other', label: t('gender.other') },
+  ];
 
   const pickImage = async () => {
     try {
@@ -167,22 +172,43 @@ export default function Profile() {
           <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
             Email
           </Text>
-          <View className="flex-row items-start">
-            <FormField
-              name="email"
-              value={formData.email}
-              editable={false}
-              inputType="email"
-              className={`flex-1 ${themedClasses.input}`}
-            />
-            <TouchableOpacity
-              className="ml-2 h-12 px-4 justify-center rounded bg-blue-500"
-              onPress={() => {}}
+
+          <View className="flex-row items-stars">
+            <View className="flex-1">
+              <FormField
+                name="email"
+                value={formData.email}
+                editable={false}
+                inputType="email"
+                className={`h-12 ${themedClasses.input}`}
+              />
+            </View>
+            <Button loading={loading} className="ml-2 h-12 px-4 rounded-md">
+              {t('button.changeEmail')}
+            </Button>
+          </View>
+        </View>
+
+        {/* Password Section */}
+        <View className="">
+          <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
+            Password
+          </Text>
+
+          <View className="flex-row items-stars">
+            <View className="flex-1">
+              <FormField
+                name="password"
+                editable={false}
+                className={`h-12 ${themedClasses.input}`}
+              />
+            </View>
+            <Button
+              onPress={() => router.push('/(screens)/profile/ChangePassword')}
+              className="ml-2 h-12 px-4 rounded-md"
             >
-              <Text className="font-semibold text-sm" style={{ color: '#fff' }}>
-                {t('button.changeEmail')}
-              </Text>
-            </TouchableOpacity>
+              {t('submitButton') || 'Change Password'}
+            </Button>
           </View>
         </View>
 
@@ -233,11 +259,11 @@ export default function Profile() {
             </TouchableOpacity>
           ))}
         </View>
-
         <Button
           onPress={handleSubmit}
           loading={loading}
-          className="mt-4 py-1.5 px-4 w-20 self-center text-sm rounded-md"
+          fullWidth
+          className="mt-6"
         >
           {t('button.save')}
         </Button>
