@@ -168,7 +168,7 @@ export default function Profile() {
         {/* Email Section */}
         <View className="">
           <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
-            Email
+            {t('section.email')}
           </Text>
 
           <View className="flex-row items-stars">
@@ -190,7 +190,7 @@ export default function Profile() {
         {/* Password Section */}
         <View className="">
           <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
-            Password
+            {t('section.password')}
           </Text>
 
           <View className="flex-row items-stars">

@@ -22,7 +22,9 @@
   },
     "section": {
     "account": "Accout Setting",
-    "profile": "Profile Infor"
+    "profile": "Profile Infor",
+    "email": "Email",
+    "password": "Password"
   },
   "success": {
     "update": "Profile updated successfully!",

@@ -28,7 +28,9 @@
   },
     "section": {
     "account": "Cài đặt tài khoản",
-    "profile": "Thông tin cá nhân"
+    "profile": "Thông tin cá nhân",
+    "email": "Email",
+    "password": "Mật khẩu"
   },
   "error": {
     "update": "Cập nhật hồ sơ thất bại",
