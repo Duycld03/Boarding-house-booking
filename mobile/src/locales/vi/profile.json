@@ -26,6 +26,10 @@
     "avatar": "Cập nhật ảnh đại diện thành công"
 
   },
+    "section": {
+    "account": "Cài đặt tài khoản",
+    "profile": "Thông tin cá nhân"
+  },
   "error": {
     "update": "Cập nhật hồ sơ thất bại",
     "fetch": "Không thể tải thông tin hồ sơ"

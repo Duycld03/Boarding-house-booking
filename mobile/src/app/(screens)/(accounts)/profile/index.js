@@ -40,11 +40,6 @@ export default function Profile() {
   });
   const [avatar, setAvatar] = useState(null);
   const [errors, setErrors] = useState({});
-  const genderOptions = [
-    { value: 'male', label: t('gender.male') },
-    { value: 'female', label: t('gender.female') },
-    { value: 'other', label: t('gender.other') },
-  ];
 
   const pickImage = async () => {
     try {
@@ -151,7 +146,7 @@ export default function Profile() {
   }, []);
 
   return (
-    <ScreenContainer className={themedClasses.bg}>
+    <ScreenContainer className={themedClasses.bg} withPadding={false}>
       <BackHeader title={t('title')} onBackPress={() => router.back()} />
 
       <ScrollContainer keyboardAvoiding className="px-4">
@@ -166,9 +161,12 @@ export default function Profile() {
             @{formData.username}
           </Text>
         </View>
+        <Text className={`text-base font-bold mt-6 mb-2 ${themedClasses.text}`}>
+          {t('section.account')}:
+        </Text>
 
         {/* Email Section */}
-        <View className="mt-4">
+        <View className="">
           <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
             Email
           </Text>
@@ -195,22 +193,17 @@ export default function Profile() {
             Password
           </Text>
 
-          <View className="flex-row items-stars">
-            <View className="flex-1">
-              <FormField
-                name="password"
-                editable={false}
-                className={`h-12 ${themedClasses.input}`}
-              />
-            </View>
-            <Button
-              onPress={() => router.push('/(screens)/profile/ChangePassword')}
-              className="ml-2 h-12 px-4 rounded-md"
-            >
-              {t('submitButton') || 'Change Password'}
-            </Button>
-          </View>
+          <Button
+            onPress={() => router.push('/(screens)/profile/ChangePassword')}
+            className="ml-2 h-12 px-4 rounded-md"
+          >
+            {t('submitButton') || 'Change Password'}
+          </Button>
         </View>
+        {/* Profile Information Section */}
+        <Text className={`text-base font-bold mt-6 mb-2 ${themedClasses.text}`}>
+          {t('section.profile')}:
+        </Text>
 
         {/* Full Name */}
         <FormField

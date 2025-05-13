@@ -20,6 +20,10 @@
     "save": "Save",
     "changeEmail": "Change Email"
   },
+    "section": {
+    "account": "Accout Setting",
+    "profile": "Profile Infor"
+  },
   "success": {
     "update": "Profile updated successfully!",
     "avatar": "Avatar updated successfully"
