@@ -10,7 +10,7 @@ import ScreenContainer, {
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import Text from '@/components/ui/Text';
 import Button from '@/components/ui/Button';
-import { FormField, CustomRadio } from '@/components/form/index';
+import { FormField } from '@/components/form/index';
 import { getUser } from '@/API/authManagement';
 import {
   updateAccountFromProfile,
@@ -129,7 +129,7 @@ export default function Profile() {
       });
       setAvatar(user.avatarImage?.url || null);
     } catch (err) {
-      showError(t('error.fetch'));
+      router.replace('/(auth)/login');
     }
   };
 
