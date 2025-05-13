@@ -193,12 +193,22 @@ export default function Profile() {
             Password
           </Text>
 
-          <Button
-            onPress={() => router.push('/(screens)/profile/ChangePassword')}
-            className="ml-2 h-12 px-4 rounded-md"
-          >
-            {t('submitButton') || 'Change Password'}
-          </Button>
+          <View className="flex-row items-stars">
+            <View className="flex-1">
+              <FormField
+                name="password"
+                value="********"
+                editable={false}
+                className={`h-12 ${themedClasses.input}`}
+              />
+            </View>
+            <Button
+              onPress={() => router.push('/(screens)/profile/ChangePassword')}
+              className="ml-2 h-12 px-4 rounded-md"
+            >
+              {t('submitButton') || 'Change Password'}
+            </Button>
+          </View>
         </View>
         {/* Profile Information Section */}
         <Text className={`text-base font-bold mt-6 mb-2 ${themedClasses.text}`}>
