@@ -6,7 +6,7 @@ import { useThemedClasses } from '@/utils/useTheme';
 import { useNotification } from '@/context/NotificationProvider';
 import Button from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
-import { BackHeader } from '@/components/navigation/CustomHeader';
+import { ConfirmModal } from '@/components/feedback';
 
 
 function Home() {
@@ -14,6 +14,12 @@ function Home() {
   const { themedClasses } = useThemedClasses();
   const { showSuccess, showError, showWarning, showInfo } = useNotification();
   const router = useRouter();
+  const [showConfirm, setShowConfirm] = React.useState(false);
+
+
+  const handleToggleConfim = () => {
+    setShowConfirm(!showConfirm);
+  };
 
   const handleShowNotification = () => {
     showInfo('This is a info notification');
@@ -83,11 +89,23 @@ function Home() {
       >
         Tap the button above to toggle between Light and Dark mode.
       </Text>
+      <ConfirmModal
+        visible={showConfirm}
+        onClose={handleToggleConfim}
+        title={"Confirm Action"}
+        message={"Are you sure you want to proceed?"}
+      />
       <Button
         variant="primary"
         onPress={handleRegister}
       >
         Register
+      </Button>
+      <Button
+        variant="primary"
+        onPress={handleToggleConfim}
+      >
+        Show Confirm Modal
       </Button>
     </SafeAreaView>
   );
