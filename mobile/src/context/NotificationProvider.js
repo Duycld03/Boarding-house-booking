@@ -9,42 +9,9 @@ export const NotificationProvider = ({ children }) => {
         title: '',
         message: '',
         type: 'info',
-        autoClose: true,
-        duration: 3000,
     });
 
     const pendingNotificationRef = useRef(null);
-
-    const timeoutRef = useRef(null);
-
-    useEffect(() => {
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        if (notification.visible && notification.autoClose) {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-
-            timeoutRef.current = setTimeout(() => {
-                hideNotification();
-                timeoutRef.current = null;
-            }, notification.duration);
-        }
-
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-        };
-    }, [notification.visible, notification.autoClose, notification.duration]);
 
     // Process pending notifications
     useEffect(() => {
@@ -66,15 +33,11 @@ export const NotificationProvider = ({ children }) => {
         title = 'Notification',
         message,
         type = 'info',
-        autoClose = true,
-        duration = 3000,
     }) => {
         const notificationData = {
             title,
             message,
             type,
-            autoClose,
-            duration,
         };
 
         if (notification.visible) {
@@ -103,7 +66,6 @@ export const NotificationProvider = ({ children }) => {
             title: options.title || 'Error',
             message,
             type: 'error',
-            autoClose: options.autoClose !== undefined ? options.autoClose : false,
             ...options
         });
     }, [showNotification]);
@@ -150,8 +112,6 @@ export const NotificationProvider = ({ children }) => {
                 title={notification.title}
                 message={notification.message}
                 type={notification.type}
-                autoClose={notification.autoClose}
-                duration={notification.duration}
                 onClose={hideNotification}
             />
         </NotificationContext.Provider>

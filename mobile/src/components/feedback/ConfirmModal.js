@@ -11,6 +11,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
+import { useTranslation } from 'react-i18next';
 
 const { height } = Dimensions.get('window');
 
@@ -18,23 +19,35 @@ const ConfirmModal = ({
     visible,
     onClose,
     onConfirm,
-    title = "Xác nhận",
-    message = "Bạn có chắc chắn muốn thực hiện hành động này?",
-    confirmText = "Xác nhận",
-    cancelText = "Hủy",
-    confirmColor = "#3b82f6", // Màu mặc định là blue-500
+    title,
+    message,
+    confirmText,
+    cancelText,
+    confirmColor = "#3b82f6", // Default blue-500
     dangerMode = false,
 }) => {
-    const { isDarkMode } = useTheme();
     const { themedClasses } = useThemedClasses();
     const slideAnim = useRef(new Animated.Value(height)).current;
+    const { t } = useTranslation('feedbackComponent');
 
-    // Xác định màu nút xác nhận dựa vào dangerMode
+    // Set default texts using translations
+    const defaultTitle = t('confirm_title', 'Confirm');
+    const defaultMessage = t('confirm_message', 'Are you sure you want to perform this action?');
+    const defaultConfirmText = t('ok_btn', 'OK');
+    const defaultCancelText = t('cancel_btn', 'Cancel');
+
+    // Use provided texts or fallback to translated defaults
+    const modalTitle = title || defaultTitle;
+    const modalMessage = message || defaultMessage;
+    const modalConfirmText = confirmText || defaultConfirmText;
+    const modalCancelText = cancelText || defaultCancelText;
+
+    // Determine confirm button color based on dangerMode
     const finalConfirmColor = dangerMode ? '#ef4444' : confirmColor;
 
     useEffect(() => {
         if (visible) {
-            // Hiệu ứng trượt vào
+            // Slide in animation
             Animated.timing(slideAnim, {
                 toValue: 0,
                 duration: 300,
@@ -44,7 +57,7 @@ const ConfirmModal = ({
     }, [visible]);
 
     const handleClose = () => {
-        // Hiệu ứng trượt ra trước khi đóng
+        // Slide out animation before closing
         Animated.timing(slideAnim, {
             toValue: height,
             duration: 300,
@@ -55,7 +68,7 @@ const ConfirmModal = ({
     };
 
     const handleConfirm = () => {
-        // Hiệu ứng trượt ra trước khi đóng
+        // Slide out animation before closing
         Animated.timing(slideAnim, {
             toValue: height,
             duration: 300,
@@ -97,7 +110,7 @@ const ConfirmModal = ({
                                 size={20}
                                 color="white"
                             />
-                            <Text className="text-white font-bold text-lg ml-2">{title}</Text>
+                            <Text className="text-white font-bold text-lg ml-2">{modalTitle}</Text>
                         </View>
                         <TouchableOpacity
                             onPress={handleClose}
@@ -115,7 +128,7 @@ const ConfirmModal = ({
                                 "text-text-dark text-base"
                             )}
                         >
-                            {message}
+                            {modalMessage}
                         </Text>
                     </View>
 
@@ -134,7 +147,7 @@ const ConfirmModal = ({
                                     "text-gray-200 font-medium"
                                 )}
                             >
-                                {cancelText}
+                                {modalCancelText}
                             </Text>
                         </TouchableOpacity>
 
@@ -143,7 +156,7 @@ const ConfirmModal = ({
                             style={{ backgroundColor: finalConfirmColor }}
                             className="px-4 py-2 rounded-lg"
                         >
-                            <Text className="text-white font-medium">{confirmText}</Text>
+                            <Text className="text-white font-medium">{modalConfirmText}</Text>
                         </TouchableOpacity>
                     </View>
                 </Animated.View>
