@@ -7,9 +7,8 @@
     "prepare": "npx husky install",
     "client": "cd website && npm run dev",
     "server": "cd backend && npm start",
-    "mobile": "cd mobile && npm start",
     "dashboard": "cd dashboard && npm run dev",
-    "start": "concurrently \"npm run client\" \"npm run server\" \"npm run mobile\" \"npm run dashboard\"",
+    "start": "concurrently \"npm run client\" \"npm run server\" \"npm run dashboard\"",
     "pre-commit:server": "cd backend && npm run build-babel",
     "pre-commit:client": "cd website && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,7 +21,6 @@
     "antd-img-crop": "^4.24.0",
     "concurrently": "^9.0.1",
     "i18next": "^21.9.1",
-    "nativewind": "^4.1.23",
     "react-i18next": "^11.18.6",
     "react-native-date-picker": "^5.0.12",
     "react-router-dom": "^7.1.5",
