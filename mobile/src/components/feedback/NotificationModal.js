@@ -11,6 +11,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
+import { useTranslation } from 'react-i18next';
 
 const { height } = Dimensions.get('window');
 
@@ -26,6 +27,8 @@ const NotificationModal = ({
     const { isDarkMode } = useTheme();
     const { themedClasses } = useThemedClasses();
     const slideAnim = useRef(new Animated.Value(height)).current;
+    const { t } = useTranslation('feedbackComponent');
+
 
     const notificationConfig = {
         success: {
@@ -129,12 +132,14 @@ const NotificationModal = ({
                     <View className="px-4 pb-4 flex-row justify-end">
                         <TouchableOpacity
                             onPress={handleClose}
-                            className={themedClasses(
-                                "px-4 py-2 rounded-lg bg-primary-light",
-                                "px-4 py-2 rounded-lg bg-primary-dark"
-                            )}
+                            style={{
+                                backgroundColor: color,
+                            }}
+                            className={`px-4 py-2 rounded-lg`}
                         >
-                            <Text className="text-white font-medium">OK</Text>
+                            <Text className="text-white font-medium">
+                                {t('ok_btn')}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </Animated.View>

@@ -1,18 +1,25 @@
-import React from "react";
-import { Text, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "@/context/ThemeProvider";
-import { useThemedClasses } from "@/utils/useTheme";
-import { useNotification } from "@/context/NotificationProvider";
-import Button from "@/components/ui/Button";
-import { useRouter } from "expo-router";
-import { BackHeader } from "@/components/navigation/CustomHeader";
+
+import React from 'react';
+import { Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@/context/ThemeProvider';
+import { useThemedClasses } from '@/utils/useTheme';
+import { useNotification } from '@/context/NotificationProvider';
+import Button from '@/components/ui/Button';
+import { useRouter } from 'expo-router';
+import { ConfirmModal } from '@/components/feedback';
 
 function Home() {
   const { toggleTheme, isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
   const { showSuccess, showError, showWarning, showInfo } = useNotification();
   const router = useRouter();
+  const [showConfirm, setShowConfirm] = React.useState(false);
+
+
+  const handleToggleConfim = () => {
+    setShowConfirm(!showConfirm);
+  };
 
   const handleShowNotification = () => {
     showInfo("This is a info notification");
@@ -91,6 +98,24 @@ function Home() {
       </Button>
       <Button variant="primary" onPress={handleLogin}>
         Login
+      </Button>
+      <ConfirmModal
+        visible={showConfirm}
+        onClose={handleToggleConfim}
+        title={"Confirm Action"}
+        message={"Are you sure you want to proceed?"}
+      />
+      <Button
+        variant="primary"
+        onPress={handleRegister}
+      >
+        Register
+      </Button>
+      <Button
+        variant="primary"
+        onPress={handleToggleConfim}
+      >
+        Show Confirm Modal
       </Button>
     </SafeAreaView>
   );
