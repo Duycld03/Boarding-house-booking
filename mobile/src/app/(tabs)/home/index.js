@@ -1,13 +1,12 @@
-import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '@/context/ThemeProvider';
-import { useThemedClasses } from '@/utils/useTheme';
-import { useNotification } from '@/context/NotificationProvider';
-import Button from '@/components/ui/Button';
-import { useRouter } from 'expo-router';
-import { BackHeader } from '@/components/navigation/CustomHeader';
-
+import React from "react";
+import { Text, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/context/ThemeProvider";
+import { useThemedClasses } from "@/utils/useTheme";
+import { useNotification } from "@/context/NotificationProvider";
+import Button from "@/components/ui/Button";
+import { useRouter } from "expo-router";
+import { BackHeader } from "@/components/navigation/CustomHeader";
 
 function Home() {
   const { toggleTheme, isDarkMode } = useTheme();
@@ -16,16 +15,20 @@ function Home() {
   const router = useRouter();
 
   const handleShowNotification = () => {
-    showInfo('This is a info notification');
+    showInfo("This is a info notification");
   };
 
   const handleRegister = () => {
-    router.push('/register');
+    router.push("/register");
+  };
+
+  const handleLogin = () => {
+    router.push("/login");
   };
 
   return (
     <SafeAreaView
-      edges={['top', 'left', 'right']}
+      edges={["top", "left", "right"]}
       className={themedClasses(
         "flex-1 items-center justify-center bg-background-light px-6",
         "flex-1 items-center justify-center bg-background-dark px-6"
@@ -41,7 +44,7 @@ function Home() {
       </Text>
       <Button
         variant="primary"
-        onPress={() => router.push('/(screens)/profile/ChangePassword')}
+        onPress={() => router.push("/(screens)/profile/ChangePassword")}
       >
         ChangePassword
       </Button>
@@ -55,7 +58,7 @@ function Home() {
         )}
       >
         <Text className="text-white text-lg font-semibold text-center">
-          Switch to {isDarkMode ? 'Light' : 'Dark'} Mode
+          Switch to {isDarkMode ? "Light" : "Dark"} Mode
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -83,11 +86,11 @@ function Home() {
       >
         Tap the button above to toggle between Light and Dark mode.
       </Text>
-      <Button
-        variant="primary"
-        onPress={handleRegister}
-      >
+      <Button variant="primary" onPress={handleRegister}>
         Register
+      </Button>
+      <Button variant="primary" onPress={handleLogin}>
+        Login
       </Button>
     </SafeAreaView>
   );

@@ -7,20 +7,18 @@ import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { useNotification } from "@/context/NotificationProvider";
 import { Checkbox, FormField } from "@/components/form/index";
-import { login } from "@/API/authManagement";
+import { login, verifyRegister } from "@/API/authManagement";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 export default function Login() {
   const router = useRouter();
+  const { account, token } = useLocalSearchParams();
   const { showSuccess, showError } = useNotification();
 
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    remember: false,
+    otp: "",
   });
-  const [remember, setRemember] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -35,15 +33,8 @@ export default function Login() {
     const newErrors = {};
     let isValid = true;
 
-    if (!formData.username.trim()) {
-      newErrors.username = { message: "Vui lòng nhập tài khoản" };
-      isValid = false;
-    }
-    if (!formData.password) {
-      newErrors.password = { message: "Vui lòng nhập mật khẩu" };
-      isValid = false;
-    } else if (formData.password.length < 6) {
-      newErrors.password = { message: "Mật khẩu phải có ít nhất 6 ký tự" };
+    if (!formData.otp.trim()) {
+      newErrors.otp = { message: "Vui lòng nhập OTP" };
       isValid = false;
     }
 
@@ -51,7 +42,7 @@ export default function Login() {
     return isValid;
   };
 
-  const handleLogin = async () => {
+  const handleVerifyRegister = async () => {
     if (!validateForm()) {
       showError("Vui lòng kiểm tra lại thông tin");
       return;
@@ -59,13 +50,22 @@ export default function Login() {
 
     setLoading(true);
 
+    const payload = {
+      ...formData,
+      account: JSON.parse(account),
+      token: token,
+    };
+
+    console.log(payload);
+
     try {
-      const res = await login(formData);
+      console.log(payload);
+      const res = await verifyRegister(payload);
       await AsyncStorage.setItem("access_token", res.token);
-      showSuccess("Đăng nhập thành công!");
+      showSuccess("Đăng ký thành công!");
       router.replace("/(tabs)/home");
     } catch (error) {
-      showError("Tai khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại!");
+      showError(error?.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -73,54 +73,30 @@ export default function Login() {
 
   return (
     <ScreenContainer>
-      <BackHeader title="Login" animationType="slide" />
+      <BackHeader title="Verify Register" animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
         <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          Đăng nhập
+          Nhập mã OTP
         </Text>
 
         <FormField
-          name="username"
-          label="Tài khoản"
-          placeholder="Nhập tài khoản"
+          name="otp"
+          label="OTP"
+          placeholder="Nhập mã OTP"
           value={formData.username}
           onChange={handleChange}
           error={errors}
           required
         />
 
-        <FormField
-          name="password"
-          label="Mật khẩu"
-          placeholder="Nhập mật khẩu"
-          value={formData.password}
-          onChange={handleChange}
-          error={errors}
-          inputType="password"
-          required
-        />
-
-        <Checkbox
-          checked={remember}
-          onPress={() => {
-            setRemember(!remember);
-            setFormData((prev) => ({
-              ...prev,
-              remember: !remember,
-            }));
-          }}
-          label="Ghi nhớ tài khoản"
-          className="mt-4 mb-6"
-        />
-
         <Button
-          onPress={handleLogin}
+          onPress={handleVerifyRegister}
           loading={loading}
           fullWidth
           className="mt-4"
         >
-          Đăng nhập
+          Xác nhận
         </Button>
       </ScrollContainer>
     </ScreenContainer>

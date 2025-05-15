@@ -1,33 +1,40 @@
-import React, { useState } from 'react';
-import ScreenContainer, { ScrollContainer } from '@/components/layout/ScreenContainer';
-import { BackHeader } from '@/components/navigation/CustomHeader';
-import Text from '@/components/ui/Text';
-import Button from '@/components/ui/Button';
-import { useNotification } from '@/context/NotificationProvider';
-import { CustomDatePicker, CustomRadio, Checkbox, FormField } from '@/components/form/index';
-import { ConfirmModal } from '@/components/feedback';
-import { View, TouchableOpacity } from 'react-native';
+import React, { useState } from "react";
+import ScreenContainer, {
+  ScrollContainer,
+} from "@/components/layout/ScreenContainer";
+import { BackHeader } from "@/components/navigation/CustomHeader";
+import Text from "@/components/ui/Text";
+import Button from "@/components/ui/Button";
+import { useNotification } from "@/context/NotificationProvider";
+import {
+  CustomDatePicker,
+  CustomRadio,
+  FormField,
+} from "@/components/form/index";
+import { sendOTPRegister } from "@/API/authManagement";
+import { useRouter } from "expo-router";
 
 export default function Register() {
+  const router = useRouter();
   const { showSuccess, showError } = useNotification();
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    fullname: "",
     email: "",
+    phoneNumber: "",
+    username: "",
     password: "",
-    confirmPassword: '',
+    confirmPassword: "",
+    gender: "",
   });
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [selectedTime, setSelectedTime] = useState("");
-  const [birthDate, setBirthDate] = useState(null);
-
 
   const handleChange = (name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
 
@@ -35,44 +42,62 @@ export default function Register() {
     const newErrors = {};
     let isValid = true;
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = { message: 'Vui lòng nhập họ tên' };
+    if (!formData.fullname.trim()) {
+      newErrors.fullname = { message: "Vui lòng nhập họ tên" };
       isValid = false;
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = { message: 'Vui lòng nhập email' };
+      newErrors.email = { message: "Vui lòng nhập email" };
       isValid = false;
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
-        newErrors.email = { message: 'Email không hợp lệ' };
+        newErrors.email = { message: "Email không hợp lệ" };
         isValid = false;
       }
     }
+
+    if (!formData.phoneNumber) {
+      newErrors.phoneNumber = { message: "Vui lòng nhập số điện thoại" };
+    } else if (formData.phoneNumber.length != 10) {
+      newErrors.phoneNumber = { message: "Số điện thoại phải có 10 ký tự" };
+    }
+
+    if (!formData.username) {
+      newErrors.username = { message: "Vui lòng nhập tên tài khoản" };
+      isValid = false;
+    } else if (formData.username.includes(" ")) {
+      newErrors.username = {
+        message: "Tên tài khoản không được chứa khoảng trắng",
+      };
+      isValid = false;
+    } else if (formData.username.length < 5) {
+      newErrors.username = { message: "Tên tài khoản phải có ít nhất 5 ký tự" };
+      isValid = false;
+    } else if (formData.username.length > 20) {
+      newErrors.username = { message: "Tên tài khoản không được quá 20 ký tự" };
+      isValid = false;
+    } else if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
+      newErrors.username = {
+        message: "Tên tài khoản chỉ được chứa chữ cái và số",
+      };
+      isValid = false;
+    }
+
     if (!formData.password) {
-      newErrors.password = { message: 'Vui lòng nhập mật khẩu' };
+      newErrors.password = { message: "Vui lòng nhập mật khẩu" };
       isValid = false;
     } else if (formData.password.length < 6) {
-      newErrors.password = { message: 'Mật khẩu phải có ít nhất 6 ký tự' };
+      newErrors.password = { message: "Mật khẩu phải có ít nhất 6 ký tự" };
       isValid = false;
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = { message: 'Vui lòng xác nhận mật khẩu' };
+      newErrors.confirmPassword = { message: "Vui lòng xác nhận mật khẩu" };
       isValid = false;
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = { message: 'Mật khẩu không khớp' };
-      isValid = false;
-    }
-
-    if (!agreeTerms) {
-      newErrors.agreeTerms = { message: 'Bạn cần đồng ý với Điều khoản và Điều kiện' };
-      isValid = false;
-    }
-
-    if (!birthDate) {
-      newErrors.birthDate = { message: 'Vui lòng chọn ngày sinh' };
+      newErrors.confirmPassword = { message: "Mật khẩu không khớp" };
       isValid = false;
     }
 
@@ -80,68 +105,53 @@ export default function Register() {
     return isValid;
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!validateForm()) {
-      showError('Vui lòng kiểm tra lại thông tin');
+      showError("Vui lòng kiểm tra lại thông tin");
       return;
     }
 
+    const payload = { ...formData, gender };
+
     setLoading(true);
-
-    setTimeout(() => {
+    try {
+      const res = await sendOTPRegister(payload);
+      showSuccess("Gửi mã OTP thành công");
+      router.push({
+        pathname: "/(auth)/verifyRegister",
+        params: {
+          account: JSON.stringify(res.account),
+          token: res.token,
+        },
+      });
+    } catch (error) {
+      showError(error?.response?.data?.message);
+    } finally {
       setLoading(false);
-
-      console.log('Form data submitted:', formData);
-
-      showSuccess('Đăng ký thành công!');
-
-    }, 1500);
+    }
   };
 
-  const [selectedValue, setSelectedValue] = useState('option1');
+  const [gender, setGender] = useState("male");
 
   const radioOptions = [
-    { value: 'option1', label: 'Tùy chọn 1', description: 'Mô tả cho tùy chọn 1' },
-    { value: 'option2', label: 'Tùy chọn 2' },
-    { value: 'option3', label: 'Tùy chọn 3', disabled: true },
+    { value: "male", label: "Nam" },
+    { value: "female", label: "Nữ" },
   ];
-
-  const termsError = errors.agreeTerms?.message || null;
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [dangerModalVisible, setDangerModalVisible] = useState(false);
-
-  const handleConfirmAction = () => {
-    // Xử lý khi người dùng xác nhận
-    console.log('Người dùng đã xác nhận hành động');
-  };
-
-  const handleDeleteAction = () => {
-    // Xử lý khi người dùng xác nhận xóa
-    console.log('Người dùng đã xác nhận xóa');
-  };
 
   return (
     <ScreenContainer>
-      <BackHeader
-        title="Register"
-        animationType="slide"
-      />
+      <BackHeader title="Register" animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
-        <Text
-          variant="h2"
-          weight="bold"
-          className="mt-4 mb-6"
-        >
+        <Text variant="h2" weight="bold" className="mt-4 mb-6">
           Tạo tài khoản mới
         </Text>
 
         <FormField
-          name="fullName"
+          name="fullname"
           label="Họ và tên"
           placeholder="Nhập họ và tên"
-          value={formData.fullName}
+          value={formData.fullname}
           onChange={handleChange}
           error={errors}
           required
@@ -155,6 +165,27 @@ export default function Register() {
           onChange={handleChange}
           error={errors}
           inputType="email"
+          required
+        />
+
+        <FormField
+          name="phoneNumber"
+          label="Số điện thoại"
+          placeholder="Nhập số điện thoại"
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          error={errors}
+          inputType="phone"
+          required
+        />
+
+        <FormField
+          name="username"
+          label="Tên tài khoản"
+          placeholder="Nhập tên tài khoản"
+          value={formData.username}
+          onChange={handleChange}
+          error={errors}
           required
         />
 
@@ -180,48 +211,14 @@ export default function Register() {
           required
         />
 
-        <Checkbox
-          checked={agreeTerms}
-          onPress={() => {
-            setAgreeTerms(!agreeTerms);
-            if (errors.agreeTerms) {
-              setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors.agreeTerms;
-                return newErrors;
-              });
-            }
-          }}
-          label="Tôi đồng ý với Điều khoản và Điều kiện"
-          className="mt-4 mb-6"
-          error={termsError}
-        />
-        <CustomDatePicker
-          label="Ngày sinh"
-          value={birthDate}
-          onChange={setBirthDate}
-          mode="time"
-          required
-          error={errors?.birthDate}
-        />
         <CustomRadio
-          label="Chọn một tùy chọn"
+          label="Chọn giới tính"
           options={radioOptions}
-          value={selectedValue}
-          onChange={setSelectedValue}
+          value={gender}
+          onChange={setGender}
           required={true}
           direction="vertical"
           radioPosition="left"
-        />
-
-        <ConfirmModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          onConfirm={handleConfirmAction}
-          title="Xác nhận đặt hàng"
-          message="Bạn có chắc chắn muốn đặt đơn hàng này không?"
-          confirmText="Đặt hàng"
-          cancelText="Để sau"
         />
 
         <Button
@@ -232,52 +229,6 @@ export default function Register() {
         >
           Đăng Ký
         </Button>
-
-
-        <View className="flex-1 p-4 justify-center">
-          {/* Nút mở modal thông thường */}
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            className="bg-blue-500 py-3 px-4 rounded-lg mb-4"
-          >
-            <Text className="text-white text-center font-medium">
-              Mở modal xác nhận
-            </Text>
-          </TouchableOpacity>
-
-          {/* Nút mở modal nguy hiểm */}
-          <TouchableOpacity
-            onPress={() => setDangerModalVisible(true)}
-            className="bg-red-500 py-3 px-4 rounded-lg"
-          >
-            <Text className="text-white text-center font-medium">
-              Mở modal xóa
-            </Text>
-          </TouchableOpacity>
-
-          {/* Modal xác nhận thông thường */}
-          <ConfirmModal
-            visible={modalVisible}
-            onClose={() => setModalVisible(false)}
-            onConfirm={handleConfirmAction}
-            title="Xác nhận đặt hàng"
-            message="Bạn có chắc chắn muốn đặt đơn hàng này không?"
-            confirmText="Đặt hàng"
-            cancelText="Để sau"
-          />
-
-          {/* Modal xác nhận xóa */}
-          <ConfirmModal
-            visible={dangerModalVisible}
-            onClose={() => setDangerModalVisible(false)}
-            onConfirm={handleDeleteAction}
-            title="Xóa sản phẩm"
-            message="Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác."
-            confirmText="Xóa"
-            cancelText="Hủy"
-            dangerMode={true}
-          />
-        </View>
       </ScrollContainer>
     </ScreenContainer>
   );
