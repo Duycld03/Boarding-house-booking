@@ -19,6 +19,7 @@
     "@babel/runtime": "^7.27.1",
     "@emailjs/browser": "^4.4.1",
     "antd-img-crop": "^4.24.0",
+    "antd-style": "^3.7.1",
     "concurrently": "^9.0.1",
     "i18next": "^21.9.1",
     "react-i18next": "^11.18.6",

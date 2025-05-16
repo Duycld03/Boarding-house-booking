@@ -3,6 +3,10 @@
   "about": "Về chúng tôi",
   "contact": "Liên hệ",
   "profile": "Cá nhân",
-  "changePassword": "Đổi mật khẩu",
-  "logout": "Đăng xuất"
+  "change-password": "Đổi mật khẩu",
+  "logout": "Đăng xuất",
+  "auth": {
+    "login-btn": "Đăng nhập",
+    "register-btn": "Đăng ký"
+  }
 }

@@ -1,8 +1,73 @@
+const { Option } = Select;
 import { useState, useEffect } from "react";
-import { Divider, Table as AntTable, Button, Select, Grid } from "antd";
+import { Divider, Table as AntTable, Button, Select, Grid, theme } from "antd";
+import { createStyles } from "antd-style";
 import PropTypes from "prop-types";
 
-const { Option } = Select;
+// Custom styles using antd-style
+const useStyle = createStyles(({ css, token, isDarkMode }) => {
+  const { antCls } = token;
+  return {
+    customTable: css`
+      ${antCls}-table {
+        ${antCls}-table-container {
+          ${antCls}-table-body,
+          ${antCls}-table-content {
+            scrollbar-width: thin;
+            scrollbar-color: #eaeaea transparent;
+            scrollbar-gutter: stable;
+          }
+        }
+      }
+
+      /* Pagination dark mode styles */
+      ${isDarkMode &&
+      `
+        .ant-pagination-prev .ant-btn,
+        .ant-pagination-next .ant-btn {
+          background-color: ${token.colorBgContainer} !important;
+          color: ${token.colorTextSecondary} !important;
+          border-color: ${token.colorBorder} !important;
+        }
+        
+        .ant-pagination-prev:hover .ant-btn,
+        .ant-pagination-next:hover .ant-btn {
+          background-color: ${token.colorBgTextHover} !important;
+          border-color: ${token.colorPrimary} !important;
+          color: ${token.colorPrimary} !important;
+        }
+        
+        .ant-pagination-item {
+          background-color: ${token.colorBgContainer} !important;
+          border-color: ${token.colorBorder} !important;
+        }
+        
+        .ant-pagination-item a {
+          color: ${token.colorTextSecondary} !important;
+        }
+        
+        .ant-pagination-item-active {
+          background-color: ${token.colorPrimary} !important;
+          border-color: ${token.colorPrimary} !important;
+        }
+        
+        .ant-pagination-item-active a {
+          color: #ffffff !important;
+        }
+        
+        .ant-pagination-options .ant-select-selector {
+          background-color: ${token.colorBgContainer} !important;
+          color: ${token.colorTextSecondary} !important;
+          border-color: ${token.colorBorder} !important;
+        }
+        
+        .ant-pagination-options .ant-select-arrow {
+          color: ${token.colorTextSecondary} !important;
+        }
+      `}
+    `,
+  };
+});
 
 const TableCustom = ({
   columns,
@@ -14,20 +79,20 @@ const TableCustom = ({
   loading = false,
   onRowClick,
   scrollY = null,
+  isDarkMode = false, // Add dark mode prop
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [dynamicSelect, setDynamicSelect] = useState(null);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
+  // Custom styles using antd-style
+  const { styles } = useStyle({ isDarkMode });
+
   const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
     setSelectedRowKeys(newSelectedRowKeys);
     setSelectedRows(newSelectedRows);
   };
-
-  const { useBreakpoint } = Grid;
-
-  const screens = useBreakpoint();
 
   const handleSelectChange = (value) => {
     setDynamicSelect(value);
@@ -117,16 +182,19 @@ const TableCustom = ({
       <div className="w-full">
         <div className="max-w-full">
           <AntTable
-            pagination={{ pageSize: 10 }}
+            pagination={{
+              pageSize: 10,
+            }}
             scroll={{
               x: "max-content",
             }}
-            className="text-xs sm:text-sm md:text-base"
+            className={`text-xs sm:text-sm md:text-base ${styles.customTable}`}
             rowKey="_id"
             rowSelection={checkbox ? rowSelection : null}
             columns={numberedColumns}
             dataSource={numberedData}
             onRow={onRow}
+            loading={loading}
           />
         </div>
       </div>
@@ -143,6 +211,7 @@ TableCustom.propTypes = {
   enableCount: PropTypes.bool,
   loading: PropTypes.bool,
   onRowClick: PropTypes.func,
+  isDarkMode: PropTypes.bool,
 };
 
 export default TableCustom;

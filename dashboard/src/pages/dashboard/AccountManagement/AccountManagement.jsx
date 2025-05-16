@@ -17,6 +17,10 @@ import AddAccountModal from "./AddAccount";
 import UpdateAccountModal from "./UpdateAccount/UpdateAccount";
 import { FileTextOutlined } from "@ant-design/icons";
 
+//import đa ngôn ngữ và theme
+import { useTranslation } from "react-i18next";
+import { useTheme } from "../../../context/themeContext";
+
 function AccountManagement() {
   const [accountData, setAccountData] = useState([]);
   const [selectedData, setSelectedData] = useState(undefined);
@@ -24,6 +28,36 @@ function AccountManagement() {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [filterValue, setFilterValue] = useState();
+  const { t } = useTranslation("accountManagement");
+  const { darkMode } = useTheme();
+
+  //Translate role
+  const translateRole = (role) => {
+    switch (role) {
+      case "user":
+        return t("role.user");
+      case "owner":
+        return t("role.owner");
+      case "manager":
+        return t("role.manager");
+      case "admin":
+        return t("role.admin");
+      default:
+        return role;
+    }
+  };
+
+  //Translate status
+  const translateStatus = (status) => {
+    switch (status) {
+      case "active":
+        return t("status.active");
+      case "inactive":
+        return t("status.inactive");
+      default:
+        return status;
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -36,9 +70,7 @@ function AccountManagement() {
       }
     } catch (error) {
       console.error("Failed to fetch withdrawal requests:", error);
-      toast.error(
-        "Failed to fetch withdrawal requests. Please try again later."
-      );
+      toast.error(t("messages.fetchError"));
       setAccountData([]);
     } finally {
       setLoading(false);
@@ -56,7 +88,7 @@ function AccountManagement() {
       }
     } catch (error) {
       console.error("Failed to fetch filtered accounts:", error);
-      toast.error("Failed to fetch filtered accounts. Please try again later.");
+      toast.error(t("messages.fetchError"));
       setAccountData([]);
     } finally {
       setLoading(false);
@@ -66,6 +98,7 @@ function AccountManagement() {
   //fetch account data
   useEffect(() => {
     fetchData();
+    console.log(accountData);
   }, []);
 
   //Filter account data
@@ -76,7 +109,7 @@ function AccountManagement() {
   // Các cột cho bảng
   const columns = [
     {
-      title: "Avatar",
+      title: t("columns.avatar"),
       dataIndex: "avatarImage",
       key: "avatarImage",
       render: (avatarImage) => {
@@ -90,51 +123,53 @@ function AccountManagement() {
       },
     },
     {
-      title: "Username",
+      title: t("columns.username"),
       dataIndex: "username",
       key: "username",
     },
     {
-      title: "Full Name",
+      title: t("columns.fullName"),
       dataIndex: "fullname",
       key: "fullname",
     },
     {
-      title: "Email",
+      title: t("columns.email"),
       dataIndex: "email",
       key: "email",
     },
     {
-      title: "Role",
+      title: t("columns.role"),
       dataIndex: "role",
       key: "role",
+      render: (role) => translateRole(role),
     },
     {
-      title: "Status",
+      title: t("columns.status"),
       dataIndex: "status",
       key: "status",
+      render: (status) => translateStatus(status),
     },
     {
-      title: "Created At",
+      title: t("columns.createdAt"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (createdAt) => convertTimetap(createdAt),
     },
     {
-      title: "Ation",
+      title: t("columns.action"),
       key: "action",
       render: (createdAt, record) => (
         <div className="flex gap-3">
           <Button
             size="large"
             btnDelete
-            title={"Delete"}
+            title={t("buttons.delete")}
             onClick={() => handleSelectDelete(record)}
           />
           <Button
             onClick={() => onProcessData(record)}
             size="large"
-            title={"Detail"}
+            title={t("buttons.detail")}
             icon={<FileTextOutlined />}
             className={" text-white"}
             bgColor={"rgb(5 150 105)"}
@@ -152,15 +187,18 @@ function AccountManagement() {
         if (res) {
           fetchData();
           setLoading(false);
-          toast.success("Add new account successful");
+          toast.success(t("messages.addSuccess"));
         } else {
           setLoading(false);
-          toast.error("Add account failed, no response received.");
+          toast.error(t("messages.addFailed"));
         }
       })
       .catch((error) => {
         setLoading(false);
-        toast.error("An error occurred : ", error.response.data.error);
+        toast.error(
+          "An error occurred : " +
+            (error.response?.data?.error || error.message)
+        );
       });
   };
 
@@ -174,13 +212,16 @@ function AccountManagement() {
       .then((res) => {
         if (res) {
           fetchData();
-          toast.success("Update account successful!");
+          toast.success(t("messages.updateSuccess"));
         } else {
-          toast.error("Update failed, no response received.");
+          toast.error(t("messages.updateFailed"));
         }
       })
       .catch((error) => {
-        toast.error("An error occurred : ", error.response.data.error);
+        toast.error(
+          "An error occurred : " +
+            (error.response?.data?.error || error.message)
+        );
       });
   };
 
@@ -202,7 +243,7 @@ function AccountManagement() {
     setLoading(true);
     try {
       if (!currentRecord._id) {
-        toast.error("Invalid ID");
+        toast.error(t("messages.invalidId"));
         return;
       }
       const response = await deleteAccount(currentRecord?._id);
@@ -210,15 +251,13 @@ function AccountManagement() {
         fetchData();
         setCurrentRecord("");
         handleToggleMobal();
-        toast.success("Delete account successful");
+        toast.success(t("messages.deleteSuccess"));
       } else {
-        toast.error(
-          "Failed to delete account. Server response was not successful."
-        );
+        toast.error(t("messages.deleteFailed"));
       }
     } catch (error) {
       toast.error(
-        "An error occurred: " + error.response?.data?.error || error.message
+        "An error occurred: " + (error.response?.data?.error || error.message)
       );
     } finally {
       setLoading(false); // Ensures loading is stopped in all cases
@@ -226,7 +265,11 @@ function AccountManagement() {
   };
 
   return (
-    <div className="txt">
+    <div
+      className={`txt ${
+        darkMode ? "bg-gray-700 text-text-dark" : " text-text-light"
+      }`}
+    >
       <>
         <div className="flex justify-between">
           <AddAccountModal onAddData={handleAddNewData} />
@@ -244,8 +287,8 @@ function AccountManagement() {
         />
 
         <ConfirmModal
-          title="Confirm Deletion"
-          content="Do you want to delete this account report?"
+          title={t("modals.confirmDelete.title")}
+          content={t("modals.confirmDelete.content")}
           onOk={handleDelete}
           onCancel={handleCancel}
           isOpen={isOpen}

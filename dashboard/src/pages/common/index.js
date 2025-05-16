@@ -18,3 +18,4 @@ export { default as BHManagementOwner } from './BHManagementOwner';
 export { default as BHDetailOwner } from './BHDetailOwner';
 export { default as DepositRefundRequestOwner } from './DepositRefundRequestOwner';
 export { default as RevenueManagementOwner } from './RevenueManagementOwner';
+export { default as AccessDeniedPage } from './AccessDeniedPage';

@@ -1,4 +1,4 @@
-import { AuthLayout, HeaderOnly, ProfileLayout } from "../Layouts";
+import { AuthLayout, ProfileLayout } from "../Layouts";
 
 // Namespace imports
 import * as AuthPages from "../pages/auth";
@@ -55,6 +55,11 @@ const routes = [
     page: CommonPages.ErrorPage,
     layout: AuthLayout,
   },
+  {
+    path: "/access-denied",
+    page: CommonPages.AccessDeniedPage,
+    layout: AuthLayout,
+  },
 
   // Dashboard routes
   {
@@ -96,6 +101,11 @@ const routes = [
     path: `${DASHBOARD_PATH}/facilities-management`,
     page: DashboardPages.FacilitiesManagement,
     layout: null,
+  },
+  {
+    path: "/profile",
+    page: CommonPages.Profile,
+    layout: ProfileLayout,
   },
 ];
 

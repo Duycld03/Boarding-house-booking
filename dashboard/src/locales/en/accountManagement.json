@@ -1,0 +1,131 @@
+{
+  "title": "Account Management",
+  "columns": {
+    "avatar": "Avatar",
+    "username": "Username",
+    "fullName": "Full Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "createdAt": "Created At",
+    "action": "Action"
+  },
+  "role": {
+    "user": "User",
+    "owner": "Owner",
+    "manager": "Manager",
+    "admin": "Admin"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "buttons": {
+    "delete": "Delete",
+    "detail": "Detail",
+    "addNew": "Add New Account",
+    "next": "Next",
+    "back": "Back",
+    "submit": "Submit"
+  },
+  "filters": {
+    "title": "Filter",
+    "gender": "Gender",
+    "role": "Role",
+    "status": "Status",
+    "statusPlaceholder": "Select status",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "clear": "Clear",
+    "statusOptions": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "startDatePlaceholder": "Select start date",
+    "endDatePlaceholder": "Select end date",
+    "errors": {
+      "startDateRequired": "Please select a start date.",
+      "endDateRequired": "Please select an end date.",
+      "invalidDateRange": "Start date cannot be later than end date."
+    }
+  },
+  "forms": {
+    "fullname": {
+      "label": "Enter your full name",
+      "placeholder": "Full Name",
+      "required": "Full Name is required",
+      "invalidFormat": "Full Name cannot contain numbers or special characters"
+    },
+    "email": {
+      "label": "Enter your email",
+      "placeholder": "Email",
+      "required": "Email is required",
+      "invalidFormat": "Invalid email address"
+    },
+    "gender": {
+      "label": "Select your gender",
+      "placeholder": "Select Gender",
+      "required": "Gender is required",
+      "options": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      }
+    },
+    "phoneNumber": {
+      "label": "Enter your phone number",
+      "placeholder": "Phone Number",
+      "required": "Phone Number is required",
+      "invalidFormat": "Invalid phone number format"
+    },
+    "username": {
+      "label": "Enter your username",
+      "placeholder": "Username",
+      "required": "Username is required"
+    },
+    "password": {
+      "label": "Enter your password",
+      "placeholder": "Password",
+      "required": "Password is required",
+      "minLength": "Password must be at least 6 characters"
+    },
+    "confirmPassword": {
+      "label": "Enter confirm password",
+      "placeholder": "Confirm Password",
+      "required": "Confirm Password is required",
+      "mismatch": "Passwords do not match!"
+    },
+    "role": {
+      "label": "Select role",
+      "placeholder": "Select Role",
+      "required": "Role is required",
+      "options": {
+        "user": "User",
+        "owner": "Owner"
+      }
+    }
+  },
+  "modals": {
+    "createAccount": {
+      "title": "Create Account"
+    },
+    "confirmDelete": {
+      "title": "Confirm Deletion",
+      "content": "Do you want to delete this account report?"
+    }
+  },
+  "messages": {
+    "addSuccess": "Add new account successful",
+    "addFailed": "Add account failed, no response received.",
+    "updateSuccess": "Update account successful!",
+    "updateFailed": "Update failed, no response received.",
+    "deleteSuccess": "Delete account successful",
+    "deleteFailed": "Failed to delete account. Server response was not successful.",
+    "invalidId": "Invalid ID",
+    "fetchError": "Failed to fetch accounts. Please try again later."
+  },
+  "errors": {
+    "form1": "Please correct the errors in form 1.",
+    "form2": "Please correct the errors in form 2."
+  }
+}
