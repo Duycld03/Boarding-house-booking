@@ -89,7 +89,7 @@ const CustomHeader = () => {
     {
       key: "change-password",
       icon: <LockOutlined />,
-      label: t("changePassword"),
+      label: t("change-password"),
       onClick: () => navigate("/change-password"),
     },
     {
@@ -175,19 +175,14 @@ const CustomHeader = () => {
               type="primary"
               onClick={() => navigate("/login")}
             >
-              Login
+              {t("auth.login-btn")}
             </Button>
             <Button
               size="large"
-              className={cx(
-                "btn-register",
-                darkMode
-                  ? "border-white text-white hover:text-white hover:border-blue-400"
-                  : ""
-              )}
+              className={cx("btn-register")}
               onClick={() => navigate("/register")}
             >
-              Register
+              {t("auth.register-btn")}
             </Button>
           </Space>
         ) : (

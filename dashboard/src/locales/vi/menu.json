@@ -2,6 +2,16 @@
   "home": "Trang chủ",
   "about": "Về chúng tôi",
   "contact": "Liên hệ",
-  "profile": "Cá nhân"
-
+  "change-password": "Đổi mật khẩu",
+  "logout": "Đăng xuất",
+  "profile": "Cá nhân",
+  "account-management": "Quản lý tài khoản",
+  "report-management": "Quản lý báo cáo",
+  "report-review-management": "Xem xét báo cáo",
+  "report-boarding-house-management": "Báo cáo nhà trọ",
+  "boarding-house-management": "Quản lý nhà trọ",
+  "boarding-house-type-management": "Quản lý loại nhà trọ",
+  "withdrawal-requests-management": "Yêu cầu rút tiền",
+  "list-boarding-house-reviews": "Quản lý đánh giá",
+  "facilities-management": "Quản lý tiện nghi"
 }

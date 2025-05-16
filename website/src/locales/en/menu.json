@@ -3,6 +3,10 @@
   "about": "About Us",
   "contact": "Contact",
   "profile": "Profile",
-  "changePassword": "Change Password",
-  "logout": "Logout"
+  "change-password": "Change Password",
+  "logout": "Logout",
+  "auth": {
+    "login-btn": "Login",
+    "register-btn": "Register"
+  }
 }

@@ -18,6 +18,7 @@ function DefaultLayout({ children, isLoggedIn }) {
             padding: "24px 0",
             minHeight: "calc(100vh - 64px)",
           }}
+          className=" dark:bg-gray-700"
         >
           <CustomSlider />
           <Content className={cx("content-wrapper")}>{children}</Content>

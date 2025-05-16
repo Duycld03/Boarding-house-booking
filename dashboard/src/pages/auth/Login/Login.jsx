@@ -22,16 +22,14 @@ function Login() {
       const role = res.user.role;
       loginData(res.user);
 
-      localStorage.setItem('access_token', res.token);
+      localStorage.setItem("access_token", res.token);
 
       if (role === "admin") {
         navigate("/dashboard/account-management");
-      } else if (location.key !== "default") {
-        navigate(-1);
+        toast.success("Login successful");
       } else {
-        navigate("/");
+        navigate("/access-denied");
       }
-      toast.success("Login successful");
 
       setLoading(false);
     } catch (error) {
@@ -40,20 +38,10 @@ function Login() {
       setLoading(false);
     }
   };
-  const checkUser = async () => {
-    try {
-      await getUser();
-      navigate('/');
-    } catch (error) {}
-  };
-
-  useEffect(() => {
-    checkUser();
-  }, []);
 
   const loginWithGoogleHandler = async (response) => {
     try {
-      const remember = form.getFieldValue('remember');
+      const remember = form.getFieldValue("remember");
       const data = { ...response, remember };
       const res = await loginWithGoogle(data);
 
@@ -69,9 +57,8 @@ function Login() {
         }
 
         toast.success("Login successful");
-
       } else {
-        navigate('/register-with-google', { state: { user: res.user } });
+        navigate("/register-with-google", { state: { user: res.user } });
       }
     } catch (error) {
       toast.error(error?.response?.data?.message);
@@ -83,14 +70,14 @@ function Login() {
       <Card
         style={{
           width: 400,
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
         <p className="mb-5">
           <Back />
         </p>
 
-        <h2 className={'font-body text-4xl font-bold text-center mb-5'}>
+        <h2 className={"font-body text-4xl font-bold text-center mb-5"}>
           Login
         </h2>
         <Form
@@ -108,7 +95,7 @@ function Login() {
             rules={[
               {
                 required: true,
-                message: 'Please input your username!',
+                message: "Please input your username!",
               },
             ]}
           >
@@ -121,11 +108,11 @@ function Login() {
             rules={[
               {
                 required: true,
-                message: 'Please input your password!',
+                message: "Please input your password!",
               },
               {
                 min: 5,
-                message: 'Password must be at least 5 characters!',
+                message: "Password must be at least 5 characters!",
               },
             ]}
           >
@@ -139,7 +126,7 @@ function Login() {
             <p className="text-right">
               <span
                 className="text-blue-500 cursor-pointer"
-                onClick={() => navigate('/forgot-password')}
+                onClick={() => navigate("/forgot-password")}
               >
                 Forgot password?
               </span>
@@ -152,9 +139,9 @@ function Login() {
           <Form.Item>
             <Button
               style={{
-                backgroundColor: '#40BFFF',
-                borderColor: '#40BFFF',
-                color: '#fff',
+                backgroundColor: "#40BFFF",
+                borderColor: "#40BFFF",
+                color: "#fff",
                 padding: 20,
               }}
               htmlType="submit"
@@ -168,16 +155,16 @@ function Login() {
             <GoogleLogin
               onSuccess={loginWithGoogleHandler}
               onError={() => {
-                console.log('error');
+                console.log("error");
               }}
             />
           </Form.Item>
         </Form>
         <p className="text-center">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <span
             className="text-blue-500 cursor-pointer"
-            onClick={() => navigate('/register')}
+            onClick={() => navigate("/register")}
           >
             Register
           </span>

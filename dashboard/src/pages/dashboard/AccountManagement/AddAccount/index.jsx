@@ -1,18 +1,82 @@
 import { useState } from "react";
-import { Form, Select, Modal, Input } from "antd";
+import { Form, Select, Modal, Input, ConfigProvider } from "antd";
 import { Button } from "../../../../component";
 import { toast } from "react-toastify";
-
-import { createAccount } from "../../../../api/AccountManagement";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/themeContext";
+import "./AddAccountModal.css"; // Import custom CSS for additional dark mode fixes
 
 const { Option } = Select;
 
 const AddAccountModal = ({ onAddData }) => {
+  const { t } = useTranslation("accountManagement");
+  const { darkMode } = useTheme();
+
   const [form1] = Form.useForm();
   const [form2] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [step, setStep] = useState(1);
-  const [form1Data, setForm1Data] = useState({}); // State to store Form 1 data
+  const [form1Data, setForm1Data] = useState({});
+
+  // Theme-specific styles
+
+  // Modal styles for dark mode
+  const modalStyles = darkMode
+    ? {
+        mask: {
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
+        },
+        content: {
+          backgroundColor: "#1f2937",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+        },
+        header: {
+          backgroundColor: "#1f2937",
+          color: "#ffffff", // Brighter white for better visibility
+          borderBottom: "1px solid #374151",
+        },
+        body: {
+          backgroundColor: "#1f2937",
+          color: "#ffffff", // Brighter white for better visibility
+        },
+        footer: {
+          backgroundColor: "#1f2937",
+          borderTop: "1px solid #374151",
+        },
+      }
+    : {};
+
+  // Form styles for dark mode
+  const formStyles = {
+    item: darkMode ? { marginBottom: "24px" } : {},
+    input: darkMode
+      ? {
+          backgroundColor: "#374151",
+          borderColor: "#4B5563",
+          color: "#F9FAFB",
+        }
+      : {},
+    select: darkMode
+      ? {
+          backgroundColor: "#374151",
+          color: "#F9FAFB",
+        }
+      : {},
+    option: darkMode
+      ? {
+          backgroundColor: "#374151",
+          color: "#F9FAFB",
+          "&:hover": {
+            backgroundColor: "#4B5563",
+          },
+        }
+      : {},
+  };
+
+  // Button styles based on theme
+  const primaryButtonClass = "bg-primary w-full text-white";
+
+  const secondaryButtonClass = "bg-gray-300 dark:bg-gray-600";
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -30,11 +94,11 @@ const AddAccountModal = ({ onAddData }) => {
     form1
       .validateFields()
       .then((values) => {
-        setForm1Data(values); // Save Form 1 data
+        setForm1Data(values);
         setStep(2);
       })
       .catch(() => {
-        toast.error("Please correct the errors in form 1.");
+        toast.error(t("errors.form1"));
       });
   };
 
@@ -45,7 +109,7 @@ const AddAccountModal = ({ onAddData }) => {
         form2
           .validateFields()
           .then((values2) => {
-            const { confirmPassword, ...accountData } = values2; // Loại bỏ confirmPassword
+            const { confirmPassword, ...accountData } = values2;
 
             const finalValues = {
               ...form1Data,
@@ -53,158 +117,333 @@ const AddAccountModal = ({ onAddData }) => {
             };
 
             onAddData(finalValues);
+            toast.success(t("messages.addSuccess"));
             handleCancel();
           })
           .catch((error) => {
-            console.error("Form 2 validation failed:", error); // In lỗi form2
-            toast.error("Please correct the errors in form 2.");
+            console.error("Form 2 validation failed:", error);
+            toast.error(t("errors.form2"));
           });
       })
       .catch((error) => {
-        console.error("Form 1 validation failed:", error); // In lỗi form1
-        toast.error("Please correct the errors in form 1.");
+        console.error("Form 1 validation failed:", error);
+        toast.error(t("errors.form1"));
       });
   };
 
+  // Enhanced theme config with proper input field styling for dark mode
+  const themeConfig = {
+    algorithm: darkMode
+      ? ConfigProvider.darkAlgorithm
+      : ConfigProvider.defaultAlgorithm,
+    token: darkMode
+      ? {
+          colorText: "#ffffff", // Brighter text for better visibility
+          colorTextSecondary: "#e5e7eb", // Less faded secondary text
+          colorBgContainer: "#1f2937", // Dark background
+          colorBorder: "#4b5563", // More visible borders
+          colorPrimary: "#3b82f6", // Blue primary color
+
+          // Form input colors
+          colorBgElevated: "#374151", // Dropdown menus, popover backgrounds
+          colorFillSecondary: "#374151", // Secondary fill color (select, etc)
+          controlItemBgActive: "#3b82f6", // Active item background
+          controlItemBgHover: "#4B5563", // Hover state background
+
+          // Input colors
+          colorTextPlaceholder: "#9CA3AF", // Placeholder text
+          colorTextQuaternary: "#D1D5DB", // Form labels
+          colorBorderSecondary: "#4B5563", // Secondary borders
+        }
+      : {},
+    components: {
+      Select: darkMode
+        ? {
+            optionSelectedBg: "#2563eb",
+            optionSelectedColor: "#ffffff",
+            optionActiveBg: "#3b82f6",
+            selectorBg: "#374151",
+            colorBgElevated: "#374151",
+            colorText: "#F9FAFB",
+            colorTextPlaceholder: "#9CA3AF",
+            colorBorder: "#4B5563",
+            colorPrimaryHover: "#3b82f6",
+            borderRadius: 4,
+            controlOutline: "rgba(59, 130, 246, 0.5)",
+          }
+        : {},
+      Input: darkMode
+        ? {
+            colorBgContainer: "#374151",
+            colorText: "#F9FAFB",
+            colorTextPlaceholder: "#9CA3AF",
+            colorBorder: "#4B5563",
+            activeBorderColor: "#3b82f6",
+            hoverBorderColor: "#60A5FA",
+            addonBg: "#374151",
+          }
+        : {},
+      Form: darkMode
+        ? {
+            labelColor: "#F9FAFB",
+            colorText: "#F9FAFB",
+          }
+        : {},
+    },
+  };
+
+  // Custom CSS class for input fields in dark mode
+  const darkModeInputClass = darkMode ? "dark-mode-input" : "";
+  const darkModeSelectClass = darkMode ? "dark-mode-select" : "";
+
   return (
-    <>
-      <Button btnAdd title="Add new" size="large" onClick={showModal}></Button>
+    <ConfigProvider theme={themeConfig}>
+      <Button
+        btnAdd
+        title={t("buttons.addNew")}
+        size="large"
+        onClick={showModal}
+      />
+
       <Modal
-        title="Create Account"
+        title={
+          <span className={darkMode ? "text-white font-medium" : ""}>
+            {t("modals.createAccount.title")}
+          </span>
+        }
         open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
         destroyOnClose
+        styles={modalStyles}
+        className={darkMode ? "dark-mode-modal" : ""}
       >
-        {step === 1 && (
-          <Form form={form1} layout="vertical" name="personal_info">
-            <Form.Item
-              label="Enter your full name"
-              name="fullname"
-              rules={[
-                { required: true, message: "Full Name is required" },
-                {
-                  pattern: /^[a-zA-Z\s]+$/,
-                  message:
-                    "Full Name cannot contain numbers or special characters",
-                },
-              ]}
-            >
-              <Input placeholder="Full Name" />
-            </Form.Item>
-            <Form.Item
-              label="Enter your email"
-              name="email"
-              rules={[
-                { required: true, message: "Email is required" },
-                { type: "email", message: "Invalid email address" },
-              ]}
-            >
-              <Input placeholder="Email" />
-            </Form.Item>
-            <Form.Item
-              label="Select your gender"
-              name="gender"
-              rules={[{ required: true, message: "Gender is required" }]}
-            >
-              <Select placeholder="Select Gender">
-                <Option value="male">Male</Option>
-                <Option value="female">Female</Option>
-                <Option value="other">Other</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item
-              label="Enter your phone number"
-              name="phoneNumber"
-              rules={[
-                { required: true, message: "Phone Number is required" },
-                {
-                  pattern: /^[0-9]{10,11}$/,
-                  message: "Invalid phone number format",
-                },
-              ]}
-            >
-              <Input placeholder="Phone Number" />
-            </Form.Item>
-            <Button
-              className="bg-primary w-full text-white"
-              size="large"
-              onClick={handleNext}
-              title="Next"
-            >
-              Next
-            </Button>
-          </Form>
-        )}
-        {step === 2 && (
-          <Form form={form2} layout="vertical" name="account_info">
-            <Form.Item
-              label="Enter your username"
-              name="username"
-              rules={[{ required: true, message: "Username is required" }]}
-            >
-              <Input placeholder="Username" />
-            </Form.Item>
-            <Form.Item
-              label="Enter your password"
-              name="password"
-              rules={[
-                { required: true, message: "Password is required" },
-                { min: 6, message: "Password must be at least 6 characters" },
-              ]}
-            >
-              <Input.Password placeholder="Password" />
-            </Form.Item>
-            <Form.Item
-              label="Enter confirm password"
-              name="confirmPassword"
-              dependencies={["password"]}
-              rules={[
-                { required: true, message: "Confirm Password is required" },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue("password") === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error("Passwords do not match!"));
+        <div className={darkMode ? "dark-mode-form" : ""}>
+          {step === 1 && (
+            <Form form={form1} layout="vertical" name="personal_info">
+              <Form.Item
+                label={
+                  <span className={darkMode ? "text-white" : ""}>
+                    {t("forms.fullname.label")}
+                  </span>
+                }
+                name="fullname"
+                rules={[
+                  { required: true, message: t("forms.fullname.required") },
+                  {
+                    pattern: /^[a-zA-Z\s]+$/,
+                    message: t("forms.fullname.invalidFormat"),
                   },
-                }),
-              ]}
-            >
-              <Input.Password placeholder="Confirm Password" />
-            </Form.Item>
-            <Form.Item
-              label="Select role"
-              name="role"
-              rules={[{ required: true, message: "Role is required" }]}
-            >
-              <Select placeholder="Select Role">
-                <Option value="user">User</Option>
-                <Option value="owner">Owner</Option>
-              </Select>
-            </Form.Item>
-            <div className="flex justify-between">
-              <Button
-                className="bg-gray-300"
-                size="large"
-                onClick={() => setStep(1)}
-                title="Back"
+                ]}
+                style={formStyles.item}
               >
-                Back
-              </Button>
-              <Button
-                className="bg-primary w-full text-white"
-                size="large"
-                onClick={handleSubmit}
-                title="Submit"
+                <Input
+                  placeholder={t("forms.fullname.placeholder")}
+                  className={darkModeInputClass}
+                  style={formStyles.input}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={
+                  <span className={darkMode ? "text-white" : ""}>
+                    {t("forms.email.label")}
+                  </span>
+                }
+                name="email"
+                rules={[
+                  { required: true, message: t("forms.email.required") },
+                  { type: "email", message: t("forms.email.invalidFormat") },
+                ]}
+                style={formStyles.item}
               >
-                Submit
+                <Input
+                  placeholder={t("forms.email.placeholder")}
+                  className={darkModeInputClass}
+                  style={formStyles.input}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={
+                  <span className={darkMode ? "text-white" : ""}>
+                    {t("forms.gender.label")}
+                  </span>
+                }
+                name="gender"
+                rules={[
+                  { required: true, message: t("forms.gender.required") },
+                ]}
+                style={formStyles.item}
+              >
+                <Select
+                  placeholder={t("forms.gender.placeholder")}
+                  className={darkModeSelectClass}
+                  dropdownStyle={darkMode ? { backgroundColor: "#374151" } : {}}
+                  popupClassName={darkMode ? "dark-mode-dropdown" : ""}
+                >
+                  <Option value="male">{t("forms.gender.options.male")}</Option>
+                  <Option value="female">
+                    {t("forms.gender.options.female")}
+                  </Option>
+                  <Option value="other">
+                    {t("forms.gender.options.other")}
+                  </Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                label={
+                  <span className={darkMode ? "text-white" : ""}>
+                    {t("forms.phoneNumber.label")}
+                  </span>
+                }
+                name="phoneNumber"
+                rules={[
+                  { required: true, message: t("forms.phoneNumber.required") },
+                  {
+                    pattern: /^[0-9]{10,11}$/,
+                    message: t("forms.phoneNumber.invalidFormat"),
+                  },
+                ]}
+                style={formStyles.item}
+              >
+                <Input
+                  placeholder={t("forms.phoneNumber.placeholder")}
+                  className={darkModeInputClass}
+                  style={formStyles.input}
+                />
+              </Form.Item>
+
+              <Button
+                className={primaryButtonClass}
+                size="large"
+                onClick={handleNext}
+                title={t("buttons.next")}
+              >
+                {t("buttons.next")}
               </Button>
-            </div>
-          </Form>
-        )}
+            </Form>
+          )}
+
+          {step === 2 && (
+            <Form form={form2} layout="vertical" name="account_info">
+              <Form.Item
+                label={
+                  <span className={darkMode ? "text-white" : ""}>
+                    {t("forms.username.label")}
+                  </span>
+                }
+                name="username"
+                rules={[
+                  { required: true, message: t("forms.username.required") },
+                ]}
+                style={formStyles.item}
+              >
+                <Input
+                  placeholder={t("forms.username.placeholder")}
+                  className={darkModeInputClass}
+                  style={formStyles.input}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={
+                  <span className={darkMode ? "text-white" : ""}>
+                    {t("forms.password.label")}
+                  </span>
+                }
+                name="password"
+                rules={[
+                  { required: true, message: t("forms.password.required") },
+                  { min: 6, message: t("forms.password.minLength") },
+                ]}
+                style={formStyles.item}
+              >
+                <Input.Password
+                  placeholder={t("forms.password.placeholder")}
+                  className={darkModeInputClass}
+                  style={formStyles.input}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={
+                  <span className={darkMode ? "text-white" : ""}>
+                    {t("forms.confirmPassword.label")}
+                  </span>
+                }
+                name="confirmPassword"
+                dependencies={["password"]}
+                rules={[
+                  {
+                    required: true,
+                    message: t("forms.confirmPassword.required"),
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(t("forms.confirmPassword.mismatch"))
+                      );
+                    },
+                  }),
+                ]}
+                style={formStyles.item}
+              >
+                <Input.Password
+                  placeholder={t("forms.confirmPassword.placeholder")}
+                  className={darkModeInputClass}
+                  style={formStyles.input}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={
+                  <span className={darkMode ? "text-white" : ""}>
+                    {t("forms.role.label")}
+                  </span>
+                }
+                name="role"
+                rules={[{ required: true, message: t("forms.role.required") }]}
+                style={formStyles.item}
+              >
+                <Select
+                  placeholder={t("forms.role.placeholder")}
+                  className={darkModeSelectClass}
+                  dropdownStyle={darkMode ? { backgroundColor: "#374151" } : {}}
+                  popupClassName={darkMode ? "dark-mode-dropdown" : ""}
+                >
+                  <Option value="user">{t("forms.role.options.user")}</Option>
+                  <Option value="owner">{t("forms.role.options.owner")}</Option>
+                </Select>
+              </Form.Item>
+
+              <div className="flex justify-between">
+                <Button
+                  className={secondaryButtonClass}
+                  size="large"
+                  onClick={() => setStep(1)}
+                  title={t("buttons.back")}
+                >
+                  {t("buttons.back")}
+                </Button>
+                <Button
+                  className={primaryButtonClass}
+                  size="large"
+                  onClick={handleSubmit}
+                  title={t("buttons.submit")}
+                >
+                  {t("buttons.submit")}
+                </Button>
+              </div>
+            </Form>
+          )}
+        </div>
       </Modal>
-    </>
+    </ConfigProvider>
   );
 };
 
