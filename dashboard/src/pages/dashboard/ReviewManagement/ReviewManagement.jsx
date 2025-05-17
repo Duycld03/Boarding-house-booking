@@ -14,7 +14,7 @@ import {
 } from '../../../api/ReviewManagement';
 import FilterReview from './FilterReview';
 import { FileTextOutlined } from '@ant-design/icons';
-import DetailModal from './DetailModal';
+import DetailModal from './DetailModal.jsx';
 import { useTranslation } from 'react-i18next';
 
 function ReviewManagement() {
