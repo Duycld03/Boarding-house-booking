@@ -1,0 +1,33 @@
+{
+  "filters": {
+    "title": "Filter Reports",
+    "reason": "Reason",
+    "reasonPlaceholder": "Select reason",
+    "reasonOptions": {
+      "spam": "Spam",
+      "misleading": "Misleading information",
+      "privacy": "Privacy violation",
+      "inappropriate": "Inappropriate content"
+    },
+    "status": "Status",
+    "statusPlaceholder": "Select status",
+    "statusOptions": {
+      "pending": "Pending",
+      "resolved": "Resolved",
+      "rejected": "Rejected"
+    },
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "startDatePlaceholder": "Select start date",
+    "endDatePlaceholder": "Select end date",
+    "clear": "Clear",
+    "errors": {
+      "invalidDateRange": "Start date cannot be after end date.",
+      "startDateRequired": "Please select a start date.",
+      "endDateRequired": "Please select an end date."
+    }
+  },
+  "buttons": {
+    "submit": "Apply"
+  }
+}
