@@ -30,7 +30,9 @@
   "buttons": {
     "delete": "Xóa",
     "detail": "Chi tiết",
-    "submit": "Áp dụng"
+    "submit": "Áp dụng",
+     "close": "Đóng",
+    "replay": "Phản hồi"
   },
   "reasons": {
     "Spam": "Spam",
@@ -65,5 +67,18 @@
     "pending": "Chờ xử lý",
     "resolved": "Đã xử lý",
     "rejected": "Từ chối"
+  },
+  "detail": {
+    "title": "Chi tiết báo cáo đánh giá",
+    "reviewInfo": "Thông tin đánh giá",
+    "reportInfo": "Thông tin báo cáo",
+    "reportedAt": "Thời gian báo cáo",
+    "rating": "Đánh giá",
+    "content": "Nội dung",
+    "noContent": "Không có nội dung",
+    "reviewImages": "Ảnh đánh giá",
+    "reportImages": "Ảnh báo cáo",
+    "noImages": "Không có ảnh",
+    "details": "Chi tiết"
   }
 }

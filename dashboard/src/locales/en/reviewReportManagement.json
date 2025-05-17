@@ -30,7 +30,9 @@
   "buttons": {
     "delete": "Delete",
     "detail": "Detail",
-    "submit": "Apply"
+    "submit": "Apply",
+    "close": "Close",
+    "replay": "Replay"
   },
   "reasons": {
     "Spam": "Spam",
@@ -65,5 +67,18 @@
     "pending": "pending",
     "resolved": "resolved",
     "rejected": "rejected"
+  },
+  "detail": {
+    "title": "Review Report Details",
+    "reviewInfo": "Review Information",
+    "reportInfo": "Report Information",
+    "reportedAt": "Reported At",
+    "rating": "Rating",
+    "content": "Content",
+    "noContent": "No content",
+    "reviewImages": "Review Images",
+    "reportImages": "Report Images",
+    "noImages": "No images available",
+    "details": "Details"
   }
 }

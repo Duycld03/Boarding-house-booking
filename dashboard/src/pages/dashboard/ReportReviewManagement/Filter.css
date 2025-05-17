@@ -152,3 +152,28 @@
 .ant-picker-dark input::placeholder {
   color: rgba(255, 255, 255, 0.5) !important;
 }
+/* styles.css hoặc tailwind.css */
+.dark-modal .ant-modal-content {
+  background-color: #1f2937 !important;
+  /* bg-gray-800 */
+  color: white;
+}
+
+.dark-modal .ant-modal-header {
+  background-color: #1f2937 !important;
+  color: white;
+  /* bg-gray-700 */
+}
+
+.dark-modal .ant-modal-title {
+  color: white !important;
+}
+
+.dark-modal .ant-modal-footer {
+  background-color: #1f2937 !important;
+}
+
+.dark-modal .ant-btn-default {
+  background-color: #374151 !important;
+  color: white !important;
+}
