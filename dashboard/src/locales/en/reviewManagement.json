@@ -9,7 +9,10 @@
   },
   "buttons": {
     "delete": "Delete",
-    "detail": "Detail"
+    "detail": "Detail",
+    "submit": "Apply",
+    "cancel": "Cancel"
+
   },
   "modals": {
     "confirmDelete": {
@@ -23,5 +26,22 @@
     "deleteFailed": "Failed to delete review.",
     "detailFetchError": "Failed to fetch review details.",
     "filterFetchError": "Failed to fetch filtered reviews."
+  },
+  "filters": {
+    "title": "Filter",
+    "boardingHouse": "Boarding House Name",
+    "boardingHousePlaceholder": "Enter boarding house name",
+    "startDate": "Start Date",
+    "startDatePlaceholder": "Select start date",
+    "endDate": "End Date",
+    "endDatePlaceholder": "Select end date",
+    "rating": "Rating",
+    "ratingPlaceholder": "Select rating",
+    "clear": "Clear",
+    "errors": {
+      "invalidDateRange": "Start date cannot be later than end date.",
+      "startDateRequired": "Please select a start date.",
+      "endDateRequired": "Please select an end date."
+    }
   }
 }

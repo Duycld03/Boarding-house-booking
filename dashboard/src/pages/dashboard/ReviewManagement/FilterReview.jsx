@@ -1,123 +1,141 @@
-import { useState } from "react";
-import { DatePicker, Form, Input, Select } from "antd";
-import { StarOutlined, StarFilled } from "@ant-design/icons";
-import moment from "moment";
-import ButtonCustom from "../../../component/Button";
-import { toast } from "react-toastify";
+import { useState } from 'react';
+import { DatePicker, Form, Input, Select } from 'antd';
+import { StarOutlined, StarFilled } from '@ant-design/icons';
+import moment from 'moment';
+import ButtonCustom from '../../../component/Button';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/context/ThemeContext';
+import './Filter.css';
 
 function FilterReview({ setFilterValue }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [boardingHouseName, setBoardingHouseName] = useState("");
+  const [boardingHouseName, setBoardingHouseName] = useState('');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [rating, setRating] = useState([]);
-
   const [form] = Form.useForm();
 
-  const handleFilterClick = () => {
-    setIsOpen(!isOpen);
-  };
+  const { t } = useTranslation('reviewManagement');
+  const { darkMode } = useTheme();
+
+  const handleFilterClick = () => setIsOpen(!isOpen);
 
   const handleSubmit = (values) => {
     const { startDate, endDate } = values;
 
     if (startDate && !endDate) {
-      toast.error("Please select an end date.");
+      toast.error(t('filters.errors.endDateRequired'));
       return;
     }
-
     if (endDate && !startDate) {
-      toast.error("Please select a start date.");
+      toast.error(t('filters.errors.startDateRequired'));
       return;
     }
-
     if (startDate && endDate && startDate.isAfter(endDate)) {
-      toast.error("Start date cannot be later than end date.");
+      toast.error(t('filters.errors.invalidDateRange'));
       return;
     }
 
     setFilterValue({
-      boardingHouse: values.boardingHouse || "",
-      startDate: startDate || "",
-      endDate: endDate || "",
+      boardingHouse: values.boardingHouse || '',
+      startDate: startDate || '',
+      endDate: endDate || '',
       ratings: values.rating || [],
     });
   };
 
   const handleClear = () => {
-    setBoardingHouseName("");
+    setBoardingHouseName('');
     setStartDate(null);
     setEndDate(null);
     setRating([]);
     setFilterValue({
-      boardingHouse: "",
-      startDate: "",
-      endDate: "",
+      boardingHouse: '',
+      startDate: '',
+      endDate: '',
       ratings: [],
     });
     form.resetFields();
   };
 
-  const handleSelectChange = (value) => {
-    setRating(value);
-  };
-
   return (
     <div className="relative inline-block text-left">
-      <div>
-        <ButtonCustom
-          onClick={handleFilterClick}
-          size="large"
-          title={"Filter"}
-          btnFilter
-        ></ButtonCustom>
-      </div>
+      <ButtonCustom
+        onClick={handleFilterClick}
+        size="large"
+        title={t('filters.title')}
+        btnFilter
+      />
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-2 w-96 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden rounded-2xl">
+        <div
+          className={`absolute right-0 z-10 mt-2 w-96 origin-top-right rounded-2xl shadow-lg ring-1 ring-black/5 ${
+            darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'
+          }`}
+        >
           <Form
             form={form}
             onFinish={handleSubmit}
             layout="vertical"
-            className="py-2 px-4"
+            className={`py-2 px-4 ${darkMode ? 'dark-form' : ''}`}
           >
             <Form.Item
-              label="Boarding House Name"
+              label={t('filters.boardingHouse')}
               name="boardingHouse"
               className="mb-2"
             >
               <Input
+                className={darkMode ? 'ant-picker-dark' : ''}
                 value={boardingHouseName}
-                placeholder="Enter boarding house name"
                 onChange={(e) => setBoardingHouseName(e.target.value)}
+                placeholder={t('filters.boardingHousePlaceholder')}
                 allowClear
               />
             </Form.Item>
-            <Form.Item label="Start Date" name="startDate" className="mb-2">
+            <Form.Item
+              label={t('filters.startDate')}
+              name="startDate"
+              className="mb-2"
+            >
               <DatePicker
-                className="w-full"
+                className={`w-full ${darkMode ? 'ant-picker-dark' : ''}`}
                 value={startDate ? moment(startDate) : null}
                 onChange={(date) => setStartDate(date)}
                 format="DD-MM-YYYY"
                 allowClear
+                inputReadOnly
+                placeholder={t('filters.startDatePlaceholder')} // ✅ thêm dòng này
               />
             </Form.Item>
-            <Form.Item label="End Date" name="endDate" className="mb-2">
+
+            <Form.Item
+              label={t('filters.endDate')}
+              name="endDate"
+              className="mb-2"
+            >
               <DatePicker
-                className="w-full"
+                className={`w-full ${darkMode ? 'ant-picker-dark' : ''}`}
                 value={endDate ? moment(endDate) : null}
                 onChange={(date) => setEndDate(date)}
                 format="DD-MM-YYYY"
                 allowClear
+                inputReadOnly
+                placeholder={t('filters.endDatePlaceholder')} // ✅ thêm dòng này
               />
             </Form.Item>
-            <Form.Item label="Rating" name="rating" className="mb-2">
+
+            <Form.Item
+              label={t('filters.rating')}
+              name="rating"
+              className="mb-2"
+            >
               <Select
                 mode="multiple"
                 allowClear
                 value={rating}
-                onChange={handleSelectChange}
-                placeholder="Select rating"
-                className="w-full"
+                onChange={setRating}
+                placeholder={t('filters.ratingPlaceholder')}
+                className={`w-full ${darkMode ? 'ant-select-dark' : ''}`}
               >
                 {[1, 2, 3, 4, 5].map((value) => (
                   <Select.Option key={value} value={value}>
@@ -140,13 +158,15 @@ function FilterReview({ setFilterValue }) {
                   btnFilter
                   size="large"
                   htmlType="submit"
-                  className={"flex-1 w-40"}
+                  className="flex-1 w-40"
+                  title={t('buttons.submit')}
                 />
                 <ButtonCustom
                   onClick={handleClear}
-                  className={"flex-1 w-40"}
+                  className="flex-1 w-40"
                   btnDelete
                   size="large"
+                  title={t('filters.clear')}
                 />
               </div>
             </Form.Item>
