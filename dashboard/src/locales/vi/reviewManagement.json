@@ -11,7 +11,9 @@
     "delete": "Xóa",
     "detail": "Chi tiết",
     "submit": "Xác nhận",
-    "cancel": "Xóa"
+    "cancel": "Xóa",
+     "owner": "Chủ trọ trả lời"
+
   },
   "modals": {
     "confirmDelete": {
@@ -41,6 +43,8 @@
       "invalidDateRange": "Ngày bắt đầu không được sau ngày kết thúc.",
       "startDateRequired": "Vui lòng chọn ngày bắt đầu.",
       "endDateRequired": "Vui lòng chọn ngày kết thúc."
-    }
+    },
+        "images": "Ảnh"
+
   }
 }

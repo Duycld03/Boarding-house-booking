@@ -11,7 +11,8 @@
     "delete": "Delete",
     "detail": "Detail",
     "submit": "Apply",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "owner": "Owner reply"
 
   },
   "modals": {
@@ -42,6 +43,7 @@
       "invalidDateRange": "Start date cannot be later than end date.",
       "startDateRequired": "Please select a start date.",
       "endDateRequired": "Please select an end date."
-    }
+    },
+    "images": "Images"
   }
 }

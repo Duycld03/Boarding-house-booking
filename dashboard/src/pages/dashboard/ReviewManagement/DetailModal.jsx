@@ -90,7 +90,7 @@ const DetailModal = ({ isOpen, onClose, review }) => {
       {review.images && review.images.length > 0 && (
         <div>
           <p>
-            <strong>{t('filters.rating')} Images:</strong>
+            <strong>{t('filters.images')}</strong>
           </p>
           <div className="grid grid-cols-3 gap-2">
             {review.images.map((img, index) => (
@@ -121,7 +121,7 @@ const DetailModal = ({ isOpen, onClose, review }) => {
           }}
         >
           <p style={{ fontWeight: 'bold', color: '#1890ff' }}>
-            {t('buttons.submit')}:
+            {t('buttons.owner')}:
           </p>
           <p>{review.replies[0].content}</p>
         </div>
