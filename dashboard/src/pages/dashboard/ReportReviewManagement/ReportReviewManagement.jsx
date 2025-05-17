@@ -18,6 +18,8 @@ import convertTimetap from '../../../utils/convertTimetap';
 import FilterReport from './FilterReport';
 import { FileTextOutlined } from '@ant-design/icons';
 import DetailReportModal from './DetailReportModal';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../../context/themeContext';
 
 function ReportReviewManagement() {
   const [data, setData] = useState([]);
@@ -35,21 +37,18 @@ function ReportReviewManagement() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
 
+  const { t } = useTranslation('reviewReportManagement');
+  const { darkMode } = useTheme();
+
   const fetchData = async () => {
     setLoading(true);
     try {
       const res = await getReviewReports();
-      if (res) {
-        setData(res);
-        console.log(res);
-      } else {
-        setData([]);
-      }
+      if (res) setData(res);
+      else setData([]);
     } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
-      toast.error(
-        'Failed to fetch withdrawal requests. Please try again later.'
-      );
+      console.error(error);
+      toast.error(t('messages.fetchError'));
       setData([]);
     } finally {
       setLoading(false);
@@ -60,34 +59,24 @@ function ReportReviewManagement() {
     setLoading(true);
     try {
       const res = await filterReviewReports(filterValue);
-      console.log('Filtered Data:', res); // Log the response to check its structure
-
-      if (res && Array.isArray(res.data)) {
-        setData(res.data); // Adjusting for data field if necessary
-      } else {
-        throw new Error('Invalid response format');
-      }
+      if (res && Array.isArray(res.data)) setData(res.data);
+      else throw new Error('Invalid response format');
     } catch (error) {
-      console.error('Failed to fetch filtered reports:', error);
-      toast.error('Failed to fetch filtered reports. Please try again later.');
+      console.error(error);
+      toast.error(t('messages.fetchError'));
       setData([]);
     } finally {
       setLoading(false);
     }
   };
-  const fetchReportDetail = async (reportId) => {
-    try {
-      const res = await getReportReviewDetail(reportId);
-      console.log('Report deatil', res);
 
-      if (res) {
-        setSelectedData(res);
-      } else {
-        setSelectedData(null);
-      }
+  const fetchReportDetail = async (id) => {
+    try {
+      const res = await getReportReviewDetail(id);
+      setSelectedData(res || null);
     } catch (error) {
-      console.error('Failed to fetch report details:', error);
-      toast.error('Failed to fetch report details. Please try again later.');
+      console.error(error);
+      toast.error(t('messages.detailFetchError'));
     }
   };
 
@@ -96,42 +85,28 @@ function ReportReviewManagement() {
     setIsDetailModalOpen(true);
   };
 
-  const closeDetailModal = () => {
-    setIsDetailModalOpen(false);
-  };
-
-  //fetch account data
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  //Filter account data
-  useEffect(() => {
-    console.log('Filter Value:', filterValue); // This should show updated filter values when changed
-    filterReportData();
-  }, [filterValue]);
-
-  // Define columns for the Table component
   const columns = [
     {
-      title: 'Reporter',
+      title: t('columns.reporter'),
       dataIndex: 'reporter',
       key: 'reporter',
-      render: (reporter) => reporter?.fullname || 'N/A',
+      render: (r) => r?.fullname || 'N/A',
     },
     {
-      title: 'Email',
+      title: t('columns.email'),
       dataIndex: 'reporter',
       key: 'email',
-      render: (reporter) => reporter?.email || 'N/A',
+      render: (r) => r?.email || 'N/A',
     },
     {
-      title: 'Reason',
+      title: t('columns.reason'),
       dataIndex: 'reason',
       key: 'reason',
+      render: (reason) => t(`reasons.${reason}`) || reason,
     },
+
     {
-      title: 'Status',
+      title: t('columns.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
@@ -140,33 +115,36 @@ function ReportReviewManagement() {
           resolved: 'green',
           rejected: 'red',
         };
-        return <Tag color={statusColors[status.toLowerCase()]}>{status}</Tag>;
+        return (
+          <Tag color={statusColors[status.toLowerCase()]}>
+            {t(`status.${status}`)}
+          </Tag>
+        );
       },
     },
     {
-      title: 'Created at',
+      title: t('columns.createdAt'),
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (createdAt) => convertTimetap(createdAt),
+      render: convertTimetap,
     },
     {
-      title: 'Processed Date',
+      title: t('columns.updatedAt'),
       dataIndex: 'updatedAt',
       key: 'updatedAt',
-      render: (updatedAt) => convertTimetap(updatedAt),
+      render: convertTimetap,
     },
     {
-      title: 'Action',
+      title: t('columns.action'),
       render: (record) => (
         <div className="flex gap-2">
           <Button
-            title={'Delete'}
+            title={t('buttons.delete')}
             btnDelete
-            className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
           <Button
-            title={'Detail'}
+            title={t('buttons.detail')}
             icon={<FileTextOutlined />}
             className={'text-white'}
             bgColor={'rgb(5 150 105)'}
@@ -177,32 +155,28 @@ function ReportReviewManagement() {
     },
   ];
 
-  // Handle opening the delete modal
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    filterReportData();
+  }, [filterValue]);
+
   const handleDeleteModal = (record) => {
     setSelectedRequest(record);
     setIsOpenDeleteModal(true);
   };
 
-  // Handle opening the replay popup
-  const handleReplay = (record) => {
-    setReplayReportData({
-      ...record,
-      status: record.status || 'pending',
-    });
-    setIsReplayPopupOpen(true);
-  };
-
-  // Handle deleting a report
   const handleDelete = async () => {
     if (!selectedRequest) return;
-
     try {
       await deleteReport(selectedRequest._id);
-      setData(data.filter((item) => item._id !== selectedRequest._id));
-      toast.success('Review report deleted successfully.');
+      setData(data.filter((d) => d._id !== selectedRequest._id));
+      toast.success(t('messages.deleteSuccess'));
     } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
-      toast.error('Failed to delete review report. Please try again later.');
+      console.error(error);
+      toast.error(t('messages.deleteFailed'));
     } finally {
       setIsOpenDeleteModal(false);
       setSelectedRequest(null);
@@ -210,14 +184,8 @@ function ReportReviewManagement() {
   };
 
   const handleReplaySubmit = async (formData) => {
-    console.log('Form data before submit:', formData);
-    console.log('Replay report data:', replayReportData);
-    if (!replayReportData || !replayReportData._id) {
-      toast.error('Report data is missing. Please try again.');
-      return;
-    }
-    if (!formData.status) {
-      toast.error('Please select a valid status.');
+    if (!replayReportData || !replayReportData._id || !formData.status) {
+      toast.error(t('messages.replayError'));
       return;
     }
     try {
@@ -225,50 +193,44 @@ function ReportReviewManagement() {
         status: formData.status,
         detailReport: formData.detailReport,
       });
-      setTimeout(() => fetchData(), 500);
-
-      setIsReplayPopupOpen(false);
       fetchData();
+      setIsReplayPopupOpen(false);
     } catch (error) {
-      console.error('Failed to fetch filtered reports:', error);
-      console.error('API error:', error.response ? error.response.data : error);
-
-      toast.error(
-        'Failed to send reply or update report. Please try again later.'
-      );
+      console.error(error);
+      toast.error(t('messages.replayFailed'));
     }
   };
 
   return (
-    <div className="txt">
-      <>
-        <div className="flex justify-end mb-4">
-          <FilterReport setFilterValue={setFilterValue} />
-        </div>
-        {/* Show filtered data if available, else show full data */}
-        <Table columns={columns} data={data} loading={loading} />
-        <DetailReportModal
-          isOpen={isDetailModalOpen}
-          onClose={closeDetailModal}
-          reportData={selectedData}
-          onReplay={handleReplay}
+    <div className={`txt ${darkMode ? 'bg-gray-700 text-white' : ''}`}>
+      <div className="flex justify-end mb-4">
+        <FilterReport setFilterValue={setFilterValue} />
+      </div>
+      <Table columns={columns} data={data} loading={loading} />
+      <DetailReportModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        reportData={selectedData}
+        onReplay={(record) => {
+          setReplayReportData(record);
+          setIsReplayPopupOpen(true);
+        }}
+      />
+      <ConfirmModal
+        title={t('modals.confirmDelete.title')}
+        content={t('modals.confirmDelete.content')}
+        onOk={handleDelete}
+        onCancel={() => setIsOpenDeleteModal(false)}
+        isOpen={isOpenDeleteModal}
+      />
+      {isReplayPopupOpen && (
+        <FormReplayPopup
+          visible={isReplayPopupOpen}
+          onClose={() => setIsReplayPopupOpen(false)}
+          onSubmit={handleReplaySubmit}
+          reportData={replayReportData}
         />
-        <ConfirmModal
-          title="Confirm Deletion"
-          content="Do you want to delete this review report?"
-          onOk={handleDelete}
-          onCancel={() => setIsOpenDeleteModal(false)}
-          isOpen={isOpenDeleteModal}
-        />
-        {isReplayPopupOpen && (
-          <FormReplayPopup
-            visible={isReplayPopupOpen}
-            onClose={() => setIsReplayPopupOpen(false)}
-            onSubmit={handleReplaySubmit}
-            reportData={replayReportData}
-          />
-        )}
-      </>
+      )}
     </div>
   );
 }

@@ -28,6 +28,42 @@
     }
   },
   "buttons": {
+    "delete": "Xóa",
+    "detail": "Chi tiết",
     "submit": "Áp dụng"
+  },
+  "reasons": {
+    "Spam": "Spam",
+    "Misleading information": "Thông tin sai lệch",
+    "Privacy violation": "Vi phạm riêng tư",
+    "Inappropriate content": "Nội dung không phù hợp"
+  },
+  "columns": {
+    "reporter": "Người báo cáo",
+    "email": "Email",
+    "reason": "Lý do",
+    "status": "Trạng thái",
+    "createdAt": "Ngày tạo",
+    "updatedAt": "Ngày xử lý",
+    "action": "Hành động"
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Xác nhận xóa",
+      "content": "Bạn có chắc chắn muốn xóa báo cáo này không?"
+    }
+  },
+  "messages": {
+    "fetchError": "Lỗi khi tải dữ liệu. Vui lòng thử lại sau.",
+    "detailFetchError": "Lỗi khi lấy chi tiết báo cáo.",
+    "deleteSuccess": "Xóa báo cáo thành công.",
+    "deleteFailed": "Xóa báo cáo thất bại.",
+    "replayError": "Thiếu thông tin phản hồi. Vui lòng kiểm tra lại.",
+    "replayFailed": "Phản hồi hoặc cập nhật báo cáo thất bại."
+  },
+  "status": {
+    "pending": "Chờ xử lý",
+    "resolved": "Đã xử lý",
+    "rejected": "Từ chối"
   }
 }
