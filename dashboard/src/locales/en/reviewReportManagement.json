@@ -1,6 +1,6 @@
 {
   "filters": {
-    "title": "Filter Reports",
+    "title": "Filter",
     "reason": "Reason",
     "reasonPlaceholder": "Select reason",
     "reasonOptions": {
