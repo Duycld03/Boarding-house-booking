@@ -1,0 +1,27 @@
+{
+  "columns": {
+    "boardingHouseName": "Tên nhà trọ",
+    "content": "Nội dung",
+    "rating": "Đánh giá",
+    "createdAt": "Ngày tạo",
+    "reviewer": "Người đánh giá",
+    "action": "Hành động"
+  },
+  "buttons": {
+    "delete": "Xóa",
+    "detail": "Chi tiết"
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Xác nhận xóa",
+      "content": "Bạn có chắc chắn muốn xóa đánh giá này không?"
+    }
+  },
+  "messages": {
+    "fetchError": "Không thể tải đánh giá. Vui lòng thử lại sau.",
+    "deleteSuccess": "Xóa đánh giá thành công.",
+    "deleteFailed": "Xóa đánh giá thất bại.",
+    "detailFetchError": "Không thể tải chi tiết đánh giá.",
+    "filterFetchError": "Không thể lọc đánh giá. Vui lòng thử lại sau."
+  }
+}

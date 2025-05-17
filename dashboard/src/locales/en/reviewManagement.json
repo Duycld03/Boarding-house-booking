@@ -1,0 +1,27 @@
+{
+  "columns": {
+    "boardingHouseName": "Boarding House Name",
+    "content": "Content",
+    "rating": "Rating",
+    "createdAt": "Created Date",
+    "reviewer": "Reviewer",
+    "action": "Action"
+  },
+  "buttons": {
+    "delete": "Delete",
+    "detail": "Detail"
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Confirm Deletion",
+      "content": "Do you want to delete this review?"
+    }
+  },
+  "messages": {
+    "fetchError": "Failed to fetch reviews. Please try again later.",
+    "deleteSuccess": "Delete review successful.",
+    "deleteFailed": "Failed to delete review.",
+    "detailFetchError": "Failed to fetch review details.",
+    "filterFetchError": "Failed to fetch filtered reviews."
+  }
+}

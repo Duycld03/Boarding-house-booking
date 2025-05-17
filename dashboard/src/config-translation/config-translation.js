@@ -6,6 +6,8 @@ import en_accountManagement from '@/locales/en/accountManagement.json';
 import vi_accountManagement from '@/locales/vi/accountManagement.json';
 import en_changePassword from '@/locales/en/changePassword.json';
 import vi_changePassword from '@/locales/vi/changePassword.json';
+import en_reviewManagement from '@/locales/en/reviewManagement.json';
+import vi_reviewManagement from '@/locales/vi/reviewManagement.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -13,11 +15,13 @@ i18n.use(initReactI18next).init({
       menu: en_menu,
       accountManagement: en_accountManagement,
       changePassword: en_changePassword,
+      reviewManagement: en_reviewManagement,
     },
     vi: {
       menu: vi_menu,
       accountManagement: vi_accountManagement,
       changePassword: vi_changePassword,
+      reviewManagement: vi_reviewManagement,
     },
   },
   lng: 'en',
