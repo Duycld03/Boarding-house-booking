@@ -1,0 +1,16 @@
+.dark-select {
+    background-color: #374151 !important;
+    color: white !important;
+    border-color: #4b5563 !important;
+}
+
+.dark-select .ant-select-selector {
+    background-color: #374151 !important;
+    color: white !important;
+    border-color: #4b5563 !important;
+}
+
+.dark-select-dropdown .ant-select-item-option {
+    background-color: #1f2937 !important;
+    color: white !important;
+}

@@ -31,7 +31,7 @@
     "delete": "Xóa",
     "detail": "Chi tiết",
     "submit": "Áp dụng",
-     "close": "Đóng",
+    "close": "Đóng",
     "replay": "Phản hồi"
   },
   "reasons": {
@@ -61,7 +61,9 @@
     "deleteSuccess": "Xóa báo cáo thành công.",
     "deleteFailed": "Xóa báo cáo thất bại.",
     "replayError": "Thiếu thông tin phản hồi. Vui lòng kiểm tra lại.",
-    "replayFailed": "Phản hồi hoặc cập nhật báo cáo thất bại."
+    "replayFailed": "Phản hồi hoặc cập nhật báo cáo thất bại.",
+        "replaySuccess":"Phản hồi báo cáo thành công."
+
   },
   "status": {
     "pending": "Chờ xử lý",
@@ -79,6 +81,7 @@
     "reviewImages": "Ảnh đánh giá",
     "reportImages": "Ảnh báo cáo",
     "noImages": "Không có ảnh",
-    "details": "Chi tiết"
+    "details": "Chi tiết",
+    "updatedAt": "Thời gian xử lý"
   }
 }

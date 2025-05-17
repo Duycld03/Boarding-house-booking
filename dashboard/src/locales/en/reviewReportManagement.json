@@ -61,7 +61,8 @@
     "deleteSuccess": "Review report deleted successfully.",
     "deleteFailed": "Failed to delete review report.",
     "replayError": "Missing reply information. Please check again.",
-    "replayFailed": "Failed to send reply or update report."
+    "replayFailed": "Failed to send reply or update report.",
+    "replaySuccess":"Replay submitted successfully!"
   },
   "status": {
     "pending": "pending",
@@ -79,6 +80,8 @@
     "reviewImages": "Review Images",
     "reportImages": "Report Images",
     "noImages": "No images available",
-    "details": "Details"
+    "details": "Details",
+    "updatedAt": "UpdatedAt"
+
   }
 }
