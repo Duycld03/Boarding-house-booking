@@ -1,0 +1,16 @@
+{
+  "login": "Đăng nhập",
+  "username": "Tên tài khoản",
+  "enterUsername": "Nhập tên tài khoản",
+  "password": "Mật khẩu",
+  "enterPassword": "Nhập mật khẩu",
+  "rememberMe": "Ghi nhớ tài khoản",
+  "forgotPassword": "Quên mật khẩu?",
+  "loginWithGoogle": "Đăng nhập bằng Google",
+  "usernameError": "Vui lòng nhập tên tài khoản",
+  "passwordError": "Vui lòng nhập mật khẩu",
+  "minLengthError": "Mật khẩu phải có ít nhất 6 ký tự",
+  "validationError": "Vui lòng kiểm tra lại thông tin",
+  "success": "Đăng nhập thành công",
+  "invalidCredentials": "Tên tài khoản hoặc mật khẩu không đúng"
+}

@@ -13,9 +13,11 @@ import {
 } from "@/components/form/index";
 import { sendOTPRegister } from "@/API/authManagement";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 export default function Register() {
   const router = useRouter();
+  const { t } = useTranslation("register");
   const { showSuccess, showError } = useNotification();
 
   const [formData, setFormData] = useState({
@@ -43,61 +45,61 @@ export default function Register() {
     let isValid = true;
 
     if (!formData.fullname.trim()) {
-      newErrors.fullname = { message: "Vui lòng nhập họ tên" };
+      newErrors.fullname = { message: t("fullnameError") };
       isValid = false;
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = { message: "Vui lòng nhập email" };
+      newErrors.email = { message: t("emailError") };
       isValid = false;
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
-        newErrors.email = { message: "Email không hợp lệ" };
+        newErrors.email = { message: t("emailFormatError") };
         isValid = false;
       }
     }
 
     if (!formData.phoneNumber) {
-      newErrors.phoneNumber = { message: "Vui lòng nhập số điện thoại" };
+      newErrors.phoneNumber = { message: t("phoneNumberError") };
     } else if (formData.phoneNumber.length != 10) {
-      newErrors.phoneNumber = { message: "Số điện thoại phải có 10 ký tự" };
+      newErrors.phoneNumber = { message: t("phoneNumberLengthError") };
     }
 
     if (!formData.username) {
-      newErrors.username = { message: "Vui lòng nhập tên tài khoản" };
+      newErrors.username = { message: t("usernameError") };
       isValid = false;
     } else if (formData.username.includes(" ")) {
       newErrors.username = {
-        message: "Tên tài khoản không được chứa khoảng trắng",
+        message: t("usernameSpaceError"),
       };
       isValid = false;
     } else if (formData.username.length < 5) {
-      newErrors.username = { message: "Tên tài khoản phải có ít nhất 5 ký tự" };
+      newErrors.username = { message: t("usernameLengthError") };
       isValid = false;
     } else if (formData.username.length > 20) {
-      newErrors.username = { message: "Tên tài khoản không được quá 20 ký tự" };
+      newErrors.username = { message: "usernameExceedsCharError" };
       isValid = false;
     } else if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
       newErrors.username = {
-        message: "Tên tài khoản chỉ được chứa chữ cái và số",
+        message: t("usernameFormatError"),
       };
       isValid = false;
     }
 
     if (!formData.password) {
-      newErrors.password = { message: "Vui lòng nhập mật khẩu" };
+      newErrors.password = { message: t("passwordError") };
       isValid = false;
     } else if (formData.password.length < 6) {
-      newErrors.password = { message: "Mật khẩu phải có ít nhất 6 ký tự" };
+      newErrors.password = { message: t("passwordLengthError") };
       isValid = false;
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = { message: "Vui lòng xác nhận mật khẩu" };
+      newErrors.confirmPassword = { message: t("confirmPasswordError") };
       isValid = false;
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = { message: "Mật khẩu không khớp" };
+      newErrors.confirmPassword = { message: t("confirmPasswordMatchError") };
       isValid = false;
     }
 
@@ -107,7 +109,7 @@ export default function Register() {
 
   const handleRegister = async () => {
     if (!validateForm()) {
-      showError("Vui lòng kiểm tra lại thông tin");
+      showError(t("validationError"));
       return;
     }
 
@@ -116,7 +118,7 @@ export default function Register() {
     setLoading(true);
     try {
       const res = await sendOTPRegister(payload);
-      showSuccess("Gửi mã OTP thành công");
+      showSuccess(t("sentOtpSuccess"));
       router.push({
         pathname: "/(auth)/verifyRegister",
         params: {
@@ -134,23 +136,23 @@ export default function Register() {
   const [gender, setGender] = useState("male");
 
   const radioOptions = [
-    { value: "male", label: "Nam" },
-    { value: "female", label: "Nữ" },
+    { value: "male", label: t("male") },
+    { value: "female", label: t("female") },
   ];
 
   return (
     <ScreenContainer>
-      <BackHeader title="Register" animationType="slide" />
+      <BackHeader title={t("register")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
         <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          Tạo tài khoản mới
+          {t("registerTitle")}
         </Text>
 
         <FormField
           name="fullname"
-          label="Họ và tên"
-          placeholder="Nhập họ và tên"
+          label={t("fullname")}
+          placeholder={t("enterFullname")}
           value={formData.fullname}
           onChange={handleChange}
           error={errors}
@@ -160,7 +162,7 @@ export default function Register() {
         <FormField
           name="email"
           label="Email"
-          placeholder="Nhập địa chỉ email"
+          placeholder={t("enterEmail")}
           value={formData.email}
           onChange={handleChange}
           error={errors}
@@ -170,8 +172,8 @@ export default function Register() {
 
         <FormField
           name="phoneNumber"
-          label="Số điện thoại"
-          placeholder="Nhập số điện thoại"
+          label={t("phoneNumber")}
+          placeholder={t("enterPhoneNumber")}
           value={formData.phoneNumber}
           onChange={handleChange}
           error={errors}
@@ -181,8 +183,8 @@ export default function Register() {
 
         <FormField
           name="username"
-          label="Tên tài khoản"
-          placeholder="Nhập tên tài khoản"
+          label={t("username")}
+          placeholder={t("enterUsername")}
           value={formData.username}
           onChange={handleChange}
           error={errors}
@@ -191,8 +193,8 @@ export default function Register() {
 
         <FormField
           name="password"
-          label="Mật khẩu"
-          placeholder="Nhập mật khẩu"
+          label={t("password")}
+          placeholder={t("enterPassword")}
           value={formData.password}
           onChange={handleChange}
           error={errors}
@@ -202,8 +204,8 @@ export default function Register() {
 
         <FormField
           name="confirmPassword"
-          label="Xác nhận mật khẩu"
-          placeholder="Nhập lại mật khẩu"
+          label={t("confirmPassword")}
+          placeholder={t("enterConfirmPassword")}
           value={formData.confirmPassword}
           onChange={handleChange}
           error={errors}
@@ -212,7 +214,7 @@ export default function Register() {
         />
 
         <CustomRadio
-          label="Chọn giới tính"
+          label={t("chooseGender")}
           options={radioOptions}
           value={gender}
           onChange={setGender}
@@ -227,7 +229,7 @@ export default function Register() {
           fullWidth
           className="mt-4"
         >
-          Đăng Ký
+          {t("register")}
         </Button>
       </ScrollContainer>
     </ScreenContainer>

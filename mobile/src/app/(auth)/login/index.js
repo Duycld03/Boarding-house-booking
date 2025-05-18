@@ -10,9 +10,11 @@ import { Checkbox, FormField } from "@/components/form/index";
 import { login } from "@/API/authManagement";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const router = useRouter();
+  const { t } = useTranslation("login");
   const { showSuccess, showError } = useNotification();
 
   const [formData, setFormData] = useState({
@@ -36,14 +38,14 @@ export default function Login() {
     let isValid = true;
 
     if (!formData.username.trim()) {
-      newErrors.username = { message: "Vui lòng nhập tài khoản" };
+      newErrors.username = { message: t("usernameError") };
       isValid = false;
     }
     if (!formData.password) {
-      newErrors.password = { message: "Vui lòng nhập mật khẩu" };
+      newErrors.password = { message: t("passwordError") };
       isValid = false;
     } else if (formData.password.length < 6) {
-      newErrors.password = { message: "Mật khẩu phải có ít nhất 6 ký tự" };
+      newErrors.password = { message: t("minLengthError") };
       isValid = false;
     }
 
@@ -53,7 +55,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!validateForm()) {
-      showError("Vui lòng kiểm tra lại thông tin");
+      showError(t("validationError"));
       return;
     }
 
@@ -62,10 +64,10 @@ export default function Login() {
     try {
       const res = await login(formData);
       await AsyncStorage.setItem("access_token", res.token);
-      showSuccess("Đăng nhập thành công!");
+      showSuccess(t("success"));
       router.replace("/(tabs)/home");
     } catch (error) {
-      showError("Tai khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại!");
+      showError(t("invalidCredentials"));
     } finally {
       setLoading(false);
     }
@@ -73,17 +75,17 @@ export default function Login() {
 
   return (
     <ScreenContainer>
-      <BackHeader title="Login" animationType="slide" />
+      <BackHeader title={t("login")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
         <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          Đăng nhập
+          {t("login")}
         </Text>
 
         <FormField
           name="username"
-          label="Tài khoản"
-          placeholder="Nhập tài khoản"
+          label={t("username")}
+          placeholder={t("enterUsername")}
           value={formData.username}
           onChange={handleChange}
           error={errors}
@@ -92,8 +94,8 @@ export default function Login() {
 
         <FormField
           name="password"
-          label="Mật khẩu"
-          placeholder="Nhập mật khẩu"
+          label={t("password")}
+          placeholder={t("enterPassword")}
           value={formData.password}
           onChange={handleChange}
           error={errors}
@@ -110,7 +112,7 @@ export default function Login() {
               remember: !remember,
             }));
           }}
-          label="Ghi nhớ tài khoản"
+          label={t("rememberMe")}
           className="mt-4 mb-6"
         />
 
@@ -120,7 +122,7 @@ export default function Login() {
           fullWidth
           className="mt-4"
         >
-          Đăng nhập
+          {t("login")}
         </Button>
       </ScrollContainer>
     </ScreenContainer>
