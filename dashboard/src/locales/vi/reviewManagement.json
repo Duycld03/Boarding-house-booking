@@ -1,0 +1,50 @@
+{
+  "columns": {
+    "boardingHouseName": "Tên nhà trọ",
+    "content": "Nội dung",
+    "rating": "Đánh giá",
+    "createdAt": "Ngày tạo",
+    "reviewer": "Người đánh giá",
+    "action": "Hành động"
+  },
+  "buttons": {
+    "delete": "Xóa",
+    "detail": "Chi tiết",
+    "submit": "Xác nhận",
+    "cancel": "Xóa",
+     "owner": "Chủ trọ trả lời"
+
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Xác nhận xóa",
+      "content": "Bạn có chắc chắn muốn xóa đánh giá này không?"
+    }
+  },
+  "messages": {
+    "fetchError": "Không thể tải đánh giá. Vui lòng thử lại sau.",
+    "deleteSuccess": "Xóa đánh giá thành công.",
+    "deleteFailed": "Xóa đánh giá thất bại.",
+    "detailFetchError": "Không thể tải chi tiết đánh giá.",
+    "filterFetchError": "Không thể lọc đánh giá. Vui lòng thử lại sau."
+  },
+    "filters": {
+    "title": "Lọc",
+    "boardingHouse": "Tên nhà trọ",
+    "boardingHousePlaceholder": "Nhập tên nhà trọ",
+    "startDate": "Ngày bắt đầu",
+    "startDatePlaceholder": "Chọn ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "endDatePlaceholder": "Chọn ngày kết thúc",
+    "rating": "Đánh giá",
+    "ratingPlaceholder": "Chọn mức đánh giá",
+    "clear": "Xóa",
+    "errors": {
+      "invalidDateRange": "Ngày bắt đầu không được sau ngày kết thúc.",
+      "startDateRequired": "Vui lòng chọn ngày bắt đầu.",
+      "endDateRequired": "Vui lòng chọn ngày kết thúc."
+    },
+        "images": "Ảnh"
+
+  }
+}

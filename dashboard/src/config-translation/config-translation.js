@@ -8,6 +8,8 @@ import en_changePassword from '@/locales/en/changePassword.json';
 import vi_changePassword from '@/locales/vi/changePassword.json';
 import en_reviewReportManagement from '@/locales/en/reviewReportManagement.json';
 import vi_reviewReportManagement from '@/locales/vi/reviewReportManagement.json';
+import en_reviewManagement from '@/locales/en/reviewManagement.json';
+import vi_reviewManagement from '@/locales/vi/reviewManagement.json';
 import en_reportBoardingHouse from '@/locales/en/reportBoardingHouse.json';
 import vi_reportBoardingHouse from '@/locales/vi/reportBoardingHouse.json';
 
@@ -18,6 +20,7 @@ i18n.use(initReactI18next).init({
       accountManagement: en_accountManagement,
       changePassword: en_changePassword,
       reviewReportManagement: en_reviewReportManagement,
+      reviewManagement: en_reviewManagement,
       reportBoardingHouse: en_reportBoardingHouse,
     },
     vi: {
@@ -25,6 +28,7 @@ i18n.use(initReactI18next).init({
       accountManagement: vi_accountManagement,
       changePassword: vi_changePassword,
       reviewReportManagement: vi_reviewReportManagement,
+      reviewManagement: vi_reviewManagement,
       reportBoardingHouse: vi_reportBoardingHouse,
     },
   },
