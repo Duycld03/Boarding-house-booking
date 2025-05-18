@@ -1,32 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { Select } from 'antd';
-import i18n from '@/config-translation/config-translation'; // ✅ import đúng từ file đã init
+import i18n from '@/config-translation/config-translation';
 import 'flag-icons/css/flag-icons.min.css';
+import './LanguageSwitcher.css';
+import { useTheme } from '@/context/ThemeContext';
 
 const LanguageSwitcher = () => {
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { darkMode } = useTheme();
 
   useEffect(() => {
-    // Check localStorage for saved language
+    const checkDarkMode = () => {
+      const dark = document.body.classList.contains('dark');
+      setIsDarkMode(dark);
+    };
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
     const storedLanguage = localStorage.getItem('language');
     if (storedLanguage) {
       i18n.changeLanguage(storedLanguage);
       setCurrentLanguage(storedLanguage);
     }
-    console.log('Initial language:', i18n.language);
 
-    // Listen for language changes and update localStorage
     const handleLanguageChange = (lng) => {
       localStorage.setItem('language', lng);
       setCurrentLanguage(lng);
     };
 
-    // Subscribe to i18n language change event
     i18n.on('languageChanged', handleLanguageChange);
 
-    // Cleanup the subscription when the component is unmounted
     return () => {
       i18n.off('languageChanged', handleLanguageChange);
+      observer.disconnect();
     };
   }, []);
 
@@ -35,9 +47,12 @@ const LanguageSwitcher = () => {
       value={currentLanguage}
       onChange={(lng) => {
         i18n.changeLanguage(lng);
-        console.log('Switched language to:', lng);
       }}
-      style={{ width: 150 }}
+      className={darkMode ? 'ant-select-dark' : ''}
+      style={{ width: 160 }}
+      popupClassName={
+        darkMode ? 'ant-select-dropdown-dark' : 'ant-select-dropdown-light'
+      }
     >
       <Select.Option value="en">
         <span className="fi fi-gb" style={{ marginRight: 8 }}></span> English
