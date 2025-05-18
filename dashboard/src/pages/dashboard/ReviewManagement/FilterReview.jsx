@@ -104,7 +104,8 @@ function FilterReview({ setFilterValue }) {
                 format="DD-MM-YYYY"
                 allowClear
                 inputReadOnly
-                placeholder={t('filters.startDatePlaceholder')} // ✅ thêm dòng này
+                placeholder={t('filters.startDatePlaceholder')}
+                popupClassName={darkMode ? 'dark-mode-picker-dropdown' : ''}
               />
             </Form.Item>
 
@@ -120,7 +121,8 @@ function FilterReview({ setFilterValue }) {
                 format="DD-MM-YYYY"
                 allowClear
                 inputReadOnly
-                placeholder={t('filters.endDatePlaceholder')} // ✅ thêm dòng này
+                placeholder={t('filters.endDatePlaceholder')}
+                popupClassName={darkMode ? 'dark-mode-picker-dropdown' : ''}
               />
             </Form.Item>
 
@@ -135,7 +137,8 @@ function FilterReview({ setFilterValue }) {
                 value={rating}
                 onChange={setRating}
                 placeholder={t('filters.ratingPlaceholder')}
-                className={`w-full ${darkMode ? 'ant-select-dark' : ''}`}
+                className={`w-full ${darkMode ? 'dark-mode-select' : ''}`}
+                popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
               >
                 {[1, 2, 3, 4, 5].map((value) => (
                   <Select.Option key={value} value={value}>
