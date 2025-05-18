@@ -1,0 +1,90 @@
+{
+  "filters": {
+    "title": "Filter",
+    "reason": "Reason",
+    "reasonPlaceholder": "Select reason",
+    "reasonOptions": {
+      "spam": "Spam",
+      "misleading": "Misleading information",
+      "privacy": "Privacy violation",
+      "inappropriate": "Inappropriate content"
+    },
+    "status": "Status",
+    "statusPlaceholder": "Select status",
+    "statusOptions": {
+      "pending": "Pending",
+      "resolved": "Resolved",
+      "rejected": "Rejected"
+    },
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "startDatePlaceholder": "Select start date",
+    "endDatePlaceholder": "Select end date",
+    "clear": "Clear",
+    "errors": {
+      "invalidDateRange": "Start date cannot be after end date.",
+      "startDateRequired": "Please select a start date.",
+      "endDateRequired": "Please select an end date."
+    }
+  },
+  "buttons": {
+    "delete": "Delete",
+    "detail": "Detail",
+    "submit": "Apply",
+    "close": "Close",
+    "replay": "Replay"
+  },
+  "reasons": {
+    "Spam": "Spam",
+    "Misleading information": "Misleading information",
+    "Privacy violation": "Privacy violation",
+    "Inappropriate content": "Inappropriate content"
+  },
+  "columns": {
+    "reporter": "Reporter",
+    "email": "Email",
+    "reason": "Reason",
+    "status": "Status",
+    "createdAt": "Created At",
+    "updatedAt": "Processed Date",
+    "action": "Action"
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Confirm Deletion",
+      "content": "Do you want to delete this review report?"
+    },
+    "replayTitle": "Replay to report"
+  },
+  "messages": {
+    "fetchError": "Failed to fetch data. Please try again later.",
+    "detailFetchError": "Failed to fetch report details.",
+    "deleteSuccess": "Review report deleted successfully.",
+    "deleteFailed": "Failed to delete review report.",
+    "replayError": "Missing reply information. Please check again.",
+    "replayFailed": "Failed to send reply or update report.",
+    "replaySuccess":"Replay submitted successfully!"
+  },
+  "status": {
+    "pending": "pending",
+    "resolved": "resolved",
+    "rejected": "rejected"
+  },
+  "detail": {
+    "title": "Review Report Details",
+    "reviewInfo": "Review Information",
+    "reportInfo": "Report Information",
+    "reportedAt": "Reported At",
+    "rating": "Rating",
+    "content": "Content",
+    "noContent": "No content",
+    "reviewImages": "Review Images",
+    "reportImages": "Report Images",
+    "noImages": "No images available",
+    "details": "Details",
+    "updatedAt": "UpdatedAt",
+    "detailPlaceholder":"Reason for decision or comments..."
+
+
+  }
+}

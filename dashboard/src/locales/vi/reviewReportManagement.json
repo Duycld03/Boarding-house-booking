@@ -1,0 +1,90 @@
+{
+  "filters": {
+    "title": "Lọc",
+    "reason": "Lý do",
+    "reasonPlaceholder": "Chọn lý do",
+    "reasonOptions": {
+      "spam": "Spam",
+      "misleading": "Thông tin sai lệch",
+      "privacy": "Vi phạm riêng tư",
+      "inappropriate": "Nội dung không phù hợp"
+    },
+    "status": "Trạng thái",
+    "statusPlaceholder": "Chọn trạng thái",
+    "statusOptions": {
+      "pending": "Chờ xử lý",
+      "resolved": "Đã xử lý",
+      "rejected": "Từ chối"
+    },
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "startDatePlaceholder": "Chọn ngày bắt đầu",
+    "endDatePlaceholder": "Chọn ngày kết thúc",
+    "clear": "Xóa",
+    "errors": {
+      "invalidDateRange": "Ngày bắt đầu không được sau ngày kết thúc.",
+      "startDateRequired": "Vui lòng chọn ngày bắt đầu.",
+      "endDateRequired": "Vui lòng chọn ngày kết thúc."
+    }
+  },
+  "buttons": {
+    "delete": "Xóa",
+    "detail": "Chi tiết",
+    "submit": "Áp dụng",
+    "close": "Đóng",
+    "replay": "Phản hồi"
+  },
+  "reasons": {
+    "Spam": "Spam",
+    "Misleading information": "Thông tin sai lệch",
+    "Privacy violation": "Vi phạm riêng tư",
+    "Inappropriate content": "Nội dung không phù hợp"
+  },
+  "columns": {
+    "reporter": "Người báo cáo",
+    "email": "Email",
+    "reason": "Lý do",
+    "status": "Trạng thái",
+    "createdAt": "Ngày tạo",
+    "updatedAt": "Ngày xử lý",
+    "action": "Hành động"
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Xác nhận xóa",
+      "content": "Bạn có chắc chắn muốn xóa báo cáo này không?"
+    },
+        "replayTitle": "Trả lời báo cáo"
+
+  },
+  "messages": {
+    "fetchError": "Lỗi khi tải dữ liệu. Vui lòng thử lại sau.",
+    "detailFetchError": "Lỗi khi lấy chi tiết báo cáo.",
+    "deleteSuccess": "Xóa báo cáo thành công.",
+    "deleteFailed": "Xóa báo cáo thất bại.",
+    "replayError": "Thiếu thông tin phản hồi. Vui lòng kiểm tra lại.",
+    "replayFailed": "Phản hồi hoặc cập nhật báo cáo thất bại.",
+        "replaySuccess":"Phản hồi báo cáo thành công."
+
+  },
+  "status": {
+    "pending": "Chờ xử lý",
+    "resolved": "Đã xử lý",
+    "rejected": "Từ chối"
+  },
+  "detail": {
+    "title": "Chi tiết báo cáo đánh giá",
+    "reviewInfo": "Thông tin đánh giá",
+    "reportInfo": "Thông tin báo cáo",
+    "reportedAt": "Thời gian báo cáo",
+    "rating": "Đánh giá",
+    "content": "Nội dung",
+    "noContent": "Không có nội dung",
+    "reviewImages": "Ảnh đánh giá",
+    "reportImages": "Ảnh báo cáo",
+    "noImages": "Không có ảnh",
+    "details": "Chi tiết",
+    "updatedAt": "Thời gian xử lý",
+    "detailPlaceholder":"Lý do..."
+  }
+}
