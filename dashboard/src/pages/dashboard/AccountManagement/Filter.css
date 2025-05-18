@@ -19,32 +19,32 @@
 }
 
 .ant-select-dark .ant-select-arrow {
-  color: #9ca3af !important;
+  color: #9ca3af;
 }
 
 .ant-select-dark .ant-select-selection-placeholder {
-  color: #9ca3af !important;
+  color: #9ca3af;
 }
 
 .ant-select-dark .ant-select-selection-item {
-  color: #e5e7eb !important;
+  color: #e5e7eb;
 }
 
 .ant-select-dropdown.ant-select-dropdown-dark {
-  background-color: #1f2937 !important;
+  background-color: #1f2937;
 }
 
 .ant-select-dropdown.ant-select-dropdown-dark .ant-select-item {
-  color: #e5e7eb !important;
+  color: #e5e7eb;
 }
 
 .ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option-selected {
-  background-color: #374151 !important;
+  background-color: #374151;
 }
 
 .ant-select-dropdown.ant-select-dropdown-dark
   .ant-select-item-option-active:not(.ant-select-item-option-selected) {
-  background-color: #374151 !important;
+  background-color: #374151;
 }
 
 /* Dark mode for DatePicker components */
