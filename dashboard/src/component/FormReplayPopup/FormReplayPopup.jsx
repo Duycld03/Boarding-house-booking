@@ -5,6 +5,9 @@ import convertTimetap from '../../utils/convertTimetap';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/themeContext';
 import styles from './FormReplayPopup.module.css';
+import classNames from 'classnames';
+
+const cx = classNames.bind(styles);
 
 const { Option } = Select;
 
@@ -21,6 +24,9 @@ const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
         borderColor: '#4b5563',
       }
     : {};
+  const darkModeSelectClass = cx({
+    'dark-mode-select': darkMode,
+  });
 
   const handleSubmit = async () => {
     try {
@@ -96,10 +102,10 @@ const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
           {reportData?.status === 'pending' ? (
             <Select
               placeholder={t('filters.statusPlaceholder')}
-              className={darkMode ? 'dark-select' : ''}
-              popupClassName={darkMode ? 'dark-select-dropdown' : ''}
+              className={darkModeSelectClass}
+              style={darkInputStyle.select}
+              popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
             >
-              {' '}
               <Option value="pending">{t('status.pending')}</Option>
               <Option value="rejected">{t('status.rejected')}</Option>
               <Option value="resolved">{t('status.resolved')}</Option>
