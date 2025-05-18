@@ -26,11 +26,9 @@ const { Option } = Select;
 const UpdateAccountModal = ({ accountData, onUpdate }) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
 
   // Using the theme context for dark mode
-  const { theme } = useTheme();
-  const darkMode = theme === "dark";
+  const { darkMode } = useTheme();
 
   // Using react-i18next for translations
   const { t } = useTranslation("accountManagement");
@@ -153,7 +151,7 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
   const modalClass = cx({
     relative: true,
     "z-10": true,
-    "dark-mode-modal": darkMode,
+    "ant-modal-dark": darkMode, // Updated to match the CSS class in your style file
   });
 
   // Button styles based on theme
@@ -314,6 +312,7 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
               <Input.Password
                 placeholder={t("updateAccount.passwordPlaceholder")}
                 disabled
+                value={"********"}
                 className={darkModeInputClass}
                 style={formStyles.input}
               />
@@ -401,8 +400,7 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
                 placeholder={t("updateAccount.selectGender")}
                 className={darkModeSelectClass}
                 style={formStyles.select}
-                dropdownStyle={darkMode ? { backgroundColor: "#374151" } : {}}
-                popupClassName={darkMode ? "dark-mode-dropdown" : ""}
+                popupClassName={darkMode ? "dark-mode-select-dropdown" : ""}
               >
                 <Option value="male">{t("updateAccount.genderMale")}</Option>
                 <Option value="female">
@@ -425,8 +423,7 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
                 placeholder={t("updateAccount.selectRole")}
                 className={darkModeSelectClass}
                 style={formStyles.select}
-                dropdownStyle={darkMode ? { backgroundColor: "#374151" } : {}}
-                popupClassName={darkMode ? "dark-mode-dropdown" : ""}
+                popupClassName={darkMode ? "dark-mode-select-dropdown" : ""}
               >
                 <Option value="user">{t("updateAccount.roleUser")}</Option>
                 <Option value="owner">{t("updateAccount.roleOwner")}</Option>
@@ -447,6 +444,7 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
                 placeholder={t("updateAccount.creationDate")}
                 disabled
                 className={darkModeDatePickerClass}
+                popupClassName={darkMode ? "dark-mode-picker-dropdown" : ""}
               />
             </Form.Item>
 
@@ -464,6 +462,7 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
                 placeholder={t("updateAccount.lastUpdatedDate")}
                 disabled
                 className={darkModeDatePickerClass}
+                popupClassName={darkMode ? "dark-mode-picker-dropdown" : ""}
               />
             </Form.Item>
 

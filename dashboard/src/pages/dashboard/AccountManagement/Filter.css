@@ -1,5 +1,3 @@
-/* Dark mode styles for Ant Design components */
-
 /* Dark mode for Form Items */
 .dark-form .ant-form-item-label > label {
   color: #e5e7eb !important;
@@ -11,31 +9,42 @@
   color: #e5e7eb !important;
 }
 
-/* Dark mode for Select components */
+/* Dark mode for Select components - Fixed for selected values */
 .ant-select-dark .ant-select-selector {
-  background-color: #1f2937 !important;
+  background-color: #374151 !important;
   border-color: #4b5563 !important;
-  color: #e5e7eb !important;
+  color: #f9fafb !important;
 }
 
-.ant-select-dark .ant-select-arrow {
-  color: #9ca3af;
-}
-
+/* Styling for the placeholder text in dark mode */
 .ant-select-dark .ant-select-selection-placeholder {
-  color: #9ca3af;
+  color: #9ca3af !important;
 }
 
+/* Fix for the selected value text color in dark mode */
 .ant-select-dark .ant-select-selection-item {
-  color: #e5e7eb;
+  color: #f9fafb !important;
 }
 
+/* Fix for the selected value in the multiple select mode */
+.ant-select-dark.ant-select-multiple .ant-select-selection-item {
+  background-color: #2c3e50 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+/* Fix for the close icon in multiple select tags */
+.ant-select-dark.ant-select-multiple .ant-select-selection-item-remove {
+  color: #d1d5db !important;
+}
+
+.ant-select-dark.ant-select-multiple .ant-select-selection-item-remove:hover {
+  color: #f9fafb !important;
+}
+
+/* Dropdown styling */
 .ant-select-dropdown.ant-select-dropdown-dark {
   background-color: #1f2937;
-}
-
-.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item {
-  color: #e5e7eb;
 }
 
 .ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option-selected {
@@ -45,6 +54,56 @@
 .ant-select-dropdown.ant-select-dropdown-dark
   .ant-select-item-option-active:not(.ant-select-item-option-selected) {
   background-color: #374151;
+}
+
+/* This is the fix for the option text color in dark mode */
+.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option {
+  color: #e5e7eb !important;
+}
+
+/* For the dropdown arrow color */
+.ant-select-dark .ant-select-arrow {
+  color: #9ca3af !important;
+}
+
+/* Fix for the search input within Select */
+.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-empty {
+  color: #e5e7eb !important;
+}
+
+/* Fix for the overflow items count */
+.ant-select-dark .ant-select-selection-overflow-item-suffix {
+  color: #f9fafb !important;
+}
+
+/* Fix for the clear icon */
+.ant-select-dark .ant-select-clear {
+  background-color: #374151 !important;
+  color: #9ca3af !important;
+}
+
+/* Fix for the select focused state */
+.ant-select-dark.ant-select-focused .ant-select-selector {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Fix for the dropdown render */
+.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option-content {
+  color: #f9fafb !important;
+}
+
+/* Fix for dropdown search highlight */
+.ant-select-dropdown.ant-select-dropdown-dark
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled)
+  .ant-select-item-option-content {
+  color: #ffffff !important;
+}
+
+/* Fix for the hover state in dropdown */
+.ant-select-dropdown.ant-select-dropdown-dark
+  .ant-select-item-option:hover:not(.ant-select-item-option-disabled) {
+  background-color: #374151 !important;
 }
 
 /* Dark mode for DatePicker components */

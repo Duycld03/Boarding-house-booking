@@ -107,7 +107,8 @@ function FilterAccount({ setFilterValue }) {
                 placeholder={t("forms.gender.placeholder")}
                 onChange={setGender}
                 allowClear
-                className={darkMode ? "ant-select-dark" : ""}
+                className={darkMode ? "dark-mode-select" : ""}
+                popupClassName={darkMode ? "dark-mode-select-dropdown" : ""}
               >
                 <Option value="male">{t("forms.gender.options.male")}</Option>
                 <Option value="female">
@@ -122,7 +123,8 @@ function FilterAccount({ setFilterValue }) {
                 value={role}
                 placeholder={t("forms.role.placeholder")}
                 onChange={setRole}
-                className={darkMode ? "ant-select-dark" : ""}
+                className={darkMode ? "dark-mode-select" : ""}
+                popupClassName={darkMode ? "dark-mode-select-dropdown" : ""}
                 options={[
                   { label: t("forms.role.options.user"), value: "user" },
                   { label: t("forms.role.options.owner"), value: "owner" },
@@ -140,7 +142,8 @@ function FilterAccount({ setFilterValue }) {
                 value={status}
                 placeholder={t("filters.statusPlaceholder")}
                 onChange={setStatus}
-                className={darkMode ? "ant-select-dark" : ""}
+                className={darkMode ? "dark-mode-select" : ""}
+                popupClassName={darkMode ? "dark-mode-select-dropdown" : ""}
                 allowClear
               >
                 <Option value="active">
