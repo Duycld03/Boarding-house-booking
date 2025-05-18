@@ -81,7 +81,9 @@
     "reportImages": "Report Images",
     "noImages": "No images available",
     "details": "Details",
-    "updatedAt": "UpdatedAt"
+    "updatedAt": "UpdatedAt",
+    "detailPlaceholder":"Reason for decision or comments..."
+
 
   }
 }

@@ -82,6 +82,7 @@
     "reportImages": "Ảnh báo cáo",
     "noImages": "Không có ảnh",
     "details": "Chi tiết",
-    "updatedAt": "Thời gian xử lý"
+    "updatedAt": "Thời gian xử lý",
+    "detailPlaceholder":"Lý do..."
   }
 }

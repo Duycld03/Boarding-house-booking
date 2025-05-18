@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import convertTimetap from '../../utils/convertTimetap';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/themeContext';
-import './FormReplayPopup.module.css';
+import styles from './FormReplayPopup.module.css';
 
 const { Option } = Select;
 
@@ -131,10 +131,8 @@ const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
         >
           <Input.TextArea
             rows={4}
-            placeholder={t(
-              'detail.detailPlaceholder',
-              'E.g., Reason for decision or comments...'
-            )}
+            className={darkMode ? styles.darkTextarea : styles.lightTextarea}
+            placeholder={t('detail.detailPlaceholder')}
             style={darkInputStyle}
           />
         </Form.Item>

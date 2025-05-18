@@ -14,3 +14,26 @@
     background-color: #1f2937 !important;
     color: white !important;
 }
+.darkTextarea {
+    background-color: #374151 !important;
+    color: white !important;
+    border-color: #4b5563 !important;
+}
+
+/* Dark placeholder fix */
+.darkTextarea::placeholder {
+    color: rgba(255, 255, 255, 0.8) !important;
+    opacity: 1 !important;
+}
+
+/* Light mode */
+.lightTextarea {
+    background-color: white !important;
+    color: black !important;
+    border-color: #d9d9d9 !important;
+}
+
+.lightTextarea::placeholder {
+    color: rgba(0, 0, 0, 0.45) !important;
+    opacity: 1 !important;
+}
