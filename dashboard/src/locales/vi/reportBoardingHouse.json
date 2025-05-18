@@ -1,0 +1,74 @@
+{
+  "title": "Báo Cáo Nhà Trọ",
+  "columns": {
+    "reporter": "Người báo cáo",
+    "boardingHouseName": "Tên nhà trọ",
+    "reason": "Lý do",
+    "status": "Trạng thái",
+    "createdAt": "Ngày tạo",
+    "processedDate": "Ngày xử lý",
+    "action": "Thao tác"
+  },
+  "status": {
+    "pending": "Đang chờ",
+    "resolved": "Đã giải quyết",
+    "rejected": "Đã từ chối"
+  },
+  "buttons": {
+    "delete": "Xóa",
+    "replay": "Phản hồi"
+  },
+  "modals": {
+    "deleteTitle": "Xác nhận xóa",
+    "deleteContent": "Bạn có muốn xóa báo cáo nhà trọ này không?",
+    "cancelButton": "Hủy",
+    "confirmButton": "Xác nhận"
+  },
+  "replyForm": {
+    "title": "Phản hồi báo cáo",
+    "status": "Trạng thái",
+    "details": "Chi tiết",
+    "submit": "Gửi",
+    "cancel": "Hủy"
+  },
+  "filter": {
+    "filterButton": "Lọc",
+    "boardingHouseName": "Tên Nhà Trọ",
+    "enterBoardingHouseName": "Nhập tên nhà trọ",
+    "reason": "Lý Do",
+    "selectReason": "Chọn lý do",
+    "reasonOptions": {
+      "scamOnRentOrDeposit": "Lừa đảo tiền thuê hoặc đặt cọc",
+      "falseAdvertisement": "Quảng cáo sai sự thật",
+      "violationOfPrivacy": "Vi phạm quyền riêng tư",
+      "unfriendlyLandlord": "Chủ nhà không thân thiện",
+      "poorSecurity": "An ninh kém"
+    },
+    "status": "Trạng Thái",
+    "selectStatus": "Chọn trạng thái",
+    "startDate": "Ngày Bắt Đầu",
+    "endDate": "Ngày Kết Thúc",
+    "apply": "Áp Dụng",
+    "clear": "Xóa Bộ Lọc",
+    "errors": {
+      "noEndDate": "Vui lòng chọn ngày kết thúc",
+      "noStartDate": "Vui lòng chọn ngày bắt đầu",
+      "startAfterEnd": "Ngày bắt đầu không thể sau ngày kết thúc"
+    }
+  },
+  "toast": {
+    "deleteSuccess": "Xóa báo cáo nhà trọ thành công.",
+    "deleteFailed": "Không thể xóa báo cáo. Vui lòng thử lại sau.",
+    "replyFailed": "Không thể gửi phản hồi hoặc cập nhật báo cáo. Vui lòng thử lại sau.",
+    "fetchFailed": "Không thể tải dữ liệu yêu cầu. Vui lòng thử lại sau.",
+    "filterFailed": "Không thể tải dữ liệu báo cáo đã lọc. Vui lòng thử lại sau.",
+    "missingData": "Thiếu dữ liệu báo cáo. Vui lòng thử lại."
+  },
+  "reason": {
+    "scamOnRentOrDeposit": "Lừa đảo tiền thuê hoặc đặt cọc",
+    "falseAdvertisement": "Quảng cáo sai sự thật",
+    "violationOfPrivacy": "Vi phạm quyền riêng tư",
+    "unfriendlyLandlord": "Chủ nhà không thân thiện",
+    "poorSecurity": "An ninh kém"
+  }
+}

@@ -4,7 +4,9 @@ import { Button } from "../../../../component";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/themeContext";
-import "./AddAccountModal.css"; // Import custom CSS for additional dark mode fixes
+import Style from "./AddAccountModal.module.css"; // Import custom CSS for additional dark mode fixes
+import classNames from "classnames";
+const cx = classNames.bind(Style); // Bind the styles to the classNames function
 
 const { Option } = Select;
 
@@ -74,9 +76,10 @@ const AddAccountModal = ({ onAddData }) => {
   };
 
   // Button styles based on theme
-  const primaryButtonClass = "bg-primary w-full text-white";
-
-  const secondaryButtonClass = "bg-gray-300 dark:bg-gray-600";
+  const primaryButtonClass = cx("bg-primary", "w-full", "text-white");
+  const secondaryButtonClass = cx("bg-gray-300", {
+    "dark:bg-gray-600": darkMode,
+  });
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -193,8 +196,8 @@ const AddAccountModal = ({ onAddData }) => {
   };
 
   // Custom CSS class for input fields in dark mode
-  const darkModeInputClass = darkMode ? "dark-mode-input" : "";
-  const darkModeSelectClass = darkMode ? "dark-mode-select" : "";
+  const darkModeInputClass = cx({ "dark-mode-input": darkMode });
+  const darkModeSelectClass = cx({ "dark-mode-select": darkMode });
 
   return (
     <ConfigProvider theme={themeConfig}>
@@ -207,7 +210,7 @@ const AddAccountModal = ({ onAddData }) => {
 
       <Modal
         title={
-          <span className={darkMode ? "text-white font-medium" : ""}>
+          <span className={cx({ "text-white font-medium": darkMode })}>
             {t("modals.createAccount.title")}
           </span>
         }
@@ -216,14 +219,14 @@ const AddAccountModal = ({ onAddData }) => {
         footer={null}
         destroyOnClose
         styles={modalStyles}
-        className={darkMode ? "dark-mode-modal" : ""}
+        className={cx({ "dark-mode-modal": darkMode })}
       >
-        <div className={darkMode ? "dark-mode-form" : ""}>
+        <div className={cx({ "dark-mode-form": darkMode })}>
           {step === 1 && (
             <Form form={form1} layout="vertical" name="personal_info">
               <Form.Item
                 label={
-                  <span className={darkMode ? "text-white" : ""}>
+                  <span className={cx({ "text-white": darkMode })}>
                     {t("forms.fullname.label")}
                   </span>
                 }
@@ -246,7 +249,7 @@ const AddAccountModal = ({ onAddData }) => {
 
               <Form.Item
                 label={
-                  <span className={darkMode ? "text-white" : ""}>
+                  <span className={cx({ "text-white": darkMode })}>
                     {t("forms.email.label")}
                   </span>
                 }
@@ -266,7 +269,7 @@ const AddAccountModal = ({ onAddData }) => {
 
               <Form.Item
                 label={
-                  <span className={darkMode ? "text-white" : ""}>
+                  <span className={cx({ "text-white": darkMode })}>
                     {t("forms.gender.label")}
                   </span>
                 }
@@ -280,7 +283,7 @@ const AddAccountModal = ({ onAddData }) => {
                   placeholder={t("forms.gender.placeholder")}
                   className={darkModeSelectClass}
                   dropdownStyle={darkMode ? { backgroundColor: "#374151" } : {}}
-                  popupClassName={darkMode ? "dark-mode-dropdown" : ""}
+                  popupClassName={cx({ "dark-mode-dropdown": darkMode })}
                 >
                   <Option value="male">{t("forms.gender.options.male")}</Option>
                   <Option value="female">
@@ -294,7 +297,7 @@ const AddAccountModal = ({ onAddData }) => {
 
               <Form.Item
                 label={
-                  <span className={darkMode ? "text-white" : ""}>
+                  <span className={cx({ "text-white": darkMode })}>
                     {t("forms.phoneNumber.label")}
                   </span>
                 }
@@ -330,7 +333,7 @@ const AddAccountModal = ({ onAddData }) => {
             <Form form={form2} layout="vertical" name="account_info">
               <Form.Item
                 label={
-                  <span className={darkMode ? "text-white" : ""}>
+                  <span className={cx({ "text-white": darkMode })}>
                     {t("forms.username.label")}
                   </span>
                 }
@@ -349,7 +352,7 @@ const AddAccountModal = ({ onAddData }) => {
 
               <Form.Item
                 label={
-                  <span className={darkMode ? "text-white" : ""}>
+                  <span className={cx({ "text-white": darkMode })}>
                     {t("forms.password.label")}
                   </span>
                 }
@@ -369,7 +372,7 @@ const AddAccountModal = ({ onAddData }) => {
 
               <Form.Item
                 label={
-                  <span className={darkMode ? "text-white" : ""}>
+                  <span className={cx({ "text-white": darkMode })}>
                     {t("forms.confirmPassword.label")}
                   </span>
                 }
@@ -402,7 +405,7 @@ const AddAccountModal = ({ onAddData }) => {
 
               <Form.Item
                 label={
-                  <span className={darkMode ? "text-white" : ""}>
+                  <span className={cx({ "text-white": darkMode })}>
                     {t("forms.role.label")}
                   </span>
                 }
@@ -414,14 +417,14 @@ const AddAccountModal = ({ onAddData }) => {
                   placeholder={t("forms.role.placeholder")}
                   className={darkModeSelectClass}
                   dropdownStyle={darkMode ? { backgroundColor: "#374151" } : {}}
-                  popupClassName={darkMode ? "dark-mode-dropdown" : ""}
+                  popupClassName={cx({ "dark-mode-dropdown": darkMode })}
                 >
                   <Option value="user">{t("forms.role.options.user")}</Option>
                   <Option value="owner">{t("forms.role.options.owner")}</Option>
                 </Select>
               </Form.Item>
 
-              <div className="flex justify-between">
+              <div className={cx("flex", "justify-between")}>
                 <Button
                   className={secondaryButtonClass}
                   size="large"

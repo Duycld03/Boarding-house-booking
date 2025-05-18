@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   TableCustom as Table,
   Button,
   ConfirmModal,
-  Loader,
   FormReplayPopup,
-} from '../../../component';
-import { toast } from 'react-toastify';
-import { Tag } from 'antd';
+} from "../../../component";
+import { toast } from "react-toastify";
+import { Tag } from "antd";
 import {
   deleteReport,
   sendReplyByEmail,
   getBHReports,
   filterBHReports,
-} from '../../../api/reportManagement';
-import convertTimetap from '../../../utils/convertTimetap';
-import FilterBHReportPopup from './FilterBHReportPopup ';
+} from "../../../api/reportManagement";
+import convertTimetap from "../../../utils/convertTimetap";
+import FilterBHReportPopup from "./FilterBHReportPopup ";
+import { useTranslation } from "react-i18next";
 
 function ReportBoardingHouse() {
   const [data, setData] = useState([]);
@@ -25,6 +25,32 @@ function ReportBoardingHouse() {
   const [isReplayPopupOpen, setIsReplayPopupOpen] = useState(false);
   const [replayReportData, setReplayReportData] = useState(null);
   const [filterValue, setFilterValue] = useState({});
+  const { t } = useTranslation("reportBoardingHouse");
+
+  const coverReasonToMultipleLanguage = (reasonValue) => {
+    const reasonLowerCase = reasonValue.toLowerCase();
+
+    switch (reasonLowerCase) {
+      case "scam on rent or deposit".toLowerCase(): {
+        return t("reason.scamOnRentOrDeposit");
+      }
+      case "false advertisement".toLowerCase(): {
+        return t("reason.falseAdvertisement");
+      }
+      case "violation of privacy".toLowerCase(): {
+        return t("reason.violationOfPrivacy");
+      }
+      case "unfriendly landlord".toLowerCase(): {
+        return t("reason.unfriendlyLandlord");
+      }
+      case "poor security".toLowerCase(): {
+        return t("reason.poorSecurity");
+      }
+      default: {
+        return reasonValue;
+      }
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -37,10 +63,8 @@ function ReportBoardingHouse() {
         setData([]);
       }
     } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
-      toast.error(
-        'Failed to fetch withdrawal requests. Please try again later.'
-      );
+      console.error("Failed to fetch withdrawal requests:", error);
+      toast.error(t("toast.fetchFailed"));
       setData([]);
     } finally {
       setLoading(false);
@@ -54,11 +78,11 @@ function ReportBoardingHouse() {
       if (res) {
         setData(res);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error('Failed to fetch filtered reports:', error);
-      toast.error('Failed to fetch filtered reports. Please try again later.');
+      console.error("Failed to fetch filtered reports:", error);
+      toast.error(t("toast.filterFailed"));
       setData([]);
     } finally {
       setLoading(false);
@@ -78,60 +102,68 @@ function ReportBoardingHouse() {
   // Define columns for the Table component
   const columns = [
     {
-      title: 'Reporter',
-      dataIndex: 'reporter',
-      key: 'reporter',
-      render: (reporter) => reporter?.fullname || 'N/A',
+      title: t("columns.reporter"),
+      dataIndex: "reporter",
+      key: "reporter",
+      render: (reporter) => reporter?.fullname || "N/A",
     },
     {
-      title: 'Boarding house name',
-      dataIndex: 'targetId',
-      key: 'email',
-      render: (target) => target?.name || 'N/A',
+      title: t("columns.boardingHouseName"),
+      dataIndex: "targetId",
+      key: "email",
+      render: (target) => target?.name || "N/A",
     },
     {
-      title: 'Reason',
-      dataIndex: 'reason',
-      key: 'reason',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        const statusColors = {
-          pending: 'orange',
-          resolved: 'green',
-          rejected: 'red',
-        };
-        return <Tag color={statusColors[status.toLowerCase()]}>{status}</Tag>;
+      title: t("columns.reason"),
+      dataIndex: "reason",
+      key: "reason",
+      render: (reason) => {
+        const reasonText = coverReasonToMultipleLanguage(reason);
+        return <span>{reasonText}</span>;
       },
     },
     {
-      title: 'Created at',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: t("columns.status"),
+      dataIndex: "status",
+      key: "status",
+      render: (status) => {
+        const statusColors = {
+          pending: "orange",
+          resolved: "green",
+          rejected: "red",
+        };
+        return (
+          <Tag color={statusColors[status.toLowerCase()]}>
+            {t(`status.${status.toLowerCase()}`)}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: t("columns.createdAt"),
+      dataIndex: "createdAt",
+      key: "createdAt",
       render: (createdAt) => convertTimetap(createdAt),
     },
     {
-      title: 'Processed Date',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
+      title: t("columns.processedDate"),
+      dataIndex: "updatedAt",
+      key: "updatedAt",
       render: (updatedAt) => convertTimetap(updatedAt),
     },
     {
-      title: 'Action',
+      title: t("columns.action"),
       render: (record) => (
         <div className="flex gap-2">
           <Button
-            title={'Delete'}
+            title={t("buttons.delete")}
             btnDelete
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
-          {record.status !== 'rejected' && record.status !== 'resolved' && (
+          {record.status !== "rejected" && record.status !== "resolved" && (
             <Button
-              title={'Replay'}
+              title={t("buttons.replay")}
               btnReplay
               className="btn-replay"
               onClick={() => handleReplay(record)}
@@ -161,10 +193,10 @@ function ReportBoardingHouse() {
     try {
       await deleteReport(selectedRequest._id);
       setData(data.filter((item) => item._id !== selectedRequest._id));
-      toast.success('Boarding house report deleted successfully.');
+      toast.success(t("toast.deleteSuccess"));
     } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
-      toast.error('Failed to delete review report. Please try again later.');
+      console.error("Failed to delete report:", error);
+      toast.error(t("toast.deleteFailed"));
     } finally {
       setIsOpenDeleteModal(false);
       setSelectedRequest(null);
@@ -173,7 +205,7 @@ function ReportBoardingHouse() {
 
   const handleReplaySubmit = async (formData) => {
     if (!replayReportData || !replayReportData._id) {
-      toast.error('Report data is missing. Please try again.');
+      toast.error(t("toast.missingData"));
       return;
     }
 
@@ -186,10 +218,8 @@ function ReportBoardingHouse() {
       setIsReplayPopupOpen(false);
       fetchData();
     } catch (error) {
-      console.error('Failed to fetch filtered reports:', error);
-      toast.error(
-        'Failed to send reply or update report. Please try again later.'
-      );
+      console.error("Failed to send reply:", error);
+      toast.error(t("toast.replyFailed"));
     }
   };
 
@@ -202,11 +232,13 @@ function ReportBoardingHouse() {
         {/* Show filtered data if available, else show full data */}
         <Table columns={columns} data={data} loading={loading} />
         <ConfirmModal
-          title="Confirm Deletion"
-          content="Do you want to delete this boarding house report?"
+          title={t("modals.deleteTitle")}
+          content={t("modals.deleteContent")}
           onOk={handleDelete}
           onCancel={() => setIsOpenDeleteModal(false)}
           isOpen={isOpenDeleteModal}
+          cancelText={t("modals.cancelButton")}
+          okText={t("modals.confirmButton")}
         />
         {isReplayPopupOpen && (
           <FormReplayPopup
@@ -214,6 +246,11 @@ function ReportBoardingHouse() {
             onClose={() => setIsReplayPopupOpen(false)}
             onSubmit={handleReplaySubmit}
             reportData={replayReportData}
+            title={t("replyForm.title")}
+            statusLabel={t("replyForm.status")}
+            detailsLabel={t("replyForm.details")}
+            submitText={t("replyForm.submit")}
+            cancelText={t("replyForm.cancel")}
           />
         )}
       </>
