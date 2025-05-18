@@ -164,6 +164,7 @@ function FilterAccount({ setFilterValue }) {
                 placeholder={t("filters.startDatePlaceholder")}
                 format="DD-MM-YYYY"
                 allowClear
+                popupClassName={darkMode ? "dark-mode-picker-dropdown" : ""}
               />
             </Form.Item>
 
@@ -179,6 +180,7 @@ function FilterAccount({ setFilterValue }) {
                 placeholder={t("filters.endDatePlaceholder")}
                 format="DD-MM-YYYY"
                 allowClear
+                popupClassName={darkMode ? "dark-mode-picker-dropdown" : ""}
               />
             </Form.Item>
 

@@ -113,6 +113,48 @@
   background-color: #3b82f6 !important;
 }
 
+/* Dark mode for DatePicker dropdown panel */
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-panel-container {
+  background-color: #1f2937 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header {
+  color: #e5e7eb !important;
+  border-color: #4b5563 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header-view {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header button {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-content th {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-cell {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-cell-in-view {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown
+  .ant-picker-cell:hover
+  .ant-picker-cell-inner {
+  background-color: #374151 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown
+  .ant-picker-cell-selected
+  .ant-picker-cell-inner {
+  background-color: #3b82f6 !important;
+}
+
 /* Dark mode for modal */
 .ant-modal.ant-modal-dark .ant-modal-content {
   background-color: #1f2937 !important;
