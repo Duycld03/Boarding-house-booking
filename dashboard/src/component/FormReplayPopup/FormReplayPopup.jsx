@@ -51,7 +51,7 @@ const FormReplayPopup = ({ visible, onClose, onSubmit, reportData }) => {
 
   return (
     <Modal
-      title={t('modals.replayTitle', 'Replay to Report')}
+      title={t('modals.replayTitle')}
       open={visible}
       onCancel={() => {
         form.resetFields();

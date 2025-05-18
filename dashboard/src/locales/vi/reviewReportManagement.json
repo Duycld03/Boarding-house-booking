@@ -53,7 +53,9 @@
     "confirmDelete": {
       "title": "Xác nhận xóa",
       "content": "Bạn có chắc chắn muốn xóa báo cáo này không?"
-    }
+    },
+        "replayTitle": "Trả lời báo cáo"
+
   },
   "messages": {
     "fetchError": "Lỗi khi tải dữ liệu. Vui lòng thử lại sau.",

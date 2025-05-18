@@ -150,11 +150,11 @@ function FilterReport({ setFilterValue }) {
                 allowClear
                 inputReadOnly
                 className={`w-full ${darkMode ? 'ant-picker-dark' : ''}`}
+                popupClassName={darkMode ? 'dark-mode-picker-dropdown' : ''}
                 placeholder={t('filters.startDatePlaceholder')}
               />
             </Form.Item>
 
-            {/* Ngày kết thúc */}
             <Form.Item
               label={<span>{t('filters.endDate')}</span>}
               name="endDate"
@@ -167,6 +167,7 @@ function FilterReport({ setFilterValue }) {
                 allowClear
                 inputReadOnly
                 className={`w-full ${darkMode ? 'ant-picker-dark' : ''}`}
+                popupClassName={darkMode ? 'dark-mode-picker-dropdown' : ''}
                 placeholder={t('filters.endDatePlaceholder')}
               />
             </Form.Item>

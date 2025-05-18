@@ -80,7 +80,9 @@ const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
             <strong>{t('detail.content')}:</strong>{' '}
             {target?.content || t('detail.noContent')}
           </p>
-          <p className="mt-2 font-semibold">{t('detail.reviewImages')}:</p>
+          <p>
+            <strong>{t('detail.reviewImages')}:</strong>{' '}
+          </p>
           <div className="grid grid-cols-3 gap-1.5 mt-2">
             {target?.images?.length > 0 ? (
               target.images.map((img, idx) => (
@@ -138,7 +140,9 @@ const DetailReportModal = ({ isOpen, onClose, reportData, onReplay }) => {
             <strong>{t('detail.details')}:</strong>{' '}
             {details || t('detail.noContent')}
           </p>
-          <p className="mt-2 font-semibold">{t('detail.reportImages')}:</p>
+          <p>
+            <strong>{t('detail.reportImages')}:</strong>{' '}
+          </p>
           <div className="grid grid-cols-3 gap-1.5 mt-2">
             {images?.length > 0 ? (
               images.map((img, idx) => (
