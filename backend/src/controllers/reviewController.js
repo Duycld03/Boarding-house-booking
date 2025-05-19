@@ -28,8 +28,7 @@ class ReviewController {
       const { boardingHouse, startDate, endDate, ratings } = req.query;
 
       // Xây dựng filter cơ bản
-      let filter = {};
-
+      let filter = { parentId: null };
       // Lọc theo khoảng thời gian
       // Ex: startDate=2025-05-01&endDate=2025-05-31
       if (startDate || endDate) {
