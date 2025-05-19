@@ -13,5 +13,12 @@
   "boarding-house-type-management": "Quản lý loại nhà trọ",
   "withdrawal-requests-management": "Yêu cầu rút tiền",
   "list-boarding-house-reviews": "Quản lý đánh giá",
-  "facilities-management": "Quản lý tiện nghi"
+  "facilities-management": "Quản lý tiện nghi",
+  "table-component": {
+    "pagination": {
+      "page": "Trang",
+      "of": "của",
+      "rows-per-page": "Số hàng trên mỗi trang"
+    }
+  }
 }

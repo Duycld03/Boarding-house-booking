@@ -13,5 +13,12 @@
   "boarding-house-type-management": "Boarding House Type Management",
   "withdrawal-requests-management": "Withdrawal Requests",
   "list-boarding-house-reviews": "Review Management",
-  "facilities-management": "Facilities Management"
+  "facilities-management": "Facilities Management",
+  "table-component": {
+    "pagination": {
+      "page": "Page",
+      "of": "of",
+      "rows-per-page": "Rows per page"
+    }
+  }
 }

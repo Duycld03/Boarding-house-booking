@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { generateToken, verifyToken } from "../utils/functions.js";
 import { v2 as cloudinary } from "cloudinary";
+import paginate from '../utils/pagination.js'
 
 class accountController {
   async getAllAccount(req, res) {
@@ -46,11 +47,12 @@ class accountController {
         .json({ message: "An error occurred", error: error.message });
     }
   }
-
   async filterAccounts(req, res) {
     try {
-      let { gender, role, startDate, endDate, status } = req.query;
-      let filter = {};
+      const { gender, role, startDate, endDate, status } = req.query;
+
+      // Xây dựng filter cơ bản
+      const filter = {};
       if (gender) filter.gender = gender;
       if (role) filter.role = role;
       if (status) filter.status = status;
@@ -61,11 +63,31 @@ class accountController {
         };
       }
 
-      const accounts = await Account.find(filter).sort({ createdAt: 1 });
-      res.status(200).json(accounts);
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'asc',
+        filter, // Gộp filter thủ công
+        allowQueryFilters: ['gender', 'role', 'status'],
+        allowSearchFields: ['email', 'username', 'phone'], // WHITELIST tìm kiếm
+        fields: '-password', // Không trả về trường nhạy cảm
+        populate: ['role'], // Ví dụ nếu account có role là ref
+        includeTotalData: true // Bật nếu cần thống kê tổng toàn collection
+      };
+
+      // Gọi helper paginate
+      const result = await paginate(Account, paginationOptions, req);
+
+      return res.status(200).json(result);
     } catch (error) {
-      console.error("Error filtering accounts:", error);
-      res.status(500).json({ message: "Server Error" });
+      console.error('Error filtering accounts:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Server Error',
+        error: error.message,
+      });
     }
   }
 
