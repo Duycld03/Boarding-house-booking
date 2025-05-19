@@ -117,7 +117,7 @@ function Contact() {
             <h3 className="text-[22px] font-semibold text-center">
               {t('title')}
             </h3>
-            <p className="text-center text-sm mb-4">{t('description')}</p>
+            <p className="text-center text-[14px] mb-4">{t('description')}</p>
 
             <Form
               form={form}
