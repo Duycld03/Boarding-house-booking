@@ -8,6 +8,8 @@ import en_home from '@/locales/en/home.json';
 import vi_home from '@/locales/vi/home.json';
 import en_changePassword from '@/locales/en/changePassword.json';
 import vi_changePassword from '@/locales/vi/changePassword.json';
+import en_contact from '@/locales/en/contact.json';
+import vi_contact from '@/locales/vi/contact.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -16,12 +18,14 @@ i18n.use(initReactI18next).init({
       sidebar: en_sidebar,
       home: en_home,
       changePassword: en_changePassword,
+      contact: en_contact,
     },
     vi: {
       menu: vi_menu,
       sidebar: vi_sidebar,
       home: vi_home,
       changePassword: vi_changePassword,
+      contact: vi_contact,
     },
   },
   lng: 'en',
