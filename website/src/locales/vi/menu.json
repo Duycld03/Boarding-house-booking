@@ -8,5 +8,14 @@
   "auth": {
     "login-btn": "Đăng nhập",
     "register-btn": "Đăng ký"
+  },
+  "table-component": {
+    "pagination": {
+      "showing": "Hiển thị",
+      "to": "đến",
+      "of": "của",
+      "entries": "mục",
+      "no-data": "Không có dữ liệu trong bảng"
+    }
   }
 }

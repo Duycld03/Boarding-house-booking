@@ -1,16 +1,19 @@
-import { useState, useEffect } from "react";
-import { Divider, Table as AntTable, Button, Select } from "antd";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Divider, Table as AntTable, Button, Select, Grid, theme } from "antd";
 import PropTypes from "prop-types";
 import { useTheme } from "../../context/themeContext";
+import { createStyles } from "antd-style";
+import classNames from "classnames";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
-// CSS styles trong một chuỗi template literal
 const getTableStyles = (isDarkMode) => `
   /* Base table styles */
   .custom-table .ant-table .ant-table-container .ant-table-body,
   .custom-table .ant-table .ant-table-container .ant-table-content {
-    scrollbar-width: thin;
+    scrollbar-width: none;
     scrollbar-color: #eaeaea transparent;
     scrollbar-gutter: stable;
   }
@@ -115,128 +118,189 @@ const getTableStyles = (isDarkMode) => `
   }
 `;
 
+/**
+ * Enhanced TableCustom component with improved performance and maintainability
+ *
+ * @param {Object} props Component props
+ * @returns {JSX.Element} TableCustom component
+ */
 const TableCustom = ({
   columns,
-  data,
+  data = [],
   checkbox = false,
   onProcessData,
   selectOptions = [],
   enableCount = true,
   loading = false,
   onRowClick,
-  scrollY = "auto",
+  scrollY = null,
+  pagination = {},
+  onChange = () => {},
+  tableName,
+  noDataText = "No data available",
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [dynamicSelect, setDynamicSelect] = useState(null);
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const { darkMode } = useTheme();
+  const { t } = useTranslation("menu");
 
-  const onSelectChange = (newSelectedRowKeys, newSelectedRows) => {
+  // Memoize pagination config to avoid unnecessary re-renders
+  const paginationConfig = useMemo(
+    () => ({
+      showSizeChanger: true,
+      pageSize: 10,
+      showTotal: (total, range) => (
+        <span
+          style={{
+            color: darkMode ? "#ddd" : "#333",
+            userSelect: "none",
+            fontWeight: "500",
+          }}
+        >
+          {`${range[0]}-${range[1]} ${t(
+            "table-component.pagination.of"
+          )} ${total} ${tableName}`}
+        </span>
+      ),
+      ...pagination,
+      classNames: classNames(
+        "ant-pagination",
+        darkMode ? "ant-pagination-dark" : ""
+      ),
+    }),
+    [pagination]
+  );
+
+  // Determine if submit button should be disabled
+  const isSubmitDisabled = useMemo(() => {
+    return !(selectedRows.length > 0 && dynamicSelect !== null);
+  }, [selectedRows.length, dynamicSelect]);
+
+  const numberedData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+
+    return data.map((item, index) => {
+      const pageSize = paginationConfig.pageSize || 10;
+      const currentPage = paginationConfig.current || 1;
+      const startNumber = (currentPage - 1) * pageSize + 1;
+
+      return {
+        ...item,
+        number: startNumber + index,
+      };
+    });
+  }, [data, paginationConfig.pageSize, paginationConfig.current]);
+
+  // Memoize the columns with numbering column if enableCount is true
+  const numberedColumns = useMemo(() => {
+    if (!enableCount) return columns;
+
+    return [
+      {
+        title: "No.",
+        dataIndex: "number",
+        key: "number",
+        width: 60,
+        render: (_, record) => <span>{record.number}</span>,
+      },
+      ...columns,
+    ];
+  }, [columns, enableCount]);
+
+  // Callback for row selection changes
+  const onSelectChange = useCallback((newSelectedRowKeys, newSelectedRows) => {
     setSelectedRowKeys(newSelectedRowKeys);
     setSelectedRows(newSelectedRows);
-  };
+  }, []);
 
-  const handleSelectChange = (value) => {
+  // Callback for dynamic select changes
+  const handleSelectChange = useCallback((value) => {
     setDynamicSelect(value);
-  };
+  }, []);
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-    getCheckboxProps: (record) => ({
-      name: record.name,
-      disabled: false,
-    }),
-  };
-
-  const handleProcessData = () => {
-    const combinedData = {
-      formValues: { dynamicSelect },
-      selectedRows: selectedRows,
-    };
+  // Callback for processing data
+  const handleProcessData = useCallback(() => {
     if (onProcessData && typeof onProcessData === "function") {
-      onProcessData(combinedData);
+      onProcessData({
+        formValues: { dynamicSelect },
+        selectedRows: selectedRows,
+      });
     }
+
+    // Reset form after processing
     setDynamicSelect(null);
     setSelectedRowKeys([]);
     setSelectedRows([]);
-  };
+  }, [dynamicSelect, selectedRows, onProcessData]);
 
-  const numberedData = data.map((item, index) => ({
-    ...item,
-    number: index + 1,
-  }));
+  // Memoize row selection configuration
+  const rowSelection = useMemo(
+    () => ({
+      selectedRowKeys,
+      onChange: onSelectChange,
+      getCheckboxProps: (record) => ({
+        name: record.name,
+        disabled: false,
+      }),
+    }),
+    [selectedRowKeys, onSelectChange]
+  );
 
-  const numberedColumns = enableCount
-    ? [
-        {
-          title: "No.",
-          dataIndex: "number",
-          key: "number",
-          render: (_, record) => <span>{record.number}</span>,
-        },
-        ...columns,
-      ]
-    : columns;
-
-  useEffect(() => {
-    const hasSelection = selectedRows.length > 0;
-    const hasValue = dynamicSelect !== null;
-    setIsSubmitDisabled(!hasSelection || !hasValue);
-  }, [selectedRows, dynamicSelect]);
-
-  const onRow = (record) => ({
-    onClick: () => {
+  // Callback for row click handling
+  const handleRowClick = useCallback(
+    (record) => {
       if (onRowClick && typeof onRowClick === "function") {
         onRowClick(record);
       }
     },
-  });
+    [onRowClick]
+  );
 
   return (
-    <div className="w-full p-2 dark:bg-gray-700 dark:text-text-dark text-text-light">
-      {/* Sử dụng CSS thông thường thay vì antd-style */}
+    <div>
       <style>{getTableStyles(darkMode)}</style>
 
-      {checkbox && <Divider className="dark:border-gray-700" />}
       {checkbox && (
-        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:gap-4">
-          <label className="mb-2 sm:mb-0 text-sm dark:text-text-dark text-text-light">
-            Select Option:
-          </label>
-          <Select
-            placeholder="Select an option"
-            className="w-full sm:w-[200px]"
-            value={dynamicSelect}
-            onChange={handleSelectChange}
-            dropdownClassName={darkMode ? "ant-select-dropdown-dark" : ""}
-            style={
-              darkMode ? { backgroundColor: "#2d3748", color: "#f9fafb" } : {}
-            }
-          >
-            {selectOptions.map((option) => (
-              <Option key={option.value} value={option.value}>
-                {option.label}
-              </Option>
-            ))}
-          </Select>
-          <Button
-            type="primary"
-            onClick={handleProcessData}
-            disabled={isSubmitDisabled}
-            className={`mt-2 sm:mt-0 ${darkMode ? "ant-btn-dark" : ""}`}
-          >
-            Submit
-          </Button>
-        </div>
+        <>
+          <Divider className={darkMode ? "border-gray-700" : ""} />
+          <div className={styles.formContainer}>
+            <label className={styles.formLabel}>Select Option:</label>
+            <Select
+              placeholder="Select an option"
+              className={styles.formSelect}
+              value={dynamicSelect}
+              onChange={handleSelectChange}
+              style={
+                darkMode ? { backgroundColor: "#2d3748", color: "#f9fafb" } : {}
+              }
+            >
+              {selectOptions.map((option) => (
+                <Option key={option.value} value={option.value}>
+                  {option.label}
+                </Option>
+              ))}
+            </Select>
+            <Button
+              type="primary"
+              onClick={handleProcessData}
+              disabled={isSubmitDisabled}
+              className={`${styles.formButton} ${
+                darkMode ? "table-action-button" : ""
+              }`}
+            >
+              Submit
+            </Button>
+          </div>
+        </>
       )}
+
       <div className="w-full">
-        <div className="max-w-full">
+        <div className="max-w-full ">
           <AntTable
             pagination={{
-              pageSize: 10,
-              className: darkMode ? "ant-pagination-dark" : "",
+              className: paginationConfig.classNames,
+              ...paginationConfig,
             }}
             scroll={{
               x: "max-content",
@@ -249,8 +313,14 @@ const TableCustom = ({
             rowSelection={checkbox ? rowSelection : null}
             columns={numberedColumns}
             dataSource={numberedData}
-            onRow={onRow}
+            onRow={(record) => ({
+              onClick: () => handleRowClick(record),
+            })}
             loading={loading}
+            onChange={onChange}
+            locale={{
+              emptyText: noDataText,
+            }}
             components={
               darkMode
                 ? {
@@ -296,6 +366,10 @@ TableCustom.propTypes = {
   loading: PropTypes.bool,
   onRowClick: PropTypes.func,
   scrollY: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  pagination: PropTypes.object,
+  onChange: PropTypes.func,
+  noDataText: PropTypes.string,
+  tableName: PropTypes.string,
 };
 
 export default TableCustom;

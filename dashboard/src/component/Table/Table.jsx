@@ -9,200 +9,11 @@ import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
-// Unified styles using antd-style - combined all dark mode styles
-const useStyles = createStyles(({ css, token, isDarkMode }) => {
-  const { antCls } = token;
-
-  return {
-    tableWrapper: css`
-      width: 100%;
-      padding: 0.5rem;
-      background-color: ${isDarkMode ? "rgb(55 65 81)" : "inherit"};
-      color: ${isDarkMode ? "#f9fafb" : "inherit"};
-    `,
-    customTable: css`
-      ${antCls}-table {
-        ${antCls}-table-container {
-          ${antCls}-table-body,
-          ${antCls}-table-content {
-            scrollbar-width: thin;
-            scrollbar-color: ${isDarkMode
-              ? "#4b5563 transparent"
-              : "#eaeaea transparent"};
-            scrollbar-gutter: stable;
-          }
-        }
-      }
-
-      /* Tablet responsive styles */
-      @media (min-width: 768px) and (max-width: 1024px) {
-        ${antCls}-table-container {
-          overflow-x: auto;
-        }
-        ${antCls}-table-body {
-          overflow-y: auto !important;
-          overflow-x: auto !important;
-        }
-        ${antCls}-table-content {
-          width: max-content;
-        }
-      }
-
-      /* Dark mode styles */
-      ${isDarkMode
-        ? `
-        /* Table styles */
-        .ant-table {
-          background-color: rgb(55 65 81);
-          color: #f9fafb;
-        }
-        
-        .ant-table-thead > tr > th {
-          background-color: #2d3748 !important;
-          color: #f9fafb !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .ant-table-tbody > tr > td {
-          color: #f9fafb !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .ant-table-tbody > tr:hover > td {
-          background-color: #1f2937 !important;
-        }
-        
-        /* Pagination styles */
-        .ant-pagination-item-active {
-          border-color: #3b82f6 !important;
-          background-color: #3b82f6 !important;
-        }
-        
-        .ant-pagination-item-active a {
-          color: #ffffff !important;
-        }
-        
-        .ant-pagination-item {
-          background-color: #2d3748 !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .ant-pagination-item a {
-          color: #f9fafb !important;
-        }
-        
-        .ant-pagination-prev .ant-pagination-item-link,
-        .ant-pagination-next .ant-pagination-item-link {
-          background-color: #2d3748 !important;
-          color: #f9fafb !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .ant-pagination-prev:hover .ant-pagination-item-link,
-        .ant-pagination-next:hover .ant-pagination-item-link {
-          background-color: #1f2937 !important;
-          border-color: #3b82f6 !important;
-          color: #ffffff !important;
-        }
-        
-        .ant-pagination-disabled .ant-pagination-item-link,
-        .ant-pagination-disabled:hover .ant-pagination-item-link {
-          background-color: rgba(45, 55, 72, 0.5) !important;
-          color: rgba(249, 250, 251, 0.5) !important;
-          border-color: rgba(255, 255, 255, 0.05) !important;
-          cursor: not-allowed;
-        }
-        
-        .ant-pagination-options .ant-select-selector {
-          background-color: #2d3748 !important;
-          color: #f9fafb !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .ant-pagination-options .ant-select-arrow {
-          color: #f9fafb !important;
-        }
-        
-        .ant-pagination-options-quick-jumper {
-          color: #f9fafb !important;
-        }
-        
-        .ant-pagination-options-quick-jumper input {
-          background-color: #2d3748 !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
-          color: #f9fafb !important;
-        }
-        
-        /* Select dropdown */
-        .ant-select-dropdown {
-          background-color: #2d3748 !important;
-          color: #f9fafb !important;
-        }
-        
-        .ant-select-item {
-          color: #f9fafb !important;
-        }
-        
-        .ant-select-item-option-selected,
-        .ant-select-item-option-active {
-          background-color: #1f2937 !important;
-        }
-        
-        /* Button styles */
-        .table-action-button {
-          background-color: #3b82f6 !important;
-          border-color: #3b82f6 !important;
-        }
-        
-        .table-action-button[disabled] {
-          background-color: rgba(59, 130, 246, 0.5) !important;
-          border-color: rgba(59, 130, 246, 0.5) !important;
-        }
-      `
-        : ""}
-    `,
-    formContainer: css`
-      margin-bottom: 1rem;
-      display: flex;
-      flex-direction: column;
-
-      @media (min-width: 640px) {
-        flex-direction: row;
-        align-items: center;
-        gap: 1rem;
-      }
-    `,
-    formLabel: css`
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
-      color: ${isDarkMode ? "#f9fafb" : "inherit"};
-
-      @media (min-width: 640px) {
-        margin-bottom: 0;
-      }
-    `,
-    formSelect: css`
-      width: 100%;
-
-      @media (min-width: 640px) {
-        width: 200px;
-      }
-    `,
-    formButton: css`
-      margin-top: 0.5rem;
-
-      @media (min-width: 640px) {
-        margin-top: 0;
-      }
-    `,
-  };
-});
-
 const getTableStyles = (isDarkMode) => `
   /* Base table styles */
   .custom-table .ant-table .ant-table-container .ant-table-body,
   .custom-table .ant-table .ant-table-container .ant-table-content {
-    scrollbar-width: thin;
+    scrollbar-width: none;
     scrollbar-color: #eaeaea transparent;
     scrollbar-gutter: stable;
   }
@@ -332,7 +143,6 @@ const TableCustom = ({
   const [selectedRows, setSelectedRows] = useState([]);
   const [dynamicSelect, setDynamicSelect] = useState(null);
   const { darkMode } = useTheme();
-  const { styles } = useStyles({ isDarkMode: darkMode });
   const { t } = useTranslation("menu");
 
   // Memoize pagination config to avoid unnecessary re-renders
@@ -448,7 +258,7 @@ const TableCustom = ({
   );
 
   return (
-    <div className={styles.tableWrapper}>
+    <div>
       <style>{getTableStyles(darkMode)}</style>
 
       {checkbox && (
