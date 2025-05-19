@@ -13,7 +13,8 @@ import {
 } from "../../../api/AccountManagement";
 import { useNavigate } from "react-router-dom";
 import ChangeEmailModal from "./ChangeEmailModal";
-
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/themeContext";
 const cx = classNames.bind(Styles);
 
 const getBase64 = (img, callback) => {
@@ -45,7 +46,8 @@ function Profile() {
   const [email, setEmail] = useState("");
 
   const [changeEmailModalVisible, setChangeEmailModalVisible] = useState(false);
-
+  const { t, i18n } = useTranslation("profile");
+  const { darkMode } = useTheme();
   const handleAvatarChange = (info) => {
     if (info.file.status === "uploading") {
       setLoading(true);
@@ -144,12 +146,18 @@ function Profile() {
   }, []);
 
   return (
-    <div className="txt">
+    <div className={`txt ${darkMode ? "bg-background-dark" : "bg-[#f0f2f5]"}`}>
       {profileLoading ? (
         <Loader />
       ) : (
-        <div className="flex justify-between mb-4 flex-col md:w-[60%] mx-auto">
-          <Card>
+        <div className="flex justify-between mb-4 flex-col md:w-[60%] mx-auto" >
+          <Card
+            style={{
+              width: 600,
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              backgroundColor: darkMode ? "#1f2937" : "#ffffff",
+            }}
+            className={darkMode ? "dark:border-gray-700" : ""}>
             <div className="flex justify-center items-center flex-col">
               <Upload
                 name="avatar"
@@ -165,6 +173,10 @@ function Profile() {
                     src={imageUrl}
                     alt="avatar"
                     className="w-36 h-36 rounded-full object-cover"
+                    style={{
+                      backgroundColor: "#ffffff",
+                      color: "#000000",
+                    }}
                   />
                 ) : (
                   uploadButton
@@ -205,6 +217,11 @@ function Profile() {
                     name="email"
                     value={email}
                     disabled
+                    style={{
+                      backgroundColor: "#ffffff", // Input luôn sáng
+                      color: "#000000", // Text luôn tối
+                      border: "1px solid #d1d5db",
+                    }}
                   />
                   <Button
                     name="change-email"
