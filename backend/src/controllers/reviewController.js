@@ -1,6 +1,7 @@
 import Review from '../models/review.js';
 import BoardingHouse from '../models/boardingHouse.js';
 import { v2 as cloudinary } from 'cloudinary';
+import paginate from '../utils/pagination.js';
 
 class ReviewController {
   async getReviews(req, res) {
@@ -28,7 +29,7 @@ class ReviewController {
 
       let filter = { parentId: null };
 
-      // Validate and add date range filter
+      // Date range filter
       if (startDate || endDate) {
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
@@ -48,17 +49,15 @@ class ReviewController {
         if (end) filter.createdAt.$lte = end;
       }
 
+      // Ratings filter
       if (ratings) {
         if (Array.isArray(ratings)) {
           const ratingArray = ratings.map(Number);
-
           if (!ratingArray.every((r) => r >= 1 && r <= 5)) {
             return res
               .status(400)
               .json({ message: 'Invalid ratings provided' });
           }
-
-          // Lọc reviews có rating nằm trong ratingArray
           filter.rating = { $in: ratingArray };
         } else {
           return res
@@ -67,28 +66,43 @@ class ReviewController {
         }
       }
 
-      const reviews = await Review.find(filter)
-        .populate({
-          path: 'accountId',
-          select: 'username _id fullname avatarImage',
-        })
-        .populate('boardingHouseId', 'name')
-        .sort({ createdAt: 1 });
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 50,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter,
+        allowQueryFilters: ['ratings', 'startDate', 'endDate'],
+        allowSearchFields: [], // Nếu cần search theo nội dung review có thể thêm
+        fields: '', // Không loại bỏ trường nào
+        populate: [
+          { path: 'accountId', select: 'username _id fullname avatarImage' },
+          { path: 'boardingHouseId', select: 'name' },
+        ],
+        includeTotalData: true,
+      };
 
+      // Gọi paginate
+      const result = await paginate(Review, paginationOptions, req);
+
+      // Nếu có tìm kiếm theo tên boardingHouse
       if (boardingHouse) {
-        const filteredReviews = reviews.filter((review) =>
+        result.docs = result.docs.filter((review) =>
           review?.boardingHouseId?.name
             ?.toLowerCase()
             .includes(boardingHouse.toLowerCase())
         );
-
-        res.status(200).json(filteredReviews);
-      } else {
-        res.status(200).json(reviews);
       }
+
+      return res.status(200).json(result);
     } catch (error) {
       console.error('Error filtering reviews:', error);
-      res.status(500).json({ success: false, message: 'Server Error' });
+      return res.status(500).json({
+        success: false,
+        message: 'Server Error',
+        error: error.message,
+      });
     }
   }
 
