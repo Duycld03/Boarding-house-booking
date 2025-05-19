@@ -210,7 +210,7 @@ function Contact() {
 
           {/* Contact Info + Map (Laptop) */}
           <div className="hidden lg:flex flex-col items-start">
-            <h3 className="text-[20px] font-semibold text-blue-500">
+            <h3 className="text-[22px] font-semibold text-blue-500">
               {t('title')}
             </h3>
             <p
