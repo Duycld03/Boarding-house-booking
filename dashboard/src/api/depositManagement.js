@@ -1,11 +1,11 @@
-import axios from './axios.config';
+import axios from "./axios.config";
 
 export const depositRoom = (data) => {
-  return axios.post('auth/deposit', data);
+  return axios.post("auth/deposit", data);
 };
 
 export const getMyDepositedRoom = () => {
-  return axios.get('auth/deposited-room');
+  return axios.get("auth/deposited-room");
 };
 
 export const getDepositRoom = (depositRoomId) => {
@@ -13,7 +13,7 @@ export const getDepositRoom = (depositRoomId) => {
 };
 
 export const payRent = (data) => {
-  return axios.post('auth/pay-rent', data);
+  return axios.post("auth/pay-rent", data);
 };
 
 export const checkPayRentStatus = (depositRoomId) => {
@@ -21,24 +21,29 @@ export const checkPayRentStatus = (depositRoomId) => {
 };
 
 export const getDepositByBhId = (boardingHouseId, filters = {}) => {
-  return axios.get(`owner/boardinghouse/deposit/${boardingHouseId}`, { params: filters });
+  return axios.get(`manager/boardinghouse/deposit/${boardingHouseId}`, {
+    params: filters,
+  });
 };
 export const acceptDepositRoom = (depositId) => {
-  return axios.put(`owner/acceptdeposit/${depositId}`);
+  return axios.put(`manager/acceptdeposit/${depositId}`);
 };
 
 export const getMaxDeposit = (boardingHouseId) => {
-  return axios.get(`owner/boardinghouse/deposit/max-deposit/${boardingHouseId}`);
+  return axios.get(
+    `manager/boardinghouse/deposit/max-deposit/${boardingHouseId}`
+  );
 };
 
 export const getRentTime = (boardingHouseId) => {
-  return axios.get(`owner/boardinghouse/deposit/max-rent-time/${boardingHouseId}`);
-}
+  return axios.get(
+    `manager/boardinghouse/deposit/max-rent-time/${boardingHouseId}`
+  );
+};
 
 export const payDeposit = (data) => {
-  return axios.post('auth/pay-deposit', data);
+  return axios.post("auth/pay-deposit", data);
 };
 export const rejectDepositRoom = (depositId, reasonForCancel) => {
-  return axios.put(`owner/rejectdeposit/${depositId}`, { reasonForCancel });
+  return axios.put(`manager/rejectdeposit/${depositId}`, { reasonForCancel });
 };
-
