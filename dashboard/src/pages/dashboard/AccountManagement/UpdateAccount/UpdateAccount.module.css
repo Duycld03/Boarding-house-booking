@@ -1,0 +1,187 @@
+/* UpdateAccount.module.css */
+
+/* Modal styles */
+.relative {
+  position: relative;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.dark-mode-modal :global(.ant-modal-content) {
+  background-color: #1f1f1f;
+  color: #ffffff;
+  border-color: #333333;
+}
+
+.dark-mode-modal :global(.ant-modal-header) {
+  background-color: #1f1f1f;
+  border-bottom-color: #333333;
+}
+
+.dark-mode-modal :global(.ant-modal-title) {
+  color: #ffffff;
+}
+
+.dark-mode-modal :global(.ant-modal-close) {
+  color: #ffffff;
+}
+
+.dark-mode-modal :global(.ant-form-item-label > label) {
+  color: #ffffff;
+}
+
+/* Avatar container styles */
+.absolute {
+  position: absolute;
+}
+
+.top-\[-5\%\] {
+  top: -5%;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.border-sky-600 {
+  border-color: #0284c7;
+}
+
+.border-2 {
+  border-width: 2px;
+}
+
+.left-1\/2 {
+  left: 50%;
+}
+
+.transform {
+  transform: translateX(-50%);
+}
+
+.-translate-x-1\/2 {
+  transform: translateX(-50%);
+}
+
+.dark-avatar-border {
+  border-color: #1890ff;
+}
+
+/* Avatar styles */
+.w-40 {
+  width: 10rem;
+}
+
+.h-40 {
+  height: 10rem;
+}
+
+/* Button container styles */
+.flex {
+  display: flex;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+/* Button styles */
+.bg-orange-700 {
+  background-color: #c2410c;
+}
+
+.bg-orange-600 {
+  background-color: #ea580c;
+}
+
+.bg-blue-700 {
+  background-color: #1d4ed8;
+}
+
+.bg-primary {
+  background-color: #1677ff;
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+/* Dark mode form control styles */
+.dark-mode-modal :global(.ant-input),
+.dark-mode-modal :global(.ant-input-password),
+.dark-mode-modal :global(.ant-picker),
+.dark-mode-modal :global(.ant-select-selector) {
+  background-color: #141414;
+  color: #ffffff;
+  border-color: #333333;
+}
+
+.dark-mode-modal :global(.ant-input[disabled]),
+.dark-mode-modal :global(.ant-picker[disabled]) {
+  background-color: #303030;
+  color: #888888;
+}
+
+/* Dark mode dropdown styles */
+.dark-mode-modal :global(.ant-select-dropdown) {
+  background-color: #1f1f1f;
+  border-color: #333333;
+}
+
+.dark-mode-modal :global(.ant-select-item) {
+  color: #ffffff;
+}
+
+.dark-mode-modal
+  :global(
+    .ant-select-item-option-active:not(.ant-select-item-option-disabled)
+  ) {
+  background-color: #2c2c2c;
+}
+
+.dark-mode-modal
+  :global(
+    .ant-select-item-option-selected:not(.ant-select-item-option-disabled)
+  ) {
+  background-color: #177ddc;
+  color: white;
+}
+
+/* Dark mode DatePicker styles */
+.dark-mode-modal :global(.ant-picker-dropdown) {
+  background-color: #1f1f1f;
+}
+
+.dark-mode-modal :global(.ant-picker-panel-container) {
+  background-color: #1f1f1f;
+  color: #ffffff;
+  border-color: #333333;
+}
+
+.dark-mode-modal :global(.ant-picker-header) {
+  color: #ffffff;
+  border-bottom-color: #333333;
+}
+
+.dark-mode-modal :global(.ant-picker-header button) {
+  color: #ffffff;
+}
+
+.dark-mode-modal :global(.ant-picker-cell) {
+  color: #ffffff;
+}
+
+.dark-mode-modal :global(.ant-picker-cell-in-view) {
+  color: #ffffff;
+}
+
+.dark-mode-modal :global(.ant-picker-cell-disabled) {
+  color: rgba(255, 255, 255, 0.25);
+  background-color: transparent;
+}

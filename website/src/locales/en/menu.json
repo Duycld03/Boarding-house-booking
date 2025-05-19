@@ -1,0 +1,12 @@
+{
+  "home": "Home",
+  "about": "About Us",
+  "contact": "Contact",
+  "profile": "Profile",
+  "change-password": "Change Password",
+  "logout": "Logout",
+  "auth": {
+    "login-btn": "Login",
+    "register-btn": "Register"
+  }
+}

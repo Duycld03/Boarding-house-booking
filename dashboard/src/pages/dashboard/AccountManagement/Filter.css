@@ -1,0 +1,255 @@
+/* Dark mode for Form Items */
+.dark-form .ant-form-item-label > label {
+  color: #e5e7eb !important;
+}
+
+/* Alternative styling - can be used globally */
+.dark .ant-form-item-label > label,
+.dark-form .ant-form-item-label > label {
+  color: #e5e7eb !important;
+}
+
+/* Dark mode for Select components - Fixed for selected values */
+.ant-select-dark .ant-select-selector {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+/* Styling for the placeholder text in dark mode */
+.ant-select-dark .ant-select-selection-placeholder {
+  color: #9ca3af !important;
+}
+
+/* Fix for the selected value text color in dark mode */
+.ant-select-dark .ant-select-selection-item {
+  color: #f9fafb !important;
+}
+
+/* Fix for the selected value in the multiple select mode */
+.ant-select-dark.ant-select-multiple .ant-select-selection-item {
+  background-color: #2c3e50 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+/* Fix for the close icon in multiple select tags */
+.ant-select-dark.ant-select-multiple .ant-select-selection-item-remove {
+  color: #d1d5db !important;
+}
+
+.ant-select-dark.ant-select-multiple .ant-select-selection-item-remove:hover {
+  color: #f9fafb !important;
+}
+
+/* Dropdown styling */
+.ant-select-dropdown.ant-select-dropdown-dark {
+  background-color: #1f2937;
+}
+
+.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option-selected {
+  background-color: #374151;
+}
+
+.ant-select-dropdown.ant-select-dropdown-dark
+  .ant-select-item-option-active:not(.ant-select-item-option-selected) {
+  background-color: #374151;
+}
+
+/* This is the fix for the option text color in dark mode */
+.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option {
+  color: #e5e7eb !important;
+}
+
+/* For the dropdown arrow color */
+.ant-select-dark .ant-select-arrow {
+  color: #9ca3af !important;
+}
+
+/* Fix for the search input within Select */
+.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-empty {
+  color: #e5e7eb !important;
+}
+
+/* Fix for the overflow items count */
+.ant-select-dark .ant-select-selection-overflow-item-suffix {
+  color: #f9fafb !important;
+}
+
+/* Fix for the clear icon */
+.ant-select-dark .ant-select-clear {
+  background-color: #374151 !important;
+  color: #9ca3af !important;
+}
+
+/* Fix for the select focused state */
+.ant-select-dark.ant-select-focused .ant-select-selector {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Fix for the dropdown render */
+.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option-content {
+  color: #f9fafb !important;
+}
+
+/* Fix for dropdown search highlight */
+.ant-select-dropdown.ant-select-dropdown-dark
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled)
+  .ant-select-item-option-content {
+  color: #ffffff !important;
+}
+
+/* Fix for the hover state in dropdown */
+.ant-select-dropdown.ant-select-dropdown-dark
+  .ant-select-item-option:hover:not(.ant-select-item-option-disabled) {
+  background-color: #374151 !important;
+}
+
+/* Dark mode for DatePicker components */
+.ant-picker-dark {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+}
+
+.ant-picker-dark input {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dark .ant-picker-suffix {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dark .ant-picker-clear {
+  background-color: #374151 !important;
+  color: #9ca3af !important;
+}
+
+.ant-picker-dark.ant-picker-focused {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Dark mode for the DatePicker dropdown panel */
+.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-panel-container {
+  background-color: #1f2937 !important;
+}
+
+.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-header {
+  color: #e5e7eb !important;
+  border-color: #4b5563 !important;
+}
+
+.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-header-view {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-header button {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-content th {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-cell {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-cell-in-view {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.ant-picker-dropdown-dark
+  .ant-picker-cell:hover
+  .ant-picker-cell-inner {
+  background-color: #374151 !important;
+}
+
+.ant-picker-dropdown.ant-picker-dropdown-dark
+  .ant-picker-cell-selected
+  .ant-picker-cell-inner {
+  background-color: #3b82f6 !important;
+}
+
+/* Dark mode for DatePicker dropdown panel */
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-panel-container {
+  background-color: #1f2937 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header {
+  color: #e5e7eb !important;
+  border-color: #4b5563 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header-view {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header button {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-content th {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-cell {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-cell-in-view {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown
+  .ant-picker-cell:hover
+  .ant-picker-cell-inner {
+  background-color: #374151 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown
+  .ant-picker-cell-selected
+  .ant-picker-cell-inner {
+  background-color: #3b82f6 !important;
+}
+
+/* Dark mode for modal */
+.ant-modal.ant-modal-dark .ant-modal-content {
+  background-color: #1f2937 !important;
+}
+
+.ant-modal.ant-modal-dark .ant-modal-header {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+}
+
+.ant-modal.ant-modal-dark .ant-modal-title {
+  color: #e5e7eb !important;
+}
+
+.ant-modal.ant-modal-dark .ant-modal-close-x {
+  color: #9ca3af !important;
+}
+
+.ant-modal.ant-modal-dark .ant-modal-body {
+  color: #e5e7eb !important;
+}
+
+.ant-modal.ant-modal-dark .ant-modal-footer {
+  border-color: #4b5563 !important;
+}
+
+.ant-picker-dark {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.ant-picker-dark input {
+  color: white;
+}
+
+/* This is the key styling for placeholder color in dark mode */
+.ant-picker-dark input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}

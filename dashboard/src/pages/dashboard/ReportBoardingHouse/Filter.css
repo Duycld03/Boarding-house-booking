@@ -1,0 +1,158 @@
+/* Dark mode styles for FilterBHReportPopup component */
+
+/* Dark mode for the dropdown container */
+.dark-mode-dropdown {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+
+/* Dark mode for Input components */
+.dark-mode-input {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+
+.dark-mode-input::placeholder {
+  color: #9ca3af !important;
+}
+
+.dark-mode-input .ant-input-suffix {
+  color: #9ca3af !important;
+}
+
+.dark-mode-input .ant-input-clear-icon {
+  color: #9ca3af !important;
+  background-color: transparent !important;
+}
+
+/* Dark mode form labels */
+.dark-mode-form .ant-form-item-label > label {
+  color: #e5e7eb !important;
+}
+
+/* Dark mode for Select components */
+.dark-mode-select .ant-select-selector {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+
+.dark-mode-select .ant-select-arrow {
+  color: #9ca3af !important;
+}
+
+.dark-mode-select .ant-select-selection-placeholder {
+  color: #9ca3af !important;
+}
+
+.dark-mode-select .ant-select-selection-item {
+  color: #e5e7eb !important;
+}
+
+/* Dark mode for Select dropdown */
+.ant-select-dropdown.dark-mode-select-dropdown {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+}
+
+.ant-select-dropdown.dark-mode-select-dropdown .ant-select-item {
+  color: #e5e7eb !important;
+}
+
+.ant-select-dropdown.dark-mode-select-dropdown
+  .ant-select-item-option-selected {
+  background-color: #374151 !important;
+}
+
+.ant-select-dropdown.dark-mode-select-dropdown
+  .ant-select-item-option-active:not(.ant-select-item-option-selected) {
+  background-color: #374151 !important;
+}
+
+/* Dark mode for DatePicker components */
+.dark-mode-date-picker {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+}
+
+.dark-mode-date-picker input {
+  color: #e5e7eb !important;
+}
+
+.dark-mode-date-picker input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.dark-mode-date-picker .ant-picker-suffix {
+  color: #9ca3af !important;
+}
+
+.dark-mode-date-picker .ant-picker-clear {
+  background-color: #374151 !important;
+  color: #9ca3af !important;
+}
+
+.dark-mode-date-picker.ant-picker-focused {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+/* Dark mode for DatePicker dropdown panel */
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-panel-container {
+  background-color: #1f2937 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header {
+  color: #e5e7eb !important;
+  border-color: #4b5563 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header-view {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-header button {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-content th {
+  color: #9ca3af !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-cell {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown .ant-picker-cell-in-view {
+  color: #e5e7eb !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown
+  .ant-picker-cell:hover
+  .ant-picker-cell-inner {
+  background-color: #374151 !important;
+}
+
+.ant-picker-dropdown.dark-mode-picker-dropdown
+  .ant-picker-cell-selected
+  .ant-picker-cell-inner {
+  background-color: #3b82f6 !important;
+}
+
+/* Dark mode styles for input placeholders */
+.dark-mode-input .ant-input::placeholder {
+  color: #9ca3af !important; /* Light gray color for placeholder in dark mode */
+  opacity: 0.7;
+}
+
+.dark-mode-input input::placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}
+
+.dark-mode-date-picker input::placeholder {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}

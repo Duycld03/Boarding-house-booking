@@ -1,0 +1,17 @@
+{
+  "home": "Home",
+  "about": "About Us",
+  "change-password": "Change Password",
+  "logout": "Logout",
+  "contact": "Contact",
+  "profile": "Profile",
+  "account-management": "Account Management",
+  "report-management": "Report Management",
+  "report-review-management": "Report Review",
+  "report-boarding-house-management": "Report Boarding House",
+  "boarding-house-management": "Boarding House Management",
+  "boarding-house-type-management": "Boarding House Type Management",
+  "withdrawal-requests-management": "Withdrawal Requests",
+  "list-boarding-house-reviews": "Review Management",
+  "facilities-management": "Facilities Management"
+}

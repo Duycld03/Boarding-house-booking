@@ -1,0 +1,171 @@
+{
+  "title": "Quản Lý Tài Khoản",
+  "columns": {
+    "avatar": "Ảnh Đại Diện",
+    "username": "Tên Đăng Nhập",
+    "fullName": "Họ Và Tên",
+    "email": "Email",
+    "role": "Vai Trò",
+    "status": "Trạng Thái",
+    "createdAt": "Ngày Tạo",
+    "action": "Thao Tác"
+  },
+  "role": {
+    "user": "Người Dùng",
+    "owner": "Chủ trọ",
+    "manager": "Người quản lý",
+    "admin": "Quản trị viên"
+  },
+  "status": {
+    "active": "Hoạt Động",
+    "inactive": "Không Hoạt Động"
+  },
+  "buttons": {
+    "delete": "Xóa",
+    "detail": "Chi Tiết",
+    "addNew": "Thêm Tài Khoản Mới",
+    "next": "Tiếp Theo",
+    "back": "Quay Lại",
+    "submit": "Xác Nhận"
+  },
+  "filters": {
+    "title": "Lọc",
+    "gender": "Giới Tính",
+    "role": "Vai Trò",
+    "status": "Trạng Thái",
+    "statusPlaceholder": "Chọn trạng thái",
+    "startDate": "Ngày Bắt Đầu",
+    "endDate": "Ngày Kết Thúc",
+    "clear": "Xóa",
+    "statusOptions": {
+      "active": "Hoạt Động",
+      "inactive": "Không Hoạt Động"
+    },
+    "startDatePlaceholder": "Chọn ngày bắt đầu",
+    "endDatePlaceholder": "Chọn ngày kết thúc",
+    "errors": {
+      "startDateRequired": "Vui lòng chọn ngày bắt đầu.",
+      "endDateRequired": "Vui lòng chọn ngày kết thúc.",
+      "invalidDateRange": "Ngày bắt đầu không thể muộn hơn ngày kết thúc."
+    }
+  },
+  "forms": {
+    "fullname": {
+      "label": "Nhập họ và tên của bạn",
+      "placeholder": "Họ Và Tên",
+      "required": "Họ và tên là bắt buộc",
+      "invalidFormat": "Họ và tên không thể chứa số hoặc ký tự đặc biệt"
+    },
+    "email": {
+      "label": "Nhập email của bạn",
+      "placeholder": "Email",
+      "required": "Email là bắt buộc",
+      "invalidFormat": "Địa chỉ email không hợp lệ"
+    },
+    "gender": {
+      "label": "Chọn giới tính của bạn",
+      "placeholder": "Chọn Giới Tính",
+      "required": "Giới tính là bắt buộc",
+      "options": {
+        "male": "Nam",
+        "female": "Nữ",
+        "other": "Khác"
+      }
+    },
+    "phoneNumber": {
+      "label": "Nhập số điện thoại của bạn",
+      "placeholder": "Số Điện Thoại",
+      "required": "Số điện thoại là bắt buộc",
+      "invalidFormat": "Định dạng số điện thoại không hợp lệ"
+    },
+    "username": {
+      "label": "Nhập tên đăng nhập của bạn",
+      "placeholder": "Tên Đăng Nhập",
+      "required": "Tên đăng nhập là bắt buộc"
+    },
+    "password": {
+      "label": "Nhập mật khẩu của bạn",
+      "placeholder": "Mật Khẩu",
+      "required": "Mật khẩu là bắt buộc",
+      "minLength": "Mật khẩu phải có ít nhất 6 ký tự"
+    },
+    "confirmPassword": {
+      "label": "Nhập lại mật khẩu",
+      "placeholder": "Xác Nhận Mật Khẩu",
+      "required": "Xác nhận mật khẩu là bắt buộc",
+      "mismatch": "Mật khẩu không khớp!"
+    },
+    "role": {
+      "label": "Chọn vai trò",
+      "placeholder": "Chọn Vai Trò",
+      "required": "Vai trò là bắt buộc",
+      "options": {
+        "user": "Người Dùng",
+        "owner": "Chủ Sở Hữu"
+      }
+    }
+  },
+  "modals": {
+    "createAccount": {
+      "title": "Tạo Tài Khoản"
+    },
+    "confirmDelete": {
+      "title": "Xác Nhận Xóa",
+      "content": "Bạn có muốn xóa báo cáo tài khoản này không?"
+    }
+  },
+  "messages": {
+    "addSuccess": "Thêm tài khoản mới thành công",
+    "addFailed": "Thêm tài khoản thất bại, không nhận được phản hồi.",
+    "updateSuccess": "Cập nhật tài khoản thành công!",
+    "updateFailed": "Cập nhật thất bại, không nhận được phản hồi.",
+    "deleteSuccess": "Xóa tài khoản thành công",
+    "deleteFailed": "Xóa tài khoản thất bại. Phản hồi từ máy chủ không thành công.",
+    "invalidId": "ID không hợp lệ",
+    "fetchError": "Không thể tải danh sách tài khoản. Vui lòng thử lại sau."
+  },
+  "errors": {
+    "form1": "Vui lòng sửa lỗi trong biểu mẫu 1.",
+    "form2": "Vui lòng sửa lỗi trong biểu mẫu 2."
+  },
+  "updateAccount": {
+    "title": "Cập Nhật Tài Khoản",
+    "avatar": "Ảnh Đại Diện",
+    "username": "Tên Đăng Nhập",
+    "usernamePlaceholder": "Tên Đăng Nhập",
+    "password": "Mật Khẩu",
+    "passwordPlaceholder": "Mật Khẩu",
+    "email": "Email",
+    "emailPlaceholder": "Email",
+    "phoneNumber": "Số Điện Thoại",
+    "phoneNumberPlaceholder": "Số Điện Thoại",
+    "invalidPhoneFormat": "Định dạng số điện thoại không hợp lệ",
+    "phoneRequired": "Số điện thoại là bắt buộc",
+    "fullName": "Họ và Tên",
+    "fullNamePlaceholder": "Họ và Tên",
+    "fullNameRequired": "Họ và tên là bắt buộc",
+    "fullNameInvalid": "Họ và tên không được chứa số hoặc ký tự đặc biệt",
+    "gender": "Giới Tính",
+    "selectGender": "Chọn Giới Tính",
+    "genderMale": "Nam",
+    "genderFemale": "Nữ",
+    "genderOther": "Khác",
+    "role": "Vai Trò",
+    "selectRole": "Chọn Vai Trò",
+    "roleUser": "Người Dùng",
+    "roleOwner": "Chủ Sở Hữu",
+    "createdAt": "Ngày Tạo",
+    "creationDate": "Ngày Tạo",
+    "updatedAt": "Ngày Cập Nhật",
+    "lastUpdatedDate": "Ngày Cập Nhật Gần Nhất",
+    "accountBalance": "Số Dư Tài Khoản",
+    "status": "Trạng Thái",
+    "statusActive": "Hoạt Động",
+    "statusInactive": "Không Hoạt Động",
+    "statusLocked": "Đã Khóa",
+    "cancel": "Hủy",
+    "update": "Cập Nhật",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa tài khoản này không?",
+    "delete": "Xóa"
+  }
+}

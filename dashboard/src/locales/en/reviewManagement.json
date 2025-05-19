@@ -1,0 +1,49 @@
+{
+  "columns": {
+    "boardingHouseName": "Boarding House Name",
+    "content": "Content",
+    "rating": "Rating",
+    "createdAt": "Created Date",
+    "reviewer": "Reviewer",
+    "action": "Action"
+  },
+  "buttons": {
+    "delete": "Delete",
+    "detail": "Detail",
+    "submit": "Apply",
+    "cancel": "Cancel",
+    "owner": "Owner reply"
+
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Confirm Deletion",
+      "content": "Do you want to delete this review?"
+    }
+  },
+  "messages": {
+    "fetchError": "Failed to fetch reviews. Please try again later.",
+    "deleteSuccess": "Delete review successful.",
+    "deleteFailed": "Failed to delete review.",
+    "detailFetchError": "Failed to fetch review details.",
+    "filterFetchError": "Failed to fetch filtered reviews."
+  },
+  "filters": {
+    "title": "Filter",
+    "boardingHouse": "Boarding House Name",
+    "boardingHousePlaceholder": "Enter boarding house name",
+    "startDate": "Start Date",
+    "startDatePlaceholder": "Select start date",
+    "endDate": "End Date",
+    "endDatePlaceholder": "Select end date",
+    "rating": "Rating",
+    "ratingPlaceholder": "Select rating",
+    "clear": "Clear",
+    "errors": {
+      "invalidDateRange": "Start date cannot be later than end date.",
+      "startDateRequired": "Please select a start date.",
+      "endDateRequired": "Please select an end date."
+    },
+    "images": "Images"
+  }
+}

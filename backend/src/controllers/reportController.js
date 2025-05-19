@@ -1,6 +1,7 @@
 import Report from "../models/report.js";
 import Review from "../models/review.js";
 import BoardingHouse from "../models/boardingHouse.js";
+import Account from "../models/account.js";
 import nodemailer from "nodemailer";
 import { v2 as cloudinary } from "cloudinary";
 class reportController {
@@ -60,10 +61,6 @@ class reportController {
         return res.status(404).json({ error: "Report not found" });
       }
 
-      if (!report.processedBy) {
-        return res.status(404).json({ error: "Processed by user not found" });
-      }
-
       // Tìm tất cả các báo cáo có cùng targetId và reason
       const relatedReports = await Report.find({
         targetId: report.targetId,
@@ -73,6 +70,28 @@ class reportController {
       if (relatedReports.length === 0) {
         return res.status(404).json({ error: "No related reports found" });
       }
+      if (!report.processedBy) {
+        const account = await Account.findById(req.user.userId).select(
+          "fullname"
+        );
+        if (!account) {
+          return res.status(404).json({ error: "User not found in token" });
+        }
+        // Cập nhật processedBy ngay tại đây
+        report.processedBy = account._id;
+        await report.save();
+      }
+
+      // Load lại report để đảm bảo processedBy đã cập nhật
+      const updatedReport = await Report.findById(reportId).populate({
+        path: "processedBy",
+        select: "fullname",
+      });
+
+      // Kiểm tra lại processedBy
+      const processedByName = updatedReport.processedBy
+        ? updatedReport.processedBy.fullname
+        : "Không xác định";
 
       // Cập nhật trạng thái và chi tiết xử lý cho tất cả các báo cáo liên quan
       await Report.updateMany(
@@ -145,7 +164,7 @@ class reportController {
                 <li><strong>Ngày gửi báo cáo:</strong> ${new Date(
                   relatedReport.createdAt
                 ).toLocaleDateString()}</li>
-                <li><strong>Người xử lý:</strong> ${report.processedBy.fullname}</li>
+                <li><strong>Người xử lý:</strong> ${processedByName}</li>
                 <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
                 <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>
             </ul>
@@ -386,6 +405,88 @@ class reportController {
       });
     } catch (error) {
       return res.status(500).json({ message: error.message });
+    }
+  }
+  async getReportReviewDetail(req, res) {
+    try {
+      const { reportId } = req.params;
+
+      // Tìm báo cáo trước
+      const report = await Report.findById(reportId)
+        .populate({ path: "reporter", select: "fullname email avatarImage" })
+        .populate({ path: "processedBy", select: "fullname" });
+
+      if (!report) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+
+      let populatedTarget = null;
+
+      // Populate dựa trên loại report
+      if (report.reportTypeRef === "Review") {
+        populatedTarget = await Review.findOne(
+          { _id: report.targetId },
+          null,
+          { withDeleted: true } // Lấy cả review bị đánh dấu delete
+        ).populate({
+          path: "accountId",
+          select: "fullname email avatarImage",
+        });
+      } else if (report.reportTypeRef === "BoardingHouse") {
+        populatedTarget = await BoardingHouse.findById(
+          report.targetId
+        ).populate("boardingHouseType");
+      }
+
+      return res.status(200).json({
+        ...report.toObject(),
+        target: populatedTarget, // Thêm thông tin của Review hoặc BoardingHouse vào response
+      });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getReportByUserId(req, res) {
+    try {
+      const reports = await Report.find({
+        reporter: req.user.userId,
+        reportType: { $in: ["review", "boardingHouse"] },
+      })
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "reporter",
+          select: "fullname email",
+        })
+        .populate({
+          path: "processedBy",
+          select: "fullname",
+        })
+        .populate({
+          path: "targetId",
+          select: "content name",
+        });
+
+      const formattedReports = reports.map((report) => ({
+        _id: report._id,
+        reportType:
+          report.reportType === "review" ? "Review" : "Boarding House",
+        target:
+          report.reportType === "review"
+            ? `Review của ${report.reporter.fullname}`
+            : report.targetId?.name || "N/A",
+        reason: report.reason,
+        status: report.status,
+        details: report.details,
+        createdAt: report.createdAt,
+      }));
+
+      res.status(200).json({ success: true, data: formattedReports });
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Lỗi khi lấy danh sách báo cáo." });
     }
   }
 }

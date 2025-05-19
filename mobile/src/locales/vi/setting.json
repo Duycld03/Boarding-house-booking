@@ -1,0 +1,15 @@
+{
+  "settings": "Cài đặt",
+  "appearance": "Giao diện",
+  "dark_mode": "Chế độ tối",
+  "dark_mode_description": "Chọn giữa chế độ sáng và tối",
+  "language": "Ngôn ngữ",
+  "select_display_language": "Chọn ngôn ngữ hiển thị",
+  "notifications": "Thông báo",
+  "push_notifications": "Thông báo đẩy",
+  "push_notifications_desc": "Nhận thông báo từ ứng dụng",
+  "notification_sound": "Âm thanh thông báo",
+  "notification_sound_desc": "Phát âm thanh khi có thông báo mới",
+  "back": "Quay lại"
+
+}
