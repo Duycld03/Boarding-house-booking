@@ -1,5 +1,6 @@
 {
   "title": "Quản Lý Tài Khoản",
+  "tableName": "Tài Khoản",
   "columns": {
     "avatar": "Ảnh Đại Diện",
     "username": "Tên Đăng Nhập",

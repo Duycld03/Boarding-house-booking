@@ -16,13 +16,18 @@ function ProfileLayout({ children, isLoggedIn }) {
         <CustomHeader isAdmin isLoggedIn={isLoggedIn} />
         <Layout
           style={{
-            padding: "24px 0",
+            padding: "10px 0",
             minHeight: "calc(100vh - 64px)",
           }}
+          className="bg-gray-300 dark:bg-gray-700"
         >
           <CustomProfileSlider />
 
-          <Content className={cx("content-wrapper")}>{children}</Content>
+          <Content
+            className={cx("content-wrapper", "bg-gray-300 dark:bg-gray-700")}
+          >
+            {children}
+          </Content>
         </Layout>
         <Layout>
           <FooterComponent />
