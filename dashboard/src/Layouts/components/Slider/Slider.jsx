@@ -76,24 +76,15 @@ const CustomSlider = ({ width = 250, ...props }) => {
       ),
       icon: <HomeOutlined />,
     },
-    {
-      key: "boarding-house-type-management",
-      label: (
-        <Link to={dashBoard + "/boarding-house-type-management"}>
-          {t("boarding-house-type-management")}
-        </Link>
-      ),
-      icon: <HomeOutlined />,
-    },
-    {
-      key: "withdrawal-requests-management",
-      label: (
-        <Link to={dashBoard + "/withdrawal-requests-management"}>
-          {t("withdrawal-requests-management")}
-        </Link>
-      ),
-      icon: <FontAwesomeIcon icon={faCreditCard} />,
-    },
+    // {
+    //   key: "boarding-house-type-management",
+    //   label: (
+    //     <Link to={dashBoard + "/boarding-house-type-management"}>
+    //       {t("boarding-house-type-management")}
+    //     </Link>
+    //   ),
+    //   icon: <HomeOutlined />,
+    // },
     {
       key: "list-boarding-house-reviews",
       label: (
@@ -103,15 +94,15 @@ const CustomSlider = ({ width = 250, ...props }) => {
       ),
       icon: <FontAwesomeIcon icon={faCalendarCheck} />,
     },
-    {
-      key: "facilities-management",
-      label: (
-        <Link to={dashBoard + "/facilities-management"}>
-          {t("facilities-management")}
-        </Link>
-      ),
-      icon: <FontAwesomeIcon icon={faTools} />,
-    },
+    // {
+    //   key: "facilities-management",
+    //   label: (
+    //     <Link to={dashBoard + "/facilities-management"}>
+    //       {t("facilities-management")}
+    //     </Link>
+    //   ),
+    //   icon: <FontAwesomeIcon icon={faTools} />,
+    // },
   ];
 
   return (
