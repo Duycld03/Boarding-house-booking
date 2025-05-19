@@ -27,55 +27,59 @@ class ReviewController {
     try {
       const { boardingHouse, startDate, endDate, ratings } = req.query;
 
-      let filter = { parentId: null };
+      // Xây dựng filter cơ bản
+      let filter = {};
 
-      // Date range filter
+      // Lọc theo khoảng thời gian
+      // Ex: startDate=2025-05-01&endDate=2025-05-31
       if (startDate || endDate) {
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
 
-        if (start && isNaN(start)) {
-          return res
-            .status(400)
-            .json({ message: 'Invalid start date provided' });
+        if (start && isNaN(start.getTime())) {
+          return res.status(400).json({ message: 'Invalid start date' });
         }
 
-        if (end && isNaN(end)) {
-          return res.status(400).json({ message: 'Invalid end date provided' });
+        if (end && isNaN(end.getTime())) {
+          return res.status(400).json({ message: 'Invalid end date' });
         }
 
         filter.createdAt = {};
         if (start) filter.createdAt.$gte = start;
-        if (end) filter.createdAt.$lte = end;
-      }
-
-      // Ratings filter
-      if (ratings) {
-        if (Array.isArray(ratings)) {
-          const ratingArray = ratings.map(Number);
-          if (!ratingArray.every((r) => r >= 1 && r <= 5)) {
-            return res
-              .status(400)
-              .json({ message: 'Invalid ratings provided' });
-          }
-          filter.rating = { $in: ratingArray };
-        } else {
-          return res
-            .status(400)
-            .json({ message: 'Ratings must be an array of strings' });
+        if (end) {
+          end.setHours(23, 59, 59, 999);
+          filter.createdAt.$lte = end;
         }
       }
 
+      // Lọc theo ratings
+      if (ratings) {
+        let ratingArray = [];
+
+        if (Array.isArray(ratings)) {
+          ratingArray = ratings.map((r) => Number(r));
+        } else {
+          ratingArray = [Number(ratings)];
+        }
+
+        // Kiểm tra hợp lệ
+        if (!ratingArray.every((r) => r >= 1 && r <= 5 && !isNaN(r))) {
+          return res.status(400).json({ message: 'Invalid ratings provided' });
+        }
+
+        filter.rating = { $in: ratingArray };
+      }
+
+      // Thiết lập cấu hình phân trang
       const paginationOptions = {
         defaultPage: 1,
         defaultLimit: 10,
-        maxLimit: 50,
+        maxLimit: 100,
         sortField: 'createdAt',
         sortOrder: 'desc',
         filter,
-        allowQueryFilters: ['ratings', 'startDate', 'endDate'],
-        allowSearchFields: [], // Nếu cần search theo nội dung review có thể thêm
-        fields: '', // Không loại bỏ trường nào
+        allowSearchFields: [],
+        fields: '',
         populate: [
           { path: 'accountId', select: 'username _id fullname avatarImage' },
           { path: 'boardingHouseId', select: 'name' },
@@ -83,16 +87,37 @@ class ReviewController {
         includeTotalData: true,
       };
 
-      // Gọi paginate
-      const result = await paginate(Review, paginationOptions, req);
+      // Dữ liệu phân trang ban đầu
+      let result = await paginate(Review, paginationOptions, req);
 
-      // Nếu có tìm kiếm theo tên boardingHouse
+      // Lọc theo boardingHouse.name nếu có
       if (boardingHouse) {
-        result.docs = result.docs.filter((review) =>
-          review?.boardingHouseId?.name
-            ?.toLowerCase()
-            .includes(boardingHouse.toLowerCase())
+        const keyword = boardingHouse.toLowerCase();
+        result.data = result.data.filter((review) =>
+          review?.boardingHouseId?.name?.toLowerCase().includes(keyword)
         );
+
+        // Cập nhật lại tổng số item và trang
+        const totalItems = result.data.length;
+        const currentPage = parseInt(req.query.page) || 1;
+        const limit =
+          parseInt(req.query.limit) || paginationOptions.defaultLimit;
+        const startIndex = (currentPage - 1) * limit;
+        const paginatedData = result.data.slice(startIndex, startIndex + limit);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        return res.status(200).json({
+          success: true,
+          pagination: {
+            currentPage,
+            totalPages,
+            totalItems,
+            limit,
+            hasNextPage: currentPage < totalPages,
+            hasPrevPage: currentPage > 1,
+          },
+          data: paginatedData,
+        });
       }
 
       return res.status(200).json(result);
