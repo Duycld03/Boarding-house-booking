@@ -12,6 +12,8 @@ import en_contact from '@/locales/en/contact.json';
 import vi_contact from '@/locales/vi/contact.json';
 import vi_profile from '@/locales/vi/profile.json';
 import en_profile from '@/locales/en/profile.json';
+import vi_aboutUs from '@/locales/vi/aboutUs.json';
+import en_aboutUs from '@/locales/en/aboutUs.json';
 i18n.use(initReactI18next).init({
   resources: {
     en: {
@@ -21,6 +23,7 @@ i18n.use(initReactI18next).init({
       changePassword: en_changePassword,
       contact: en_contact,
       profile: en_profile,
+      aboutUs: en_aboutUs,
     },
     vi: {
       menu: vi_menu,
@@ -29,12 +32,12 @@ i18n.use(initReactI18next).init({
       changePassword: vi_changePassword,
       contact: vi_contact,
       profile: vi_profile,
-
+      aboutUs: vi_aboutUs,
     },
   },
   lng: 'en',
   fallbackLng: 'en',
-  ns: ['menu', 'sidebar', 'home', 'changePassword'],
+  ns: ['menu', 'sidebar', 'home', 'changePassword', 'aboutUs'],
   defaultNS: 'menu',
   interpolation: {
     escapeValue: false,
