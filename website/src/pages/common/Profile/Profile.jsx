@@ -30,6 +30,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import ChangeEmailModal from "./ChangeEmailModal";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 const cx = classNames.bind(Styles);
@@ -43,11 +44,11 @@ const getBase64 = (img, callback) => {
 const beforeUpload = (file) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
-    message.error("You can only upload JPG/PNG file!");
+    toast.error("You can only upload JPG/PNG file!");
   }
   const isLt2M = file.size / 1024 / 1024 < 2;
   if (!isLt2M) {
-    message.error("Image must smaller than 2MB!");
+    toast.error("Image must smaller than 2MB!");
   }
   return isJpgOrPng && isLt2M;
 };
@@ -63,6 +64,7 @@ function Profile() {
   const [accountBalance, setAccountBalance] = useState(0);
   const [email, setEmail] = useState("");
   const { darkMode } = useTheme();
+  const { t } = useTranslation("profile");
 
   const [changeEmailModalVisible, setChangeEmailModalVisible] = useState(false);
 
@@ -72,7 +74,6 @@ function Profile() {
       return;
     }
     if (info.file.status === "done") {
-      // Get this url from response in real world.
       getBase64(info.file.originFileObj, (url) => {
         setLoading(false);
         setImageUrl(url);
@@ -95,7 +96,7 @@ function Profile() {
           marginTop: 8,
         }}
       >
-        Upload
+        {t("avatar.upload")}
       </div>
     </button>
   );
@@ -125,7 +126,7 @@ function Profile() {
       setProfileLoading(false);
     } catch (error) {
       setProfileLoading(false);
-      toast.error("Failed to get user profile!");
+      toast.error(t("actions.error"));
     }
   };
 
@@ -135,28 +136,10 @@ function Profile() {
       const res = await updateAccountFromProfile(values);
       getUserProfile();
       setLoading(false);
-      toast.success(res.message);
+      toast.success(t("actions.success"));
     } catch (error) {
       setLoading(false);
       toast.error(error?.response?.data?.message);
-    }
-  };
-
-  const handleUpload = async ({ file, onSuccess, onError }) => {
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    try {
-      const res = await updateAvatar(formData);
-
-      toast.success(res.message);
-      onSuccess();
-      setLoading(false);
-    } catch (error) {
-      toast.error("Upload avatar failed!");
-      onError(error);
-      setLoading(false);
     }
   };
 
@@ -173,34 +156,27 @@ function Profile() {
     border: darkMode ? "1px solid #333" : "1px solid #eaeaea",
     transition: "all 0.3s ease",
   };
+  console.log("Translated title:", t("title"));
 
   return (
     <div
-      className={`txt transition-colors duration-300 ${
-        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-800"
-      }`}
+      className={`txt transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-800"}`}
     >
       {profileLoading ? (
         <Loader />
       ) : (
         <div className="container py-8 px-4 mx-auto max-w-full lg:px-10 xl:px-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Profile Header - Left Side */}
             <div className="lg:col-span-3">
-              <Card
-                style={cardStyle}
-                className="overflow-hidden"
-                bodyStyle={{ padding: "24px" }}
-              >
+              <Card style={cardStyle} className="overflow-hidden" bodyStyle={{ padding: "24px" }}>
                 <div className="flex flex-col items-center">
                   <Upload
                     name="avatar"
                     listType="picture-circle"
                     className="avatar-uploader mb-4"
                     showUploadList={false}
-                    customRequest={handleUpload}
+                    customRequest={handleAvatarChange}
                     beforeUpload={beforeUpload}
-                    onChange={handleAvatarChange}
                   >
                     {imageUrl ? (
                       <div className="relative group">
@@ -217,33 +193,15 @@ function Profile() {
                       uploadButton
                     )}
                   </Upload>
-
-                  <Title
-                    level={3}
-                    className={`m-0 text-center ${
-                      darkMode ? "text-gray-100" : "text-gray-800"
-                    }`}
-                  >
+                  <Title level={3} className={`m-0 text-center ${darkMode ? "text-gray-100" : "text-gray-800"}`}>
                     @{username}
                   </Title>
-
                   {isOwner && (
-                    <div
-                      className={`mt-4 p-4 rounded-lg text-center ${
-                        darkMode ? "bg-gray-800" : "bg-gray-50"
-                      }`}
-                    >
-                      <Text
-                        strong
-                        className={darkMode ? "text-gray-300" : "text-gray-600"}
-                      >
-                        Account Balance
+                    <div className={`mt-4 p-4 rounded-lg text-center ${darkMode ? "bg-gray-800" : "bg-gray-50"}`}>
+                      <Text strong className={darkMode ? "text-gray-300" : "text-gray-600"}>
+                        {t("accountBalance.label")}
                       </Text>
-                      <div
-                        className={`text-xl font-bold mt-2 ${
-                          darkMode ? "text-green-400" : "text-green-600"
-                        }`}
-                      >
+                      <div className={`text-xl font-bold mt-2 ${darkMode ? "text-green-400" : "text-green-600"}`}>
                         {new Intl.NumberFormat("vi-VN", {
                           style: "currency",
                           currency: "VND",
@@ -254,35 +212,18 @@ function Profile() {
                 </div>
               </Card>
             </div>
-
-            {/* Main Profile Content - Right Side */}
             <div className="lg:col-span-9">
-              <Card
-                style={cardStyle}
-                className="overflow-hidden"
-                bodyStyle={{ padding: "28px" }}
-              >
-                {/* Account Information Section */}
+              <Card style={cardStyle} className="overflow-hidden" bodyStyle={{ padding: "28px" }}>
                 <div className="mb-8">
-                  <Title
-                    level={4}
-                    className={`mb-6 ${
-                      darkMode ? "text-gray-200" : "text-gray-700"
-                    }`}
-                  >
-                    Account Information
+                  <Title level={4} className={`mb-6 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>
+                    {t("title")}
                   </Title>
-
                   <Form form={formEmail} layout="vertical" className="mb-4">
                     <Form.Item
                       label={
-                        <span
-                          className={`text-base ${
-                            darkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
+                        <span className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                           <MailOutlined className="mr-2" />
-                          Email Address
+                          {t("email.label")}
                         </span>
                       }
                       name="email"
@@ -291,15 +232,11 @@ function Profile() {
                       <div className="flex items-end gap-4 flex-col md:flex-row">
                         <Input
                           size="large"
-                          placeholder="Enter your email"
+                          placeholder={t("email.placeholder")}
                           name="email"
                           value={email}
                           disabled
-                          className={
-                            darkMode
-                              ? "bg-gray-800 border-gray-700 text-gray-300"
-                              : ""
-                          }
+                          className={darkMode ? "bg-gray-800 border-gray-700 text-gray-300" : ""}
                           style={{ flexGrow: 1 }}
                         />
                         <Button
@@ -310,120 +247,81 @@ function Profile() {
                           loading={loading}
                           icon={<EditOutlined />}
                         >
-                          Change Email
+                          {t("actions.save")}
                         </Button>
                       </div>
                     </Form.Item>
                   </Form>
                 </div>
-
-                <Divider
-                  className={darkMode ? "border-gray-700" : "border-gray-200"}
-                />
-
-                {/* Personal Information Section */}
+                <Divider className={darkMode ? "border-gray-700" : "border-gray-200"} />
                 <div>
-                  <Title
-                    level={4}
-                    className={`mb-6 ${
-                      darkMode ? "text-gray-200" : "text-gray-700"
-                    }`}
-                  >
-                    Personal Information
+                  <Title level={4} className={`mb-6 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>
+                    {t("description")}
                   </Title>
-
-                  <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={onFinish}
-                    className={darkMode ? "dark-form" : ""}
-                  >
+                  <Form form={form} layout="vertical" onFinish={onFinish} className={darkMode ? "dark-form" : ""}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <Form.Item
                         label={
-                          <span
-                            className={`text-base ${
-                              darkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
-                          >
+                          <span className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                             <UserOutlined className="mr-2" />
-                            Full Name
+                            {t("fullName.label")}
                           </span>
                         }
                         name="fullname"
                         rules={[
                           {
                             required: true,
-                            message: "Please input your fullname!",
+                            message: t("fullName.required"),
                           },
                         ]}
                       >
                         <Input
                           size="large"
-                          placeholder="Enter your fullname"
-                          className={
-                            darkMode
-                              ? "bg-gray-800 border-gray-700 text-gray-300"
-                              : ""
-                          }
+                          placeholder={t("fullName.placeholder")}
+                          className={darkMode ? "bg-gray-800 border-gray-700 text-gray-300" : ""}
                         />
                       </Form.Item>
-
                       <Form.Item
                         label={
-                          <span
-                            className={`text-base ${
-                              darkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
-                          >
+                          <span className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                             <PhoneOutlined className="mr-2" />
-                            Phone Number
+                            {t("phone.label")}
                           </span>
                         }
                         name="phoneNumber"
                         rules={[
                           {
                             required: true,
-                            message: "Please input your phone number!",
+                            message: t("phone.required"),
                           },
                           {
                             len: 10,
-                            message: "Phone number must be 10 characters!",
+                            message: t("phone.invalidFormat"),
                           },
                         ]}
                       >
                         <Input
                           type="number"
                           size="large"
-                          placeholder="Enter your phone number"
-                          className={
-                            darkMode
-                              ? "bg-gray-800 border-gray-700 text-gray-300"
-                              : ""
-                          }
+                          placeholder={t("phone.placeholder")}
+                          className={darkMode ? "bg-gray-800 border-gray-700 text-gray-300" : ""}
                         />
                       </Form.Item>
                     </div>
-
                     <Form.Item
                       label={
-                        <span
-                          className={`text-base ${
-                            darkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          Gender
+                        <span className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                          {t("gender.label")}
                         </span>
                       }
                       name="gender"
                     >
                       <Radio.Group className={darkMode ? "text-gray-300" : ""}>
-                        <Radio value="male">Male</Radio>
-                        <Radio value="female">Female</Radio>
-                        <Radio value="other">Other</Radio>
+                        <Radio value="male">{t("gender.options.male")}</Radio>
+                        <Radio value="female">{t("gender.options.female")}</Radio>
+                        <Radio value="other">{t("gender.options.other")}</Radio>
                       </Radio.Group>
                     </Form.Item>
-
                     <Form.Item className="mt-8">
                       <Button
                         type="primary"
@@ -433,7 +331,7 @@ function Profile() {
                         icon={<EditOutlined />}
                         className="min-w-40"
                       >
-                        Save Changes
+                        {t("actions.save")}
                       </Button>
                     </Form.Item>
                   </Form>

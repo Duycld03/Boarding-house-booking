@@ -10,7 +10,8 @@ import en_changePassword from '@/locales/en/changePassword.json';
 import vi_changePassword from '@/locales/vi/changePassword.json';
 import en_contact from '@/locales/en/contact.json';
 import vi_contact from '@/locales/vi/contact.json';
-
+import vi_profile from '@/locales/vi/profile.json';
+import en_profile from '@/locales/en/profile.json';
 i18n.use(initReactI18next).init({
   resources: {
     en: {
@@ -19,6 +20,7 @@ i18n.use(initReactI18next).init({
       home: en_home,
       changePassword: en_changePassword,
       contact: en_contact,
+      profile: en_profile,
     },
     vi: {
       menu: vi_menu,
@@ -26,6 +28,8 @@ i18n.use(initReactI18next).init({
       home: vi_home,
       changePassword: vi_changePassword,
       contact: vi_contact,
+      profile: vi_profile,
+
     },
   },
   lng: 'en',
