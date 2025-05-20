@@ -8,6 +8,7 @@ import {
 import { toast } from 'react-toastify';
 import { Tag } from 'antd';
 import {
+  getReviewReports,
   deleteReport,
   sendReplyByEmail,
   filterReviewReports,
@@ -36,22 +37,38 @@ function ReportReviewManagement() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
 
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 0,
-    limit: 10,
-  });
-
-  const [paginationOptions, setPaginationOptions] = useState({
-    page: 1,
-    limit: 10,
-    sortField: 'createdAt',
-    sortOrder: 'desc',
-  });
-
   const { t } = useTranslation('reviewReportManagement');
   const { darkMode } = useTheme();
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await getReviewReports();
+      if (res) setData(res);
+      else setData([]);
+    } catch (error) {
+      console.error(error);
+      toast.error(t('messages.fetchError'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterReportData = async () => {
+    setLoading(true);
+    try {
+      const res = await filterReviewReports(filterValue);
+      if (res && Array.isArray(res.data)) setData(res.data);
+      else throw new Error('Invalid response format');
+    } catch (error) {
+      console.error(error);
+      toast.error(t('messages.fetchError'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchReportDetail = async (id) => {
     try {
@@ -66,86 +83,6 @@ function ReportReviewManagement() {
   const handleDetailModal = (record) => {
     fetchReportDetail(record._id);
     setIsDetailModalOpen(true);
-  };
-
-  const filterReportData = async () => {
-    setLoading(true);
-    try {
-      const res = await filterReviewReports({
-        ...filterValue,
-        ...paginationOptions,
-      });
-      if (res?.data && res?.pagination) {
-        setData(res.data);
-        setPagination({
-          currentPage: res.pagination.currentPage,
-          totalPages: res.pagination.totalPages,
-          totalItems: res.pagination.totalItems,
-          limit: res.pagination.limit,
-        });
-      } else {
-        throw new Error('Invalid response format');
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error(t('messages.fetchError'));
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteModal = (record) => {
-    setSelectedRequest(record);
-    setIsOpenDeleteModal(true);
-  };
-
-  const handleDelete = async () => {
-    if (!selectedRequest) return;
-    try {
-      await deleteReport(selectedRequest._id);
-      toast.success(t('messages.deleteSuccess'));
-      filterReportData();
-    } catch (error) {
-      console.error(error);
-      toast.error(t('messages.deleteFailed'));
-    } finally {
-      setIsOpenDeleteModal(false);
-      setSelectedRequest(null);
-    }
-  };
-
-  const handleReplaySubmit = async (formData) => {
-    if (!replayReportData || !replayReportData._id || !formData.status) {
-      toast.error(t('messages.replayError'));
-      return;
-    }
-    try {
-      await sendReplyByEmail(replayReportData._id, {
-        status: formData.status,
-        detailReport: formData.detailReport,
-      });
-      filterReportData();
-      setIsReplayPopupOpen(false);
-    } catch (error) {
-      console.error(error);
-      toast.error(t('messages.replayFailed'));
-    }
-  };
-
-  const handleTableChange = (pagination) => {
-    setPaginationOptions((prev) => ({
-      ...prev,
-      page: pagination.current,
-      limit: pagination.pageSize,
-    }));
-  };
-
-  const tablePaginationConfig = {
-    current: pagination.currentPage,
-    pageSize: pagination.limit,
-    total: pagination.totalItems,
-    showSizeChanger: true,
   };
 
   const columns = [
@@ -167,6 +104,7 @@ function ReportReviewManagement() {
       key: 'reason',
       render: (reason) => t(`reasons.${reason}`) || reason,
     },
+
     {
       title: t('columns.status'),
       dataIndex: 'status',
@@ -178,7 +116,7 @@ function ReportReviewManagement() {
           rejected: 'red',
         };
         return (
-          <Tag color={statusColors[status?.toLowerCase()]}>
+          <Tag color={statusColors[status.toLowerCase()]}>
             {t(`status.${status}`)}
           </Tag>
         );
@@ -218,23 +156,57 @@ function ReportReviewManagement() {
   ];
 
   useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     filterReportData();
-  }, [filterValue, paginationOptions]);
+  }, [filterValue]);
+
+  const handleDeleteModal = (record) => {
+    setSelectedRequest(record);
+    setIsOpenDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedRequest) return;
+    try {
+      await deleteReport(selectedRequest._id);
+      setData(data.filter((d) => d._id !== selectedRequest._id));
+      toast.success(t('messages.deleteSuccess'));
+    } catch (error) {
+      console.error(error);
+      toast.error(t('messages.deleteFailed'));
+    } finally {
+      setIsOpenDeleteModal(false);
+      setSelectedRequest(null);
+    }
+  };
+
+  const handleReplaySubmit = async (formData) => {
+    if (!replayReportData || !replayReportData._id || !formData.status) {
+      toast.error(t('messages.replayError'));
+      return;
+    }
+    try {
+      await sendReplyByEmail(replayReportData._id, {
+        status: formData.status,
+        detailReport: formData.detailReport,
+      });
+      fetchData();
+      setIsReplayPopupOpen(false);
+    } catch (error) {
+      console.error(error);
+      toast.error(t('messages.replayFailed'));
+    }
+  };
 
   return (
     <div className={`txt ${darkMode ? 'bg-gray-700 text-white' : ''}`}>
       <div className="flex justify-end mb-4">
         <FilterReport setFilterValue={setFilterValue} />
       </div>
-      <Table
-        tableName={t('tableName')}
-        columns={columns}
-        data={data}
-        loading={loading}
-        pagination={tablePaginationConfig}
-        onChange={handleTableChange}
-        noDataText={t('messages.noData')}
-      />
+      <Table columns={columns} data={data} loading={loading} />
       <DetailReportModal
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}

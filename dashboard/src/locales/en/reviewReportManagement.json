@@ -1,5 +1,4 @@
 {
-  "tableName": "Review Report",
   "filters": {
     "title": "Filter",
     "reason": "Reason",
@@ -58,7 +57,6 @@
     "replayTitle": "Replay to report"
   },
   "messages": {
-    "noData": "No review report found",
     "fetchError": "Failed to fetch data. Please try again later.",
     "detailFetchError": "Failed to fetch report details.",
     "deleteSuccess": "Review report deleted successfully.",
