@@ -105,32 +105,25 @@ const AddAccountModal = ({ onAddData }) => {
       });
   };
 
+  // Thay đổi hàm handleSubmit để chỉ validate form2
   const handleSubmit = () => {
-    form1
+    form2
       .validateFields()
-      .then((values1) => {
-        form2
-          .validateFields()
-          .then((values2) => {
-            const { confirmPassword, ...accountData } = values2;
+      .then((values2) => {
+        const { confirmPassword, ...accountData } = values2;
 
-            const finalValues = {
-              ...form1Data,
-              ...accountData,
-            };
+        const finalValues = {
+          ...form1Data,
+          ...accountData,
+        };
 
-            onAddData(finalValues);
-            toast.success(t("messages.addSuccess"));
-            handleCancel();
-          })
-          .catch((error) => {
-            console.error("Form 2 validation failed:", error);
-            toast.error(t("errors.form2"));
-          });
+        onAddData(finalValues);
+
+        handleCancel();
       })
       .catch((error) => {
-        console.error("Form 1 validation failed:", error);
-        toast.error(t("errors.form1"));
+        console.error("Form 2 validation failed:", error);
+        toast.error(t("errors.form2"));
       });
   };
 

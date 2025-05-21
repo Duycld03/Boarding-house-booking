@@ -96,6 +96,8 @@ class accountController {
       const { username, password, email, phoneNumber, fullname, gender, role } =
         req.body;
 
+      console.log('data: ', req.body);
+
       if (
         !username ||
         !password ||
@@ -162,8 +164,11 @@ class accountController {
       await newUser.save();
 
       res.status(201).json(newUser);
+
     } catch (error) {
-      return res.status(400).json(error.message);
+      console.error("Error creating account:", error);
+      return res.status(400).json(error.errorResponse);
+
     }
   }
 
@@ -172,7 +177,6 @@ class accountController {
       const { phoneNumber, fullname, gender, role } = req.body;
       const { accountId } = req.params;
 
-      // Kiểm tra các trường bắt buộc có mặt trong yêu cầu
       if (!phoneNumber || !fullname || !gender || !role) {
         return res.status(400).json({ error: "All fields are required" });
       }
