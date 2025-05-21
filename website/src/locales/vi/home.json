@@ -1,5 +1,13 @@
-
 {
-    "Province": "Tỉnh",
-    "All": "Tất cả"
+  "All": "Tất cả",
+  "newest": "Mới nhất",
+  "rating": "Đánh giá cao",
+  "timeAgo": {
+    "justPosted": "Vừa đăng",
+    "oneHourAgo": "1 giờ trước",
+    "manyHoursAgo": "{{count}} giờ trước",
+    "oneDayAgo": "1 ngày trước",
+    "manyDaysAgo": "{{count}} ngày trước"
+  },
+  "noAddress": "Không có địa chỉ"
 }

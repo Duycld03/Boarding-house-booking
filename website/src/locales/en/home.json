@@ -1,6 +1,13 @@
 {
-"Province": "Province",
-"All": "All"
-
-
+  "All": "All",
+  "newest": "Newest",
+  "rating": "High rating",
+  "timeAgo": {
+    "justPosted": "Just posted",
+    "oneHourAgo": "1 hour ago",
+    "manyHoursAgo": "{{count}} hours ago",
+    "oneDayAgo": "1 day ago",
+    "manyDaysAgo": "{{count}} days ago"
+  },
+  "noAddress": "No address provided"
 }

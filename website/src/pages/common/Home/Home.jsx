@@ -51,14 +51,11 @@ function Home() {
           id: item._id?.$oid || item._id,
           name: item.name,
           price: formatAmount(item.priceRange),
-          detail: truncateDetail(
-            item.address?.province || 'No address provided'
-          ),
+          detail: truncateDetail(item.address?.province),
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0,
           img: imgUrl,
           updatedAt: item.updatedAt,
-          timeAgo: formatTimeAgo(item.updatedAt),
         };
       });
 
@@ -116,10 +113,10 @@ function Home() {
                   <Tabs.TabPane tab={t('All')} key="all">
                     <BoardingHouseGrid data={dataToShow} loading={loading} />
                   </Tabs.TabPane>
-                  <Tabs.TabPane tab="Newest" key="newest">
+                  <Tabs.TabPane tab={t('newest')} key="newest">
                     <BoardingHouseGrid data={newestData} loading={loading} />
                   </Tabs.TabPane>
-                  <Tabs.TabPane tab="High rating" key="highRating">
+                  <Tabs.TabPane tab={t('rating')} key="highRating">
                     <BoardingHouseGrid
                       data={highRatingData}
                       loading={loading}
