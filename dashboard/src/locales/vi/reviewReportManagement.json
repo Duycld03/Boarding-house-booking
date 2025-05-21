@@ -1,4 +1,5 @@
 {
+    "tableName": "Báo cáo",
   "filters": {
     "title": "Lọc",
     "reason": "Lý do",
@@ -58,6 +59,7 @@
 
   },
   "messages": {
+    "noData": "Không tìm thấy báo cáo",
     "fetchError": "Lỗi khi tải dữ liệu. Vui lòng thử lại sau.",
     "detailFetchError": "Lỗi khi lấy chi tiết báo cáo.",
     "deleteSuccess": "Xóa báo cáo thành công.",
