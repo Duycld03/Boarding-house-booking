@@ -19,22 +19,21 @@ import AddReview from "./AddReview";
 import ReportModal from "./ReportModal";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../../../context/userContext";
-import {
-  checkReportExist,
-  getReviewReports,
-} from "../../../api/reportManagement";
+import { checkReportExist } from "../../../api/reportManagement";
 import { toast } from "react-toastify";
 import { addFavorite, getFavorite } from "../../../api/favoriteManagement";
 import LocationPicker from "@/component/LocationPicker";
 import userRoles from "@/constants/userRole";
-
-const { Content } = Layout;
+import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 function BoardingHouseDetail() {
   const { hasRole } = useCurrentUser();
   const isOwner = hasRole(userRoles.owner);
 
-  const location = useLocation();
+  const { t } = useTranslation("boardingHouseDetail");
+  const { darkMode } = useTheme();
+
   const { isLogin } = useCurrentUser();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -81,7 +80,7 @@ function BoardingHouseDetail() {
         }));
       } else {
         console.error("Invalid response structure:", response);
-        toast.error("Dữ liệu phản hồi không hợp lệ!");
+        toast.error(t("invalidResponseData"));
       }
     } catch (error) {
       navigate(`/login`);
@@ -159,15 +158,15 @@ function BoardingHouseDetail() {
     try {
       const response = await addReview(formData);
       if (response.status === 201 && response.data.success) {
-        message.success("Review added successfully!");
+        toast.success(t("reviewAddedSuccessfully"));
         setIsModalOpen(false);
         await fetchReviews();
       } else {
-        message.error(response.data.message || "Failed to add review.");
+        toast.error(response.data.message || t("failedToAddReview"));
       }
     } catch (error) {
       console.error("Error adding review:", error);
-      message.error("Failed to add review. Please try again.");
+      toast.error(t("failedToAddReviewTryAgain"));
     }
   };
 
@@ -184,23 +183,24 @@ function BoardingHouseDetail() {
   const handleOpen = () => {
     if (!isLogin) {
       Modal.confirm({
-        title: " You need to log in",
-        content: "Please log in to report.",
-        okText: " Log in",
-        cancelText: "Cancel",
+        title: t("needToLogin"),
+        content: t("pleaseLoginToReport"),
+        okText: t("login"),
+        cancelText: t("cancel"),
         onOk: () => navigate("/login"),
       });
       return;
     }
     setReportModalVisible(true);
   };
+
   const handleOpenAddReview = () => {
     if (!isLogin) {
       Modal.confirm({
-        title: " You need to log in",
-        content: "Please log in to add review.",
-        okText: " Log in",
-        cancelText: "Cancel",
+        title: t("needToLogin"),
+        content: t("pleaseLoginToAddReview"),
+        okText: t("login"),
+        cancelText: t("cancel"),
         onOk: () => navigate("/login"),
       });
       return;
@@ -209,7 +209,13 @@ function BoardingHouseDetail() {
   };
 
   return (
-    <div className="md:max-w-screen-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div
+      className={`md:max-w-screen-xl mx-auto p-6 ${
+        darkMode
+          ? "bg-background-dark text-text-dark"
+          : "bg-background-light text-text-light"
+      } shadow-lg rounded-lg`}
+    >
       {loading ? (
         <div className="flex justify-center items-center h-40">
           <Spin size="large" />
@@ -225,18 +231,24 @@ function BoardingHouseDetail() {
           <div className="mt-8 px-5 sm:px-10">
             {/* Header */}
             <div className="flex justify-between lg:gap-0 md:gap-0 sm:gap-[100px] flex-wrap items-start w-full">
-              <p className="text-4xl font-bold">{boardingHouse?.name}</p>
+              <p
+                className={`text-4xl font-bold ${
+                  darkMode ? "text-text-dark" : "text-text-light"
+                }`}
+              >
+                {boardingHouse?.name}
+              </p>
 
               <div className="flex items-center md:mt-0 sm:mt-0 mt-5 gap-4 sm:gap-5">
                 <p className="lg:text-4xl md:text-3xl sm:text-xl sm:gap-3 font-bold text-orange-500">
-                  {formatAmount(boardingHouse?.priceRange) + "(VND)/month"}
+                  {formatAmount(boardingHouse?.priceRange) + t("vndPerMonth")}
                 </p>
                 <Button
                   onClick={scrollToRoomType}
-                  className="text-white bg-orange-500 flex-shrink-0 px-4 py-2 md:text-2xl font-bold sm:text-base"
+                  className="text-white bg-orange-500 hover:bg-orange-600 flex-shrink-0 px-4 py-2 md:text-2xl font-bold sm:text-base"
                   size="large"
                 >
-                  Select room
+                  {t("selectRoom")}
                 </Button>
               </div>
             </div>
@@ -252,10 +264,14 @@ function BoardingHouseDetail() {
                     icon={faLocationDot}
                     className="md:text-3xl text-red-500"
                   />
-                  <p className="text-2xl">
+                  <p
+                    className={`text-2xl ${
+                      darkMode ? "text-text-dark" : "text-text-light"
+                    }`}
+                  >
                     {boardingHouse?.address
                       ? `${boardingHouse.address.detail}, ${boardingHouse.address.ward}, ${boardingHouse.address.district}, ${boardingHouse.address.province}`
-                      : "Address not available"}
+                      : t("addressNotAvailable")}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 cursor-pointer select-none text-4xl mt-5 sm:mt-0">
@@ -267,39 +283,76 @@ function BoardingHouseDetail() {
                     {isLiked ? (
                       <HeartFilled className="text-red-500 transition-transform duration-300 scale-110" />
                     ) : (
-                      <HeartOutlined className="text-gray-600 hover:text-red-500 transition-colors duration-300" />
+                      <HeartOutlined
+                        className={`${
+                          darkMode ? "text-gray-300" : "text-gray-600"
+                        } hover:text-red-500 transition-colors duration-300`}
+                      />
                     )}
                   </button>
 
-                  <span className="text-gray-700 font-semibold">
+                  <span
+                    className={`${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    } font-semibold`}
+                  >
                     {formatAmount(boardingHouse?.likes)}
                   </span>
                 </div>
               </div>
               <div className="flex gap-4 font-bold items-center">
                 <Tag color="#f50" className="text-lg sm:text-3xl">
-                  Owner:
+                  {t("owner")}:
                 </Tag>
                 <OwnerInfo ownerData={boardingHouse?.ownerId} />
               </div>
             </div>
 
             {/* Extra Prices */}
-            <div className="mt-10 p-6 bg-white rounded-lg shadow-md border w-full max-w-sm">
-              <h3 className="text-3xl font-semibold text-gray-800 mb-4">
-                Extra price
+            <div
+              className={`mt-10 p-6 ${
+                darkMode ? "bg-gray-800" : "bg-white"
+              } rounded-lg shadow-md border w-full max-w-sm ${
+                darkMode ? "border-gray-700" : "border-gray-200"
+              }`}
+            >
+              <h3
+                className={`text-3xl font-semibold ${
+                  darkMode ? "text-gray-100" : "text-gray-800"
+                } mb-4`}
+              >
+                {t("extraPrice")}
               </h3>
               <div className="flex justify-between items-center mb-3">
-                <span className="font-medium text-gray-600">
-                  Electricity Price:
+                <span
+                  className={`font-medium ${
+                    darkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  {t("electricityPrice")}:
                 </span>
-                <span className="text-gray-900 font-semibold">
-                  {formatAmount(boardingHouse?.electricityPrice)} kWh (VND)
+                <span
+                  className={`${
+                    darkMode ? "text-gray-100" : "text-gray-900"
+                  } font-semibold`}
+                >
+                  {formatAmount(boardingHouse?.electricityPrice)} {t("kWh")}{" "}
+                  (VND)
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-600">Water Price:</span>
-                <span className="text-gray-900 font-semibold">
+                <span
+                  className={`font-medium ${
+                    darkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  {t("waterPrice")}:
+                </span>
+                <span
+                  className={`${
+                    darkMode ? "text-gray-100" : "text-gray-900"
+                  } font-semibold`}
+                >
                   {formatAmount(boardingHouse?.waterPrice)} m³ (VND)
                 </span>
               </div>
@@ -307,14 +360,26 @@ function BoardingHouseDetail() {
 
             {/* Description */}
             <div className="mt-14">
-              <p className="font-bold text-4xl">Description</p>
-              <div className="bg-gray-300 p-4 rounded-lg mt-3">
+              <p
+                className={`font-bold text-4xl ${
+                  darkMode ? "text-text-dark" : "text-text-light"
+                }`}
+              >
+                {t("description")}
+              </p>
+              <div
+                className={`${
+                  darkMode ? "bg-gray-700" : "bg-gray-300"
+                } p-4 rounded-lg mt-3`}
+              >
                 <div
-                  className={`text-gray-800 text-lg sm:text-2xl leading-relaxed text-justify transition-all duration-300 ${
+                  className={`${
+                    darkMode ? "text-gray-200" : "text-gray-800"
+                  } text-lg sm:text-2xl leading-relaxed text-justify transition-all duration-300 ${
                     expanded ? "max-h-full" : "max-h-60 overflow-hidden"
                   }`}
                 >
-                  {boardingHouse?.description || "No description available."}
+                  {boardingHouse?.description || t("noDescriptionAvailable")}
                 </div>
                 {boardingHouse?.description &&
                   boardingHouse?.description.split(" ").length > 50 && (
@@ -322,17 +387,26 @@ function BoardingHouseDetail() {
                       <Button
                         type="link"
                         onClick={() => setExpanded(!expanded)}
-                        className="text-blue-600 text-sm sm:text-base md:text-3xl"
+                        className={`${
+                          darkMode ? "text-blue-400" : "text-blue-600"
+                        } text-sm sm:text-base md:text-3xl`}
                       >
-                        {expanded ? "Collapse" : "Show more"}
+                        {expanded ? t("collapse") : t("showMore")}
                       </Button>
                     </div>
                   )}
               </div>
             </div>
+
             {/* Map */}
             <div className="mt-14">
-              <p className="font-bold text-4xl">Location</p>
+              <p
+                className={`font-bold text-4xl ${
+                  darkMode ? "text-text-dark" : "text-text-light"
+                }`}
+              >
+                {t("location")}
+              </p>
               <div className="mt-3">
                 <LocationPicker
                   initialPosition={
@@ -347,12 +421,18 @@ function BoardingHouseDetail() {
                 />
               </div>
             </div>
-            <Divider className="border-gray-500" />
+            <Divider
+              className={darkMode ? "border-gray-600" : "border-gray-500"}
+            />
 
             {/* Room Types */}
             <div className="mt-14" ref={roomTypeRef}>
-              <p className="font-bold text-4xl">
-                Available room type in boarding house
+              <p
+                className={`font-bold text-4xl ${
+                  darkMode ? "text-text-dark" : "text-text-light"
+                }`}
+              >
+                {t("availableRoomTypes")}
               </p>
               {roomTypes.map((rType, index) => (
                 <RoomCard
@@ -362,17 +442,29 @@ function BoardingHouseDetail() {
                 />
               ))}
             </div>
-            <Divider className="border-gray-500" />
+            <Divider
+              className={darkMode ? "border-gray-600" : "border-gray-500"}
+            />
 
             {/* Reviews Section */}
             <div className="my-14">
-              <p className="font-bold mb-10 text-4xl">Rating & Review</p>
+              <p
+                className={`font-bold mb-10 text-4xl ${
+                  darkMode ? "text-text-dark" : "text-text-light"
+                }`}
+              >
+                {t("ratingAndReview")}
+              </p>
               <Button
-                className="bg-primary text-white hover:bg-primary-700 font-medium rounded-lg  px-5 py-2.5 mr-2 mb-2 h-20 w-60"
+                className={`${
+                  darkMode
+                    ? "bg-primary text-white hover:bg-blue-700"
+                    : "bg-primary text-white hover:bg-primary-700"
+                } font-medium rounded-lg px-5 py-2.5 mr-2 mb-2 h-20 w-60`}
                 onClick={handleOpenAddReview}
                 disabled={isOwner}
               >
-                Write a Review
+                {t("writeAReview")}
               </Button>
               <ReviewList
                 reviews={reviews}
@@ -389,7 +481,7 @@ function BoardingHouseDetail() {
         </>
       ) : (
         <div className="flex justify-center items-center h-60">
-          <Empty description="Boarding house not found" />
+          <Empty description={t("boardingHouseNotFound")} />
         </div>
       )}
 

@@ -215,9 +215,10 @@ function AccountManagement() {
             <Button
               onClick={() => onProcessData(record)}
               size="large"
+              btnUpdate
               title={t("buttons.update")}
               icon={<FileTextOutlined />}
-              className="text-white bg-emerald-600" // Thay "rgb(5 150 105)" bằng class bg-emerald-600
+              F
             />
           </div>
         ),
