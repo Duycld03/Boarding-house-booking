@@ -188,13 +188,13 @@ function ReportReviewManagement() {
       title: t('columns.createdAt'),
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: convertTimetap,
+      render: (createdAt) => convertTimetap(createdAt),
     },
     {
       title: t('columns.updatedAt'),
       dataIndex: 'updatedAt',
       key: 'updatedAt',
-      render: convertTimetap,
+      render: (updatedAt) => convertTimetap(updatedAt),
     },
     {
       title: t('columns.action'),

@@ -11,6 +11,7 @@ import FilterReview from './FilterReview';
 import { FileTextOutlined } from '@ant-design/icons';
 import DetailModal from './DetailModal';
 import { useTranslation } from 'react-i18next';
+import convertTimetap from '../../../utils/convertTimetap';
 
 function ReviewManagement() {
   const { t } = useTranslation('reviewManagement');
@@ -78,7 +79,7 @@ function ReviewManagement() {
         title: t('columns.createdAt'),
         dataIndex: 'createdAt',
         key: 'createdAt',
-        render: (date) => new Date(date).toLocaleDateString('en-GB'),
+        render: (createdAt) => convertTimetap(createdAt),
       },
       {
         title: t('columns.reviewer'),
