@@ -1,5 +1,4 @@
 {
-  "tableName": "Review",
   "columns": {
     "boardingHouseName": "Boarding House Name",
     "content": "Content",
@@ -23,7 +22,6 @@
     }
   },
   "messages": {
-    "noData": "No reviews found",
     "fetchError": "Failed to fetch reviews. Please try again later.",
     "deleteSuccess": "Delete review successful.",
     "deleteFailed": "Failed to delete review.",

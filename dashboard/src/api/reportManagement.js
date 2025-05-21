@@ -1,7 +1,7 @@
-import axios from './axios.config';
+import axios from "./axios.config";
 
 export const getReviewReports = () => {
-  return axios.get('/dashboard/review-reports');
+  return axios.get("/dashboard/review-reports");
 };
 export const deleteReport = (reportId) => {
   return axios.delete(`/dashboard/reports/${reportId}`);
@@ -9,19 +9,11 @@ export const deleteReport = (reportId) => {
 export const sendReplyByEmail = (reportId, data) => {
   return axios.put(`/dashboard/reports/${reportId}/send-email`, data);
 };
-
-export const filterReviewReports = (
-  filterValue = {},
-  paginationOptions = {}
-) => {
-  const params = {
-    ...filterValue,
-    ...paginationOptions,
-  };
-
-  return axios.get(`/dashboard/reports/filter`, { params });
+export const filterReviewReports = (filterValue) => {
+  return axios.get(`/dashboard/reports/filter`, {
+    params: filterValue,
+  });
 };
-
 export const filterBHReports = (filterValue) => {
   return axios.get(`/dashboard/reports/filter/boarding-house`, {
     params: filterValue,
@@ -29,13 +21,13 @@ export const filterBHReports = (filterValue) => {
 };
 
 export const getBHReports = () => {
-  return axios.get('/dashboard/boarding-house-reports');
+  return axios.get("/dashboard/boarding-house-reports");
 };
 
 export const createReport = (data) => {
-  return axios.post('auth/reports', data, {
+  return axios.post("auth/reports", data, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
   });
 };
