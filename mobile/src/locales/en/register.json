@@ -31,5 +31,6 @@
   "male": "Male",
   "female": "Female",
   "validationError": "Please check your information",
-  "sentOtpSuccess": "OTP has been sent successfully"
+  "sentOtpSuccess": "OTP has been sent successfully",
+  "other": "Other"
 }

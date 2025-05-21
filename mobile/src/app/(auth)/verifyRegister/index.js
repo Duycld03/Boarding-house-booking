@@ -10,9 +10,11 @@ import { Checkbox, FormField } from "@/components/form/index";
 import { login, verifyRegister } from "@/API/authManagement";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 
-export default function Login() {
+export default function VerifyRegister() {
   const router = useRouter();
+  const { t } = useTranslation("verifyRegister");
   const { account, token } = useLocalSearchParams();
   const { showSuccess, showError } = useNotification();
 
@@ -34,7 +36,7 @@ export default function Login() {
     let isValid = true;
 
     if (!formData.otp.trim()) {
-      newErrors.otp = { message: "Vui lòng nhập OTP" };
+      newErrors.otp = { message: t("otpError") };
       isValid = false;
     }
 
@@ -44,7 +46,7 @@ export default function Login() {
 
   const handleVerifyRegister = async () => {
     if (!validateForm()) {
-      showError("Vui lòng kiểm tra lại thông tin");
+      showError(t("validationError"));
       return;
     }
 
@@ -62,28 +64,28 @@ export default function Login() {
       console.log(payload);
       const res = await verifyRegister(payload);
       await AsyncStorage.setItem("access_token", res.token);
-      showSuccess("Đăng ký thành công!");
+      showSuccess(t("successMessage"));
       router.replace("/(tabs)/home");
     } catch (error) {
-      showError(error?.response?.data?.message);
+      showError(t("errorMessage"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <ScreenContainer>
-      <BackHeader title="Verify Register" animationType="slide" />
+    <ScreenContainer withPadding={false}>
+      <BackHeader title={t("verifyRegisterTitle")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
         <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          Nhập mã OTP
+          {t("verifyRegisterTitle")}
         </Text>
 
         <FormField
           name="otp"
           label="OTP"
-          placeholder="Nhập mã OTP"
+          placeholder={t("otpPlaceholder")}
           value={formData.username}
           onChange={handleChange}
           error={errors}
@@ -96,7 +98,7 @@ export default function Login() {
           fullWidth
           className="mt-4"
         >
-          Xác nhận
+          {t("verifyRegisterButton")}
         </Button>
       </ScrollContainer>
     </ScreenContainer>

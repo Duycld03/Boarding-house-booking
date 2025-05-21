@@ -138,10 +138,11 @@ export default function Register() {
   const radioOptions = [
     { value: "male", label: t("male") },
     { value: "female", label: t("female") },
+    { value: "other", label: t("other") },
   ];
 
   return (
-    <ScreenContainer>
+    <ScreenContainer withPadding={false}>
       <BackHeader title={t("register")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">

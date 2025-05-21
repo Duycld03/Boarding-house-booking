@@ -31,5 +31,6 @@
   "male": "Nam",
   "female": "Nữ",
   "validationError": "Vui lòng kiểm tra lại thông tin",
-  "sentOtpSuccess": "Gửi mã OTP thành công"
+  "sentOtpSuccess": "Gửi mã OTP thành công",
+  "other": "Khác"
 }

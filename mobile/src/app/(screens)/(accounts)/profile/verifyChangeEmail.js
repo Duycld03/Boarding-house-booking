@@ -7,22 +7,20 @@ import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { useNotification } from "@/context/NotificationProvider";
 import { Checkbox, FormField } from "@/components/form/index";
-import { login } from "@/API/authManagement";
+import { verifyChangeEmail } from "@/API/AccountManagement";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
-export default function Login() {
+export default function VerifyChangeEmail() {
   const router = useRouter();
-  const { t } = useTranslation("login");
+  const { t } = useTranslation("verifyChangeEmail");
+  const { email, token } = useLocalSearchParams();
   const { showSuccess, showError } = useNotification();
 
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    remember: false,
+    otp: "",
   });
-  const [remember, setRemember] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -37,15 +35,8 @@ export default function Login() {
     const newErrors = {};
     let isValid = true;
 
-    if (!formData.username.trim()) {
-      newErrors.username = { message: t("usernameError") };
-      isValid = false;
-    }
-    if (!formData.password) {
-      newErrors.password = { message: t("passwordError") };
-      isValid = false;
-    } else if (formData.password.length < 6) {
-      newErrors.password = { message: t("minLengthError") };
+    if (!formData.otp.trim()) {
+      newErrors.otp = { message: t("otpError") };
       isValid = false;
     }
 
@@ -53,7 +44,7 @@ export default function Login() {
     return isValid;
   };
 
-  const handleLogin = async () => {
+  const handleVerifyChangeEmail = async () => {
     if (!validateForm()) {
       showError(t("validationError"));
       return;
@@ -61,13 +52,18 @@ export default function Login() {
 
     setLoading(true);
 
+    const payload = {
+      ...formData,
+      email,
+      token,
+    };
+
     try {
-      const res = await login(formData);
-      await AsyncStorage.setItem("access_token", res.token);
-      showSuccess(t("success"));
-      router.replace("/(tabs)/home");
-    } catch (error) {
-      showError(t("invalidCredentials"));
+      const res = await verifyChangeEmail(payload);
+      showSuccess(t("successMessage"));
+      router.back();
+      router.replace("/(screens)/(accounts)/profile");
+      showError(t("errorMessage"));
     } finally {
       setLoading(false);
     }
@@ -75,54 +71,30 @@ export default function Login() {
 
   return (
     <ScreenContainer withPadding={false}>
-      <BackHeader title={t("login")} animationType="slide" />
+      <BackHeader title={t("verifyChangeEmailTitle")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
         <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          {t("login")}
+          {t("verifyChangeEmailTitle")}
         </Text>
 
         <FormField
-          name="username"
-          label={t("username")}
-          placeholder={t("enterUsername")}
-          value={formData.username}
+          name="otp"
+          label="OTP"
+          placeholder={t("otpPlaceholder")}
+          value={formData.otp}
           onChange={handleChange}
           error={errors}
           required
-        />
-
-        <FormField
-          name="password"
-          label={t("password")}
-          placeholder={t("enterPassword")}
-          value={formData.password}
-          onChange={handleChange}
-          error={errors}
-          inputType="password"
-          required
-        />
-
-        <Checkbox
-          checked={remember}
-          onPress={() => {
-            setRemember(!remember);
-            setFormData((prev) => ({
-              ...prev,
-              remember: !remember,
-            }));
-          }}
-          label={t("rememberMe")}
-          className="mt-4 mb-6"
         />
 
         <Button
-          onPress={handleLogin}
+          onPress={handleVerifyChangeEmail}
           loading={loading}
           fullWidth
           className="mt-4"
         >
-          {t("login")}
+          {t("verifyChangeEmailButton")}
         </Button>
       </ScrollContainer>
     </ScreenContainer>

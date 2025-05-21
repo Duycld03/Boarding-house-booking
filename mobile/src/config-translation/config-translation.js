@@ -15,6 +15,12 @@ import en_login from "@/locales/en/login.json";
 import vi_login from "@/locales/vi/login.json";
 import en_register from "@/locales/en/register.json";
 import vi_register from "@/locales/vi/register.json";
+import en_verifyRegister from "@/locales/en/verifyRegister.json";
+import vi_verifyRegister from "@/locales/vi/verifyRegister.json";
+import en_verifyChangeEmail from "@/locales/en/verifyChangeEmail.json";
+import vi_verifyChangeEmail from "@/locales/vi/verifyChangeEmail.json";
+import en_changeEmail from "@/locales/en/changeEmail.json";
+import vi_changeEmail from "@/locales/vi/changeEmail.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -26,6 +32,9 @@ i18n.use(initReactI18next).init({
       feedbackComponent: en_feedbackComponent,
       login: en_login,
       register: en_register,
+      verifyRegister: en_verifyRegister,
+      verifyChangeEmail: en_verifyChangeEmail,
+      changeEmail: en_changeEmail,
     },
     vi: {
       setting: vi_setting,
@@ -35,6 +44,9 @@ i18n.use(initReactI18next).init({
       feedbackComponent: vi_feedbackComponent,
       login: vi_login,
       register: vi_register,
+      verifyRegister: vi_verifyRegister,
+      verifyChangeEmail: vi_verifyChangeEmail,
+      changeEmail: vi_changeEmail,
     },
   },
   lng: "en",
