@@ -23,7 +23,7 @@
   },
   "buttons": {
     "delete": "Delete",
-    "detail": "Detail",
+    "update": "Update",
     "addNew": "Add New Account",
     "next": "Next",
     "back": "Back",
@@ -123,7 +123,8 @@
     "deleteSuccess": "Delete account successful",
     "deleteFailed": "Failed to delete account. Server response was not successful.",
     "invalidId": "Invalid ID",
-    "fetchError": "Failed to fetch accounts. Please try again later."
+    "fetchError": "Failed to fetch accounts. Please try again later.",
+    "des": "An error occurred: {{error}}"
   },
   "errors": {
     "form1": "Please correct the errors in form 1.",

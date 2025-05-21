@@ -26,6 +26,7 @@ const { Option } = Select;
 const UpdateAccountModal = ({ accountData, onUpdate }) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  console.log("accountData", accountData);
 
   // Using the theme context for dark mode
   const { darkMode } = useTheme();
@@ -312,7 +313,7 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
               <Input.Password
                 placeholder={t("updateAccount.passwordPlaceholder")}
                 disabled
-                value={"********"}
+                defaultValue="********" // Thêm dòng này
                 className={darkModeInputClass}
                 style={formStyles.input}
               />

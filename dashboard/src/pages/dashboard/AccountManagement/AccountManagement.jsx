@@ -215,10 +215,9 @@ function AccountManagement() {
             <Button
               onClick={() => onProcessData(record)}
               size="large"
-              title={t("buttons.detail")}
+              title={t("buttons.update")}
               icon={<FileTextOutlined />}
-              className="text-white"
-              bgColor="rgb(5 150 105)"
+              className="text-white bg-emerald-600" // Thay "rgb(5 150 105)" bằng class bg-emerald-600
             />
           </div>
         ),
@@ -248,7 +247,7 @@ function AccountManagement() {
       createAccount(data)
         .then((res) => {
           if (res) {
-            filterAccountData(); // Refresh with current filters
+            filterAccountData();
             toast.success(t("messages.addSuccess"));
           } else {
             toast.error(t("messages.addFailed"));
@@ -256,8 +255,7 @@ function AccountManagement() {
         })
         .catch((error) => {
           toast.error(
-            "An error occurred : " +
-              (error.response?.data?.error || error.message)
+            `An error occurred: ${error.response?.data?.error || error.message}`
           );
         })
         .finally(() => {
