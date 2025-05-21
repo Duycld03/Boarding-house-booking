@@ -14,6 +14,7 @@ import { useCurrentUser } from '@/context/userContext';
 import userRoles from '@/constants/userRole';
 import { formatTimeAgo } from '@/utils/timeUtils';
 import { useTranslation } from 'react-i18next';
+import truncateDetail from '@/utils/truncateDetail';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -33,9 +34,13 @@ const BoardingHouseCard = ({
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
-  const { t } = useTranslation('home'); // ✨ hook i18n
+  const { t } = useTranslation('home');
   const timeAgoText = formatTimeAgo(updatedAt, t);
-
+  const translatedDetail = truncateDetail(
+    detail
+      ? t(`location.${detail}`, { defaultValue: detail })
+      : t('location.No address provided')
+  );
   // Điều hướng khi click vào card
   const handleCardClick = () => {
     navigate(`/boarding-house/${id}`);
@@ -122,7 +127,7 @@ const BoardingHouseCard = ({
             marginBottom: '12px',
           }}
         >
-          {price} VND/month
+          {price} {t('currencyPerMonth')}
         </Typography.Text>
 
         {/* Detail + TimeAgo + Icon Heart */}
@@ -135,7 +140,7 @@ const BoardingHouseCard = ({
           }}
         >
           <Typography.Text strong>
-            {detail} - {timeAgoText}
+            {translatedDetail} - {timeAgoText}
           </Typography.Text>
 
           {/* Icon heart */}

@@ -9,5 +9,12 @@
     "oneDayAgo": "1 day ago",
     "manyDaysAgo": "{{count}} days ago"
   },
-  "noAddress": "No address provided"
+  "noAddress": "No address provided",
+  "currencyPerMonth": "VND/month",
+    "location": {
+    "Thành phố Cần Thơ": "Can Tho City",
+    "Thành phố Hà Nội": "Hanoi",
+    "Thành phố Hồ Chí Minh": "Ho Chi Minh City",
+    "No address provided": "No address provided"
+  }
 }

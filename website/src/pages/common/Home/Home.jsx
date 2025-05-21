@@ -51,7 +51,7 @@ function Home() {
           id: item._id?.$oid || item._id,
           name: item.name,
           price: formatAmount(item.priceRange),
-          detail: truncateDetail(item.address?.province),
+          detail: item.address?.province,
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0,
           img: imgUrl,
