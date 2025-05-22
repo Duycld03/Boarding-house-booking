@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
-import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from "react";
+import { View, Image, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { useTranslation } from "react-i18next";
 
 import ScreenContainer, {
   ScrollContainer,
-} from '@/components/layout/ScreenContainer';
-import { BackHeader } from '@/components/navigation/CustomHeader';
-import Text from '@/components/ui/Text';
-import Button from '@/components/ui/Button';
-import { FormField } from '@/components/form/index';
-import { getUser } from '@/API/authManagement';
+} from "@/components/layout/ScreenContainer";
+import { BackHeader } from "@/components/navigation/CustomHeader";
+import Text from "@/components/ui/Text";
+import Button from "@/components/ui/Button";
+import { FormField } from "@/components/form/index";
+import { getUser } from "@/API/authManagement";
 import {
   updateAccountFromProfile,
   updateAvatar,
-} from '@/API/AccountManagement';
-import { useNotification } from '@/context/NotificationProvider';
-import { useTheme } from '@/context/ThemeProvider';
-import { useThemedClasses } from '@/utils/useTheme';
+} from "@/API/AccountManagement";
+import { useNotification } from "@/context/NotificationProvider";
+import { useTheme } from "@/context/ThemeProvider";
+import { useThemedClasses } from "@/utils/useTheme";
 
-const genders = ['male', 'female', 'other'];
-const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+const genders = ["male", "female", "other"];
+const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
 export default function Profile() {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation("profile");
   const router = useRouter();
   const { showSuccess, showError } = useNotification();
   const { isDarkMode } = useTheme();
@@ -32,11 +32,11 @@ export default function Profile() {
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    fullname: '',
-    phoneNumber: '',
-    gender: 'male',
-    email: '',
-    username: '',
+    fullname: "",
+    phoneNumber: "",
+    gender: "male",
+    email: "",
+    username: "",
   });
   const [avatar, setAvatar] = useState(null);
   const [errors, setErrors] = useState({});
@@ -45,21 +45,21 @@ export default function Profile() {
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        showError(t('error.permission'));
+      if (status !== "granted") {
+        showError(t("error.permission"));
         return;
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'images',
+        mediaTypes: "images",
         allowsEditing: true,
         quality: 1,
       });
 
       if (!result.canceled && result.assets?.length > 0) {
         const uri = result.assets[0].uri;
-        const fileName = uri.split('/').pop();
-        const match = /\.(\w+)$/.exec(fileName || '');
+        const fileName = uri.split("/").pop();
+        const match = /\.(\w+)$/.exec(fileName || "");
         const type = match ? `image/${match[1]}` : `image`;
 
         const photo: any = {
@@ -69,22 +69,22 @@ export default function Profile() {
         };
 
         const formData = new FormData();
-        formData.append('avatar', photo);
+        formData.append("avatar", photo);
 
         setLoading(true);
         try {
           const response = await updateAvatar(formData); // API như trên web
-          showSuccess(t('success.avatar') || 'Cập nhật ảnh thành công');
+          showSuccess(t("success.avatar") || "Cập nhật ảnh thành công");
           setAvatar(uri); // Cập nhật ảnh hiển thị
         } catch (err) {
-          showError(err?.response?.data?.message || 'Không thể cập nhật ảnh');
+          showError(err?.response?.data?.message || "Không thể cập nhật ảnh");
         } finally {
           setLoading(false);
         }
       }
     } catch (error) {
-      console.error('ImagePicker Error:', error);
-      showError('Không thể chọn ảnh');
+      console.error("ImagePicker Error:", error);
+      showError("Không thể chọn ảnh");
     }
   };
 
@@ -100,11 +100,11 @@ export default function Profile() {
     let isValid = true;
 
     if (!formData.fullname.trim()) {
-      newErrors.fullname = { message: t('fullname.required') };
+      newErrors.fullname = { message: t("fullname.required") };
       isValid = false;
     }
     if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = { message: t('phone.required') };
+      newErrors.phoneNumber = { message: t("phone.required") };
       isValid = false;
     }
 
@@ -118,13 +118,13 @@ export default function Profile() {
       setFormData({
         fullname: user.fullname,
         phoneNumber: user.phoneNumber,
-        gender: user.gender || 'male',
+        gender: user.gender || "male",
         email: user.email,
         username: user.username,
       });
       setAvatar(user.avatarImage?.url || null);
     } catch (err) {
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
     }
   };
 
@@ -133,9 +133,9 @@ export default function Profile() {
     try {
       setLoading(true);
       await updateAccountFromProfile(formData);
-      showSuccess(t('success.update'));
+      showSuccess(t("success.update"));
     } catch (err) {
-      showError(err?.response?.data?.message || t('error.update'));
+      showError(err?.response?.data?.message || t("error.update"));
     } finally {
       setLoading(false);
     }
@@ -147,7 +147,7 @@ export default function Profile() {
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
-      <BackHeader title={t('title')} onBackPress={() => router.back()} />
+      <BackHeader title={t("title")} onBackPress={() => router.back()} />
 
       <ScrollContainer keyboardAvoiding className="px-4">
         <View className="items-center mt-4">
@@ -162,13 +162,13 @@ export default function Profile() {
           </Text>
         </View>
         <Text className={`text-base font-bold mt-6 mb-2 ${themedClasses.text}`}>
-          {t('section.account')}:
+          {t("section.account")}:
         </Text>
 
         {/* Email Section */}
         <View className="">
           <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
-            {t('section.email')}
+            {t("section.email")}
           </Text>
 
           <View className="flex-row items-stars">
@@ -181,8 +181,12 @@ export default function Profile() {
                 className={`h-12 ${themedClasses.input}`}
               />
             </View>
-            <Button loading={loading} className="ml-2 h-12 px-4 rounded-md">
-              {t('button.changeEmail')}
+            <Button
+              loading={loading}
+              onPress={() => router.push("/(screens)/profile/ChangeEmail")}
+              className="ml-2 h-12 px-4 rounded-md"
+            >
+              {t("button.changeEmail")}
             </Button>
           </View>
         </View>
@@ -190,7 +194,7 @@ export default function Profile() {
         {/* Password Section */}
         <View className="">
           <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
-            {t('section.password')}
+            {t("section.password")}
           </Text>
 
           <View className="flex-row items-stars">
@@ -203,23 +207,23 @@ export default function Profile() {
               />
             </View>
             <Button
-              onPress={() => router.push('/(screens)/profile/ChangePassword')}
+              onPress={() => router.push("/(screens)/profile/ChangePassword")}
               className="ml-2 h-12 px-4 rounded-md"
             >
-              {t('submitButton') || 'Change Password'}
+              {t("submitButton") || "Change Password"}
             </Button>
           </View>
         </View>
         {/* Profile Information Section */}
         <Text className={`text-base font-bold mt-6 mb-2 ${themedClasses.text}`}>
-          {t('section.profile')}:
+          {t("section.profile")}:
         </Text>
 
         {/* Full Name */}
         <FormField
           name="fullname"
-          label={t('fullname.label')}
-          placeholder={t('fullname.placeholder')}
+          label={t("fullname.label")}
+          placeholder={t("fullname.placeholder")}
           value={formData.fullname}
           onChange={handleChange}
           error={errors}
@@ -229,8 +233,8 @@ export default function Profile() {
         {/* Phone Number */}
         <FormField
           name="phoneNumber"
-          label={t('phone.label')}
-          placeholder={t('phone.placeholder')}
+          label={t("phone.label")}
+          placeholder={t("phone.placeholder")}
           value={formData.phoneNumber}
           onChange={handleChange}
           error={errors}
@@ -240,18 +244,18 @@ export default function Profile() {
 
         {/* Gender */}
         <Text className={`text-sm font-medium mb-1 ${themedClasses.text}`}>
-          {t('gender.label')}
+          {t("gender.label")}
         </Text>
         <View className="flex-row justify-between mb-4">
           {genders.map((g) => (
             <TouchableOpacity
               key={g}
-              onPress={() => handleChange('gender', g)}
+              onPress={() => handleChange("gender", g)}
               className="flex-row items-center"
             >
               <View
                 className={`w-5 h-5 rounded-full border-2 ${
-                  formData.gender === g ? 'border-blue-500' : 'border-gray-300'
+                  formData.gender === g ? "border-blue-500" : "border-gray-300"
                 } items-center justify-center mr-2`}
               >
                 {formData.gender === g && (
@@ -268,7 +272,7 @@ export default function Profile() {
           fullWidth
           className="mt-6"
         >
-          {t('button.save')}
+          {t("button.save")}
         </Button>
       </ScrollContainer>
     </ScreenContainer>

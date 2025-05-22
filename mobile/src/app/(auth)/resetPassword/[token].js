@@ -6,25 +6,22 @@ import { BackHeader } from "@/components/navigation/CustomHeader";
 import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { useNotification } from "@/context/NotificationProvider";
-import { Checkbox, FormField } from "@/components/form/index";
-import { login } from "@/API/authManagement";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FormField } from "@/components/form/index";
+import { resetPassword } from "@/API/authManagement";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Link } from "@react-navigation/native";
-import { Pressable } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 
-export default function Login() {
+export default function ResetPassword() {
   const router = useRouter();
-  const { t } = useTranslation("login");
+  const { token } = useLocalSearchParams();
+  const { t } = useTranslation("resetPassword");
   const { showSuccess, showError } = useNotification();
 
   const [formData, setFormData] = useState({
-    username: "",
     password: "",
-    remember: false,
+    confirmPassword: "",
   });
-  const [remember, setRemember] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -39,15 +36,19 @@ export default function Login() {
     const newErrors = {};
     let isValid = true;
 
-    if (!formData.username.trim()) {
-      newErrors.username = { message: t("usernameError") };
-      isValid = false;
-    }
     if (!formData.password) {
       newErrors.password = { message: t("passwordError") };
       isValid = false;
     } else if (formData.password.length < 6) {
-      newErrors.password = { message: t("minLengthError") };
+      newErrors.password = { message: t("passwordLengthError") };
+      isValid = false;
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = { message: t("confirmPasswordError") };
+      isValid = false;
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = { message: t("confirmPasswordMatchError") };
       isValid = false;
     }
 
@@ -55,21 +56,22 @@ export default function Login() {
     return isValid;
   };
 
-  const handleLogin = async () => {
+  const handleSubmit = async () => {
+    console.log(token);
     if (!validateForm()) {
       showError(t("validationError"));
       return;
     }
 
-    setLoading(true);
+    const payload = { password: formData.password, token };
 
+    setLoading(true);
     try {
-      const res = await login(formData);
-      await AsyncStorage.setItem("access_token", res.token);
-      showSuccess(t("success"));
-      router.replace("/(tabs)/home");
+      await resetPassword(payload);
+      showSuccess(t("successMessage"));
+      router.push("/(auth)/login");
     } catch (error) {
-      showError(t("invalidCredentials"));
+      showError(error?.response?.data?.message || t("errorMessage"));
     } finally {
       setLoading(false);
     }
@@ -77,22 +79,12 @@ export default function Login() {
 
   return (
     <ScreenContainer withPadding={false}>
-      <BackHeader title={t("login")} animationType="slide" />
+      <BackHeader title={t("title")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
         <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          {t("login")}
+          {t("header")}
         </Text>
-
-        <FormField
-          name="username"
-          label={t("username")}
-          placeholder={t("enterUsername")}
-          value={formData.username}
-          onChange={handleChange}
-          error={errors}
-          required
-        />
 
         <FormField
           name="password"
@@ -104,35 +96,25 @@ export default function Login() {
           inputType="password"
           required
         />
-        <Pressable
-          onPress={() => router.push("/forgotPassword")}
-          style={{ alignSelf: "flex-end", marginBottom: 12 }}
-        >
-          <Text variant="link" className="text-blue-600 text-sm">
-            {t("forgotPassword")}
-          </Text>
-        </Pressable>
 
-        <Checkbox
-          checked={remember}
-          onPress={() => {
-            setRemember(!remember);
-            setFormData((prev) => ({
-              ...prev,
-              remember: !remember,
-            }));
-          }}
-          label={t("rememberMe")}
-          className="mt-4 mb-6"
+        <FormField
+          name="confirmPassword"
+          label={t("confirmPassword")}
+          placeholder={t("enterConfirmPassword")}
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          error={errors}
+          inputType="password"
+          required
         />
 
         <Button
-          onPress={handleLogin}
+          onPress={handleSubmit}
           loading={loading}
           fullWidth
           className="mt-4"
         >
-          {t("login")}
+          {t("submit")}
         </Button>
       </ScrollContainer>
     </ScreenContainer>
