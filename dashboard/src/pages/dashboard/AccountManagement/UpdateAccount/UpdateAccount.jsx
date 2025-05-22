@@ -26,7 +26,6 @@ const { Option } = Select;
 const UpdateAccountModal = ({ accountData, onUpdate }) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  console.log("accountData", accountData);
 
   // Using the theme context for dark mode
   const { darkMode } = useTheme();

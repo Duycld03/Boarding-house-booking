@@ -157,15 +157,14 @@ class reportController {
           subject: `Kết quả xử lý báo cáo: #${relatedReport._id}`,
           html: `
             <p>Kính gửi Anh/Chị ${relatedReport.reporter.fullname},</p>
-            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${
-              relatedReport.reason || 'undefined'
+            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${relatedReport.reason || 'undefined'
             }"</strong> ${reportSubject} trên nền tảng của chúng tôi.</p>
             <p>Chúng tôi xin thông báo rằng báo cáo của bạn đã được xử lý với kết quả như sau:</p>
             <ul>
                 <li><strong>Trạng thái báo cáo:</strong> ${status}</li>
                 <li><strong>Ngày gửi báo cáo:</strong> ${new Date(
-                  relatedReport.createdAt
-                ).toLocaleDateString()}</li>
+              relatedReport.createdAt
+            ).toLocaleDateString()}</li>
                 <li><strong>Người xử lý:</strong> ${processedByName}</li>
                 <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
                 <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>
@@ -264,8 +263,10 @@ class reportController {
     try {
       const { boardingHouse, startDate, endDate, reason, status } = req.query;
 
+      // Xây dựng filter cơ bản
       let filter = { reportType: { $regex: /^boardinghouse$/i } };
 
+      // Xử lý filter ngày
       if (startDate || endDate) {
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
@@ -285,6 +286,7 @@ class reportController {
         if (end) filter.createdAt.$lte = end;
       }
 
+      // Xử lý filter reason và status
       if (reason) {
         filter.reason = { $regex: new RegExp(reason, 'i') };
       }
@@ -292,28 +294,73 @@ class reportController {
         filter.status = status;
       }
 
-      const reportsQuery = await Report.find(filter)
-        .populate({
-          path: 'targetId',
-          select: 'name',
-          model: 'BoardingHouse',
-          options: { withDeleted: true },
-        })
-        .populate('reporter')
-        .sort({ createdAt: 1 });
+      // Thiết lập options cho paginate
+      const options = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        filter: filter,
+        sortField: 'createdAt',
+        sortOrder: 1,
+        populate: [
+          {
+            path: 'targetId',
+            select: 'name',
+            model: 'BoardingHouse',
+            options: { withDeleted: true },
+          },
+          { path: 'reporter' }
+        ]
+      };
 
+      // Xử lý trường hợp tìm kiếm theo tên boardingHouse
       if (boardingHouse) {
-        const filterBHReportData = reportsQuery.filter((report) =>
+        // Cách 1: Lấy tất cả dữ liệu và lọc sau
+        // Lưu ý: Cách này không hiệu quả cho datasets lớn
+        const allResults = await Report.find(filter)
+          .populate({
+            path: 'targetId',
+            select: 'name',
+            model: 'BoardingHouse',
+            options: { withDeleted: true },
+          })
+          .populate('reporter')
+          .lean();
+
+        // Lọc theo tên boardingHouse
+        const filteredData = allResults.filter((report) =>
           report?.targetId?.name
             ?.toLowerCase()
             .includes(boardingHouse.toLowerCase())
         );
 
-        console.log(filterBHReportData);
+        // Áp dụng phân trang thủ công
+        const page = parseInt(req.query.page) || options.defaultPage;
+        const limit = parseInt(req.query.limit) || options.defaultLimit;
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
 
-        res.status(200).json(filterBHReportData);
+        // Lấy dữ liệu cho trang hiện tại
+        const paginatedData = filteredData.slice(startIndex, endIndex);
+
+        // Tạo đối tượng kết quả
+        const result = {
+          success: true,
+          pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(filteredData.length / limit),
+            totalItems: filteredData.length,
+            totalData: allResults.length,
+            limit,
+            hasNextPage: page < Math.ceil(filteredData.length / limit),
+            hasPrevPage: page > 1
+          },
+          data: paginatedData
+        };
+
+        res.status(200).json(result);
       } else {
-        res.status(200).json(reportsQuery);
+        const result = await paginate(Report, options, req);
+        res.status(200).json(result);
       }
     } catch (error) {
       console.error('Error filtering boarding house reports:', error);

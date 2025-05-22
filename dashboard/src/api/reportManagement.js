@@ -20,9 +20,14 @@ export const filterReviewReports = (
 
   return axios.get(`/dashboard/reports/filter`, { params });
 };
-export const filterBHReports = (filterValue) => {
+export const filterBHReports = (filterValue = {}, paginationOptions = {}) => {
+  const params = {
+    ...filterValue,
+    ...paginationOptions
+  };
+
   return axios.get(`/dashboard/reports/filter/boarding-house`, {
-    params: filterValue,
+    params
   });
 };
 

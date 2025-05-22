@@ -12,6 +12,8 @@ import en_reviewManagement from '@/locales/en/reviewManagement.json';
 import vi_reviewManagement from '@/locales/vi/reviewManagement.json';
 import en_reportBoardingHouse from '@/locales/en/reportBoardingHouse.json';
 import vi_reportBoardingHouse from '@/locales/vi/reportBoardingHouse.json';
+import en_common from '@/locales/en/common.json';
+import vi_common from '@/locales/vi/common.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -22,6 +24,7 @@ i18n.use(initReactI18next).init({
       reviewReportManagement: en_reviewReportManagement,
       reviewManagement: en_reviewManagement,
       reportBoardingHouse: en_reportBoardingHouse,
+      common: en_common,
     },
     vi: {
       menu: vi_menu,
@@ -30,6 +33,7 @@ i18n.use(initReactI18next).init({
       reviewReportManagement: vi_reviewReportManagement,
       reviewManagement: vi_reviewManagement,
       reportBoardingHouse: vi_reportBoardingHouse,
+      common: vi_common,
     },
   },
   lng: 'en',

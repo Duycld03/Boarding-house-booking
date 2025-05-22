@@ -207,17 +207,15 @@ function AccountManagement() {
         render: (record) => (
           <div className="flex gap-3">
             <Button
-              size="large"
               btnDelete
               title={t("buttons.delete")}
               onClick={() => handleSelectDelete(record)}
             />
             <Button
               onClick={() => onProcessData(record)}
-              size="large"
               title={t("buttons.update")}
               icon={<FileTextOutlined />}
-              className="text-white bg-emerald-600" // Thay "rgb(5 150 105)" bằng class bg-emerald-600
+              btnUpdate
             />
           </div>
         ),
