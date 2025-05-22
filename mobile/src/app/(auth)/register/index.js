@@ -220,7 +220,7 @@ export default function Register() {
           value={gender}
           onChange={setGender}
           required={true}
-          direction="vertical"
+          direction="horizontal"
           radioPosition="left"
         />
 

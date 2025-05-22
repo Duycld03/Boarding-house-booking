@@ -21,6 +21,10 @@ import en_verifyChangeEmail from "@/locales/en/verifyChangeEmail.json";
 import vi_verifyChangeEmail from "@/locales/vi/verifyChangeEmail.json";
 import en_changeEmail from "@/locales/en/changeEmail.json";
 import vi_changeEmail from "@/locales/vi/changeEmail.json";
+import en_forgotPassword from "@/locales/en/forgotPassword.json";
+import vi_forgotPassword from "@/locales/vi/forgotPassword.json";
+import en_resetPassword from "@/locales/en/resetPassword.json";
+import vi_resetPassword from "@/locales/vi/resetPassword.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -35,6 +39,8 @@ i18n.use(initReactI18next).init({
       verifyRegister: en_verifyRegister,
       verifyChangeEmail: en_verifyChangeEmail,
       changeEmail: en_changeEmail,
+      forgotPassword: en_forgotPassword,
+      resetPassword: en_resetPassword,
     },
     vi: {
       setting: vi_setting,
@@ -47,6 +53,8 @@ i18n.use(initReactI18next).init({
       verifyRegister: vi_verifyRegister,
       verifyChangeEmail: vi_verifyChangeEmail,
       changeEmail: vi_changeEmail,
+      forgotPassword: vi_forgotPassword,
+      resetPassword: vi_resetPassword,
     },
   },
   lng: "en",

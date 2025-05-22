@@ -40,6 +40,30 @@ export default function AuthLayout() {
           headerLeft: () => <FontAwesome name="arrow-left" size={24} />,
         }}
       />
+      <Stack.Screen
+        name="forgotPassword/index"
+        options={{
+          headerShown: false,
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            fontSize: 20,
+          },
+          headerLeft: () => <FontAwesome name="arrow-left" size={24} />,
+        }}
+      />
+      <Stack.Screen
+        name="resetPassword/[token]"
+        options={{
+          headerShown: false,
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            fontSize: 20,
+          },
+          headerLeft: () => <FontAwesome name="arrow-left" size={24} />,
+        }}
+      />
     </Stack>
   );
 }
