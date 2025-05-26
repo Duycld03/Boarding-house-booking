@@ -1,0 +1,16 @@
+{
+  "login": "Login",
+  "username": "Username",
+  "enterUsername": "Enter username",
+  "password": "Password",
+  "enterPassword": "Enter password",
+  "rememberMe": "Remember me",
+  "forgotPassword": "Forgot password?",
+  "loginWithGoogle": "Login with Google",
+  "usernameError": "Please enter your username",
+  "passwordError": "Please enter your password",
+  "minLengthError": "Password must be at least 6 characters long",
+  "validationError": "Please check your information",
+  "success": "Login successful",
+  "invalidCredentials": "Incorrect username or password"
+}

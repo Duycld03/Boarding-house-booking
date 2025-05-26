@@ -1,0 +1,12 @@
+{
+  "changeEmailTitle": "Thay đổi email",
+  "email": "Email",
+  "emailPlaceholder": "Nhập email mới",
+  "emailError": "Vui lòng nhập email",
+  "emailFormatError": "Email không đúng định dạng",
+  "changeEmailButton": "Gửi mã xác minh",
+  "message": {
+    "success": "Mã OTP đã được gửi đến email!",
+    "error": "Gửi OTP thất bại. Vui lòng thử lại."
+  }
+}

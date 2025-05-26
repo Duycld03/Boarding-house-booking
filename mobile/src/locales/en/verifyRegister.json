@@ -1,0 +1,9 @@
+{
+  "verifyRegisterTitle": "Verify Registration",
+  "otpPlaceholder": "Enter OTP code",
+  "otpError": "Please enter the OTP code",
+  "validationError": "Please check your input",
+  "successMessage": "Verification successful!",
+  "errorMessage": "Verification failed. Please try again.",
+  "verifyRegisterButton": "Verify"
+}

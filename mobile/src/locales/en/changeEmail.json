@@ -1,0 +1,12 @@
+{
+  "changeEmailTitle": "Change Email",
+  "email": "Email",
+  "emailPlaceholder": "Enter your new email",
+  "emailError": "Please enter your email",
+  "emailFormatError": "Invalid email format",
+  "changeEmailButton": "Send Verification Code",
+  "message": {
+    "success": "OTP has been sent to your email!",
+    "error": "Failed to send OTP. Please try again."
+  }
+}
