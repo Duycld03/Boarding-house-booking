@@ -29,6 +29,11 @@ function Home() {
     router.push('/register');
   };
 
+  const handleBhDetail = () => {
+    router.push('/(screens)/BhDetail');
+  }
+
+
   return (
     <SafeAreaView
       edges={['top', 'left', 'right']}
@@ -103,9 +108,9 @@ function Home() {
       </Button>
       <Button
         variant="primary"
-        onPress={handleToggleConfim}
+        onPress={handleBhDetail}
       >
-        Show Confirm Modal
+        Go to bh detail
       </Button>
     </SafeAreaView>
   );

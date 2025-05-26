@@ -10,6 +10,12 @@ const ScreenLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="BhDetail"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </>
   );
