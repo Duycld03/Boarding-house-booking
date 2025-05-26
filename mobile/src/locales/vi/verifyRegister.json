@@ -1,0 +1,9 @@
+{
+  "verifyRegisterTitle": "Xác minh đăng ký",
+  "otpPlaceholder": "Nhập mã OTP",
+  "otpError": "Vui lòng nhập mã OTP",
+  "validationError": "Vui lòng kiểm tra lại thông tin",
+  "successMessage": "Xác minh thành công!",
+  "errorMessage": "Xác minh thất bại. Vui lòng thử lại.",
+  "verifyRegisterButton": "Xác minh"
+}

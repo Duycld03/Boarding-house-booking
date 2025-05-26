@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/themeContext";
 import Style from "./AddAccountModal.module.css"; // Import custom CSS for additional dark mode fixes
 import classNames from "classnames";
-const cx = classNames.bind(Style); // Bind the styles to the classNames function
+const cx = classNames.bind(Style);
 
 const { Option } = Select;
 
@@ -212,7 +212,7 @@ const AddAccountModal = ({ onAddData }) => {
         footer={null}
         destroyOnClose
         styles={modalStyles}
-        className={cx({ "dark-mode-modal": darkMode })}
+        className={darkMode ? "ant-modal-dark" : ""}
       >
         <div className={cx({ "dark-mode-form": darkMode })}>
           {step === 1 && (

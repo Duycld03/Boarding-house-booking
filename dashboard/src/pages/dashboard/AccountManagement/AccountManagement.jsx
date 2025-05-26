@@ -207,7 +207,6 @@ function AccountManagement() {
         render: (record) => (
           <div className="flex gap-3">
             <Button
-              size="large"
               btnDelete
               title={t("buttons.delete")}
               onClick={() => handleSelectDelete(record)}
@@ -218,7 +217,6 @@ function AccountManagement() {
               btnUpdate
               title={t("buttons.update")}
               icon={<FileTextOutlined />}
-              F
             />
           </div>
         ),

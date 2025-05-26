@@ -318,9 +318,9 @@ const TableCustom = ({
             })}
             loading={loading}
             onChange={onChange}
-            locale={{
-              emptyText: noDataText,
-            }}
+            // locale={{
+            //   emptyText: noDataText,
+            // }}
             components={
               darkMode
                 ? {

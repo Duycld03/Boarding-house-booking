@@ -10,12 +10,12 @@ import { Tag } from "antd";
 import {
   deleteReport,
   sendReplyByEmail,
-  getBHReports,
   filterBHReports,
 } from "../../../api/reportManagement";
 import convertTimetap from "../../../utils/convertTimetap";
 import FilterBHReportPopup from "./FilterBHReportPopup ";
 import { useTranslation } from "react-i18next";
+import ReportDetailModal from "./ReportDetailModal";
 
 function ReportBoardingHouse() {
   const [data, setData] = useState([]);
@@ -26,6 +26,25 @@ function ReportBoardingHouse() {
   const [replayReportData, setReplayReportData] = useState(null);
   const [filterValue, setFilterValue] = useState({});
   const { t } = useTranslation("reportBoardingHouse");
+
+  // Thêm state quản lý phân trang
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+
+  // Thêm state quản lý các tùy chọn phân trang gửi đến API
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+    sortField: "createdAt",
+    sortOrder: "desc",
+  });
 
   const coverReasonToMultipleLanguage = (reasonValue) => {
     const reasonLowerCase = reasonValue.toLowerCase();
@@ -52,31 +71,20 @@ function ReportBoardingHouse() {
     }
   };
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await getBHReports();
-      if (res) {
-        setData(res);
-        console.log(res);
-      } else {
-        setData([]);
-      }
-    } catch (error) {
-      console.error("Failed to fetch withdrawal requests:", error);
-      toast.error(t("toast.fetchFailed"));
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Thay thế hàm fetchData bằng filterReportData với phân trang
   const filterReportData = async () => {
     setLoading(true);
     try {
-      const res = await filterBHReports(filterValue);
-      if (res) {
-        setData(res);
+      const res = await filterBHReports(filterValue, paginationOptions);
+
+      if (res?.data && res?.pagination) {
+        setData(res.data);
+        setPagination({
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
+          totalItems: res.pagination.totalItems,
+          limit: res.pagination.limit,
+        });
       } else {
         throw new Error("Invalid response format");
       }
@@ -89,15 +97,33 @@ function ReportBoardingHouse() {
     }
   };
 
-  //fetch account data
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // Xử lý sự kiện thay đổi trang
+  const handleTableChange = (pagination) => {
+    setPaginationOptions((prev) => ({
+      ...prev,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    }));
+  };
 
-  //Filter BH report
+  // Cấu hình phân trang cho bảng
+  const tablePaginationConfig = {
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
+  };
+
+  const handleViewDetail = (record) => {
+    setSelectedReport(record);
+    setIsDetailModalOpen(true);
+  };
+
+  // Loại bỏ useEffect với getBHReports
+  // Chỉ giữ lại useEffect với filterReportData
   useEffect(() => {
     filterReportData();
-  }, [filterValue]);
+  }, [filterValue, paginationOptions]);
 
   // Define columns for the Table component
   const columns = [
@@ -192,7 +218,8 @@ function ReportBoardingHouse() {
 
     try {
       await deleteReport(selectedRequest._id);
-      setData(data.filter((item) => item._id !== selectedRequest._id));
+      // Sau khi xóa, gọi lại API để lấy dữ liệu mới nhất
+      filterReportData();
       toast.success(t("toast.deleteSuccess"));
     } catch (error) {
       console.error("Failed to delete report:", error);
@@ -216,7 +243,8 @@ function ReportBoardingHouse() {
       });
 
       setIsReplayPopupOpen(false);
-      fetchData();
+      // Gọi lại API để lấy dữ liệu mới nhất
+      filterReportData();
     } catch (error) {
       console.error("Failed to send reply:", error);
       toast.error(t("toast.replyFailed"));
@@ -229,8 +257,18 @@ function ReportBoardingHouse() {
         <div className="flex justify-end mb-4">
           <FilterBHReportPopup setFilterValue={setFilterValue} />
         </div>
-        {/* Show filtered data if available, else show full data */}
-        <Table columns={columns} data={data} loading={loading} />
+        {/* Show filtered data with pagination */}
+        <Table
+          tableName={t("title")}
+          columns={columns}
+          onRowClick={(record) => {
+            console.log("Row clicked:", record);
+          }}
+          data={data}
+          loading={loading}
+          pagination={tablePaginationConfig}
+          onChange={handleTableChange}
+        />
         <ConfirmModal
           title={t("modals.deleteTitle")}
           content={t("modals.deleteContent")}
@@ -253,6 +291,11 @@ function ReportBoardingHouse() {
             cancelText={t("replyForm.cancel")}
           />
         )}
+        {/* <ReportDetailModal
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          report={selectedReport}
+        /> */}
       </>
     </div>
   );

@@ -1,7 +1,7 @@
 {
-  "title": "Báo Cáo Nhà Trọ",
+  "title": "Tố Cáo Nhà Trọ",
   "columns": {
-    "reporter": "Người báo cáo",
+    "reporter": "Người tố cáo",
     "boardingHouseName": "Tên nhà trọ",
     "reason": "Lý do",
     "status": "Trạng thái",

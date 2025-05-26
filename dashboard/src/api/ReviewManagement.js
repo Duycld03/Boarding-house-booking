@@ -8,10 +8,13 @@ export const deleteReview = (reviewId) => {
   return axios.delete(`/dashboard/reviews/${reviewId}`);
 };
 
-export const filterReviews = (filterValue) => {
-  return axios.get(`/dashboard/reviews/filter`, {
-    params: filterValue,
-  });
+export const filterReviews = (filterValue = {}, paginationOptions = {}) => {
+  const params = {
+    ...filterValue,
+    ...paginationOptions,
+  };
+
+  return axios.get('/dashboard/reviews/filter', { params });
 };
 
 export const updateReview = (reviewId, updatedData) => {
