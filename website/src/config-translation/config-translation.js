@@ -14,6 +14,9 @@ import vi_profile from '@/locales/vi/profile.json';
 import en_profile from '@/locales/en/profile.json';
 import vi_aboutUs from '@/locales/vi/aboutUs.json';
 import en_aboutUs from '@/locales/en/aboutUs.json';
+import en_bhDetail from '@/locales/en/bhDetail.json';
+import vi_bhDetail from '@/locales/vi/bhDetail.json';
+
 i18n.use(initReactI18next).init({
   resources: {
     en: {
@@ -24,6 +27,7 @@ i18n.use(initReactI18next).init({
       contact: en_contact,
       profile: en_profile,
       aboutUs: en_aboutUs,
+      boardingHouseDetail: en_bhDetail,
     },
     vi: {
       menu: vi_menu,
@@ -33,6 +37,7 @@ i18n.use(initReactI18next).init({
       contact: vi_contact,
       profile: vi_profile,
       aboutUs: vi_aboutUs,
+      boardingHouseDetail: vi_bhDetail,
     },
   },
   lng: 'en',
