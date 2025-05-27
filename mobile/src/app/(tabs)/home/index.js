@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router'; // Nếu bạn dùng expo-router
 import ScreenContainer, {
@@ -8,54 +8,77 @@ import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import HorizontalList from '@/components/ui/HorizontalList';
+import { getBhByArea } from '@/API/ownerUser/boardingHouse';
+import formatAmount from '@/utils/formatAmount';
 
 function Home() {
   const { themedClasses } = useThemedClasses();
   const { theme } = useTheme(); // light | dark
   const router = useRouter();
 
-  const mockData = [
-    {
-      id: 1,
-      name: 'Sunny Boarding House',
-      price: '2,500,000',
-      detail: 'Thành phố Cần Thơ',
-      rating: 4.5,
-      img: 'https://picsum.photos/400/200',
-      updatedAt: new Date().toISOString(),
-      isFavorite: false,
-    },
-    {
-      id: 2,
-      name: 'Cozy Boarding House',
-      price: '3,000,000',
-      detail: 'Quận 1, TP.HCM',
-      rating: 4,
-      img: 'https://picsum.photos/401/200',
-      updatedAt: new Date().toISOString(),
-      isFavorite: true,
-    },
-    {
-      id: 3,
-      name: 'Cozy Boarding House 2',
-      price: '3,000,000',
-      detail: 'Quận 1, TP.HCM',
-      rating: 4,
-      img: 'https://picsum.photos/402/200',
-      updatedAt: new Date().toISOString(),
-      isFavorite: true,
-    },
-    {
-      id: 4,
-      name: 'Modern Studio',
-      price: '4,000,000',
-      detail: 'Thủ Đức, TP.HCM',
-      rating: 4.8,
-      img: 'https://picsum.photos/403/200',
-      updatedAt: new Date().toISOString(),
-      isFavorite: true,
-    },
-  ];
+  // --- State dữ liệu lấy từ API
+  const [dataFromApi, setDataFromApi] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // --- Gọi API khi mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await getBhByArea({}); // truyền filter nếu có
+
+        if (!Array.isArray(res)) {
+          setDataFromApi([]);
+          return;
+        }
+
+        const formattedData = res.map((item) => {
+          const imgPath =
+            item.images?.find((img) => img.isPrimary)?.imageUrl ||
+            item.images?.[0]?.imageUrl ||
+            '';
+          return {
+            id: item._id?.$oid || item._id,
+            name: item.name,
+            price: formatAmount(item.priceRange),
+            detail: item.address?.province,
+            rating: item.rating || 0,
+            reviewCount: item.reviewCount || 0,
+            img: imgPath,
+            updatedAt: item.updatedAt || 0,
+            isFavorite: false,
+          };
+        });
+
+        setDataFromApi(formattedData);
+      } catch (error) {
+        console.error('Error fetching boarding houses:', error);
+        setDataFromApi([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Dữ liệu dùng để render
+  const dataToUse = dataFromApi;
+
+  // Tạo bộ dữ liệu newest và highRating
+  const newestData = [...dataToUse]
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    .slice(0, 10);
+
+  const highRatingData = [...dataToUse]
+    .filter((item) => item.rating >= 3)
+    .sort((a, b) => {
+      if (b.reviewCount !== a.reviewCount) {
+        return b.reviewCount - a.reviewCount;
+      }
+      return b.rating - a.rating;
+    })
+    .slice(0, 10);
 
   const SectionHeader = ({ title, link }: { title: string, link: string }) => (
     <View className="flex-row justify-between items-center mt-6 mb-2">
@@ -80,13 +103,13 @@ function Home() {
       <BackHeader title="Home" />
       <ScrollContainer keyboardAvoiding className="px-4">
         <SectionHeader title="All" link="/allBH" />
-        <HorizontalList data={mockData} />
+        <HorizontalList data={dataToUse} loading={loading} />
 
         <SectionHeader title="Newest" link="/newestBH" />
-        <HorizontalList data={mockData} />
+        <HorizontalList data={newestData} loading={loading} />
 
         <SectionHeader title="High Rating" link="/highRatingBH" />
-        <HorizontalList data={mockData} />
+        <HorizontalList data={highRatingData} loading={loading} />
       </ScrollContainer>
     </ScreenContainer>
   );

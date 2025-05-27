@@ -23,7 +23,7 @@ const BoardingHouseCard = ({
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
   const { t } = useTranslation('home');
 
-  const timeAgoText = formatTimeAgo(updatedAt);
+  const timeAgoText = formatTimeAgo(updatedAt, t);
   const translatedDetail = truncateDetail(
     detail
       ? t(`location.${detail}`, { defaultValue: detail })
