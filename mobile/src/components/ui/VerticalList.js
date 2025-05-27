@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import BoardingHouseCard from '@/components/ui/BoardingHouseCard';
 import { AntDesign } from '@expo/vector-icons';
@@ -12,10 +13,9 @@ import { useThemedClasses } from '@/utils/useTheme';
 
 const ITEMS_PER_PAGE = 8;
 
-const VerticalList = ({ data, isDarkMode = false }) => {
+const VerticalList = ({ data, isDarkMode = false, loading }) => {
   const [currentPage, setCurrentPage] = React.useState(0);
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-
   const paginatedData = data.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE
@@ -38,7 +38,31 @@ const VerticalList = ({ data, isDarkMode = false }) => {
   const getIconColor = (disabled) =>
     disabled ? '#9ca3af' : isDarkMode ? '#fff' : '#000';
 
-  const textColor = isDarkMode ? '#fff' : '#000';
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center', height: 300 },
+        ]}
+      >
+        <ActivityIndicator size="large" color="#0ea5e9" />
+      </View>
+    );
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center', height: 300 },
+        ]}
+      >
+        <Text>No data available</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -71,7 +95,7 @@ const VerticalList = ({ data, isDarkMode = false }) => {
                 'text-gray-800 text-center',
                 'text-text-dark text-center'
               )}
-              style={[styles.pageInfo]}
+              style={styles.pageInfo}
             >
               {currentPage + 1} / {totalPages}
             </Text>

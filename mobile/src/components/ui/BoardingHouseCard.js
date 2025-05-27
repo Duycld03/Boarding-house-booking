@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router'; // <-- thay useNavigation bằng useRouter
 import { useTheme } from '@/context/ThemeProvider';
 import { formatTimeAgo } from '@/utils/timeUtils';
 import truncateDetail from '@/utils/truncateDetail';
@@ -18,7 +18,7 @@ const BoardingHouseCard = ({
   isFavorite: initialFavorite = false,
 }) => {
   const { isDarkMode } = useTheme();
-  const navigation = useNavigation();
+  const router = useRouter(); // <-- dùng useRouter của expo-router
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
   const { t } = useTranslation('home');
@@ -39,7 +39,12 @@ const BoardingHouseCard = ({
           shadowColor: isDarkMode ? '#000' : '#aaa',
         },
       ]}
-      // onPress={() => navigation.navigate('BoardingHouseDetail', { id })}
+      onPress={() =>
+        router.push({
+          pathname: '/(screens)/BhDetail',
+          params: { id },
+        })
+      }
     >
       <Image source={{ uri: img }} style={styles.image} resizeMode="cover" />
 
@@ -83,7 +88,7 @@ const BoardingHouseCard = ({
             </Text>
           </View>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
             <AntDesign
               name={isFavorite ? 'heart' : 'hearto'}
               size={20}
@@ -102,12 +107,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginRight: 16,
     width: 165,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,
-    minHeight: 260, // <-- Đảm bảo không bị cắt chiều cao
+    minHeight: 260,
   },
   image: {
     height: 120,
