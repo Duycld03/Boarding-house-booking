@@ -3,6 +3,7 @@ import { Form, Select, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import LocationPicker from '../LocationPicker/LocationPicker';
+import './AddressSelector.module.css';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -71,6 +72,7 @@ const AddressSelector = ({
             allowClear
             className={selectClass}
             dropdownStyle={darkSelectDropdownStyle}
+            popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
           >
             {provinces.map((province) => (
               <Option key={province.code} value={province.name}>
