@@ -1,0 +1,77 @@
+{
+  "buttons": {
+    "addBoardingHouse": "Add Boarding House",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "loading": "Loading..."
+  },
+  "modals": {
+    "createBoardingHouseTitle": "Create Boarding House"
+  },
+  "form": {
+    "section": {
+      "information": "1. Information",
+      "address": "2. Address",
+      "images": "3. Images",
+      "price": "4. Price"
+    },
+    "labels": {
+      "boardingHouseType": "Boarding House Type",
+      "boardingHouseName": "Name Boarding House",
+      "description": "Description",
+      "primaryImage": "Primary Image",
+      "addImage": "Add Image",
+      "addImages": "Add Images",
+      "dragDropOrClick": "Drag-drop or click here to choose a file",
+      "otherImages": "Other Images",
+      "priceRange": "Price Rent/month (VND)",
+      "electricityPrice": "Electricity Price/kWh (VND)",
+      "waterPrice": "Water Price/m³ (VND)",
+      "province": "Province",
+      "district": "District",
+      "ward": "Ward",
+      "details": "Details"
+    },
+    "placeholders": {
+      "selectType": "Select Type",
+      "enterBoardingHouseName": "Enter boarding house name",
+      "enterDescription": "Enter description",
+      "enterPriceRange": "Enter price rent",
+      "enterElectricityPrice": "Enter electricity price",
+      "enterWaterPrice": "Enter water price",
+       "selectProvince": "Select province",
+      "selectDistrict": "Select district",
+      "selectWard": "Select ward",
+      "inputDetailsAddress": "Input details boarding house address"
+    },
+    "validation": {
+      "selectBoardingHouseType": "Please select a boarding house type",
+      "enterBoardingHouseName": "Please enter the boarding house name",
+      "enterDescription": "Please enter the description",
+      "enterPriceRange": "Please enter the price rent",
+      "enterElectricityPrice": "Please enter the electricity price",
+      "enterWaterPrice": "Please enter the water price"
+    }
+  },
+  "errors": {
+    "fetchBoardingHouseTypes": "Failed to fetch boarding house types.",
+    "selectBoardingHouseType": "Please select a boarding house type.",
+    "enterBoardingHouseName": "Please enter the boarding house name.",
+    "selectProvince": "Please select a boarding house province.",
+    "selectDistrict": "Please select a boarding house district.",
+    "selectWard": "Please select a boarding house ward.",
+    "enterAddressDetail": "Please enter boarding house details.",
+    "uploadPrimaryImage": "You must upload a primary image.",
+    "enterPriceRange": "Please enter price range.",
+    "enterElectricityPrice": "Please enter electricity price.",
+    "enterWaterPrice": "Please enter water price.",
+    "markLocationOnMap": "Please mark the location on the map.",
+    "maxOtherImages": "You can't upload more than 15 other images.",
+    "uploadAtLeastOneImage": "You must upload at least one image.",
+    "failedToAdd": "Failed to add boarding house.",
+    "failedToSubmitForm": "Failed to submit the form."
+  },
+  "messages": {
+    "createdSuccess": "Boarding house created successfully!"
+  }
+}

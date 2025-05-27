@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Form, Select, Input } from "antd";
-import LocationPicker from "../LocationPicker/LocationPicker";
+import React, { useEffect, useState } from 'react';
+import { Form, Select, Input } from 'antd';
+import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
+import LocationPicker from '../LocationPicker/LocationPicker';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -16,7 +18,9 @@ const AddressSelector = ({
   location,
   initialPosition,
   setGeoLocation,
+  darkMode = false,
 }) => {
+  const { t } = useTranslation('bhManagement'); // namespace theo ví dụ của bạn
   const [currentLocation, setCurrentLocation] = useState(
     initialPosition ? [initialPosition.lat, initialPosition.lon] : null
   );
@@ -29,32 +33,44 @@ const AddressSelector = ({
   }, [location]);
 
   const onLocationChange = (lat, lng) => {
-    setGeoLocation((prev) => {
-      return { ...prev, lat, lon: lng };
-    });
+    setGeoLocation((prev) => ({ ...prev, lat, lon: lng }));
     setCurrentLocation([lat, lng]);
   };
+
+  // Classname helper cho dark mode select và input
+  const selectClass = classNames({ 'dark-mode-select': darkMode });
+  const textareaClass = classNames({ 'dark-mode-input': darkMode });
+
+  // Style inline cho dark mode, bạn có thể customize thêm
+  const darkSelectDropdownStyle = darkMode
+    ? { backgroundColor: '#374151', color: '#F9FAFB' }
+    : {};
+  const darkInputStyle = darkMode
+    ? { borderColor: '#4B5563', color: '#F9FAFB' }
+    : {};
+
   return (
     <div className="col-span-2">
       <Form layout="vertical">
         {/* Province Selector */}
-        <Form.Item label="Province" required className="mb-2">
+        <Form.Item label={t('form.labels.province')} required className="mb-2">
           <Select
-            placeholder="Select province"
+            placeholder={t('form.placeholders.selectProvince')}
             value={formData?.address?.province || undefined}
             onChange={(value) => {
-              // Reset district and ward when province changes
               onProvinceChange({
-                target: { name: "address.province", value },
+                target: { name: 'address.province', value },
               });
               onInputChange({
-                target: { name: "address.district", value: "" },
+                target: { name: 'address.district', value: '' },
               });
               onInputChange({
-                target: { name: "address.ward", value: "" },
+                target: { name: 'address.ward', value: '' },
               });
             }}
             allowClear
+            className={selectClass}
+            dropdownStyle={darkSelectDropdownStyle}
           >
             {provinces.map((province) => (
               <Option key={province.code} value={province.name}>
@@ -65,21 +81,22 @@ const AddressSelector = ({
         </Form.Item>
 
         {/* District Selector */}
-        <Form.Item label="District" required className="mb-2">
+        <Form.Item label={t('form.labels.district')} required className="mb-2">
           <Select
-            placeholder="Select district"
+            placeholder={t('form.placeholders.selectDistrict')}
             value={formData?.address?.district || undefined}
             onChange={(value) => {
-              // Reset ward when district changes
               onDistrictChange({
-                target: { name: "address.district", value },
+                target: { name: 'address.district', value },
               });
               onInputChange({
-                target: { name: "address.ward", value: "" },
+                target: { name: 'address.ward', value: '' },
               });
             }}
             disabled={!formData?.address?.province}
             allowClear
+            className={selectClass}
+            dropdownStyle={darkSelectDropdownStyle}
           >
             {districts.map((district) => (
               <Option key={district.code} value={district.name}>
@@ -90,17 +107,19 @@ const AddressSelector = ({
         </Form.Item>
 
         {/* Ward Selector */}
-        <Form.Item label="Ward" required className="mb-2">
+        <Form.Item label={t('form.labels.ward')} required className="mb-2">
           <Select
-            placeholder="Select ward"
+            placeholder={t('form.placeholders.selectWard')}
             value={formData?.address?.ward || undefined}
             onChange={(value) => {
               onInputChange({
-                target: { name: "address.ward", value },
+                target: { name: 'address.ward', value },
               });
             }}
             disabled={!formData?.address?.district}
             allowClear
+            className={selectClass}
+            dropdownStyle={darkSelectDropdownStyle}
           >
             {wards.map((ward) => (
               <Option key={ward.code} value={ward.name}>
@@ -111,22 +130,24 @@ const AddressSelector = ({
         </Form.Item>
 
         {/* Address Details */}
-        <Form.Item label="Details" required>
+        <Form.Item label={t('form.labels.details')} required>
           <TextArea
-            placeholder="Input details boarding house address"
-            value={formData?.address?.detail || ""}
-            onChange={(e) => {
-              onInputChange(e);
-            }}
+            placeholder={t('form.placeholders.inputDetailsAddress')}
+            value={formData?.address?.detail || ''}
+            onChange={onInputChange}
             name="address.detail"
             autoSize={{ minRows: 3, maxRows: 5 }}
+            className={textareaClass}
+            style={darkInputStyle}
           />
         </Form.Item>
       </Form>
+      {/* Nếu bạn có LocationPicker thì thêm ở đây, truyền darkMode nếu hỗ trợ */}
       <LocationPicker
         onChange={onLocationChange}
         geoJson={location?.geojson}
         initialPosition={currentLocation}
+        // darkMode={darkMode}
       />
     </div>
   );
