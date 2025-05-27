@@ -1,16 +1,17 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
 import BoardingHouseCard from '@/components/ui/BoardingHouseCard';
 
-const HorizontalList = ({ data }) => {
+const VerticalList = ({ data }) => {
   return (
     <View style={styles.container}>
       <FlatList
-        horizontal
         data={data}
+        numColumns={2}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <BoardingHouseCard {...item} />}
-        showsHorizontalScrollIndicator={false}
+        columnWrapperStyle={styles.row}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
       />
     </View>
@@ -23,7 +24,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 12,
-    paddingBottom: 5,
+    paddingBottom: 80,
   },
   row: {
     justifyContent: 'space-between',
@@ -31,4 +32,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HorizontalList;
+export default VerticalList;
