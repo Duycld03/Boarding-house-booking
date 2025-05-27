@@ -10,6 +10,7 @@ import { BackHeader } from '@/components/navigation/CustomHeader';
 import HorizontalList from '@/components/ui/HorizontalList';
 import { getBhByArea } from '@/API/ownerUser/boardingHouse';
 import formatAmount from '@/utils/formatAmount';
+import { useTranslation } from 'react-i18next';
 
 function Home() {
   const { themedClasses } = useThemedClasses();
@@ -19,6 +20,7 @@ function Home() {
   // --- State dữ liệu lấy từ API
   const [dataFromApi, setDataFromApi] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation('home');
 
   // --- Gọi API khi mount
   useEffect(() => {
@@ -92,7 +94,7 @@ function Home() {
       </Text>
       <TouchableOpacity onPress={() => router.push(link)}>
         <Text className="text-lg font-bold text-sky-400 tracking-tight">
-          See More
+          {t('seeMore')}
         </Text>
       </TouchableOpacity>
     </View>
@@ -102,13 +104,13 @@ function Home() {
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
       <BackHeader title="Home" />
       <ScrollContainer keyboardAvoiding className="px-4">
-        <SectionHeader title="All" link="/allBH" />
+        <SectionHeader title={t('All')} link="/allBH" />
         <HorizontalList data={dataToUse} loading={loading} />
 
-        <SectionHeader title="Newest" link="/newestBH" />
+        <SectionHeader title={t('newest')} link="/newestBH" />
         <HorizontalList data={newestData} loading={loading} />
 
-        <SectionHeader title="High Rating" link="/highRatingBH" />
+        <SectionHeader title={t('rating')} link="/highRatingBH" />
         <HorizontalList data={highRatingData} loading={loading} />
       </ScrollContainer>
     </ScreenContainer>

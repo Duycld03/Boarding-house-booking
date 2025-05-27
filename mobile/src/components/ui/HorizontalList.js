@@ -1,8 +1,40 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  Text,
+} from 'react-native';
 import BoardingHouseCard from '@/components/ui/BoardingHouseCard';
 
-const HorizontalList = ({ data }) => {
+const HorizontalList = ({ data, loading }) => {
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center', height: 150 },
+        ]}
+      >
+        <ActivityIndicator size="small" color="#0ea5e9" />
+      </View>
+    );
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: 'center', alignItems: 'center', height: 150 },
+        ]}
+      >
+        <Text>No data available</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -24,10 +56,6 @@ const styles = StyleSheet.create({
   list: {
     paddingHorizontal: 12,
     paddingBottom: 5,
-  },
-  row: {
-    justifyContent: 'space-between',
-    marginBottom: 16,
   },
 });
 
