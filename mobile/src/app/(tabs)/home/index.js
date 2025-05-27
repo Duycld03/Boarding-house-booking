@@ -1,128 +1,94 @@
-
 import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text, View, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router'; // Nếu bạn dùng expo-router
+import ScreenContainer, {
+  ScrollContainer,
+} from '@/components/layout/ScreenContainer';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
-import { useNotification } from '@/context/NotificationProvider';
-import Button from '@/components/ui/Button';
-import { useRouter } from 'expo-router';
-import { ConfirmModal } from '@/components/feedback';
+import { BackHeader } from '@/components/navigation/CustomHeader';
+import HorizontalList from '@/components/ui/HorizontalList';
 
 function Home() {
-  const { toggleTheme, isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
-  const { showSuccess, showError, showWarning, showInfo } = useNotification();
+  const { theme } = useTheme(); // light | dark
   const router = useRouter();
-  const [showConfirm, setShowConfirm] = React.useState(false);
 
+  const mockData = [
+    {
+      id: 1,
+      name: 'Sunny Boarding House',
+      price: '2,500,000',
+      detail: 'Thành phố Cần Thơ',
+      rating: 4.5,
+      img: 'https://picsum.photos/400/200',
+      updatedAt: new Date().toISOString(),
+      isFavorite: false,
+    },
+    {
+      id: 2,
+      name: 'Cozy Boarding House',
+      price: '3,000,000',
+      detail: 'Quận 1, TP.HCM',
+      rating: 4,
+      img: 'https://picsum.photos/401/200',
+      updatedAt: new Date().toISOString(),
+      isFavorite: true,
+    },
+    {
+      id: 3,
+      name: 'Cozy Boarding House 2',
+      price: '3,000,000',
+      detail: 'Quận 1, TP.HCM',
+      rating: 4,
+      img: 'https://picsum.photos/402/200',
+      updatedAt: new Date().toISOString(),
+      isFavorite: true,
+    },
+    {
+      id: 4,
+      name: 'Modern Studio',
+      price: '4,000,000',
+      detail: 'Thủ Đức, TP.HCM',
+      rating: 4.8,
+      img: 'https://picsum.photos/403/200',
+      updatedAt: new Date().toISOString(),
+      isFavorite: true,
+    },
+  ];
 
-  const handleToggleConfim = () => {
-    setShowConfirm(!showConfirm);
-  };
-
-  const handleShowNotification = () => {
-    showInfo("This is a info notification");
-  };
-
-  const handleRegister = () => {
-    router.push("/register");
-  };
-
-  const handleLogin = () => {
-    router.push("/login");
-  };
-
-  const handleBhDetail = () => {
-    router.push('/(screens)/BhDetail');
-  }
-
+  const SectionHeader = ({ title, link }: { title: string, link: string }) => (
+    <View className="flex-row justify-between items-center mt-6 mb-2">
+      <Text
+        className={themedClasses(
+          'text-lg font-extrabold text-gray-800 text-center',
+          'text-lg font-extrabold text-text-dark text-center'
+        )}
+      >
+        {title}
+      </Text>
+      <TouchableOpacity onPress={() => router.push(link)}>
+        <Text className="text-lg font-bold text-sky-400 tracking-tight">
+          See More
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
-    <SafeAreaView
-      edges={["top", "left", "right"]}
-      className={themedClasses(
-        "flex-1 items-center justify-center bg-background-light px-6",
-        "flex-1 items-center justify-center bg-background-dark px-6"
-      )}
-    >
-      <Text
-        className={themedClasses(
-          "text-3xl font-extrabold text-red-500 mb-8 text-center",
-          "text-3xl font-extrabold text-text-dark mb-8 text-center"
-        )}
-      >
-        Welcome to My App
-      </Text>
-      <Button
-        variant="primary"
-        onPress={() => router.push("/(screens)/profile/ChangePassword")}
-      >
-        ChangePassword
-      </Button>
+    <ScreenContainer className={themedClasses.bg} withPadding={false}>
+      <BackHeader title="Home" />
+      <ScrollContainer keyboardAvoiding className="px-4">
+        <SectionHeader title="All" link="/allBH" />
+        <HorizontalList data={mockData} />
 
-      <TouchableOpacity
-        onPress={toggleTheme}
-        activeOpacity={0.8}
-        className={themedClasses(
-          "w-full max-w-xs py-4 rounded-xl bg-primary-light mb-4 shadow-lg",
-          "w-full max-w-xs py-4 rounded-xl bg-primary-dark mb-4 shadow-lg"
-        )}
-      >
-        <Text className="text-white text-lg font-semibold text-center">
-          Switch to {isDarkMode ? "Light" : "Dark"} Mode
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={handleShowNotification}
-        className={themedClasses(
-          "w-full max-w-xs py-4 rounded-xl bg-primary-light mb-4 shadow-lg",
-          "w-full max-w-xs py-4 rounded-xl bg-primary-dark mb-4 shadow-lg"
-        )}
-      >
-        <Text
-          className={themedClasses(
-            "text-white text-lg font-semibold text-center",
-            "text-white text-lg font-semibold text-center"
-          )}
-        >
-          show notification
-        </Text>
-      </TouchableOpacity>
+        <SectionHeader title="Newest" link="/newestBH" />
+        <HorizontalList data={mockData} />
 
-      <Text
-        className={themedClasses(
-          "text-base text-gray-500 mt-8 text-center",
-          "text-base text-gray-400 mt-8 text-center"
-        )}
-      >
-        Tap the button above to toggle between Light and Dark mode.
-      </Text>
-      <Button variant="primary" onPress={handleRegister}>
-        Register
-      </Button>
-      <Button variant="primary" onPress={handleLogin}>
-        Login
-      </Button>
-      <ConfirmModal
-        visible={showConfirm}
-        onClose={handleToggleConfim}
-        title={"Confirm Action"}
-        message={"Are you sure you want to proceed?"}
-      />
-      <Button
-        variant="primary"
-        onPress={handleRegister}
-      >
-        Register
-      </Button>
-      <Button
-        variant="primary"
-        onPress={handleBhDetail}
-      >
-        Go to bh detail
-      </Button>
-    </SafeAreaView>
+        <SectionHeader title="High Rating" link="/highRatingBH" />
+        <HorizontalList data={mockData} />
+      </ScrollContainer>
+    </ScreenContainer>
   );
 }
 

@@ -103,10 +103,10 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     overflow: 'hidden',
     marginRight: 16, // tạo khoảng cách giữa các card ngang
-    width: 177, // cố định chiều ngang cho mỗi card
+    width: 160, // cố định chiều ngang cho mỗi card
   },
   image: {
-    height: 200,
+    height: 150,
     width: '100%',
   },
   content: {

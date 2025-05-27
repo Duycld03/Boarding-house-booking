@@ -2,10 +2,9 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import BoardingHouseCard from '@/components/ui/BoardingHouseCard';
 
-const HorizontalList = ({ title, data }) => {
+const HorizontalList = ({ data }) => {
   return (
     <View style={styles.container}>
-      {title && <Text style={styles.title}>{title}</Text>}
       <FlatList
         horizontal
         data={data}
