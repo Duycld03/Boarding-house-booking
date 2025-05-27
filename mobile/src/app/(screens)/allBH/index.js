@@ -120,7 +120,7 @@ function AllBHScreen() {
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
       <BackHeader title="All Boarding House" />
-      <View className="px-4">
+      <View className="px-4" style={{ flex: 1 }}>
         <VerticalList data={mockData} />
       </View>
     </ScreenContainer>
