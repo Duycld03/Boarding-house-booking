@@ -74,7 +74,7 @@ function HighRatingBHScreen() {
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
-      <BackHeader title="High Rating Boarding House" />
+      <BackHeader title={t('rating')} />
       <View className="px-4" style={{ flex: 1 }}>
         <VerticalList data={highRatingData} loading={loading} />
       </View>

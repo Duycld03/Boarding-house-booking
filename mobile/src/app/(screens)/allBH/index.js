@@ -65,7 +65,7 @@ function AllBHScreen() {
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
-      <BackHeader title="All Boarding House" />
+      <BackHeader title={t('All')} />
       <View className="px-4" style={{ flex: 1 }}>
         <VerticalList data={dataToUse} loading={loading} />
       </View>

@@ -68,7 +68,7 @@ function NewestBHScreen() {
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
-      <BackHeader title="Newest Boarding House" />
+      <BackHeader title={t('newest')} />
       <View className="px-4" style={{ flex: 1 }}>
         <VerticalList data={newestData} loading={loading} />
       </View>
