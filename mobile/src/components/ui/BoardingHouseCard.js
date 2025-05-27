@@ -46,9 +46,7 @@ const BoardingHouseCard = ({
           const favoriteIds = response.favorites.map((fav) => fav.id);
           setIsFavorite(favoriteIds.includes(id));
         }
-      } catch (error) {
-        console.error('Error fetching favorites:', error);
-      }
+      } catch (error) {}
     };
     fetchFavoriteStatus();
   }, [id]);
@@ -59,11 +57,8 @@ const BoardingHouseCard = ({
       const response = await addFavorite(id);
       if (response && typeof response.isFavorite !== 'undefined') {
         setIsFavorite(response.isFavorite);
-      } else {
-        Alert.alert('Lỗi', 'Dữ liệu phản hồi không hợp lệ!');
       }
     } catch (error) {
-      Alert.alert('Thông báo', 'Bạn cần đăng nhập để thực hiện chức năng này');
       router.push('/login'); // điều hướng đến trang đăng nhập
     }
   };
