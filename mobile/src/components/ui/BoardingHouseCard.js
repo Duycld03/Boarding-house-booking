@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { useRouter } from 'expo-router'; // <-- thay useNavigation bằng useRouter
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeProvider';
 import { formatTimeAgo } from '@/utils/timeUtils';
 import truncateDetail from '@/utils/truncateDetail';
 import { useTranslation } from 'react-i18next';
+import { addFavorite, getFavorite } from '@/API/favoriteManagement';
 
 const BoardingHouseCard = ({
   id,
@@ -15,13 +23,12 @@ const BoardingHouseCard = ({
   rating,
   img,
   updatedAt,
-  isFavorite: initialFavorite = false,
 }) => {
   const { isDarkMode } = useTheme();
-  const router = useRouter(); // <-- dùng useRouter của expo-router
-  const [isFavorite, setIsFavorite] = useState(initialFavorite);
-  const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
+  const router = useRouter();
+  const [isFavorite, setIsFavorite] = useState(false); // khởi đầu false
   const { t } = useTranslation('home');
+  const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
 
   const timeAgoText = formatTimeAgo(updatedAt, t);
   const translatedDetail = truncateDetail(
@@ -29,6 +36,37 @@ const BoardingHouseCard = ({
       ? t(`location.${detail}`, { defaultValue: detail })
       : t('location.No address provided')
   );
+
+  // Khi mount, gọi API lấy danh sách favorite để biết item này có được yêu thích chưa
+  useEffect(() => {
+    const fetchFavoriteStatus = async () => {
+      try {
+        const response = await getFavorite();
+        if (response && Array.isArray(response.favorites)) {
+          const favoriteIds = response.favorites.map((fav) => fav.id);
+          setIsFavorite(favoriteIds.includes(id));
+        }
+      } catch (error) {
+        console.error('Error fetching favorites:', error);
+      }
+    };
+    fetchFavoriteStatus();
+  }, [id]);
+
+  // Hàm toggle favorite khi bấm icon
+  const handleFavoriteClick = async () => {
+    try {
+      const response = await addFavorite(id);
+      if (response && typeof response.isFavorite !== 'undefined') {
+        setIsFavorite(response.isFavorite);
+      } else {
+        Alert.alert('Lỗi', 'Dữ liệu phản hồi không hợp lệ!');
+      }
+    } catch (error) {
+      Alert.alert('Thông báo', 'Bạn cần đăng nhập để thực hiện chức năng này');
+      router.push('/login'); // điều hướng đến trang đăng nhập
+    }
+  };
 
   return (
     <TouchableOpacity
@@ -40,10 +78,7 @@ const BoardingHouseCard = ({
         },
       ]}
       onPress={() =>
-        router.push({
-          pathname: '/(screens)/BhDetail',
-          params: { id },
-        })
+        router.push({ pathname: '/(screens)/BhDetail', params: { id } })
       }
     >
       <Image source={{ uri: img }} style={styles.image} resizeMode="cover" />
@@ -89,7 +124,7 @@ const BoardingHouseCard = ({
           </View>
 
           <TouchableOpacity
-            onPress={() => setIsFavorite(!isFavorite)}
+            onPress={handleFavoriteClick}
             style={styles.heartIcon}
           >
             <AntDesign

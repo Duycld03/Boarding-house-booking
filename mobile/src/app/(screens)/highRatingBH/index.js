@@ -45,7 +45,6 @@ function HighRatingBHScreen() {
             reviewCount: item.reviewCount || 0,
             img: imgPath,
             updatedAt: item.updatedAt || 0,
-            isFavorite: false,
           };
         });
 

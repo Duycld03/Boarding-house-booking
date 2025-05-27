@@ -48,7 +48,6 @@ function Home() {
             reviewCount: item.reviewCount || 0,
             img: imgPath,
             updatedAt: item.updatedAt || 0,
-            isFavorite: false,
           };
         });
 
@@ -86,14 +85,14 @@ function Home() {
     <View className="flex-row justify-between items-center mt-6 mb-2">
       <Text
         className={themedClasses(
-          'text-lg font-extrabold text-gray-800 text-center',
-          'text-lg font-extrabold text-text-dark text-center'
+          'text-lg font-extrabold text-gray-800 text-center ml-2',
+          'text-lg font-extrabold text-text-dark text-center ml-2'
         )}
       >
         {title}
       </Text>
       <TouchableOpacity onPress={() => router.push(link)}>
-        <Text className="text-lg font-bold text-sky-400 tracking-tight">
+        <Text className="text-lg font-bold text-sky-400 tracking-tight mr-2">
           {t('seeMore')}
         </Text>
       </TouchableOpacity>
