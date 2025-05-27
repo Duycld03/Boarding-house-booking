@@ -88,7 +88,10 @@ const BoardingHouseCard = ({
             </Text>
           </View>
 
-          <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
+          <TouchableOpacity
+            onPress={() => setIsFavorite(!isFavorite)}
+            style={styles.heartIcon}
+          >
             <AntDesign
               name={isFavorite ? 'heart' : 'hearto'}
               size={20}
@@ -111,7 +114,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,
-    minHeight: 260,
+    minHeight: 250,
   },
   image: {
     height: 120,
@@ -137,12 +140,13 @@ const styles = StyleSheet.create({
   bottomRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'stretch',
-    marginTop: 4,
+    alignItems: 'center', // căn giữa theo chiều dọc để heart và timeAgo nằm cùng hàng
+    marginTop: -2,
   },
   detailContainer: {
     flex: 1,
     marginRight: 6,
+    flexDirection: 'column',
   },
   detail: {
     fontSize: 13,
@@ -150,6 +154,11 @@ const styles = StyleSheet.create({
   timeAgo: {
     fontSize: 12,
     marginTop: 2,
+  },
+  heartIcon: {
+    // Optional: can add some marginLeft để tách icon ra khỏi text
+    marginLeft: 8,
+    marginTop: 8,
   },
 });
 
