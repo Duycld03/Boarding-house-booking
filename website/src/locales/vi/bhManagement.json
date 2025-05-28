@@ -1,85 +1,141 @@
-{  "tableName": "Nhà Trọ",
+{
+  "defaultTitle": "Tiêu đề mặc định",
+  "tableName": "Nhà Trọ",
+
+  "errors": {
+    "noId": "Không tìm thấy ID nhà trọ.",
+    "fetchFailed": "Không thể lấy dữ liệu nhà trọ.",
+    "fetchAddressFailed": "Không thể lấy dữ liệu địa chỉ.",
+    "fetchBoardingHouseTypes": "Không thể lấy loại nhà trọ.",
+    "maxOtherImages": "Bạn chỉ có thể tải lên tối đa 15 ảnh khác.",
+    "selectBoardingHouseType": "Vui lòng chọn loại nhà trọ.",
+    "enterBoardingHouseName": "Vui lòng nhập tên nhà trọ.",
+    "selectProvince": "Vui lòng chọn tỉnh/thành phố.",
+    "selectDistrict": "Vui lòng chọn quận/huyện.",
+    "selectWard": "Vui lòng chọn phường/xã.",
+    "enterAddressDetail": "Vui lòng nhập chi tiết nhà trọ.",
+    "enterDetailAddress": "Vui lòng nhập chi tiết nhà trọ.",
+    "uploadPrimaryImage": "Bạn phải tải lên ảnh chính.",
+    "uploadAtLeastOneImage": "Bạn phải tải lên ít nhất một ảnh.",
+    "enterPriceRange": "Vui lòng nhập khoảng giá.",
+    "enterElectricityPrice": "Vui lòng nhập giá điện.",
+    "enterWaterPrice": "Vui lòng nhập giá nước.",
+    "markLocationOnMap": "Vui lòng đánh dấu vị trí trên bản đồ.",
+    "failedToAdd": "Thêm nhà trọ thất bại.",
+    "failedToSubmitForm": "Gửi biểu mẫu thất bại."
+  },
+
+  "messages": {
+    "imageRemoved": "Ảnh tạm thời đã được xóa.",
+    "updateSuccess": "Cập nhật nhà trọ thành công.",
+    "updateFailed": "Cập nhật nhà trọ thất bại.",
+    "createdSuccess": "Tạo nhà trọ thành công!",
+    "noData": "Không có nhà trọ nào.",
+    "fetchFailed": "Lấy nhà trọ thất bại.",
+    "deleteSuccess": "Xóa nhà trọ thành công.",
+    "deleteFailed": "Xóa nhà trọ thất bại.",
+    "confirmDeleteTitle": "Xác nhận xóa",
+    "confirmDeleteContent": "Bạn có chắc chắn muốn xóa nhà trọ này không?"
+  },
+
+  "validation": {
+    "selectBoardingHouseType": "Vui lòng chọn loại nhà trọ.",
+    "enterName": "Vui lòng nhập tên nhà trọ.",
+    "enterBoardingHouseName": "Vui lòng nhập tên nhà trọ.",
+    "selectProvince": "Vui lòng chọn tỉnh/thành phố.",
+    "selectDistrict": "Vui lòng chọn quận/huyện.",
+    "selectWard": "Vui lòng chọn phường/xã.",
+    "enterDetailAddress": "Vui lòng nhập chi tiết nhà trọ.",
+    "enterAddressDetail": "Vui lòng nhập chi tiết nhà trọ.",
+    "enterPriceRange": "Vui lòng nhập giá thuê.",
+    "enterElectricityPrice": "Vui lòng nhập giá điện.",
+    "enterWaterPrice": "Vui lòng nhập giá nước.",
+    "uploadPrimaryImage": "Bạn phải tải lên ảnh chính."
+  },
+
+  "preview": "Xem trước",
+
   "buttons": {
+    "back": "Quay lại",
+    "update": "Cập nhật",
+    "delete": "Xóa",
     "addBoardingHouse": "Thêm nhà trọ",
     "cancel": "Hủy",
     "submit": "Gửi",
     "loading": "Đang tải..."
   },
-  "modals": {
-    "createBoardingHouseTitle": "Tạo nhà trọ"
+
+  "tabs": {
+    "boardingHouseDetail": "Chi tiết Nhà Trọ",
+    "roomType": "Loại phòng",
+    "room": "Phòng",
+    "depositManagement": "Quản lý tiền đặt cọc",
+    "tenantManagement": "Quản lý khách thuê",
+    "revenueManagement": "Quản lý doanh thu",
+    "renewalManagement": "Quản lý gia hạn",
+    "rentPaymentManagement": "Quản lý thanh toán tiền thuê"
   },
+
+  "labels": {
+    "totalRooms": "Tổng số phòng",
+    "availableRooms": "Phòng trống",
+    "name": "Tên",
+    "address": "Địa chỉ",
+    "priceRange": "Khoảng giá (VND)",
+    "boardingHouseType": "Loại nhà trọ",
+    "primaryImage": "Ảnh chính",
+    "otherImages": "Ảnh khác",
+    "province": "Tỉnh/Thành phố",
+    "district": "Quận/Huyện",
+    "ward": "Phường/Xã",
+    "detail": "Chi tiết",
+    "details": "Chi tiết"
+  },
+
   "form": {
     "section": {
       "information": "1. Thông tin",
-      "address": "2. Địa chỉ",
+      "price": "2. Giá cả",
       "images": "3. Ảnh",
-      "price": "4. Giá"
+      "address": "4. Địa chỉ"
     },
     "labels": {
-      "boardingHouseType": "Loại nhà trọ",
       "boardingHouseName": "Tên nhà trọ",
+      "boardingHouseType": "Loại nhà trọ",
       "description": "Mô tả",
-      "primaryImage": "Ảnh chính",
-      "addImage": "Thêm ảnh",
-      "addImages": "Thêm nhiều ảnh",
-      "dragDropOrClick": "Kéo thả hoặc bấm vào đây để chọn file",
-      "otherImages": "Ảnh khác",
       "priceRange": "Giá thuê/tháng (VND)",
       "electricityPrice": "Giá điện/kWh (VND)",
       "waterPrice": "Giá nước/m³ (VND)",
-       "province": "Tỉnh/Thành phố",
+      "primaryImage": "Ảnh chính",
+      "otherImages": "Ảnh khác",
+      "province": "Tỉnh/Thành phố",
       "district": "Quận/Huyện",
       "ward": "Phường/Xã",
-      "details": "Chi tiết địa chỉ"
+      "detailAddress": "Chi tiết",
+      "addImage": "Thêm ảnh chính",
+      "addOtherImages": "Thêm ảnh khác",
+      "dragDropOrClick": "Kéo thả hoặc bấm vào đây để chọn tệp",
+      "details": "Chi tiết"
+
     },
     "placeholders": {
+      "selectProvince": "Chọn tỉnh/thành phố",
+      "selectDistrict": "Chọn quận/huyện",
+      "selectWard": "Chọn phường/xã",
       "selectType": "Chọn loại",
       "enterBoardingHouseName": "Nhập tên nhà trọ",
       "enterDescription": "Nhập mô tả",
       "enterPriceRange": "Nhập giá thuê",
       "enterElectricityPrice": "Nhập giá điện",
       "enterWaterPrice": "Nhập giá nước",
-       "selectProvince": "Chọn tỉnh/thành phố",
-      "selectDistrict": "Chọn quận/huyện",
-      "selectWard": "Chọn phường/xã",
       "inputDetailsAddress": "Nhập chi tiết địa chỉ nhà trọ"
-    },
-    "validation": {
-      "selectBoardingHouseType": "Vui lòng chọn loại nhà trọ",
-      "enterBoardingHouseName": "Vui lòng nhập tên nhà trọ",
-      "enterDescription": "Vui lòng nhập mô tả",
-      "enterPriceRange": "Vui lòng nhập giá thuê",
-      "enterElectricityPrice": "Vui lòng nhập giá điện",
-      "enterWaterPrice": "Vui lòng nhập giá nước"
     }
   },
-  "errors": {
-    "fetchBoardingHouseTypes": "Lấy loại nhà trọ thất bại.",
-    "selectBoardingHouseType": "Vui lòng chọn loại nhà trọ.",
-    "enterBoardingHouseName": "Vui lòng nhập tên nhà trọ.",
-    "selectProvince": "Vui lòng chọn tỉnh/thành phố.",
-    "selectDistrict": "Vui lòng chọn quận/huyện.",
-    "selectWard": "Vui lòng chọn phường/xã.",
-    "enterAddressDetail": "Vui lòng nhập chi tiết địa chỉ.",
-    "uploadPrimaryImage": "Bạn phải tải lên ảnh chính.",
-    "enterPriceRange": "Vui lòng nhập giá thuê.",
-    "enterElectricityPrice": "Vui lòng nhập giá điện.",
-    "enterWaterPrice": "Vui lòng nhập giá nước.",
-    "markLocationOnMap": "Vui lòng đánh dấu vị trí trên bản đồ.",
-    "maxOtherImages": "Bạn không thể tải lên quá 15 ảnh khác.",
-    "uploadAtLeastOneImage": "Bạn phải tải lên ít nhất một ảnh.",
-    "failedToAdd": "Thêm nhà trọ thất bại.",
-    "failedToSubmitForm": "Gửi biểu mẫu thất bại."
+
+  "modals": {
+    "createBoardingHouseTitle": "Tạo nhà trọ"
   },
-  "messages": {
-    "createdSuccess": "Tạo nhà trọ thành công!",
-     "noData": "Không có nhà trọ nào",
-    "fetchFailed": "Không lấy được dữ liệu nhà trọ.",
-    "deleteSuccess": "Xóa nhà trọ thành công.",
-    "deleteFailed": "Xóa nhà trọ thất bại.",
-    "confirmDeleteTitle": "Xác nhận xóa",
-    "confirmDeleteContent": "Bạn có chắc muốn xóa nhà trọ này không?"
-  },
+
   "columns": {
     "name": "Tên trọ",
     "address": "Địa chỉ",
@@ -87,7 +143,7 @@
     "boardingHouseType": "Loại nhà trọ",
     "totalRooms": "Tổng phòng",
     "availableRooms": "Phòng trống",
-    "action": "Thao tác",
+    "action": "Hành động",
     "detail": "Chi tiết",
     "delete": "Xóa"
   }

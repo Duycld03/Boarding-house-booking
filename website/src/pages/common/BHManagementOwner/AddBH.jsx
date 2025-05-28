@@ -656,7 +656,7 @@ const AddBHModal = ({ onAddData }) => {
                   >
                     <PlusOutlined className="text-2xl" />
                     <p className="mt-2 text-sm font-medium">
-                      {t('form.labels.addImages')}
+                      {t('form.labels.addOtherImages')}
                     </p>
                     <p className="text-xs">
                       {t('form.labels.dragDropOrClick')}
