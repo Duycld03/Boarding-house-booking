@@ -1,0 +1,20 @@
+/* Dark mode for Ant Design Select dropdown */
+body.dark-mode .ant-select-dropdown {
+    background-color: #1f2937 !important;
+    color: white !important;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+}
+
+body.dark-mode .ant-select-item-option-content {
+    color: white !important;
+}
+
+body.dark-mode .ant-select-item-option-active {
+    background-color: #374151 !important;
+}
+
+body.dark-mode .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background-color: #2563eb !important;
+    color: white !important;
+}

@@ -38,8 +38,13 @@ import { faHotel } from '@fortawesome/free-solid-svg-icons';
 
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../context/themeContext';
+import './BHDetailOwner.module.css'; // Import custom CSS for additional dark mode fixes
+import classNames from 'classnames';
+import './darkModeOverrides.css';
 
 const { TabPane } = Tabs;
+
+const cx = classNames;
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
@@ -88,6 +93,14 @@ const BHDetailOwner = () => {
       setCurrentLocation([geoLocation.lat, geoLocation.lon]);
     }
   }, [geoLocation]);
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+      console.log('Added dark-mode class to body');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     const fetchAddressData = async () => {
@@ -403,7 +416,12 @@ const BHDetailOwner = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <HeartFilled className="text-red-500 text-4xl" />
-                      <span className="text-gray-600 text-lg">
+                      <span
+                        className={`text-lg ${
+                          darkMode ? 'text-white' : 'text-gray-600'
+                        }`}
+                      >
+                        {' '}
                         {updatedData.likes
                           ? Number(updatedData.likes).toLocaleString('en-US')
                           : '0'}
@@ -412,7 +430,11 @@ const BHDetailOwner = () => {
                   </div>
 
                   {/* Right: Total & Available Rooms */}
-                  <div className="text-left min-[300px]:text-right min-w-[150px]">
+                  <div
+                    className={`text-left min-[300px]:text-right min-w-[150px] ${
+                      darkMode ? 'text-white' : 'text-black'
+                    }`}
+                  >
                     <div>
                       {t('labels.totalRooms')}: {updatedData.totalRooms || '0'}
                     </div>
@@ -427,9 +449,14 @@ const BHDetailOwner = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Information */}
                 <div className="flex flex-col flex-1">
-                  <h2 className="text-3xl font-bold">
+                  <h2
+                    className={`text-3xl font-bold ${
+                      darkMode ? 'text-white' : 'text-black'
+                    }`}
+                  >
                     {t('form.section.information')}
                   </h2>
+
                   <Form.Item
                     label={t('form.labels.boardingHouseName')}
                     className="mb-2"
@@ -438,7 +465,7 @@ const BHDetailOwner = () => {
                       name="name"
                       value={updatedData.name || ''}
                       onChange={handleInputChange}
-                      className={darkMode ? 'dark-mode-input' : ''}
+                      className={cx({ 'dark-mode-input': darkMode })}
                     />
                   </Form.Item>
 
@@ -480,9 +507,14 @@ const BHDetailOwner = () => {
 
                 {/* Price */}
                 <div className="flex flex-col flex-1">
-                  <h2 className="text-3xl font-bold mb-4">
+                  <h2
+                    className={`text-3xl font-bold mb-4 ${
+                      darkMode ? 'text-white' : 'text-black'
+                    }`}
+                  >
                     {t('form.section.price')}
                   </h2>
+
                   <Form.Item
                     label={t('form.labels.priceRange')}
                     style={{ marginTop: '10px' }}
@@ -501,6 +533,7 @@ const BHDetailOwner = () => {
                       }
                       parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                       className={darkMode ? 'dark-mode-input' : ''}
+                      style={{ width: '100%' }}
                       min={0}
                     />
                   </Form.Item>
@@ -522,6 +555,7 @@ const BHDetailOwner = () => {
                       }
                       parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                       className={darkMode ? 'dark-mode-input' : ''}
+                      style={{ width: '100%' }}
                       min={0}
                     />
                   </Form.Item>
@@ -543,14 +577,20 @@ const BHDetailOwner = () => {
                       }
                       parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                       className={darkMode ? 'dark-mode-input' : ''}
+                      style={{ width: '100%' }}
                       min={0}
                     />
                   </Form.Item>
                 </div>
               </div>
-              <h2 className="text-3xl font-bold mb-4 mt-10">
+              <h2
+                className={`text-3xl font-bold mb-4 mt-10 ${
+                  darkMode ? 'text-white' : 'text-black'
+                }`}
+              >
                 {t('form.section.images')}
               </h2>
+
               <Form.Item label={t('form.labels.primaryImage')} className="mb-4">
                 <div className="flex flex-col gap-4">
                   {updatedData.primaryImage ? (
@@ -652,9 +692,14 @@ const BHDetailOwner = () => {
                   </Upload>
                 </div>
               </Form.Item>
-              <h2 className="text-3xl font-bold mb-4 mt-10">
+              <h2
+                className={`text-3xl font-bold mb-4 mt-10 ${
+                  darkMode ? 'text-white' : 'text-black'
+                }`}
+              >
                 {t('form.section.address')}
               </h2>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="flex flex-col h-full">
                   <Form.Item label={t('form.labels.province')} required>
@@ -777,6 +822,7 @@ const BHDetailOwner = () => {
               </div>
               <div className="flex justify-center gap-4 w-full md:mt-4">
                 <Button
+                  type="primary"
                   className="bg-red-500 text-white flex-1"
                   size="large"
                   onClick={() => navigate('/bh-management-owner')}
@@ -786,6 +832,7 @@ const BHDetailOwner = () => {
                 </Button>
 
                 <Button
+                  type="primary"
                   className="bg-primary text-white flex-1"
                   size="large"
                   loading={loading}
