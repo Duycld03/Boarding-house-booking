@@ -1,4 +1,4 @@
-{
+{  "tableName": "Nhà Trọ",
   "buttons": {
     "addBoardingHouse": "Thêm nhà trọ",
     "cancel": "Hủy",
@@ -72,6 +72,23 @@
     "failedToSubmitForm": "Gửi biểu mẫu thất bại."
   },
   "messages": {
-    "createdSuccess": "Tạo nhà trọ thành công!"
+    "createdSuccess": "Tạo nhà trọ thành công!",
+     "noData": "Không có nhà trọ nào",
+    "fetchFailed": "Không lấy được dữ liệu nhà trọ.",
+    "deleteSuccess": "Xóa nhà trọ thành công.",
+    "deleteFailed": "Xóa nhà trọ thất bại.",
+    "confirmDeleteTitle": "Xác nhận xóa",
+    "confirmDeleteContent": "Bạn có chắc muốn xóa nhà trọ này không?"
+  },
+  "columns": {
+    "name": "Tên trọ",
+    "address": "Địa chỉ",
+    "priceRange": "Giá (VND)",
+    "boardingHouseType": "Loại nhà trọ",
+    "totalRooms": "Tổng phòng",
+    "availableRooms": "Phòng trống",
+    "action": "Thao tác",
+    "detail": "Chi tiết",
+    "delete": "Xóa"
   }
 }

@@ -18,6 +18,7 @@ function BHManagementOwner() {
   const [loading, setLoading] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
+
   const { t } = useTranslation('bhManagement');
   const { darkMode } = useTheme();
 
@@ -35,87 +36,92 @@ function BHManagementOwner() {
 
   const navigate = useNavigate();
 
-  const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
-      width: 200,
-      render: (address) =>
-        address ? (
-          <Tooltip
-            title={`${address.detail}, ${address.ward}, ${address.district}, ${address.province}`}
-          >
-            {`${address.detail}, ${address.ward}, ${address.district}`}
-          </Tooltip>
-        ) : (
-          'N/A'
+  const columns = useMemo(
+    () => [
+      {
+        title: t('columns.name'),
+        dataIndex: 'name',
+        key: 'name',
+      },
+      {
+        title: t('columns.address'),
+        dataIndex: 'address',
+        key: 'address',
+        width: 200,
+        render: (address) =>
+          address ? (
+            <Tooltip
+              title={`${address.detail}, ${address.ward}, ${address.district}, ${address.province}`}
+            >
+              {`${address.detail}, ${address.ward}, ${address.district}`}
+            </Tooltip>
+          ) : (
+            t('messages.noData')
+          ),
+      },
+      {
+        title: t('columns.priceRange'),
+        dataIndex: 'priceRange',
+        key: 'priceRange',
+        render: (price) => (price ? formatAmount(price) : t('messages.noData')),
+      },
+      {
+        title: t('columns.boardingHouseType'),
+        dataIndex: 'boardingHouseType',
+        key: 'boardingHouseType',
+        render: (type) => type?.name || t('messages.noData'),
+      },
+      {
+        title: t('columns.totalRooms'),
+        dataIndex: 'totalRooms',
+        key: 'totalRooms',
+        width: 80,
+      },
+      {
+        title: t('columns.availableRooms'),
+        dataIndex: 'availableRooms',
+        key: 'availableRooms',
+        width: 100,
+      },
+      {
+        title: t('columns.action'),
+        key: 'action',
+        width: 150,
+        render: (_, record) => (
+          <div className="flex gap-2">
+            <Button
+              size="large"
+              btnDelete
+              title={t('columns.delete')}
+              onClick={() => {
+                setSelectedData(record);
+                setIsOpenDeleteModal(true);
+              }}
+            />
+            <Button
+              size="large"
+              title={t('columns.detail')}
+              icon={<FileTextOutlined />}
+              onClick={() =>
+                navigate(`/bh-management-owner/${record._id}`, {
+                  state: { name: record.name },
+                })
+              }
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+            />
+          </div>
         ),
-    },
-    {
-      title: 'Price Range (VND)',
-      dataIndex: 'priceRange',
-      key: 'priceRange',
-      render: (price) => (price ? formatAmount(price) : 'N/A'),
-    },
-    {
-      title: 'Boarding House Type',
-      dataIndex: 'boardingHouseType',
-      key: 'boardingHouseType',
-      render: (type) => type?.name || 'N/A',
-    },
-    {
-      title: 'Total Rooms',
-      dataIndex: 'totalRooms',
-      key: 'totalRooms',
-      width: 80,
-    },
-    {
-      title: 'Available Rooms',
-      dataIndex: 'availableRooms',
-      key: 'availableRooms',
-      width: 100,
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      width: 150,
-      render: (_, record) => (
-        <div className="flex gap-2">
-          <Button
-            size="large"
-            btnDelete
-            title="Delete"
-            onClick={() => {
-              setSelectedData(record);
-              setIsOpenDeleteModal(true);
-            }}
-          />
-          <Button
-            size="large"
-            title="Detail"
-            icon={<FileTextOutlined />}
-            onClick={() =>
-              navigate(`/bh-management-owner/${record._id}`, {
-                state: { name: record.name },
-              })
-            }
-            className="text-white"
-            bgColor="rgb(5 150 105)"
-          />
-        </div>
-      ),
-    },
-  ];
+      },
+    ],
+    [t, navigate]
+  );
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const res = await getAllBHOwner(filterValue, paginationOptions);
-
       setBoardingHouses(res.data);
-      console.log(res);
 
       setPagination({
         current: res.pagination.currentPage,
@@ -124,28 +130,23 @@ function BHManagementOwner() {
       });
     } catch (error) {
       console.error('Error fetching boarding houses:', error);
-      toast.error('Failed to fetch boarding houses.');
+      toast.error(t('messages.fetchFailed'));
     } finally {
       setLoading(false);
     }
-  }, [filterValue, paginationOptions]);
+  }, [filterValue, paginationOptions, t]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const handleTableChange = useCallback(
-    (pagination, filters, sorter) => {
-      const newPaginationOptions = {
-        ...paginationOptions,
-        page: pagination.current,
-        limit: pagination.pageSize,
-      };
-
-      setPaginationOptions(newPaginationOptions);
-    },
-    [paginationOptions]
-  );
+  const handleTableChange = useCallback((pagination) => {
+    setPaginationOptions((prev) => ({
+      ...prev,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    }));
+  }, []);
 
   const tablePaginationConfig = useMemo(
     () => ({
@@ -156,7 +157,7 @@ function BHManagementOwner() {
       pageSizeOptions: ['10', '20', '50', '100'],
       onChange: handleTableChange,
     }),
-    [pagination]
+    [pagination, handleTableChange]
   );
 
   const handleDelete = useCallback(async () => {
@@ -164,11 +165,11 @@ function BHManagementOwner() {
     setLoading(true);
     try {
       await softDeleteBoardingHouseOwner(selectedData._id);
-      toast.success('Boarding house deleted successfully.');
+      toast.success(t('messages.deleteSuccess'));
       fetchData();
     } catch (error) {
       console.error('Delete error:', error);
-      toast.error('Failed to delete boarding house.');
+      toast.error(t('messages.deleteFailed'));
     } finally {
       setLoading(false);
       setIsOpenDeleteModal(false);
@@ -178,13 +179,11 @@ function BHManagementOwner() {
 
   return (
     <div>
-      {/* Top actions: Add + Filter */}
       <div className="flex justify-between mb-4">
         <AddBHModal onAddData={() => fetchData()} />
         {/* <FilterBH setFilterValue={setFilterValue} /> */}
       </div>
 
-      {/* Table display */}
       <Table
         tableName={t('tableName')}
         loading={loading}
@@ -195,10 +194,9 @@ function BHManagementOwner() {
         noDataText={t('messages.noData')}
       />
 
-      {/* Confirm Delete Modal */}
       <ConfirmModal
-        title="Confirm Deletion"
-        content="Are you sure you want to delete this boarding house?"
+        title={t('messages.confirmDeleteTitle')}
+        content={t('messages.confirmDeleteContent')}
         isOpen={isOpenDeleteModal}
         onOk={handleDelete}
         onCancel={() => {
