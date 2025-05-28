@@ -99,6 +99,7 @@ const AddressSelector = ({
             allowClear
             className={selectClass}
             dropdownStyle={darkSelectDropdownStyle}
+            popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
           >
             {districts.map((district) => (
               <Option key={district.code} value={district.name}>
@@ -122,6 +123,7 @@ const AddressSelector = ({
             allowClear
             className={selectClass}
             dropdownStyle={darkSelectDropdownStyle}
+            popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
           >
             {wards.map((ward) => (
               <Option key={ward.code} value={ward.name}>
