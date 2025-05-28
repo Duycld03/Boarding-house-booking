@@ -77,8 +77,7 @@ export const getAllBHOwner = (filterValue, paginationOptions) => {
   return axios.get('/owner/boardinghouseowner', {
     params: {
       ...filterValue,
-      page: paginationOptions.page,
-      limit: paginationOptions.limit,
+      ...paginationOptions,
     },
   });
 };

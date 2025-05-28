@@ -140,13 +140,18 @@ function BHManagementOwner() {
     fetchData();
   }, [fetchData]);
 
-  const handleTableChange = useCallback((pagination) => {
-    setPaginationOptions((prev) => ({
-      ...prev,
-      page: pagination.current,
-      limit: pagination.pageSize,
-    }));
-  }, []);
+  const handleTableChange = useCallback(
+    (pagination, filters, sorter) => {
+      const newPaginationOptions = {
+        ...paginationOptions,
+        page: pagination.current,
+        limit: pagination.pageSize,
+      };
+
+      setPaginationOptions(newPaginationOptions);
+    },
+    [paginationOptions]
+  );
 
   const tablePaginationConfig = useMemo(
     () => ({
@@ -157,7 +162,7 @@ function BHManagementOwner() {
       pageSizeOptions: ['10', '20', '50', '100'],
       onChange: handleTableChange,
     }),
-    [pagination, handleTableChange]
+    [pagination, handleTableChange, darkMode]
   );
 
   const handleDelete = useCallback(async () => {
