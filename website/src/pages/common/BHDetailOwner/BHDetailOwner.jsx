@@ -35,6 +35,7 @@ import RevenueManagement from './RevenueManagement';
 import RentPaymentManagement from './RentPaymentManagement';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHotel } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../context/themeContext';
@@ -244,15 +245,14 @@ const BHDetailOwner = () => {
         }
       );
       setGeoLocation(res.data[0]);
+      console.log('GeoLocation result:', res.data[0]);
     } catch (error) {
       console.log('Error getting location:', error);
     }
   };
 
   useEffect(() => {
-    if (updatedData?.address?.ward) {
-      getLocation();
-    }
+    getLocation();
   }, [updatedData?.address?.ward]);
 
   const handleSubmit = async () => {
