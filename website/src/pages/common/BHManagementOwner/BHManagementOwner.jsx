@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { TableCustom as Table, Button, ConfirmModal } from '../../../component';
 import { toast } from 'react-toastify';
 import { Tooltip } from 'antd';
@@ -6,22 +6,35 @@ import { FileTextOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import {
   getAllBHOwner,
-  updateBoardingHouseDetailsOwner,
   softDeleteBoardingHouseOwner,
 } from '../../../api/BoardingHManagement';
 import formatAmount from '../../../utils/formatAmount';
 import AddBHModal from './AddBH';
-// import UpdateBHModal from "./UpdateBH";
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../../context/themeContext';
 
 function BHManagementOwner() {
-  const [boardingHouses, setBoardingHouses] = useState([]); // List of boarding houses
-  const [loading, setLoading] = useState(false); // Loading state for data fetching
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false); // Delete confirmation modal state
-  const [isEditOpen, setIsEditOpen] = useState(false); // Edit modal state
-  const [selectedData, setSelectedData] = useState(null); // Data of the selected boarding house
+  const [boardingHouses, setBoardingHouses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
+  const { t } = useTranslation('bhManagement');
+  const { darkMode } = useTheme();
+
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+
+  const [filterValue, setFilterValue] = useState({});
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+  });
+
   const navigate = useNavigate();
 
-  // Table columns
   const columns = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
     {
@@ -56,30 +69,33 @@ function BHManagementOwner() {
       title: 'Total Rooms',
       dataIndex: 'totalRooms',
       key: 'totalRooms',
-      width: 20,
+      width: 80,
     },
     {
       title: 'Available Rooms',
       dataIndex: 'availableRooms',
       key: 'availableRooms',
-      width: 20,
+      width: 100,
     },
     {
       title: 'Action',
       key: 'action',
+      width: 150,
       render: (_, record) => (
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <Button
             size="large"
             btnDelete
-            title={'Delete'}
-            onClick={() => handleOpenDeleteModal(record)}
+            title="Delete"
+            onClick={() => {
+              setSelectedData(record);
+              setIsOpenDeleteModal(true);
+            }}
           />
           <Button
             size="large"
-            title={'Detail'}
+            title="Detail"
             icon={<FileTextOutlined />}
-            // onClick={() => openEditModal(record)}
             onClick={() =>
               navigate(`/bh-management-owner/${record._id}`, {
                 state: { name: record.name },
@@ -93,98 +109,103 @@ function BHManagementOwner() {
     },
   ];
 
-  // Fetch all boarding houses
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getAllBHOwner();
-      if (res && Array.isArray(res)) {
-        setBoardingHouses(res);
-      } else {
-        toast.error('Failed to fetch boarding houses.');
-      }
+      const res = await getAllBHOwner(filterValue, paginationOptions);
+
+      setBoardingHouses(res.data);
+      console.log(res);
+
+      setPagination({
+        current: res.pagination.currentPage,
+        pageSize: res.pagination.limit,
+        total: res.pagination.totalItems,
+      });
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('An error occurred while fetching data.');
+      console.error('Error fetching boarding houses:', error);
+      toast.error('Failed to fetch boarding houses.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterValue, paginationOptions]);
 
   useEffect(() => {
-    fetchData(); // Fetch data on component mount
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
-  // Open Edit Modal
-  const openEditModal = (record) => {
-    setSelectedData(record); // Set selected boarding house
-    setIsEditOpen(true); // Open edit modal
-  };
+  const handleTableChange = useCallback(
+    (pagination, filters, sorter) => {
+      const newPaginationOptions = {
+        ...paginationOptions,
+        page: pagination.current,
+        limit: pagination.pageSize,
+      };
 
-  // Handle Add New Data
-  const handleAddNewData = async () => {
-    await fetchData(); // Refresh data after adding a new boarding house
-  };
+      setPaginationOptions(newPaginationOptions);
+    },
+    [paginationOptions]
+  );
 
-  // Open Delete Modal
-  const handleOpenDeleteModal = (record) => {
-    setSelectedData(record); // Set selected boarding house for deletion
-    setIsOpenDeleteModal(true); // Open delete confirmation modal
-  };
+  const tablePaginationConfig = useMemo(
+    () => ({
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+      total: pagination.total,
+      showSizeChanger: true,
+      pageSizeOptions: ['10', '20', '50', '100'],
+      onChange: handleTableChange,
+    }),
+    [pagination]
+  );
 
-  // Handle Delete
-  const handleDelete = async () => {
-    if (!selectedData || !selectedData._id) return; // Ensure valid data
+  const handleDelete = useCallback(async () => {
+    if (!selectedData?._id) return;
+    setLoading(true);
     try {
-      setLoading(true);
-      await softDeleteBoardingHouseOwner(selectedData._id); // Call delete API
+      await softDeleteBoardingHouseOwner(selectedData._id);
       toast.success('Boarding house deleted successfully.');
-      fetchData(); // Refresh data
+      fetchData();
     } catch (error) {
-      console.error('Error deleting boarding house:', error);
+      console.error('Delete error:', error);
       toast.error('Failed to delete boarding house.');
     } finally {
       setLoading(false);
-      setIsOpenDeleteModal(false); // Close delete modal
-      setSelectedData(null); // Clear selected data
+      setIsOpenDeleteModal(false);
+      setSelectedData(null);
     }
-  };
-
-  // Handle Update
-  const handleUpdate = async () => {
-    fetchData(); // Refresh data after updating
-    setIsEditOpen(false); // Close edit modal
-  };
+  }, [selectedData, fetchData, t]);
 
   return (
     <div>
-      {/* Add New Boarding House */}
+      {/* Top actions: Add + Filter */}
       <div className="flex justify-between mb-4">
-        <AddBHModal onAddData={handleAddNewData} />
+        <AddBHModal onAddData={() => fetchData()} />
+        {/* <FilterBH setFilterValue={setFilterValue} /> */}
       </div>
 
-      {/* Boarding House Table */}
-      <Table loading={loading} columns={columns} data={boardingHouses ?? []} />
+      {/* Table display */}
+      <Table
+        tableName={t('tableName')}
+        loading={loading}
+        columns={columns}
+        data={boardingHouses}
+        onChange={handleTableChange}
+        pagination={tablePaginationConfig}
+        noDataText={t('messages.noData')}
+      />
 
       {/* Confirm Delete Modal */}
       <ConfirmModal
         title="Confirm Deletion"
-        content={`Are you sure you want to delete this boarding house?`}
-        onOk={handleDelete} // Trigger delete action
-        onCancel={() => {
-          setIsOpenDeleteModal(false); // Close modal
-          setSelectedData(null); // Clear selected data
-        }}
+        content="Are you sure you want to delete this boarding house?"
         isOpen={isOpenDeleteModal}
+        onOk={handleDelete}
+        onCancel={() => {
+          setIsOpenDeleteModal(false);
+          setSelectedData(null);
+        }}
       />
-
-      {/* Edit Modal */}
-      {/* <UpdateBHModal
-        open={isEditOpen}
-        formData={selectedData}
-        onCancel={() => setIsEditOpen(false)}
-        onUpdate={handleUpdate}
-      /> */}
     </div>
   );
 }

@@ -73,9 +73,16 @@ export const filterBH = async (filterValue) => {
 export const softDeleteBoardingHouse = async (boardingHouseId) => {
   return axios.delete(`/dashboard/boardinghouse/${boardingHouseId}/softDelete`);
 };
-export const getAllBHOwner = () => {
-  return axios.get('/owner/boardinghouseowner');
+export const getAllBHOwner = (filterValue, paginationOptions) => {
+  return axios.get('/owner/boardinghouseowner', {
+    params: {
+      ...filterValue,
+      page: paginationOptions.page,
+      limit: paginationOptions.limit,
+    },
+  });
 };
+
 export const getAllBoardingHouseTypesOwner = () => {
   return axios.get('/owner/types');
 };
@@ -105,14 +112,17 @@ export const getAllBoardingHouseTypeUser = () => {
 export const getMaxPriceBHUser = async () => {
   return axios.get('/boardinghouse/chore/get-max');
 };
-  export const createBoardingHouseType = (data) => {
+export const createBoardingHouseType = (data) => {
   return axios.post('/dashboard/boardinghousetype/create', data);
 };
 export const getBoardingHouseTypeDetails = (boardingHouseTypeId) => {
   return axios.get(`/dashboard/boardinghousetype/${boardingHouseTypeId}`);
 };
 export const updateBoardingHouseType = (boardingHouseTypeId, updateData) => {
-  return axios.put(`/dashboard/boardinghousetype/${boardingHouseTypeId}`, updateData);
+  return axios.put(
+    `/dashboard/boardinghousetype/${boardingHouseTypeId}`,
+    updateData
+  );
 };
 export const softDeleteBoardingHouseType = (boardingHouseTypeId) => {
   return axios.delete(`/dashboard/boardinghousetype/${boardingHouseTypeId}`);
