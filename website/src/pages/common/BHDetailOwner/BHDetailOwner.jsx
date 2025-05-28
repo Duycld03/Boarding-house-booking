@@ -632,12 +632,28 @@ const BHDetailOwner = () => {
                       }
                       name="boardingHouse"
                     >
-                      <div className="rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition text-center">
-                        <PlusOutlined className="text-2xl text-gray-400" />
-                        <p className="text-gray-500 mt-2 text-sm font-medium">
+                      <div
+                        className={`rounded-lg p-6 transition text-center ${
+                          darkMode ? 'text-white' : ''
+                        }`}
+                      >
+                        <PlusOutlined
+                          className={`text-2xl ${
+                            darkMode ? 'text-white' : 'text-gray-400'
+                          }`}
+                        />
+                        <p
+                          className={`${
+                            darkMode ? 'text-white' : 'text-gray-500'
+                          } mt-2 text-sm font-medium`}
+                        >
                           {t('form.labels.addImage')}
                         </p>
-                        <p className="text-gray-400 text-xs">
+                        <p
+                          className={`${
+                            darkMode ? 'text-white' : 'text-gray-400'
+                          } text-xs`}
+                        >
                           {t('form.labels.dragDropOrClick')}
                         </p>
                       </div>
@@ -680,12 +696,28 @@ const BHDetailOwner = () => {
                     name="boardingHouse"
                     className={darkMode ? 'dark-mode-upload' : 'custom-upload'}
                   >
-                    <div className="rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition text-center">
-                      <PlusOutlined className="text-2xl text-gray-400" />
-                      <p className="text-gray-500 mt-2 text-sm font-medium">
+                    <div
+                      className={`rounded-lg p-6 transition text-center ${
+                        darkMode ? 'text-white' : ''
+                      }`}
+                    >
+                      <PlusOutlined
+                        className={`text-2xl ${
+                          darkMode ? 'text-white' : 'text-gray-400'
+                        }`}
+                      />
+                      <p
+                        className={`${
+                          darkMode ? 'text-white' : 'text-gray-500'
+                        } mt-2 text-sm font-medium`}
+                      >
                         {t('form.labels.addOtherImages')}
                       </p>
-                      <p className="text-gray-400 text-xs">
+                      <p
+                        className={`${
+                          darkMode ? 'text-white' : 'text-gray-400'
+                        } text-xs`}
+                      >
                         {t('form.labels.dragDropOrClick')}
                       </p>
                     </div>

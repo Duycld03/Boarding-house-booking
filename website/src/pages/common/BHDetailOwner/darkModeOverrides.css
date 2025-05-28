@@ -18,3 +18,24 @@ body.dark-mode .ant-select-item-option-selected:not(.ant-select-item-option-disa
     background-color: #2563eb !important;
     color: white !important;
 }
+/* darkModeOverrides.css hoặc trong file css tương ứng */
+
+.dark-mode .ant-tabs-tab {
+    color: white !important;
+}
+
+.dark-mode .ant-tabs-tab:hover {
+    color: #40a9ff !important;
+    /* Màu xanh sáng khi hover */
+}
+
+.dark-mode .ant-tabs-tab-active {
+    color: #1890ff !important;
+    /* Màu xanh của tab active */
+    font-weight: 600;
+}
+
+.dark-mode .ant-tabs-ink-bar {
+    background-color: #1890ff !important;
+    /* Màu underline tab active */
+}
