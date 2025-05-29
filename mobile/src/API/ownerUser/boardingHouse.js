@@ -10,8 +10,21 @@ export const getRoomTypeByBhId = (id, boardingHouseId) => {
   });
 };
 
-export const getReviewByBhId = (id) => {
-  return axios.get(`/boardinghouse/reviews/${id}`);
+export const getReviewByBhId = (id, paginationOptions = {}) => {
+  const params = {
+    ...paginationOptions,
+  };
+  return axios.get(`/boardinghouse/reviews/${id}`, { params });
+};
+
+export const getTotalReviewsByBhId = async (bhId) => {
+  try {
+    const response = await axios.get(`${API_URL}/reviews/total/${bhId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching total reviews:', error);
+    throw error;
+  }
 };
 
 export const getBhByArea = async (filterValue) => {

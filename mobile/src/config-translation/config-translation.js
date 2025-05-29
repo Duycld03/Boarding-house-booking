@@ -25,6 +25,10 @@ import en_forgotPassword from "@/locales/en/forgotPassword.json";
 import vi_forgotPassword from "@/locales/vi/forgotPassword.json";
 import en_resetPassword from "@/locales/en/resetPassword.json";
 import vi_resetPassword from "@/locales/vi/resetPassword.json";
+import en_common from "@/locales/en/common.json";
+import vi_common from "@/locales/vi/common.json";
+import en_bhDetail from "@/locales/en/bhDetail.json";
+import vi_bhDetail from "@/locales/vi/bhDetail.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -41,6 +45,8 @@ i18n.use(initReactI18next).init({
       changeEmail: en_changeEmail,
       forgotPassword: en_forgotPassword,
       resetPassword: en_resetPassword,
+      common: en_common,
+      boardingHouseDetail: en_bhDetail,
     },
     vi: {
       setting: vi_setting,
@@ -55,6 +61,8 @@ i18n.use(initReactI18next).init({
       changeEmail: vi_changeEmail,
       forgotPassword: vi_forgotPassword,
       resetPassword: vi_resetPassword,
+      common: vi_common,
+      boardingHouseDetail: vi_bhDetail,
     },
   },
   lng: "en",

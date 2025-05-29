@@ -544,45 +544,112 @@ class ReviewController {
       const { id } = req.params;
 
       if (!id) {
-        return res.status(400).json({ message: 'bhId is required' });
+        return res.status(400).json({
+          success: false,
+          message: 'bhId is required'
+        });
       }
 
-      // ✅ Lấy danh sách review gốc
-      const allReviews = await Review.find({
+      // ✅ Đếm tổng số review trước khi paginate
+      const totalItems = await Review.countDocuments({
         boardingHouseId: id,
-        parentId: null, // Chỉ lấy review gốc
-      })
-        .populate({
-          path: 'accountId',
-          select: 'fullname avatarImage',
-        })
-        .sort({ updatedAt: -1 });
+        parentId: null
+      });
 
-      if (!allReviews.length) {
-        return res.status(404).json({ message: 'No reviews found' });
+      const result = await paginate(
+        Review,
+        {
+          filter: {
+            boardingHouseId: id,
+            parentId: null
+          },
+
+          // Populate thông tin account
+          populate: [{
+            path: 'accountId',
+            select: 'fullname avatarImage'
+          }],
+
+          // Cấu hình pagination
+          defaultLimit: 10,
+          maxLimit: 50,
+          sortField: 'updatedAt',
+
+          // Cho phép search theo content và rating
+          searchableFields: ['content'],
+          allowQueryFilters: [
+            'rating',
+            'rating_gte',
+            'rating_lte',
+            'createdAt_gte',
+            'createdAt_lte'
+          ],
+
+          // Cho phép sort theo các trường
+          sortableFields: ['updatedAt', 'createdAt', 'rating'],
+
+          // Không cần URLs và totalData để tối ưu performance
+          includeUrls: false,
+          includeTotalData: false
+        },
+        req
+      );
+
+      if (!result.success) {
+        return res.status(500).json({
+          success: false,
+          message: 'Error fetching reviews',
+          error: result.error
+        });
       }
 
       // ✅ Duyệt qua từng review để lấy nội dung của reply (nếu có)
       const reviewsWithReply = await Promise.all(
-        allReviews.map(async (review) => {
-          const reply = await Review.findOne({ parentId: review._id }).select(
-            '_id content'
-          );
+        result.data.map(async (review) => {
+          const reply = await Review.findOne({
+            parentId: review._id
+          }).select('_id content createdAt accountId')
+            .populate({
+              path: 'accountId',
+              select: 'fullname avatarImage'
+            });
 
           return {
-            ...review.toObject(),
-            replyId: reply ? reply._id : null,
-            replyContent: reply ? reply.content : null, // Lưu nội dung phản hồi vào object
+            ...review,
+            reply: reply ? {
+              _id: reply._id,
+              content: reply.content,
+              createdAt: reply.createdAt,
+              account: reply.accountId
+            } : null
           };
         })
       );
 
-      res.status(200).json(reviewsWithReply);
+      // ✅ Trả về kết quả với totalItems
+      res.status(200).json({
+        success: true,
+        pagination: {
+          ...result.pagination,
+          totalItems: totalItems // Thêm totalItems vào pagination
+        },
+        data: reviewsWithReply,
+        meta: {
+          boardingHouseId: id,
+          totalReviews: totalItems, // Thêm totalReviews vào meta để dễ sử dụng
+          ...result.meta
+        }
+      });
+
     } catch (error) {
-      console.error('🔥 Server Error:', error);
-      res.status(500).json({ message: 'Server error', error: error.message });
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
     }
   }
+
   async updateReplyReview(req, res) {
     try {
       const accountId = req.user?.userId;

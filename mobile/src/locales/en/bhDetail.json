@@ -12,6 +12,8 @@
   "selectRoom": "Select room",
   "addressNotAvailable": "Address not available",
   "owner": "Owner",
+  "address": "Address",
+  "priceRange": "Price range",
   "extraPrice": "Extra price",
   "electricityPrice": "Electricity Price",
   "waterPrice": "Water Price",
@@ -44,6 +46,9 @@
   "reportThisBoardingHouse": "Report this boarding house",
   "savedSuccess": "Boarding house saved successfully!",
   "removedSuccess": "Boarding house removed from saved list!",
+  "likeCount": "Like count",
+  "totalReview": " Reviews",
+  "loadMore": "Load more review",
   "addReview": {
     "title": "Rating and Review",
     "ratingLabel": "Rating",
@@ -68,18 +73,13 @@
     "fullName": "Full name",
     "email": "Email",
     "phone": "Phone",
-    "gender": "Gender"
+    "gender": "Gender",
+    "tapToViewDetails": "Tap to view details"
   },
   "gender": {
     "male": "Male",
     "female": "Female",
     "other": "Other"
-  },
-  "reviewList": {
-    "loadMore": "Load more",
-    "loading": "Loading...",
-    "noReviewsYet": "No reviews yet.",
-    "allReviewsLoaded": "All review have loaded"
   },
   "reviewCard": {
     "anonymous": "Anonymous",
@@ -108,6 +108,12 @@
     "alreadyReported": "You have reported this review. Please wait for admin to process.",
     "replyToReview": "Reply to this review",
     "alreadyReplied": "You have replied to this review."
+  },
+  "reviewList": {
+    "allReviewsLoaded": "All reviews loaded",
+    "loadMore": "Load more reviews",
+    "totalReviews": "Total reviews",
+    "averageRating": "Average rating"
   },
   "roomTypeCard": {
     "month": "month",
