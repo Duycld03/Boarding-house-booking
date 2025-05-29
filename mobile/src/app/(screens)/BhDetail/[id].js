@@ -100,16 +100,13 @@ export default function BhDetailScreen() {
         append = false
     } = {}) => {
         try {
-            console.log('🔄 Fetching reviews:', { page, limit, bhId: bhId || boardingHouseId, append });
 
-            // ✅ Use consistent pagination parameters
             const params = {
                 page,
                 limit,
             };
 
             const response = await getReviewByBhId(bhId || boardingHouseId, params);
-            console.log('📦 Review response:', response);
 
             if (response?.success && response?.data) {
                 const newReviews = response.data || [];
@@ -131,11 +128,6 @@ export default function BhDetailScreen() {
                     hasPrev: paginationData.hasPrev || false,
                 });
 
-                console.log('✅ Reviews updated:', {
-                    newCount: newReviews.length,
-                    totalCount: append ? data.reviews.length + newReviews.length : newReviews.length,
-                    pagination: paginationData
-                });
 
                 return response;
             }
