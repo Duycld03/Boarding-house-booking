@@ -616,7 +616,7 @@ class ReviewController {
 
           return {
             ...review,
-            reply: reply ? {
+            replyContent: reply ? {
               _id: reply._id,
               content: reply.content,
               createdAt: reply.createdAt,
