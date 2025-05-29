@@ -14,12 +14,14 @@ const AccountLayout = () => {
           name="myfavorite/index"
           options={{
             headerShown: false,
+
           }}
         />
         <Stack.Screen
           name="myappointment/index"
           options={{
             headerShown: false,
+
           }}
         />
         <Stack.Screen

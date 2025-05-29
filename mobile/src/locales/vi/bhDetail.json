@@ -8,10 +8,12 @@
   "pleaseLoginToAddReview": "Vui lòng đăng nhập để thêm đánh giá.",
   "login": "Đăng nhập",
   "cancel": "Hủy",
+  "priceRange": "Khoảng giá",
   "vndPerMonth": "(VNĐ)/tháng",
   "selectRoom": "Chọn phòng",
   "addressNotAvailable": "Không có địa chỉ",
   "owner": "Chủ nhà",
+  "address": "Địa chỉ",
   "extraPrice": "Giá phụ thu",
   "electricityPrice": "Giá điện",
   "waterPrice": "Giá nước",
@@ -44,6 +46,9 @@
   "reportThisBoardingHouse": "Báo cáo nhà trọ này",
   "savedSuccess": "Đã lưu nhà trọ thành công!",
   "removedSuccess": "Đã xóa nhà trọ khỏi danh sách đã lưu!",
+  "likeCount": "Số lượt thích",
+  "totalReview": "Đánh giá",
+  "loadMore": "Xem thêm đánh giá",
   "addReview": {
     "title": "Đánh giá và Nhận xét",
     "ratingLabel": "Xếp hạng",
@@ -68,18 +73,13 @@
     "fullName": "Họ và tên",
     "email": "Email",
     "phone": "Số điện thoại",
-    "gender": "Giới tính"
+    "gender": "Giới tính",
+    "tapToViewDetails": "Nhấn để xem chi tiết"
   },
   "gender": {
     "male": "Nam",
     "female": "Nữ",
     "other": "Khác"
-  },
-  "reviewList": {
-    "loadMore": "Hiển thị thêm",
-    "loading": "Loading...",
-    "noReviewsYet": "Chưa có đánh giá nào",
-    "allReviewsLoaded": "Tất cả đánh giá đã được hiển thị"
   },
   "reviewCard": {
     "anonymous": "Vô danh",
@@ -108,6 +108,12 @@
     "alreadyReported": "Bạn đã báo cáo đánh giá này. Vui lòng đợi quản trị viên xử lý.",
     "replyToReview": "Trả lời đánh giá này",
     "alreadyReplied": "Bạn đã trả lời đánh giá này."
+  },
+  "reviewList": {
+    "allReviewsLoaded": "Tất cả đánh giá đã được tải",
+    "loadMore": "Xem thêm đánh giá",
+    "totalReviews": "Tổng đánh giá",
+    "averageRating": "Điểm trung bình"
   },
   "roomTypeCard": {
     "month": "tháng",

@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { Modal, Layout, Spin, Empty, Button, Tag, Divider } from "antd";
+import {
+  Modal,
+  Layout,
+  Spin,
+  Empty,
+  Button,
+  Tag,
+  Divider,
+  Pagination,
+} from "antd";
 import {
   getBoardingHouseDetail,
   getReviewByBhId,
@@ -41,6 +50,7 @@ function BoardingHouseDetail() {
   const [roomTypes, setRoomType] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,8 +58,16 @@ function BoardingHouseDetail() {
   const [reviewId, setReviewId] = useState("");
   const [reportedReviews, setReportedReviews] = useState([]);
   const [reportedBoardingHouse, setReportedBoardingHouse] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 2,
+    loadedItems: 0,
+  });
 
   const roomTypeRef = useRef(null);
+
   useEffect(() => {
     const fetchFavoriteStatus = async () => {
       try {
@@ -69,11 +87,9 @@ function BoardingHouseDetail() {
 
   const handleLike = async () => {
     try {
-      const response = await addFavorite(id); // Gọi API để toggle favorite
+      const response = await addFavorite(id);
       if (response && typeof response.isFavorite !== "undefined") {
-        setIsLiked(response.isFavorite); // Cập nhật trạng thái icon heart
-
-        // Cập nhật số lượng likes ngay lập tức
+        setIsLiked(response.isFavorite);
         setBoardingHouse((prev) => ({
           ...prev,
           likes: response.isFavorite ? prev.likes + 1 : prev.likes - 1,
@@ -87,7 +103,27 @@ function BoardingHouseDetail() {
     }
   };
 
-  // Fetch dữ liệu boarding house
+  const onLoadMore = async () => {
+    const fetchReviews = async () => {
+      try {
+        const response = await getReviewByBhId(id, {
+          currentPage: pagination.currentPage + 1,
+          limit: pagination.limit + 2,
+        });
+        setPagination({
+          ...pagination,
+          totalItems: response?.pagination?.totalItems,
+          limit: response?.pagination?.limit,
+        });
+        setReviews(response.data);
+        console.log("Load more pagination ", response?.pagination);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+    fetchReviews();
+  };
+
   const fetchBoardingHouse = async () => {
     try {
       const response = await getBoardingHouseDetail(id);
@@ -109,35 +145,67 @@ function BoardingHouseDetail() {
     }
   };
 
-  const fetchReportStatus = async (reviews) => {
-    setLoading(true);
+  const fetchReportStatus = async (reviewsData) => {
     try {
-      const reviewIds = reviews.map((review) => review._id);
+      const reviewIds = reviewsData.map((review) => review._id);
       const res = await checkReportExist(reviewIds, id);
       setReportedReviews(res.reportedReviews);
       setReportedBoardingHouse(res.boardingHouseReported);
     } catch (error) {
       console.error("Error fetching review reports:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const fetchReviews = async () => {
-    setLoading(true);
+  const fetchReviews = async (
+    page = 1,
+    limit = pagination.limit,
+    shouldAppend = false
+  ) => {
+    setReviewsLoading(true);
     try {
-      const response = await getReviewByBhId(id);
-      if (response) {
-        setReviews([...response]);
-        fetchReportStatus(response);
+      const paginationParams = {
+        currentPage: page,
+        limit: limit,
+      };
+
+      const response = await getReviewByBhId(id, paginationParams);
+
+      if (response && response.data) {
+        console.log("Default pagination: ", response?.pagination);
+
+        const newReviews = shouldAppend
+          ? [...reviews, ...response.data]
+          : response.data;
+        setReviews(newReviews);
+
+        // Update pagination info
+        setPagination((prev) => ({
+          ...prev,
+          currentPage: page,
+          totalItems: response.totalItems || 0,
+          totalPages: response.totalPages || 1,
+          limit: limit,
+          loadedItems: newReviews.length,
+        }));
+
+        // Fetch report status for current reviews
+        await fetchReportStatus(shouldAppend ? newReviews : response.data);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
       if (error.response && error.response.status === 404) {
-        setReviews([]);
+        if (!shouldAppend) {
+          setReviews([]);
+          setPagination((prev) => ({
+            ...prev,
+            totalItems: 0,
+            totalPages: 1,
+            loadedItems: 0,
+          }));
+        }
       }
     } finally {
-      setLoading(false);
+      setReviewsLoading(false);
     }
   };
 
@@ -149,7 +217,13 @@ function BoardingHouseDetail() {
     if (id) {
       fetchBoardingHouse();
       fetchRoomTypes();
-      fetchReviews();
+    }
+  }, [id]);
+
+  // Separate useEffect for reviews to avoid infinite loop
+  useEffect(() => {
+    if (id) {
+      fetchReviews(1); // Always start from page 1 when component mounts
     }
   }, [id]);
 
@@ -160,7 +234,8 @@ function BoardingHouseDetail() {
       if (response.status === 201 && response.data.success) {
         toast.success(t("reviewAddedSuccessfully"));
         setIsModalOpen(false);
-        await fetchReviews();
+        // Reset to page 1 when adding new review
+        await fetchReviews(1);
       } else {
         toast.error(response.data.message || t("failedToAddReview"));
       }
@@ -207,6 +282,13 @@ function BoardingHouseDetail() {
     }
     setIsModalOpen(true);
   };
+
+  // Handle page change for reviews
+  const handlePageChange = (page) => {
+    fetchReviews(page);
+  };
+
+  console.log("Pagination :", pagination);
 
   return (
     <div
@@ -466,15 +548,19 @@ function BoardingHouseDetail() {
               >
                 {t("writeAReview")}
               </Button>
+
               <ReviewList
                 reviews={reviews}
-                loading={loading}
+                loading={reviewsLoading}
                 rating={boardingHouse?.rating}
                 onReport={() => handleOpen()}
                 setReviewId={setReviewId}
                 reportedReviews={reportedReviews}
-                fetchReviews={fetchReviews}
+                fetchReviews={() => fetchReviews(1)}
                 boardingHouse={boardingHouse}
+                onPageChange={handlePageChange}
+                onLoadMore={onLoadMore}
+                hasMore={pagination?.limit !== pagination?.totalItems}
               />
             </div>
           </div>
@@ -489,7 +575,7 @@ function BoardingHouseDetail() {
       <AddReview
         visible={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={fetchReviews}
+        onSubmit={handleAddReview}
         boardingHouseId={id}
       />
       <ReportModal

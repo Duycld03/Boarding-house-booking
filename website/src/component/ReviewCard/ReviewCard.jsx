@@ -111,7 +111,6 @@ const ReviewCard = ({
   const handleRemoveFile = (file) => {
     setNewFiles((prev) => prev.filter((f) => f.uid !== file.uid));
   };
-  console.log("Review Data Card:", reviewData);
 
   const uploadProps = {
     multiple: true,
