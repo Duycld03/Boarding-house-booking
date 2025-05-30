@@ -225,11 +225,7 @@ const ReviewList = ({
         try {
             const nextPage = pagination?.currentPage ? pagination.currentPage + 1 : 2;
 
-            console.log('🔄 Loading more reviews:', {
-                nextPage,
-                currentReviewsCount: reviews.length,
-                totalReviews
-            });
+
 
             await fetchReviews({
                 page: nextPage,
@@ -238,9 +234,7 @@ const ReviewList = ({
                 append: true // Important: append new reviews to existing ones
             });
 
-            console.log('✅ Successfully loaded more reviews');
         } catch (error) {
-            console.error('❌ Error loading more reviews:', error);
             // You might want to show an error message to the user here
         } finally {
             setIsLoadingMore(false);
@@ -256,7 +250,6 @@ const ReviewList = ({
         setIsLoading(true);
 
         try {
-            console.log('🔄 Loading initial reviews for:', boardingHouse._id);
 
             await fetchReviews({
                 page: 1,
@@ -275,7 +268,6 @@ const ReviewList = ({
 
     useEffect(() => {
         if (boardingHouse?._id && reviews.length === 0 && !isLoading && !isLoadingMore) {
-            console.log('🚀 Triggering initial load');
             handleInitialLoad();
         }
     }, [boardingHouse?._id]);

@@ -109,7 +109,7 @@ const RoomTypeCard = ({ roomData, boardingHouse }) => {
                     {/* Price and Guests */}
                     <View className="flex-row justify-between items-center mb-4">
                         <Text className="text-orange-500 font-semibold text-xl">
-                            {formatAmount(roomData?.price)} (VND)/ {t('roomTypeCard.month')}
+                            {formatAmount(roomData?.price)}/ {t('roomTypeCard.month')}
                         </Text>
 
                         <View className="flex-row items-center">
