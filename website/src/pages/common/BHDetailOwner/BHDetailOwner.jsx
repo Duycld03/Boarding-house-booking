@@ -500,7 +500,9 @@ const BHDetailOwner = () => {
                       value={updatedData.description || ''}
                       onChange={handleInputChange}
                       rows={4}
-                      className={darkMode ? 'dark-mode-input' : ''}
+                      className={`${
+                        darkMode ? 'dark-mode-input dark-mode-scroll' : ''
+                      }`}
                     />
                   </Form.Item>
                 </div>

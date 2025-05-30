@@ -99,7 +99,7 @@ export const updateBoardingHouseDetailsOwner = (
   boardingHouseId,
   updateData
 ) => {
-  return axios.put(`/owner/boardinghouse/${boardingHouseId}`, updateData, {
+  return axios.put(`/manager/boardinghouse/${boardingHouseId}`, updateData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
