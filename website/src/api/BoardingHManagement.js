@@ -74,7 +74,7 @@ export const softDeleteBoardingHouse = async (boardingHouseId) => {
   return axios.delete(`/dashboard/boardinghouse/${boardingHouseId}/softDelete`);
 };
 export const getAllBHOwner = (filterValue, paginationOptions) => {
-  return axios.get('/owner/boardinghouseowner', {
+  return axios.get('/manager/boardinghouseowner', {
     params: {
       ...filterValue,
       ...paginationOptions,
@@ -83,7 +83,7 @@ export const getAllBHOwner = (filterValue, paginationOptions) => {
 };
 
 export const getAllBoardingHouseTypesOwner = () => {
-  return axios.get('/owner/types');
+  return axios.get('/manager/types');
 };
 export const createBoardingHouseOwner = (data) => {
   return axios.post('owner/boardinghouse', data, {
