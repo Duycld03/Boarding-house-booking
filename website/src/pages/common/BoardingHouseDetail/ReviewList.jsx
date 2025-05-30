@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { Empty, List, Typography, Rate, Progress } from "antd";
+import { Empty, List, Typography, Rate, Progress, Button } from "antd";
 import ReviewCard from "../../../component/ReviewCard/ReviewCard";
-import { useTheme } from "@/context/ThemeContext"; // Import useTheme context
-import { useTranslation } from "react-i18next"; // Import i18n nếu cần
+import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
+
+import { getReviewByBhId } from "../../../api/ownerUser/boardingHouse";
 
 const { Text } = Typography;
 
@@ -13,23 +15,67 @@ const ReviewList = ({
   reportedReviews,
   fetchReviews,
   boardingHouse,
+  onPageChange,
+  onLoadMore,
+  loading,
+  hasMore,
 }) => {
   const [rating, setRating] = useState(0);
-  const { darkMode } = useTheme(); // Sử dụng darkMode từ context
-  const { t } = useTranslation("boardingHouseDetail"); // Thêm i18n nếu cần
+  const [ratingCounts, setRatingCounts] = useState({});
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { darkMode } = useTheme();
+  const { t } = useTranslation("boardingHouseDetail");
 
+  // Fetch review counts when component mounts
   useEffect(() => {
-    if (reviews.length > 0) {
-      const totalRating = reviews.reduce(
-        (sum, review) => sum + review.rating,
-        0
-      );
-      const averageRating = totalRating / reviews.length;
-      setRating(averageRating);
-    } else {
-      setRating(0);
+    const fetchReviewCounts = async () => {
+      try {
+        // Fetch ALL reviews to calculate rating distribution
+        const response = await getReviewByBhId(boardingHouse._id, {
+          currentPage: 1,
+          limit: 1000, // Get all reviews for statistics
+        });
+        const allReviews = response.data;
+
+        // Calculate rating counts
+        const counts = allReviews.reduce((acc, review) => {
+          acc[review.rating] = (acc[review.rating] || 0) + 1;
+          return acc;
+        }, {});
+
+        // Calculate average rating
+        const totalRating = allReviews.reduce(
+          (sum, review) => sum + review.rating,
+          0
+        );
+        const averageRating =
+          allReviews.length > 0 ? totalRating / allReviews.length : 0;
+
+        setRatingCounts(counts);
+        setRating(averageRating);
+      } catch (error) {
+        console.error("Error fetching review counts:", error);
+      }
+    };
+
+    if (boardingHouse?._id) {
+      fetchReviewCounts();
     }
-  }, [reviews]);
+  }, [boardingHouse?._id]);
+
+  // Add handleLoadMore function
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !hasMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      await onLoadMore();
+    } catch (error) {
+      console.error("Error loading more reviews:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   if (!reviews || reviews.length === 0) {
     return (
@@ -44,14 +90,108 @@ const ReviewList = ({
     );
   }
 
-  // Calculate the number of reviews per rating
-  const ratingCounts = reviews.reduce((acc, review) => {
-    acc[review.rating] = (acc[review.rating] || 0) + 1;
-    return acc;
-  }, {});
-
   // List of ratings from 5 to 1
   const allRatings = [5, 4, 3, 2, 1];
+  // Update LoadMoreButton component
+  const LoadMoreButton = () => {
+    // Hiển thị thông báo khi đã tải hết reviews
+    if (!hasMore || reviews?.length === 1) {
+      return (
+        <div className="py-8 flex flex-col items-center justify-center space-y-3">
+          <div className="flex items-center space-x-2">
+            <svg
+              className="w-5 h-5 text-green-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="text-2xl font-semibold text-green-600 dark:text-green-400">
+              {t?.("reviewList.allReviewsLoaded") || "All reviews loaded"}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex justify-center mt-10 mb-6">
+        <Button
+          onClick={onLoadMore}
+          loading={isLoadingMore}
+          size="large"
+          className={`
+            group relative px-10 py-4 h-auto font-semibold text-2xl
+            rounded-xl shadow-lg hover:shadow-xl
+            transform transition-all duration-300 ease-out
+            hover:scale-105 active:scale-95
+            ${
+              darkMode
+                ? `bg-gradient-to-r from-blue-600 to-blue-700 
+                 hover:from-blue-700 hover:to-blue-800 
+                 text-white border-0 shadow-blue-500/25 hover:shadow-blue-500/40`
+                : `bg-gradient-to-r from-blue-500 to-blue-600 
+                 hover:from-blue-600 hover:to-blue-700 
+                 text-white border-0 shadow-blue-500/30 hover:shadow-blue-500/50`
+            }
+            disabled:transform-none disabled:shadow-md disabled:opacity-70
+          `}
+          disabled={isLoadingMore}
+        >
+          <div className="flex items-center space-x-3">
+            {isLoadingMore ? (
+              <>
+                <svg
+                  className="animate-spin w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <span>{t?.("reviewList.loading") || "Loading..."}</span>
+              </>
+            ) : (
+              <>
+                <span>{t?.("reviewList.loadMore") || "Load More Reviews"}</span>
+                <svg
+                  className="w-5 h-5 transition-transform duration-200 group-hover:translate-y-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                  />
+                </svg>
+              </>
+            )}
+          </div>
+
+          {/* Hiệu ứng shine */}
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700 ease-out" />
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <div className={`lg:mx-52 mx-0 ${darkMode ? "text-white" : ""}`}>
@@ -59,7 +199,7 @@ const ReviewList = ({
         <div className="flex items-center mb-4">
           <Progress
             type="circle"
-            strokeColor={"#40BFFF"} // Giữ nguyên màu xanh cho cả dark mode và light mode
+            strokeColor={"#40BFFF"}
             percent={rating * 20}
             size={200}
             format={() => (
@@ -67,13 +207,11 @@ const ReviewList = ({
                 {rating.toFixed(1)}/5
               </span>
             )}
-            // Thêm style cho darkmode
             className={darkMode ? "dark-progress" : ""}
-            // Thêm trường styles để tùy chỉnh màu nền trong dark mode
             styles={
               darkMode
                 ? {
-                    trail: { stroke: "#1f2937" }, // Màu nền đậm hơn cho dark mode
+                    trail: { stroke: "#1f2937" },
                   }
                 : {}
             }
@@ -90,43 +228,36 @@ const ReviewList = ({
               >
                 {ratingCounts[star] || 0}
               </Text>
-              <Rate
-                disabled
-                defaultValue={star}
-                className="md:text-5xl"
-                // Không cần thay đổi màu cho Rate vì mặc định sẽ là màu vàng
-              />
+              <Rate disabled defaultValue={star} className="md:text-5xl" />
             </div>
           ))}
         </div>
       </div>
 
       {/* Review List */}
-      <List
-        dataSource={reviews}
-        renderItem={(review) => (
-          <ReviewCard
-            key={review._id}
-            reviewData={review}
-            onReport={onReport}
-            setReviewId={setReviewId}
-            reviewId={review._id}
-            isReported={reportedReviews.includes(review._id)}
-            onReviewUpdated={fetchReviews}
-            boardingHouse={boardingHouse}
-          />
-        )}
-        pagination={{
-          pageSize: 5,
-          showSizeChanger: false,
-          // Thêm style cho pagination trong dark mode
-          className: darkMode ? "ant-pagination-dark" : "",
-        }}
-        // Thêm className cho List trong dark mode
-        className={darkMode ? "review-list-dark" : ""}
-      />
+      <div className={darkMode ? "review-list-dark" : ""}>
+        <List
+          dataSource={reviews}
+          renderItem={(review) => (
+            <ReviewCard
+              key={review._id}
+              reviewData={review}
+              onReport={onReport}
+              setReviewId={setReviewId}
+              reviewId={review._id}
+              isReported={reportedReviews.includes(review._id)}
+              onReviewUpdated={fetchReviews}
+              boardingHouse={boardingHouse}
+            />
+          )}
+          className={darkMode ? "ant-list-dark" : ""}
+        />
 
-      {/* Thêm CSS inline cho các thành phần dark mode của Ant Design */}
+        {/* Load More Button */}
+        <LoadMoreButton />
+      </div>
+
+      {/* CSS for dark mode */}
       {darkMode && (
         <style jsx global>{`
           .ant-pagination-dark .ant-pagination-item {
@@ -160,6 +291,10 @@ const ReviewList = ({
 
           .dark-progress .ant-progress-text {
             color: #e5e7eb;
+          }
+
+          .ant-list-dark .ant-list-item {
+            border-bottom-color: #374151;
           }
         `}</style>
       )}

@@ -21,11 +21,11 @@ export const getBhByArea = async (filterValue) => {
 };
 
 export const getElectricalAndWaterPrice = (boardingHouseId) => {
-  return axios.get(`/owner/electrical-water-price/${boardingHouseId}`);
-}
+  return axios.get(`/manager/electrical-water-price/${boardingHouseId}`);
+};
 
 export const addRoom = async (data) => {
-  return axios.post(`/owner/room/boarding-house`, data, {
+  return axios.post(`/manager/room/boarding-house`, data, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -33,11 +33,11 @@ export const addRoom = async (data) => {
 };
 
 export const deleteRoom = async (id) => {
-  return axios.delete(`/owner/room/boarding-house/${id}`);
+  return axios.delete(`/manager/room/boarding-house/${id}`);
 };
 
 export const updateRoom = async (roomId, data) => {
-  return axios.put(`/owner/room/boarding-house/${roomId}`, data, {
+  return axios.put(`/manager/room/boarding-house/${roomId}`, data, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

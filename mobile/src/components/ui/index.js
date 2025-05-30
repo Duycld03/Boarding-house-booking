@@ -6,6 +6,9 @@ import BoardingHouseGallery from './BoardingHouseGallery';
 import BoardingHouseCard from './BoardingHouseCard';
 import HorizontalList from './HorizontalList';
 import VerticalList from './VerticalList';
+import Loader from './Loader';
+import Line from './Line';
+import Avatar from './Avatar';
 
 export {
   Button,
@@ -16,4 +19,8 @@ export {
   BoardingHouseCard,
   HorizontalList,
   VerticalList,
+Loader, Line, Avatar
 };
+
+
+

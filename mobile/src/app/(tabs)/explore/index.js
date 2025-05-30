@@ -114,7 +114,5 @@ function Explore() {
         Go to bh detail
       </Button>
     </SafeAreaView>
-  );
-}
 
 export default Explore;
