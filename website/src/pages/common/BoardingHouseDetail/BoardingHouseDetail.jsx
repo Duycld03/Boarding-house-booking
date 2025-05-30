@@ -418,8 +418,7 @@ function BoardingHouseDetail() {
                     darkMode ? "text-gray-100" : "text-gray-900"
                   } font-semibold`}
                 >
-                  {formatAmount(boardingHouse?.electricityPrice)} {t("kWh")}{" "}
-                  (VND)
+                  {formatAmount(boardingHouse?.electricityPrice)}/{t("kWh")}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -435,7 +434,7 @@ function BoardingHouseDetail() {
                     darkMode ? "text-gray-100" : "text-gray-900"
                   } font-semibold`}
                 >
-                  {formatAmount(boardingHouse?.waterPrice)} m³ (VND)
+                  {formatAmount(boardingHouse?.waterPrice)}/m³
                 </span>
               </div>
             </div>
