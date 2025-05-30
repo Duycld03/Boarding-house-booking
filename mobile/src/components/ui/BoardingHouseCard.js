@@ -14,6 +14,7 @@ import { formatTimeAgo } from '@/utils/timeUtils';
 import truncateDetail from '@/utils/truncateDetail';
 import { useTranslation } from 'react-i18next';
 import { addFavorite, getFavorite } from '@/API/favoriteManagement';
+import emitter from '@/utils/FavoriteEvent';
 
 const BoardingHouseCard = ({
   id,
@@ -50,6 +51,18 @@ const BoardingHouseCard = ({
     };
     fetchFavoriteStatus();
   }, [id]);
+  useEffect(() => {
+    const handler = ({ id: changedId, isFavorite }) => {
+      if (changedId === id) {
+        setIsFavorite(isFavorite);
+      }
+    };
+
+    emitter.on('favoriteChanged', handler);
+    return () => {
+      emitter.off('favoriteChanged', handler);
+    };
+  }, [id]);
 
   // Hàm toggle favorite khi bấm icon
   const handleFavoriteClick = async () => {
@@ -57,9 +70,14 @@ const BoardingHouseCard = ({
       const response = await addFavorite(id);
       if (response && typeof response.isFavorite !== 'undefined') {
         setIsFavorite(response.isFavorite);
+
+        emitter.emit('favoriteChanged', {
+          id: String(id),
+          isFavorite: response.isFavorite,
+        });
       }
     } catch (error) {
-      router.push('/login'); // điều hướng đến trang đăng nhập
+      router.push('/login');
     }
   };
 
