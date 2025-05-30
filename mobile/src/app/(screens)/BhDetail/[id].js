@@ -354,7 +354,9 @@ export default function BhDetailScreen() {
                 <View className="flex-row items-center">
                     <Text className="text-red-500 text-lg mr-1">♥</Text>
                     <Text className={`text-base font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                        {data.boardingHouseDetail?.likes || 0}
+                        {formatAmount(data.boardingHouseDetail?.likes, 'vi', {
+                            showCurrency: false
+                        }) || 0}
                     </Text>
                 </View>
             </View>

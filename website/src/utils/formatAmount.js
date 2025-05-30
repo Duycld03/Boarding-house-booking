@@ -1,43 +1,40 @@
-import i18n from 'i18next'; // Import i18n instance
-
-// Tỷ giá USD/VND (có thể cấu hình hoặc lấy từ API)
 const USD_TO_VND_RATE = 25000;
 
-const formatAmount = (amount, options = {}) => {
+// Format amount với language bắt buộc
+const formatAmount = (amount, language = 'en', options = {}) => {
   const {
     showCurrency = true,
     showFullFormat = false,
     customRate = USD_TO_VND_RATE,
-    forceLanguage = null // Có thể force ngôn ngữ cụ thể
   } = options;
 
+  // Language là bắt buộc
+  if (!language) {
+    throw new Error('Language is required. Please provide "vi" for Vietnamese or "en" for English');
+  }
+
   if (!amount || amount === 0) {
-    const currentLang = forceLanguage || i18n.language;
-    const isVietnamese = currentLang === 'vi' || currentLang.startsWith('vi');
+    const isVietnamese = language === 'vi' || language.startsWith('vi');
     return isVietnamese ? '0₫' : '$0';
   }
 
-  // Xác định ngôn ngữ hiện tại
-  const currentLang = forceLanguage || i18n.language;
-  const isVietnamese = currentLang === 'vi' || currentLang.startsWith('vi');
+  // Xác định ngôn ngữ
+  const isVietnamese = language === 'vi' || language.startsWith('vi');
 
   let finalAmount = amount;
   let currencySymbol = '';
   let locale = 'vi-VN';
 
   if (isVietnamese) {
-    // Tiếng Việt - VND
-    finalAmount = amount; // Amount đã là VND
+    finalAmount = amount;
     currencySymbol = '₫';
     locale = 'vi-VN';
   } else {
-    // Tiếng Anh - USD
-    finalAmount = amount / customRate; // Chuyển từ VND sang USD
+    finalAmount = amount / customRate;
     currencySymbol = '$';
     locale = 'en-US';
   }
 
-  // Nếu yêu cầu format đầy đủ (không rút gọn)
   if (showFullFormat) {
     if (showCurrency) {
       return new Intl.NumberFormat(locale, {
@@ -51,7 +48,6 @@ const formatAmount = (amount, options = {}) => {
     }
   }
 
-  // Format rút gọn với K, M, B
   let formattedNumber = '';
   let suffix = '';
 
@@ -72,10 +68,8 @@ const formatAmount = (amount, options = {}) => {
     }
   }
 
-  // Loại bỏ .0 không cần thiết
   formattedNumber = formattedNumber.replace(/\.0$/, '');
 
-  // Trả về kết quả
   if (showCurrency) {
     return isVietnamese
       ? `${formattedNumber}${suffix}${currencySymbol}`
@@ -85,42 +79,63 @@ const formatAmount = (amount, options = {}) => {
   }
 };
 
-// Hook để sử dụng trong React component
-export const useFormatAmount = () => {
-  const currentLang = i18n.language;
+// Hook đơn giản không phụ thuộc i18n
+export const useFormatAmount = (language) => {
+  // Language là bắt buộc
+  if (!language) {
+    console.warn('Language is required for useFormatAmount hook');
+  }
+
+  const isVietnamese = language === 'vi' || language?.startsWith('vi');
 
   return {
-    formatAmount,
-    formatPrice: (amount, options = {}) => formatAmount(amount, { ...options, showCurrency: true }),
-    formatNumber: (amount, options = {}) => formatAmount(amount, { ...options, showCurrency: false }),
-    isVietnamese: currentLang === 'vi' || currentLang.startsWith('vi'),
-    currentLanguage: currentLang
+    formatAmount: (amount, options = {}) => formatAmount(amount, language, options),
+    formatPrice: (amount, options = {}) => formatAmount(amount, language, { ...options, showCurrency: true }),
+    formatNumber: (amount, options = {}) => formatAmount(amount, language, { ...options, showCurrency: false }),
+    isVietnamese,
+    currentLanguage: language
   };
 };
 
-// Các function tiện ích bổ sung
-export const formatPrice = (amount, options = {}) => {
-  return formatAmount(amount, { ...options, showCurrency: true });
+// Utility functions với language parameter
+export const formatPrice = (amount, language, options = {}) => {
+  return formatAmount(amount, language, { ...options, showCurrency: true });
 };
 
-export const formatPriceRange = (minPrice, maxPrice, options = {}) => {
-  const currentLang = options.forceLanguage || i18n.language;
-  const isVietnamese = currentLang === 'vi' || currentLang.startsWith('vi');
+export const formatNumber = (amount, language, options = {}) => {
+  return formatAmount(amount, language, { ...options, showCurrency: false });
+};
 
+export const formatPriceRange = (minPrice, maxPrice, language, options = {}) => {
+  if (!language) {
+    throw new Error('Language is required for formatPriceRange');
+  }
+
+  const isVietnamese = language === 'vi' || language.startsWith('vi');
   const fromText = isVietnamese ? 'từ' : 'from';
   const toText = isVietnamese ? 'đến' : 'to';
 
   if (minPrice && maxPrice) {
-    return `${fromText} ${formatAmount(minPrice, options)} ${toText} ${formatAmount(maxPrice, options)}`;
+    return `${fromText} ${formatAmount(minPrice, language, options)} ${toText} ${formatAmount(maxPrice, language, options)}`;
   } else if (minPrice) {
-    return `${fromText} ${formatAmount(minPrice, options)}`;
+    return `${fromText} ${formatAmount(minPrice, language, options)}`;
   } else if (maxPrice) {
-    return `${toText} ${formatAmount(maxPrice, options)}`;
+    return `${toText} ${formatAmount(maxPrice, language, options)}`;
   }
 
   return isVietnamese ? 'Chưa có giá' : 'Price not available';
 };
 
-// Export default
-export default formatAmount;
+// Helper function để tạo formatter với language cố định
+export const createFormatter = (language) => {
+  return {
+    formatAmount: (amount, options = {}) => formatAmount(amount, language, options),
+    formatPrice: (amount, options = {}) => formatPrice(amount, language, options),
+    formatNumber: (amount, options = {}) => formatNumber(amount, language, options),
+    formatPriceRange: (minPrice, maxPrice, options = {}) => formatPriceRange(minPrice, maxPrice, language, options),
+    isVietnamese: language === 'vi' || language?.startsWith('vi'),
+    language
+  };
+};
 
+export default formatAmount;
