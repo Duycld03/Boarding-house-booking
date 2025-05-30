@@ -11,7 +11,7 @@
     "manyDaysAgo": "{{count}} days ago"
   },
   "noAddress": "No address provided",
-  "currencyPerMonth": "VND/month",
+  "currencyPerMonth": "/month",
     "location": {
     "An Giang": "An Giang",
     "Bà Rịa – Vũng Tàu": "Ba Ria – Vung Tau",

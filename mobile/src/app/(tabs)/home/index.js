@@ -101,7 +101,6 @@ function Home() {
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
-      <BackHeader title="Home" />
       <ScrollContainer keyboardAvoiding className="px-4">
         <SectionHeader title={t('All')} link="/allBH" />
         <HorizontalList data={dataToUse} loading={loading} />
