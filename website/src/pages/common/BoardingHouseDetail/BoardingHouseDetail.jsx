@@ -35,6 +35,7 @@ import LocationPicker from "@/component/LocationPicker";
 import userRoles from "@/constants/userRole";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 function BoardingHouseDetail() {
   const { hasRole } = useCurrentUser();
@@ -42,6 +43,8 @@ function BoardingHouseDetail() {
 
   const { t } = useTranslation("boardingHouseDetail");
   const { darkMode } = useTheme();
+
+  const currentLanguage = i18n.language;
 
   const { isLogin } = useCurrentUser();
   const { id } = useParams();
@@ -288,8 +291,6 @@ function BoardingHouseDetail() {
     fetchReviews(page);
   };
 
-  console.log("Pagination :", pagination);
-
   return (
     <div
       className={`md:max-w-screen-xl mx-auto p-6 ${
@@ -323,7 +324,8 @@ function BoardingHouseDetail() {
 
               <div className="flex items-center md:mt-0 sm:mt-0 mt-5 gap-4 sm:gap-5">
                 <p className="lg:text-4xl md:text-3xl sm:text-xl sm:gap-3 font-bold text-orange-500">
-                  {formatAmount(boardingHouse?.priceRange) + t("vndPerMonth")}
+                  {formatAmount(boardingHouse?.priceRange, currentLanguage) +
+                    t("vndPerMonth")}
                 </p>
                 <Button
                   onClick={scrollToRoomType}
@@ -378,7 +380,8 @@ function BoardingHouseDetail() {
                       darkMode ? "text-gray-300" : "text-gray-700"
                     } font-semibold`}
                   >
-                    {formatAmount(boardingHouse?.likes)}
+                    {/* {formatAmount()} */}
+                    {boardingHouse?.likes}
                   </span>
                 </div>
               </div>
