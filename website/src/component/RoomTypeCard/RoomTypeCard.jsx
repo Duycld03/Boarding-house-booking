@@ -101,7 +101,7 @@ const RoomCard = ({ roomData, boardingHouse }) => {
             />
             <div className="flex justify-between">
               <Paragraph className="text-orange-500 font-semibold md:text-3xl">
-                {formatAmount(roomData?.price)} (VND)/ {t("roomTypeCard.month")}
+                {formatAmount(roomData?.price)}/ {t("roomTypeCard.month")}
               </Paragraph>
               <Paragraph
                 className={`flex gap-2 items-center md:text-2xl ${
