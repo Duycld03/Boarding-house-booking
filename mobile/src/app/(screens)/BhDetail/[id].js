@@ -447,31 +447,7 @@ export default function BhDetailScreen() {
     </View>
   );
 
-  const renderLikeCount = () => (
-    <View className="mt-4 flex-row justify-between">
-      <View className="flex-1 mr-2">
-        <Text variant="subtitle" weight="bold">
-          {t('likeCount')}:
-        </Text>
-        <View className="flex-row items-center">
-          <TouchableOpacity onPress={handleFavoriteClick}>
-            <AntDesign
-              name={isFavorite ? 'heart' : 'hearto'}
-              size={20}
-              color={isFavorite ? 'red' : isDarkMode ? '#fff' : '#444'}
-            />
-          </TouchableOpacity>
-          <Text
-            className={`text-base font-semibold ${
-              isDarkMode ? 'text-gray-200' : 'text-gray-800'
-            }`}
-          >
-            {data.boardingHouseDetail?.likes || 0}
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
+
 
   const renderOwnerInfo = () => (
     <View className="mt-4">
@@ -505,6 +481,23 @@ export default function BhDetailScreen() {
           >
             {t('noRoomTypesAvailable')}
           </Text>
+    );
+
+    const renderLikeCount = () => (
+        <View className="mt-4 flex-row justify-between">
+            <View className="flex-1 mr-2">
+                <Text variant="subtitle" weight="bold">
+                    {t("likeCount")}:
+                </Text>
+                <View className="flex-row items-center">
+                    <Text className="text-red-500 text-lg mr-1">♥</Text>
+                    <Text className={`text-base font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                        {formatAmount(data.boardingHouseDetail?.likes, 'vi', {
+                            showCurrency: false
+                        }) || 0}
+                    </Text>
+                </View>
+            </View>
         </View>
       );
     }

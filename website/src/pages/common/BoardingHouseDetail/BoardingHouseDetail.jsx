@@ -35,6 +35,7 @@ import LocationPicker from "@/component/LocationPicker";
 import userRoles from "@/constants/userRole";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 function BoardingHouseDetail() {
   const { hasRole } = useCurrentUser();
@@ -42,6 +43,8 @@ function BoardingHouseDetail() {
 
   const { t } = useTranslation("boardingHouseDetail");
   const { darkMode } = useTheme();
+
+  const currentLanguage = i18n.language;
 
   const { isLogin } = useCurrentUser();
   const { id } = useParams();
@@ -288,7 +291,16 @@ function BoardingHouseDetail() {
     fetchReviews(page);
   };
 
-  console.log("Pagination :", pagination);
+  const likeFormat = (amount) => {
+    if (amount >= 1e9) {
+      return (amount / 1e9).toFixed(1) + "B";
+    } else if (amount >= 1e6) {
+      return (amount / 1e6).toFixed(1) + "M";
+    } else if (amount >= 1e3) {
+      return (amount / 1e3).toFixed(1) + "K";
+    }
+    return amount;
+  };
 
   return (
     <div
@@ -323,7 +335,8 @@ function BoardingHouseDetail() {
 
               <div className="flex items-center md:mt-0 sm:mt-0 mt-5 gap-4 sm:gap-5">
                 <p className="lg:text-4xl md:text-3xl sm:text-xl sm:gap-3 font-bold text-orange-500">
-                  {formatAmount(boardingHouse?.priceRange) + t("vndPerMonth")}
+                  {formatAmount(boardingHouse?.priceRange, currentLanguage) +
+                    t("vndPerMonth")}
                 </p>
                 <Button
                   onClick={scrollToRoomType}
@@ -378,7 +391,9 @@ function BoardingHouseDetail() {
                       darkMode ? "text-gray-300" : "text-gray-700"
                     } font-semibold`}
                   >
-                    {formatAmount(boardingHouse?.likes)}
+                    {formatAmount(boardingHouse?.likes, "vi", {
+                      showCurrency: false,
+                    })}
                   </span>
                 </div>
               </div>
@@ -418,7 +433,11 @@ function BoardingHouseDetail() {
                     darkMode ? "text-gray-100" : "text-gray-900"
                   } font-semibold`}
                 >
-                  {formatAmount(boardingHouse?.electricityPrice)}/{t("kWh")}
+                  {formatAmount(
+                    boardingHouse?.electricityPrice,
+                    currentLanguage
+                  )}
+                  /{t("kWh")}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -434,7 +453,7 @@ function BoardingHouseDetail() {
                     darkMode ? "text-gray-100" : "text-gray-900"
                   } font-semibold`}
                 >
-                  {formatAmount(boardingHouse?.waterPrice)}/m³
+                  {formatAmount(boardingHouse?.waterPrice, currentLanguage)}/m³
                 </span>
               </div>
             </div>

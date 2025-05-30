@@ -1,33 +1,37 @@
-import { useState, useEffect } from 'react';
-import classNames from 'classnames/bind';
-import Styles from './Home.module.css';
-import BoardingHouseGrid from '../../../component/BoardingHouseCard';
-import { Tabs } from 'antd';
-import { toast } from 'react-toastify';
-import formatAmount from '@/utils/formatAmount';
-import { formatTimeAgo } from '../../../utils/timeUtils';
-import truncateDetail from '../../../utils/truncateDetail';
-import SearchBar from './SearchBar';
-import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
-import FilterBoardingHouseUser from './FilterBoardingHouseUser';
-import FilterButton from './FilterButton';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '@/context/ThemeContext';
+import { useState, useEffect } from "react";
+import classNames from "classnames/bind";
+import Styles from "./Home.module.css";
+import BoardingHouseGrid from "../../../component/BoardingHouseCard";
+import { Tabs } from "antd";
+import { toast } from "react-toastify";
+import formatAmount from "@/utils/formatAmount";
+import { formatTimeAgo } from "../../../utils/timeUtils";
+import truncateDetail from "../../../utils/truncateDetail";
+import SearchBar from "./SearchBar";
+import { getBhByArea } from "../../../api/ownerUser/boardingHouse";
+import FilterBoardingHouseUser from "./FilterBoardingHouseUser";
+import FilterButton from "./FilterButton";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/ThemeContext";
+import i18n from "i18next";
 
 const cx = classNames.bind(Styles);
 
 function Home() {
   const [originalData, setOriginalData] = useState([]);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState("all");
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState({
-    province: '',
-    district: '',
-    ward: '',
+    province: "",
+    district: "",
+    ward: "",
   });
+
+  const currentLanguage = i18n.language;
+
   const [filteredData, setFilteredData] = useState(null);
   const [filterValue, setFilterValue] = useState(null);
-  const { t } = useTranslation('home');
+  const { t } = useTranslation("home");
   const { darkMode } = useTheme();
 
   const fetchBhByArea = async () => {
@@ -44,8 +48,8 @@ function Home() {
         const imgPath =
           item.images?.find((img) => img.isPrimary)?.imageUrl ||
           item.images?.[0]?.imageUrl ||
-          '';
-        const imgUrl = imgPath ? `${imgPath}` : '';
+          "";
+        const imgUrl = imgPath ? `${imgPath}` : "";
 
         return {
           id: item._id?.$oid || item._id,
@@ -62,8 +66,8 @@ function Home() {
       setOriginalData(formattedData);
       setFilteredData(null);
     } catch (error) {
-      console.error('Error fetching boarding houses:', error);
-      toast.error('Failed to fetch boarding houses. Please try again later.');
+      console.error("Error fetching boarding houses:", error);
+      toast.error("Failed to fetch boarding houses. Please try again later.");
       setOriginalData([]);
     } finally {
       setLoading(false);
@@ -97,7 +101,7 @@ function Home() {
   return (
     <div
       className={`container mx-auto min-h-screen ${
-        darkMode ? 'bg-[#374151] text-white' : 'bg-gray-100 text-black'
+        darkMode ? "bg-[#374151] text-white" : "bg-gray-100 text-black"
       }`}
     >
       <SearchBar searchValue={searchValue} setSearchValue={setSearchValue} />
@@ -111,11 +115,11 @@ function Home() {
           <FilterBoardingHouseUser setFilterValue={setFilterValue} />
         </div>
 
-        <div className={cx('home-container')}>
-          <div className={cx('content')}>
+        <div className={cx("home-container")}>
+          <div className={cx("content")}>
             <div
               className={`${cx(
-                'grid'
+                "grid"
               )} bg-white text-black dark:bg-gray-800 dark:text-white`}
             >
               {filteredData ? (
@@ -124,15 +128,15 @@ function Home() {
                 <Tabs
                   defaultActiveKey="all"
                   onChange={setActiveTab}
-                  className={darkMode ? 'dark-tabs' : ''}
+                  className={darkMode ? "dark-tabs" : ""}
                 >
-                  <Tabs.TabPane tab={t('All')} key="all">
+                  <Tabs.TabPane tab={t("All")} key="all">
                     <BoardingHouseGrid data={dataToShow} loading={loading} />
                   </Tabs.TabPane>
-                  <Tabs.TabPane tab={t('newest')} key="newest">
+                  <Tabs.TabPane tab={t("newest")} key="newest">
                     <BoardingHouseGrid data={newestData} loading={loading} />
                   </Tabs.TabPane>
-                  <Tabs.TabPane tab={t('rating')} key="highRating">
+                  <Tabs.TabPane tab={t("rating")} key="highRating">
                     <BoardingHouseGrid
                       data={highRatingData}
                       loading={loading}
