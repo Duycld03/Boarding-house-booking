@@ -54,6 +54,8 @@ export default function BhDetailScreen() {
   const { isDarkMode } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  console.log('Received ID:', id);
+
   const { themedClasses } = useThemedClasses();
 
   // Refs

@@ -90,9 +90,7 @@ const BoardingHouseCard = ({
           shadowColor: isDarkMode ? '#000' : '#aaa',
         },
       ]}
-      onPress={() =>
-        router.push({ pathname: '/(screens)/BhDetail', params: { id } })
-      }
+      onPress={() => router.push(`/BhDetail/${id}`)}
     >
       <Image source={{ uri: img }} style={styles.image} resizeMode="cover" />
 
