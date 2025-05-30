@@ -1,7 +1,7 @@
-import axios from './axios.config';
+import axios from "./axios.config";
 
 export const getReviews = () => {
-  return axios.get('/dashboard/reviews');
+  return axios.get("/dashboard/reviews");
 };
 
 export const deleteReview = (reviewId) => {
@@ -21,27 +21,27 @@ export const updateReview = (reviewId, updatedData) => {
   return axios.put(`/auth/reviews/${reviewId}`, updatedData);
 };
 export const getReviewsUser = () => {
-  return axios.get('/auth/reviews');
+  return axios.get("/auth/reviews");
 };
 export const addReview = (reviewData) => {
-  return axios.post('/auth/reviews', reviewData);
+  return axios.post("/auth/reviews", reviewData);
 };
 export const updateReviewImage = async (imageFile) => {
   const formData = new FormData();
-  formData.append('review', imageFile);
+  formData.append("review", imageFile);
 
   // console.log("Image File:", imageFile);
 
   try {
-    const response = await axios.put('/auth/review', formData, {
+    const response = await axios.put("/auth/review", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     // console.log("Upload Response:", response);
     return response.data;
   } catch (error) {
-    console.error('Upload Error:', error);
+    console.error("Upload Error:", error);
     throw error;
   }
 };
@@ -49,22 +49,22 @@ export const deleteReviewUser = (reviewId) => {
   return axios.delete(`/auth/reviews/${reviewId}`);
 };
 export const replyReview = (replyData) => {
-  return axios.post('/owner/reply', replyData);
+  return axios.post("/manager/reply", replyData);
 };
 export const getReplyContent = (reviewId) => {
-  return axios.get(`owner/reviews/${reviewId}`);
+  return axios.get(`manager/reviews/${reviewId}`);
 };
 export const getReviewDetail = (reviewId) => {
   return axios.get(`dashboard/review/${reviewId}`);
 };
 export const updateReplyReview = ({ replyId, content }) => {
-  return axios.put('/owner/review/updatereply', {
+  return axios.put("/manager/review/updatereply", {
     replyId,
     content,
   });
 };
 export const softDeleteReplyReview = (replyId) => {
-  return axios.delete('/owner/review/reply', {
+  return axios.delete("/manager/review/reply", {
     data: { replyId }, // ✅ Đặt `replyId` vào `data`
   });
 };
