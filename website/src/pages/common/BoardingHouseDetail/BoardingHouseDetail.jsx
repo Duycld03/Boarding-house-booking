@@ -291,6 +291,17 @@ function BoardingHouseDetail() {
     fetchReviews(page);
   };
 
+  const likeFormat = (amount) => {
+    if (amount >= 1e9) {
+      return (amount / 1e9).toFixed(1) + "B";
+    } else if (amount >= 1e6) {
+      return (amount / 1e6).toFixed(1) + "M";
+    } else if (amount >= 1e3) {
+      return (amount / 1e3).toFixed(1) + "K";
+    }
+    return amount;
+  };
+
   return (
     <div
       className={`md:max-w-screen-xl mx-auto p-6 ${
@@ -380,8 +391,9 @@ function BoardingHouseDetail() {
                       darkMode ? "text-gray-300" : "text-gray-700"
                     } font-semibold`}
                   >
-                    {/* {formatAmount()} */}
-                    {boardingHouse?.likes}
+                    {formatAmount(boardingHouse?.likes, "vi", {
+                      showCurrency: false,
+                    })}
                   </span>
                 </div>
               </div>
@@ -421,7 +433,11 @@ function BoardingHouseDetail() {
                     darkMode ? "text-gray-100" : "text-gray-900"
                   } font-semibold`}
                 >
-                  {formatAmount(boardingHouse?.electricityPrice)}/{t("kWh")}
+                  {formatAmount(
+                    boardingHouse?.electricityPrice,
+                    currentLanguage
+                  )}
+                  /{t("kWh")}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -437,7 +453,7 @@ function BoardingHouseDetail() {
                     darkMode ? "text-gray-100" : "text-gray-900"
                   } font-semibold`}
                 >
-                  {formatAmount(boardingHouse?.waterPrice)}/m³
+                  {formatAmount(boardingHouse?.waterPrice, currentLanguage)}/m³
                 </span>
               </div>
             </div>

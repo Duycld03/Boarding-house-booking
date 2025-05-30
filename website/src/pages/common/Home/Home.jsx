@@ -13,6 +13,7 @@ import FilterBoardingHouseUser from "./FilterBoardingHouseUser";
 import FilterButton from "./FilterButton";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/ThemeContext";
+import i18n from "i18next";
 
 const cx = classNames.bind(Styles);
 
@@ -25,6 +26,9 @@ function Home() {
     district: "",
     ward: "",
   });
+
+  const currentLanguage = i18n.language;
+
   const [filteredData, setFilteredData] = useState(null);
   const [filterValue, setFilterValue] = useState(null);
   const { t } = useTranslation("home");
@@ -50,7 +54,7 @@ function Home() {
         return {
           id: item._id?.$oid || item._id,
           name: item.name,
-          price: formatAmount(item.priceRange, "vi"),
+          price: item.priceRange,
           detail: item.address?.province,
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0,
