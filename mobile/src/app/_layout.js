@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/context/ThemeProvider";
 import { NotificationProvider } from "@/context/NotificationProvider";
 import * as Linking from "expo-linking";
 import "../../global.css";
+import { UserProvider } from '@/context/userContext';
 
 export default function Layout() {
   const [fontsLoaded, error] = useFonts({
@@ -42,45 +43,38 @@ export default function Layout() {
     return null;
   }
 
-  // const linking = {
-  //   prefixes: ["mobile://", "https://mobile.com"],
-  //   config: {
-  //     screens: {
-  //       resetPassword: "reset-password/:token",
-  //     },
-  //   },
-  // };
+
 
   return (
     <ThemeProvider>
-      <NotificationProvider>
-        <Stack>
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-              presentation: "modal",
-              animation: "slide_from_bottom",
-            }}
-          />
-          <Stack.Screen
-            name="(auth)"
-            options={{
-              headerShown: false,
-              presentation: "modal",
-              animation: "slide_from_bottom",
-            }}
-          />
-          <Stack.Screen
-            name="(screens)"
-            options={{
-              headerShown: false,
-              presentation: "modal",
-              animation: "slide_from_bottom",
-            }}
-          />
-        </Stack>
-      </NotificationProvider>
+      <UserProvider>
+        <NotificationProvider>
+          <Stack>
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="(auth)"
+              options={{
+                headerShown: false,
+                presentation: "modal",
+                animation: "slide_from_bottom",
+              }}
+            />
+            <Stack.Screen
+              name="(screens)"
+              options={{
+                headerShown: false,
+
+              }}
+            />
+          </Stack>
+        </NotificationProvider>
+      </UserProvider>
+
     </ThemeProvider>
   );
 }

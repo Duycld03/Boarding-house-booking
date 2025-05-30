@@ -16,7 +16,7 @@ import { useThemedClasses } from '@/utils/useTheme';
 const ScreenContainer = ({
     children,
     edges = ['top', 'left', 'right'],
-    withPadding = true,
+    withPadding = false,
     style,
     className = '',
     ...props

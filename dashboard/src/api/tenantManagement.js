@@ -1,7 +1,7 @@
-import axios from './axios.config';
+import axios from "./axios.config";
 export const getTenantsByBoardingHouse = (boardingHouseId) => {
-  return axios.get(`owner/tenant/${boardingHouseId}`);
+  return axios.get(`manager/tenant/${boardingHouseId}`);
 };
 export const deleteTenantFromBoardingHouse = (boardingHouseId, accountId) => {
-  return axios.delete(`owner/tenant/${boardingHouseId}/${accountId}`);
+  return axios.delete(`manager/tenant/${boardingHouseId}/${accountId}`);
 };

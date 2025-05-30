@@ -4,9 +4,7 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
     "target": "esnext",
     "module": "esnext",
@@ -26,6 +24,7 @@
     "**/*.jsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
+    "src/context/userContext"
   ]
 }
