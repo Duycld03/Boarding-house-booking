@@ -16,6 +16,7 @@ import { formatTimeAgo } from '@/utils/timeUtils';
 import { useTranslation } from 'react-i18next';
 import truncateDetail from '@/utils/truncateDetail';
 import { useTheme } from '@/context/ThemeContext';
+import formatAmount from '@/utils/formatAmount';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -127,7 +128,7 @@ const BoardingHouseCard = ({
             display: 'block',
           }}
         >
-          {price} {t('currencyPerMonth')}
+          {formatAmount(price)} {t('currencyPerMonth')}{' '}
         </Typography.Text>
 
         <div

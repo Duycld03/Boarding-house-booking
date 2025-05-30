@@ -50,7 +50,7 @@ function Home() {
         return {
           id: item._id?.$oid || item._id,
           name: item.name,
-          price: formatAmount(item.priceRange),
+          price: item.priceRange,
           detail: item.address?.province,
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0,
