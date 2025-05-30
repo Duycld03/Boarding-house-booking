@@ -41,7 +41,6 @@ const BoardingHouseSchema = new mongoose.Schema(
     managerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Account',
-      required: true,
     },
     name: {
       type: String,

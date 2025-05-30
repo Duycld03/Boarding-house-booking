@@ -12,6 +12,8 @@ import formatAmount from '../../../utils/formatAmount';
 import AddBHModal from './AddBH';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../context/themeContext';
+import { useCurrentUser } from '@/context/userContext';
+import userRole from '@/constants/userRole';
 
 function BHManagementOwner() {
   const [boardingHouses, setBoardingHouses] = useState([]);
@@ -21,6 +23,8 @@ function BHManagementOwner() {
 
   const { t } = useTranslation('bhManagement');
   const { darkMode } = useTheme();
+  const { hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRole.owner);
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -89,15 +93,18 @@ function BHManagementOwner() {
         width: 150,
         render: (_, record) => (
           <div className="flex gap-2">
-            <Button
-              size="large"
-              btnDelete
-              title={t('columns.delete')}
-              onClick={() => {
-                setSelectedData(record);
-                setIsOpenDeleteModal(true);
-              }}
-            />
+            {isOwner && (
+              <Button
+                size="large"
+                btnDelete
+                title={t('columns.delete')}
+                onClick={() => {
+                  setSelectedData(record);
+                  setIsOpenDeleteModal(true);
+                }}
+              />
+            )}
+
             <Button
               size="large"
               title={t('columns.detail')}
@@ -185,7 +192,7 @@ function BHManagementOwner() {
   return (
     <div>
       <div className="flex justify-between mb-4">
-        <AddBHModal onAddData={() => fetchData()} />
+        {isOwner && <AddBHModal onAddData={() => fetchData()} />}
         {/* <FilterBH setFilterValue={setFilterValue} /> */}
       </div>
 

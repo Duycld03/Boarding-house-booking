@@ -765,7 +765,13 @@ class boardingHouseController {
       }
 
       // Xây dựng filter theo ownerId
-      const filter = { ownerId: account._id };
+      let filter = {};
+
+      if (account.role === 'owner') {
+        filter = { ownerId: account._id };
+      } else if (account.role === 'manager') {
+        filter = { managerId: account._id };
+      }
 
       // (Tuỳ chỉnh thêm nếu bạn muốn filter theo query string)
       // Ví dụ: ?status=active
