@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeProvider';
@@ -7,35 +7,37 @@ import { useNotification } from '@/context/NotificationProvider';
 import Button from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
 import { ConfirmModal } from '@/components/feedback';
+import Loader from '@/components/ui/Loader';
 
 function Explore() {
   const { toggleTheme, isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
   const { showSuccess, showError, showWarning, showInfo } = useNotification();
   const router = useRouter();
-  const [showConfirm, setShowConfirm] = React.useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false); // 🟢 Thêm loading state
 
   const handleToggleConfim = () => {
     setShowConfirm(!showConfirm);
   };
 
   const handleShowNotification = () => {
-    showInfo('This is a info notification');
+    showInfo('This is an info notification');
   };
 
-  const handleRegister = () => {
-    router.push('/register');
+  const handleActionWithLoading = async (callback: () => void) => {
+    setLoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // giả lập delay
+      callback();
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleLogin = () => {
-    router.push('/login');
-  };
-
-  const handleBhDetail = () => {
-    router.push('/(screens)/BhDetail');
-  };
-
-  return (
+  return loading ? (
+    <Loader />
+  ) : (
     <SafeAreaView
       edges={['top', 'left', 'right']}
       className={themedClasses(
@@ -51,9 +53,14 @@ function Explore() {
       >
         Welcome to My App
       </Text>
+
       <Button
         variant="primary"
-        onPress={() => router.push('/(screens)/profile/ChangePassword')}
+        onPress={() =>
+          handleActionWithLoading(() =>
+            router.push('/(screens)/profile/ChangePassword')
+          )
+        }
       >
         ChangePassword
       </Button>
@@ -70,6 +77,7 @@ function Explore() {
           Switch to {isDarkMode ? 'Light' : 'Dark'} Mode
         </Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         onPress={handleShowNotification}
         className={themedClasses(
@@ -77,13 +85,8 @@ function Explore() {
           'w-full max-w-xs py-4 rounded-xl bg-primary-dark mb-4 shadow-lg'
         )}
       >
-        <Text
-          className={themedClasses(
-            'text-white text-lg font-semibold text-center',
-            'text-white text-lg font-semibold text-center'
-          )}
-        >
-          show notification
+        <Text className="text-white text-lg font-semibold text-center">
+          Show notification
         </Text>
       </TouchableOpacity>
 
@@ -95,24 +98,34 @@ function Explore() {
       >
         Tap the button above to toggle between Light and Dark mode.
       </Text>
-      <Button variant="primary" onPress={handleRegister}>
+
+      <Button
+        variant="primary"
+        onPress={() => handleActionWithLoading(() => router.push('/register'))}
+      >
         Register
       </Button>
-      <Button variant="primary" onPress={handleLogin}>
+      <Button
+        variant="primary"
+        onPress={() => handleActionWithLoading(() => router.push('/login'))}
+      >
         Login
       </Button>
+      <Button
+        variant="primary"
+        onPress={() =>
+          handleActionWithLoading(() => router.push('/(screens)/BhDetail'))
+        }
+      >
+        Go to BH Detail
+      </Button>
+
       <ConfirmModal
         visible={showConfirm}
         onClose={handleToggleConfim}
-        title={'Confirm Action'}
-        message={'Are you sure you want to proceed?'}
+        title="Confirm Action"
+        message="Are you sure you want to proceed?"
       />
-      <Button variant="primary" onPress={handleRegister}>
-        Register
-      </Button>
-      <Button variant="primary" onPress={handleBhDetail}>
-        Go to bh detail
-      </Button>
     </SafeAreaView>
   );
 }

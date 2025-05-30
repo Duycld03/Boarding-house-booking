@@ -8,20 +8,7 @@ import {
 } from 'react-native';
 import BoardingHouseCard from '@/components/ui/BoardingHouseCard';
 
-const HorizontalList = ({ data, loading }) => {
-  if (loading) {
-    return (
-      <View
-        style={[
-          styles.container,
-          { justifyContent: 'center', alignItems: 'center', height: 150 },
-        ]}
-      >
-        <ActivityIndicator size="small" color="#0ea5e9" />
-      </View>
-    );
-  }
-
+const HorizontalList = ({ data }) => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <View
