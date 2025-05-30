@@ -367,8 +367,8 @@ const ReviewCard = ({
       {(isReplying || hasReply) && (
         <ReviewReply
           reviewId={reviewIdProp}
-          currentReply={reviewData?.replyContent}
-          replyId={reviewData?.replyId}
+          currentReply={reviewData?.replyContent || {}}
+          replyId={reviewData?.replyContent?._id}
           onReviewUpdated={onReviewUpdated}
           onCancelReply={handleCancelReply}
           isReplying={isReplying}
