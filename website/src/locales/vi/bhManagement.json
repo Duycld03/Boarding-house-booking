@@ -139,7 +139,7 @@
   "columns": {
     "name": "Tên trọ",
     "address": "Địa chỉ",
-    "priceRange": "Giá (VND)",
+    "priceRange": "Giá",
     "boardingHouseType": "Loại nhà trọ",
     "totalRooms": "Tổng phòng",
     "availableRooms": "Phòng trống",

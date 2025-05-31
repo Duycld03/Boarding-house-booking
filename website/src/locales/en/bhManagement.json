@@ -139,7 +139,7 @@
   "columns": {
     "name": "Name",
     "address": "Address",
-    "priceRange": "Price Range (VND)",
+    "priceRange": "Price Range",
     "boardingHouseType": "Boarding House Type",
     "totalRooms": "Total Rooms",
     "availableRooms": "Available Rooms",
