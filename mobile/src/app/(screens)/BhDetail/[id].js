@@ -214,6 +214,20 @@ export default function BhDetailScreen() {
 
   // ✅ Debug pagination changes
   useEffect(() => {}, [pagination]);
+  const checkFavoriteStatus = useCallback(async () => {
+    try {
+      const favoriteResponse = await getFavorite();
+
+      const favoriteIds = Array.isArray(favoriteResponse?.favorites)
+        ? favoriteResponse.favorites.map((fav) => fav.id)
+        : [];
+
+      const isLiked = favoriteIds.includes(boardingHouseId);
+      setIsFavorite(isLiked);
+    } catch (error) {
+      // console.error('❌ Error checking favorite status:', error);
+    }
+  }, [boardingHouseId]);
 
   const fetchAllData = useCallback(async () => {
     if (!boardingHouseId) {
@@ -228,29 +242,10 @@ export default function BhDetailScreen() {
     setUi((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      const [boardingHouseDetail, roomType, favoriteResponse] =
-        await Promise.all([
-          fetchBoardingHouse(),
-          fetchRoomTypes(),
-          getFavorite(),
-        ]);
-
-      // Lấy danh sách ID đã yêu thích
-      const favoriteIds = Array.isArray(favoriteResponse?.favorites)
-        ? favoriteResponse.favorites.map((fav) => fav.id)
-        : [];
-
-      const isLiked = favoriteIds.includes(boardingHouseId);
-
-      // Cập nhật state
-      setIsFavorite(isLiked);
-      setData((prev) => ({
-        ...prev,
-        boardingHouseDetail: {
-          ...boardingHouseDetail,
-        },
-        roomType,
-      }));
+      const [boardingHouseDetail, roomType] = await Promise.all([
+        fetchBoardingHouse(),
+        fetchRoomTypes(),
+      ]);
 
       setData((prev) => ({
         ...prev,
@@ -259,7 +254,7 @@ export default function BhDetailScreen() {
         reviews: [], // Reset reviews
       }));
 
-      // ✅ Reset pagination when fetching all data
+      // Reset pagination
       setPagination({
         currentPage: 1,
         totalPages: 1,
@@ -268,6 +263,9 @@ export default function BhDetailScreen() {
         hasNext: false,
         hasPrev: false,
       });
+
+      // ✅ Gọi riêng check favorite
+      await checkFavoriteStatus();
     } catch (error) {
       console.error('❌ Error fetching data:', error);
       setUi((prev) => ({ ...prev, error: t('failedToLoadData') }));
@@ -278,7 +276,13 @@ export default function BhDetailScreen() {
         setUi((prev) => ({ ...prev, isScrollReady: true }));
       }, SCROLL_READY_DELAY);
     }
-  }, [boardingHouseId, fetchBoardingHouse, fetchRoomTypes, t]);
+  }, [
+    boardingHouseId,
+    fetchBoardingHouse,
+    fetchRoomTypes,
+    checkFavoriteStatus,
+    t,
+  ]);
 
   // Effects
   useFocusEffect(
