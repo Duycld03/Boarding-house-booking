@@ -1,0 +1,30 @@
+{
+    "boardingHouseDetailsAdmin": {
+        "title": "Thông Tin Nhà Trọ",
+        "information": "Thông Tin",
+        "price": "Giá",
+        "image": "Hình Ảnh",
+        "address": "Địa Chỉ",
+        "name": "Tên Nhà Trọ",
+        "boardingHouseType": "Loại Nhà Trọ",
+        "description": "Mô Tả",
+        "priceRent": "Giá Thuê/tháng (VND)",
+        "electricityPrice": "Giá Điện/kWh (VND)",
+        "waterPrice": "Giá Nước/m³ (VND)",
+        "primaryImage": "Hình Ảnh Chính",
+        "otherImages": "Hình Ảnh Khác",
+        "selectProvince": "Chọn Tỉnh/Thành",
+        "selectDistrict": "Chọn Quận/Huyện",
+        "selectWard": "Chọn Phường/Xã",
+        "detail": "Chi Tiết",
+        "totalRooms": "Tổng Số Phòng",
+        "availableRooms": "Số Phòng Trống",
+        "update": "Cập Nhật",
+        "back": "Trở Lại",
+        "likes": "{{count}} Lượt Thích",
+        "rating": "Đánh Giá",
+        "delete": "Xóa",
+        "preview": "Xem",
+        "defaultName": "Tên mặc định"
+    }
+}

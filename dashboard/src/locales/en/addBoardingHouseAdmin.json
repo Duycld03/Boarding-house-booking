@@ -1,0 +1,30 @@
+{
+    "addBoardingHouseAdmin": {
+        "title": "Create New Boarding House",
+        "ownerSection": "1. Owner and Information",
+        "addressSection": "2. Address",
+        "imageSection": "3. Image",
+        "priceSection": "4. Price",
+        "owner": "Owner",
+        "ownerPlaceholder": "Enter owner's username",
+        "boardingHouseType": "Boarding House Type",
+        "boardingHouseTypePlaceholder": "Select Type",
+        "name": "Name Boarding House",
+        "namePlaceholder": "Enter boarding house name",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter description",
+        "primaryImage": "Primary Image",
+        "addPrimaryImage": "Add Primary Image",
+        "otherImages": "Other Images",
+        "addOtherImages": "Add Images",
+        "dragDrop": "Drag-drop or click here to choose a file",
+        "priceRent": "Price Rent/month (VND)",
+        "electricityPrice": "Electricity Price/kWh (VND)",
+        "waterPrice": "Water Price/m³ (VND)",
+        "cancel": "Cancel",
+        "submit": "Submit",
+        "fieldRequired": "This field is required.",
+        "maxOtherImages": "You can't upload more than 15 other images.",
+        "imageRemoved": "Image removed successfully."
+    }
+}

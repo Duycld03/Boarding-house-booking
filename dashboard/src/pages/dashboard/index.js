@@ -7,3 +7,4 @@ export { default as WithdrawalRequestManagement } from './WithdrawalRequestManag
 export { default as ReviewManagement } from './ReviewManagement';
 export { default as BoardingHouseTypeManagement } from './BoardingHouseTypeManagement';
 export { default as FacilitiesManagement } from './FacilitiesManagement';
+export { default as BHDetailAdmin } from '../dashboard/BoardingHouseManagement/BHDetailsAdmin';
