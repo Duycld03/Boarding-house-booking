@@ -10,8 +10,12 @@ export const getRoomTypeByBhId = (id, boardingHouseId) => {
   });
 };
 
-export const getReviewByBhId = (id) => {
-  return axios.get(`/boardinghouse/reviews/${id}`);
+
+export const getReviewByBhId = (id, paginationOptions = {}) => {
+  const params = {
+    ...paginationOptions,
+  };
+  return axios.get(`/boardinghouse/reviews/${id}`, { params });
 };
 
 export const getBhByArea = async (filterValue) => {

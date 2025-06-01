@@ -1,0 +1,9 @@
+{
+  "verifyChangeEmailTitle": "Xác minh thay đổi email",
+  "otpPlaceholder": "Nhập mã OTP",
+  "otpError": "Vui lòng nhập mã OTP",
+  "validationError": "Vui lòng kiểm tra lại thông tin",
+  "successMessage": "Thay đổi email thành công!",
+  "errorMessage": "Xác minh thất bại. Vui lòng thử lại.",
+  "verifyChangeEmailButton": "Xác minh"
+}

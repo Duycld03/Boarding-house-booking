@@ -2,67 +2,37 @@ import dotenv from "dotenv";
 import { verifyToken } from "../utils/functions.js";
 dotenv.config();
 
-const authMiddleware = (req, res, next) => {
-  // allow access to the following routes without authentication
-  // const whiteList = ["/register", "/login", "/"];
-  // if (whiteList.find((path) => "/api" + path === req.originalUrl)) {
-  //   return next();
-  // }
-
-  const authorization = req?.headers["authorization"];
-  if (authorization) {
-    const token = authorization.split(" ")[1];
-    try {
-      const decoded = verifyToken(token);
-      req.user = decoded;
-    } catch (error) {
-      return res.status(401).json({ message: "Token is invalid" });
+/**
+ * Middleware tổng quát kiểm tra xác thực và phân quyền
+ * @param {Array<string>} allowedRoles - Các vai trò được phép truy cập (có thể bỏ trống để chỉ kiểm tra xác thực)
+ */
+const authorize = (allowedRoles = []) => {
+  return (req, res, next) => {
+    const authorization = req?.headers["authorization"];
+    if (!authorization) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    next();
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
-};
-
-const ownerMiddleware = (req, res, next) => {
-  const authorization = req?.headers["authorization"];
-  if (authorization) {
     const token = authorization.split(" ")[1];
     try {
       const decoded = verifyToken(token);
-      if (decoded.role !== "owner") {
-        return res.status(401).json({ message: "Unauthorized" });
+      // Nếu có role yêu cầu thì kiểm tra
+      if (allowedRoles.length && !allowedRoles.includes(decoded.role)) {
+        return res.status(403).json({ message: "Forbidden" });
       }
+
       req.user = decoded;
+      next();
     } catch (error) {
       return res.status(401).json({ message: "Token is invalid" });
     }
-
-    next();
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
+  };
 };
 
-const adminMiddleware = (req, res, next) => {
-  const authorization = req?.headers["authorization"];
-  if (authorization) {
-    const token = authorization.split(" ")[1];
-    try {
-      const decoded = verifyToken(token);
-      if (decoded.role !== "admin") {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      req.user = decoded;
-    } catch (error) {
-      return res.status(401).json({ message: "Token is invalid" });
-    }
+// Các middleware cụ thể
+const authMiddleware = authorize(); // Không cần role, chỉ cần token hợp lệ
+const managerMiddleware = authorize(["manager", "owner"]);
+const ownerMiddleware = authorize(["owner"]);
+const adminMiddleware = authorize(["admin"]);
 
-    next();
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
-};
-
-export { authMiddleware, ownerMiddleware, adminMiddleware };
+export { authMiddleware, managerMiddleware, ownerMiddleware, adminMiddleware };

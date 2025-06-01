@@ -25,7 +25,7 @@ export const getUser = () => {
 };
 
 export const forgotPassword = (data) => {
-  return axios.post("/forgot-password", data);
+  return axios.post("/forgot-password-mobile", data);
 };
 
 export const resetPassword = (data) => {

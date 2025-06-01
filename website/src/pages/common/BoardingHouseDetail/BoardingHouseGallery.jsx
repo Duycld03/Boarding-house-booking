@@ -30,10 +30,14 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/context/userContext.jsx";
 import userRoles from "@/constants/userRole.js";
+import { useTheme } from "@/context/ThemeContext.jsx";
+import { useTranslation } from "react-i18next";
 
 const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
   const { hasRole } = useCurrentUser();
   const isOwner = hasRole(userRoles.owner);
+  const { t } = useTranslation("boardingHouseDetail");
+  const { darkMode } = useTheme();
 
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
@@ -41,7 +45,7 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  if (!images || images.length === 0) return <p>Không có ảnh</p>;
+  if (!images || images.length === 0) return <p>{t("noImages")}</p>;
 
   const boardingHouseId = images[0]?._id; // Lấy ID của ảnh đầu tiên
 
@@ -72,6 +76,9 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
       const response = await createWatchLater(id);
       if (response && response.isWatchLater !== undefined) {
         setIsSaved(response.isWatchLater);
+        message.success(
+          response.isWatchLater ? t("savedSuccess") : t("removedSuccess")
+        );
       } else {
         console.error("Response missing isWatchLater:", response);
       }
@@ -83,7 +90,7 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
   };
 
   const menu = (
-    <Menu>
+    <Menu theme={darkMode ? "dark" : "light"}>
       <Menu.Item
         key="save"
         onClick={handleSaveClick}
@@ -91,13 +98,13 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
       >
         <Tooltip
           placement="left"
-          title={isSaved ? "Saved!" : "Save this boarding house"}
+          title={isSaved ? t("alreadySaved") : t("saveThisBoardingHouse")}
         >
           <FontAwesomeIcon
             icon={isSaved ? faBookmarkSolid : faBookmarkRegular}
             className="text-yellow-500 text-2xl"
           />
-          <span className="ml-2">{isSaved ? "Saved" : "Save"}</span>
+          <span className="ml-2">{isSaved ? t("saved") : t("save")}</span>
         </Tooltip>
       </Menu.Item>
       <Menu.Item
@@ -108,23 +115,25 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
         <Tooltip
           placement="left"
           title={
-            isReported
-              ? "You have reported this boarding house. Please wait for admin to process."
-              : "Report this boarding house"
+            isReported ? t("alreadyReported") : t("reportThisBoardingHouse")
           }
         >
           <FontAwesomeIcon
             icon={isReported ? faFlagSolid : faFlag}
             className="text-red-500 text-2xl"
           />
-          <span className="ml-2">Report</span>
+          <span className="ml-2">{t("report")}</span>
         </Tooltip>
       </Menu.Item>
     </Menu>
   );
 
   return (
-    <div className="flex flex-col mx-auto w-full md:w-3/4 relative">
+    <div
+      className={`flex flex-col mx-auto w-full md:w-3/4 relative ${
+        darkMode ? "bg-gray-900" : "bg-white"
+      }`}
+    >
       <div className="absolute top-10 right-14 z-10">
         <Dropdown overlay={menu} trigger={["click"]}>
           <button>
@@ -144,15 +153,15 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
         navigation
         pagination={{ clickable: true }}
         loop
-        autoplay={{ delay: 2500, disableOnInteraction: false }} // Thêm autoplay
+        autoplay={{ delay: 2500, disableOnInteraction: false }}
         thumbs={{ swiper: thumbsSwiper }}
-        className="w-full"
+        className={`w-full ${darkMode ? "swiper-dark" : ""}`}
       >
         {images.map((image) => (
           <SwiperSlide key={image._id}>
             <img
               src={image.imageUrl}
-              alt="Boarding House"
+              alt={t("boardingHouseImage")}
               className="w-full md:h-[500px] object-cover rounded-lg"
             />
           </SwiperSlide>
@@ -173,12 +182,30 @@ const BoardingHouseGallery = ({ images, onReport, onSave, isReported }) => {
           <SwiperSlide key={image._id} className="cursor-pointer">
             <img
               src={image.imageUrl}
-              alt="Thumbnail"
-              className="w-full h-52 object-cover rounded-md border border-gray-300"
+              alt={t("thumbnail")}
+              className={`w-full h-52 object-cover rounded-md border ${
+                darkMode ? "border-gray-700" : "border-gray-300"
+              }`}
             />
           </SwiperSlide>
         ))}
       </Swiper>
+
+      {/* Add custom CSS for dark mode */}
+      {darkMode && (
+        <style jsx>{`
+          .swiper-dark .swiper-button-next,
+          .swiper-dark .swiper-button-prev {
+            color: white;
+          }
+          .swiper-dark .swiper-pagination-bullet {
+            background: white;
+          }
+          .swiper-dark .swiper-pagination-bullet-active {
+            background: #1890ff;
+          }
+        `}</style>
+      )}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +8,6 @@ import { useNotification } from '@/context/NotificationProvider';
 import Button from '@/components/ui/Button';
 import { useRouter } from 'expo-router';
 import { ConfirmModal } from '@/components/feedback';
-
 
 function Home() {
   const { toggleTheme, isDarkMode } = useTheme();
@@ -22,16 +22,25 @@ function Home() {
   };
 
   const handleShowNotification = () => {
-    showInfo('This is a info notification');
+    showInfo("This is a info notification");
   };
 
   const handleRegister = () => {
-    router.push('/register');
+    router.push("/register");
   };
+
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
+  const handleBhDetail = () => {
+    router.push('/(screens)/BhDetail');
+  }
+
 
   return (
     <SafeAreaView
-      edges={['top', 'left', 'right']}
+      edges={["top", "left", "right"]}
       className={themedClasses(
         "flex-1 items-center justify-center bg-background-light px-6",
         "flex-1 items-center justify-center bg-background-dark px-6"
@@ -47,7 +56,7 @@ function Home() {
       </Text>
       <Button
         variant="primary"
-        onPress={() => router.push('/(screens)/profile/ChangePassword')}
+        onPress={() => router.push("/(screens)/profile/ChangePassword")}
       >
         ChangePassword
       </Button>
@@ -61,7 +70,7 @@ function Home() {
         )}
       >
         <Text className="text-white text-lg font-semibold text-center">
-          Switch to {isDarkMode ? 'Light' : 'Dark'} Mode
+          Switch to {isDarkMode ? "Light" : "Dark"} Mode
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -89,6 +98,12 @@ function Home() {
       >
         Tap the button above to toggle between Light and Dark mode.
       </Text>
+      <Button variant="primary" onPress={handleRegister}>
+        Register
+      </Button>
+      <Button variant="primary" onPress={handleLogin}>
+        Login
+      </Button>
       <ConfirmModal
         visible={showConfirm}
         onClose={handleToggleConfim}
@@ -103,9 +118,9 @@ function Home() {
       </Button>
       <Button
         variant="primary"
-        onPress={handleToggleConfim}
+        onPress={handleBhDetail}
       >
-        Show Confirm Modal
+        Go to bh detail
       </Button>
     </SafeAreaView>
   );

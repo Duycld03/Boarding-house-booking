@@ -1,0 +1,9 @@
+{
+  "verifyChangeEmailTitle": "Verify Email Change",
+  "otpPlaceholder": "Enter OTP code",
+  "otpError": "Please enter the OTP code",
+  "validationError": "Please check your input",
+  "successMessage": "Email change successful!",
+  "errorMessage": "Verification failed. Please try again.",
+  "verifyChangeEmailButton": "Verify"
+}
