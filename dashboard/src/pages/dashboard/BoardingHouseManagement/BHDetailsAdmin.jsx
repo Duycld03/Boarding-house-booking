@@ -690,7 +690,10 @@ const BHDetailAdmin = () => {
                                 <h2 className="text-3xl font-bold mb-4 mt-10">{t("boardingHouseDetailsAdmin.address")}</h2>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div className="flex flex-col h-full">
-                                        <Form.Item label={t("boardingHouseDetailsAdmin.selectProvince")} className="mb-4">
+                                        <Form.Item label={t("boardingHouseDetailsAdmin.selectProvince")} required
+                                            rules={[
+                                                { required: true, message: "Province is required" },
+                                            ]} className="mb-4">
                                             <Select
                                                 placeholder={t("boardingHouseDetailsAdmin.selectProvince")}
                                                 value={updatedData?.address?.province || null}
@@ -720,7 +723,101 @@ const BHDetailAdmin = () => {
                                                 ))}
                                             </Select>
                                         </Form.Item>
+                                        {/* District */}
+                                        <Form.Item
+                                            label={t("boardingHouseDetailsAdmin.selectDistrict")}
+                                            required
+                                            rules={[
+                                                { required: true, message: "District is required" },
+                                            ]}
+                                        >
+                                            <Select
+                                                placeholder="Select District"
+                                                loading={
+                                                    !districts.length && updatedData?.address?.province
+                                                }
+                                                value={updatedData?.address?.district || null}
+                                                onChange={(value) => {
+                                                    handleInputChange({
+                                                        target: { name: "address.district", value },
+                                                    });
+                                                    setUpdatedData((prev) => ({
+                                                        ...prev,
+                                                        address: {
+                                                            ...prev.address,
+                                                            district: value,
+                                                            ward: null,
+                                                        },
+                                                    }));
+                                                }}
+                                                disabled={!updatedData?.address?.province}
+                                                allowClear
+                                            >
+                                                {districts.map((district) => (
+                                                    <Select.Option
+                                                        key={district.code}
+                                                        value={district.name}
+                                                    >
+                                                        {district.name}
+                                                    </Select.Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+
+                                        {/* Ward */}
+                                        <Form.Item
+                                            label={t("boardingHouseDetailsAdmin.selectWard")}
+
+                                            required
+                                            rules={[{ required: true, message: "Ward is required" }]}
+                                        >
+                                            <Select
+                                                placeholder="Select Ward"
+                                                loading={
+                                                    !wards.length && updatedData?.address?.district
+                                                }
+                                                value={updatedData?.address?.ward || null}
+                                                onChange={(value) => {
+                                                    handleInputChange({
+                                                        target: { name: "address.ward", value },
+                                                    });
+                                                    setUpdatedData((prev) => ({
+                                                        ...prev,
+                                                        address: { ...prev.address, ward: value },
+                                                    }));
+                                                }}
+                                                disabled={!updatedData?.address?.district}
+                                                allowClear
+                                            >
+                                                {wards.map((ward) => (
+                                                    <Select.Option key={ward.code} value={ward.name}>
+                                                        {ward.name}
+                                                    </Select.Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+
+                                        {/* Detail Address */}
+                                        <Form.Item label={t("boardingHouseDetailsAdmin.detail")}
+                                            required
+                                            rules={[
+                                                { required: true, message: "Details is required" },
+                                            ]}
+                                        >
+                                            <Input.TextArea
+                                                name="address.detail"
+                                                value={updatedData?.address?.detail || ""}
+                                                onChange={handleInputChange}
+                                                rows={4}
+                                                style={{
+                                                    backgroundColor: darkMode ? "#374151" : "#f5f5f5",
+                                                    color: darkMode ? "#F9FAFB" : "#000",
+                                                    borderColor: darkMode ? "#4B5563" : "#d9d9d9",
+                                                }}
+                                            />
+                                        </Form.Item>
                                     </div>
+
 
                                     {/* Map */}
                                     <div className="order-2 lg:order-1 h-full">
