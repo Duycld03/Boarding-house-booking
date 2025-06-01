@@ -147,6 +147,7 @@
     "sameRoomError": "You cannot book an appointment in the same room!",
     "timeConflictError": "Appointments cannot be booked within 30 minutes before or after an existing appointment!",
     "requestSuccess": "Request sent successfully!",
-    "requestError": "Error when sending request: "
+    "requestError": "Error when sending request: ",
+    "datePlaceHolder": "Select appointment date and time"
   }
 }

@@ -139,7 +139,6 @@ export default function BhDetailScreen() {
         }
     }, [boardingHouseId]);
 
-    // ✅ Debug pagination changes
     useEffect(() => {
     }, [pagination]);
 
@@ -380,6 +379,8 @@ export default function BhDetailScreen() {
         />
     );
 
+
+
     const renderDescription = () => (
         <Description
             boardingHouse={data.boardingHouseDetail}
@@ -407,13 +408,14 @@ export default function BhDetailScreen() {
                     <RoomTypeCard
                         key={`room-${roomData.id || index}`}
                         roomData={roomData}
+                        boardingHouseId={boardingHouseId}
+                        ownerId={data?.boardingHouseDetail?.ownerId}
                     />
                 ))}
             </View>
         );
     };
 
-    // ✅ Updated renderReviewList
     const renderReviewList = () => {
         return (
             <View className="mt-4">

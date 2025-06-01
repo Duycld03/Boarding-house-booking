@@ -258,7 +258,6 @@ const ReviewList = ({
                 append: false // Replace existing reviews
             });
 
-            console.log('Successfully loaded initial reviews');
         } catch (error) {
             console.error('Error loading initial reviews:', error);
         } finally {

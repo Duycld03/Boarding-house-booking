@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
 import { useThemedClasses } from '@/utils/useTheme';
+import PropTypes from 'prop-types';
 
 /**
  * CustomButton component with support for different variants and states
@@ -138,6 +139,30 @@ const Button = ({
             )}
         </TouchableOpacity>
     );
+};
+
+Button.propTypes = {
+    variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text']),
+    fullWidth: PropTypes.bool,
+    loading: PropTypes.bool,
+    disabled: PropTypes.bool,
+    onPress: PropTypes.func,
+    size: PropTypes.oneOf(['sm', 'md', 'lg']),
+    children: PropTypes.node,
+    style: PropTypes.object,
+    textStyle: PropTypes.object,
+    className: PropTypes.string,
+    textClassName: PropTypes.string
+};
+
+Button.defaultProps = {
+    variant: 'primary',
+    fullWidth: false,
+    loading: false,
+    disabled: false,
+    size: 'md',
+    className: '',
+    textClassName: ''
 };
 
 export default Button;

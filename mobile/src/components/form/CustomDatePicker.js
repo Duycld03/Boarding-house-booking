@@ -5,6 +5,7 @@ import { Calendar, Clock } from "react-native-feather";
 import Text from "@/components/ui/Text";
 import { useThemedClasses } from "@/utils/useTheme";
 import { useTheme } from "@/context/ThemeProvider";
+import i18n from "@/config-translation/config-translation";
 
 const CustomDatePicker = ({
   label,
@@ -28,13 +29,79 @@ const CustomDatePicker = ({
     value ? new Date(value) : new Date()
   );
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const currentLanguage = i18n.language;
+
+  // Đa ngôn ngữ cho các text trong component
+  const getLocalizedText = (key) => {
+    const texts = {
+      'vi': {
+        clear: 'Xóa',
+        done: 'Xong',
+        selectDate: 'Chọn ngày',
+        selectTime: 'Chọn giờ',
+        selectDateTime: 'Chọn ngày & giờ',
+        selectDatePlaceholder: 'Chọn ngày',
+        selectTimePlaceholder: 'Chọn giờ',
+        selectDateTimePlaceholder: 'Chọn ngày & giờ',
+      },
+      'en': {
+        clear: 'Clear',
+        done: 'Done',
+        selectDate: 'Select Date',
+        selectTime: 'Select Time',
+        selectDateTime: 'Select Date & Time',
+        selectDatePlaceholder: 'Select date',
+        selectTimePlaceholder: 'Select time',
+        selectDateTimePlaceholder: 'Select date & time',
+      }
+    };
+
+    const currentTexts = texts[currentLanguage] || texts['en'];
+    return currentTexts[key] || key;
+  };
+
+  // Xác định locale dựa trên ngôn ngữ hiện tại
+  const getDatePickerLocale = () => {
+    switch (currentLanguage) {
+      case 'vi':
+        return 'vi-VN';
+      case 'en':
+        return 'en-US';
+      case 'ja':
+        return 'ja-JP';
+      case 'ko':
+        return 'ko-KR';
+      case 'zh':
+        return 'zh-CN';
+      case 'th':
+        return 'th-TH';
+      default:
+        return locale || 'en-US';
+    }
+  };
+
+  // Xác định placeholder dựa trên mode và ngôn ngữ
+  const getPlaceholder = () => {
+    if (placeholder !== "Select date") {
+      return placeholder; // Sử dụng placeholder tùy chỉnh nếu được cung cấp
+    }
+
+    switch (mode) {
+      case 'time':
+        return getLocalizedText('selectTimePlaceholder');
+      case 'datetime':
+        return getLocalizedText('selectDateTimePlaceholder');
+      default:
+        return getLocalizedText('selectDatePlaceholder');
+    }
+  };
 
   const errorMessage =
     error && typeof error === "object" && error[label]
       ? error[label].message
       : typeof error === "string"
-      ? error
-      : null;
+        ? error
+        : null;
 
   const formatDate = (dateValue) => {
     if (!dateValue) return "";
@@ -45,6 +112,7 @@ const CustomDatePicker = ({
       return format(date);
     }
 
+    const datePickerLocale = getDatePickerLocale();
     const options = {
       year: "numeric",
       month: "2-digit",
@@ -65,7 +133,7 @@ const CustomDatePicker = ({
     }
 
     try {
-      return date.toLocaleString(locale, options);
+      return date.toLocaleString(datePickerLocale, options);
     } catch (error) {
       if (mode === "time") {
         return date.toLocaleTimeString();
@@ -162,6 +230,8 @@ const CustomDatePicker = ({
           : "date"
         : mode;
 
+    const datePickerLocale = getDatePickerLocale();
+
     if (Platform.OS === "ios") {
       return (
         <Modal
@@ -183,7 +253,7 @@ const CustomDatePicker = ({
                     className="text-red-500"
                     style={{ fontFamily: "Poppins-Medium" }}
                   >
-                    Clear
+                    {getLocalizedText('clear')}
                   </Text>
                 </TouchableOpacity>
 
@@ -192,20 +262,19 @@ const CustomDatePicker = ({
                   style={{ fontFamily: "Poppins-Medium" }}
                 >
                   {mode === "date"
-                    ? "Select Date"
+                    ? getLocalizedText('selectDate')
                     : mode === "time"
-                    ? "Select Time"
-                    : "Select Date & Time"}
+                      ? getLocalizedText('selectTime')
+                      : getLocalizedText('selectDateTime')}
                 </Text>
 
                 <TouchableOpacity onPress={handleIOSConfirm}>
                   <Text
-                    className={`${
-                      isDarkMode ? "text-primary-dark" : "text-primary-light"
-                    }`}
+                    className={`${isDarkMode ? "text-primary-dark" : "text-primary-light"
+                      }`}
                     style={{ fontFamily: "Poppins-Medium" }}
                   >
-                    Done
+                    {getLocalizedText('done')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -218,7 +287,7 @@ const CustomDatePicker = ({
                 minimumDate={minDate ? new Date(minDate) : undefined}
                 maximumDate={maxDate ? new Date(maxDate) : undefined}
                 textColor={isDarkMode ? "#f9fafb" : "#111827"}
-                locale={locale}
+                locale={datePickerLocale}
               />
 
               {mode === "datetime" && (
@@ -228,7 +297,7 @@ const CustomDatePicker = ({
                   display="spinner"
                   onChange={handleIOSChange}
                   textColor={isDarkMode ? "#f9fafb" : "#111827"}
-                  locale={locale}
+                  locale={datePickerLocale}
                 />
               )}
             </View>
@@ -277,21 +346,19 @@ const CustomDatePicker = ({
         className={`
           flex-row justify-between items-center px-4 py-3 rounded-lg
           border
-          ${
-            errorMessage
-              ? "border-red-500"
-              : `${isDarkMode ? "border-gray-700" : "border-gray-300"}`
+          ${errorMessage
+            ? "border-red-500"
+            : `${isDarkMode ? "border-gray-700" : "border-gray-300"}`
           }
           ${disabled ? "opacity-50" : ""}
         `}
       >
         <Text
-          className={`flex-1 ${
-            value ? themedClasses.text : "text-gray-400 dark:text-gray-500"
-          }`}
+          className={`flex-1 ${value ? themedClasses.text : "text-gray-400 dark:text-gray-500"
+            }`}
           style={{ fontFamily: "Poppins-Regular" }}
         >
-          {value ? formatDate(value) : placeholder}
+          {value ? formatDate(value) : getPlaceholder()}
         </Text>
 
         <DisplayIcon

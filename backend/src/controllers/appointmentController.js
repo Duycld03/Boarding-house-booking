@@ -1,9 +1,10 @@
 import ViewRoomRequest from "../models/viewRoomRequest.js"
 import BoardingHouse from '../models/boardingHouse.js'
 import Room from "../models/room.js";
-
+import pagination from '../utils/pagination.js'
 
 class AppointmentController {
+
     async getAppointmentByUserId(req, res) {
         try {
             const { userId } = req.user;
@@ -12,31 +13,59 @@ class AppointmentController {
                 return res.status(403).json({ message: 'User not found' });
             }
 
+            // Lấy các tham số pagination từ query
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const skip = (page - 1) * limit;
 
-            const appointmentList = await ViewRoomRequest.find({ accountId: userId }).populate({
-                path: 'roomId',
-                populate: {
-                    path: 'boardingHouseId',
-                    populate: { path: 'ownerId' }
-                }
-            }).sort({ createdAt: -1 }).lean()
+            // Filter cơ bản chỉ theo userId
+            const filter = { accountId: userId };
 
+            // Đếm tổng số appointments của user
+            const totalItems = await ViewRoomRequest.countDocuments(filter);
 
-            if (appointmentList.length === 0) {
-                return res.status(404).json({ message: 'No appointments found for this user' });
+            if (totalItems === 0) {
+                return res.status(404).json({
+                    message: 'No appointments found for this user',
+                    pagination: {
+                        currentPage: page,
+                        totalPages: 0,
+                        totalItems: 0,
+                        limit,
+                        hasNextPage: false,
+                        hasPrevPage: false
+                    },
+                    data: []
+                });
             }
+
+            // Lấy danh sách appointments với pagination
+            const appointmentList = await ViewRoomRequest.find(filter)
+                .populate({
+                    path: 'roomId',
+                    populate: {
+                        path: 'boardingHouseId',
+                        populate: { path: 'ownerId' }
+                    }
+                })
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean();
 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-
-
+            // Cập nhật status và format dữ liệu
             const updatedAppointments = await Promise.all(
                 appointmentList.map(async (appointment) => {
                     const appointmentDate = new Date(appointment.appointmentDate);
                     appointmentDate.setHours(0, 0, 0, 0);
 
-                    if (appointmentDate < today && appointment.status !== "completed" && appointment.status !== "canceled") {
+                    // Cập nhật status nếu cần
+                    if (appointmentDate < today &&
+                        appointment.status !== "completed" &&
+                        appointment.status !== "canceled") {
                         await ViewRoomRequest.findByIdAndUpdate(appointment._id, { status: "completed" });
                         appointment.status = "completed";
                     }
@@ -54,9 +83,33 @@ class AppointmentController {
                 })
             );
 
-            return res.status(200).json(updatedAppointments);
+            // Tính toán pagination
+            const totalPages = Math.ceil(totalItems / limit);
+            const hasNextPage = page < totalPages;
+            const hasPrevPage = page > 1;
+
+            const pagination = {
+                currentPage: page,
+                totalPages,
+                totalItems,
+                limit,
+                hasNextPage,
+                hasPrevPage
+            };
+
+            return res.status(200).json({
+                success: true,
+                pagination,
+                data: updatedAppointments
+            });
+
         } catch (error) {
-            return res.status(500).json({ message: 'There is something wrong!', error: error.message });
+            console.error('Error in getAppointmentByUserId:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'There is something wrong!',
+                error: error.message
+            });
         }
     }
 

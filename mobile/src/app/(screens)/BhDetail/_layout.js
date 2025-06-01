@@ -15,6 +15,12 @@ export default function BhDetailLayout() {
                         headerShown: false,
                     }}
                 />
+                <Stack.Screen name="createAppointment"
+                    options={{
+                        headerShown: false,
+                    }}
+                />
+
             </Stack>
         </>
     );

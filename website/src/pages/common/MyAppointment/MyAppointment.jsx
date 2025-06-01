@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   getAppointmentOfUser,
   updateAppointmentStatus,
@@ -7,12 +7,39 @@ import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
 import { toast } from "react-toastify";
 import convertTimetap from "../../../utils/convertTimetap";
 import { Tag, Tooltip } from "antd";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/ThemeContext";
 
 function MyAppointment() {
   const [appointmentData, setAppointmentData] = useState([]);
+  const { t } = useTranslation("myAppointment");
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const { darkMode } = useTheme();
   const [selectedData, setSelectedData] = useState(null);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+    sortField: "createdAt",
+    sortOrder: "desc",
+  });
+
+  const tablePaginationConfig = useMemo(
+    () => ({
+      current: pagination.currentPage,
+      pageSize: pagination.limit,
+      total: pagination.totalItems,
+      showSizeChanger: true,
+    }),
+    [pagination]
+  );
 
   const statusColors = {
     pending: "blue",
@@ -75,25 +102,45 @@ function MyAppointment() {
     },
   ];
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getAppointmentOfUser();
-      if (res.length === 0) {
+      const res = await getAppointmentOfUser(paginationOptions);
+      setPagination({
+        currentPage: res.currentPage,
+        totalPages: res.totalPages,
+        totalItems: res.pagination.totalItems,
+        limit: res.limit,
+      });
+      if (res.data === 0) {
         toast.info("No data available.");
       } else {
-        setAppointmentData(res);
+        setAppointmentData(res.data);
       }
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [paginationOptions]);
 
+  // Fixed: Add paginationOptions to dependency array
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  const handleTableChange = useCallback(
+    (pagination, filters, sorter) => {
+      const newPaginationOptions = {
+        ...paginationOptions,
+        page: pagination.current,
+        limit: pagination.pageSize,
+      };
+
+      setPaginationOptions(newPaginationOptions);
+    },
+    [paginationOptions]
+  );
 
   const openCancelModal = (record) => {
     setSelectedData(record);
@@ -131,8 +178,11 @@ function MyAppointment() {
     <div className="min-h-[500px]">
       <Table
         loading={loading}
+        tableName="Appointment"
         columns={appointmentCol}
         data={appointmentData ?? []}
+        onChange={handleTableChange}
+        pagination={tablePaginationConfig}
       />
       <ConfirmModal
         isOpen={isOpen}
