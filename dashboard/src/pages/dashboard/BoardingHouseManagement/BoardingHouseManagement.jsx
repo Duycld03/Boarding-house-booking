@@ -286,49 +286,59 @@ function BoardingHouseManagement(onClose) {
         return;
       }
 
-      const imagesData = [...images];
-      const payloadPrimary = new FormData();
+      // const imagesData = [...images];
+      // const payloadPrimary = new FormData();
 
-      // Upload primary image
-      if (formData.primaryImage) {
-        payloadPrimary.append("file", formData.primaryImage);
+      // // Upload primary image
+      // if (formData.primaryImage) {
+      //   payloadPrimary.append("file", formData.primaryImage);
 
-        try {
-          const responsePrimary = await uploadFile(payloadPrimary);
-          imagesData.push({
-            imageUrl: responsePrimary.filePath,
-            isPrimary: true,
-          });
-        } catch (error) {
-          toast.error("Please upload a primary image.");
-          return;
-        }
+      //   try {
+      //     const responsePrimary = await uploadFile(payloadPrimary);
+      //     imagesData.push({
+      //       imageUrl: responsePrimary.filePath,
+      //       isPrimary: true,
+      //     });
+      //   } catch (error) {
+      //     toast.error("Please upload a primary image.");
+      //     return;
+      //   }
+      // }
+
+      // // Validate and upload other images
+      // for (const image of formData.otherImages) {
+      //   const payload = new FormData();
+      //   payload.append("file", image);
+
+      //   try {
+      //     const response = await uploadFile(payload);
+      //     imagesData.push({
+      //       imageUrl: response.filePath,
+      //       isPrimary: false,
+      //     });
+      //   } catch (error) {
+      //     toast.error("Failed to upload an image.");
+      //     return;
+      //   }
+      // }
+      const allImages = [];
+      if (formData.primaryImage) allImages.push(formData.primaryImage);
+      if (formData.otherImages.length > 15) {
+        toast.error("You can't upload more than 15 other images.");
+        return;
       }
-
-      // Validate and upload other images
-      for (const image of formData.otherImages) {
-        const payload = new FormData();
-        payload.append("file", image);
-
-        try {
-          const response = await uploadFile(payload);
-          imagesData.push({
-            imageUrl: response.filePath,
-            isPrimary: false,
-          });
-        } catch (error) {
-          toast.error("Failed to upload an image.");
-          return;
-        }
+      allImages.push(...formData.otherImages);
+      if (allImages.length === 0) {
+        toast.error("You must upload at least one image.");
+        return;
       }
-
-      const form = {
+      let form = {
         ownerUsername: formData.owner,
         boardingHouseType: formData.boardingHouseType,
         name: formData.name,
         address: formData.address,
         description: formData.description,
-        images: imagesData,
+        // images: imagesData,
         priceRange: formData.priceRange,
         electricityPrice: formData.electricityPrice,
         waterPrice: formData.waterPrice,
@@ -337,7 +347,10 @@ function BoardingHouseManagement(onClose) {
           lon: geoLocation?.lon,
         },
       };
-
+      allImages.forEach((file, index) => {
+        // form.append("boardingHouse", file);
+        form = { ...form, boardingHouse: file }
+      });
       setLoading(true);
 
       //API  update boarding house details
@@ -545,9 +558,8 @@ function BoardingHouseManagement(onClose) {
       <Table columns={columns} data={boardingHData} loading={loading} />
       <ConfirmModal
         title="Confirm Deletion"
-        content={`Are you sure you want to delete "${
-          selectedRequest?.name || "this boarding house"
-        }"?`}
+        content={`Are you sure you want to delete "${selectedRequest?.name || "this boarding house"
+          }"?`}
         onOk={handleSelectDelete}
         onCancel={() => {
           setIsOpenDeleteModal(false);
@@ -658,15 +670,14 @@ function BoardingHouseManagement(onClose) {
               <div className="flex flex-col gap-4">
                 {/* Check primary Image exists */}
                 {formData.primaryImage ||
-                images?.find((img) => img.isPrimary) ? (
+                  images?.find((img) => img.isPrimary) ? (
                   <div className="relative">
                     <Image
                       src={
                         formData.primaryImage
                           ? URL.createObjectURL(formData.primaryImage)
-                          : `http://localhost:3000${
-                              images.find((img) => img.isPrimary)?.imageUrl
-                            }`
+                          : `http://localhost:3000${images.find((img) => img.isPrimary)?.imageUrl
+                          }`
                       }
                       alt="Primary"
                       className="object-cover border rounded"
