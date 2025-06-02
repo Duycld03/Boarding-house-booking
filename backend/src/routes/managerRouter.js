@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   authController,
   boardingHouseController,
@@ -13,188 +13,188 @@ import {
   refundRequestController,
   renewalController,
   paymentBillController,
-} from "../controllers/index.js";
-import { upload } from "../config/cloudinary.config.js";
+} from '../controllers/index.js';
+import { upload } from '../config/cloudinary.config.js';
 
 const managerRouter = Router();
 
-managerRouter.get("/", (req, res) => {
-  res.send("This is a manager router");
+managerRouter.get('/', (req, res) => {
+  res.send('This is a manager router');
 });
 
 //boarding house
-managerRouter.get("/boardinghouseowner", boardingHouseController.getAllBHOwner);
+managerRouter.get('/boardinghouseowner', boardingHouseController.getAllBHOwner);
 managerRouter.get(
-  "/boardinghouse/:id",
+  '/boardinghouse/:id',
   boardingHouseController.getBoardingHouseDetails
 );
 managerRouter.put(
-  "/boardinghouse/:id",
-  upload.array("boardingHouse"),
+  '/boardinghouse/:id',
+  upload.array('boardingHouse'),
   boardingHouseController.updateBoardingHouseDetailsOwner
 );
 
-managerRouter.get("/types", boardingHouseController.getAllBoardingHouseTypes);
-managerRouter.post(
-  "/boardinghouse",
-  upload.array("boardingHouse"), // Cho phép tối đa 16 ảnh trong 1 lần upload
-  boardingHouseController.createBoardingHouseOwner
-);
+managerRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
+// managerRouter.post(
+//   "/boardinghouse",
+//   upload.array("boardingHouse"), // Cho phép tối đa 16 ảnh trong 1 lần upload
+//   boardingHouseController.createBoardingHouseOwner
+// );
 managerRouter.delete(
-  "/boardinghouse/:id/softDelete",
+  '/boardinghouse/:id/softDelete',
   boardingHouseController.softDeleteBoardingHouse
 );
 
 //review
-managerRouter.post("/reply", ReviewController.replyReview);
-managerRouter.get("/reviews/:reviewId", ReviewController.getReviewContent);
+managerRouter.post('/reply', ReviewController.replyReview);
+managerRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
 
 // deposit
-managerRouter.put("/review/updatereply", ReviewController.updateReplyReview);
-managerRouter.delete("/review/reply", ReviewController.softDeleteReplyReview);
+managerRouter.put('/review/updatereply', ReviewController.updateReplyReview);
+managerRouter.delete('/review/reply', ReviewController.softDeleteReplyReview);
 
 //tenant
 managerRouter.get(
-  "/tenant/:boardingHouseId",
+  '/tenant/:boardingHouseId',
   tenantController.getTenantsByBoardingHouse
 );
 managerRouter.delete(
-  "/tenant/:boardingHouseId/:accountId",
+  '/tenant/:boardingHouseId/:accountId',
   tenantController.deleteTenantFromBoardingHouse
 );
 
 //facilities
-managerRouter.get("/facilities", FacilitiesController.getAllFacilities);
+managerRouter.get('/facilities', FacilitiesController.getAllFacilities);
 
 //roomtype
 managerRouter.get(
-  "/boardinghouse/room-types/:id",
+  '/boardinghouse/room-types/:id',
   roomTypeController.getRoomTypeByBhId
 );
 managerRouter.post(
-  "/boardinghouse/roomtype/:id/create",
-  upload.single("roomType"),
+  '/boardinghouse/roomtype/:id/create',
+  upload.single('roomType'),
   roomTypeController.addRoomTypeToBoardingHouse
 );
 managerRouter.put(
-  "/boardinghouse/roomtype/:roomTypeId/",
-  upload.single("roomType"), // Nếu có ảnh mới, upload lên Cloudinary
+  '/boardinghouse/roomtype/:roomTypeId/',
+  upload.single('roomType'), // Nếu có ảnh mới, upload lên Cloudinary
   roomTypeController.updateRoomTypeToBoardingHouse
 );
 managerRouter.delete(
-  "/boardinghouse/roomtype/:roomTypeId/",
+  '/boardinghouse/roomtype/:roomTypeId/',
   roomTypeController.softDeleteRoomType
 );
 
 //deposit
 managerRouter.get(
-  "/boardinghouse/deposit/:boardingHouseId",
+  '/boardinghouse/deposit/:boardingHouseId',
   depositController.getDepositByBhId
 );
 
 managerRouter.get(
-  "/boardinghouse/deposit/max-deposit/:boardingHouseId",
+  '/boardinghouse/deposit/max-deposit/:boardingHouseId',
   depositController.getMaxDeposit
 );
 managerRouter.get(
-  "/boardinghouse/deposit/max-rent-time/:boardingHouseId",
+  '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
   depositController.getMaxRentTime
 );
 managerRouter.put(
-  "/acceptdeposit/:depositId",
+  '/acceptdeposit/:depositId',
   depositController.acceptDepositRoom
 );
 managerRouter.put(
-  "/rejectdeposit/:depositId",
+  '/rejectdeposit/:depositId',
   depositController.rejectDepositRoom
 );
 
 // room
 managerRouter.get(
-  "/room/boarding-house/:boardingHouseId",
+  '/room/boarding-house/:boardingHouseId',
   roomController.getRoomsByBoardingHouse
 );
 
 managerRouter.post(
-  "/room/boarding-house",
-  upload.single("Room"),
+  '/room/boarding-house',
+  upload.single('Room'),
   roomController.addRoom
 );
 managerRouter.put(
-  "/room/boarding-house/:roomId",
-  upload.single("Room"),
+  '/room/boarding-house/:roomId',
+  upload.single('Room'),
   roomController.updateRoom
 );
-managerRouter.delete("/room/boarding-house/:roomId", roomController.deleteRoom);
+managerRouter.delete('/room/boarding-house/:roomId', roomController.deleteRoom);
 
 //renewal
 managerRouter.get(
-  "/renewal/boarding-house/:boardingHouseId",
+  '/renewal/boarding-house/:boardingHouseId',
   renewalController.getRenewalRequestByBhID
 );
 managerRouter.put(
-  "/renewal/:requestId",
+  '/renewal/:requestId',
   renewalController.acceptExtensionRequest
 );
 managerRouter.put(
-  "/rejectrenewal/:requestId",
+  '/rejectrenewal/:requestId',
   renewalController.rejectExtensionRequest
 );
 
 // refund request
 managerRouter.get(
-  "/refund-requests",
+  '/refund-requests',
   refundRequestController.getRefundRequestsForOwner
 );
 managerRouter.put(
-  "/refund-request/:refundRequestId",
+  '/refund-request/:refundRequestId',
   refundRequestController.cancelRefundRequestsForOwner
 );
 
 managerRouter.post(
-  "/refund-request/:refundRequestId",
+  '/refund-request/:refundRequestId',
   depositController.acceptRefundRequestForOwner
 );
 
 //expense
-managerRouter.get("/expense", expenseController.getExpensesByTime);
-managerRouter.put("/expense/:expenseId", expenseController.updateExpense);
-managerRouter.get("/total-expense", expenseController.getTotalExpensesByTime);
+managerRouter.get('/expense', expenseController.getExpensesByTime);
+managerRouter.put('/expense/:expenseId', expenseController.updateExpense);
+managerRouter.get('/total-expense', expenseController.getTotalExpensesByTime);
 
 //revenue
-managerRouter.get("/revenue", revenueController.getRevenue);
-managerRouter.get("/revenue/years", revenueController.getAvailableYears);
-managerRouter.get("/revenue/year", revenueController.getRevenueByYear);
+managerRouter.get('/revenue', revenueController.getRevenue);
+managerRouter.get('/revenue/years', revenueController.getAvailableYears);
+managerRouter.get('/revenue/year', revenueController.getRevenueByYear);
 
-managerRouter.get("/total-revenue", revenueController.getTotalRevenue);
+managerRouter.get('/total-revenue', revenueController.getTotalRevenue);
 managerRouter.get(
-  "/total-revenue/years",
+  '/total-revenue/years',
   revenueController.getTotalAvailableYears
 );
 managerRouter.get(
-  "/total-revenue/year",
+  '/total-revenue/year',
   revenueController.getTotalRevenueByYear
 );
 
 //rent payment
 managerRouter.get(
-  "/rent-payment/:boardingHouseId",
+  '/rent-payment/:boardingHouseId',
   paymentBillController.getPaymentBillByBoardingHouseId
 );
 
 managerRouter.get(
-  "/unpaid-rooms/:boardingHouseId",
+  '/unpaid-rooms/:boardingHouseId',
   roomController.getUnpaidRoomsByBoardingHouse
 );
 
 // get electrical and water price
 managerRouter.get(
-  "/electrical-water-price/:boardingHouseId",
+  '/electrical-water-price/:boardingHouseId',
   boardingHouseController.getElectricalAndWaterPrice
 );
 
 managerRouter.post(
-  "/calculate-monthly-bill",
+  '/calculate-monthly-bill',
   paymentBillController.calculateMonthlyRoomRent
 );
 

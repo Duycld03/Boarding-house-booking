@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import {
   Form,
   Input,
@@ -9,55 +9,68 @@ import {
   Image,
   Button,
   Tabs,
-} from "antd";
+} from 'antd';
 import {
   PlusOutlined,
   HeartFilled,
   StarFilled,
   StarOutlined,
-} from "@ant-design/icons";
-import { getAllBoardingHouseTypesOwner } from "../../../api/BoardingHManagement";
+} from '@ant-design/icons';
+import { getAllBoardingHouseTypesOwner } from '../../../api/BoardingHManagement';
 import {
   fetchProvinces,
   fetchDistricts,
   fetchWards,
-} from "../../../api/apiAddress";
-import { getBoardingHouseDetail } from "../../../api/ownerUser/boardingHouse";
-import { updateBoardingHouseDetailsOwner } from "../../../api/BoardingHManagement";
-import { useNavigate, useParams } from "react-router-dom";
-import { Back } from "../../../component";
-import axios from "axios";
-import LocationPicker from "@/component/LocationPicker";
-import RoomType from "./RoomType/RoomType";
-import { useLocation } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHotel } from "@fortawesome/free-solid-svg-icons";
-import DepositManagement from "@/pages/common/BHDetailOwner/DepositManagement";
-import RenewalRequest from "./RenewalRequestManagement/RenewalRequest";
-import TenantManagement from "./TenantManagement/TenantManagement";
-import RoomManagement from "./RoomManagement/RoomManagement";
-import RevenueManagement from "./RevenueManagement";
-import RentPaymentManagement from "./RentPaymentManagement";
+} from '../../../api/apiAddress';
+import { getBoardingHouseDetail } from '../../../api/ownerUser/boardingHouse';
+import { updateBoardingHouseDetailsOwner } from '../../../api/BoardingHManagement';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import LocationPicker from '@/component/LocationPicker';
+import RoomType from './RoomType/RoomType';
+import DepositManagement from '@/pages/common/BHDetailOwner/DepositManagement';
+import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
+import TenantManagement from './TenantManagement/TenantManagement';
+import RoomManagement from './RoomManagement/RoomManagement';
+import RevenueManagement from './RevenueManagement';
+import RentPaymentManagement from './RentPaymentManagement';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHotel } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../../context/themeContext';
+import './BHDetailOwner.module.css'; // Import custom CSS for additional dark mode fixes
+import classNames from 'classnames';
+import './darkModeOverrides.css';
+
+const { TabPane } = Tabs;
+
+const cx = classNames;
 
 const BHDetailOwner = () => {
   const { boardingHouseId } = useParams();
-
-  const [updatedData, setUpdatedData] = useState({}); // Updated form data
-  const [loading, setLoading] = useState(false); // Loading state
-  const [provinces, setProvinces] = useState([]); // Provinces list
-  const [districts, setDistricts] = useState([]); // Districts list
-  const [wards, setWards] = useState([]); // Wards list
-  const [boardingHouseTypes, setBoardingHouseTypes] = useState([]); // House types
-  const [geoLocation, setGeoLocation] = useState(null); // Geo location
-  const [currentLocation, setCurrentLocation] = useState(null); // Current location
   const navigate = useNavigate();
   const location = useLocation();
-  const boardingHouseName = location.state?.name || "Default Name";
+
+  const { t } = useTranslation('bhManagement');
+  const { darkMode } = useTheme();
+
+  const boardingHouseName = location.state?.name || t('defaultTitle');
+
+  const [updatedData, setUpdatedData] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
+  const [geoLocation, setGeoLocation] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(null);
 
   const fetchBoardingHouseDetails = async () => {
     if (!boardingHouseId) {
-      toast.error("Boarding house ID not found.");
-      navigate("/bh-management-owner");
+      toast.error(t('errors.noId'));
+      navigate('/bh-management-owner');
+      return;
     }
     try {
       const response = await getBoardingHouseDetail(boardingHouseId);
@@ -66,10 +79,11 @@ const BHDetailOwner = () => {
       setUpdatedData({ ...response, primaryImage, otherImages });
       setCurrentLocation([response?.location?.lat, response?.location?.lon]);
     } catch (error) {
-      console.error("Failed to fetch boarding house data:", error);
-      toast.error("Failed to fetch boarding house data.");
+      console.error('Failed to fetch boarding house data:', error);
+      toast.error(t('errors.fetchFailed'));
     }
   };
+
   useEffect(() => {
     fetchBoardingHouseDetails();
   }, []);
@@ -80,8 +94,15 @@ const BHDetailOwner = () => {
       setCurrentLocation([geoLocation.lat, geoLocation.lon]);
     }
   }, [geoLocation]);
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+      console.log('Added dark-mode class to body');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [darkMode]);
 
-  // Fetch provinces, districts, and wards
   useEffect(() => {
     const fetchAddressData = async () => {
       try {
@@ -108,44 +129,40 @@ const BHDetailOwner = () => {
           }
         }
       } catch (error) {
-        console.error("Error fetching address data:", error);
-        toast.error("Failed to fetch address data.");
+        console.error('Error fetching address data:', error);
+        toast.error(t('errors.fetchAddressFailed'));
       }
     };
 
     if (updatedData?.address?.province) {
       fetchAddressData();
     }
-  }, [updatedData?.address?.province, updatedData?.address?.district]);
+  }, [updatedData?.address?.province, updatedData?.address?.district, t]);
 
-  // Fetch boarding house types
   useEffect(() => {
     const fetchTypes = async () => {
       try {
         const response = await getAllBoardingHouseTypesOwner();
         setBoardingHouseTypes(response.data || []);
       } catch (error) {
-        console.error("Failed to fetch boarding house types:", error);
-        toast.error("Failed to fetch boarding house types.");
+        console.error('Failed to fetch boarding house types:', error);
+        toast.error(t('errors.fetchBoardingHouseTypes'));
       }
     };
 
     fetchTypes();
-  }, []);
+  }, [t]);
 
-  // Update form data on input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const keys = name.split("."); // Split by dot notation for nested fields (e.g., "address.detail")
+    const keys = name.split('.');
 
     if (keys.length === 2) {
-      // Handle nested fields (e.g., "address.detail")
       setUpdatedData((prev) => ({
         ...prev,
         [keys[0]]: { ...prev[keys[0]], [keys[1]]: value },
       }));
     } else {
-      // Handle top-level fields
       setUpdatedData((prev) => ({
         ...prev,
         [name]: value,
@@ -165,8 +182,8 @@ const BHDetailOwner = () => {
       return;
     }
 
-    if (updatedData.otherImages.length >= 15) {
-      toast.error("You can only upload up to 15 other images.");
+    if ((updatedData.otherImages?.length || 0) >= 15) {
+      toast.error(t('errors.maxOtherImages'));
       return;
     }
 
@@ -181,13 +198,12 @@ const BHDetailOwner = () => {
       primaryImage: null,
     }));
   };
-  // Remove other images
   const handleRemoveOtherImage = (index) => {
     setUpdatedData((prev) => ({
       ...prev,
       otherImages: prev.otherImages.filter((_, i) => i !== index),
     }));
-    toast.success("Temporary image removed.");
+    toast.success(t('messages.imageRemoved'));
   };
 
   const handleSelectedTypesChange = (event) => {
@@ -197,20 +213,21 @@ const BHDetailOwner = () => {
       [name]: { _id: value },
     }));
   };
+
   const uploadOtherImgProps = {
     beforeUpload: (file) => {
       handleFileChange({ target: { files: [file] } }, false);
-      return false; // Prevent auto-upload
+      return false;
     },
     multiple: true,
-    accept: "image/*",
+    accept: 'image/*',
   };
   const uploadProps = {
     beforeUpload: (file) => {
       handleFileChange({ target: { files: [file] } }, true);
-      return false; // Prevent auto-upload
+      return false;
     },
-    accept: "image/*",
+    accept: 'image/*',
     maxCount: 1,
     showUploadList: false,
   };
@@ -218,18 +235,19 @@ const BHDetailOwner = () => {
   const getLocation = async () => {
     try {
       const res = await axios.get(
-        "https://nominatim.openstreetmap.org/search",
+        'https://nominatim.openstreetmap.org/search',
         {
           params: {
-            format: "json",
+            format: 'json',
             q: `${updatedData.address.ward}, ${updatedData.address.district}, ${updatedData.address.province}`,
             polygon_geojson: 1,
           },
         }
       );
       setGeoLocation(res.data[0]);
+      console.log('GeoLocation result:', res.data[0]);
     } catch (error) {
-      console.log("Error getting location:", error);
+      console.log('Error getting location:', error);
     }
   };
 
@@ -243,171 +261,186 @@ const BHDetailOwner = () => {
     try {
       setLoading(true);
 
-      const payload = new FormData();
       if (!updatedData.boardingHouseType) {
-        toast.error("Please select a boarding house type.");
+        toast.error(t('validation.selectBoardingHouseType'));
+        setLoading(false);
         return;
       }
       if (!updatedData.name) {
-        toast.error("Please enter a boarding house name.");
+        toast.error(t('validation.enterName'));
+        setLoading(false);
         return;
       }
       if (!updatedData.address.province) {
-        toast.error("Please select a boarding house province.");
+        toast.error(t('validation.selectProvince'));
+        setLoading(false);
         return;
       }
       if (!updatedData.address.district) {
-        toast.error("Please select a boarding house district.");
+        toast.error(t('validation.selectDistrict'));
+        setLoading(false);
         return;
       }
       if (!updatedData.address.ward) {
-        toast.error("Please select a boarding house ward.");
+        toast.error(t('validation.selectWard'));
+        setLoading(false);
         return;
       }
       if (!updatedData.address.detail) {
-        toast.error("Please enter a boarding house details.");
+        toast.error(t('validation.enterDetailAddress'));
+        setLoading(false);
         return;
       }
       if (!updatedData.priceRange) {
-        toast.error("Please enter price range.");
+        toast.error(t('validation.enterPriceRange'));
+        setLoading(false);
         return;
       }
       if (!updatedData.electricityPrice) {
-        toast.error("Please enter electricity price.");
+        toast.error(t('validation.enterElectricityPrice'));
+        setLoading(false);
         return;
       }
       if (!updatedData.waterPrice) {
-        toast.error("Please enter water price.");
+        toast.error(t('validation.enterWaterPrice'));
+        setLoading(false);
+        return;
+      }
+      if (!updatedData.primaryImage) {
+        toast.error(t('validation.uploadPrimaryImage'));
+        setLoading(false);
         return;
       }
 
-      // Append basic form fields
+      const payload = new FormData();
+
       payload.append(
-        "boardingHouseType",
+        'boardingHouseType',
         updatedData.boardingHouseType?._id || updatedData.boardingHouseType
       );
-      payload.append("name", updatedData.name);
-      payload.append("description", updatedData.description);
-      payload.append("priceRange", updatedData.priceRange);
-      payload.append("electricityPrice", updatedData.electricityPrice);
-      payload.append("waterPrice", updatedData.waterPrice);
-      payload.append("address[province]", updatedData.address.province);
-      payload.append("address[district]", updatedData.address.district);
-      payload.append("address[ward]", updatedData.address.ward);
-      payload.append("address[detail]", updatedData.address.detail);
-      payload.append("location[lat]", updatedData.location.lat);
-      payload.append("location[lon]", updatedData.location.lon);
+      payload.append('name', updatedData.name);
+      payload.append('description', updatedData.description || '');
+      payload.append('priceRange', updatedData.priceRange);
+      payload.append('electricityPrice', updatedData.electricityPrice);
+      payload.append('waterPrice', updatedData.waterPrice);
+      payload.append('address[province]', updatedData.address.province);
+      payload.append('address[district]', updatedData.address.district);
+      payload.append('address[ward]', updatedData.address.ward);
+      payload.append('address[detail]', updatedData.address.detail);
+      payload.append('location[lat]', updatedData.location.lat);
+      payload.append('location[lon]', updatedData.location.lon);
 
-      // Append primary image (new or existing)
       const oldImg = [];
 
-      if (updatedData.primaryImage) {
-        if (updatedData.primaryImage instanceof File) {
-          payload.append("boardingHouse", updatedData.primaryImage);
-        } else {
-          oldImg.push(updatedData.primaryImage);
-        }
+      if (updatedData.primaryImage instanceof File) {
+        payload.append('boardingHouse', updatedData.primaryImage);
       } else {
-        toast.error("A primary image is required.");
-        return;
+        oldImg.push(updatedData.primaryImage);
       }
 
-      if (updatedData.otherImages) {
-        updatedData.otherImages.forEach((file) => {
-          if (file instanceof File) {
-            payload.append("boardingHouse", file);
-          } else {
-            oldImg.push(file);
-          }
-        });
-      }
+      (updatedData.otherImages || []).forEach((file) => {
+        if (file instanceof File) {
+          payload.append('boardingHouse', file);
+        } else {
+          oldImg.push(file);
+        }
+      });
+
       if (oldImg.length > 0) {
-        payload.append("boardingHouse", JSON.stringify(oldImg));
+        payload.append('boardingHouse', JSON.stringify(oldImg));
       }
+
       const response = await updateBoardingHouseDetailsOwner(
-        updatedData._id, // Boarding house ID
+        updatedData._id,
         payload
       );
 
       if (response?.success) {
-        toast.success(
-          response.message || "Boarding house updated successfully."
-        );
-        navigate("/bh-management-owner");
+        toast.success(t('messages.updateSuccess'));
+        navigate('/bh-management-owner');
       } else {
-        toast.error(response?.message || "Failed to update boarding house.");
+        toast.error(response.message || t('messages.updateFailed'));
       }
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "Failed to update the boarding house."
+          t('messages.updateFailed')
       );
     } finally {
       setLoading(false);
     }
   };
-  if (!updatedData) {
-    return null; // Do not render modal if no data
-  }
+
+  if (!updatedData) return null;
 
   return (
-    <div className="mx-auto w-full back bg-white rounded-xl p-4">
-      {" "}
+    <div
+      className={`mx-auto w-full back rounded-xl p-4 ${
+        darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'
+      }`}
+    >
       <h1 className="text-5xl flex items-center gap-2">
-        <FontAwesomeIcon icon={faHotel} className="text-gray-500 text-6xl" />{" "}
-        {boardingHouseName || "Default Title"}
+        <FontAwesomeIcon
+          icon={faHotel}
+          className={`text-6xl ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+        />{' '}
+        {boardingHouseName || t('defaultTitle')}
       </h1>
       <Tabs defaultActiveKey="boardingHouseDetail">
         {/* Tab: Boarding House Detail */}
-        <Tabs.TabPane tab="Boarding House Detail" key="boardingHouseDetail">
+        <Tabs.TabPane
+          tab={t('tabs.boardingHouseDetail')}
+          key="boardingHouseDetail"
+        >
           <div className="mx-auto md:w-[100%]">
-            <Form
-              layout="vertical"
-              // onFinish={handleSubmit}
-              className="p-6 *:m-7"
-            >
+            <Form layout="vertical" className="p-6 *:m-7">
               <Form.Item>
                 <div className="flex flex-wrap min-[361px]:flex-nowrap justify-between items-center w-full gap-4">
-                  {/* Bên trái: Rating & Like (luôn nằm bên trái) */}
+                  {/* Left: Rating & Likes */}
                   <div className="flex flex-col items-start gap-2">
-                    {/* Rating */}
                     <div className="flex items-center gap-1">
-                      {Array.from({ length: 5 }, (_, index) => {
-                        if (index < Math.floor(updatedData.rating || 0)) {
-                          return (
-                            <StarFilled
-                              key={index}
-                              className="text-yellow-500 text-4xl"
-                            />
-                          );
-                        } else {
-                          return (
-                            <StarOutlined
-                              key={index}
-                              className="text-yellow-500 text-4xl"
-                            />
-                          );
-                        }
-                      })}
+                      {Array.from({ length: 5 }, (_, index) =>
+                        index < Math.floor(updatedData.rating || 0) ? (
+                          <StarFilled
+                            key={index}
+                            className="text-yellow-500 text-4xl"
+                          />
+                        ) : (
+                          <StarOutlined
+                            key={index}
+                            className="text-yellow-500 text-4xl"
+                          />
+                        )
+                      )}
                     </div>
-
-                    {/* Like */}
                     <div className="flex items-center gap-2">
                       <HeartFilled className="text-red-500 text-4xl" />
-                      <span className="text-gray-600 text-lg">
+                      <span
+                        className={`text-lg ${
+                          darkMode ? 'text-white' : 'text-gray-600'
+                        }`}
+                      >
+                        {' '}
                         {updatedData.likes
-                          ? Number(updatedData.likes).toLocaleString("en-US")
-                          : "0"}
+                          ? Number(updatedData.likes).toLocaleString('en-US')
+                          : '0'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Bên phải: Total Rooms & Available Rooms */}
-                  <div className="text-left min-[300px]:text-right min-w-[150px]">
-                    <div>Total Rooms: {updatedData.totalRooms || "0"}</div>
+                  {/* Right: Total & Available Rooms */}
+                  <div
+                    className={`text-left min-[300px]:text-right min-w-[150px] ${
+                      darkMode ? 'text-white' : 'text-black'
+                    }`}
+                  >
                     <div>
-                      Available Rooms: {updatedData.availableRooms || "0"}
+                      {t('labels.totalRooms')}: {updatedData.totalRooms || '0'}
+                    </div>
+                    <div>
+                      {t('labels.availableRooms')}:{' '}
+                      {updatedData.availableRooms || '0'}
                     </div>
                   </div>
                 </div>
@@ -416,24 +449,39 @@ const BHDetailOwner = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Information */}
                 <div className="flex flex-col flex-1">
-                  <h2 className="text-3xl font-bold">1. Information</h2>
-                  <Form.Item label="Name Boarding House" className="mb-2">
+                  <h2
+                    className={`text-3xl font-bold ${
+                      darkMode ? 'text-white' : 'text-black'
+                    }`}
+                  >
+                    {t('form.section.information')}
+                  </h2>
+
+                  <Form.Item
+                    label={t('form.labels.boardingHouseName')}
+                    className="mb-2"
+                  >
                     <Input
                       name="name"
-                      value={updatedData.name || ""}
+                      value={updatedData.name || ''}
                       onChange={handleInputChange}
+                      className={cx({ 'dark-mode-input': darkMode })}
                     />
                   </Form.Item>
 
-                  <Form.Item label="Boarding House Type" className="mb-2">
+                  <Form.Item
+                    label={t('form.labels.boardingHouseType')}
+                    className="mb-2"
+                  >
                     <Select
                       name="boardingHouseType"
-                      value={updatedData.boardingHouseType?._id || ""}
+                      value={updatedData.boardingHouseType?._id || ''}
                       onChange={(value) =>
                         handleSelectedTypesChange({
-                          target: { name: "boardingHouseType", value },
+                          target: { name: 'boardingHouseType', value },
                         })
                       }
+                      className={darkMode ? 'dark-mode-select' : ''}
                     >
                       {boardingHouseTypes.map((type) => (
                         <Select.Option key={type.value} value={type.value}>
@@ -443,88 +491,110 @@ const BHDetailOwner = () => {
                     </Select>
                   </Form.Item>
 
-                  <Form.Item label="Description" className="flex-grow">
+                  <Form.Item
+                    label={t('form.labels.description')}
+                    className="flex-grow"
+                  >
                     <Input.TextArea
                       name="description"
-                      value={updatedData.description || ""}
+                      value={updatedData.description || ''}
                       onChange={handleInputChange}
                       rows={4}
+                      className={`${
+                        darkMode ? 'dark-mode-input dark-mode-scroll' : ''
+                      }`}
                     />
                   </Form.Item>
                 </div>
 
                 {/* Price */}
                 <div className="flex flex-col flex-1">
-                  <h2 className="text-3xl font-bold mb-4">2. Price</h2>
+                  <h2
+                    className={`text-3xl font-bold mb-4 ${
+                      darkMode ? 'text-white' : 'text-black'
+                    }`}
+                  >
+                    {t('form.section.price')}
+                  </h2>
+
                   <Form.Item
-                    label="Price Rent/month (VND)"
-                    style={{ marginTop: "10px" }} // Sử dụng object-style đúng cách
+                    label={t('form.labels.priceRange')}
+                    style={{ marginTop: '10px' }}
                     className="mb-2"
                   >
                     <InputNumber
                       name="priceRange"
-                      value={updatedData.priceRange || ""}
+                      value={updatedData.priceRange || ''}
                       onChange={(value) =>
                         handleInputChange({
-                          target: { name: "priceRange", value },
+                          target: { name: 'priceRange', value },
                         })
                       }
                       formatter={(value) =>
-                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                       }
-                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                      className="w-full"
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                      className={darkMode ? 'dark-mode-input' : ''}
+                      style={{ width: '100%' }}
                       min={0}
                     />
                   </Form.Item>
 
                   <Form.Item
-                    label="Electricity Price/kWh (VND)"
+                    label={t('form.labels.electricityPrice')}
                     className="mb-2"
                   >
                     <InputNumber
                       name="electricityPrice"
-                      value={updatedData.electricityPrice || ""}
+                      value={updatedData.electricityPrice || ''}
                       onChange={(value) =>
                         handleInputChange({
-                          target: { name: "electricityPrice", value },
+                          target: { name: 'electricityPrice', value },
                         })
                       }
                       formatter={(value) =>
-                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                       }
-                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                      className="w-full"
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                      className={darkMode ? 'dark-mode-input' : ''}
+                      style={{ width: '100%' }}
                       min={0}
                     />
                   </Form.Item>
 
                   <Form.Item
-                    label="Water Price/m³ (VND)"
+                    label={t('form.labels.waterPrice')}
                     className="mb-2 flex-grow"
                   >
                     <InputNumber
                       name="waterPrice"
-                      value={updatedData.waterPrice || ""}
+                      value={updatedData.waterPrice || ''}
                       onChange={(value) =>
                         handleInputChange({
-                          target: { name: "waterPrice", value },
+                          target: { name: 'waterPrice', value },
                         })
                       }
                       formatter={(value) =>
-                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                       }
-                      parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                      className="w-full"
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                      className={darkMode ? 'dark-mode-input' : ''}
+                      style={{ width: '100%' }}
                       min={0}
                     />
                   </Form.Item>
                 </div>
               </div>
-              <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
-              <Form.Item label="Primary Image" className="mb-4">
+              <h2
+                className={`text-3xl font-bold mb-4 mt-10 ${
+                  darkMode ? 'text-white' : 'text-black'
+                }`}
+              >
+                {t('form.section.images')}
+              </h2>
+
+              <Form.Item label={t('form.labels.primaryImage')} className="mb-4">
                 <div className="flex flex-col gap-4">
-                  {/* Check if a primary image exists */}
                   {updatedData.primaryImage ? (
                     <div className="relative">
                       <Image
@@ -535,19 +605,21 @@ const BHDetailOwner = () => {
                         alt="Primary"
                         className="object-cover border rounded"
                         style={{
-                          width: "100%",
-                          height: "auto",
-                          maxHeight: "300px",
+                          width: '100%',
+                          height: 'auto',
+                          maxHeight: '300px',
                         }}
                         preview={{
-                          mask: <span className="text-white">Preview</span>,
+                          mask: (
+                            <span className="text-white">{t('preview')}</span>
+                          ),
                         }}
                       />
-                      {/* Delete Button */}
                       <button
                         type="button"
                         onClick={handleRemovePrimaryImage}
                         className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                        title={t('buttons.delete')}
                       >
                         X
                       </button>
@@ -557,25 +629,43 @@ const BHDetailOwner = () => {
                       {...uploadProps}
                       listType="picture-card"
                       showUploadList={false}
-                      className="custom-upload"
+                      className={
+                        darkMode ? 'dark-mode-upload' : 'custom-upload'
+                      }
                       name="boardingHouse"
                     >
-                      <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                        <PlusOutlined className="text-2xl text-gray-400" />
-                        <p className="text-gray-500 mt-2 text-sm font-medium">
-                          Add Primary Image
+                      <div
+                        className={`rounded-lg p-6 transition text-center ${
+                          darkMode ? 'text-white' : ''
+                        }`}
+                      >
+                        <PlusOutlined
+                          className={`text-2xl ${
+                            darkMode ? 'text-white' : 'text-gray-400'
+                          }`}
+                        />
+                        <p
+                          className={`${
+                            darkMode ? 'text-white' : 'text-gray-500'
+                          } mt-2 text-sm font-medium`}
+                        >
+                          {t('form.labels.addImage')}
                         </p>
-                        <p className="text-gray-400 text-xs">
-                          Drag-drop or click here to choose a file
+                        <p
+                          className={`${
+                            darkMode ? 'text-white' : 'text-gray-400'
+                          } text-xs`}
+                        >
+                          {t('form.labels.dragDropOrClick')}
                         </p>
                       </div>
                     </Upload>
                   )}
                 </div>
               </Form.Item>
-              <Form.Item label="Other Images" className="mb-4">
+
+              <Form.Item label={t('form.labels.otherImages')} className="mb-4">
                 <div className="mt-4 flex flex-wrap gap-4">
-                  {/* Display Uploaded Other Images */}
                   {(updatedData.otherImages || []).map((file, index) => (
                     <div key={index} className="relative group">
                       <Image
@@ -585,14 +675,16 @@ const BHDetailOwner = () => {
                         width={100}
                         height={100}
                         preview={{
-                          mask: <span className="text-white">Preview</span>,
+                          mask: (
+                            <span className="text-white">{t('preview')}</span>
+                          ),
                         }}
                       />
-                      {/* Delete Button */}
                       <button
                         type="button"
                         onClick={() => handleRemoveOtherImage(index)}
                         className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        title={t('buttons.delete')}
                       >
                         X
                       </button>
@@ -604,150 +696,149 @@ const BHDetailOwner = () => {
                     listType="picture-card"
                     showUploadList={false}
                     name="boardingHouse"
-                    className="custom-upload"
+                    className={darkMode ? 'dark-mode-upload' : 'custom-upload'}
                   >
-                    <div className="rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                      <PlusOutlined className="text-2xl text-gray-400" />
-                      <p className="text-gray-500 mt-2 text-sm font-medium">
-                        Add Other Image
+                    <div
+                      className={`rounded-lg p-6 transition text-center ${
+                        darkMode ? 'text-white' : ''
+                      }`}
+                    >
+                      <PlusOutlined
+                        className={`text-2xl ${
+                          darkMode ? 'text-white' : 'text-gray-400'
+                        }`}
+                      />
+                      <p
+                        className={`${
+                          darkMode ? 'text-white' : 'text-gray-500'
+                        } mt-2 text-sm font-medium`}
+                      >
+                        {t('form.labels.addOtherImages')}
                       </p>
-                      <p className="text-gray-400 text-xs">
-                        Drag-drop or click here to choose a file
+                      <p
+                        className={`${
+                          darkMode ? 'text-white' : 'text-gray-400'
+                        } text-xs`}
+                      >
+                        {t('form.labels.dragDropOrClick')}
                       </p>
                     </div>
                   </Upload>
                 </div>
               </Form.Item>
-              <h2 className="text-3xl font-bold mb-4 mt-10">4. Address</h2>
+              <h2
+                className={`text-3xl font-bold mb-4 mt-10 ${
+                  darkMode ? 'text-white' : 'text-black'
+                }`}
+              >
+                {t('form.section.address')}
+              </h2>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Các thông tin địa chỉ */}
                 <div className="flex flex-col h-full">
-                  <Form.Item className="mb-4 flex-1">
-                    {/* Province */}
-                    <Form.Item
-                      label="Province"
-                      required
-                      rules={[
-                        { required: true, message: "Province is required" },
-                      ]}
+                  <Form.Item label={t('form.labels.province')} required>
+                    <Select
+                      placeholder={t('form.placeholders.selectProvince')}
+                      loading={!provinces.length}
+                      value={updatedData?.address?.province || null}
+                      onChange={(value) => {
+                        handleInputChange({
+                          target: { name: 'address.province', value },
+                        });
+                        setUpdatedData((prev) => ({
+                          ...prev,
+                          address: {
+                            ...prev.address,
+                            province: value,
+                            district: null,
+                            ward: null,
+                          },
+                        }));
+                      }}
+                      allowClear
+                      className={darkMode ? 'dark-mode-select' : ''}
                     >
-                      <Select
-                        placeholder="Select Province"
-                        loading={!provinces.length}
-                        value={updatedData?.address?.province || null}
-                        onChange={(value) => {
-                          handleInputChange({
-                            target: { name: "address.province", value },
-                          });
-                          setUpdatedData((prev) => ({
-                            ...prev,
-                            address: {
-                              ...prev.address,
-                              province: value,
-                              district: null,
-                              ward: null,
-                            },
-                          }));
-                        }}
-                        allowClear
-                      >
-                        {provinces.map((province) => (
-                          <Select.Option
-                            key={province.code}
-                            value={province.name}
-                          >
-                            {province.name}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-
-                    {/* District */}
-                    <Form.Item
-                      label="District"
-                      required
-                      rules={[
-                        { required: true, message: "District is required" },
-                      ]}
+                      {provinces.map((province) => (
+                        <Select.Option
+                          key={province.code}
+                          value={province.name}
+                        >
+                          {province.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item label={t('form.labels.district')} required>
+                    <Select
+                      placeholder={t('form.placeholders.selectDistrict')}
+                      loading={
+                        !districts.length && !!updatedData.address?.province
+                      }
+                      value={updatedData?.address?.district || null}
+                      onChange={(value) => {
+                        handleInputChange({
+                          target: { name: 'address.district', value },
+                        });
+                        setUpdatedData((prev) => ({
+                          ...prev,
+                          address: {
+                            ...prev.address,
+                            district: value,
+                            ward: null,
+                          },
+                        }));
+                      }}
+                      disabled={!updatedData.address?.province}
+                      allowClear
+                      className={darkMode ? 'dark-mode-select' : ''}
                     >
-                      <Select
-                        placeholder="Select District"
-                        loading={
-                          !districts.length && updatedData?.address?.province
-                        }
-                        value={updatedData?.address?.district || null}
-                        onChange={(value) => {
-                          handleInputChange({
-                            target: { name: "address.district", value },
-                          });
-                          setUpdatedData((prev) => ({
-                            ...prev,
-                            address: {
-                              ...prev.address,
-                              district: value,
-                              ward: null,
-                            },
-                          }));
-                        }}
-                        disabled={!updatedData?.address?.province}
-                        allowClear
-                      >
-                        {districts.map((district) => (
-                          <Select.Option
-                            key={district.code}
-                            value={district.name}
-                          >
-                            {district.name}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-
-                    {/* Ward */}
-                    <Form.Item
-                      label="Ward"
-                      required
-                      rules={[{ required: true, message: "Ward is required" }]}
+                      {districts.map((district) => (
+                        <Select.Option
+                          key={district.code}
+                          value={district.name}
+                        >
+                          {district.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item label={t('form.labels.ward')} required>
+                    <Select
+                      placeholder={t('form.placeholders.selectWard')}
+                      loading={
+                        !wards.length && !!updatedData?.address?.district
+                      }
+                      value={updatedData.address?.ward || null}
+                      onChange={(value) => {
+                        handleInputChange({
+                          target: { name: 'address.ward', value },
+                        });
+                        setUpdatedData((prev) => ({
+                          ...prev,
+                          address: { ...prev.address, ward: value },
+                        }));
+                      }}
+                      disabled={!updatedData.address?.district}
+                      allowClear
+                      className={darkMode ? 'dark-mode-select' : ''}
                     >
-                      <Select
-                        placeholder="Select Ward"
-                        loading={
-                          !wards.length && updatedData?.address?.district
-                        }
-                        value={updatedData?.address?.ward || null}
-                        onChange={(value) => {
-                          handleInputChange({
-                            target: { name: "address.ward", value },
-                          });
-                          setUpdatedData((prev) => ({
-                            ...prev,
-                            address: { ...prev.address, ward: value },
-                          }));
-                        }}
-                        disabled={!updatedData?.address?.district}
-                        allowClear
-                      >
-                        {wards.map((ward) => (
-                          <Select.Option key={ward.code} value={ward.name}>
-                            {ward.name}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-
-                    {/* Detail Address */}
-                    <Form.Item label="Detail">
-                      <Input.TextArea
-                        name="address.detail"
-                        value={updatedData?.address?.detail || ""}
-                        onChange={handleInputChange}
-                        rows={4}
-                      />
-                    </Form.Item>
+                      {wards.map((ward) => (
+                        <Select.Option key={ward.code} value={ward.name}>
+                          {ward.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item label={t('form.labels.detailAddress')}>
+                    <Input.TextArea
+                      name="address.detail"
+                      value={updatedData.address?.detail || ''}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className={darkMode ? 'dark-mode-input' : ''}
+                    />
                   </Form.Item>
                 </div>
-
-                {/* Bản đồ (Map) */}
                 <div className="order-2 lg:order-1 h-full">
                   <LocationPicker
                     className="h-full min-h-[500px] w-full"
@@ -763,60 +854,60 @@ const BHDetailOwner = () => {
                   />
                 </div>
               </div>
-
-              {/* </div> */}
               <div className="flex justify-center gap-4 w-full md:mt-4">
                 <Button
+                  type="primary"
                   className="bg-red-500 text-white flex-1"
                   size="large"
-                  onClick={() => navigate("/bh-management-owner")}
-                  title="Back"
+                  onClick={() => navigate('/bh-management-owner')}
+                  title={t('buttons.back')}
                 >
-                  Back
+                  {t('buttons.back')}
                 </Button>
 
                 <Button
+                  type="primary"
                   className="bg-primary text-white flex-1"
                   size="large"
                   loading={loading}
                   onClick={handleSubmit}
-                  title="Update"
+                  title={t('buttons.update')}
                 >
-                  Update
+                  {t('buttons.update')}
                 </Button>
               </div>
             </Form>
           </div>
         </Tabs.TabPane>
 
-        {/* Tab: Room Type */}
-        <Tabs.TabPane tab="Room Type" key="roomType">
+        {/* Other Tabs */}
+        <Tabs.TabPane tab={t('tabs.roomType')} key="roomType">
           <RoomType />
         </Tabs.TabPane>
 
-        {/* Tab: Room */}
-        <Tabs.TabPane tab="Room" key="room">
-          {/* <Room /> */}
+        <Tabs.TabPane tab={t('tabs.room')} key="room">
           <RoomManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
 
-        {/* Tab: Deposit Management */}
-        <Tabs.TabPane tab="Deposit Management" key="depositManagement">
+        <Tabs.TabPane tab={t('tabs.depositManagement')} key="depositManagement">
           <DepositManagement />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="Tenant Management" key="Tenant Management">
+
+        <Tabs.TabPane tab={t('tabs.tenantManagement')} key="tenantManagement">
           <TenantManagement />
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab="Revenue Management" key="Revenue Management">
+        <Tabs.TabPane tab={t('tabs.revenueManagement')} key="revenueManagement">
           <RevenueManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="Renewal Management" key="Renewal Request Management">
+
+        <Tabs.TabPane tab={t('tabs.renewalManagement')} key="renewalManagement">
           <RenewalRequest boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
+
         <Tabs.TabPane
-          tab="Rent Payment Management"
-          key="Rent Payment Management"
+          tab={t('tabs.rentPaymentManagement')}
+          key="rentPaymentManagement"
         >
           <RentPaymentManagement />
         </Tabs.TabPane>

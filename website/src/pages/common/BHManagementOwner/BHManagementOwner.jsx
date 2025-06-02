@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { TableCustom as Table, Button, ConfirmModal } from '../../../component';
 import { toast } from 'react-toastify';
 import { Tooltip } from 'antd';
@@ -6,185 +6,216 @@ import { FileTextOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import {
   getAllBHOwner,
-  updateBoardingHouseDetailsOwner,
   softDeleteBoardingHouseOwner,
 } from '../../../api/BoardingHManagement';
 import formatAmount from '../../../utils/formatAmount';
 import AddBHModal from './AddBH';
-// import UpdateBHModal from "./UpdateBH";
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../../context/themeContext';
+import { useCurrentUser } from '@/context/userContext';
+import userRole from '@/constants/userRole';
 
 function BHManagementOwner() {
-  const [boardingHouses, setBoardingHouses] = useState([]); // List of boarding houses
-  const [loading, setLoading] = useState(false); // Loading state for data fetching
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false); // Delete confirmation modal state
-  const [isEditOpen, setIsEditOpen] = useState(false); // Edit modal state
-  const [selectedData, setSelectedData] = useState(null); // Data of the selected boarding house
+  const [boardingHouses, setBoardingHouses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
+
+  const { t } = useTranslation('bhManagement');
+  const { darkMode } = useTheme();
+  const { hasRole } = useCurrentUser();
+  const isOwner = hasRole(userRole.owner);
+
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
+
+  const [filterValue, setFilterValue] = useState({});
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+  });
+
   const navigate = useNavigate();
 
-  // Table columns
-  const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
-      width: 200,
-      render: (address) =>
-        address ? (
-          <Tooltip
-            title={`${address.detail}, ${address.ward}, ${address.district}, ${address.province}`}
-          >
-            {`${address.detail}, ${address.ward}, ${address.district}`}
-          </Tooltip>
-        ) : (
-          'N/A'
-        ),
-    },
-    {
-      title: 'Price Range (VND)',
-      dataIndex: 'priceRange',
-      key: 'priceRange',
-      render: (price) => (price ? formatAmount(price) : 'N/A'),
-    },
-    {
-      title: 'Boarding House Type',
-      dataIndex: 'boardingHouseType',
-      key: 'boardingHouseType',
-      render: (type) => type?.name || 'N/A',
-    },
-    {
-      title: 'Total Rooms',
-      dataIndex: 'totalRooms',
-      key: 'totalRooms',
-      width: 20,
-    },
-    {
-      title: 'Available Rooms',
-      dataIndex: 'availableRooms',
-      key: 'availableRooms',
-      width: 20,
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <div className="flex gap-3">
-          <Button
-            size="large"
-            btnDelete
-            title={'Delete'}
-            onClick={() => handleOpenDeleteModal(record)}
-          />
-          <Button
-            size="large"
-            title={'Detail'}
-            icon={<FileTextOutlined />}
-            // onClick={() => openEditModal(record)}
-            onClick={() =>
-              navigate(`/bh-management-owner/${record._id}`, {
-                state: { name: record.name },
-              })
-            }
-            className="text-white"
-            bgColor="rgb(5 150 105)"
-          />
-        </div>
-      ),
-    },
-  ];
+  const columns = useMemo(
+    () => [
+      {
+        title: t('columns.name'),
+        dataIndex: 'name',
+        key: 'name',
+      },
+      {
+        title: t('columns.address'),
+        dataIndex: 'address',
+        key: 'address',
+        width: 200,
+        render: (address) =>
+          address ? (
+            <Tooltip
+              title={`${address.detail}, ${address.ward}, ${address.district}, ${address.province}`}
+            >
+              {`${address.detail}, ${address.ward}, ${address.district}`}
+            </Tooltip>
+          ) : (
+            t('messages.noData')
+          ),
+      },
+      {
+        title: t('columns.priceRange'),
+        dataIndex: 'priceRange',
+        key: 'priceRange',
+        render: (price) => (price ? formatAmount(price) : t('messages.noData')),
+      },
+      {
+        title: t('columns.boardingHouseType'),
+        dataIndex: 'boardingHouseType',
+        key: 'boardingHouseType',
+        render: (type) => type?.name || t('messages.noData'),
+      },
+      {
+        title: t('columns.totalRooms'),
+        dataIndex: 'totalRooms',
+        key: 'totalRooms',
+        width: 80,
+      },
+      {
+        title: t('columns.availableRooms'),
+        dataIndex: 'availableRooms',
+        key: 'availableRooms',
+        width: 100,
+      },
+      {
+        title: t('columns.action'),
+        key: 'action',
+        width: 150,
+        render: (_, record) => (
+          <div className="flex gap-2">
+            {isOwner && (
+              <Button
+                size="large"
+                btnDelete
+                title={t('columns.delete')}
+                onClick={() => {
+                  setSelectedData(record);
+                  setIsOpenDeleteModal(true);
+                }}
+              />
+            )}
 
-  // Fetch all boarding houses
-  const fetchData = async () => {
+            <Button
+              size="large"
+              title={t('columns.detail')}
+              icon={<FileTextOutlined />}
+              onClick={() =>
+                navigate(`/bh-management-owner/${record._id}`, {
+                  state: { name: record.name },
+                })
+              }
+              className="text-white"
+              bgColor="rgb(5 150 105)"
+            />
+          </div>
+        ),
+      },
+    ],
+    [t, navigate]
+  );
+
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getAllBHOwner();
-      if (res && Array.isArray(res)) {
-        setBoardingHouses(res);
-      } else {
-        toast.error('Failed to fetch boarding houses.');
-      }
+      const res = await getAllBHOwner(filterValue, paginationOptions);
+      setBoardingHouses(res.data);
+
+      setPagination({
+        current: res.pagination.currentPage,
+        pageSize: res.pagination.limit,
+        total: res.pagination.totalItems,
+      });
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('An error occurred while fetching data.');
+      console.error('Error fetching boarding houses:', error);
+      toast.error(t('messages.fetchFailed'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterValue, paginationOptions, t]);
 
   useEffect(() => {
-    fetchData(); // Fetch data on component mount
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
-  // Open Edit Modal
-  const openEditModal = (record) => {
-    setSelectedData(record); // Set selected boarding house
-    setIsEditOpen(true); // Open edit modal
-  };
+  const handleTableChange = useCallback(
+    (pagination, filters, sorter) => {
+      const newPaginationOptions = {
+        ...paginationOptions,
+        page: pagination.current,
+        limit: pagination.pageSize,
+      };
 
-  // Handle Add New Data
-  const handleAddNewData = async () => {
-    await fetchData(); // Refresh data after adding a new boarding house
-  };
+      setPaginationOptions(newPaginationOptions);
+    },
+    [paginationOptions]
+  );
 
-  // Open Delete Modal
-  const handleOpenDeleteModal = (record) => {
-    setSelectedData(record); // Set selected boarding house for deletion
-    setIsOpenDeleteModal(true); // Open delete confirmation modal
-  };
+  const tablePaginationConfig = useMemo(
+    () => ({
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+      total: pagination.total,
+      showSizeChanger: true,
+      pageSizeOptions: ['10', '20', '50', '100'],
+      onChange: handleTableChange,
+    }),
+    [pagination, handleTableChange, darkMode]
+  );
 
-  // Handle Delete
-  const handleDelete = async () => {
-    if (!selectedData || !selectedData._id) return; // Ensure valid data
+  const handleDelete = useCallback(async () => {
+    if (!selectedData?._id) return;
+    setLoading(true);
     try {
-      setLoading(true);
-      await softDeleteBoardingHouseOwner(selectedData._id); // Call delete API
-      toast.success('Boarding house deleted successfully.');
-      fetchData(); // Refresh data
+      await softDeleteBoardingHouseOwner(selectedData._id);
+      toast.success(t('messages.deleteSuccess'));
+      fetchData();
     } catch (error) {
-      console.error('Error deleting boarding house:', error);
-      toast.error('Failed to delete boarding house.');
+      console.error('Delete error:', error);
+      toast.error(t('messages.deleteFailed'));
     } finally {
       setLoading(false);
-      setIsOpenDeleteModal(false); // Close delete modal
-      setSelectedData(null); // Clear selected data
+      setIsOpenDeleteModal(false);
+      setSelectedData(null);
     }
-  };
-
-  // Handle Update
-  const handleUpdate = async () => {
-    fetchData(); // Refresh data after updating
-    setIsEditOpen(false); // Close edit modal
-  };
+  }, [selectedData, fetchData, t]);
 
   return (
     <div>
-      {/* Add New Boarding House */}
       <div className="flex justify-between mb-4">
-        <AddBHModal onAddData={handleAddNewData} />
+        {isOwner && <AddBHModal onAddData={() => fetchData()} />}
+        {/* <FilterBH setFilterValue={setFilterValue} /> */}
       </div>
 
-      {/* Boarding House Table */}
-      <Table loading={loading} columns={columns} data={boardingHouses ?? []} />
-
-      {/* Confirm Delete Modal */}
-      <ConfirmModal
-        title="Confirm Deletion"
-        content={`Are you sure you want to delete this boarding house?`}
-        onOk={handleDelete} // Trigger delete action
-        onCancel={() => {
-          setIsOpenDeleteModal(false); // Close modal
-          setSelectedData(null); // Clear selected data
-        }}
-        isOpen={isOpenDeleteModal}
+      <Table
+        tableName={t('tableName')}
+        loading={loading}
+        columns={columns}
+        data={boardingHouses}
+        onChange={handleTableChange}
+        pagination={tablePaginationConfig}
+        noDataText={t('messages.noData')}
       />
 
-      {/* Edit Modal */}
-      {/* <UpdateBHModal
-        open={isEditOpen}
-        formData={selectedData}
-        onCancel={() => setIsEditOpen(false)}
-        onUpdate={handleUpdate}
-      /> */}
+      <ConfirmModal
+        title={t('messages.confirmDeleteTitle')}
+        content={t('messages.confirmDeleteContent')}
+        isOpen={isOpenDeleteModal}
+        onOk={handleDelete}
+        onCancel={() => {
+          setIsOpenDeleteModal(false);
+          setSelectedData(null);
+        }}
+      />
     </div>
   );
 }

@@ -20,6 +20,24 @@ const ScreenLayout = () => {
             animation: 'slide_from_bottom',
           }}
         />
+        <Stack.Screen
+          name="allBH"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="newestBH"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="highRatingBH"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </>
   );
