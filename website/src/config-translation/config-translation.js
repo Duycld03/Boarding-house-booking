@@ -16,6 +16,10 @@ import vi_aboutUs from '@/locales/vi/aboutUs.json';
 import en_aboutUs from '@/locales/en/aboutUs.json';
 import en_bhDetail from '@/locales/en/bhDetail.json';
 import vi_bhDetail from '@/locales/vi/bhDetail.json';
+import en_bhManagement from '@/locales/en/bhManagement';
+import vi_bhManagement from '@/locales/vi/bhManagement';
+import en_common from '@/locales/en/common.json';
+import vi_common from '@/locales/vi/common.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -28,6 +32,8 @@ i18n.use(initReactI18next).init({
       profile: en_profile,
       aboutUs: en_aboutUs,
       boardingHouseDetail: en_bhDetail,
+      bhManagement: en_bhManagement,
+      common: en_common,
     },
     vi: {
       menu: vi_menu,
@@ -38,6 +44,8 @@ i18n.use(initReactI18next).init({
       profile: vi_profile,
       aboutUs: vi_aboutUs,
       boardingHouseDetail: vi_bhDetail,
+      bhManagement: vi_bhManagement,
+      common: vi_common,
     },
   },
   lng: 'en',
