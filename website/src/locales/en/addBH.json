@@ -1,0 +1,42 @@
+{
+    "addBH": {
+        "addBoardingHouse": "Add Boarding House",
+        "createBoardingHouse": "Create Boarding House",
+        "information": "1. Information",
+        "boardingHouseType": "Boarding House Type",
+        "selectBoardingHouseType": "Select Type",
+        "boardingHouseName": "Boarding House Name",
+        "enterBoardingHouseName": "Enter boarding house name",
+        "description": "Description",
+        "enterDescription": "Enter description",
+        "address": "2. Address",
+        "image": "3. Image",
+        "primaryImage": "Primary Image",
+        "addPrimaryImage": "Add Primary Image",
+        "otherImages": "Other Images",
+        "addOtherImages": "Add Other Images",
+        "price": "4. Price",
+        "priceRent": "Price Rent/month (VND)",
+        "enterPriceRent": "Enter price rent",
+        "electricityPrice": "Electricity Price/kWh (VND)",
+        "enterElectricityPrice": "Enter electricity price",
+        "waterPrice": "Water Price/m³ (VND)",
+        "enterWaterPrice": "Enter water price",
+        "cancel": "Cancel",
+        "submit": "Submit",
+        "loading": "Processing...",
+        "error": {
+            "boardingHouseType": "Please select a boarding house type.",
+            "boardingHouseName": "Please enter the boarding house name.",
+            "province": "Please select a province.",
+            "district": "Please select a district.",
+            "ward": "Please select a ward.",
+            "addressDetail": "Please enter the address details.",
+            "primaryImage": "You must upload a primary image.",
+            "priceRange": "Please enter the price rent.",
+            "electricityPrice": "Please enter the electricity price.",
+            "waterPrice": "Please enter the water price.",
+            "location": "Please mark the location on the map."
+        }
+    }
+}

@@ -17,11 +17,15 @@ import {
   Image,
   Modal,
   Spin,
+  ConfigProvider
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { createBoardingHouseOwner } from "../../../api/BoardingHManagement";
 import axios from "axios";
-
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/themeContext";
+import Style from "./AddBH.module.css";
+import classNames from "classnames";
 const AddBHModal = ({ onAddData }) => {
   // State management
   const [isModalVisible, setIsModalVisible] = useState(false); // Controls modal visibility
@@ -47,7 +51,8 @@ const AddBHModal = ({ onAddData }) => {
   const [wards, setWards] = useState([]);
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
   const [geoLocation, setGeoLocation] = useState(null);
-
+  const { darkMode } = useTheme();
+  const { t } = useTranslation("addBH");
   // Function to reset form data
   const resetFormData = () => {
     setFormData({
@@ -307,164 +312,333 @@ const AddBHModal = ({ onAddData }) => {
       console.error("Error submitting boarding house:", error);
       toast.error(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to submit the form."
+        error.message ||
+        "Failed to submit the form."
       );
     } finally {
       setGeoLocation(null); // Reset location
       setLoading(false); // Hide loading spinner
     }
   };
+  const themeConfig = {
+    algorithm: darkMode
+      ? ConfigProvider.darkAlgorithm
+      : ConfigProvider.defaultAlgorithm,
+    token: darkMode
+      ? {
+        colorText: "#ffffff", // Văn bản sáng
+        colorTextSecondary: "#e5e7eb", // Văn bản phụ nhạt hơn
+        colorBgContainer: "#1f2937", // Nền tối
+        colorBorder: "#4b5563", // Viền rõ hơn
+        colorPrimary: "#3b82f6", // Màu chính (xanh lam)
 
+        // Thiết lập màu sắc cho Input
+        colorBgElevated: "#374151", // Nền cho các thành phần thả xuống
+        colorFillSecondary: "#374151", // Nền cho các ô input
+        colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
+        colorBorderSecondary: "#4B5563", // Viền phụ
+        controlItemBgActive: "#3b82f6", // Nền khi được chọn
+        controlItemBgHover: "#4B5563", // Nền khi hover
+      }
+      : {
+        colorText: "#000", // Văn bản tối
+        colorTextSecondary: "#4b5563", // Văn bản phụ
+        colorBgContainer: "#ffffff", // Nền sáng
+        colorBorder: "#d9d9d9", // Viền nhạt
+        colorPrimary: "#3b82f6", // Màu chính (xanh lam)
+
+        // Thiết lập màu sắc cho Input
+        colorBgElevated: "#f5f5f5", // Nền cho các thành phần thả xuống
+        colorFillSecondary: "#f5f5f5", // Nền cho các ô input
+        colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
+        colorBorderSecondary: "#d9d9d9", // Viền phụ
+        controlItemBgActive: "#e5e7eb", // Nền khi được chọn
+        controlItemBgHover: "#f0f0f0", // Nền khi hover
+      },
+    components: {
+      // Cấu hình cho Select
+      Select: {
+        selectorBg: darkMode ? "#374151" : "#f5f5f5", // Nền của Select
+        colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Select
+        colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
+        optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb", // Nền khi được chọn
+        optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0", // Nền khi hover
+      },
+      // Cấu hình cho Input
+      Input: {
+        colorBgContainer: darkMode ? "#374151" : "#f5f5f5", // Nền Input
+        colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Input
+        colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
+        colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563", // Placeholder
+      },
+      // Cấu hình cho Form
+      Form: {
+        labelColor: darkMode ? "#F9FAFB" : "#000", // Màu nhãn Form
+      },
+    },
+  };
   return (
-    <>
-      {/* Trigger Button */}
-      <Button
-        btnAdd
-        title="Add Boarding House"
-        size="large"
-        onClick={openModal} // Open modal and reset form
-      />
+    <ConfigProvider theme={themeConfig}>
+      <>
+        {/* Trigger Button */}
+        <Button
+          btnAdd
+          title="Add Boarding House"
+          size="large"
+          onClick={openModal} // Open modal and reset form
+          className={darkMode ? "dark-button" : ""}
+        />
 
-      {/* Outer Modal */}
-      <Modal
-        title="Create Boarding House"
-        open={isModalVisible}
-        onCancel={closeModal} // Close modal
-        footer={null}
-        destroyOnClose
-      >
-        <Form
-          layout="vertical"
-          onSubmitCapture={handleSubmit}
-          className="bg-white rounded-lg w-full max-w-3xl"
+        {/* Outer Modal */}
+        <Modal
+          title="Create Boarding House"
+          open={isModalVisible}
+          onCancel={closeModal} // Close modal
+          footer={null}
+          destroyOnClose
+          className={darkMode ? "dark-modal" : ""}
         >
-          <h2 className="text-3xl font-bold mb-4 ">1. Information</h2>
-          {/* Boarding House Type */}
-          <Form.Item
-            label="Boarding House Type"
-            name="boardingHouseType"
-            rules={[
-              {
-                required: true,
-                message: "Please select a boarding house type",
-              },
-            ]}
-            className="mb-2"
+          <Form
+            layout="vertical"
+            onSubmitCapture={handleSubmit}
+            className={`rounded-lg w-full max-w-3xl ${darkMode ? "dark-form bg-dark" : "bg-white"
+              }`}
           >
-            <Select
-              placeholder="Select Type"
-              value={formData.boardingHouseType}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, boardingHouseType: value }))
-              }
+            <h2
+              className={`text-3xl font-bold mb-4 ${darkMode ? "text-white" : "text-black"
+                }`}
             >
-              {boardingHouseTypes.map((type) => (
-                <Select.Option key={type.value} value={type.value}>
-                  {type.label}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+              1. Information
+            </h2>
+            {/* Boarding House Type */}
+            <Form.Item
+              label={
+                <span className={darkMode ? "text-white" : ""}>
+                  Boarding House Type
+                </span>
+              }
+              name="boardingHouseType"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select a boarding house type",
+                },
+              ]}
+              className="mb-2"
+            >
+              <Select
+                placeholder="Select Type"
+                value={formData.boardingHouseType}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, boardingHouseType: value }))
+                }
+                className={darkMode ? "dark-select" : ""}
+              >
+                {boardingHouseTypes.map((type) => (
+                  <Select.Option key={type.value} value={type.value}>
+                    {type.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-          {/* Boarding House Name */}
-          <Form.Item
-            label="Name Boarding House"
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: "Please enter the boarding house name",
-              },
-            ]}
-            className="mb-2"
-          >
-            <Input
-              placeholder="Enter boarding house name"
+            {/* Boarding House Name */}
+            <Form.Item
+              label={
+                <span className={darkMode ? "text-white" : ""}>
+                  Boarding House Name
+                </span>
+              }
               name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-            />
-          </Form.Item>
-          {/* Description */}
-          <Form.Item label="Description" name="description" className="mb-2">
-            <Input.TextArea
-              placeholder="Enter description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={4}
-            />
-          </Form.Item>
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter the boarding house name",
+                },
+              ]}
+              className="mb-2"
+            >
+              <Input
+                placeholder="Enter boarding house name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className={darkMode ? "dark-input" : ""}
+              />
+            </Form.Item>
 
-          <h2 className="text-3xl font-bold mb-4 mt-10 ">2. Address</h2>
-          {/* Address Selector */}
-          <AddressSelector
-            provinces={provinces}
-            districts={districts}
-            wards={wards}
-            onProvinceChange={handleInputChange}
-            onDistrictChange={handleInputChange}
-            onInputChange={handleInputChange}
-            formData={formData}
-            location={geoLocation}
-            setGeoLocation={setGeoLocation}
-          />
-          <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
-          {/* Primary Image */}
-          <Form.Item label={<span>Primary Image</span>} className="mb-4">
-            <div className="flex flex-col gap-4">
-              {/* Nút Upload Primary Image */}
-              {!formData.primaryImage && (
+            {/* Description */}
+            <Form.Item
+              label={
+                <span className={darkMode ? "text-white" : ""}>Description</span>
+              }
+              name="description"
+              className="mb-2"
+            >
+              <Input.TextArea
+                placeholder="Enter description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={4}
+                className={darkMode ? "dark-input" : ""}
+              />
+            </Form.Item>
+
+            <h2
+              className={`text-3xl font-bold mb-4 mt-10 ${darkMode ? "text-white" : "text-black"
+                }`}
+            >
+              2. Address
+            </h2>
+            {/* Address Selector */}
+            <AddressSelector
+              provinces={provinces}
+              districts={districts}
+              wards={wards}
+              onProvinceChange={handleInputChange}
+              onDistrictChange={handleInputChange}
+              onInputChange={handleInputChange}
+              formData={formData}
+              location={geoLocation}
+              setGeoLocation={setGeoLocation}
+              darkMode={darkMode} // Passing darkMode to AddressSelector
+            />
+
+            <h2
+              className={`text-3xl font-bold mb-4 mt-10 ${darkMode ? "text-white" : "text-black"
+                }`}
+            >
+              3. Image
+            </h2>
+            {/* Primary Image */}
+            <Form.Item
+              label={
+                <span className={darkMode ? "text-white" : ""}>Primary Image</span>
+              }
+              className="mb-4"
+            >
+              <div className="flex flex-col gap-4">
+                {!formData.primaryImage && (
+                  <Upload
+                    {...uploadProps}
+                    name="boardingHouse"
+                    listType="picture-card"
+                    showUploadList={false}
+                    className={`custom-upload ${darkMode ? "dark-upload" : "w-full max-w-lg"
+                      }`}
+                  >
+                    <div
+                      className={`flex flex-col items-center justify-center border border-dashed rounded-lg p-6 ${darkMode
+                        ? "border-gray-600 hover:border-blue-500 hover:bg-gray-700"
+                        : "border-gray-300 hover:border-blue-500 hover:bg-gray-50"
+                        } transition`}
+                    >
+                      <PlusOutlined
+                        className={`text-2xl ${darkMode ? "text-gray-400" : "text-gray-400"
+                          }`}
+                      />
+                      <p
+                        className={`mt-2 text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                      >
+                        Add Image
+                      </p>
+                      <p
+                        className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"
+                          }`}
+                      >
+                        Drag-drop or click here to choose a file
+                      </p>
+                    </div>
+                  </Upload>
+                )}
+
+                {formData.primaryImage && (
+                  <div className="items-center justify-center flex flex-col gap-4">
+                    <Image
+                      src={URL.createObjectURL(formData.primaryImage)}
+                      alt="Primary"
+                      className="object-cover border rounded"
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        maxHeight: "300px",
+                      }}
+                      preview={{
+                        mask: (
+                          <span
+                            className={`${darkMode ? "text-white" : "text-black"
+                              }`}
+                          >
+                            Preview
+                          </span>
+                        ),
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemovePrimaryImage}
+                      className={`absolute top-2 right-2 ${darkMode
+                        ? "bg-red-500 hover:bg-red-600"
+                        : "bg-red-500 hover:bg-red-600"
+                        } text-white text-xs px-3 py-1 rounded-full z-10 shadow-lg`}
+                    >
+                      X
+                    </button>
+                  </div>
+                )}
+              </div>
+            </Form.Item>
+            {/* Other Images */}
+            <Form.Item label={<span>Other Images</span>} className="mb-4">
+              <div className="mt-4 flex flex-wrap gap-4">
+                {formData.otherImages.map((file, index) => (
+                  <div key={index} className="relative">
+                    {/* Hiển thị ảnh bằng Ant Design Image */}
+                    <Image
+                      src={URL.createObjectURL(file)}
+                      alt={`Other ${index + 1}`}
+                      name="boardingHouse"
+                      className="object-cover border rounded"
+                      width={100}
+                      height={100}
+                      preview={{
+                        mask: <span>Preview</span>,
+                      }}
+                    />
+                    {/* Nút delete */}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveOtherImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                    >
+                      X
+                    </button>
+                  </div>
+                ))}
+
+                {/* Upload component */}
                 <Upload
-                  {...uploadProps}
-                  name="boardingHouse"
+                  {...uploadOtherImgProps}
                   listType="picture-card"
                   showUploadList={false}
-                  className="custom-upload w-full max-w-lg"
+                  className="custom-upload"
                 >
                   <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
                     <PlusOutlined className="text-2xl text-gray-400" />
                     <p className="text-gray-500 mt-2 text-sm font-medium">
-                      Add Image
+                      Add Images
                     </p>
                     <p className="text-gray-400 text-xs">
                       Drag-drop or click here to choose a file
                     </p>
                   </div>
                 </Upload>
-              )}
-
-              {/* Hiển thị Primary Image nếu đã upload */}
-              {formData.primaryImage && (
-                <div className="items-center justify-center flex flex-col gap-4">
-                  <Image
-                    src={URL.createObjectURL(formData.primaryImage)}
-                    alt="Primary"
-                    className="object-cover border rounded"
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      maxHeight: "300px",
-                    }}
-                    preview={{
-                      mask: <span className="text-white">Preview</span>,
-                    }}
-                  />
-                  {/* Nút xóa ảnh */}
-                  <button
-                    type="button"
-                    onClick={handleRemovePrimaryImage}
-                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-3 py-1 rounded-full z-10 shadow-lg"
-                  >
-                    X
-                  </button>
-                </div>
-              )}
-            </div>
-            {/* thêm css để bỏ đường viền khung của antd*/}
-            <style>
-              {`
+              </div>
+              {/* thêm css để bỏ đường viền khung của antd*/}
+              <style>
+                {`
                             .custom-upload .ant-upload
                             {
                             border: none !important;
@@ -472,197 +646,73 @@ const AddBHModal = ({ onAddData }) => {
                             padding: 0 !important;
                             }
                         `}
-            </style>
-          </Form.Item>
-
-          {/* Other Images */}
-          <Form.Item label={<span>Other Images</span>} className="mb-4">
-            <div className="mt-4 flex flex-wrap gap-4">
-              {formData.otherImages.map((file, index) => (
-                <div key={index} className="relative">
-                  {/* Hiển thị ảnh bằng Ant Design Image */}
-                  <Image
-                    src={URL.createObjectURL(file)}
-                    alt={`Other ${index + 1}`}
-                    name="boardingHouse"
-                    className="object-cover border rounded"
-                    width={100}
-                    height={100}
-                    preview={{
-                      mask: <span>Preview</span>,
-                    }}
-                  />
-                  {/* Nút delete */}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveOtherImage(index)}
-                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
-                  >
-                    X
-                  </button>
-                </div>
-              ))}
-
-              {/* Upload component */}
-              <Upload
-                {...uploadOtherImgProps}
-                listType="picture-card"
-                showUploadList={false}
-                className="custom-upload"
-              >
-                <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                  <PlusOutlined className="text-2xl text-gray-400" />
-                  <p className="text-gray-500 mt-2 text-sm font-medium">
-                    Add Images
-                  </p>
-                  <p className="text-gray-400 text-xs">
-                    Drag-drop or click here to choose a file
-                  </p>
-                </div>
-              </Upload>
-            </div>
-            {/* thêm css để bỏ đường viền khung của antd*/}
-            <style>
-              {`
-                            .custom-upload .ant-upload
-                            {
-                            border: none !important;
-                            background: none !important;
-                            padding: 0 !important;
-                            }
-                        `}
-            </style>
-          </Form.Item>
-          <h2 className="text-3xl font-bold mb-4 mt-10 ">4. Price</h2>
-          {/* Price Range */}
-          <Form.Item
-            label="Price Rent/month (VND)"
-            name="priceRange"
-            rules={[{ required: true, message: "Please enter the price rent" }]}
-            className="mb-2"
-          >
-            <InputNumber
-              placeholder="Enter price rent"
+              </style>
+            </Form.Item>
+            <h2
+              className={`text-3xl font-bold mb-4 mt-10 ${darkMode ? "text-white" : "text-black"
+                }`}
+            >
+              4. Price
+            </h2>
+            {/* Price Range */}
+            <Form.Item
+              label={
+                <span className={darkMode ? "text-white" : ""}>
+                  Price Rent/month (VND)
+                </span>
+              }
               name="priceRange"
-              value={formData.priceRange}
-              onChange={(value) =>
-                handleInputChange({ target: { name: "priceRange", value } })
-              }
-              formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              } // Thêm dấu phẩy ngăn cách hàng nghìn
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")} // Loại bỏ dấu phẩy khi nhập
-              className="w-full"
-              min={0}
-            />
-          </Form.Item>
-
-          {/* Electricity Price */}
-          <Form.Item
-            label="Electricity Price/kWh (VND)"
-            name="electricityPrice"
-            rules={[
-              { required: true, message: "Please enter the electricity price" },
-            ]}
-            className="mb-2"
-          >
-            <InputNumber
-              placeholder="Enter electricity price"
-              name="electricityPrice"
-              value={formData.electricityPrice}
-              onChange={(value) =>
-                handleInputChange({
-                  target: { name: "electricityPrice", value },
-                })
-              }
-              formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-              className="w-full"
-              min={0}
-            />
-          </Form.Item>
-
-          {/* Water Price */}
-          <Form.Item
-            label="Water Price/m³ (VND)"
-            name="waterPrice"
-            rules={[
-              { required: true, message: "Please enter the water price" },
-            ]}
-            className="mb-2"
-          >
-            <InputNumber
-              placeholder="Enter water price"
-              name="waterPrice"
-              value={formData.waterPrice}
-              onChange={(value) =>
-                handleInputChange({ target: { name: "waterPrice", value } })
-              }
-              formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-              className="w-full"
-              min={0}
-            />
-          </Form.Item>
-          {/* Total Rooms */}
-          {/* <Form.Item
-                    label="Total Rooms"
-                    name="totalRooms"
-                    rules={[{ required: true, message: "Please enter the total number of rooms" }]}
-                    className="mb-2"
-                >
-                    <Input
-                        type="number"
-                        placeholder="Enter total rooms"
-                        name="totalRooms"
-                        value={formData.totalRooms}
-                        onChange={handleInputChange}
-                    />
-                </Form.Item>
-
-                {/* Available Rooms */}
-          {/* <Form.Item
-                    label="Available Rooms"
-                    name="availableRooms"
-                    rules={[{ required: true, message: "Please enter the available rooms" }]}
-                    className="mb-2"
-                >
-                    <Input
-                        type="number"
-                        placeholder="Enter available rooms"
-                        name="availableRooms"
-                        value={formData.availableRooms}
-                        onChange={handleInputChange}
-                    />
-                </Form.Item> */}
-
-          <div className="flex justify-end mt-4">
-            <Button
-              title="Cancel"
-              btnCancel={true}
-              onClick={closeModal}
-              className="bg-red-500 hover:bg-red-600 text-white mr-2"
-              size="large"
+              rules={[
+                { required: true, message: "Please enter the price rent" },
+              ]}
+              className="mb-2"
             >
-              Cancel
-            </Button>
-            <Button
-              className="bg-primary text-white flex items-center"
-              size="large"
-              onClick={handleSubmit}
-              title="Submit"
-              loading={loading} // Disable button when loading
-            >
-              {loading ? <Spin size="small" className="mr-2" /> : null} Submit
-            </Button>
-          </div>
-        </Form>
-      </Modal>
-    </>
+              <InputNumber
+                placeholder="Enter price rent"
+                name="priceRange"
+                value={formData.priceRange}
+                onChange={(value) =>
+                  handleInputChange({ target: { name: "priceRange", value } })
+                }
+                formatter={(value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                className={darkMode ? "dark-input w-full" : "w-full"}
+                min={0}
+              />
+            </Form.Item>
+
+            <div className="flex justify-end mt-4">
+              <Button
+                title="Cancel"
+                btnCancel={true}
+                onClick={closeModal}
+                className={`${darkMode
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-red-500 hover:bg-red-600"
+                  } text-white mr-2`}
+                size="large"
+              >
+                Cancel
+              </Button>
+              <Button
+                className={`${darkMode
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "bg-primary hover:bg-blue-500"
+                  } text-white flex items-center`}
+                size="large"
+                onClick={handleSubmit}
+                title="Submit"
+                loading={loading}
+              >
+                {loading ? <Spin size="small" className="mr-2" /> : null} Submit
+              </Button>
+            </div>
+          </Form>
+        </Modal>
+      </>
+    </ConfigProvider>
   );
 };
 

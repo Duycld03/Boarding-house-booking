@@ -1,0 +1,42 @@
+{
+    "addBH": {
+        "addBoardingHouse": "Thêm nhà trọ",
+        "createBoardingHouse": "Tạo nhà trọ",
+        "information": "1. Thông tin",
+        "boardingHouseType": "Loại nhà trọ",
+        "selectBoardingHouseType": "Chọn loại nhà trọ",
+        "boardingHouseName": "Tên nhà trọ",
+        "enterBoardingHouseName": "Nhập tên nhà trọ",
+        "description": "Mô tả",
+        "enterDescription": "Nhập mô tả",
+        "address": "2. Địa chỉ",
+        "image": "3. Hình ảnh",
+        "primaryImage": "Hình ảnh chính",
+        "addPrimaryImage": "Thêm ảnh chính",
+        "otherImages": "Hình ảnh khác",
+        "addOtherImages": "Thêm ảnh khác",
+        "price": "4. Giá cả",
+        "priceRent": "Giá thuê/tháng (VND)",
+        "enterPriceRent": "Nhập giá thuê",
+        "electricityPrice": "Giá điện/kWh (VND)",
+        "enterElectricityPrice": "Nhập giá điện",
+        "waterPrice": "Giá nước/m³ (VND)",
+        "enterWaterPrice": "Nhập giá nước",
+        "cancel": "Hủy",
+        "submit": "Gửi",
+        "loading": "Đang xử lý...",
+        "error": {
+            "boardingHouseType": "Vui lòng chọn loại nhà trọ.",
+            "boardingHouseName": "Vui lòng nhập tên nhà trọ.",
+            "province": "Vui lòng chọn tỉnh/thành phố.",
+            "district": "Vui lòng chọn quận/huyện.",
+            "ward": "Vui lòng chọn xã/phường.",
+            "addressDetail": "Vui lòng nhập chi tiết địa chỉ.",
+            "primaryImage": "Vui lòng tải lên ảnh chính.",
+            "priceRange": "Vui lòng nhập giá thuê.",
+            "electricityPrice": "Vui lòng nhập giá điện.",
+            "waterPrice": "Vui lòng nhập giá nước.",
+            "location": "Vui lòng đánh dấu vị trí trên bản đồ."
+        }
+    }
+}
