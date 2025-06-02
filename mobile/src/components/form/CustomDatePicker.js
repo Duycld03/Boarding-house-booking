@@ -295,6 +295,7 @@ const CustomDatePicker = ({
                   value={tempValue || new Date()}
                   mode="time"
                   display="spinner"
+
                   onChange={handleIOSChange}
                   textColor={isDarkMode ? "#f9fafb" : "#111827"}
                   locale={datePickerLocale}
@@ -324,8 +325,6 @@ const CustomDatePicker = ({
       {label && (
         <View className="flex-row mb-1">
           <Text
-            className={`${themedClasses.text} text-sm font-medium`}
-            style={{ fontFamily: "Poppins-Medium" }}
           >
             {label}
           </Text>
@@ -354,9 +353,7 @@ const CustomDatePicker = ({
         `}
       >
         <Text
-          className={`flex-1 ${value ? themedClasses.text : "text-gray-400 dark:text-gray-500"
-            }`}
-          style={{ fontFamily: "Poppins-Regular" }}
+          className={`flex-1 ${value ? themedClasses("text-gray-400", "text-gray-500") : ""}`}
         >
           {value ? formatDate(value) : getPlaceholder()}
         </Text>

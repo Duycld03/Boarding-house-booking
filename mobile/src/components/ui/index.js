@@ -6,6 +6,7 @@ import BoardingHouseGallery from './BoardingHouseGallery';
 import Loader from './Loader';
 import Line from './Line';
 import Avatar from './Avatar';
+import LoadMoreButton from './LoadMoreButton'
 
 
-export { Button, Text, Input, Card, BoardingHouseGallery, Loader, Line, Avatar };
+export { Button, Text, Input, Card, BoardingHouseGallery, Loader, Line, Avatar, LoadMoreButton };

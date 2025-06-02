@@ -148,6 +148,22 @@
     "timeConflictError": "Không thể đặt lịch hẹn trong vòng 30 phút trước hoặc sau một lịch hẹn đã có!",
     "requestSuccess": "Đã gửi yêu cầu thành công!",
     "requestError": "Lỗi khi gửi yêu cầu: ",
-    "datePlaceHolder": "Select appointment date and time"
+    "datePlaceHolder": "Select appointment date and time",
+    "successTitle": "Tạo cuộc hẹn thành công!",
+    "successMessage": "Bạn có muốn đi đến trang My Appointments không?",
+    "goToMyAppointments": "Đi đến My Appointments",
+    "goBack": "Quay lại",
+    "timeError": "Không thể tạo lịch hẹn trước 7pm và sau 17pm",
+    "validation": {
+      "roomRequired": "Vui lòng chọn phòng",
+      "dateRequired": "Vui lòng chọn ngày giờ",
+      "pastDate": "Không thể chọn ngày trong quá khứ",
+      "invalidTime": "Vui lòng chọn thời gian từ 6:00 sáng đến 6:00 chiều",
+      "dateUnavailable": "Ngày đã chọn không khả dụng",
+      "timeUnavailable": "Thời gian đã chọn không khả dụng",
+      "noteTooLong": "Ghi chú không được vượt quá 500 ký tự",
+      "fixErrors": "Vui lòng sửa các lỗi trước khi gửi"
+    },
+    "submitting": "Đang tạo..."
   }
 }

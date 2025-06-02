@@ -35,8 +35,6 @@ function CreateAppointment() {
     const { showSuccess, showError } = useNotification();
 
     const [roomData, setRoomData] = useState([]);
-
-
     const [ownerAppointment, setOwnerAppointment] = useState([]);
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -47,20 +45,118 @@ function CreateAppointment() {
     const [appointmentDate, setAppointmentDate] = useState(null);
     const [note, setNote] = useState('');
 
+    // Validation error state
+    const [errors, setErrors] = useState({
+        room: '',
+        appointmentDate: '',
+        note: ''
+    });
+
     const { isLogin, hasRole } = useCurrentUser();
     const isOwner = hasRole(userRoles.owner);
 
     // Modal state
     const [showRoomPicker, setShowRoomPicker] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+    // Validation functions
+    const validateRoom = (roomId) => {
+        if (!roomId || roomId.trim() === '') {
+            return t('createAppointment.validation.roomRequired') || 'Please select a room';
+        }
+        return '';
+    };
 
+    const validateAppointmentDate = (date) => {
+        if (!date) {
+            return t('createAppointment.validation.dateRequired') || 'Please select appointment date';
+        }
+
+        const selectedDateTime = dayjs(date);
+        const now = dayjs();
+
+        // Check if date is in the past
+        if (selectedDateTime.isBefore(now)) {
+            return t('createAppointment.validation.pastDate') || 'Cannot select past date';
+        }
+
+        // Check if time is within allowed hours (6 AM - 6 PM)
+        const hour = selectedDateTime.hour();
+        if (hour < 6 || hour >= 18) {
+            return t('createAppointment.validation.invalidTime') || 'Please select time between 6:00 AM and 6:00 PM';
+        }
+
+        // Check if date is disabled
+        if (isDisabledDate(date)) {
+            return t('createAppointment.validation.dateUnavailable') || 'Selected date is not available';
+        }
+
+        // Check if time is disabled
+        if (isDisabledTime(date)) {
+            return t('createAppointment.validation.timeUnavailable') || 'Selected time is not available';
+        }
+
+        return '';
+    };
+
+    const validateNote = (noteText) => {
+        // Note is optional, but if provided, check length
+        if (noteText && noteText.length > 500) {
+            return t('createAppointment.validation.noteTooLong') || 'Note cannot exceed 500 characters';
+        }
+        return '';
+    };
+
+    // Real-time validation
+    const handleRoomChange = (roomId) => {
+        setSelectedRoomId(roomId);
+        const error = validateRoom(roomId);
+        setErrors(prev => ({ ...prev, room: error }));
+    };
+
+    const handleDateChange = (date) => {
+        setAppointmentDate(date);
+        const error = validateAppointmentDate(date);
+        setErrors(prev => ({ ...prev, appointmentDate: error }));
+    };
+
+    const handleNoteChange = (text) => {
+        setNote(text);
+        const error = validateNote(text);
+        setErrors(prev => ({ ...prev, note: error }));
+    };
+
+    // Validate all fields
+    const validateAllFields = () => {
+        const roomError = validateRoom(selectedRoomId);
+        const dateError = validateAppointmentDate(appointmentDate);
+        const noteError = validateNote(note);
+
+        setErrors({
+            room: roomError,
+            appointmentDate: dateError,
+            note: noteError
+        });
+
+        return !roomError && !dateError && !noteError;
+    };
+
+    // Reset form function
+    const resetForm = () => {
+        setSelectedRoomId('');
+        setAppointmentDate(null);
+        setNote('');
+        setErrors({
+            room: '',
+            appointmentDate: '',
+            note: ''
+        });
+    };
 
     // Fixed: Added function to fetch rooms data
     const fetchRoomByRoomTypeId = async () => {
         try {
-            const res = await getRoomsByRoomType(
-                roomTypeId,
-            );
+            const res = await getRoomsByRoomType(roomTypeId);
             setRoomData(res)
         } catch (error) {
             // toast.error(t("roomTypeCard.fetchError") + error.message);
@@ -141,24 +237,15 @@ function CreateAppointment() {
 
     const handleDateTimeChange = (selectedDateTime) => {
         if (selectedDateTime) {
-            setAppointmentDate(selectedDateTime);
+            handleDateChange(selectedDateTime);
         }
     };
 
     const handleCreateAppointment = async () => {
-        // Validation
-        if (!selectedRoomId) {
-            showError('Please select room!')
+        // Validate all fields before submission
+        if (!validateAllFields()) {
             return;
         }
-
-        if (!appointmentDate) {
-            showError('Please select date!')
-            return;
-        }
-
-
-
 
         setSubmitting(true);
 
@@ -183,7 +270,7 @@ function CreateAppointment() {
                 );
 
                 if (hasSameRoom) {
-                    Alert.alert('Error', t('createAppointment.sameRoomError'));
+                    showError(t('createAppointment.sameRoomError'))
                     return;
                 }
             }
@@ -193,7 +280,6 @@ function CreateAppointment() {
                 return diff <= 30 * 60 * 1000;
             };
 
-            // Check for time conflict
             if (userAppointment.length > 0) {
                 const hasConflict = userAppointment
                     .filter(
@@ -207,24 +293,27 @@ function CreateAppointment() {
                     );
 
                 if (hasConflict) {
-                    Alert.alert('Error', t('createAppointment.timeConflictError'));
+                    showError(t('createAppointment.timeConflictError'))
                     return;
                 }
             }
 
-            await createAppointment(appointmentData);
-            Alert.alert('Success', t('createAppointment.success'), [
-                {
-                    text: 'OK',
-                    onPress: () => router.push('/my-appointment'),
-                },
-            ]);
+            await createAppointment(appointmentData).then(() => {
+                showSuccess('Create appointment success')
+                resetForm();
+                router.back()
+            })
         } catch (error) {
             console.log('Error creating appointment:', error);
             Alert.alert('Error', t('createAppointment.createError'));
         } finally {
             setSubmitting(false);
         }
+    };
+
+    const handleStayHere = () => {
+        setShowSuccessModal(false);
+        router.back();
     };
 
     if (loading) {
@@ -251,26 +340,32 @@ function CreateAppointment() {
             />
             <View className="flex-1 p-5">
 
-
                 {/* Room Selection */}
                 <View className="mb-5">
                     <Text className={`text-base font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                        {t('createAppointment.selectRoom')}
+                        {t('createAppointment.selectRoom')} <Text
+                            style={{ color: 'red' }}
+                        >*</Text>
                     </Text>
                     <TouchableOpacity
                         className={`border rounded-lg p-4 ${isDarkMode
                             ? 'border-gray-600 bg-gray-800'
                             : 'border-gray-300 bg-white'
-                            } ${isOwner ? 'opacity-50' : ''}`}
+                            } ${isOwner ? 'opacity-50' : ''} ${errors.room ? 'border-red-500' : ''}`}
                         onPress={() => setShowRoomPicker(true)}
                         disabled={isOwner}
                     >
-                        <Text className={`text-base ${isDarkMode ? 'text-gray-200' : 'text-black'}`}>
+                        <Text className={`text-base ${isDarkMode ? 'text-gray-200' : 'text-black'} ${!selectedRoomId ? 'opacity-60' : ''}`}>
                             {selectedRoomId
                                 ? roomData.find(room => room._id === selectedRoomId)?.roomNumber
                                 : t('createAppointment.roomPlaceholder')}
                         </Text>
                     </TouchableOpacity>
+                    {errors.room ? (
+                        <Text style={{ color: '#ef4444', fontSize: 12, marginTop: 4 }}>
+                            {errors.room}
+                        </Text>
+                    ) : null}
 
                     <Modal
                         visible={showRoomPicker}
@@ -284,8 +379,7 @@ function CreateAppointment() {
                             onPress={() => setShowRoomPicker(false)}
                         >
                             <View className={`rounded-t-3xl max-h-[80%] ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-                                <View className={`flex-row justify-between items-center p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                                    }`}>
+                                <View className={`flex-row justify-between items-center p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                                     <Text className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-black'}`}>
                                         {t('createAppointment.selectRoom')}
                                     </Text>
@@ -302,20 +396,15 @@ function CreateAppointment() {
                                     {roomData.map((room) => (
                                         <TouchableOpacity
                                             key={room._id}
-                                            className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                                                } ${selectedRoomId === room._id
-                                                    ? isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
-                                                    : ''
-                                                }`}
+                                            className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} ${selectedRoomId === room._id
+                                                ? isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                                                : ''}`}
                                             onPress={() => {
-                                                setSelectedRoomId(room._id);
+                                                handleRoomChange(room._id);
                                                 setShowRoomPicker(false);
                                             }}
                                         >
-                                            <Text className={`text-base ${selectedRoomId === room._id
-                                                ? 'font-semibold'
-                                                : ''
-                                                } ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                                            <Text className={`text-base ${selectedRoomId === room._id ? 'font-semibold' : ''} ${isDarkMode ? 'text-white' : 'text-black'}`}>
                                                 {room.roomNumber}
                                             </Text>
                                         </TouchableOpacity>
@@ -330,6 +419,9 @@ function CreateAppointment() {
                 <View className="mb-5">
                     <Text className={`text-base font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>
                         {t('createAppointment.dateTime')}
+                        <Text
+                            style={{ color: 'red' }}
+                        >*</Text>
                     </Text>
                     <CustomDatePicker
                         value={appointmentDate}
@@ -339,30 +431,38 @@ function CreateAppointment() {
                         placeholder={t('createAppointment.datePlaceHolder')}
                         format={(date) => dayjs(date).format('YYYY-MM-DD HH:mm')}
                         disabled={isOwner}
+                        error={errors.appointmentDate}
                     />
+
                 </View>
 
                 {/* Note Input */}
                 <View className="mb-5">
                     <Text className={`text-base font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>
                         {t('createAppointment.note')}
+                        <Text className="text-gray-500 text-sm font-normal ml-2">
+                            ({note.length}/500)
+                        </Text>
                     </Text>
                     <Input
                         value={note}
-                        onChangeText={setNote}
+                        onChangeText={handleNoteChange}
                         placeholder={t('createAppointment.notePlaceholder')}
                         multiline
                         numberOfLines={4}
                         className={`min-h-[100px] text-top border rounded-lg p-3 ${isDarkMode
                             ? 'border-gray-600 bg-gray-800 text-gray-200'
                             : 'border-gray-300 bg-white text-black'
-                            }`}
+                            } ${errors.note ? 'border-red-500' : ''}`}
                         style={{ textAlignVertical: 'top' }}
+                        error={errors.note}
                     />
+                    {errors.note ? (
+                        <Text className="text-red-500 text-sm mt-1">{errors.note}</Text>
+                    ) : null}
                 </View>
 
                 {/* Submit Button */}
-
                 <Button
                     onPress={handleCreateAppointment}
                     disabled={submitting || isOwner || roomData.length === 0}
@@ -371,9 +471,19 @@ function CreateAppointment() {
                         : ''
                         } ${isDarkMode ? 'bg-red-600' : 'bg-red-500'}`}
                 >
-
-                    {t('createAppointment.submit')}
+                    {submitting ? t('createAppointment.submitting') || 'Creating...' : t('createAppointment.submit')}
                 </Button>
+
+                {/* Success Confirmation Modal */}
+                <ConfirmModal
+                    visible={showSuccessModal}
+                    title={t('createAppointment.successTitle')}
+                    message={t('createAppointment.successMessage')}
+                    confirmText={t('createAppointment.goToMyAppointments')}
+                    cancelText={t('createAppointment.goBack')}
+                    onConfirm={() => handleGoToMyAppointment()}
+                    onClose={handleStayHere}
+                />
 
             </View>
         </ScrollContainer>

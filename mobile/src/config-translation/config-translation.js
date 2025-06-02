@@ -29,6 +29,8 @@ import en_common from "@/locales/en/common.json";
 import vi_common from "@/locales/vi/common.json";
 import en_bhDetail from "@/locales/en/bhDetail.json";
 import vi_bhDetail from "@/locales/vi/bhDetail.json";
+import vi_myAppointment from '@/locales/vi/myAppointment.json'
+import en_myAppointment from '@/locales/en/myAppointment.json'
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -47,6 +49,7 @@ i18n.use(initReactI18next).init({
       resetPassword: en_resetPassword,
       common: en_common,
       boardingHouseDetail: en_bhDetail,
+      myAppointment: en_myAppointment
     },
     vi: {
       setting: vi_setting,
@@ -63,6 +66,7 @@ i18n.use(initReactI18next).init({
       resetPassword: vi_resetPassword,
       common: vi_common,
       boardingHouseDetail: vi_bhDetail,
+      myAppointment: vi_myAppointment
     },
   },
   lng: "en",
