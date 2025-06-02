@@ -29,6 +29,8 @@ import en_common from "@/locales/en/common.json";
 import vi_common from "@/locales/vi/common.json";
 import en_bhDetail from "@/locales/en/bhDetail.json";
 import vi_bhDetail from "@/locales/vi/bhDetail.json";
+import en_home from '@/locales/en/home.json';
+import vi_home from '@/locales/vi/home.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -45,8 +47,10 @@ i18n.use(initReactI18next).init({
       changeEmail: en_changeEmail,
       forgotPassword: en_forgotPassword,
       resetPassword: en_resetPassword,
+      home: en_home,
       common: en_common,
       boardingHouseDetail: en_bhDetail,
+
     },
     vi: {
       setting: vi_setting,
@@ -61,14 +65,15 @@ i18n.use(initReactI18next).init({
       changeEmail: vi_changeEmail,
       forgotPassword: vi_forgotPassword,
       resetPassword: vi_resetPassword,
+      home: vi_home,
       common: vi_common,
       boardingHouseDetail: vi_bhDetail,
     },
   },
-  lng: "en",
-  fallbackLng: "en",
-  ns: ["setting", "account"],
-  defaultNS: "setting",
+  lng: 'en',
+  fallbackLng: 'en',
+  ns: ['setting', 'account'],
+  defaultNS: 'setting',
   interpolation: {
     escapeValue: false,
   },
