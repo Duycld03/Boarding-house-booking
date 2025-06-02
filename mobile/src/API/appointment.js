@@ -1,7 +1,5 @@
 import axios from './axios.config';
 
-
-
 export const getAppointmentOfUser = (paginationOptions = {}) => {
     const params = {
         ...paginationOptions,

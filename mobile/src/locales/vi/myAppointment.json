@@ -1,0 +1,33 @@
+{
+  "myAppointments": "Lịch Hẹn Của Tôi",
+  "totalAppointments": "Tổng Lịch Hẹn",
+  "appointments": "lịch hẹn",
+  "noDataAvailable": "Không có dữ liệu",
+  "fetchError": "Lỗi khi tải dữ liệu",
+  "loading": "Đang tải",
+  "noAppointments": "Chưa có lịch hẹn nào",
+  "noAppointmentsSubtext": "Bạn chưa có lịch hẹn nào. Hãy đặt lịch hẹn để xem phòng trọ!",
+  "confirmCancellation": "Xác nhận hủy",
+  "confirmCancellationMessage": "Bạn có chắc chắn muốn hủy lịch hẹn này không?",
+  "cancel": "Hủy",
+  "confirm": "Xác nhận",
+  "appointmentCanceled": "Đã hủy lịch hẹn thành công",
+  "cancelError": "Lỗi khi hủy lịch hẹn",
+  "cancelFailed": "Hủy lịch hẹn thất bại",
+  "cancelAppointment": "Hủy Lịch Hẹn",
+  "owner": "Chủ Trọ",
+  "boardingHouse": "Nhà Trọ",
+  "roomNumber": "Số Phòng",
+  "note": "Ghi Chú",
+  "status": {
+    "pending": "Chờ Xác Nhận",
+    "accepted": "Đã Chấp Nhận",
+    "canceled": "Đã Hủy",
+    "completed": "Hoàn Thành"
+  },
+  "allAppointmentsLoaded": "Đã tải tất cả lịch hẹn",
+  "loadingMoreAppointments": "Đang tải thêm lịch hẹn...",
+  "loadMoreAppointments": "Tải thêm lịch hẹn",
+  "of": "trên",
+  "appointmentsLoaded": "lịch hẹn đã được tải"
+}

@@ -31,7 +31,7 @@ import ExtraPrices from '@/components/screen/bhDetail/ExtraPrices';
 // Context & Utils
 import { useTheme } from '@/context/ThemeProvider';
 import formatAmount from '@/utils/formatAmount';
-import emitter from '@/utils/FavoriteEvent'; // bạn đã có
+import emitter from '@/utils/FavoriteEvent';
 
 // API
 import {
@@ -79,7 +79,7 @@ export default function BhDetailScreen() {
     isScrollReady: false,
   });
 
-  // ✅ Simplified pagination state
+  // Simplified pagination state
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -116,6 +116,7 @@ export default function BhDetailScreen() {
     return response?.data || [];
   }, [boardingHouseId]);
 
+  // Favorite management
   useEffect(() => {
     const handler = ({ id: changedId, isFavorite }) => {
       if (String(changedId) === String(boardingHouseId)) {
@@ -125,8 +126,8 @@ export default function BhDetailScreen() {
           boardingHouseDetail: {
             ...prev.boardingHouseDetail,
             // likes: isFavorite
-            //   ? prev.boardingHouseDetail.likes + 1
-            //   : prev.boardingHouseDetail.likes - 1,
+            // ? prev.boardingHouseDetail.likes + 1
+            // : prev.boardingHouseDetail.likes - 1,
           },
         }));
       }
@@ -137,6 +138,7 @@ export default function BhDetailScreen() {
       emitter.off('favoriteChanged', handler);
     };
   }, [boardingHouseId]);
+
   const handleFavoriteClick = async () => {
     try {
       const response = await addFavorite(boardingHouseId);
@@ -164,7 +166,7 @@ export default function BhDetailScreen() {
     }
   };
 
-  // ✅ Fixed fetchReviews function - removed circular dependency
+  // Fixed fetchReviews function - removed circular dependency
   const fetchReviews = useCallback(
     async ({
       page = 1,
@@ -183,13 +185,13 @@ export default function BhDetailScreen() {
         if (response?.success && response?.data) {
           const newReviews = response.data || [];
 
-          // ✅ Update reviews state properly
+          // Update reviews state properly
           setData((prev) => ({
             ...prev,
             reviews: append ? [...prev.reviews, ...newReviews] : newReviews,
           }));
 
-          // ✅ Update pagination with response data
+          // Update pagination with response data
           const paginationData = response.pagination || {};
           setPagination({
             currentPage: paginationData.currentPage || page,
@@ -212,8 +214,11 @@ export default function BhDetailScreen() {
     [boardingHouseId]
   );
 
-  // ✅ Debug pagination changes
-  useEffect(() => {}, [pagination]);
+  // Debug pagination changes
+  useEffect(() => {
+    // Debug pagination changes if needed
+  }, [pagination]);
+
   const checkFavoriteStatus = useCallback(async () => {
     try {
       const favoriteResponse = await getFavorite();
@@ -264,7 +269,7 @@ export default function BhDetailScreen() {
         hasPrev: false,
       });
 
-      // ✅ Gọi riêng check favorite
+      // Gọi riêng check favorite
       await checkFavoriteStatus();
     } catch (error) {
       console.error('❌ Error fetching data:', error);
@@ -344,7 +349,7 @@ export default function BhDetailScreen() {
     }, SCROLL_TO_ROOM_DELAY);
   }, [ui.roomTypesPosition, ui.isScrollReady]);
 
-  // ✅ Write Review Handler
+  // Write Review Handler
   const handleWriteReview = useCallback(() => {
     router.push({
       pathname: '/review/write',
@@ -376,9 +381,8 @@ export default function BhDetailScreen() {
               {ui.error}
             </Text>
             <Text
-              className={`text-base underline ${
-                isDarkMode ? 'text-blue-400' : 'text-blue-700'
-              }`}
+              className={`text-base underline ${isDarkMode ? 'text-blue-400' : 'text-blue-700'
+                }`}
               onPress={onRefresh}
             >
               {t('retry')}
@@ -441,9 +445,8 @@ export default function BhDetailScreen() {
         {t('address')}:
       </Text>
       <Text
-        className={`text-base ${
-          isDarkMode ? 'text-gray-400' : 'text-gray-600'
-        }`}
+        className={`text-base ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+          }`}
       >
         {formattedAddress}
       </Text>
@@ -465,9 +468,8 @@ export default function BhDetailScreen() {
             />
           </TouchableOpacity>
           <Text
-            className={`text-base font-semibold ${
-              isDarkMode ? 'text-gray-200' : 'text-gray-800'
-            }`}
+            className={`text-base font-semibold ml-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'
+              }`}
           >
             {data.boardingHouseDetail?.likes || 0}
           </Text>
@@ -502,9 +504,8 @@ export default function BhDetailScreen() {
       return (
         <View className="mt-4" onLayout={onRoomTypesLayout}>
           <Text
-            className={`text-base ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-            }`}
+            className={`text-base ${isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              }`}
           >
             {t('noRoomTypesAvailable')}
           </Text>
@@ -527,7 +528,7 @@ export default function BhDetailScreen() {
     );
   };
 
-  // ✅ Updated renderReviewList
+  // Updated renderReviewList
   const renderReviewList = () => {
     return (
       <View className="mt-4">

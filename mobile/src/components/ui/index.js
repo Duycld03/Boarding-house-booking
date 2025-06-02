@@ -9,6 +9,7 @@ import VerticalList from './VerticalList';
 import Loader from './Loader';
 import Line from './Line';
 import Avatar from './Avatar';
+import LoadMoreButton from './LoadMoreButton'
 
 export {
   Button,
@@ -19,7 +20,10 @@ export {
   BoardingHouseCard,
   HorizontalList,
   VerticalList,
-Loader, Line, Avatar
+  Loader,
+  Line,
+  Avatar,
+  LoadMoreButton
 };
 
 

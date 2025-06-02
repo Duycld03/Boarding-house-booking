@@ -1,0 +1,33 @@
+{
+  "myAppointments": "My Appointments",
+  "totalAppointments": "Total Appointments",
+  "appointments": "appointments",
+  "noDataAvailable": "No data available",
+  "fetchError": "Error loading data",
+  "loading": "Loading",
+  "noAppointments": "No appointments yet",
+  "noAppointmentsSubtext": "You don't have any appointments yet. Book an appointment to view boarding houses!",
+  "confirmCancellation": "Confirm Cancellation",
+  "confirmCancellationMessage": "Are you sure you want to cancel this appointment?",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "appointmentCanceled": "Appointment canceled successfully",
+  "cancelError": "Error canceling appointment",
+  "cancelFailed": "Failed to cancel appointment",
+  "cancelAppointment": "Cancel Appointment",
+  "owner": "Owner",
+  "boardingHouse": "Boarding House",
+  "roomNumber": "Room Number",
+  "note": "Note",
+  "status": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "canceled": "Canceled",
+    "completed": "Completed"
+  },
+  "allAppointmentsLoaded": "All appointments loaded",
+  "loadingMoreAppointments": "Loading more appointments...",
+  "loadMoreAppointments": "Load more appointments",
+  "of": "of",
+  "appointmentsLoaded": "appointments loaded"
+}
