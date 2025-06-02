@@ -28,5 +28,6 @@
   "allAppointmentsLoaded": "All appointments loaded",
   "loadingMoreAppointments": "Loading more appointments...",
   "loadMoreAppointments": "Load more appointments",
-  "of": "of"
+  "of": "of",
+  "appointmentsLoaded": "appointments loaded"
 }

@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import { useTranslation } from 'react-i18next';
+import Text from './Text'
 
 /**
  * LoadMoreButton Component
@@ -59,12 +60,13 @@ const LoadMoreButton = ({
                     className="text-base font-medium"
                     style={{ color: "#10B981", ...customStyles.completedText }}
                 >
-                    {t(defaultTranslations.allLoaded) || defaultTranslations.allLoaded}
+                    {defaultTranslations.allLoaded}
                 </Text>
             </View>
         );
     }
 
+    // Tính số items còn lại và số items sẽ load
     const remainingItems = totalCount - currentCount;
     const itemsToLoad = Math.min(itemsPerPage, remainingItems);
 
@@ -103,7 +105,7 @@ const LoadMoreButton = ({
                             className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}
                             style={customStyles.loadingText}
                         >
-                            {t(defaultTranslations.loadingMore) || defaultTranslations.loadingMore}
+                            {defaultTranslations.loadingMore}
                         </Text>
                     </>
                 ) : (
@@ -118,7 +120,7 @@ const LoadMoreButton = ({
                             className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}
                             style={customStyles.buttonText}
                         >
-                            {t(defaultTranslations.loadMore) || `Load ${itemsToLoad} more ${itemName}`}
+                            {defaultTranslations.loadMore || `Load ${itemsToLoad} more ${itemName}`}
                         </Text>
                     </>
                 )}
@@ -131,7 +133,7 @@ const LoadMoreButton = ({
                         className={`text-xs ${themedClasses.textSecondary} mb-2`}
                         style={customStyles.progressText}
                     >
-                        {t(defaultTranslations.progressText) || defaultTranslations.progressText}
+                        {defaultTranslations.progressText}
                     </Text>
                     <View
                         className={`w-full h-1 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}

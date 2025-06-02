@@ -116,7 +116,7 @@ const ReviewList = ({
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    const REVIEWS_PER_PAGE = 2;
+    const REVIEWS_PER_PAGE = 5;
 
     const [reviewList, setReviewList] = useState([]);
     const [reviewPagination, setReviewPagination] = useState({
@@ -208,7 +208,6 @@ const ReviewList = ({
         return reviews.length < totalReviews;
     }, [pagination, reviews.length, totalReviews]);
 
-    // ✅ Handle loading more reviews with better error handling
     const handleLoadMore = async () => {
         if (isLoadingMore || !hasMoreReviews || !fetchReviews || !boardingHouse?._id) {
             console.log('🚫 Cannot load more:', {
@@ -241,7 +240,6 @@ const ReviewList = ({
         }
     };
 
-    // ✅ Handle initial load with better logic
     const handleInitialLoad = async () => {
         if (!fetchReviews || !boardingHouse?._id || isLoading) {
             return;

@@ -39,7 +39,7 @@ const AppointmentCard = ({ item, onCancel }) => {
             text: 'text-white',
             iconName: 'time',
             iconLibrary: Ionicons,
-            iconColor: '#fef3c7', // amber-800 : amber-100
+            iconColor: 'yellow',
             borderColor: isDarkMode ? 'border-amber-500/30' : 'border-amber-200'
         },
         accepted: {
@@ -49,7 +49,7 @@ const AppointmentCard = ({ item, onCancel }) => {
             text: 'text-white',
             iconName: 'checkmark-circle',
             iconLibrary: Ionicons,
-            iconColor: '#dbeafe', // blue-800 : blue-100
+            iconColor: 'orange',
             borderColor: isDarkMode ? 'border-blue-500/30' : 'border-blue-200'
         },
         canceled: {
@@ -59,7 +59,7 @@ const AppointmentCard = ({ item, onCancel }) => {
             text: 'text-white',
             iconName: 'close-circle',
             iconLibrary: Ionicons,
-            iconColor: '#fee2e2', // red-800 : red-100
+            iconColor: 'red', // red-800 : red-100
             borderColor: isDarkMode ? 'border-red-500/30' : 'border-red-200'
         },
         completed: {
@@ -69,7 +69,7 @@ const AppointmentCard = ({ item, onCancel }) => {
             text: 'text-white',
             iconName: 'checkmark-done-circle',
             iconLibrary: Ionicons,
-            iconColor: '#dcfce7',
+            iconColor: 'green',
             borderColor: isDarkMode ? 'border-green-500/30' : 'border-green-200'
         },
     };

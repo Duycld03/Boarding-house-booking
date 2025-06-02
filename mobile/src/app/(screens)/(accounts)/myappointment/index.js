@@ -55,9 +55,10 @@ function MyAppointment() {
     limit: 5,
   });
 
+  // Thay đổi: Chỉ dùng limit thay vì page
   const [paginationOptions, setPaginationOptions] = useState({
-    page: 1,
-    limit: 5,
+    page: 1, // Luôn giữ page = 1
+    limit: 5, // Sẽ tăng limit khi load more
     sortField: 'createdAt',
     sortOrder: 'desc',
   });
@@ -89,17 +90,10 @@ function MyAppointment() {
         limit: res.pagination?.limit,
       });
 
-      if (isLoadMore) {
-        // Append new data to existing data
-        setAppointmentData(prev => [...prev, ...res.data]);
-      } else {
-        // Replace data (for initial load or refresh)
+      setAppointmentData(res.data);
 
-        setAppointmentData(res.data);
-      }
     } catch (error) {
-      console.log(error);
-      showError(t('fetchError'));
+      // showError(t('fetchError'));
     } finally {
       if (isLoadMore) {
         setLoadingMore(false);
@@ -118,8 +112,8 @@ function MyAppointment() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    // Reset pagination for refresh
-    setPaginationOptions(prev => ({ ...prev, page: 1 }));
+    // Reset về limit ban đầu khi refresh
+    setPaginationOptions(prev => ({ ...prev, limit: 5 }));
     await fetchData();
     setRefreshing(false);
   }, [fetchData]);
@@ -146,11 +140,8 @@ function MyAppointment() {
         status: 'canceled',
       });
 
-
-
       if (res) {
-        // Refresh data after canceling
-        setPaginationOptions(prev => ({ ...prev, page: 1 }));
+        // Giữ nguyên limit hiện tại khi refresh sau khi cancel
         await fetchData();
         showSuccess(t('appointmentCanceled'));
         handleCloseConfirmModal();
@@ -169,21 +160,18 @@ function MyAppointment() {
     handleShowCancelConfirm(appointment);
   }, [handleShowCancelConfirm]);
 
-  // Handle load more với LoadMoreButton
+  // Thay đổi: Handle load more bằng cách tăng limit
   const handleLoadMore = useCallback(() => {
-    if (pagination.currentPage < pagination.totalPages && !loadingMore) {
+    if (appointmentData.length < pagination.totalItems && !loadingMore) {
       setPaginationOptions(prev => ({
         ...prev,
-        page: prev.page + 1,
+        limit: prev.limit + 5, // Tăng limit thêm 5
       }));
-      fetchData(true); // Pass true để indicate load more
+      fetchData(true);
     }
-  }, [pagination.currentPage, pagination.totalPages, loadingMore, fetchData]);
+  }, [appointmentData.length, pagination.totalItems, loadingMore, fetchData]);
 
-
-
-  // Check if has more data
-  const hasMoreAppointments = pagination.currentPage < pagination.totalPages;
+  const hasMoreAppointments = appointmentData.length < pagination.totalItems;
 
   const renderAppointmentItem = useCallback(({ item }) => (
     <AppointmentCard
@@ -192,8 +180,6 @@ function MyAppointment() {
     />
   ), [handleCancel]);
 
-
-  // Simplified render footer - chỉ hiển thị khi initial loading
   const renderFooter = () => {
     if (!loading || appointmentData.length > 0) return null;
     return (
@@ -262,7 +248,7 @@ function MyAppointment() {
         hasMore={hasMoreAppointments}
         currentCount={appointmentData.length}
         totalCount={pagination.totalItems}
-        itemsPerPage={pagination.limit}
+        itemsPerPage={5} // Luôn load thêm 5 items
         isLoading={loadingMore}
         onLoadMore={handleLoadMore}
         itemName="appointments"
@@ -314,9 +300,6 @@ function MyAppointment() {
             progressBackgroundColor={isDarkMode ? '#1f2937' : '#ffffff'}
           />
         }
-        // Remove onEndReached since we're using LoadMoreButton
-        // onEndReached={loadMore}
-        // onEndReachedThreshold={0.1}
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
         showsVerticalScrollIndicator={false}
@@ -328,7 +311,6 @@ function MyAppointment() {
         ItemSeparatorComponent={() => <View className="h-1" />}
       />
 
-      {/* LoadMoreButton - hiển thị sau FlatList */}
       {renderLoadMoreButton()}
 
       {/* ConfirmModal */}
@@ -341,7 +323,6 @@ function MyAppointment() {
         confirmText={t('confirm')}
         cancelText={t('cancel')}
         warningMode={true}
-      // loading={isProcessing}
       />
     </ScrollContainer>
   );
