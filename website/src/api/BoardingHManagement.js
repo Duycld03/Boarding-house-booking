@@ -73,11 +73,17 @@ export const filterBH = async (filterValue) => {
 export const softDeleteBoardingHouse = async (boardingHouseId) => {
   return axios.delete(`/dashboard/boardinghouse/${boardingHouseId}/softDelete`);
 };
-export const getAllBHOwner = () => {
-  return axios.get('/owner/boardinghouseowner');
+export const getAllBHOwner = (filterValue, paginationOptions) => {
+  return axios.get('/manager/boardinghouseowner', {
+    params: {
+      ...filterValue,
+      ...paginationOptions,
+    },
+  });
 };
+
 export const getAllBoardingHouseTypesOwner = () => {
-  return axios.get('/owner/types');
+  return axios.get('/manager/types');
 };
 export const createBoardingHouseOwner = (data) => {
   return axios.post('owner/boardinghouse', data, {
@@ -93,7 +99,7 @@ export const updateBoardingHouseDetailsOwner = (
   boardingHouseId,
   updateData
 ) => {
-  return axios.put(`/owner/boardinghouse/${boardingHouseId}`, updateData, {
+  return axios.put(`/manager/boardinghouse/${boardingHouseId}`, updateData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -112,7 +118,10 @@ export const getBoardingHouseTypeDetails = (boardingHouseTypeId) => {
   return axios.get(`/dashboard/boardinghousetype/${boardingHouseTypeId}`);
 };
 export const updateBoardingHouseType = (boardingHouseTypeId, updateData) => {
-  return axios.put(`/dashboard/boardinghousetype/${boardingHouseTypeId}`, updateData);
+  return axios.put(
+    `/dashboard/boardinghousetype/${boardingHouseTypeId}`,
+    updateData
+  );
 };
 export const softDeleteBoardingHouseType = (boardingHouseTypeId) => {
   return axios.delete(`/dashboard/boardinghousetype/${boardingHouseTypeId}`);
