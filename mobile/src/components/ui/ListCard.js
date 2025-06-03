@@ -6,11 +6,13 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  useColorScheme,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useTheme } from '@/context/ThemeProvider';
 
 const getPrimaryImage = (images = [], fallbackImages = []) => {
   const source =
@@ -55,7 +57,8 @@ const ListCard = ({
   totalPages = 1,
   onPageChange,
 }) => {
-  const navigation = useNavigation();
+  const colorScheme = useColorScheme(); // Light | dark
+  const { isDarkMode } = useTheme();
   const { t } = useTranslation('common');
   const router = useRouter();
 
@@ -75,7 +78,10 @@ const ListCard = ({
 
     return (
       <TouchableOpacity
-        style={styles.card}
+        style={[
+          styles.card,
+          { backgroundColor: isDarkMode ? '#1f2937' : '#FFF' },
+        ]}
         onPress={() => goToDetail(navigateId)}
       >
         <View style={styles.imageWrapper}>
@@ -85,8 +91,10 @@ const ListCard = ({
           />
         </View>
         <View style={styles.info}>
-          <Text style={styles.name}>{house?.name}</Text>
-          <Text style={styles.type}>
+          <Text style={[styles.name, { color: isDarkMode ? '#fff' : '#000' }]}>
+            {house?.name}
+          </Text>
+          <Text style={[styles.type, { color: isDarkMode ? '#ccc' : '#666' }]}>
             {t(
               `boardingHouseTypes.${
                 typeof house?.boardingHouseType === 'object'
@@ -96,7 +104,11 @@ const ListCard = ({
             )}
           </Text>
           {renderStars(house?.rating)}
-          <Text style={styles.address}>{getAddress(house?.address, t)}</Text>
+          <Text
+            style={[styles.address, { color: isDarkMode ? '#aaa' : '#888' }]}
+          >
+            {getAddress(house?.address, t)}
+          </Text>
         </View>
         <TouchableOpacity
           onPress={() => handleRemove(itemId)}
@@ -109,7 +121,12 @@ const ListCard = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDarkMode ? '#111827' : '#f9fafb' },
+      ]}
+    >
       <FlatList
         data={data}
         renderItem={renderItem}
@@ -128,11 +145,15 @@ const ListCard = ({
               <AntDesign
                 name="left"
                 size={20}
-                color={currentPage === 1 ? '#9ca3af' : '#000'}
+                color={
+                  currentPage === 1 ? '#9ca3af' : isDarkMode ? '#fff' : '#000'
+                }
               />
             </TouchableOpacity>
 
-            <Text style={styles.pageText}>
+            <Text
+              style={[styles.pageText, { color: isDarkMode ? '#fff' : '#000' }]}
+            >
               {currentPage} / {totalPages}
             </Text>
 
@@ -147,7 +168,13 @@ const ListCard = ({
               <AntDesign
                 name="right"
                 size={20}
-                color={currentPage === totalPages ? '#9ca3af' : '#000'}
+                color={
+                  currentPage === totalPages
+                    ? '#9ca3af'
+                    : isDarkMode
+                    ? '#fff'
+                    : '#000'
+                }
               />
             </TouchableOpacity>
           </View>
@@ -164,7 +191,6 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
@@ -190,7 +216,6 @@ const styles = StyleSheet.create({
   },
   type: {
     fontSize: 14,
-    color: '#666',
   },
   rating: {
     flexDirection: 'row',
@@ -198,7 +223,6 @@ const styles = StyleSheet.create({
   },
   address: {
     fontSize: 12,
-    color: '#888',
     marginTop: 4,
   },
   deleteIcon: {

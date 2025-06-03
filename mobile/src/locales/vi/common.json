@@ -14,6 +14,9 @@
     "ward": "Phường/Xã",
     "detail": "Địa chỉ chi tiết"
   },
-  "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}"
+  "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}",
+  "favorites": "Danh sách yêu thích",
+  "confirmDeletion": "Xác nhận xoá",
+  "confirmRemoveFavorite": "Bạn có chắc chắn muốn xoá khỏi danh sách yêu thích?"
 
 }

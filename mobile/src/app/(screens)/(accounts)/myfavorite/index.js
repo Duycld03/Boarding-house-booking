@@ -4,6 +4,9 @@ import ListCard from '@/components/ui/ListCard';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import { getAllFavorites, deleteFavorite } from '@/API/favoriteManagement';
 import { ConfirmModal } from '@/components/feedback';
+import { useRouter } from 'expo-router';
+import { useTheme } from '@/context/ThemeProvider';
+import { useTranslation } from 'react-i18next'; // ✅ i18n
 
 function Favorite() {
   const [favorites, setFavorites] = useState([]);
@@ -15,6 +18,10 @@ function Favorite() {
     totalPages: 1,
   });
 
+  const router = useRouter();
+  const { isDarkMode } = useTheme();
+  const { t } = useTranslation('common'); // ✅ i18n
+
   const fetchFavorites = async (page = 1) => {
     setLoading(true);
     try {
@@ -25,7 +32,8 @@ function Favorite() {
         totalPages: res?.pagination?.totalPages || 1,
       });
     } catch (error) {
-      console.error('Failed to fetch favorites:', error);
+      setLoading(false);
+      router.push('/login');
     } finally {
       setLoading(false);
     }
@@ -52,8 +60,14 @@ function Favorite() {
   }, []);
 
   return (
-    <View style={{ flex: 1, paddingTop: 16 }}>
-      <BackHeader title="Favorites" />
+    <View
+      style={{
+        flex: 1,
+        paddingTop: 16,
+        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+      }}
+    >
+      <BackHeader title={t('favorites')} />
       {loading ? (
         <View
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
@@ -74,8 +88,8 @@ function Favorite() {
 
       <ConfirmModal
         visible={isOpenDeleteModal}
-        title="Confirm Deletion"
-        message="Are you sure you want to remove this favorite?"
+        title={t('confirmDeletion')}
+        message={t('confirmRemoveFavorite')}
         onConfirm={handleDelete}
         onClose={() => {
           setIsOpenDeleteModal(false);

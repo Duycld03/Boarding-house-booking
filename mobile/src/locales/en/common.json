@@ -14,5 +14,10 @@
     "ward": "Ward",
     "detail": "Detail"
   },
-  "addressFormat": "{{detail}} {{ward}} {{district}} {{province}}"
+  "addressFormat": "{{detail}} {{ward}} {{district}} {{province}}",
+  
+  "favorites": "Favorites",
+  "confirmDeletion": "Confirm Deletion",
+  "confirmRemoveFavorite": "Are you sure you want to remove this favorite?"
+
 }
