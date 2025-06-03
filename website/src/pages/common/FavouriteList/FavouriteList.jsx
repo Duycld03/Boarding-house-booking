@@ -17,8 +17,10 @@ const FavouriteList = () => {
   const fetchList = async () => {
     setLoading(true);
     try {
-      const res = await getAllFavorites();
-      setFavorites(res.favorites || []);
+      const res = await getAllFavorites({ page: 1, limit: 5 }); // hoặc nhận từ state
+      console.log(res);
+
+      setFavorites(res.data);
     } catch (error) {
       toast.error('Failed to fetch favorites');
     } finally {

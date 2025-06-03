@@ -61,7 +61,7 @@ const WatchLaterList = ({
         itemLayout="horizontal"
         dataSource={paginatedData}
         renderItem={(item, index) => {
-          const house = mode === 'watchLater' ? item?.boardingHouseId : item;
+          const house = mode === 'favorite' ? item?.boardingHouseId : item;
           const navigateId =
             mode === 'watchLater'
               ? item?.boardingHouseId?._id

@@ -9,6 +9,11 @@ export const addFavorite = (boardingHouseId) => {
 export const deleteFavorite = (boardingHouseId) => {
   return axios.delete(`/auth/favorites/${boardingHouseId}`);
 };
-export const getAllFavorites = () => {
-  return axios.get('/auth/allfavorites');
+
+export const getAllFavorites = (paginationOptions) => {
+  return axios.get('/auth/allfavorites', {
+    params: {
+      ...paginationOptions,
+    },
+  });
 };
