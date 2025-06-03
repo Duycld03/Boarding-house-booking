@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import ListCard from '@/components/ui/ListCard';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import { getAllFavorites, deleteFavorite } from '@/API/favoriteManagement';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import LoadMoreButton from '@/components/ui/LoadMoreButton';
 import EmptyState from '@/components/ui/EmptyState';
+import Loader from '@/components/ui/Loader';
 
 function Favorite() {
   const [favorites, setFavorites] = useState([]);
@@ -17,7 +18,7 @@ function Favorite() {
   const [loading, setLoading] = useState(true);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
-  const [limit, setLimit] = useState(5); // Default limit
+  const [limit, setLimit] = useState(5);
 
   const router = useRouter();
   const { themedClasses, isDarkMode } = useThemedClasses();
@@ -95,19 +96,7 @@ function Favorite() {
           </>
         )}
 
-        {loading && (
-          <View
-            style={{
-              ...StyleSheet.absoluteFillObject,
-              backgroundColor: 'rgba(0,0,0,0.1)',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 10,
-            }}
-          >
-            <ActivityIndicator size="large" color="#0ea5e9" />
-          </View>
-        )}
+        {loading && <Loader overlay />}
 
         <ConfirmModal
           visible={isOpenDeleteModal}
