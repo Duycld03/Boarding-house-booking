@@ -1,6 +1,6 @@
+import WatchLaterList from './WatchLaterList';
 import { Card, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
-import WatchLaterList from './WatchLaterList';
 import {
   getAllWatchLater,
   deleteWatchLater,
@@ -18,8 +18,9 @@ function WatchLater() {
     setLoading(true);
     try {
       const res = await getAllWatchLater();
-      setWatchList(res);
+      setWatchList(res || []);
     } catch (error) {
+      toast.error('Failed to fetch watch later list');
     } finally {
       setLoading(false);
     }
@@ -28,9 +29,10 @@ function WatchLater() {
   const onRemove = async () => {
     try {
       const res = await deleteWatchLater(watchLaterId);
-      fetchWatchList();
+      toast.success('Removed from Watch Later');
+      setWatchList((prev) => prev.filter((item) => item._id !== watchLaterId));
     } catch (error) {
-      toast.error(error?.response?.data?.error);
+      toast.error(error?.response?.data?.error || 'Failed to delete item');
     }
   };
 
@@ -48,21 +50,20 @@ function WatchLater() {
         <Card className="mb-6">
           <WatchLaterList
             data={watchList}
-            onConfirmModal={() => setIsOpenDeleteModal(true)}
-            setWatchLaterId={setWatchLaterId}
+            onConfirmDelete={() => setIsOpenDeleteModal(true)}
+            setSelectedId={setWatchLaterId}
+            mode="watchLater"
           />
         </Card>
       )}
       <ConfirmModal
         title="Confirm Deletion"
-        content={`Are you sure you want to delete this boarding house?`}
+        content="Are you sure you want to remove this from your Watch Later list?"
         onOk={() => {
           onRemove();
           setIsOpenDeleteModal(false);
         }}
-        onCancel={() => {
-          setIsOpenDeleteModal(false);
-        }}
+        onCancel={() => setIsOpenDeleteModal(false)}
         isOpen={isOpenDeleteModal}
       />
     </div>

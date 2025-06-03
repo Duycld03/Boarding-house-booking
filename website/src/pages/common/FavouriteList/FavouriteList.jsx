@@ -1,29 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Card, Spin, Pagination } from 'antd';
+import { Card, Spin } from 'antd';
 import {
   getAllFavorites,
   deleteFavorite,
 } from '../../../api/favoriteManagement';
 import { ConfirmModal } from '../../../component';
 import { toast } from 'react-toastify';
-import WatchLaterList from '@/pages/common/WatchLater/WatchLaterList'; // bạn có thể rename nếu muốn
-import { useNavigate } from 'react-router-dom';
+import WatchLaterList from '@/pages/common/WatchLater/WatchLaterList';
 
 const FavouriteList = () => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedFavoriteId, setSelectedFavoriteId] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
-  const navigate = useNavigate();
 
   const fetchList = async () => {
     setLoading(true);
     try {
       const res = await getAllFavorites();
-      setFavorites(res.favorites || []); // 💥 Fix ở đây
+      setFavorites(res.favorites || []);
     } catch (error) {
       toast.error('Failed to fetch favorites');
     } finally {
@@ -31,12 +26,20 @@ const FavouriteList = () => {
     }
   };
 
-  const handleDelete = async () => {
+  const onRemove = async () => {
     try {
-      const res = await deleteFavorite(selectedFavoriteId);
-      fetchList();
+      const response = await deleteFavorite(selectedId);
+      if (response?.isFavorite === false) {
+        toast.success('Deleted favorite successfully');
+        await fetchList();
+      } else {
+        toast.error('Failed to delete favorite');
+      }
     } catch (error) {
-      toast.error(error?.response?.data?.error);
+      toast.error('Failed to delete favorite');
+    } finally {
+      setIsOpenDeleteModal(false);
+      setSelectedId(null);
     }
   };
 
@@ -54,20 +57,19 @@ const FavouriteList = () => {
         <Card className="mb-6">
           <WatchLaterList
             data={favorites}
-            onConfirmModal={() => setIsOpenDeleteModal(true)}
-            setSelectedFavoriteId={setSelectedFavoriteId}
+            onConfirmDelete={() => setIsOpenDeleteModal(true)}
+            setSelectedId={setSelectedId}
+            mode="favorite"
           />
         </Card>
       )}
       <ConfirmModal
         title="Confirm Deletion"
-        content={`Are you sure you want to delete this boarding house?`}
-        onOk={() => {
-          handleDelete();
-          setIsOpenDeleteModal(false);
-        }}
+        content="Are you sure you want to delete this favorite?"
+        onOk={onRemove}
         onCancel={() => {
           setIsOpenDeleteModal(false);
+          setSelectedId(null);
         }}
         isOpen={isOpenDeleteModal}
       />

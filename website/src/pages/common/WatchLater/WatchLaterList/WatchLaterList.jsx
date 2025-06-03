@@ -19,12 +19,17 @@ const getAddress = (address) => {
   return `${detail}, ${ward}, ${district}, ${province}`;
 };
 
-const WatchLaterList = ({ data, onConfirmModal, setWatchLaterId }) => {
+const WatchLaterList = ({
+  data,
+  onConfirmDelete,
+  setSelectedId,
+  mode = 'watchLater', // 'favorite' | 'watchLater'
+}) => {
   const navigate = useNavigate();
 
-  const onRemove = (id) => {
-    onConfirmModal();
-    setWatchLaterId(id);
+  const handleRemove = (id) => {
+    setSelectedId(id);
+    onConfirmDelete();
   };
 
   const goToDetail = (id) => {
@@ -36,15 +41,21 @@ const WatchLaterList = ({ data, onConfirmModal, setWatchLaterId }) => {
       itemLayout="horizontal"
       dataSource={data}
       renderItem={(item, index) => {
-        const house = item?.boardingHouseId || item; // fallback
-        const id = item?.boardingHouseId?._id || item?.id;
+        const house = mode === 'watchLater' ? item?.boardingHouseId : item;
+        const navigateId =
+          mode === 'watchLater'
+            ? item?.boardingHouseId?._id
+            : item?.boardingHouseId?._id || item?._id || item?.id;
+
+        const itemId =
+          mode === 'watchLater' ? item?._id : item?._id || item?.id; // 🔥 sửa chỗ này để xoá đúng ID
 
         return (
-          <Card className="mb-4 hover:shadow-md" hoverable key={id}>
+          <Card className="mb-4 hover:shadow-md" hoverable key={itemId}>
             <List.Item>
               <div style={{ fontSize: 18, marginRight: 16 }}>{index + 1}</div>
               <List.Item.Meta
-                onClick={() => goToDetail(id)}
+                onClick={() => goToDetail(navigateId)}
                 avatar={
                   <Avatar
                     shape="square"
@@ -63,7 +74,7 @@ const WatchLaterList = ({ data, onConfirmModal, setWatchLaterId }) => {
               />
               <CloseOutlined
                 style={{ fontSize: 20, color: 'red', cursor: 'pointer' }}
-                onClick={() => onRemove(item._id || item.id)}
+                onClick={() => handleRemove(itemId)}
               />
             </List.Item>
           </Card>
