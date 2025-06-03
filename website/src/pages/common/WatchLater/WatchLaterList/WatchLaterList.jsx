@@ -105,7 +105,10 @@ const WatchLaterList = ({
                         )}
                       </p>
 
-                      <Rate disabled defaultValue={house?.rating || 0} />
+                      <Rate
+                        disabled
+                        defaultValue={Math.round(house?.rating || 0)}
+                      />
                       <p>{getAddress(house?.address, t)}</p>
                     </div>
                   }
