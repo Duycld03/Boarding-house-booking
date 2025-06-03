@@ -1,23 +1,24 @@
-import Account from "../models/account.js";
-import WatchLater from "../models/watchLater.js";
-import BoardingHouse from "../models/boardingHouse.js";
-import mongoose from "mongoose";
+import Account from '../models/account.js';
+import WatchLater from '../models/watchLater.js';
+import BoardingHouse from '../models/boardingHouse.js';
+import mongoose from 'mongoose';
+import paginate from '../utils/pagination.js';
 
 class watchLaterController {
   async getWatchLater(req, res) {
     try {
       const account = await Account.findById(req.user.userId); // Lấy user từ token
       if (!account) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: 'User not found' });
       }
 
       // Tìm tất cả danh sách yêu thích của người dùng
       const favorites = await WatchLater.find({ accountId: account._id })
-        .populate("boardingHouseId", "name price img rating detail timeAgo") // Lấy thông tin phòng trọ
+        .populate('boardingHouseId', 'name price img rating detail timeAgo') // Lấy thông tin phòng trọ
         .lean();
 
       return res.status(200).json({
-        message: "Successfully",
+        message: 'Successfully',
         watchlaterlist: favorites.map((fav) => ({
           id: fav.boardingHouseId._id,
           name: fav.boardingHouseId.name,
@@ -36,21 +37,46 @@ class watchLaterController {
 
   async getAllWatchLater(req, res) {
     try {
-      const watchLaterList = await WatchLater.find({
-        accountId: req.user.userId,
-      })
-        .populate({
-          path: "boardingHouseId",
-          populate: {
-            path: "boardingHouseType",
-            model: "BoardingHouseType",
-          },
-        })
-        .lean();
+      const account = await Account.findById(req.user.userId);
+      if (!account) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'User not found' });
+      }
 
-      return res.status(200).json(watchLaterList);
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 5,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter: { accountId: account._id },
+        allowQueryFilters: [],
+        allowSearchFields: ['boardingHouseId.name'],
+        fields: '-__v',
+        populate: [
+          {
+            path: 'boardingHouseId',
+            select:
+              'name priceRange images rating description address boardingHouseType timeAgo',
+            populate: {
+              path: 'boardingHouseType',
+              select: 'name roomSize peopleNumber',
+            },
+          },
+        ],
+        includeTotalData: true,
+      };
+
+      const result = await paginate(WatchLater, paginationOptions, req);
+
+      return res.status(200).json({
+        success: true,
+        ...result,
+      });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      console.error('Error in getAllWatchLater:', error);
+      return res.status(500).json({ success: false, error: error.message });
     }
   }
 
@@ -58,7 +84,7 @@ class watchLaterController {
     try {
       const account = await Account.findById(req.user.userId);
       if (!account) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: 'User not found' });
       }
 
       let { boardingHouseId } = req.body;
@@ -66,7 +92,7 @@ class watchLaterController {
         !boardingHouseId ||
         !mongoose.Types.ObjectId.isValid(boardingHouseId)
       ) {
-        return res.status(400).json({ message: "Invalid boardingHouseId" });
+        return res.status(400).json({ message: 'Invalid boardingHouseId' });
       }
       boardingHouseId = new mongoose.Types.ObjectId(boardingHouseId);
 
@@ -104,9 +130,9 @@ class watchLaterController {
         accountId: req.user.userId,
       });
       if (deletedWatchLater.deletedCount === 0) {
-        return res.status(404).json({ message: "WatchLater not found" });
+        return res.status(404).json({ message: 'WatchLater not found' });
       }
-      res.status(200).json({ message: "Successfully deleted" });
+      res.status(200).json({ message: 'Successfully deleted' });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }

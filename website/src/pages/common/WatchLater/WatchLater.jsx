@@ -17,8 +17,8 @@ function WatchLater() {
   const fetchWatchList = async () => {
     setLoading(true);
     try {
-      const res = await getAllWatchLater();
-      setWatchList(res || []);
+      const res = await getAllWatchLater({ page: 1, limit: 5 });
+      setWatchList(res.data || []);
     } catch (error) {
       toast.error('Failed to fetch watch later list');
     } finally {

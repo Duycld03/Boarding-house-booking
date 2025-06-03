@@ -32,7 +32,7 @@ const WatchLaterList = ({
   data,
   onConfirmDelete,
   setSelectedId,
-  mode = 'watchLater', // 'favorite' | 'watchLater'
+  mode = 'watchLater',
   pageSize = 5,
 }) => {
   const navigate = useNavigate();
@@ -61,13 +61,12 @@ const WatchLaterList = ({
         itemLayout="horizontal"
         dataSource={paginatedData}
         renderItem={(item, index) => {
-          const house = mode === 'favorite' ? item?.boardingHouseId : item;
-          const navigateId =
-            mode === 'watchLater'
-              ? item?.boardingHouseId?._id
-              : item?.boardingHouseId?._id || item?._id || item?.id;
-
-          const itemId = item?._id || item?.id;
+          const house = item?.boardingHouseId || item;
+          const navigateId = house?._id;
+          const itemId =
+            mode === 'favorite'
+              ? item?.boardingHouseId?._id // dùng boardingHouseId để xóa
+              : item?._id || item?.id; // dùng chính WatchLater._id để xóa
 
           return (
             <Card
@@ -106,11 +105,8 @@ const WatchLaterList = ({
                         )}
                       </p>
 
-                      <Rate
-                        disabled
-                        defaultValue={house?.rating || item?.rating || 0}
-                      />
-                      <p>{getAddress(house?.address || item?.address, t)}</p>
+                      <Rate disabled defaultValue={house?.rating || 0} />
+                      <p>{getAddress(house?.address, t)}</p>
                     </div>
                   }
                 />

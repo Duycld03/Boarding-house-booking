@@ -31,12 +31,8 @@ const FavouriteList = () => {
   const onRemove = async () => {
     try {
       const response = await deleteFavorite(selectedId);
-      if (response?.isFavorite === false) {
-        toast.success('Deleted favorite successfully');
-        await fetchList();
-      } else {
-        toast.error('Failed to delete favorite');
-      }
+      toast.success('Deleted favorite successfully');
+      await fetchList();
     } catch (error) {
       toast.error('Failed to delete favorite');
     } finally {
