@@ -1,31 +1,22 @@
 {
-    "boardingHouseDetailsAdmin": {
-        "title": "Boarding House Details",
-        "information": "Information",
-        "price": "Price",
-        "image": "Image",
+    "boardingHouseAdmin": {
+        "name": "Name",
         "address": "Address",
-        "name": "Name Boarding House",
+        "priceRange": "Price Range (VND)",
         "boardingHouseType": "Boarding House Type",
-        "description": "Description",
-        "priceRent": "Price Rent/month (VND)",
-        "electricityPrice": "Electricity Price/kWh (VND)",
-        "waterPrice": "Water Price/m³ (VND)",
-        "primaryImage": "Primary Image",
-        "otherImages": "Other Images",
-        "selectProvince": "Select Province",
-        "selectDistrict": "Select District",
-        "selectWard": "Select Ward",
-        "detail": "Detail",
         "totalRooms": "Total Rooms",
-        "availableRooms": "Available Rooms",
-        "update": "Update",
-        "back": "Back",
-        "likes": "{{count}} Likes",
-        "rating": "Rating",
+        "createdAt": "Created At",
+        "action": "Action",
         "delete": "Delete",
-        "preview": "Preview",
-        "defaultName": "Default name"
+        "update": "Update",
+        "addNew": "Add New Boarding House",
+        "confirmDeletion": {
+            "title": "Confirm Deletion",
+            "content": "Are you sure you want to delete \"{{name}}\"?"
+        },
+        "pagination": {
+            "showTotal": "{{start}}-{{end}} of {{total}} Boarding Houses"
+        }
     },
     "errors": {
         "noId": "Boarding house ID not found.",

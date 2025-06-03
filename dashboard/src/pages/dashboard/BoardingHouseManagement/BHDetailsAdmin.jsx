@@ -107,7 +107,14 @@ const BHDetailAdmin = () => {
             setCurrentLocation([geoLocation.lat, geoLocation.lon]);
         }
     }, [geoLocation]);
-
+    useEffect(() => {
+        if (!location.state?.name && !updatedData.name) {
+            setUpdatedData((prev) => ({
+                ...prev,
+                name: t("boardingHouseDetailsAdmin.defaultName"),
+            }));
+        }
+    }, [location.state?.name, updatedData.name]);
     // Fetch provinces, districts, and wards
     useEffect(() => {
         const fetchAddressData = async () => {
@@ -362,11 +369,11 @@ const BHDetailAdmin = () => {
 
             if (response?.success) {
                 toast.success(
-                    response.message || "Boarding house updated successfully."
+                    t("messages.updateSuccess")
                 );
                 navigate("/dashboard/boarding-house-management");
             } else {
-                toast.error(response?.message || "Failed to update boarding house.");
+                toast.error(t("messages.updateFailed"));
             }
         } catch (error) {
             toast.error(
@@ -445,7 +452,7 @@ const BHDetailAdmin = () => {
             <div className={`mx-auto w-full rounded-xl p-4`}>
                 <h1 className="text-5xl flex items-center gap-2">
                     <FontAwesomeIcon icon={faHotel} className="text-gray-500 text-6xl" />
-                    {boardingHouseName}
+                    {updatedData.name}
                 </h1>
                 <Tabs defaultActiveKey="boardingHouseDetail">
                     {/* Tab: Boarding House Detail */}

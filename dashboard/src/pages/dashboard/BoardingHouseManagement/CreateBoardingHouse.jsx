@@ -294,7 +294,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
     try {
       // console.log("test: ", formData);
       await createBoardingHouse(form); // Call API to create boarding house
-      toast.success("Boarding house created successfully!");
+      toast.success(t("messages.createdSuccess"));
       onSuccess(); // Callback to refresh data
       onClose(); // Close the form
     } catch (error) {

@@ -26,5 +26,53 @@
         "fieldRequired": "This field is required.",
         "maxOtherImages": "You can't upload more than 15 other images.",
         "imageRemoved": "Image removed successfully."
+    },
+    "errors": {
+        "noId": "Boarding house ID not found.",
+        "fetchFailed": "Failed to fetch boarding house data.",
+        "fetchAddressFailed": "Failed to fetch address data.",
+        "fetchBoardingHouseTypes": "Failed to fetch boarding house types.",
+        "maxOtherImages": "You can only upload up to 15 other images.",
+        "selectBoardingHouseType": "Please select a boarding house type.",
+        "enterBoardingHouseName": "Please enter the boarding house name.",
+        "selectProvince": "Please select a boarding house province.",
+        "selectDistrict": "Please select a boarding house district.",
+        "selectWard": "Please select a boarding house ward.",
+        "enterAddressDetail": "Please enter boarding house details.",
+        "enterDetailAddress": "Please enter a boarding house details.",
+        "uploadPrimaryImage": "You must upload a primary image.",
+        "uploadAtLeastOneImage": "You must upload at least one image.",
+        "enterPriceRange": "Please enter price range.",
+        "enterElectricityPrice": "Please enter electricity price.",
+        "enterWaterPrice": "Please enter water price.",
+        "markLocationOnMap": "Please mark the location on the map.",
+        "failedToAdd": "Failed to add boarding house.",
+        "failedToSubmitForm": "Failed to submit the form."
+    },
+    "messages": {
+        "imageRemoved": "Temporary image removed.",
+        "updateSuccess": "Boarding house updated successfully.",
+        "updateFailed": "Failed to update boarding house.",
+        "createdSuccess": "Boarding house created successfully!",
+        "noData": "No boarding houses available",
+        "fetchFailed": "Failed to fetch boarding houses.",
+        "deleteSuccess": "Boarding house deleted successfully.",
+        "deleteFailed": "Failed to delete boarding house.",
+        "confirmDeleteTitle": "Confirm Deletion",
+        "confirmDeleteContent": "Are you sure you want to delete this boarding house?"
+    },
+    "validation": {
+        "selectBoardingHouseType": "Please select a boarding house type.",
+        "enterName": "Please enter a boarding house name.",
+        "enterBoardingHouseName": "Please enter the boarding house name.",
+        "selectProvince": "Please select a boarding house province.",
+        "selectDistrict": "Please select a boarding house district.",
+        "selectWard": "Please select a boarding house ward.",
+        "enterDetailAddress": "Please enter a boarding house details.",
+        "enterAddressDetail": "Please enter boarding house details.",
+        "enterPriceRange": "Please enter price rent.",
+        "enterElectricityPrice": "Please enter electricity price.",
+        "enterWaterPrice": "Please enter water price.",
+        "uploadPrimaryImage": "A primary image is required."
     }
 }

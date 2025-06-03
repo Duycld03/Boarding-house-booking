@@ -13,7 +13,6 @@ import fs from 'fs';
 import multer from 'multer';
 import Account from '../models/account.js';
 import Review from '../models/review.js';
-import paginate from '../utils/pagination.js';
 
 class boardingHouseController {
   async getAllBHOnDashBoard(req, res, next) {

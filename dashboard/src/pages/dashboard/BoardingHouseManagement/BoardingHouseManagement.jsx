@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import AddressSelector from "../../../component/AddressSelector";
 import { Button, TableCustom as Table, ConfirmModal } from "../../../component";
 import {
@@ -33,6 +33,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import BHDetailAdmin from "./BHDetailsAdmin";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/themeContext";
 function BoardingHouseManagement(onClose) {
   const [boardingHData, setBoardingHData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +71,19 @@ function BoardingHouseManagement(onClose) {
   const [currentPage, setCurrentPage] = useState(1); // Current page number
   const [pageSize, setPageSize] = useState(10); // Number of items per page
   const [totalItems, setTotalItems] = useState(0); // Total number of items
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+    sortField: "createdAt",
+    sortOrder: "desc",
+  });
+  const { t } = useTranslation("boardingHouseAdmin");
   // Handle opening the delete modal
   const handleDeleteModal = (record) => {
     setSelectedRequest(record);
@@ -156,13 +171,18 @@ function BoardingHouseManagement(onClose) {
     try {
       const response = await filterBH({
         ...filterValue,
-        page: currentPage,
-        limit: pageSize,
+        page: paginationOptions.page,
+        limit: paginationOptions.limit,
       });
 
       if (response?.data) {
-        setBoardingHData(response.data); // Set filtered data
-        setTotalItems(response.pagination.totalItems); // Set total items for pagination
+        setBoardingHData(response.data);
+        setPagination({
+          currentPage: response.pagination.currentPage,
+          totalPages: response.pagination.totalPages,
+          totalItems: response.pagination.totalItems,
+          limit: response.pagination.limit,
+        });
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -173,7 +193,7 @@ function BoardingHouseManagement(onClose) {
   };
   useEffect(() => {
     fetchFilterData();
-  }, [filterValue, currentPage, pageSize]);
+  }, [filterValue, paginationOptions]);
 
   // Handle page change
   const handlePageChange = (page, size) => {
@@ -282,23 +302,27 @@ function BoardingHouseManagement(onClose) {
     e.preventDefault();
 
     if (!formData.name) {
-      toast.error("Please enter a boarding house name.");
+      toast.error(t("errors.enterBoardingHouseName"));
       return;
     }
     if (!formData.address.province) {
-      toast.error("Please select a boarding house province.");
+      toast.error(t("errors.selectProvince"));
+      return;
+    }
+    if (formData.otherImages.length > 15) {
+      toast.error(t("errors.maxOtherImages"));
       return;
     }
     if (!formData.address.district) {
-      toast.error("Please select a boarding house district.");
+      toast.error(t("errors.selectDistrict"));
       return;
     }
     if (!formData.address.ward) {
-      toast.error("Please select a boarding house ward.");
+      toast.error(t("errors.selectWard"));
       return;
     }
     if (!formData.address.detail) {
-      toast.error("Please enter a boarding house details.");
+      toast.error(t("validation.enterDetailAddress"));
       return;
     }
     try {
@@ -426,7 +450,7 @@ function BoardingHouseManagement(onClose) {
     try {
       const response = await softDeleteBoardingHouse(selectedRequest._id); // Pass the correct _id
       if (response.success) {
-        toast.success("Boarding house deleted successfully.");
+        toast.success(t("messages.deleteSuccess"));
         fetchData(); // Refresh the data
         setIsOpenDeleteModal(false); // Close the modal
         setSelectedRequest(null); // Clear the selected request
@@ -469,12 +493,12 @@ function BoardingHouseManagement(onClose) {
   // Cấu hình cột trong bảng
   const columns = [
     {
-      title: "Name",
+      title: t("boardingHouseAdmin.name"),
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "Address",
+      title: t("boardingHouseAdmin.address"),
       dataIndex: "address",
       key: "address",
       render: (text) =>
@@ -483,35 +507,35 @@ function BoardingHouseManagement(onClose) {
           : "",
     },
     {
-      title: "Price Range (VND)",
+      title: t("boardingHouseAdmin.priceRange"),
       dataIndex: "priceRange",
       key: "priceRange",
       render: (text) => `${formatAmount(text)}/month`,
     },
     {
-      title: "Boarding House Type",
+      title: t("boardingHouseAdmin.boardingHouseType"),
       dataIndex: "boardingHouseType",
       key: "boardingHouseType",
       render: (text) => (text ? text.name : ""),
     },
     {
-      title: "Total Rooms",
+      title: t("boardingHouseAdmin.totalRooms"),
       dataIndex: "totalRooms",
       key: "totalRooms",
     },
     {
-      title: "Created At",
+      title: t("boardingHouseAdmin.createdAt"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (text) => convertTimetap(text),
     },
     {
-      title: "Action",
+      title: t("boardingHouseAdmin.action"),
       key: "action",
       render: (text, record) => (
         <div className="flex gap-3">
           <Button
-            title="Delete"
+            title={t("boardingHouseAdmin.delete")}
             size="large"
             btnDelete
             className="btn-delete"
@@ -520,7 +544,7 @@ function BoardingHouseManagement(onClose) {
           <Button
             onClick={() => onProcessData(record)}
             size="large"
-            title="Update"
+            title={t("boardingHouseAdmin.update")}
             icon={<FileTextOutlined />}
             className="text-white"
             bgColor="rgb(5 150 105)"
@@ -529,28 +553,54 @@ function BoardingHouseManagement(onClose) {
       ),
     },
   ];
-
+  const handleTableChange = (pagination, filters, sorter) => {
+    const newPaginationOptions = {
+      ...paginationOptions,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    };
+    setPaginationOptions(newPaginationOptions);
+  };
+  const tablePaginationConfig = useMemo(() => ({
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
+    showTotal: (total, range) =>
+      t("boardingHouseAdmin.pagination.showTotal", {
+        start: range[0],
+        end: range[1],
+        total,
+      }),
+  }), [pagination, t]);
   return (
     <div className="boarding-house-management">
-      <div className="flex justify-between">
+      <div className="flex justify-between mb-4">
         <Button
           btnAdd
-          title="Add new"
+          title={t("boardingHouseAdmin.addNew")}
           size="large"
           onClick={handleOpenForm}
-        ></Button>
+        />
 
         <FilterBoardingHouse
           setFilterValue={setFilterValue}
           boardingHouseTypes={boardingHouseTypes}
         />
       </div>
-      <Table columns={columns} data={boardingHData} loading={loading} />
+      <Table
+        columns={columns}
+        data={boardingHData}
+        loading={loading}
+        onChange={handleTableChange}
+        pagination={tablePaginationConfig}
+      />
 
       <ConfirmModal
-        title="Confirm Deletion"
-        content={`Are you sure you want to delete "${selectedRequest?.name || "this boarding house"
-          }"?`}
+        title={t("boardingHouseAdmin.confirmDeletion.title")}
+        content={t("boardingHouseAdmin.confirmDeletion.content", {
+          name: selectedRequest?.name || t("boardingHouseAdmin.delete"),
+        })}
         onOk={handleSelectDelete}
         onCancel={() => {
           setIsOpenDeleteModal(false);
