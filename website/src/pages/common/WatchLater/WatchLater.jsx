@@ -13,12 +13,16 @@ function WatchLater() {
   const [watchLaterId, setWatchLaterId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchWatchList = async () => {
+  const fetchWatchList = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await getAllWatchLater({ page: 1, limit: 5 });
+      const res = await getAllWatchLater({ page, limit: 5 });
       setWatchList(res.data || []);
+      setCurrentPage(res.pagination?.currentPage || 1);
+      setTotalPages(res.pagination?.totalPages || 1);
     } catch (error) {
       toast.error('Failed to fetch watch later list');
     } finally {
@@ -28,11 +32,14 @@ function WatchLater() {
 
   const onRemove = async () => {
     try {
-      const res = await deleteWatchLater(watchLaterId);
+      await deleteWatchLater(watchLaterId);
       toast.success('Removed from Watch Later');
-      setWatchList((prev) => prev.filter((item) => item._id !== watchLaterId));
+      fetchWatchList(currentPage); // refresh page
     } catch (error) {
       toast.error(error?.response?.data?.error || 'Failed to delete item');
+    } finally {
+      setIsOpenDeleteModal(false);
+      setWatchLaterId(null);
     }
   };
 
@@ -53,17 +60,21 @@ function WatchLater() {
             onConfirmDelete={() => setIsOpenDeleteModal(true)}
             setSelectedId={setWatchLaterId}
             mode="watchLater"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => fetchWatchList(page)}
           />
         </Card>
       )}
+
       <ConfirmModal
         title="Confirm Deletion"
         content="Are you sure you want to remove this from your Watch Later list?"
-        onOk={() => {
-          onRemove();
+        onOk={onRemove}
+        onCancel={() => {
           setIsOpenDeleteModal(false);
+          setWatchLaterId(null);
         }}
-        onCancel={() => setIsOpenDeleteModal(false)}
         isOpen={isOpenDeleteModal}
       />
     </div>

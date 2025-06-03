@@ -13,14 +13,16 @@ const FavouriteList = () => {
   const [loading, setLoading] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchList = async () => {
+  const fetchList = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await getAllFavorites({ page: 1, limit: 5 }); // hoặc nhận từ state
-      console.log(res);
-
+      const res = await getAllFavorites({ page, limit: 5 });
       setFavorites(res.data);
+      setCurrentPage(res.pagination.currentPage);
+      setTotalPages(res.pagination.totalPages);
     } catch (error) {
       toast.error('Failed to fetch favorites');
     } finally {
@@ -58,6 +60,9 @@ const FavouriteList = () => {
             onConfirmDelete={() => setIsOpenDeleteModal(true)}
             setSelectedId={setSelectedId}
             mode="favorite"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => fetchList(page)} // <-- Gọi lại API với trang mới
           />
         </Card>
       )}

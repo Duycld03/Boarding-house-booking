@@ -4,10 +4,10 @@
     "btnCancel": "Hủy bỏ"
   },
   
-  "boardingHouseTypes": {
+   "boardingHouseTypes": {
     "Nhà trọ truyền thống": "Nhà trọ truyền thống",
-    "Căn hộ mini": "Căn hộ mini",
-    "Ký túc xá": "Ký túc xá"
+    "Mini house": "Căn hộ mini",
+    "Nhà trọ kiến trúc xá": "Ký túc xá"
   },
   "address": {
     "province": "Tỉnh/Thành phố",

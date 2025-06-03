@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, List, Avatar, Rate, Button, Typography } from 'antd';
 import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +24,6 @@ const getAddress = (address, t) => {
       province: '',
     });
   const { detail, ward, district, province } = address;
-
   return t('addressFormat', { detail, ward, district, province });
 };
 
@@ -34,17 +33,13 @@ const WatchLaterList = ({
   setSelectedId,
   mode = 'watchLater',
   pageSize = 5,
+  currentPage = 1,
+  totalPages = 1,
+  onPageChange,
 }) => {
   const navigate = useNavigate();
   const { darkMode } = useTheme();
-  const [currentPage, setCurrentPage] = useState(0);
   const { t } = useTranslation('common');
-
-  const paginatedData = data.slice(
-    currentPage * pageSize,
-    (currentPage + 1) * pageSize
-  );
-  const totalPages = Math.ceil(data.length / pageSize);
 
   const handleRemove = (id) => {
     setSelectedId(id);
@@ -59,14 +54,14 @@ const WatchLaterList = ({
     <>
       <List
         itemLayout="horizontal"
-        dataSource={paginatedData}
+        dataSource={data}
         renderItem={(item, index) => {
           const house = item?.boardingHouseId || item;
           const navigateId = house?._id;
           const itemId =
             mode === 'favorite'
-              ? item?.boardingHouseId?._id // dùng boardingHouseId để xóa
-              : item?._id || item?.id; // dùng chính WatchLater._id để xóa
+              ? item?.boardingHouseId?._id
+              : item?._id || item?.id;
 
           return (
             <Card
@@ -77,7 +72,7 @@ const WatchLaterList = ({
             >
               <List.Item>
                 <div className="text-[18px] mr-4 text-black dark:text-white">
-                  {index + 1 + currentPage * pageSize}
+                  {index + 1 + (currentPage - 1) * pageSize}
                 </div>
                 <List.Item.Meta
                   onClick={() => goToDetail(navigateId)}
@@ -127,8 +122,8 @@ const WatchLaterList = ({
         <Button
           shape="circle"
           size="middle"
-          disabled={currentPage === 0}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
+          disabled={currentPage === 1}
+          onClick={() => onPageChange?.(currentPage - 1)}
           icon={<LeftOutlined />}
           style={{
             backgroundColor: darkMode ? '#374151' : '#fff',
@@ -137,13 +132,13 @@ const WatchLaterList = ({
           }}
         />
         <Typography.Text style={{ color: darkMode ? '#fff' : '#000' }}>
-          {currentPage + 1} / {totalPages}
+          {currentPage} / {totalPages}
         </Typography.Text>
         <Button
           shape="circle"
           size="middle"
-          disabled={currentPage === totalPages - 1}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
+          disabled={currentPage === totalPages}
+          onClick={() => onPageChange?.(currentPage + 1)}
           icon={<RightOutlined />}
           style={{
             backgroundColor: darkMode ? '#374151' : '#fff',
