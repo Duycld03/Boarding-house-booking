@@ -71,7 +71,7 @@ const WatchLaterList = ({
           return (
             <Card
               bordered={false}
-              className="mb-4 bg-white dark:bg-gray-800 transition-colors"
+              className="mb-4 bg-white dark:bg-gray-800 transition-colors border border-gray-200 dark:border-gray-600"
               hoverable
               key={itemId}
             >
