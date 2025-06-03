@@ -2,5 +2,21 @@
   "confirmComponent": {
     "btnConfirm": "Xác nhận",
     "btnCancel": "Hủy bỏ"
-  }
+  },
+  
+  "boardingHouseTypes": {
+    "Nhà trọ truyền thống": "Nhà trọ truyền thống",
+    "Căn hộ mini": "Căn hộ mini",
+    "Ký túc xá": "Ký túc xá"
+  },
+  "address": {
+    "province": "Tỉnh/Thành phố",
+    "district": "Quận/Huyện",
+    "ward": "Phường/Xã",
+    "detail": "Địa chỉ chi tiết"
+  },
+  "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}"
+
+
+
 }

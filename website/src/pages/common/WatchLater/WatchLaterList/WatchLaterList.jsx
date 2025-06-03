@@ -3,6 +3,7 @@ import { Card, List, Avatar, Rate, Button, Typography } from 'antd';
 import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const getPrimaryImage = (images = [], fallbackImages = []) => {
   const source =
@@ -14,10 +15,17 @@ const getPrimaryImage = (images = [], fallbackImages = []) => {
   return primary ? primary.imageUrl : source[0].imageUrl;
 };
 
-const getAddress = (address) => {
-  if (!address) return 'No address';
+const getAddress = (address, t) => {
+  if (!address)
+    return t('addressFormat', {
+      detail: 'N/A',
+      ward: '',
+      district: '',
+      province: '',
+    });
   const { detail, ward, district, province } = address;
-  return `${detail}, ${ward}, ${district}, ${province}`;
+
+  return t('addressFormat', { detail, ward, district, province });
 };
 
 const WatchLaterList = ({
@@ -30,6 +38,7 @@ const WatchLaterList = ({
   const navigate = useNavigate();
   const { darkMode } = useTheme();
   const [currentPage, setCurrentPage] = useState(0);
+  const { t } = useTranslation('common');
 
   const paginatedData = data.slice(
     currentPage * pageSize,
@@ -88,15 +97,20 @@ const WatchLaterList = ({
                   description={
                     <div className="flex flex-col justify-between text-black dark:text-gray-300">
                       <p>
-                        {typeof house?.boardingHouseType === 'object'
-                          ? house?.boardingHouseType?.name
-                          : house?.boardingHouseType || 'Unknown type'}
+                        {t(
+                          `boardingHouseTypes.${
+                            typeof house?.boardingHouseType === 'object'
+                              ? house?.boardingHouseType?.name
+                              : house?.boardingHouseType || 'Unknown'
+                          }`
+                        )}
                       </p>
+
                       <Rate
                         disabled
                         defaultValue={house?.rating || item?.rating || 0}
                       />
-                      <p>{getAddress(house?.address || item?.address)}</p>
+                      <p>{getAddress(house?.address || item?.address, t)}</p>
                     </div>
                   }
                 />
