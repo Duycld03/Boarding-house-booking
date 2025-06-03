@@ -17,6 +17,11 @@
   "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}",
   "favorites": "Danh sách yêu thích",
   "confirmDeletion": "Xác nhận xoá",
-  "confirmRemoveFavorite": "Bạn có chắc chắn muốn xoá khỏi danh sách yêu thích?"
+  "confirmRemoveFavorite": "Bạn có chắc chắn muốn xoá khỏi danh sách yêu thích?",
 
+  "watchLater": "Xem sau",
+  "confirmRemoveWatchLater": "Bạn có chắc muốn xoá khỏi danh sách xem sau?"
 }
+
+
+

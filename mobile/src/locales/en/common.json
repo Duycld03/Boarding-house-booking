@@ -18,6 +18,8 @@
   
   "favorites": "Favorites",
   "confirmDeletion": "Confirm Deletion",
-  "confirmRemoveFavorite": "Are you sure you want to remove this favorite?"
+  "confirmRemoveFavorite": "Are you sure you want to remove this favorite?",
+   "watchLater": "Watch later",
+  "confirmRemoveWatchLater": "Are you sure you want to remove this from your watch later list?"
 
 }
