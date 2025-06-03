@@ -137,10 +137,30 @@ const ListCard = ({
             <TouchableOpacity
               onPress={() => onPageChange?.(currentPage - 1)}
               disabled={currentPage === 1}
-              style={[
-                styles.paginationButton,
-                currentPage === 1 && styles.disabledButton,
-              ]}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 1,
+                backgroundColor:
+                  currentPage === 1
+                    ? isDarkMode
+                      ? '#1e293b'
+                      : '#f3f4f6'
+                    : isDarkMode
+                    ? '#1f2937'
+                    : '#1f2937',
+                borderColor:
+                  currentPage === 1
+                    ? isDarkMode
+                      ? '#334155'
+                      : '#d1d5db'
+                    : isDarkMode
+                    ? '#4b5563'
+                    : '#cccccc',
+              }}
             >
               <AntDesign
                 name="left"
@@ -160,10 +180,30 @@ const ListCard = ({
             <TouchableOpacity
               onPress={() => onPageChange?.(currentPage + 1)}
               disabled={currentPage === totalPages}
-              style={[
-                styles.paginationButton,
-                currentPage === totalPages && styles.disabledButton,
-              ]}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 1,
+                backgroundColor:
+                  currentPage === totalPages
+                    ? isDarkMode
+                      ? '#1e293b'
+                      : '#f3f4f6'
+                    : isDarkMode
+                    ? '#1f2937'
+                    : '#ffffff',
+                borderColor:
+                  currentPage === totalPages
+                    ? isDarkMode
+                      ? '#334155'
+                      : '#d1d5db'
+                    : isDarkMode
+                    ? '#4b5563'
+                    : '#cccccc',
+              }}
             >
               <AntDesign
                 name="right"
