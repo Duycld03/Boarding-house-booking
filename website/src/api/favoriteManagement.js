@@ -9,3 +9,6 @@ export const addFavorite = (boardingHouseId) => {
 export const deleteFavorite = (boardingHouseId) => {
   return axios.delete(`/auth/favorites/${boardingHouseId}`);
 };
+export const getAllFavorites = () => {
+  return axios.get('/auth/allfavorites');
+};

@@ -1,105 +1,78 @@
-import { useState, useEffect } from "react";
-import { getFavorite, deleteFavorite } from "../../../api/favoriteManagement";
-import { List, Spin, Pagination } from "antd";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import WatchLaterCard from "../../../component/WatchLaterCard";
+import { useState, useEffect } from 'react';
+import { Card, Spin, Pagination } from 'antd';
+import {
+  getAllFavorites,
+  deleteFavorite,
+} from '../../../api/favoriteManagement';
+import { ConfirmModal } from '../../../component';
+import { toast } from 'react-toastify';
+import WatchLaterList from '@/pages/common/WatchLater/WatchLaterList'; // bạn có thể rename nếu muốn
+import { useNavigate } from 'react-router-dom';
 
 const FavouriteList = () => {
-    const [favorites, setFavorites] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(5);
-    const navigate = useNavigate();
+  const [favorites, setFavorites] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedFavoriteId, setSelectedFavoriteId] = useState(null);
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
-    useEffect(() => {
-        const fetchFavorites = async () => {
-            try {
-                const response = await getFavorite();
-                if (response && Array.isArray(response.favorites)) {
-                    setFavorites(response.favorites);
-                }
-            } catch (error) {
-                console.error("Error fetching favorites:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchFavorites();
-    }, []);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const navigate = useNavigate();
 
-    const getPrimaryImage = (images) => {
-        if (!Array.isArray(images) || images.length === 0) {
-            return "https://via.placeholder.com/200";
-        }
-        const primaryImage = images.find((img) => img.isPrimary);
-        return primaryImage ? primaryImage.imageUrl : images[0].imageUrl;
-    };
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const res = await getAllFavorites();
+      setFavorites(res.favorites || []); // 💥 Fix ở đây
+    } catch (error) {
+      toast.error('Failed to fetch favorites');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleDeleteFavorite = async (id) => {
-        try {
-            const response = await deleteFavorite(id);
-            if (response && response.isFavorite === false) {
-                toast.success("Delete favorite successfully");
-                setFavorites((prevFavorites) => prevFavorites.filter((item) => item.id !== id));
-            } else {
-                toast.error("Failed to delete favorite");
-            }
-        } catch (error) {
-            console.error("Lỗi xóa yêu thích:", error);
-            toast.error("Failed to delete favorite");
-        }
-    };
+  const handleDelete = async () => {
+    try {
+      const res = await deleteFavorite(selectedFavoriteId);
+      fetchList();
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+    }
+  };
 
-    const formatAddress = (address) => {
-        if (typeof address === "object" && address !== null) {
-            const { province, district, ward, detail } = address;
-            return `${detail}, ${ward}, ${district}, ${province}`;
-        }
-        return "None address";
-    };
+  useEffect(() => {
+    fetchList();
+  }, []);
 
-    const paginatedFavorites = favorites.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-    return (
-        <div style={{ padding: "20px", margin: "0 auto", minHeight: "500px" }}>
-            {loading ? (
-                <Spin size="large" style={{ display: "block", textAlign: "center", margin: "20px" }} />
-            ) : (
-                <>
-                    <List
-                        itemLayout="vertical"
-                        dataSource={paginatedFavorites}
-                        renderItem={(item, index) => (
-                            <WatchLaterCard
-                                key={item.id}
-                                item={item}
-                                index={(currentPage - 1) * pageSize + index}
-                                onCardClick={(id) => navigate(`/boarding-house/${id}`)}
-                                onDelete={handleDeleteFavorite}
-                                getPrimaryImage={getPrimaryImage}
-                                formatAddress={formatAddress}
-                            />
-                        )}
-                    />
-
-                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
-                        <Pagination
-                            current={currentPage}
-                            pageSize={pageSize}
-                            total={favorites.length}
-                            onChange={(page, size) => {
-                                setCurrentPage(page);
-                                setPageSize(size);
-                            }}
-
-                            pageSizeOptions={["5", "10", "20"]}
-                        />
-                    </div>
-                </>
-            )}
+  return (
+    <div className="min-h-[500px]">
+      {loading ? (
+        <div className="flex justify-center items-center h-40">
+          <Spin size="large" />
         </div>
-    );
+      ) : (
+        <Card className="mb-6">
+          <WatchLaterList
+            data={favorites}
+            onConfirmModal={() => setIsOpenDeleteModal(true)}
+            setSelectedFavoriteId={setSelectedFavoriteId}
+          />
+        </Card>
+      )}
+      <ConfirmModal
+        title="Confirm Deletion"
+        content={`Are you sure you want to delete this boarding house?`}
+        onOk={() => {
+          handleDelete();
+          setIsOpenDeleteModal(false);
+        }}
+        onCancel={() => {
+          setIsOpenDeleteModal(false);
+        }}
+        isOpen={isOpenDeleteModal}
+      />
+    </div>
+  );
 };
 
 export default FavouriteList;

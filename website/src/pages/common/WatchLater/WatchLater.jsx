@@ -1,12 +1,12 @@
-import { Card, Spin } from "antd";
-import React, { useEffect, useState } from "react";
-import WatchLaterList from "./WatchLaterList";
+import { Card, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import WatchLaterList from './WatchLaterList';
 import {
   getAllWatchLater,
   deleteWatchLater,
-} from "../../../api/watchLaterManagement";
-import { ConfirmModal } from "../../../component";
-import { toast } from "react-toastify";
+} from '../../../api/watchLaterManagement';
+import { ConfirmModal } from '../../../component';
+import { toast } from 'react-toastify';
 
 function WatchLater() {
   const [watchList, setWatchList] = useState([]);

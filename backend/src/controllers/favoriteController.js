@@ -14,11 +14,12 @@ class favoriteController {
       const favorites = await FavoriteBH.find({ accountId: account._id })
         .populate({
           path: 'boardingHouseId',
-          select: 'name priceRange images rating description address boardingHouseType timeAgo',
+          select:
+            'name priceRange images rating description address boardingHouseType timeAgo',
           populate: {
             path: 'boardingHouseType',
-            select: 'name roomSize peopleNumber'
-          }
+            select: 'name roomSize peopleNumber',
+          },
         })
         .lean();
 
@@ -37,7 +38,7 @@ class favoriteController {
 
           boardingHouseType: fav.boardingHouseId.boardingHouseType
             ? fav.boardingHouseId.boardingHouseType.name
-            : "undefined",
+            : 'undefined',
         })),
       });
     } catch (error) {
@@ -122,7 +123,51 @@ class favoriteController {
         { timestamps: false }
       );
 
-      return res.status(200).json({ message: 'Deleted from favorites', isFavorite: false });
+      return res
+        .status(200)
+        .json({ message: 'Deleted from favorites', isFavorite: false });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+  async getAllFavorites(req, res) {
+    try {
+      const account = await Account.findById(req.user.userId); // Lấy user từ token
+      if (!account) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Tìm tất cả danh sách yêu thích của người dùng
+      const favorites = await FavoriteBH.find({ accountId: account._id })
+        .populate({
+          path: 'boardingHouseId',
+          select:
+            'name priceRange images rating description address boardingHouseType timeAgo',
+          populate: {
+            path: 'boardingHouseType',
+            select: 'name roomSize peopleNumber',
+          },
+        })
+        .lean();
+
+      return res.status(200).json({
+        message: 'Successfully retrieved favorites',
+        favorites: favorites.map((fav) => ({
+          id: fav.boardingHouseId._id,
+          name: fav.boardingHouseId.name,
+          price: fav.boardingHouseId.priceRange,
+          img: fav.boardingHouseId.images,
+          rating: fav.boardingHouseId.rating,
+          detail: fav.boardingHouseId.description,
+          address: fav.boardingHouseId.address,
+          timeAgo: fav.boardingHouseId.timeAgo,
+          isFavorite: true,
+
+          boardingHouseType: fav.boardingHouseId.boardingHouseType
+            ? fav.boardingHouseId.boardingHouseType.name
+            : 'undefined',
+        })),
+      });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
