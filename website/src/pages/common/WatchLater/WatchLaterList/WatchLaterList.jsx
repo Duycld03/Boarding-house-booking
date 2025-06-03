@@ -48,12 +48,19 @@ const WatchLaterList = ({
             : item?.boardingHouseId?._id || item?._id || item?.id;
 
         const itemId =
-          mode === 'watchLater' ? item?._id : item?._id || item?.id; // 🔥 sửa chỗ này để xoá đúng ID
+          mode === 'watchLater' ? item?._id : item?._id || item?.id;
 
         return (
-          <Card className="mb-4 hover:shadow-md" hoverable key={itemId}>
+          <Card
+            bordered={false}
+            className="mb-4   bg-white dark:bg-gray-800"
+            hoverable
+            key={itemId}
+          >
             <List.Item>
-              <div style={{ fontSize: 18, marginRight: 16 }}>{index + 1}</div>
+              <div className="text-[18px] mr-4 text-black dark:text-white">
+                {index + 1}
+              </div>
               <List.Item.Meta
                 onClick={() => goToDetail(navigateId)}
                 avatar={
@@ -63,12 +70,24 @@ const WatchLaterList = ({
                     src={getPrimaryImage(house?.images, house?.img)}
                   />
                 }
-                title={<strong className="text-3xl">{house?.name}</strong>}
+                title={
+                  <strong className="text-3xl text-black dark:text-white">
+                    {house?.name}
+                  </strong>
+                }
                 description={
-                  <div className="flex flex-col justify-between">
-                    <p>{house?.boardingHouseType?.name}</p>
-                    <Rate disabled defaultValue={house?.rating || 0} />
-                    <p>{getAddress(house?.address)}</p>
+                  <div className="flex flex-col justify-between text-black dark:text-gray-300">
+                    <p>
+                      {typeof house?.boardingHouseType === 'object'
+                        ? house?.boardingHouseType?.name
+                        : house?.boardingHouseType || 'Unknown type'}
+                    </p>
+
+                    <Rate
+                      disabled
+                      defaultValue={house?.rating || item?.rating || 0}
+                    />
+                    <p>{getAddress(house?.address || item?.address)}</p>
                   </div>
                 }
               />

@@ -47,7 +47,7 @@ function WatchLater() {
           <Spin size="large" />
         </div>
       ) : (
-        <Card className="mb-6">
+        <Card bordered={false} className="mb-6 bg-white dark:bg-gray-800">
           <WatchLaterList
             data={watchList}
             onConfirmDelete={() => setIsOpenDeleteModal(true)}
