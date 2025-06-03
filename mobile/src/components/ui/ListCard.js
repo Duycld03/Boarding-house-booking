@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,8 @@ import {
   StyleSheet,
   useColorScheme,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useTranslation } from 'react-i18next';
 import { AntDesign } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeProvider';
 
@@ -53,11 +52,7 @@ const ListCard = ({
   onConfirmDelete,
   setSelectedId,
   mode = 'watchLater',
-  currentPage = 1,
-  totalPages = 1,
-  onPageChange,
 }) => {
-  const colorScheme = useColorScheme(); // Light | dark
   const { isDarkMode } = useTheme();
   const { t } = useTranslation('common');
   const router = useRouter();
@@ -132,103 +127,13 @@ const ListCard = ({
         renderItem={renderItem}
         keyExtractor={(item, index) => `${item?._id || index}`}
         showsVerticalScrollIndicator={false}
-        ListFooterComponent={
-          <View style={styles.paginationContainerRight}>
-            <TouchableOpacity
-              onPress={() => onPageChange?.(currentPage - 1)}
-              disabled={currentPage === 1}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderWidth: 1,
-                backgroundColor:
-                  currentPage === 1
-                    ? isDarkMode
-                      ? '#1e293b'
-                      : '#f3f4f6'
-                    : isDarkMode
-                    ? '#1f2937'
-                    : '#1f2937',
-                borderColor:
-                  currentPage === 1
-                    ? isDarkMode
-                      ? '#334155'
-                      : '#d1d5db'
-                    : isDarkMode
-                    ? '#4b5563'
-                    : '#cccccc',
-              }}
-            >
-              <AntDesign
-                name="left"
-                size={20}
-                color={
-                  currentPage === 1 ? '#9ca3af' : isDarkMode ? '#fff' : '#000'
-                }
-              />
-            </TouchableOpacity>
-
-            <Text
-              style={[styles.pageText, { color: isDarkMode ? '#fff' : '#000' }]}
-            >
-              {currentPage} / {totalPages}
-            </Text>
-
-            <TouchableOpacity
-              onPress={() => onPageChange?.(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderWidth: 1,
-                backgroundColor:
-                  currentPage === totalPages
-                    ? isDarkMode
-                      ? '#1e293b'
-                      : '#f3f4f6'
-                    : isDarkMode
-                    ? '#1f2937'
-                    : '#ffffff',
-                borderColor:
-                  currentPage === totalPages
-                    ? isDarkMode
-                      ? '#334155'
-                      : '#d1d5db'
-                    : isDarkMode
-                    ? '#4b5563'
-                    : '#cccccc',
-              }}
-            >
-              <AntDesign
-                name="right"
-                size={20}
-                color={
-                  currentPage === totalPages
-                    ? '#9ca3af'
-                    : isDarkMode
-                    ? '#fff'
-                    : '#000'
-                }
-              />
-            </TouchableOpacity>
-          </View>
-        }
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 12,
-    flex: 1,
-  },
+  container: { padding: 12, flex: 1 },
   card: {
     flexDirection: 'row',
     borderRadius: 8,
@@ -237,63 +142,14 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center',
   },
-  imageWrapper: {
-    width: 100,
-    height: 100,
-    marginRight: 12,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 6,
-  },
-  info: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  type: {
-    fontSize: 14,
-  },
-  rating: {
-    flexDirection: 'row',
-    marginTop: 4,
-  },
-  address: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  deleteIcon: {
-    marginLeft: 8,
-  },
-  paginationContainerRight: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingRight: 12,
-  },
-  paginationButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#f3f4f6',
-    borderColor: '#d1d5db',
-  },
-  pageText: {
-    marginHorizontal: 12,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  imageWrapper: { width: 100, height: 100, marginRight: 12 },
+  image: { width: '100%', height: '100%', borderRadius: 6 },
+  info: { flex: 1 },
+  name: { fontSize: 18, fontWeight: 'bold' },
+  type: { fontSize: 14 },
+  rating: { flexDirection: 'row', marginTop: 4 },
+  address: { fontSize: 12, marginTop: 4 },
+  deleteIcon: { marginLeft: 8 },
 });
 
 export default ListCard;

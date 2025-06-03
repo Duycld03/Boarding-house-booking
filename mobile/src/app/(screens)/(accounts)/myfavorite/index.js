@@ -1,52 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import ListCard from '@/components/ui/ListCard';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import { getAllFavorites, deleteFavorite } from '@/API/favoriteManagement';
 import { ConfirmModal } from '@/components/feedback';
 import { useRouter } from 'expo-router';
-import { useTheme } from '@/context/ThemeProvider';
-import { useTranslation } from 'react-i18next'; // ✅ i18n
+import { useThemedClasses } from '@/utils/useTheme';
+import { useTranslation } from 'react-i18next';
+import ScreenContainer from '@/components/layout/ScreenContainer';
+import LoadMoreButton from '@/components/ui/LoadMoreButton';
+import EmptyState from '@/components/ui/EmptyState';
 
 function Favorite() {
   const [favorites, setFavorites] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-  });
+  const [totalItems, setTotalItems] = useState(0);
+  const [limit, setLimit] = useState(5); // Default limit
 
   const router = useRouter();
-  const { isDarkMode } = useTheme();
-  const { t } = useTranslation('common'); // ✅ i18n
+  const { themedClasses, isDarkMode } = useThemedClasses();
+  const { t } = useTranslation('common');
 
-  const fetchFavorites = async (page = 1) => {
+  const fetchFavorites = async (currentLimit = 5) => {
     setLoading(true);
     try {
-      const res = await getAllFavorites({ page, limit: 8 });
+      const res = await getAllFavorites({ page: 1, limit: currentLimit });
       setFavorites(res?.data || []);
-      setPagination({
-        currentPage: res?.pagination?.currentPage || 1,
-        totalPages: res?.pagination?.totalPages || 1,
-      });
+      setTotalItems(res?.pagination?.totalItems || 0);
     } catch (error) {
-      setLoading(false);
       router.push('/login');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleConfirmDelete = () => {
-    setIsOpenDeleteModal(true);
+  const handleLoadMore = () => {
+    setLimit((prev) => prev + 5);
   };
 
   const handleDelete = async () => {
     try {
       await deleteFavorite(selectedId);
-      fetchFavorites(pagination.currentPage);
+      fetchFavorites(limit);
     } catch (error) {
       console.error('Delete failed', error);
     } finally {
@@ -56,47 +53,74 @@ function Favorite() {
   };
 
   useEffect(() => {
-    fetchFavorites();
-  }, []);
+    fetchFavorites(limit);
+  }, [limit]);
+
+  const hasMore = favorites.length < totalItems;
 
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: 16,
-        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-      }}
-    >
-      <BackHeader title={t('favorites')} />
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-        >
-          <ActivityIndicator size="large" color="#0ea5e9" />
-        </View>
-      ) : (
-        <ListCard
-          data={favorites}
-          onConfirmDelete={handleConfirmDelete}
-          setSelectedId={setSelectedId}
-          mode="favorite"
-          currentPage={pagination.currentPage}
-          totalPages={pagination.totalPages}
-          onPageChange={(page) => fetchFavorites(page)}
-        />
-      )}
-
-      <ConfirmModal
-        visible={isOpenDeleteModal}
-        title={t('confirmDeletion')}
-        message={t('confirmRemoveFavorite')}
-        onConfirm={handleDelete}
-        onClose={() => {
-          setIsOpenDeleteModal(false);
-          setSelectedId(null);
+    <ScreenContainer className={themedClasses.bg} withPadding={false}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
         }}
-      />
-    </View>
+      >
+        <BackHeader title={t('favorites')} />
+
+        {favorites.length === 0 && !loading ? (
+          <EmptyState
+            title={t('noFavorites')}
+            message={
+              t('noFavoritesDesc') || 'You have not added any favorites yet.'
+            }
+          />
+        ) : (
+          <>
+            <ListCard
+              data={favorites}
+              onConfirmDelete={() => setIsOpenDeleteModal(true)}
+              setSelectedId={setSelectedId}
+              mode="favorite"
+            />
+            <LoadMoreButton
+              hasMore={hasMore}
+              isLoading={loading}
+              onLoadMore={handleLoadMore}
+              currentCount={favorites.length}
+              totalCount={totalItems}
+              itemsPerPage={5}
+              itemName="boarding houses"
+            />
+          </>
+        )}
+
+        {loading && (
+          <View
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              backgroundColor: 'rgba(0,0,0,0.1)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 10,
+            }}
+          >
+            <ActivityIndicator size="large" color="#0ea5e9" />
+          </View>
+        )}
+
+        <ConfirmModal
+          visible={isOpenDeleteModal}
+          title={t('confirmDeletion')}
+          message={t('confirmRemoveFavorite')}
+          onConfirm={handleDelete}
+          onClose={() => {
+            setIsOpenDeleteModal(false);
+            setSelectedId(null);
+          }}
+        />
+      </View>
+    </ScreenContainer>
   );
 }
 

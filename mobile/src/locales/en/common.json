@@ -20,6 +20,11 @@
   "confirmDeletion": "Confirm Deletion",
   "confirmRemoveFavorite": "Are you sure you want to remove this favorite?",
    "watchLater": "Watch later",
-  "confirmRemoveWatchLater": "Are you sure you want to remove this from your watch later list?"
+  "confirmRemoveWatchLater": "Are you sure you want to remove this from your watch later list?",
+  "noWatchLater": "No watch later items",
+  "noWatchLaterDesc": "You have no saved items to watch later.",
+    "noFavorites": "No favorites yet",
+  "noFavoritesDesc": "You have not added any favorites yet."
+
 
 }
