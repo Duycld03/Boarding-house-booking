@@ -396,60 +396,45 @@ const BHDetailAdmin = () => {
             : ConfigProvider.defaultAlgorithm,
         token: darkMode
             ? {
-                colorText: "#ffffff", // Văn bản sáng
-                colorTextSecondary: "#e5e7eb", // Văn bản phụ nhạt hơn
-                colorBgContainer: "#1f2937", // Nền tối
-                colorBorder: "#4b5563", // Viền rõ hơn
-                colorPrimary: "#3b82f6", // Màu chính (xanh lam)
-
-                // Thiết lập màu sắc cho Input
-                colorBgElevated: "#374151", // Nền cho các thành phần thả xuống
-                colorFillSecondary: "#374151", // Nền cho các ô input
-                colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
-                colorBorderSecondary: "#4B5563", // Viền phụ
-                controlItemBgActive: "#3b82f6", // Nền khi được chọn
-                controlItemBgHover: "#4B5563", // Nền khi hover
+                colorText: "#F9FAFB", // Text color in dark mode
+                colorTextSecondary: "#e5e7eb", // Secondary text color
+                colorBgContainer: "#374151", // Background for both Input and Select
+                colorBorder: "#4B5563", // Border color for Input and Select
+                colorTextPlaceholder: "#9CA3AF", // Placeholder text color
+                colorPrimary: "#3b82f6", // Primary color
+                controlItemBgActive: "#3b82f6", // Active item background
+                controlItemBgHover: "#4B5563", // Hover item background
             }
             : {
-                colorText: "#000", // Văn bản tối
-                colorTextSecondary: "#4b5563", // Văn bản phụ
-                colorBgContainer: "#ffffff", // Nền sáng
-                colorBorder: "#d9d9d9", // Viền nhạt
-                colorPrimary: "#3b82f6", // Màu chính (xanh lam)
-
-                // Thiết lập màu sắc cho Input
-                colorBgElevated: "#f5f5f5", // Nền cho các thành phần thả xuống
-                colorFillSecondary: "#f5f5f5", // Nền cho các ô input
-                colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
-                colorBorderSecondary: "#d9d9d9", // Viền phụ
-                controlItemBgActive: "#e5e7eb", // Nền khi được chọn
-                controlItemBgHover: "#f0f0f0", // Nền khi hover
+                colorText: "#000000",
+                colorTextSecondary: "#4B5563",
+                colorBgContainer: "#f5f5f5",
+                colorBorder: "#d9d9d9",
+                colorTextPlaceholder: "#9CA3AF",
+                colorPrimary: "#3b82f6",
+                controlItemBgActive: "#e5e7eb",
+                controlItemBgHover: "#f0f0f0",
             },
         components: {
-            // Cấu hình cho Select
-            Select: {
-                selectorBg: darkMode ? "#374151" : "#f5f5f5", // Nền của Select
-                colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Select
-                colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
-                optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb", // Nền khi được chọn
-                optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0", // Nền khi hover
-            },
-            // Cấu hình cho Input
             Input: {
-                colorBgContainer: darkMode ? "#374151" : "#f5f5f5", // Nền Input
-                colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Input
-                colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
-                colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563", // Placeholder
+                colorBgContainer: darkMode ? "#374151" : "#f5f5f5",
+                colorText: darkMode ? "#F9FAFB" : "#000",
+                colorBorder: darkMode ? "#4B5563" : "#d9d9d9",
+                colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563",
             },
-            // Cấu hình cho Form
-            Form: {
-                labelColor: darkMode ? "#F9FAFB" : "#000", // Màu nhãn Form
+            Select: {
+                selectorBg: darkMode ? "#374151" : "#f5f5f5",
+                colorText: darkMode ? "#F9FAFB" : "#000",
+                colorBorder: darkMode ? "#4B5563" : "#d9d9d9",
+                optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb",
+                optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0",
             },
         },
     };
     return (
         <ConfigProvider theme={themeConfig}>
-            <div className={`mx-auto w-full rounded-xl p-4`}>
+            <div className={`mx-auto w-full back rounded-xl p-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'
+                }`}>
                 <h1 className="text-5xl flex items-center gap-2">
                     <FontAwesomeIcon icon={faHotel} className="text-gray-500 text-6xl" />
                     {updatedData.name}
@@ -522,6 +507,11 @@ const BHDetailAdmin = () => {
                                                         target: { name: "boardingHouseType", value },
                                                     })
                                                 }
+                                                style={{
+                                                    backgroundColor: darkMode ? "#374151" : "#f5f5f5",
+                                                    color: darkMode ? "#F9FAFB" : "#000",
+                                                    borderColor: darkMode ? "#4B5563" : "#d9d9d9",
+                                                }}
                                             >
                                                 {boardingHouseTypes.map((type) => (
                                                     <Select.Option key={type.value} value={type.value}>
