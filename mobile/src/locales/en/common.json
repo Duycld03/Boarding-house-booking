@@ -2,5 +2,11 @@
   "loaderComponent": {
     "loading": "Loading...",
     "processing": "Processing..."
+  },
+  "accommodation_types": {
+    "nha_tro_truyen_thong": "Traditional Boarding House",
+    "mini_house": "Mini House",
+    "nha_tro_kien_truc_xa": "Dormitory Style Boarding House",
+    "nha_tro_cao_cap": "Premium Boarding House"
   }
 }
