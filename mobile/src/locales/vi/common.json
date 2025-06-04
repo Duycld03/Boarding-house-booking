@@ -8,5 +8,30 @@
     "mini_house": "Mini house",
     "nha_tro_kien_truc_xa": "Nhà trọ kiến trúc xá",
     "nha_tro_cao_cap": "Nhà trọ cao cấp"
-  }
+  },
+  "boardingHouseTypes": {
+    "Nhà trọ truyền thống": "Nhà trọ truyền thống",
+    "Mini house": "Căn hộ mini",
+    "Nhà trọ kiến trúc xá": "Ký túc xá"
+  },
+  "address": {
+    "province": "Tỉnh/Thành phố",
+    "district": "Quận/Huyện",
+    "ward": "Phường/Xã",
+    "detail": "Địa chỉ chi tiết"
+  },
+  "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}",
+  "favorites": "Danh sách yêu thích",
+  "confirmDeletion": "Xác nhận xoá",
+  "confirmRemoveFavorite": "Bạn có chắc chắn muốn xoá khỏi danh sách yêu thích?",
+
+  "watchLater": "Xem sau",
+  "confirmRemoveWatchLater": "Bạn có chắc muốn xoá khỏi danh sách xem sau?",
+  "noWatchLater": "Không có mục nào để xem sau",
+  "noWatchLaterDesc": "Bạn chưa lưu mục nào để xem sau.",
+   "noFavorites": "Chưa có mục yêu thích nào",
+  "noFavoritesDesc": "Bạn chưa thêm mục nào vào danh sách yêu thích."
 }
+
+
+
