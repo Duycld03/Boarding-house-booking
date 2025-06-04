@@ -11,6 +11,13 @@ import ScreenContainer from '@/components/layout/ScreenContainer';
 import LoadMoreButton from '@/components/ui/LoadMoreButton';
 import EmptyState from '@/components/ui/EmptyState';
 import Loader from '@/components/ui/Loader';
+import {
+  Ionicons,
+  MaterialIcons,
+  AntDesign,
+  FontAwesome,
+  FontAwesome5,
+} from '@expo/vector-icons';
 
 function Favorite() {
   const [favorites, setFavorites] = useState([]);
@@ -67,7 +74,16 @@ function Favorite() {
           backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
         }}
       >
-        <BackHeader title={t('favorites')} />
+        <BackHeader
+          backIcon={
+            <FontAwesome5
+              name="chevron-left"
+              size={18}
+              color={isDarkMode ? '#fff' : '#333'}
+            />
+          }
+          title={t('favorites')}
+        />
 
         {favorites.length === 0 && !loading ? (
           <EmptyState

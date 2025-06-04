@@ -11,7 +11,13 @@ import { useThemedClasses } from '@/utils/useTheme';
 import LoadMoreButton from '@/components/ui/LoadMoreButton';
 import EmptyState from '@/components/ui/EmptyState';
 import Loader from '@/components/ui/Loader';
-
+import {
+  Ionicons,
+  MaterialIcons,
+  AntDesign,
+  FontAwesome,
+  FontAwesome5,
+} from '@expo/vector-icons';
 function WatchLater() {
   const [watchList, setWatchList] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -64,7 +70,16 @@ function WatchLater() {
       <View
         style={{ flex: 1, backgroundColor: isDarkMode ? '#0f172a' : '#ffffff' }}
       >
-        <BackHeader title={t('watchLater')} />
+        <BackHeader
+          backIcon={
+            <FontAwesome5
+              name="chevron-left"
+              size={18}
+              color={isDarkMode ? '#fff' : '#333'}
+            />
+          }
+          title={t('watchLater')}
+        />
 
         {watchList.length === 0 && !loading ? (
           <EmptyState

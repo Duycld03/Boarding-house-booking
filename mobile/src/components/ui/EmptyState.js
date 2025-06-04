@@ -16,24 +16,24 @@ const EmptyState = ({
     <View className="flex-1 justify-center items-center py-20 px-6">
       <View
         className={themedClasses(
-          'bg-white/95 backdrop-blur-sm border border-gray-200/50 p-12 rounded-3xl shadow-xl max-w-sm w-full',
-          'bg-gray-800/95 backdrop-blur-sm border-gray-700/50 shadow-2xl shadow-black/40'
+          'bg-white/95 border border-gray-200 p-12 rounded-3xl shadow-xl max-w-sm w-full',
+          'bg-gray-800/95  p-12 rounded-3xl shadow-xl max-w-sm w-full'
         )}
       >
         <View className="items-center">
           {/* Gradient glow behind icon */}
           <View className="relative mb-8">
-            <View className="absolute -inset-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full opacity-20 blur-xl" />
+            <View className="absolute -inset-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full opacity-25 blur-xl" />
             <View
               className={themedClasses(
-                'bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-full relative shadow-lg',
-                'bg-gradient-to-br from-blue-900/40 to-purple-900/40 shadow-xl'
+                'bg-gradient-to-br from-indigo-100 to-purple-100 p-8 rounded-full shadow-md',
+                'bg-gradient-to-br from-indigo-900/30 to-purple-900/30 p-8 rounded-full shadow-md'
               )}
             >
               <AntDesign
                 name={iconName}
                 size={72}
-                color={isDarkMode ? '#8B5CF6' : '#6366F1'}
+                color={isDarkMode ? '#A78BFA' : '#6366F1'}
               />
             </View>
           </View>
@@ -41,7 +41,7 @@ const EmptyState = ({
           <Text
             className={themedClasses(
               'text-gray-800 text-2xl font-bold mb-4 text-center',
-              'text-gray-200'
+              'text-white text-2xl font-bold mb-4 text-center'
             )}
           >
             {title}
@@ -49,7 +49,7 @@ const EmptyState = ({
           <Text
             className={themedClasses(
               'text-gray-600 text-center leading-6 text-base',
-              'text-gray-400'
+              'text-gray-400 text-center leading-6 text-base'
             )}
           >
             {message}
