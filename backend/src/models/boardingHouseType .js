@@ -12,6 +12,10 @@ const boardingHouseTypeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    codeName: {
+      type: String,
+      required: true,
+    }
   },
   {
     timestamps: true,

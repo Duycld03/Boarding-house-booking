@@ -36,6 +36,7 @@ import userRoles from "@/constants/userRole";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
+import coverBhType from "@/utils/coverBhType";
 
 function BoardingHouseDetail() {
   const { hasRole } = useCurrentUser();
@@ -68,6 +69,8 @@ function BoardingHouseDetail() {
     limit: 2,
     loadedItems: 0,
   });
+
+  console.log("bh data: ", boardingHouse);
 
   const roomTypeRef = useRef(null);
 
@@ -352,7 +355,10 @@ function BoardingHouseDetail() {
             <div className="flex flex-wrap justify-between mt-5 sm:mt-0">
               <div>
                 <Tag color="blue" className="md:text-2xl md:mt-3">
-                  {boardingHouse?.boardingHouseType?.name}
+                  {coverBhType(
+                    boardingHouse?.boardingHouseType?.codeName,
+                    currentLanguage
+                  )}
                 </Tag>
                 <div className="mt-5 flex gap-4">
                   <FontAwesomeIcon
