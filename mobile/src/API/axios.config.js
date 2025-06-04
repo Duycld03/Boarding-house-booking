@@ -19,7 +19,6 @@ instance.interceptors.request.use(
   },
   function (error) {
     // Do something with request error
-    console.log("Request error", error);
     return Promise.reject(error);
   }
 );
@@ -37,15 +36,12 @@ instance.interceptors.response.use(
     // Do something with response error
     if (error.response) {
       // Server responded with a status code out of 2xx range
-      console.log("Response error data:", error.response.data);
-      console.log("Response error status:", error.response.status);
-      console.log("Response error headers:", error.response.headers);
     } else if (error.request) {
       // Request was made but no response was received
-      console.log("Request error", error.request);
+
     } else {
       // Something happened in setting up the request
-      console.log("Error", error.message);
+
     }
 
     return Promise.reject(error);

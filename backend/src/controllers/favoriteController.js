@@ -1,6 +1,7 @@
 import Account from '../models/account.js';
 import FavoriteBH from '../models/favoriteBH.js';
 import BoardingHouse from '../models/boardingHouse.js';
+import paginate from '../utils/pagination.js';
 
 class favoriteController {
   async getFavorites(req, res) {
@@ -14,11 +15,12 @@ class favoriteController {
       const favorites = await FavoriteBH.find({ accountId: account._id })
         .populate({
           path: 'boardingHouseId',
-          select: 'name priceRange images rating description address boardingHouseType timeAgo',
+          select:
+            'name priceRange images rating description address boardingHouseType timeAgo',
           populate: {
             path: 'boardingHouseType',
-            select: 'name roomSize peopleNumber'
-          }
+            select: 'name roomSize peopleNumber',
+          },
         })
         .lean();
 
@@ -37,7 +39,7 @@ class favoriteController {
 
           boardingHouseType: fav.boardingHouseId.boardingHouseType
             ? fav.boardingHouseId.boardingHouseType.name
-            : "undefined",
+            : 'undefined',
         })),
       });
     } catch (error) {
@@ -122,9 +124,73 @@ class favoriteController {
         { timestamps: false }
       );
 
-      return res.status(200).json({ message: 'Deleted from favorites', isFavorite: false });
+      return res
+        .status(200)
+        .json({ message: 'Deleted from favorites', isFavorite: false });
     } catch (error) {
       return res.status(500).json({ error: error.message });
+    }
+  }
+  async getAllFavorites(req, res) {
+    try {
+      const account = await Account.findById(req.user.userId);
+      if (!account) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'User not found' });
+      }
+
+      // Cấu hình pagination
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 5,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter: { accountId: account._id },
+        allowQueryFilters: [], // Thêm nếu muốn lọc theo status, etc.
+        allowSearchFields: ['boardingHouseId.name'], // Nếu cần search theo tên nhà
+        fields: '-__v',
+        populate: [
+          {
+            path: 'boardingHouseId',
+            select:
+              'name priceRange images rating description address boardingHouseType timeAgo',
+            populate: {
+              path: 'boardingHouseType',
+              select: 'name roomSize peopleNumber',
+            },
+          },
+        ],
+        includeTotalData: true,
+      };
+
+      // Gọi helper phân trang
+      const result = await paginate(FavoriteBH, paginationOptions, req);
+
+      // const transformedFavorites = result.docs.map((fav) => {
+      //   const bh = fav.boardingHouseId;
+      //   return {
+      //     id: bh._id,
+      //     name: bh.name,
+      //     price: bh.priceRange,
+      //     img: bh.images,
+      //     rating: bh.rating,
+      //     detail: bh.description,
+      //     address: bh.address,
+      //     timeAgo: bh.timeAgo,
+      //     isFavorite: true,
+      //     boardingHouseType: bh.boardingHouseType?.name || 'undefined',
+      //   };
+      // });
+
+      return res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      console.error('Error in getAllFavorites:', error);
+      return res.status(500).json({ success: false, error: error.message });
     }
   }
 }
