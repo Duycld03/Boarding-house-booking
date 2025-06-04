@@ -66,7 +66,7 @@ class boardingHouseController {
     try {
       const { id } = req.params;
       const boardingHouse = await BoardingHouse.findById(id)
-        .populate('boardingHouseType', 'name')
+        .populate('boardingHouseType')
         .populate('ownerId')
         .exec();
 

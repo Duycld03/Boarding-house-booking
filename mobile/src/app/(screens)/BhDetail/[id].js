@@ -41,6 +41,8 @@ import {
 } from '@/API/ownerUser/boardingHouse';
 import { useThemedClasses } from '@/utils/useTheme';
 import { addFavorite, getFavorite } from '@/API/favoriteManagement';
+import i18next from 'i18next';
+import coverBhType from '@/utils/coverBhType';
 
 // Constants
 const DEFAULT_BOARDING_HOUSE_ID = '64ab1cd234abcd1234567878';
@@ -54,6 +56,7 @@ export default function BhDetailScreen() {
   const { isDarkMode } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const currentLanguage = i18next.language
 
   const { themedClasses } = useThemedClasses();
 
@@ -408,7 +411,7 @@ export default function BhDetailScreen() {
         weight="bold"
         style={{ color: '#fff' }}
       >
-        {data.boardingHouseDetail?.boardingHouseType?.name ||
+        {coverBhType(data.boardingHouseDetail?.boardingHouseType?.codeName, currentLanguage) ||
           t('boardingHouseTypeUnknown')}
       </Text>
     </View>

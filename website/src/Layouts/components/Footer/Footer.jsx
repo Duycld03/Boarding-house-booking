@@ -1,7 +1,7 @@
 import Layout from "antd/es/layout/layout";
 import classnames from "classnames/bind";
 import Styles from "./Footer.module.css";
-import Icon from "../../../assets/images/Icon.svg";
+import Icon from "../../../assets/images/newLogo.png";
 
 const { Footer } = Layout;
 
@@ -10,8 +10,8 @@ function FooterComponent() {
     <Footer className="bg-white dark:bg-gray-800">
       <div className="mx-auto max-w-full space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">
         <div className="sm:flex sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 font-body font-bold dark:text-white">
-            <img src={Icon} alt="Footer-icon" />
+          <div className="flex cursor-pointer items-center gap-2 font-body font-bold dark:text-white">
+            <img className="w-32 h-28" src={Icon} alt="Footer-icon" />
             <p>MOTELLEASE TECH</p>
           </div>
 
