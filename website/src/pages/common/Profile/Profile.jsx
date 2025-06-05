@@ -26,6 +26,7 @@ import { updateAccountFromProfile } from "../../../api/AccountManagement";
 import ChangeEmailModal from "./ChangeEmailModal";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
+import { updateAvatar } from "../../../api/AccountManagement";
 
 const { Title, Text } = Typography;
 
@@ -137,6 +138,25 @@ function Profile() {
     }
   };
 
+  const handleUpload = async ({ file, onSuccess, onError }) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const res = await updateAvatar(formData);
+
+      // setImageUrl(response.url);
+      toast.success("Upload avatar successfully!");
+      onSuccess();
+      setLoading(false);
+    } catch (error) {
+      toast.error("Upload avatar failed!");
+      onError(error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     getUserProfile();
   }, []);
@@ -175,7 +195,8 @@ function Profile() {
                     listType="picture-circle"
                     className="avatar-uploader mb-4"
                     showUploadList={false}
-                    customRequest={handleAvatarChange}
+                    onChange={handleAvatarChange}
+                    customRequest={handleUpload}
                     beforeUpload={beforeUpload}
                   >
                     {imageUrl ? (
