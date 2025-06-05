@@ -834,6 +834,7 @@ class boardingHouseController {
         electricityPrice,
         waterPrice,
         totalRooms = 0,
+        managerId,
         availableRooms = 0,
       } = req.body;
 
@@ -900,6 +901,7 @@ class boardingHouseController {
         images,
         totalRooms,
         availableRooms,
+        managerId,
       });
 
       const savedBoardingHouse = await newBoardingHouse.save();

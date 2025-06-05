@@ -20,7 +20,10 @@ import {
   ConfigProvider,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { createBoardingHouseOwner } from '../../../api/BoardingHManagement';
+import {
+  createBoardingHouseOwner,
+  getManagersForOwner,
+} from '../../../api/BoardingHManagement'; // Assuming this function exists to fetch managers
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/themeContext';
@@ -44,6 +47,7 @@ const AddBHModal = ({ onAddData }) => {
     priceRange: '',
     electricityPrice: '',
     waterPrice: '',
+    managerId: '',
   });
   const [loading, setLoading] = useState(false);
   const [provinces, setProvinces] = useState([]);
@@ -51,6 +55,8 @@ const AddBHModal = ({ onAddData }) => {
   const [wards, setWards] = useState([]);
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
   const [geoLocation, setGeoLocation] = useState(null);
+  const [managers, setManagers] = useState([]); // To store the list of managers
+
   const darkInputStyle = darkMode
     ? {
         backgroundColor: '#374151',
@@ -109,6 +115,19 @@ const AddBHModal = ({ onAddData }) => {
     };
     fetchTypes();
   }, [t]);
+  // Fetch managers for the logged-in owner
+  useEffect(() => {
+    const fetchManagers = async () => {
+      try {
+        const response = await getManagersForOwner(); // Assuming this API returns managers for the logged-in owner
+        setManagers(response.data || []);
+      } catch (error) {
+        console.error('Failed to fetch managers:', error);
+        toast.error(t('errors.fetchManagers'));
+      }
+    };
+    fetchManagers();
+  }, [t]);
 
   // Reset form data
   const resetFormData = () => {
@@ -122,6 +141,7 @@ const AddBHModal = ({ onAddData }) => {
       priceRange: '',
       electricityPrice: '',
       waterPrice: '',
+      managerId: '',
     });
     setDistricts([]);
     setWards([]);
@@ -245,6 +265,11 @@ const AddBHModal = ({ onAddData }) => {
         setLoading(false);
         return;
       }
+      if (!formData.managerId) {
+        toast.error(t('errors.manager'));
+        setLoading(false);
+        return;
+      }
       if (!formData.name) {
         toast.error(t('errors.enterBoardingHouseName'));
         setLoading(false);
@@ -305,6 +330,8 @@ const AddBHModal = ({ onAddData }) => {
       const payload = new FormData();
       payload.append('boardingHouseType', formData.boardingHouseType);
       payload.append('name', formData.name);
+      payload.append('managerId', formData.managerId);
+
       payload.append('description', formData.description);
       payload.append('priceRange', formData.priceRange);
       payload.append('electricityPrice', formData.electricityPrice);
@@ -331,6 +358,7 @@ const AddBHModal = ({ onAddData }) => {
       });
 
       const response = await createBoardingHouseOwner(payload);
+      console.log('Add', response);
 
       if (response?.message === 'Boarding house created successfully!') {
         toast.success(t('messages.createdSuccess'));
@@ -465,6 +493,33 @@ const AddBHModal = ({ onAddData }) => {
                 {boardingHouseTypes.map((type) => (
                   <Select.Option key={type.value} value={type.value}>
                     {type.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              label={t('form.labels.manager')}
+              name="managerId"
+              style={formItemStyle}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <Select
+                placeholder={t('form.placeholders.selectManager')}
+                value={formData.managerId}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, managerId: value }))
+                }
+                className={darkModeSelectClass}
+                style={darkInputStyle.select}
+                dropdownStyle={darkMode ? { backgroundColor: '#374151' } : {}}
+              >
+                {managers.map((manager) => (
+                  <Select.Option key={manager._id} value={manager._id}>
+                    {manager.fullname}
                   </Select.Option>
                 ))}
               </Select>

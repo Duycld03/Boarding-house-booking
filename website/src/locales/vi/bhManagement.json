@@ -11,6 +11,7 @@
     "selectBoardingHouseType": "Vui lòng chọn loại nhà trọ.",
     "enterBoardingHouseName": "Vui lòng nhập tên nhà trọ.",
     "selectProvince": "Vui lòng chọn tỉnh/thành phố.",
+     "manager": "Vui lòng chọn quản lí.",
     "selectDistrict": "Vui lòng chọn quận/huyện.",
     "selectWard": "Vui lòng chọn phường/xã.",
     "enterAddressDetail": "Vui lòng nhập chi tiết nhà trọ.",
@@ -108,6 +109,7 @@
       "waterPrice": "Giá nước/m³ (VND)",
       "primaryImage": "Ảnh chính",
       "otherImages": "Ảnh khác",
+      "manager": "Quản lí",
       "province": "Tỉnh/Thành phố",
       "district": "Quận/Huyện",
       "ward": "Phường/Xã",
@@ -121,6 +123,7 @@
     "placeholders": {
       "selectProvince": "Chọn tỉnh/thành phố",
       "selectDistrict": "Chọn quận/huyện",
+      "selectManager": "Chọn quản lí",
       "selectWard": "Chọn phường/xã",
       "selectType": "Chọn loại",
       "enterBoardingHouseName": "Nhập tên nhà trọ",
