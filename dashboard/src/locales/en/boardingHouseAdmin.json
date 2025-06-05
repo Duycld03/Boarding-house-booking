@@ -16,7 +16,8 @@
         },
         "pagination": {
             "showTotal": "{{start}}-{{end}} of {{total}} Boarding Houses"
-        }
+        },
+        "filter": "Filter"
     },
     "errors": {
         "noId": "Boarding house ID not found.",

@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import AddressSelector from "../../../component/AddressSelector";
 import { Button, TableCustom as Table, ConfirmModal } from "../../../component";
 import {
@@ -34,7 +34,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import BHDetailAdmin from "./BHDetailsAdmin";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/context/themeContext";
+import { useTheme } from "../../../context/themeContext";
 function BoardingHouseManagement(onClose) {
   const [boardingHData, setBoardingHData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,6 +71,8 @@ function BoardingHouseManagement(onClose) {
   const [currentPage, setCurrentPage] = useState(1); // Current page number
   const [pageSize, setPageSize] = useState(10); // Number of items per page
   const [totalItems, setTotalItems] = useState(0); // Total number of items
+  const { darkMode } = useTheme();
+
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -536,14 +538,12 @@ function BoardingHouseManagement(onClose) {
         <div className="flex gap-3">
           <Button
             title={t("boardingHouseAdmin.delete")}
-            size="large"
             btnDelete
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
           <Button
             onClick={() => onProcessData(record)}
-            size="large"
             title={t("boardingHouseAdmin.update")}
             icon={<FileTextOutlined />}
             className="text-white"
@@ -566,12 +566,19 @@ function BoardingHouseManagement(onClose) {
     pageSize: pagination.limit,
     total: pagination.totalItems,
     showSizeChanger: true,
-    showTotal: (total, range) =>
-      t("boardingHouseAdmin.pagination.showTotal", {
-        start: range[0],
-        end: range[1],
-        total,
-      }),
+    showTotal: (total, range) => (
+      <span
+        style={{
+          color: darkMode ? "#ffffff" : "#000000",
+        }}
+      >
+        {t("boardingHouseAdmin.pagination.showTotal", {
+          start: range[0],
+          end: range[1],
+          total,
+        })}
+      </span>
+    ),
   }), [pagination, t]);
   return (
     <div className="boarding-house-management">

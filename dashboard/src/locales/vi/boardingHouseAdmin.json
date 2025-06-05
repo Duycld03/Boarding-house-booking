@@ -16,7 +16,8 @@
         },
         "pagination": {
             "showTotal": "{{start}}-{{end}} trong tổng số {{total}} Nhà Trọ"
-        }
+        },
+        "filter": "Lọc"
     },
     "errors": {
         "noId": "Không tìm thấy ID nhà trọ.",

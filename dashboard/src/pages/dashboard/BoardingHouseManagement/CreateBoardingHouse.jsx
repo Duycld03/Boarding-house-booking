@@ -657,7 +657,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             className="mb-2"
           >
             <InputNumber
-              placeholder={t("addBoardingHouseAdmin.priceRent")}
+              placeholder={t("addBoardingHouseAdmin.enterPriceRent")}
               name="priceRange"
               value={formData.priceRange}
               onChange={(value) =>
@@ -682,7 +682,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             className="mb-2"
           >
             <InputNumber
-              placeholder={t("addBoardingHouseAdmin.electricityPrice")}
+              placeholder={t("addBoardingHouseAdmin.enterElectricityPrice")}
               name="electricityPrice"
               value={formData.electricityPrice}
               onChange={(value) =>
@@ -707,7 +707,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             className="mb-2"
           >
             <InputNumber
-              placeholder={t("addBoardingHouseAdmin.waterPrice")}
+              placeholder={t("addBoardingHouseAdmin.enterWaterPrice")}
               name="waterPrice"
               value={formData.waterPrice}
               onChange={(value) =>
