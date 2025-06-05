@@ -1,14 +1,14 @@
-import mongoose from "mongoose";
-import mongoose_delete from "mongoose-delete";
+import mongoose from 'mongoose';
+import mongoose_delete from 'mongoose-delete';
 
 const AvatarImageSchema = mongoose.Schema({
   publicId: {
     type: String,
-    default: "",
+    default: '',
   },
   url: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
@@ -51,7 +51,7 @@ const AccountSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      default: "user",
+      default: 'user',
     },
     socialId: {
       type: String,
@@ -64,13 +64,18 @@ const AccountSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      default: "inactive",
+      default: 'inactive',
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Account',
+      default: null,
     },
   },
   { timestamps: true }
 );
 
-AccountSchema.plugin(mongoose_delete, { overrideMethods: "all" });
+AccountSchema.plugin(mongoose_delete, { overrideMethods: 'all' });
 
-const Account = mongoose.model("Account", AccountSchema);
+const Account = mongoose.model('Account', AccountSchema);
 export default Account;
