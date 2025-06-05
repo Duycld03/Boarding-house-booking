@@ -9,19 +9,25 @@ import Text from '../ui/Text';
  * @param {string} title - header title
  * @param {boolean} showBack - whether to show back button
  * @param {ReactNode} rightComponent - component to render on the right side
+ * @param {ReactNode} backIcon - custom back icon component
  * @param {function} onBackPress - custom function to call when back button is pressed
  * @param {object} style - additional style for the header
  * @param {string} className - additional className for the header
  * @param {string} animationType - type of animation for back button ("scale" | "fade" | "slide" | "ripple")
+ * @param {object} backButtonStyle - additional style for back button
+ * @param {string} backButtonClassName - additional className for back button
  */
 const CustomHeader = ({
     title,
     showBack = false,
     rightComponent,
+    backIcon,
     onBackPress,
     style,
     className = '',
     animationType = 'scale',
+    backButtonStyle,
+    backButtonClassName = '',
     ...props
 }) => {
     const { themedClasses } = useThemedClasses();
@@ -113,6 +119,15 @@ const CustomHeader = ({
                 });
                 break;
 
+            case 'ripple':
+                // For ripple effect, we just use the TouchableOpacity's activeOpacity
+                if (onBackPress) {
+                    onBackPress();
+                } else {
+                    router.back();
+                }
+                break;
+
             default:
                 // No animation, just execute the action
                 if (onBackPress) {
@@ -123,24 +138,33 @@ const CustomHeader = ({
         }
     };
 
+    // Render the back icon - either custom or default
+    const renderBackIcon = () => {
+        if (backIcon) {
+            return backIcon;
+        }
+        return <DefaultBackIcon />;
+    };
+
     return (
         <View className={headerClassName} style={style} {...props}>
             <View className="flex-row items-center">
                 {showBack && (
                     <TouchableOpacity
                         onPress={handleBackPress}
-                        className="mr-3 p-1"
+                        className={`mr-3 p-1 ${backButtonClassName}`}
+                        style={backButtonStyle}
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                         activeOpacity={animationType === 'ripple' ? 0.5 : 0.9}
                     >
                         <Animated.View style={{
                             transform: [
-                                { scale: scaleAnim },
-                                { translateX: translateXAnim }
+                                { scale: animationType === 'scale' ? scaleAnim : 1 },
+                                { translateX: animationType === 'slide' ? translateXAnim : 0 }
                             ],
-                            opacity: opacityAnim
+                            opacity: animationType === 'fade' ? opacityAnim : 1
                         }}>
-                            <BackIcon />
+                            {renderBackIcon()}
                         </Animated.View>
                     </TouchableOpacity>
                 )}
@@ -159,8 +183,8 @@ const CustomHeader = ({
     );
 };
 
-// Improved back arrow icon with better visuals
-const BackIcon = () => {
+// Default back arrow icon
+const DefaultBackIcon = () => {
     const { themedClasses } = useThemedClasses();
     const arrowColor = themedClasses('#000000', '#ffffff');
 
@@ -197,21 +221,30 @@ const BackIcon = () => {
 /**
  * BackHeader - a simplified header with back button and title
  * @param {string} title - header title
+ * @param {ReactNode} backIcon - custom back icon component
  * @param {function} onBackPress - custom function to call when back button is pressed
  * @param {string} animationType - type of animation for back button
+ * @param {object} backButtonStyle - additional style for back button
+ * @param {string} backButtonClassName - additional className for back button
  */
 export const BackHeader = ({
     title,
+    backIcon,
     onBackPress,
     animationType = 'scale',
+    backButtonStyle,
+    backButtonClassName,
     ...props
 }) => {
     return (
         <CustomHeader
             title={title}
             showBack={true}
+            backIcon={backIcon}
             onBackPress={onBackPress}
             animationType={animationType}
+            backButtonStyle={backButtonStyle}
+            backButtonClassName={backButtonClassName}
             {...props}
         />
     );

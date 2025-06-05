@@ -67,7 +67,7 @@ class boardingHouseController {
     try {
       const { id } = req.params;
       const boardingHouse = await BoardingHouse.findById(id)
-        .populate('boardingHouseType', 'name')
+        .populate('boardingHouseType')
         .populate('ownerId')
         .exec();
 
@@ -893,6 +893,7 @@ class boardingHouseController {
         electricityPrice,
         waterPrice,
         totalRooms = 0,
+        managerId,
         availableRooms = 0,
       } = req.body;
 
@@ -927,6 +928,10 @@ class boardingHouseController {
             'Province, district, and ward are required fields in the address.',
         });
       }
+      let validManagerId = managerId;
+      if (managerId === '') {
+        validManagerId = null;
+      }
 
       const images = [];
       if (req.files && req.files.length > 0) {
@@ -959,6 +964,7 @@ class boardingHouseController {
         images,
         totalRooms,
         availableRooms,
+        managerId: validManagerId, // Use validManagerId here
       });
 
       const savedBoardingHouse = await newBoardingHouse.save();
@@ -979,8 +985,14 @@ class boardingHouseController {
     try {
       const { id } = req.params; // Boarding house ID
       const updateData = req.body;
-      const { name, address, priceRange, electricityPrice, waterPrice } =
-        updateData;
+      const {
+        name,
+        address,
+        priceRange,
+        electricityPrice,
+        waterPrice,
+        managerId,
+      } = updateData;
 
       // Validate name
       if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
@@ -1079,7 +1091,9 @@ class boardingHouseController {
           message: 'Price fields must be greater than 0.',
         });
       }
-
+      if (managerId === '' || managerId === 'null') {
+        updateData.managerId = null;
+      }
       // Update the boarding house details
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
         id,

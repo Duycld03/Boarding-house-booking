@@ -1,24 +1,24 @@
-import favoriteController from "./favoriteController.js";
-import authController from "./authController.js";
-import ReviewController from "./reviewController.js";
-import withdrawalRequestsController from "./withdrawalRequestsController.js";
-import reportController from "./reportController.js";
-import boardingHouseController from "./boardingHouseController.js";
-import accountController from "./accountController.js";
-import appointmentController from "./appointmentController.js";
-import roomController from "./roomController.js";
-import watchLaterController from "./watchLaterController.js";
-import depositController from "./depositController.js";
-import FacilitiesController from "./facilitiesController.js";
-import roomTypeController from "./roomTypeController.js";
-import tenantController from "./tenantController.js";
-import renewalController from "./renewalController.js";
-import expenseController from "./expenseController.js";
-import revenueController from "./revenueController.js";
-import userPaymentController from "./userPaymentController.js";
-import refundRequestController from "./refundRequestController.js"; // Fixed typo here
-import paymentBillController from "./paymentBillController.js";
-
+import favoriteController from './favoriteController.js';
+import authController from './authController.js';
+import ReviewController from './reviewController.js';
+import withdrawalRequestsController from './withdrawalRequestsController.js';
+import reportController from './reportController.js';
+import boardingHouseController from './boardingHouseController.js';
+import accountController from './accountController.js';
+import appointmentController from './appointmentController.js';
+import roomController from './roomController.js';
+import watchLaterController from './watchLaterController.js';
+import depositController from './depositController.js';
+import FacilitiesController from './facilitiesController.js';
+import roomTypeController from './roomTypeController.js';
+import tenantController from './tenantController.js';
+import renewalController from './renewalController.js';
+import expenseController from './expenseController.js';
+import revenueController from './revenueController.js';
+import userPaymentController from './userPaymentController.js';
+import refundRequestController from './refundRequestController.js'; // Fixed typo here
+import paymentBillController from './paymentBillController.js';
+import managerController from './managerController.js';
 
 export {
   authController,
@@ -41,4 +41,5 @@ export {
   revenueController,
   refundRequestController,
   paymentBillController,
+  managerController,
 };

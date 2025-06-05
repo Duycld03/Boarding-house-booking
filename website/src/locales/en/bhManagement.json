@@ -11,6 +11,7 @@
     "selectBoardingHouseType": "Please select a boarding house type.",
     "enterBoardingHouseName": "Please enter the boarding house name.",
     "selectProvince": "Please select a boarding house province.",
+    "manager": "Please select a manager.",
     "selectDistrict": "Please select a boarding house district.",
     "selectWard": "Please select a boarding house ward.",
     "enterAddressDetail": "Please enter boarding house details.",
@@ -102,6 +103,7 @@
     "labels": {
       "boardingHouseName": "Name Boarding House",
       "boardingHouseType": "Boarding House Type",
+      "manager": "Manager",
       "description": "Description",
       "priceRange": "Price Rent/month (VND)",
       "electricityPrice": "Electricity Price/kWh (VND)",
@@ -121,6 +123,7 @@
     "placeholders": {
       "selectProvince": "Select Province",
       "selectDistrict": "Select District",
+      "selectManager": "Select Manager",
       "selectWard": "Select Ward",
       "selectType": "Select Type",
       "enterBoardingHouseName": "Enter boarding house name",
@@ -146,5 +149,10 @@
     "action": "Action",
     "detail": "Detail",
     "delete": "Delete"
+  },
+  "boardingHouseTypes": {
+    "Nhà trọ truyền thống": "Traditional Boarding House",
+    "Mini house": "Mini Apartment",
+    "Nhà trọ kiến trúc xá": "Dormitory"
   }
 }

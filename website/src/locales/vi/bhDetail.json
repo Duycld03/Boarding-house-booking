@@ -141,6 +141,7 @@
     "sameRoomError": "Bạn không thể đặt lịch hẹn cho cùng một phòng!",
     "timeConflictError": "Không thể đặt lịch hẹn trong vòng 30 phút trước hoặc sau một lịch hẹn đã có!",
     "requestSuccess": "Đã gửi yêu cầu thành công!",
-    "requestError": "Lỗi khi gửi yêu cầu: "
+    "requestError": "Lỗi khi gửi yêu cầu: ",
+    "datePlaceHolder": "Chọn ngày giờ hẹn"
   }
 }

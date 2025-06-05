@@ -13,11 +13,14 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Link } from "@react-navigation/native";
 import { Pressable } from "react-native";
+import { useCurrentUser } from "@/context/userContext"; // Import UserContext
 
 export default function Login() {
   const router = useRouter();
   const { t } = useTranslation("login");
   const { showSuccess, showError } = useNotification();
+
+  const { loginData } = useCurrentUser()
 
   const [formData, setFormData] = useState({
     username: "",
@@ -65,6 +68,17 @@ export default function Login() {
 
     try {
       const res = await login(formData);
+
+      if (!res.token || !res.user) {
+        throw new Error("Invalid response from server");
+      }
+
+      // Use UserContext's loginData method
+      await loginData(
+        res.user,
+        res.token,
+      );
+
       await AsyncStorage.setItem("access_token", res.token);
       showSuccess(t("success"));
       router.replace("/(tabs)/home");

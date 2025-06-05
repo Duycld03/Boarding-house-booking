@@ -126,3 +126,6 @@ export const updateBoardingHouseType = (boardingHouseTypeId, updateData) => {
 export const softDeleteBoardingHouseType = (boardingHouseTypeId) => {
   return axios.delete(`/dashboard/boardinghousetype/${boardingHouseTypeId}`);
 };
+export const getManagersForOwner = () => {
+  return axios.get(`/manager/manager-owner`);
+};

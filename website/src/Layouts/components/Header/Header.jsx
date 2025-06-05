@@ -13,7 +13,7 @@ import {
 import classNames from "classnames/bind";
 import Styles from "./Header.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import Icon from "../../../assets/images/Icon.svg";
+import Icon from "../../../assets/images/newLogo.png";
 import UserAvatar from "../../../assets/images/none_avatar.png";
 import {
   LockOutlined,
@@ -133,7 +133,11 @@ const CustomHeader = () => {
         to={hasRole(userRole.admin) ? "/dashboard/account-management" : "/"}
         className="flex items-center"
       >
-        <img src={Icon} alt="Logo" className="h-20 cursor-pointer" />
+        <img
+          src={Icon}
+          alt="Logo"
+          className="flex-shrink-0 h-32 w-36 cursor-pointer"
+        />
         <p
           className={cx(
             "logo-txt font-body text-3xl font-extrabold ml-2 dark:text-white text-gray-800"

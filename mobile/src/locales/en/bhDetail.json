@@ -147,6 +147,23 @@
     "sameRoomError": "You cannot book an appointment in the same room!",
     "timeConflictError": "Appointments cannot be booked within 30 minutes before or after an existing appointment!",
     "requestSuccess": "Request sent successfully!",
-    "requestError": "Error when sending request: "
+    "requestError": "Error when sending request: ",
+    "datePlaceHolder": "Select appointment date and time",
+    "successTitle": "Appointment Created Successfully!",
+    "successMessage": "Would you like to go to My Appointments page?",
+    "goToMyAppointments": "Go to My Appointments",
+    "goBack": "Go Back",
+    "timeError": "Can not create appointment before 7pm and after 17pm",
+    "validation": {
+      "roomRequired": "Please select a room",
+      "dateRequired": "Please select date and time",
+      "pastDate": "Cannot select a date in the past",
+      "invalidTime": "Please select time between 6:00 AM to 6:00 PM",
+      "dateUnavailable": "Selected date is not available",
+      "timeUnavailable": "Selected time is not available",
+      "noteTooLong": "Note cannot exceed 500 characters",
+      "fixErrors": "Please fix the errors before submitting"
+    },
+    "submitting": "Creating..."
   }
 }

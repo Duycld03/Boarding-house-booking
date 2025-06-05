@@ -2,5 +2,23 @@
   "confirmComponent": {
     "btnConfirm": "Xác nhận",
     "btnCancel": "Hủy bỏ"
-  }
+  },
+  "accommodation_types": {
+    "nha_tro_truyen_thong": "Nhà trọ truyền thống",
+    "mini_house": "Mini house",
+    "nha_tro_kien_truc_xa": "Nhà trọ kiến trúc xá",
+    "nha_tro_cao_cap": "Nhà trọ cao cấp"
+  },  
+   "boardingHouseTypes": {
+    "Nhà trọ truyền thống": "Nhà trọ truyền thống",
+    "Mini house": "Căn hộ mini",
+    "Nhà trọ kiến trúc xá": "Ký túc xá"
+  },
+  "address": {
+    "province": "Tỉnh/Thành phố",
+    "district": "Quận/Huyện",
+    "ward": "Phường/Xã",
+    "detail": "Địa chỉ chi tiết"
+  },
+  "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}"
 }

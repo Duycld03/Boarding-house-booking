@@ -20,6 +20,9 @@ import vi_addBoardingHouseAdmin from '@/locales/vi/addBoardingHouseAdmin.json';
 import en_addBoardingHouseAdmin from '@/locales/en/addBoardingHouseAdmin.json';
 import vi_boardingHouseAdmin from '@/locales/vi/boardingHouseAdmin.json';
 import en_boardingHouseAdmin from '@/locales/en/boardingHouseAdmin.json';
+import en_profile from "@/locales/en/profile.json";
+import vi_profile from "@/locales/vi/profile.json";
+
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -34,6 +37,7 @@ i18n.use(initReactI18next).init({
       boardingHouseDetailsAdmin: en_boardingHouseDetailsAdmin,
       addBoardingHouseAdmin: en_addBoardingHouseAdmin,
       boardingHouseAdmin: en_boardingHouseAdmin,
+      profile: en_profile,
     },
     vi: {
       menu: vi_menu,
@@ -46,12 +50,14 @@ i18n.use(initReactI18next).init({
       boardingHouseDetailsAdmin: vi_boardingHouseDetailsAdmin,
       addBoardingHouseAdmin: vi_addBoardingHouseAdmin,
       boardingHouseAdmin: vi_boardingHouseAdmin,
+      profile: vi_profile,
     },
   },
   lng: 'en',
   fallbackLng: 'en',
   ns: ['menu', 'boardingHouseDetailsAdmin', 'addBoardingHouseAdmin', 'boardingHouseAdmin'],
   defaultNS: 'menu',
+
   interpolation: {
     escapeValue: false,
   },

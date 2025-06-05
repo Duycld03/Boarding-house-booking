@@ -25,6 +25,7 @@ const ConfirmModal = ({
     cancelText,
     confirmColor = "#3b82f6", // Default blue-500
     dangerMode = false,
+    warningMode = false,
 }) => {
     const { themedClasses } = useThemedClasses();
     const slideAnim = useRef(new Animated.Value(height)).current;
@@ -42,8 +43,21 @@ const ConfirmModal = ({
     const modalConfirmText = confirmText || defaultConfirmText;
     const modalCancelText = cancelText || defaultCancelText;
 
-    // Determine confirm button color based on dangerMode
-    const finalConfirmColor = dangerMode ? '#ef4444' : confirmColor;
+    // Determine confirm button color and icon based on mode
+    const getConfirmColor = () => {
+        if (dangerMode) return '#ef4444'; // red-500
+        if (warningMode) return '#f59e0b'; // amber-500
+        return confirmColor;
+    };
+
+    const getIconName = () => {
+        if (dangerMode) return 'exclamation-triangle';
+        if (warningMode) return 'exclamation-circle';
+        return 'question-circle';
+    };
+
+    const finalConfirmColor = getConfirmColor();
+    const iconName = getIconName();
 
     useEffect(() => {
         if (visible) {
@@ -106,7 +120,7 @@ const ConfirmModal = ({
                     >
                         <View className="flex-row items-center">
                             <FontAwesome
-                                name={dangerMode ? "exclamation-triangle" : "question-circle"}
+                                name={iconName}
                                 size={20}
                                 color="white"
                             />

@@ -1,9 +1,14 @@
 import axios from './axios.config';
 
 
-export const getAppointmentOfUser = () => {
-    return axios.get('/auth/appointment/user')
+
+export const getAppointmentOfUser = (paginationOptions = {}) => {
+    const params = {
+        ...paginationOptions,
+    };
+    return axios.get('/auth/appointment/user', { params })
 }
+
 export const updateAppointmentStatus = (id, data) => {
     return axios.put(`/auth/appointment/update-status/${id}`, data);
 };
