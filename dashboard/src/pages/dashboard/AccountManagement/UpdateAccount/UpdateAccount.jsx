@@ -508,14 +508,15 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
               <Button
                 className={cancelButtonClass}
                 size="large"
+                btnCancel
                 onClick={handleCancel}
                 title={t("updateAccount.cancel")}
               >
                 {t("updateAccount.cancel")}
               </Button>
               <Button
-                className={updateButtonClass}
                 size="large"
+                btnUpdate
                 onClick={handleSubmit}
                 title={t("updateAccount.update")}
               >

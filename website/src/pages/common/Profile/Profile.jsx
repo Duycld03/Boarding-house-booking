@@ -1,5 +1,4 @@
-import classNames from "classnames/bind";
-import Styles from "./Profile.module.css";
+import "./Profile.css";
 import { useEffect, useState } from "react";
 import { Loader } from "../../../component";
 import {
@@ -23,17 +22,12 @@ import {
 import { toast } from "react-toastify";
 import UserAvatar from "../../../assets/images/none_avatar.png";
 import { getUser } from "../../../api/authManagement";
-import {
-  updateAccountFromProfile,
-  updateAvatar,
-} from "../../../api/AccountManagement";
-import { useNavigate } from "react-router-dom";
+import { updateAccountFromProfile } from "../../../api/AccountManagement";
 import ChangeEmailModal from "./ChangeEmailModal";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
-const cx = classNames.bind(Styles);
 
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
@@ -160,7 +154,9 @@ function Profile() {
 
   return (
     <div
-      className={`txt transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-800"}`}
+      className={`txt transition-colors duration-300 ${
+        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-800"
+      }`}
     >
       {profileLoading ? (
         <Loader />
@@ -168,7 +164,11 @@ function Profile() {
         <div className="container py-8 px-4 mx-auto max-w-full lg:px-10 xl:px-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
-              <Card style={cardStyle} className="overflow-hidden" bodyStyle={{ padding: "24px" }}>
+              <Card
+                style={cardStyle}
+                className="overflow-hidden"
+                bodyStyle={{ padding: "24px" }}
+              >
                 <div className="flex flex-col items-center">
                   <Upload
                     name="avatar"
@@ -193,15 +193,33 @@ function Profile() {
                       uploadButton
                     )}
                   </Upload>
-                  <Title level={3} className={`m-0 text-center ${darkMode ? "text-gray-100" : "text-gray-800"}`}>
-                    @{username}
+                  <Title
+                    level={3}
+                    className={`m-0 text-center ${
+                      darkMode ? "text-gray-100" : "text-gray-800"
+                    }`}
+                  >
+                    <span className="text-gray-800 dark:text-white">
+                      @{username}
+                    </span>
                   </Title>
                   {isOwner && (
-                    <div className={`mt-4 p-4 rounded-lg text-center ${darkMode ? "bg-gray-800" : "bg-gray-50"}`}>
-                      <Text strong className={darkMode ? "text-gray-300" : "text-gray-600"}>
+                    <div
+                      className={`mt-4 p-4 rounded-lg text-center ${
+                        darkMode ? "bg-gray-800" : "bg-gray-50"
+                      }`}
+                    >
+                      <Text
+                        strong
+                        className={darkMode ? "text-gray-300" : "text-gray-600"}
+                      >
                         {t("accountBalance.label")}
                       </Text>
-                      <div className={`text-xl font-bold mt-2 ${darkMode ? "text-green-400" : "text-green-600"}`}>
+                      <div
+                        className={`text-xl font-bold mt-2 ${
+                          darkMode ? "text-green-400" : "text-green-600"
+                        }`}
+                      >
                         {new Intl.NumberFormat("vi-VN", {
                           style: "currency",
                           currency: "VND",
@@ -213,15 +231,30 @@ function Profile() {
               </Card>
             </div>
             <div className="lg:col-span-9">
-              <Card style={cardStyle} className="overflow-hidden" bodyStyle={{ padding: "28px" }}>
+              <Card
+                style={cardStyle}
+                className="overflow-hidden"
+                bodyStyle={{ padding: "28px" }}
+              >
                 <div className="mb-8">
-                  <Title level={4} className={`mb-6 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>
-                    {t("title")}
+                  <Title
+                    level={4}
+                    className={`mb-6 ${
+                      darkMode ? "text-gray-200" : "text-gray-700"
+                    }`}
+                  >
+                    <span className="text-gray-800 dark:text-white">
+                      {t("title")}
+                    </span>
                   </Title>
                   <Form form={formEmail} layout="vertical" className="mb-4">
                     <Form.Item
                       label={
-                        <span className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                        <span
+                          className={`text-2xl font-semibold ${
+                            darkMode ? "text-gray-200" : "text-gray-800"
+                          }`}
+                        >
                           <MailOutlined className="mr-2" />
                           {t("email.label")}
                         </span>
@@ -236,8 +269,10 @@ function Profile() {
                           name="email"
                           value={email}
                           disabled
-                          className={darkMode ? "bg-gray-800 border-gray-700 text-gray-300" : ""}
-                          style={{ flexGrow: 1 }}
+                          style={{
+                            flexGrow: 1,
+                            color: darkMode ? "gray" : "",
+                          }}
                         />
                         <Button
                           name="change-email"
@@ -253,16 +288,34 @@ function Profile() {
                     </Form.Item>
                   </Form>
                 </div>
-                <Divider className={darkMode ? "border-gray-700" : "border-gray-200"} />
+                <Divider
+                  className={darkMode ? "border-gray-700" : "border-gray-200"}
+                />
                 <div>
-                  <Title level={4} className={`mb-6 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>
-                    {t("description")}
+                  <Title
+                    level={4}
+                    className={`mb-6 ${
+                      darkMode ? "text-gray-200" : "text-gray-700"
+                    }`}
+                  >
+                    <span className="text-gray-800 dark:text-white">
+                      {t("description")}
+                    </span>
                   </Title>
-                  <Form form={form} layout="vertical" onFinish={onFinish} className={darkMode ? "dark-form" : ""}>
+                  <Form
+                    form={form}
+                    layout="vertical"
+                    onFinish={onFinish}
+                    className={darkMode ? "dark-form" : ""}
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <Form.Item
                         label={
-                          <span className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                          <span
+                            className={`text-2xl font-semibold ${
+                              darkMode ? "text-gray-200" : "text-gray-800"
+                            }`}
+                          >
                             <UserOutlined className="mr-2" />
                             {t("fullName.label")}
                           </span>
@@ -278,12 +331,18 @@ function Profile() {
                         <Input
                           size="large"
                           placeholder={t("fullName.placeholder")}
-                          className={darkMode ? "bg-gray-800 border-gray-700 text-gray-300" : ""}
+                          className={
+                            darkMode
+                              ? "bg-gray-800 border-gray-700 text-gray-300"
+                              : ""
+                          }
                         />
                       </Form.Item>
                       <Form.Item
                         label={
-                          <span className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                          <span
+                            className={`text-2xl font-semibold text-gray-800 dark:text-white `}
+                          >
                             <PhoneOutlined className="mr-2" />
                             {t("phone.label")}
                           </span>
@@ -304,22 +363,45 @@ function Profile() {
                           type="number"
                           size="large"
                           placeholder={t("phone.placeholder")}
-                          className={darkMode ? "bg-gray-800 border-gray-700 text-gray-300" : ""}
+                          className={
+                            darkMode
+                              ? "bg-gray-800 border-gray-700 text-gray-300"
+                              : ""
+                          }
                         />
                       </Form.Item>
                     </div>
                     <Form.Item
                       label={
-                        <span className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                        <span
+                          className={`text-2xl font-semibold ${
+                            darkMode ? "text-gray-200" : "text-gray-800"
+                          }`}
+                        >
                           {t("gender.label")}
                         </span>
                       }
                       name="gender"
                     >
                       <Radio.Group className={darkMode ? "text-gray-300" : ""}>
-                        <Radio value="male">{t("gender.options.male")}</Radio>
-                        <Radio value="female">{t("gender.options.female")}</Radio>
-                        <Radio value="other">{t("gender.options.other")}</Radio>
+                        <Radio
+                          value="male"
+                          className={darkMode ? "text-gray-300" : ""}
+                        >
+                          {t("gender.options.male")}
+                        </Radio>
+                        <Radio
+                          value="female"
+                          className={darkMode ? "text-gray-300" : ""}
+                        >
+                          {t("gender.options.female")}
+                        </Radio>
+                        <Radio
+                          value="other"
+                          className={darkMode ? "text-gray-300" : ""}
+                        >
+                          {t("gender.options.other")}
+                        </Radio>
                       </Radio.Group>
                     </Form.Item>
                     <Form.Item className="mt-8">
