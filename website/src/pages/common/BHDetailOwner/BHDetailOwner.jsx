@@ -23,7 +23,10 @@ import {
   fetchWards,
 } from '../../../api/apiAddress';
 import { getBoardingHouseDetail } from '../../../api/ownerUser/boardingHouse';
-import { updateBoardingHouseDetailsOwner } from '../../../api/BoardingHManagement';
+import {
+  updateBoardingHouseDetailsOwner,
+  getManagersForOwner,
+} from '../../../api/BoardingHManagement';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import LocationPicker from '@/component/LocationPicker';
 import RoomType from './RoomType/RoomType';
@@ -42,6 +45,8 @@ import { useTheme } from '../../../context/themeContext';
 import './BHDetailOwner.module.css'; // Import custom CSS for additional dark mode fixes
 import classNames from 'classnames';
 import './darkModeOverrides.css';
+import { useCurrentUser } from '@/context/userContext';
+import userRole from '@/constants/userRole';
 
 const { TabPane } = Tabs;
 
@@ -63,8 +68,12 @@ const BHDetailOwner = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
+  const [managers, setManagers] = useState([]); // To store the list of managers
   const [geoLocation, setGeoLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const { hasRole } = useCurrentUser();
+
+  const isOwner = hasRole(userRole.owner);
 
   const fetchBoardingHouseDetails = async () => {
     if (!boardingHouseId) {
@@ -152,6 +161,20 @@ const BHDetailOwner = () => {
 
     fetchTypes();
   }, [t]);
+  useEffect(() => {
+    if (isOwner) {
+      const fetchManagers = async () => {
+        try {
+          const response = await getManagersForOwner(); // Fetch managers for owner
+          setManagers(response.data || []);
+        } catch (error) {
+          console.error('Failed to fetch managers:', error);
+          toast.error(t('errors.fetchManagers'));
+        }
+      };
+      fetchManagers();
+    }
+  }, [isOwner, t]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -329,6 +352,7 @@ const BHDetailOwner = () => {
       payload.append('address[detail]', updatedData.address.detail);
       payload.append('location[lat]', updatedData.location.lat);
       payload.append('location[lon]', updatedData.location.lon);
+      payload.append('managerId', updatedData.managerId);
 
       const oldImg = [];
 
@@ -490,6 +514,29 @@ const BHDetailOwner = () => {
                       ))}
                     </Select>
                   </Form.Item>
+                  {isOwner && (
+                    <Form.Item label={t('form.labels.manager')}>
+                      <Select
+                        name="managerId"
+                        value={updatedData.managerId || ''}
+                        onChange={(value) => {
+                          setUpdatedData((prev) => ({
+                            ...prev,
+                            managerId: value,
+                          }));
+                        }}
+                        // disabled={!isOwner}
+                        className={darkMode ? 'dark-mode-select' : ''}
+                        placeholder={t('form.placeholders.selectManager')}
+                      >
+                        {managers.map((manager) => (
+                          <Select.Option key={manager._id} value={manager._id}>
+                            {manager.fullname}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  )}
 
                   <Form.Item
                     label={t('form.labels.description')}

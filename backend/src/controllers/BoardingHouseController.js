@@ -922,8 +922,14 @@ class boardingHouseController {
     try {
       const { id } = req.params; // Boarding house ID
       const updateData = req.body;
-      const { name, address, priceRange, electricityPrice, waterPrice } =
-        updateData;
+      const {
+        name,
+        address,
+        priceRange,
+        electricityPrice,
+        waterPrice,
+        managerId,
+      } = updateData;
 
       // Validate name
       if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
