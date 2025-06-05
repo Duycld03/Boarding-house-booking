@@ -81,6 +81,9 @@ const ConfirmModal = ({
           title={t("confirmComponent.btnConfirm")}
           onClick={onOk}
           className={"bg-teal-600 text-white hover:bg-teal-700"}
+          style={{
+            backgroundColor: darkMode ? "#0d9488" : "#14b8a6", // bg-teal-600 : bg-teal-500
+          }}
           loading={confirmLoading}
         />
         <ButtonCustom

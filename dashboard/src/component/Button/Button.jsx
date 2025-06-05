@@ -71,7 +71,7 @@ const ButtonCustom = ({
     : btnReplay
     ? "bg-purple-500 hover:bg-purple-600 text-white"
     : btnCancel
-    ? "bg-red-500 hover:bg-red-600 text-white"
+    ? "bg-red-500 hover:text-black text-white"
     : btnReject
     ? "bg-red-600 hover:bg-red-700 text-white" // btnReject color
     : btnAccept

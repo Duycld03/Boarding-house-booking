@@ -213,7 +213,6 @@ function AccountManagement() {
             />
             <Button
               onClick={() => onProcessData(record)}
-              size="large"
               btnUpdate
               title={t("buttons.update")}
               icon={<FileTextOutlined />}
