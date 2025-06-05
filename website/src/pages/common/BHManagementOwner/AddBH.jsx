@@ -492,7 +492,7 @@ const AddBHModal = ({ onAddData }) => {
               >
                 {boardingHouseTypes.map((type) => (
                   <Select.Option key={type.value} value={type.value}>
-                    {type.label}
+                    {t(`boardingHouseTypes.${type.label}`) || type.label}
                   </Select.Option>
                 ))}
               </Select>

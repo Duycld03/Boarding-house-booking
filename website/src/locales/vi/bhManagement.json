@@ -149,5 +149,10 @@
     "action": "Hành động",
     "detail": "Chi tiết",
     "delete": "Xóa"
+  },
+ "boardingHouseTypes": {
+    "Nhà trọ truyền thống": "Nhà trọ truyền thống",
+    "Mini house": "Căn hộ mini",
+    "Nhà trọ kiến trúc xá": "Nhà trọ kiến trúc xá"
   }
 }

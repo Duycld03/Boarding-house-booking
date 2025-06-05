@@ -73,7 +73,10 @@ function BHManagementOwner() {
         title: t('columns.boardingHouseType'),
         dataIndex: 'boardingHouseType',
         key: 'boardingHouseType',
-        render: (type) => type?.name || t('messages.noData'),
+        render: (type) => {
+          if (!type) return t('messages.noData');
+          return t(`boardingHouseTypes.${type.name}`) || t('messages.noData');
+        },
       },
       {
         title: t('columns.totalRooms'),
