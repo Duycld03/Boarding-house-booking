@@ -869,6 +869,10 @@ class boardingHouseController {
             'Province, district, and ward are required fields in the address.',
         });
       }
+      let validManagerId = managerId;
+      if (managerId === '') {
+        validManagerId = null;
+      }
 
       const images = [];
       if (req.files && req.files.length > 0) {
@@ -901,7 +905,7 @@ class boardingHouseController {
         images,
         totalRooms,
         availableRooms,
-        managerId,
+        managerId: validManagerId, // Use validManagerId here
       });
 
       const savedBoardingHouse = await newBoardingHouse.save();
@@ -1028,7 +1032,9 @@ class boardingHouseController {
           message: 'Price fields must be greater than 0.',
         });
       }
-
+      if (managerId === '' || managerId === 'null') {
+        updateData.managerId = null;
+      }
       // Update the boarding house details
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
         id,

@@ -168,8 +168,8 @@ const BHDetailOwner = () => {
           const response = await getManagersForOwner(); // Fetch managers for owner
           setManagers(response.data || []);
         } catch (error) {
-          console.error('Failed to fetch managers:', error);
-          toast.error(t('errors.fetchManagers'));
+          // console.error('Failed to fetch managers:', error);
+          // toast.error(t('errors.fetchManagers'));
         }
       };
       fetchManagers();
@@ -386,6 +386,8 @@ const BHDetailOwner = () => {
         toast.error(response.message || t('messages.updateFailed'));
       }
     } catch (error) {
+      console.error('Error updating boarding house details:', error);
+
       toast.error(
         error.response?.data?.message ||
           error.message ||

@@ -122,8 +122,8 @@ const AddBHModal = ({ onAddData }) => {
         const response = await getManagersForOwner(); // Assuming this API returns managers for the logged-in owner
         setManagers(response.data || []);
       } catch (error) {
-        console.error('Failed to fetch managers:', error);
-        toast.error(t('errors.fetchManagers'));
+        // console.error('Failed to fetch managers:', error);
+        // toast.error(t('errors.fetchManagers'));
       }
     };
     fetchManagers();
@@ -265,11 +265,7 @@ const AddBHModal = ({ onAddData }) => {
         setLoading(false);
         return;
       }
-      if (!formData.managerId) {
-        toast.error(t('errors.manager'));
-        setLoading(false);
-        return;
-      }
+
       if (!formData.name) {
         toast.error(t('errors.enterBoardingHouseName'));
         setLoading(false);
