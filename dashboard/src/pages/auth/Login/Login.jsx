@@ -69,6 +69,19 @@ function Login() {
     }
   };
 
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    try {
+      await getUser();
+      navigate("/dashboard/account-management");
+    } catch (error) {
+      // User is not logged in, do nothing
+    }
+  };
+
   // Dark mode styles for Card
   const cardStyle = {
     width: 400,
