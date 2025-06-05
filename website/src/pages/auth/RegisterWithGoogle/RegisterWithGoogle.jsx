@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { register, getUser } from "../../../api/authManagement";
 import { Back } from "../../../component";
+import { useTheme } from "../../../context/themeContext";
+import styles from "./RegisterWithGoogle.module.css";
 
 function RegisterWithGoogle() {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const { darkMode } = useTheme();
 
   const onFinish = async (values) => {
     try {
@@ -46,20 +49,14 @@ function RegisterWithGoogle() {
   }, []);
 
   return (
-    <div className="flex justify-center items-center h-screen bg-[#f0f2f5]">
-      <Card
-        style={{
-          width: 500,
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <p className="mb-5">
+    <div
+      className={`${styles.container} ${darkMode ? styles.containerDark : ""}`}
+    >
+      <Card className={`${styles.card} ${darkMode ? styles.cardDark : ""}`}>
+        <p className={styles.backButton}>
           <Back />
         </p>
-        <h2
-          className={"font-body text-4xl font-bold"}
-          style={{ textAlign: "center", marginBottom: "20px" }}
-        >
+        <h2 className={`${styles.title} ${darkMode ? styles.titleDark : ""}`}>
           Register With Google
         </h2>
         <Form
@@ -72,6 +69,7 @@ function RegisterWithGoogle() {
             remember: true,
           }}
           onFinish={onFinish}
+          className={darkMode ? styles.formDark : ""}
         >
           <Form.Item
             label="Full Name"
@@ -189,25 +187,20 @@ function RegisterWithGoogle() {
             <Input
               type="number"
               size="large"
-              placeholder="Enter your confirm password"
+              placeholder="Enter your phone number"
             />
           </Form.Item>
 
           <Form.Item name="gender" label="Gender" rules={[{ required: true }]}>
             <Select size="large" placeholder="Select your gender">
-              <Select.Option value="male">male</Select.Option>
-              <Select.Option value="female">female</Select.Option>
-              <Select.Option value="other">other</Select.Option>
+              <Select.Option value="male">Male</Select.Option>
+              <Select.Option value="female">Female</Select.Option>
+              <Select.Option value="other">Other</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item name="submit" wrapperCol={{ offset: 4, span: 16 }}>
             <Button
-              style={{
-                backgroundColor: "#40BFFF",
-                borderColor: "#40BFFF",
-                color: "#fff",
-                padding: 20,
-              }}
+              className={styles.submitButton}
               htmlType="submit"
               loading={loading}
               block

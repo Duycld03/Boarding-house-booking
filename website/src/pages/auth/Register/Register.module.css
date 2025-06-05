@@ -1,114 +1,109 @@
-/* Register.module.css */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+}
 
-/* Regular input styles */
-.darkInput :global(.ant-input) {
+.containerDark {
+  background-color: #374151; /* bg-gray-800 equivalent */
+}
+
+.card {
+  width: 500px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cardDark {
+  background-color: rgb(55, 65, 81); /* rgb(55, 65, 81) as requested */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #4b5563;
+}
+
+.backButton {
+  margin-bottom: 20px;
+}
+
+.title {
+  font-family: inherit;
+  font-size: 2.25rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #000;
+}
+
+.titleDark {
+  color: #fff;
+}
+
+.submitButton {
+  background-color: #40bfff;
+  border-color: #40bfff;
+  color: #fff;
+  padding: 20px;
+}
+
+.submitButton:hover {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+/* Dark mode form styles */
+.formDark .ant-form-item-label > label {
+  color: #f3f4f6;
+}
+
+.formDark .ant-input {
+  background-color: #4b5563;
+  border-color: #6b7280;
+  color: #f3f4f6;
+}
+
+.formDark .ant-input:hover,
+.formDark .ant-input:focus {
+  border-color: #40bfff;
+  background-color: #4b5563;
+}
+
+.formDark .ant-input-password {
+  background-color: #4b5563;
+  border-color: #6b7280;
+}
+
+.formDark .ant-input-password:hover,
+.formDark .ant-input-password:focus {
+  border-color: #40bfff;
+}
+
+.formDark .ant-input-password input {
+  background-color: #4b5563 !important;
+  color: #f3f4f6 !important;
+}
+
+.formDark .ant-select-selector {
   background-color: #4b5563 !important;
   border-color: #6b7280 !important;
-  color: #ffffff !important;
+  color: #f3f4f6 !important;
 }
 
-.darkInput :global(.ant-input::placeholder) {
-  color: #9ca3af !important;
-}
-
-.darkInput :global(.ant-input:focus) {
-  border-color: #40bfff !important;
-  box-shadow: 0 0 0 2px rgba(64, 191, 255, 0.2) !important;
-}
-
-.darkInput :global(.ant-input:hover) {
+.formDark .ant-select-selector:hover {
   border-color: #40bfff !important;
 }
 
-/* Password input styles */
-.darkPasswordInput :global(.ant-input-password) {
-  background-color: #4b5563 !important;
-  border-color: #6b7280 !important;
+.formDark .ant-select-selection-placeholder {
+  color: #9ca3af;
 }
 
-.darkPasswordInput :global(.ant-input-password .ant-input) {
-  background-color: #4b5563 !important;
-  border: none !important;
-  color: #ffffff !important;
+.formDark .ant-select-arrow {
+  color: #f3f4f6;
 }
 
-.darkPasswordInput :global(.ant-input-password .ant-input::placeholder) {
-  color: #9ca3af !important;
+.formDark .ant-input::placeholder {
+  color: #9ca3af;
 }
 
-.darkPasswordInput :global(.ant-input-password:hover) {
-  border-color: #40bfff !important;
-}
-
-.darkPasswordInput :global(.ant-input-password:focus-within) {
-  border-color: #40bfff !important;
-  box-shadow: 0 0 0 2px rgba(64, 191, 255, 0.2) !important;
-}
-
-.darkPasswordInput :global(.ant-input-password .anticon) {
-  color: #9ca3af !important;
-}
-
-.darkPasswordInput :global(.ant-input-password .ant-input-suffix) {
-  background-color: transparent !important;
-}
-
-/* Select dropdown styles */
-.darkSelect :global(.ant-select-selector) {
-  background-color: #4b5563 !important;
-  border-color: #6b7280 !important;
-  color: #ffffff !important;
-}
-
-.darkSelect :global(.ant-select-selection-item) {
-  color: #ffffff !important;
-}
-
-.darkSelect :global(.ant-select-selection-placeholder) {
-  color: #9ca3af !important;
-}
-
-.darkSelect :global(.ant-select:hover .ant-select-selector) {
-  border-color: #40bfff !important;
-}
-
-.darkSelect :global(.ant-select-focused .ant-select-selector) {
-  border-color: #40bfff !important;
-  box-shadow: 0 0 0 2px rgba(64, 191, 255, 0.2) !important;
-}
-
-.darkSelect :global(.ant-select-arrow) {
-  color: #9ca3af !important;
-}
-
-/* Form item label dark mode */
-.darkFormItem :global(.ant-form-item-label > label) {
-  color: #ffffff !important;
-}
-
-/* Transition effects */
-.themeTransition {
-  transition: background-color 0.3s ease, color 0.3s ease,
-    border-color 0.3s ease;
-}
-
-.linkTransition {
-  transition: color 0.2s ease;
-}
-
-/* Number input specific styles */
-.darkNumberInput :global(.ant-input[type="number"]) {
-  background-color: #4b5563 !important;
-  border-color: #6b7280 !important;
-  color: #ffffff !important;
-}
-
-.darkNumberInput :global(.ant-input[type="number"]::-webkit-outer-spin-button),
-.darkNumberInput :global(.ant-input[type="number"]::-webkit-inner-spin-button) {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.darkNumberInput :global(.ant-input[type="number"]) {
-  -moz-appearance: textfield;
+.formDark .ant-input-password input::placeholder {
+  color: #9ca3af;
 }
