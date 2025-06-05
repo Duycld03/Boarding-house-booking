@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/themeContext';
 import classNames from 'classnames';
 import './AddBHModal.module.css'; // Import custom CSS for additional dark mode fixes
+import './darkModeOverrides.css';
 
 const cx = classNames;
 
