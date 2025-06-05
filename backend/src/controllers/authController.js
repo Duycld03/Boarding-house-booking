@@ -8,6 +8,7 @@ import Account from "../models/account.js";
 dotenv.config();
 
 class AuthController {
+  resetTokenBlacklist = new Set();
   async getAccountFromToken(req, res) {
     const user = await Account.findOne({ username: req.user.username }).select(
       "-password"
@@ -323,7 +324,6 @@ class AuthController {
 
     const userAgent = req.headers["user-agent"];
     const isMobile = /Android|iPhone|iPad/i.test(userAgent);
-    console.log("User-Agent:", userAgent);
 
     if (isMobile) {
       res.redirect(deepLink);
@@ -333,9 +333,14 @@ class AuthController {
     }
   }
 
-  async resetPassword(req, res) {
+  resetPassword = async (req, res) => {
     try {
       const { token, password } = req.body;
+
+      if (this.resetTokenBlacklist.has(token)) {
+        return res.status(400).json({ message: "Reset token has been used" });
+      }
+
       const decoded = verifyToken(token);
       const user = await Account.findById(decoded.userId);
       if (!user) {
@@ -344,6 +349,8 @@ class AuthController {
 
       user.password = await bcrypt.hash(password, 10);
       await user.save();
+
+      this.resetTokenBlacklist.add(token);
       res.status(200).json({ message: "Password reset successful" });
     } catch (error) {
       if (error.name === "TokenExpiredError") {
@@ -351,7 +358,7 @@ class AuthController {
       }
       res.status(500).json({ message: "An unexpected error occurred" });
     }
-  }
+  };
 }
 
 export default new AuthController();
