@@ -5,8 +5,8 @@ import {
   getDepositByBhId,
   acceptDepositRoom,
   rejectDepositRoom,
-} from "../../../../api/depositManagement";
-import { getRoomsByBoardingHouse } from "@/api/room";
+} from "../../../../api/depositAPI";
+import { getRoomsByBoardingHouse } from "@/api/roomAPI";
 import { useParams } from "react-router-dom";
 import Table from "@/component/Table";
 import formatAmount from "@/utils/formatAmount";

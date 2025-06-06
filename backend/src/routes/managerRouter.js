@@ -8,7 +8,7 @@ import {
   tenantController,
   roomController,
   depositController,
-  expenseController,
+  bhExpenseController,
   revenueController,
   refundRequestController,
   renewalController,
@@ -158,9 +158,9 @@ managerRouter.post(
 );
 
 //expense
-managerRouter.get('/expense', expenseController.getExpensesByTime);
-managerRouter.put('/expense/:expenseId', expenseController.updateExpense);
-managerRouter.get('/total-expense', expenseController.getTotalExpensesByTime);
+managerRouter.get('/expense', bhExpenseController.getExpensesByTime);
+managerRouter.put('/expense/:expenseId', bhExpenseController.updateExpense);
+managerRouter.get('/total-expense', bhExpenseController.getTotalExpensesByTime);
 
 //revenue
 managerRouter.get('/revenue', revenueController.getRevenue);

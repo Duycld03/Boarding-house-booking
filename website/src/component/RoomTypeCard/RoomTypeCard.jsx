@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserAlt } from "@fortawesome/free-solid-svg-icons";
 import CreateAppointmentForm from "../../pages/common/BoardingHouseDetail/CreateAppointmentForm";
 import { useEffect, useState } from "react";
-import { getRoomsByRoomType } from "../../api/room";
+import { getRoomsByRoomType } from "../../api/roomAPI";
 import { toast } from "react-toastify";
 import { useCurrentUser } from "../../context/userContext";
 import { useNavigate } from "react-router-dom";

@@ -7,7 +7,7 @@ import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { useNotification } from "@/context/NotificationProvider";
 import { FormField } from "@/components/form/index";
-import { resetPassword } from "@/API/authManagement";
+import { resetPassword } from "@/API/authAPI";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useLocalSearchParams } from "expo-router";

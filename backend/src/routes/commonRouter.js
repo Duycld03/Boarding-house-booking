@@ -8,7 +8,6 @@ import {
   ReviewController,
   roomTypeController,
 } from "../controllers/index.js";
-import ViewRoomRequest from "../models/viewRoomRequest.js";
 
 const commonRouter = Router();
 

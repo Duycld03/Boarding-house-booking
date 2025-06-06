@@ -1,12 +1,9 @@
-import WatchLaterList from './WatchLaterList';
-import { Card, Spin } from 'antd';
-import React, { useEffect, useState } from 'react';
-import {
-  getAllWatchLater,
-  deleteWatchLater,
-} from '../../../api/watchLaterManagement';
-import { ConfirmModal } from '../../../component';
-import { toast } from 'react-toastify';
+import WatchLaterList from "./WatchLaterList";
+import { Card, Spin } from "antd";
+import React, { useEffect, useState } from "react";
+import { getAllWatchLater, deleteWatchLater } from "../../../api/watchLaterAPI";
+import { ConfirmModal } from "../../../component";
+import { toast } from "react-toastify";
 
 function WatchLater() {
   const [watchList, setWatchList] = useState([]);
@@ -24,7 +21,7 @@ function WatchLater() {
       setCurrentPage(res.pagination?.currentPage || 1);
       setTotalPages(res.pagination?.totalPages || 1);
     } catch (error) {
-      toast.error('Failed to fetch watch later list');
+      toast.error("Failed to fetch watch later list");
     } finally {
       setLoading(false);
     }
@@ -33,10 +30,10 @@ function WatchLater() {
   const onRemove = async () => {
     try {
       await deleteWatchLater(watchLaterId);
-      toast.success('Removed from Watch Later');
+      toast.success("Removed from Watch Later");
       fetchWatchList(currentPage); // refresh page
     } catch (error) {
-      toast.error(error?.response?.data?.error || 'Failed to delete item');
+      toast.error(error?.response?.data?.error || "Failed to delete item");
     } finally {
       setIsOpenDeleteModal(false);
       setWatchLaterId(null);

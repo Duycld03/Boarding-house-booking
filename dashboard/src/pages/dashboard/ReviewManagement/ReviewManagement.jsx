@@ -1,20 +1,20 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Button, ConfirmModal } from '../../../component';
-import Table from '../../../component/Table';
-import { toast } from 'react-toastify';
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { Button, ConfirmModal } from "../../../component";
+import Table from "../../../component/Table";
+import { toast } from "react-toastify";
 import {
   filterReviews,
   deleteReview,
   getReviewDetail,
-} from '../../../api/ReviewManagement';
-import FilterReview from './FilterReview';
-import { FileTextOutlined } from '@ant-design/icons';
-import DetailModal from './DetailModal';
-import { useTranslation } from 'react-i18next';
-import convertTimetap from '../../../utils/convertTimetap';
+} from "../../../api/reviewAPI";
+import FilterReview from "./FilterReview";
+import { FileTextOutlined } from "@ant-design/icons";
+import DetailModal from "./DetailModal";
+import { useTranslation } from "react-i18next";
+import convertTimetap from "../../../utils/convertTimetap";
 
 function ReviewManagement() {
-  const { t } = useTranslation('reviewManagement');
+  const { t } = useTranslation("reviewManagement");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
@@ -34,8 +34,8 @@ function ReviewManagement() {
   const [paginationOptions, setPaginationOptions] = useState({
     page: 1,
     limit: 10,
-    sortField: 'createdAt',
-    sortOrder: 'desc',
+    sortField: "createdAt",
+    sortOrder: "desc",
   });
 
   const handleDetailModal = async (record) => {
@@ -46,11 +46,11 @@ function ReviewManagement() {
       if (res) {
         setSelectedDetail(res);
       } else {
-        toast.error(t('messages.detailFetchError'));
+        toast.error(t("messages.detailFetchError"));
       }
     } catch (error) {
-      console.error('Error fetching review details:', error);
-      toast.error(t('messages.detailFetchError'));
+      console.error("Error fetching review details:", error);
+      toast.error(t("messages.detailFetchError"));
     } finally {
       setDetailLoading(false);
     }
@@ -59,40 +59,40 @@ function ReviewManagement() {
   const columns = useMemo(
     () => [
       {
-        title: t('columns.boardingHouseName'),
-        dataIndex: 'boardingHouseId',
-        key: 'boardingHouseId',
-        render: (house) => house?.name || 'N/A',
+        title: t("columns.boardingHouseName"),
+        dataIndex: "boardingHouseId",
+        key: "boardingHouseId",
+        render: (house) => house?.name || "N/A",
       },
       {
-        title: t('columns.content'),
-        dataIndex: 'content',
-        key: 'content',
+        title: t("columns.content"),
+        dataIndex: "content",
+        key: "content",
       },
       {
-        title: t('columns.rating'),
-        dataIndex: 'rating',
-        key: 'rating',
+        title: t("columns.rating"),
+        dataIndex: "rating",
+        key: "rating",
         render: (rating) => <span>{rating} / 5</span>,
       },
       {
-        title: t('columns.createdAt'),
-        dataIndex: 'createdAt',
-        key: 'createdAt',
+        title: t("columns.createdAt"),
+        dataIndex: "createdAt",
+        key: "createdAt",
         render: (createdAt) => convertTimetap(createdAt),
       },
       {
-        title: t('columns.reviewer'),
-        dataIndex: 'accountId',
-        key: 'accountId',
-        render: (account) => account?.username || 'N/A',
+        title: t("columns.reviewer"),
+        dataIndex: "accountId",
+        key: "accountId",
+        render: (account) => account?.username || "N/A",
       },
       {
-        title: t('columns.action'),
+        title: t("columns.action"),
         render: (record) => (
           <div className="flex gap-2">
             <Button
-              title={t('buttons.delete')}
+              title={t("buttons.delete")}
               size="large"
               btnDelete
               onClick={() => handleDeleteModal(record)}
@@ -100,7 +100,7 @@ function ReviewManagement() {
             <Button
               onClick={() => handleDetailModal(record)}
               size="large"
-              title={t('buttons.detail')}
+              title={t("buttons.detail")}
               icon={<FileTextOutlined />}
               className="text-white"
               bgColor="rgb(5 150 105)"
@@ -134,11 +134,11 @@ function ReviewManagement() {
           limit: res.pagination.limit,
         });
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error('❌ API error:', error);
-      toast.error(t('messages.filterFetchError'));
+      console.error("❌ API error:", error);
+      toast.error(t("messages.filterFetchError"));
       setData([]);
     } finally {
       setLoading(false);
@@ -160,12 +160,12 @@ function ReviewManagement() {
       if (response) {
         setIsOpenDeleteModal(false);
         filterReview();
-        toast.success(t('messages.deleteSuccess'));
+        toast.success(t("messages.deleteSuccess"));
       } else {
-        toast.error(t('messages.deleteFailed'));
+        toast.error(t("messages.deleteFailed"));
       }
     } catch (error) {
-      toast.error(t('messages.deleteFailed'));
+      toast.error(t("messages.deleteFailed"));
     }
   };
 
@@ -186,13 +186,13 @@ function ReviewManagement() {
       </div>
 
       <Table
-        tableName={t('tableName')}
+        tableName={t("tableName")}
         columns={columns}
         data={data}
         loading={loading}
         onChange={handleTableChange}
         pagination={tablePaginationConfig}
-        noDataText={t('messages.noData')}
+        noDataText={t("messages.noData")}
       />
 
       <DetailModal
@@ -203,8 +203,8 @@ function ReviewManagement() {
       />
 
       <ConfirmModal
-        title={t('modals.confirmDelete.title')}
-        content={t('modals.confirmDelete.content')}
+        title={t("modals.confirmDelete.title")}
+        content={t("modals.confirmDelete.content")}
         onOk={handleDelete}
         onCancel={() => setIsOpenDeleteModal(false)}
         isOpen={isOpenDeleteModal}

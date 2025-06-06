@@ -2,7 +2,7 @@ import { Modal, Form, Input, Image, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { createReport } from "../../../api/reportManagement";
+import { createReport } from "../../../api/reportAPI";
 
 const reasonOptions = {
   boardingHouse: [

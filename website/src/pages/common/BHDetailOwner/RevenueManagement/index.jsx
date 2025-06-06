@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getExpenseByTime, updateExpense } from "@/api/expense";
+import { getExpenseByTime, updateExpense } from "@/api/boardingHouseExpenseAPI";
 import { Modal } from "antd";
 import RevenueMonthlyView from "./RevenueMonthlyView";
 import ExpenseMonthlyView from "./ExpenseMonthlyView";
@@ -11,7 +11,7 @@ import {
   getRevenueByYear,
   getAvailableYears,
   getRevenueByTime,
-} from "@/api/revenueManagement";
+} from "@/api/revenueAPI";
 
 // Colors for the charts
 export const COLORS = {

@@ -1,4 +1,4 @@
-import ViewRoomRequest from "../models/viewRoomRequest.js"
+import Appointment from "../models/appointment.js"
 import BoardingHouse from '../models/boardingHouse.js'
 import Room from "../models/room.js";
 import pagination from '../utils/pagination.js'
@@ -22,7 +22,7 @@ class AppointmentController {
             const filter = { accountId: userId };
 
             // Đếm tổng số appointments của user
-            const totalItems = await ViewRoomRequest.countDocuments(filter);
+            const totalItems = await Appointment.countDocuments(filter);
 
             if (totalItems === 0) {
                 return res.status(404).json({
@@ -40,7 +40,7 @@ class AppointmentController {
             }
 
             // Lấy danh sách appointments với pagination
-            const appointmentList = await ViewRoomRequest.find(filter)
+            const appointmentList = await Appointment.find(filter)
                 .populate({
                     path: 'roomId',
                     populate: {
@@ -66,7 +66,7 @@ class AppointmentController {
                     if (appointmentDate < today &&
                         appointment.status !== "completed" &&
                         appointment.status !== "canceled") {
-                        await ViewRoomRequest.findByIdAndUpdate(appointment._id, { status: "completed" });
+                        await Appointment.findByIdAndUpdate(appointment._id, { status: "completed" });
                         appointment.status = "completed";
                     }
 
@@ -118,8 +118,6 @@ class AppointmentController {
         try {
             const { id } = req.params;
 
-            console.log(req.params);
-
             const { status } = req.body;
 
             const validStatuses = ["pending", "confirmed", "canceled", "completed"];
@@ -127,7 +125,7 @@ class AppointmentController {
                 return res.status(400).json({ message: "Invalid status value" });
             }
 
-            const updatedAppointment = await ViewRoomRequest.findByIdAndUpdate(
+            const updatedAppointment = await Appointment.findByIdAndUpdate(
                 id,
                 { status },
                 { new: true }
@@ -165,7 +163,7 @@ class AppointmentController {
                 return res.status(404).json({ message: "No rooms found for this owner" });
             }
 
-            const appointments = await ViewRoomRequest.find({
+            const appointments = await Appointment.find({
                 roomId: { $in: rooms.map((room) => room._id) },
                 status: "confirmed",
             }).populate("roomId", "roomNumber");
@@ -183,7 +181,7 @@ class AppointmentController {
             const { roomId, appointmentDate, note } = req.body;
             const userId = req.user.userId;
 
-            const bookingRequest = new ViewRoomRequest({
+            const bookingRequest = new Appointment({
                 accountId: userId,
                 roomId,
                 appointmentDate,
@@ -198,10 +196,6 @@ class AppointmentController {
             res.status(500).json({ message: "Lỗi server", error });
         }
     }
-
-
-
-
 }
 
 export default new AppointmentController()

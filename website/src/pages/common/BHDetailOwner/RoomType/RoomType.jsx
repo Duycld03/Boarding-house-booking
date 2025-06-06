@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import Table from '@/component/Table';
-import { Button, ConfirmModal } from '@/component';
-import { Avatar } from 'antd';
-import DefaultRoomImage from '@/assets/images/none_avatar.png';
-import { FileTextOutlined } from '@ant-design/icons';
-import {
-  getRoomTypeByBhId,
-  softDeleteRoomType,
-} from '@/api/roomTypeManagement';
-import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
-import formatAmount from '@/utils/formatAmount';
-import AddRoomTypeModal from './AddRoomType';
-import UpdateRoomTypeModal from './UpdateRoomTypeModal';
+import React, { useEffect, useState } from "react";
+import Table from "@/component/Table";
+import { Button, ConfirmModal } from "@/component";
+import { Avatar } from "antd";
+import DefaultRoomImage from "@/assets/images/none_avatar.png";
+import { FileTextOutlined } from "@ant-design/icons";
+import { getRoomTypeByBhId, softDeleteRoomType } from "@/api/roomTypeAPI";
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
+import formatAmount from "@/utils/formatAmount";
+import AddRoomTypeModal from "./AddRoomType";
+import UpdateRoomTypeModal from "./UpdateRoomTypeModal";
 
 const RoomType = () => {
   const { boardingHouseId } = useParams();
@@ -26,7 +23,7 @@ const RoomType = () => {
   // ✅ Fetch danh sách RoomType
   const fetchRoomTypes = async () => {
     if (!boardingHouseId) {
-      toast.error('Boarding House ID is missing!');
+      toast.error("Boarding House ID is missing!");
       return;
     }
     setLoading(true);
@@ -35,10 +32,10 @@ const RoomType = () => {
       if (Array.isArray(response.data)) {
         setRoomData(response.data);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error('Failed to fetch room types:', error);
+      console.error("Failed to fetch room types:", error);
       // toast.error("Failed to load room types. Please try again.");
       setRoomData([]);
     } finally {
@@ -75,16 +72,16 @@ const RoomType = () => {
     setLoading(true);
     try {
       if (!currentRecord?._id) {
-        toast.error('Invalid ID');
+        toast.error("Invalid ID");
         return;
       }
 
       const response = await softDeleteRoomType(currentRecord._id);
 
       if (
-        response?.message === 'Room Type deleted successfully (soft delete).'
+        response?.message === "Room Type deleted successfully (soft delete)."
       ) {
-        toast.success('Room Type deleted successfully!');
+        toast.success("Room Type deleted successfully!");
         setRoomData((prev) =>
           prev.filter((room) => room._id !== currentRecord._id)
         );
@@ -98,7 +95,7 @@ const RoomType = () => {
         setCurrentRecord(null);
       }
     } catch (error) {
-      console.error('❌ Delete Room Type Error:', error);
+      console.error("❌ Delete Room Type Error:", error);
       toast.error(
         `Failed to delete Room Type: ${
           error.response?.data?.message || error.message
@@ -111,9 +108,9 @@ const RoomType = () => {
 
   const columns = [
     {
-      title: 'Image',
-      dataIndex: 'image',
-      key: 'image',
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
       render: (image) => (
         <Avatar
           src={image?.imageUrl || DefaultRoomImage}
@@ -123,51 +120,51 @@ const RoomType = () => {
       ),
     },
     {
-      title: 'Type Name',
-      dataIndex: 'typeName',
-      key: 'typeName',
+      title: "Type Name",
+      dataIndex: "typeName",
+      key: "typeName",
     },
     {
-      title: 'Facilities',
-      dataIndex: 'facilities',
-      key: 'facilities',
+      title: "Facilities",
+      dataIndex: "facilities",
+      key: "facilities",
       render: (facilities) =>
         facilities && facilities.length > 0
-          ? facilities.map((f) => f.name).join(', ')
-          : 'No facilities',
+          ? facilities.map((f) => f.name).join(", ")
+          : "No facilities",
     },
     {
-      title: 'Room Size',
-      dataIndex: 'roomSize',
-      key: 'roomSize',
+      title: "Room Size",
+      dataIndex: "roomSize",
+      key: "roomSize",
     },
     {
-      title: 'Rent/month',
-      dataIndex: 'price',
-      key: 'price',
+      title: "Rent/month",
+      dataIndex: "price",
+      key: "price",
       render: (price) => formatAmount(price),
     },
     {
-      title: 'People Number',
-      dataIndex: 'peopleNumber',
-      key: 'peopleNumber',
+      title: "People Number",
+      dataIndex: "peopleNumber",
+      key: "peopleNumber",
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (_, record) => (
         <div className="flex gap-3">
           <Button
             size="large"
-            title={'Update'}
+            title={"Update"}
             btnUpdate
-            className={'text-white'}
+            className={"text-white"}
             onClick={() => handleOpenUpdateModal(record)}
           />
           <Button
             size="large"
             btnDelete
-            title={'Delete'}
+            title={"Delete"}
             onClick={() => handleSelectDelete(record)}
           />
         </div>

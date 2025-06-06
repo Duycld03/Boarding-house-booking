@@ -1,5 +1,5 @@
-import { payDeposit } from "@/api/depositManagement";
-import { acceptRefundRequestForOwner } from "@/api/ownerUser/refundRequestManagement";
+import { payDeposit } from "@/api/depositAPI";
+import { acceptRefundRequestForOwner } from "@/api/ownerUser/refundRequestAPI";
 import formatAmount from "@/utils/formatAmount";
 import { Form, Modal, Radio } from "antd";
 import React, { useState, useEffect } from "react";

@@ -4,7 +4,7 @@ import ReviewCard from "../../../component/ReviewCard/ReviewCard";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
 
-import { getReviewByBhId } from "../../../api/ownerUser/boardingHouse";
+import { getReviewByBhId } from "../../../api/ownerUser/boardingHouseAPI";
 
 const { Text } = Typography;
 

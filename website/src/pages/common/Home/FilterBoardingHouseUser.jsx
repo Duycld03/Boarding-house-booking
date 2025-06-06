@@ -1,200 +1,223 @@
 import { useEffect, useState } from "react";
 import { Form, Select, Slider, Checkbox, Drawer, Button, Input } from "antd";
 import { FilterOutlined, StarFilled } from "@ant-design/icons";
-import { getAllBoardingHouseTypeUser, getMaxPriceBHUser, filterBHUser } from "../../../api/BoardingHManagement";
+import {
+  getAllBoardingHouseTypeUser,
+  getMaxPriceBHUser,
+  filterBHUser,
+} from "../../../api/BoardingHouseAPI";
 import formatAmount from "../../../utils/formatAmount";
 import { toast } from "react-toastify";
-import { getBhByArea } from '../../../api/ownerUser/boardingHouse';
+import { getBhByArea } from "../../../api/ownerUser/boardingHouseAPI";
 
 function FilterBoardingHouseUser({ setFilterValue }) {
-    const [form] = Form.useForm();
-    const [priceRange, setPriceRange] = useState({ min: 0, max: 50000000 });
-    const [currentPrice, setCurrentPrice] = useState([0, 50000000]);
-    const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
-    const [selectedType, setSelectedType] = useState(null);
-    const [selectedRatings, setSelectedRatings] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 1366);
-    const [openDrawer, setOpenDrawer] = useState(false);
-    const [nameFilter, setNameFilter] = useState("");
+  const [form] = Form.useForm();
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 50000000 });
+  const [currentPrice, setCurrentPrice] = useState([0, 50000000]);
+  const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
+  const [selectedRatings, setSelectedRatings] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1366);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [nameFilter, setNameFilter] = useState("");
 
-    useEffect(() => {
-        fetchMaxPrice();
-        fetchBoardingHouseTypes();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+  useEffect(() => {
+    fetchMaxPrice();
+    fetchBoardingHouseTypes();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-    const fetchMaxPrice = async () => {
-        try {
-            const maxPriceRes = await getMaxPriceBHUser();
-            if (maxPriceRes) {
-                const maxPrice = maxPriceRes.maxPrice || 50000000;
-                setPriceRange({ min: 0, max: maxPrice });
-                setCurrentPrice([0, maxPrice]);
-            }
-        } catch (error) {
-            console.error("Error fetching max price:", error);
-        }
+  const fetchMaxPrice = async () => {
+    try {
+      const maxPriceRes = await getMaxPriceBHUser();
+      if (maxPriceRes) {
+        const maxPrice = maxPriceRes.maxPrice || 50000000;
+        setPriceRange({ min: 0, max: maxPrice });
+        setCurrentPrice([0, maxPrice]);
+      }
+    } catch (error) {
+      console.error("Error fetching max price:", error);
+    }
+  };
+
+  const fetchBoardingHouseTypes = async () => {
+    try {
+      const typeRes = await getAllBoardingHouseTypeUser();
+      if (typeRes?.data) {
+        setBoardingHouseTypes(typeRes.data);
+      }
+    } catch (error) {
+      console.error("Error fetching boarding house types:", error);
+    }
+  };
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 1366);
+  };
+
+  const handleSubmit = async () => {
+    if (currentPrice[0] > currentPrice[1]) {
+      toast.error(
+        "Invalid price range. Minimum price cannot be greater than maximum price."
+      );
+      return;
+    }
+
+    const filters = {
+      name: nameFilter || null,
+      priceRange: `${currentPrice[0]},${currentPrice[1]}`,
+      boardingHouseType: selectedType || null,
+      rating: selectedRatings.length > 0 ? selectedRatings.join(",") : null,
     };
 
-    const fetchBoardingHouseTypes = async () => {
-        try {
-            const typeRes = await getAllBoardingHouseTypeUser();
-            if (typeRes?.data) {
-                setBoardingHouseTypes(typeRes.data);
-            }
-        } catch (error) {
-            console.error("Error fetching boarding house types:", error);
-        }
-    };
+    setLoading(true);
+    try {
+      const response = await getBhByArea(filters);
+      console.log(response);
+      if (!response || response?.success === false) {
+        throw new Error(response?.message || "Failed to apply filters.");
+      }
 
-    const handleResize = () => {
-        setIsMobile(window.innerWidth <= 1366);
-    };
+      const rawData = Array.isArray(response)
+        ? response
+        : response?.data || response?.results || [];
 
-    const handleSubmit = async () => {
-        if (currentPrice[0] > currentPrice[1]) {
-            toast.error("Invalid price range. Minimum price cannot be greater than maximum price.");
-            return;
-        }
+      const formattedData = rawData.map((item) => ({
+        id: item._id?.$oid || item._id,
+        name: item.name,
+        price: formatAmount(item.priceRange),
+        detail: item.address?.province || "No address provided",
+        rating: item.rating || 0,
+        reviewCount: item.reviewCount || 0,
+        img: item.images?.[0]?.imageUrl || "",
+        updatedAt: item.updatedAt,
+      }));
 
-        const filters = {
-            name: nameFilter || null,
-            priceRange: `${currentPrice[0]},${currentPrice[1]}`,
-            boardingHouseType: selectedType || null,
-            rating: selectedRatings.length > 0 ? selectedRatings.join(",") : null,
-        };
+      if (formattedData.length > 0) {
+        setFilterValue?.(formattedData);
+      } else {
+        setFilterValue?.([]);
+      }
+      setFilterValue(filters);
+      setOpenDrawer(false);
+    } catch (error) {
+      console.error("Filter error:", error);
+      toast.error(
+        error.message || "Failed to apply filters. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setLoading(true);
-        try {
-            const response = await getBhByArea(filters);
-            console.log(response);
-            if (!response || response?.success === false) {
-                throw new Error(response?.message || "Failed to apply filters.");
-            }
+  const handleReset = () => {
+    form.resetFields();
+    setCurrentPrice([priceRange.min, priceRange.max]);
+    setSelectedType(null);
+    setSelectedRatings([]);
+    setNameFilter("");
+    setFilterValue(null);
+  };
 
-            const rawData = Array.isArray(response) ? response : response?.data || response?.results || [];
+  const ratingOptions = [1, 2, 3, 4, 5].map((value) => ({
+    label: (
+      <>
+        {[...Array(value)].map((_, index) => (
+          <StarFilled
+            key={index}
+            style={{ color: "gold", fontSize: "16px", marginRight: "2px" }}
+          />
+        ))}
+      </>
+    ),
+    value: value,
+  }));
 
-            const formattedData = rawData.map((item) => ({
-                id: item._id?.$oid || item._id,
-                name: item.name,
-                price: formatAmount(item.priceRange),
-                detail: item.address?.province || "No address provided",
-                rating: item.rating || 0,
-                reviewCount: item.reviewCount || 0,
-                img: item.images?.[0]?.imageUrl || "",
-                updatedAt: item.updatedAt,
-            }));
+  return (
+    <div className="">
+      <div className="w-full hidden lg:block ">
+        <Form form={form} onFinish={handleSubmit} layout="vertical">
+          <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
+            <Form.Item
+              label={<span className="text-2xl mb-4">Name</span>}
+              name="name"
+            >
+              <Input
+                placeholder="Enter name"
+                value={nameFilter}
+                onChange={(e) => setNameFilter(e.target.value)}
+              />
+            </Form.Item>
+          </div>
 
-            if (formattedData.length > 0) {
-                setFilterValue?.(formattedData);
-            } else {
-                setFilterValue?.([]);
-            }
-            setFilterValue(filters);
-            setOpenDrawer(false);
-        } catch (error) {
-            console.error("Filter error:", error);
-            toast.error(error.message || "Failed to apply filters. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
+          <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
+            <Form.Item label={<span className="text-2xl ">Price</span>}>
+              <Slider
+                range
+                min={priceRange.min}
+                max={priceRange.max}
+                step={100000}
+                value={currentPrice}
+                onChange={setCurrentPrice}
+              />
+              <div className="flex justify-between text-xl mt-1 mb-2 ">
+                <p className="truncate max-w-[40%]">
+                  Min: {formatAmount(currentPrice[0])}
+                </p>
+                <p className="truncate max-w-[40%] text-right">
+                  Max: {formatAmount(currentPrice[1])}
+                </p>
+              </div>
+            </Form.Item>
+          </div>
 
-    const handleReset = () => {
-        form.resetFields();
-        setCurrentPrice([priceRange.min, priceRange.max]);
-        setSelectedType(null);
-        setSelectedRatings([]);
-        setNameFilter("");
-        setFilterValue(null);
-    };
+          <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
+            <Form.Item
+              label={<span className="text-2xl mb-4">Boarding House Type</span>}
+            >
+              <Select
+                placeholder="Choose type"
+                value={selectedType}
+                onChange={setSelectedType}
+                allowClear
+                options={boardingHouseTypes}
+              />
+            </Form.Item>
+          </div>
 
-    const ratingOptions = [1, 2, 3, 4, 5].map((value) => ({
-        label: (
-            <>
-                {[...Array(value)].map((_, index) => (
-                    <StarFilled key={index} style={{ color: "gold", fontSize: "16px", marginRight: "2px" }} />
-                ))}
-            </>
-        ),
-        value: value,
-    }));
+          <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
+            <Form.Item label={<span className="text-2xl mb-4">Rating</span>}>
+              <Checkbox.Group
+                options={ratingOptions}
+                value={selectedRatings}
+                onChange={setSelectedRatings}
+                style={{ display: "flex", flexDirection: "column" }}
+              />
+            </Form.Item>
+          </div>
 
-    return (
-        <div className="">
-            <div className="w-full hidden lg:block ">
-                <Form form={form} onFinish={handleSubmit} layout="vertical" >
-                    <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
-                        <Form.Item label={<span className="text-2xl mb-4">Name</span>}
-                            name="name">
-                            <Input
-                                placeholder="Enter name"
-                                value={nameFilter}
-                                onChange={(e) => setNameFilter(e.target.value)}
-                            />
-                        </Form.Item>
-                    </div>
-
-                    <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
-
-                        <Form.Item label={<span className="text-2xl ">Price</span>}>
-
-                            <Slider
-                                range
-                                min={priceRange.min}
-                                max={priceRange.max}
-                                step={100000}
-                                value={currentPrice}
-                                onChange={setCurrentPrice}
-                            />
-                            <div className="flex justify-between text-xl mt-1 mb-2 ">
-                                <p className="truncate max-w-[40%]">
-                                    Min: {formatAmount(currentPrice[0])}
-                                </p>
-                                <p className="truncate max-w-[40%] text-right">
-                                    Max: {formatAmount(currentPrice[1])}
-                                </p>
-                            </div>
-                        </Form.Item>
-                    </div>
-
-                    <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
-                        <Form.Item label={<span className="text-2xl mb-4">Boarding House Type</span>}>
-                            <Select
-                                placeholder="Choose type"
-                                value={selectedType}
-                                onChange={setSelectedType}
-                                allowClear
-                                options={boardingHouseTypes}
-                            />
-                        </Form.Item>
-                    </div>
-
-                    <div className="border-1 border-gray-300 shadow-md p-4 rounded-2xl mb-6 bg-white">
-                        <Form.Item label={<span className="text-2xl mb-4">Rating</span>}>
-                            <Checkbox.Group
-                                options={ratingOptions}
-                                value={selectedRatings}
-                                onChange={setSelectedRatings}
-                                style={{ display: "flex", flexDirection: "column" }}
-                            />
-                        </Form.Item>
-                    </div>
-
-                    <div className="flex justify-between mt-6">
-                        <Button type="primary" htmlType="submit" loading={loading} className="w-1/2 text-lg">
-                            Apply
-                        </Button>
-                        <Button onClick={handleReset} className="bg-red-500 text-white w-1/2">
-                            Reset
-                        </Button>
-                    </div>
-                </Form>
-            </div>
-        </div>
-    );
+          <div className="flex justify-between mt-6">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              className="w-1/2 text-lg"
+            >
+              Apply
+            </Button>
+            <Button
+              onClick={handleReset}
+              className="bg-red-500 text-white w-1/2"
+            >
+              Reset
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </div>
+  );
 }
 
 export default FilterBoardingHouseUser;

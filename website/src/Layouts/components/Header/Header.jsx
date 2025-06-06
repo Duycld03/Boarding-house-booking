@@ -23,7 +23,7 @@ import {
   BulbOutlined,
   BulbFilled,
 } from "@ant-design/icons";
-import { getUser } from "../../../api/authManagement";
+import { getUser } from "../../../api/authAPI";
 import { useCurrentUser } from "../../../context/userContext";
 import adminMenu from "../Slider/menuItem";
 import userRole from "../../../constants/userRole";

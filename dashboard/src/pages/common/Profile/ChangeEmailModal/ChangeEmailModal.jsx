@@ -1,6 +1,6 @@
 import { Modal, Form, Input } from "antd";
 import React, { useEffect } from "react";
-import { sendOTPChangeEmail } from "../../../../api/AccountManagement";
+import { sendOTPChangeEmail } from "../../../../api/accountAPI";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 

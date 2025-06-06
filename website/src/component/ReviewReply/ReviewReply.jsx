@@ -5,7 +5,7 @@ import {
   replyReview,
   updateReplyReview,
   softDeleteReplyReview,
-} from "../../api/ReviewManagement";
+} from "../../api/reviewAPI";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEdit,

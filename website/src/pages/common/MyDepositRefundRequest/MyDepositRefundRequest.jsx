@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { TableCustom as Table, Button, ConfirmModal } from '../../../component';
-import formatAmount from '../../../utils/formatAmount';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Loader } from '../../../component';
-import { Tag } from 'antd';
-import { toast } from 'react-toastify';
-import { getRefundRequests } from '@/api/refundRequestManagement';
+import React, { useEffect, useState } from "react";
+import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
+import formatAmount from "../../../utils/formatAmount";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Loader } from "../../../component";
+import { Tag } from "antd";
+import { toast } from "react-toastify";
+import { getRefundRequests } from "@/api/refundRequestAPI";
 
 function MyDepositRefundRequest() {
   const location = useLocation();
@@ -15,38 +15,38 @@ function MyDepositRefundRequest() {
 
   const columns = [
     {
-      title: 'Boarding House Name',
-      dataIndex: 'boardingHouseName',
-      key: 'boardingHouseName',
+      title: "Boarding House Name",
+      dataIndex: "boardingHouseName",
+      key: "boardingHouseName",
     },
     {
-      title: 'Room Number',
-      dataIndex: 'roomNumber',
-      key: 'roomNumber',
+      title: "Room Number",
+      dataIndex: "roomNumber",
+      key: "roomNumber",
     },
     {
-      title: 'End Date',
-      dataIndex: 'endDate',
-      key: 'endDate',
+      title: "End Date",
+      dataIndex: "endDate",
+      key: "endDate",
     },
     {
-      title: 'Amount Refunded',
-      dataIndex: 'amountRefunded',
-      key: 'amountRefunded',
-      render: (price) => (price ? formatAmount(price) : 'N/A'),
+      title: "Amount Refunded",
+      dataIndex: "amountRefunded",
+      key: "amountRefunded",
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (status) => (
         <Tag
           color={
-            status === 'pending'
-              ? 'orange'
-              : status === 'accepted'
-              ? 'green'
-              : 'red'
+            status === "pending"
+              ? "orange"
+              : status === "accepted"
+              ? "green"
+              : "red"
           }
         >
           {status}
@@ -54,18 +54,18 @@ function MyDepositRefundRequest() {
       ),
     },
     {
-      title: 'Reason',
-      dataIndex: 'reason',
-      key: 'reason',
+      title: "Reason",
+      dataIndex: "reason",
+      key: "reason",
     },
     {
-      title: 'Created At',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (_, record) => (
         <div className="flex gap-3">
           {/* {record.status == "confirmed" && (
@@ -104,7 +104,7 @@ function MyDepositRefundRequest() {
       const res = await getRefundRequests();
       setRefundRequests(res);
     } catch (error) {
-      console.log('Error getting deposited room:', error);
+      console.log("Error getting deposited room:", error);
     } finally {
       setLoading(false);
     }
@@ -112,14 +112,14 @@ function MyDepositRefundRequest() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const status = params.get('status');
+    const status = params.get("status");
 
-    if (status === 'success') {
-      toast.success('Pay successfully!');
-    } else if (status === 'fail') {
-      toast.error('Pay failed!');
+    if (status === "success") {
+      toast.success("Pay successfully!");
+    } else if (status === "fail") {
+      toast.error("Pay failed!");
     }
-    params.delete('status');
+    params.delete("status");
     if (status) {
       navigate(window.location.pathname, { replace: true });
     }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Modal, Card, Image, List, Avatar, Dropdown, Menu } from "antd";
 import { DollarOutlined, EllipsisOutlined } from "@ant-design/icons";
-import { checkPayRentStatus, getDepositRoom } from "@/api/depositManagement";
+import { checkPayRentStatus, getDepositRoom } from "@/api/depositAPI";
 import formatAmount from "@/utils/formatAmount";
 import { useCurrentUser } from "@/context/userContext";
 import PayRentPopup from "./PayRentPopup";

@@ -1,5 +1,5 @@
 import { TableCustom as Table } from "@/component";
-import { getRentPaymentByUserId } from "@/api/rentPayment";
+import { getRentPaymentByUserId } from "@/api/rentPaymentAPI";
 import { useEffect, useState } from "react";
 import { Tag } from "antd";
 import RentPaymentDetailModal from "./RentPaymentDetailModal";

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import ListCard from '@/components/ui/ListCard';
 import { BackHeader } from '@/components/navigation/CustomHeader';
-import { getAllFavorites, deleteFavorite } from '@/API/favoriteManagement';
+import { getAllFavorites, deleteFavorite } from '@/API/favoriteAPI';
 import { ConfirmModal } from '@/components/feedback';
 import { useRouter } from 'expo-router';
 import { useThemedClasses } from '@/utils/useTheme';

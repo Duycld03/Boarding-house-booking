@@ -11,7 +11,7 @@ import {
   deleteReport,
   sendReplyByEmail,
   filterBHReports,
-} from "../../../api/reportManagement";
+} from "../../../api/reportAPI";
 import convertTimetap from "../../../utils/convertTimetap";
 import FilterBHReportPopup from "./FilterBHReportPopup ";
 import { useTranslation } from "react-i18next";

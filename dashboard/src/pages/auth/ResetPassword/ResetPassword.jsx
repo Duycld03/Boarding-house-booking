@@ -2,7 +2,7 @@ import { Form, Button, Card, Input } from "antd";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { resetPassword } from "../../../api/authManagement";
+import { resetPassword } from "../../../api/authAPI";
 import { useTheme } from "../../../context/themeContext";
 
 function ResetPassword() {

@@ -5,7 +5,7 @@ import {
   getAllBoardingHouseTypes,
   createBoardingHouse,
   uploadFile,
-} from "../../../api/BoardingHManagement";
+} from "../../../api/BoardingHouseAPI";
 import {
   fetchProvinces,
   fetchDistricts,
