@@ -10,7 +10,7 @@ import { BackHeader } from "@/components/navigation/CustomHeader";
 import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { FormField } from "@/components/form/index";
-import { changePassword, getUser } from "@/API/authManagement";
+import { changePassword, getUser } from "@/API/authAPI";
 import { useNotification } from "@/context/NotificationProvider";
 import { useTheme } from "@/context/ThemeProvider";
 import { useThemedClasses } from "@/utils/useTheme";

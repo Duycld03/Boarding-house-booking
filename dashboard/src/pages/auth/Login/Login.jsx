@@ -3,7 +3,7 @@ import { Form, Button, Checkbox, Card, Input } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
-import { login, getUser, loginWithGoogle } from "../../../api/authManagement";
+import { login, getUser, loginWithGoogle } from "../../../api/authAPI";
 import { Back } from "../../../component";
 import { useCurrentUser } from "../../../context/userContext";
 import { useTheme } from "../../../context/themeContext";

@@ -1,16 +1,12 @@
 import mongoose from 'mongoose';
 import BoardingHouse from '../models/boardingHouse.js';
-import BoardingHouseType from '../models/boardingHouseType .js';
-import RoomType from '../models/roomType.js';
-import Room from '../models/room.js';
+import BoardingHouseType from '../models/boardingHouseType.js';
 import { v2 as cloudinary } from 'cloudinary';
-import facilities from '../models/facilities.js';
 
 // import path from "path";
 import fs from 'fs';
 import multer from 'multer';
 import Account from '../models/account.js';
-import Review from '../models/review.js';
 import paginate from '../utils/pagination.js';
 
 class boardingHouseController {
@@ -400,16 +396,13 @@ class boardingHouseController {
         rating = 5,
       } = req.body;
 
-      console.log(location);
 
-      // console.log("Request body received:", req.body);
 
       // Validate owner
       const ownerAccount = await Account.findOne({
         username: ownerUsername,
         role: 'owner',
       });
-      // console.log("Owner account found:", ownerAccount);
       if (!ownerAccount) {
         console.error('Invalid owner:', ownerUsername);
         return res.status(400).json({
@@ -605,18 +598,7 @@ class boardingHouseController {
       if (priceRange && priceRange.length === 2) {
         filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
       }
-      // if (priceRange) {
-      //   console.log("Price range:", priceRange);
-      //   const prices = priceRange.split(",").map(Number);
-      //   if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
-      //     filter.priceRange = { $gte: prices[0], $lte: prices[1] };
-      //   } else {
-      //     return res.status(400).json({
-      //       success: false,
-      //       message: "Invalid price range format. Use 'priceRange=min,max'.",
-      //     });
-      //   }
-      // }
+      // If province is provided, filter by province
       if (startDate && endDate) {
         filter.createdAt = {
           $gte: new Date(startDate),
@@ -838,7 +820,6 @@ class boardingHouseController {
         availableRooms = 0,
       } = req.body;
 
-      console.log('Validating boarding house type...');
       const boardingHouseTypeExists =
         await BoardingHouseType.findById(boardingHouseType);
       if (!boardingHouseTypeExists) {

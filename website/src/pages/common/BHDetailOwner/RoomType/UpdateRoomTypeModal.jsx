@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Select, Upload, InputNumber, Image } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button } from '@/component';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Input, Select, Upload, InputNumber, Image } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { Button } from "@/component";
+import { toast } from "react-toastify";
 import {
   getAllFacilities,
   updateRoomTypeToBoardingHouse,
-} from '@/api/roomTypeManagement';
+} from "@/api/roomTypeAPI";
 
 const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
   const [formData, setFormData] = useState({
-    typeName: '',
+    typeName: "",
     facilities: [],
-    roomSize: '',
-    price: '',
-    peopleNumber: '',
+    roomSize: "",
+    price: "",
+    peopleNumber: "",
     image: null,
   });
 
@@ -29,8 +29,8 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
         const response = await getAllFacilities();
         setFacilitiesList(response?.data || []);
       } catch (error) {
-        console.error('Failed to fetch facilities:', error);
-        toast.error('Failed to fetch facilities.');
+        console.error("Failed to fetch facilities:", error);
+        toast.error("Failed to fetch facilities.");
       }
     };
 
@@ -64,11 +64,11 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       }
 
       return {
-        typeName: roomData.typeName || '',
+        typeName: roomData.typeName || "",
         facilities: roomData.facilities?.map((fac) => fac._id) || [],
-        roomSize: roomData.roomSize || '',
-        price: roomData.price || '',
-        peopleNumber: roomData.peopleNumber || '',
+        roomSize: roomData.roomSize || "",
+        price: roomData.price || "",
+        peopleNumber: roomData.peopleNumber || "",
         image: roomData.image?.imageUrl || null,
       };
     });
@@ -82,11 +82,11 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
   useEffect(() => {
     if (!visible) {
       setFormData({
-        typeName: '',
+        typeName: "",
         facilities: [],
-        roomSize: '',
-        price: '',
-        peopleNumber: '',
+        roomSize: "",
+        price: "",
+        peopleNumber: "",
         image: null,
       });
       setImagePreview(null);
@@ -114,7 +114,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       setImagePreview(URL.createObjectURL(file));
       return false;
     },
-    accept: 'image/*',
+    accept: "image/*",
     maxCount: 1,
     showUploadList: false,
   };
@@ -128,11 +128,11 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
   // ✅ Gửi dữ liệu lên API
   const handleSubmit = async () => {
     if (!formData.typeName.trim()) {
-      toast.error('Type Name is required.');
+      toast.error("Type Name is required.");
       return;
     }
     if (!/^\d+x\d+$/.test(formData.roomSize)) {
-      toast.error('Room size must be in format 20x30 or 30x40.');
+      toast.error("Room size must be in format 20x30 or 30x40.");
       return;
     }
     // if (
@@ -144,32 +144,32 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
     //   return;
     // }
     if (!formData.price || isNaN(Number(formData.price))) {
-      toast.error('Please enter a valid number for rent/month!');
+      toast.error("Please enter a valid number for rent/month!");
       return;
     }
     if (!formData.peopleNumber || formData.peopleNumber < 1) {
-      toast.error('People number must be at least 1.');
+      toast.error("People number must be at least 1.");
       return;
     }
     if (!formData.image) {
-      toast.error('You must upload an image.');
+      toast.error("You must upload an image.");
       return;
     }
 
     setLoading(true);
 
     const formDataToSend = new FormData();
-    formDataToSend.append('typeName', formData.typeName);
-    formDataToSend.append('roomSize', formData.roomSize);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('peopleNumber', formData.peopleNumber);
+    formDataToSend.append("typeName", formData.typeName);
+    formDataToSend.append("roomSize", formData.roomSize);
+    formDataToSend.append("price", formData.price);
+    formDataToSend.append("peopleNumber", formData.peopleNumber);
     formDataToSend.append(
-      'facilities',
+      "facilities",
       JSON.stringify(formData.facilities || [])
     );
 
     if (formData.image instanceof File) {
-      formDataToSend.append('roomType', formData.image);
+      formDataToSend.append("roomType", formData.image);
     }
 
     try {
@@ -178,15 +178,15 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
         formDataToSend
       );
 
-      if (response?.message === 'Room Type updated successfully') {
-        toast.success('Room type updated successfully!');
+      if (response?.message === "Room Type updated successfully") {
+        toast.success("Room type updated successfully!");
         onClose();
         onUpdate();
       }
     } catch (error) {
-      console.error('❌ API Error:', error.response?.data || error.message);
+      console.error("❌ API Error:", error.response?.data || error.message);
       const errorMessage =
-        error.response?.data?.message || 'Failed to submit form.';
+        error.response?.data?.message || "Failed to submit form.";
 
       toast.error(errorMessage);
     } finally {
@@ -249,9 +249,9 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
               setFormData((prev) => ({ ...prev, price: value }))
             }
             formatter={(value) =>
-              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
             }
-            parser={(value) => value.replace(/\$\s?|,*/g, '')}
+            parser={(value) => value.replace(/\$\s?|,*/g, "")}
             className="w-full"
           />
         </Form.Item>
@@ -283,13 +283,13 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
           ) : (
             <div
               className="relative"
-              style={{ width: '200px', height: '200px' }}
+              style={{ width: "200px", height: "200px" }}
             >
               <Image
                 src={imagePreview}
                 alt="Room Image"
                 className="w-full rounded"
-                style={{ width: '200px', height: '200px' }}
+                style={{ width: "200px", height: "200px" }}
               />
               <button
                 onClick={handleRemoveImage}

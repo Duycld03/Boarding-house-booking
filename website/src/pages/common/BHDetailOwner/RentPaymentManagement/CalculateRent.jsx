@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Button, Table, Select } from "antd";
-import { getAvailableRooms } from "@/api/ownerUser/roomManagement";
+import { getAvailableRooms } from "@/api/ownerUser/roomAPI";
 import { toast } from "react-toastify";
-import { getElectricalAndWaterPrice } from "@/api/ownerUser/boardingHouse";
-import { calculateMonthlyBill } from "@/api/ownerUser/paymentBillManagement";
+import { getElectricalAndWaterPrice } from "@/api/ownerUser/boardingHouseAPI";
+import { calculateMonthlyBill } from "@/api/ownerUser/paymentBillAPI";
 
 const CalculateRent = ({
   visible,

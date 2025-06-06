@@ -4,7 +4,7 @@ import {
   getOwnerAppointmentById,
   createAppointment,
   getAppointmentOfUser,
-} from "../../../api/appointment";
+} from "../../../api/appointmentAPI";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";

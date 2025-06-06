@@ -17,7 +17,7 @@ import {
   filterAccount,
   updateAccount,
   createAccount,
-} from "../../../api/AccountManagement";
+} from "../../../api/accountAPI";
 import convertTimetap from "../../../utils/convertTimetap";
 
 // Assets

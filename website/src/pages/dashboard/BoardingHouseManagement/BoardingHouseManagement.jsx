@@ -23,7 +23,7 @@ import {
   filterBH,
   uploadFile,
   softDeleteBoardingHouse,
-} from "../../../api/BoardingHManagement";
+} from "../../../api/BoardingHouseAPI";
 import formatAmount from "../../../utils/formatAmount";
 import convertTimetap from "../../../utils/convertTimetap";
 import CreateBoardingHouse from "./CreateBoardingHouse";

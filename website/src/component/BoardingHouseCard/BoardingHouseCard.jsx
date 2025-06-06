@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { addFavorite, getFavorite } from "../../api/favoriteManagement";
+import { addFavorite, getFavorite } from "../../api/favoriteAPI";
 import { useCurrentUser } from "@/context/userContext";
 import userRoles from "@/constants/userRole";
 import { formatTimeAgo } from "@/utils/timeUtils";

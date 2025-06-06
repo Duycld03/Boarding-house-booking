@@ -7,7 +7,7 @@ import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { useNotification } from "@/context/NotificationProvider";
 import { Checkbox, FormField } from "@/components/form/index";
-import { login, verifyRegister } from "@/API/authManagement";
+import { login, verifyRegister } from "@/API/authAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";

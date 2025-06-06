@@ -9,7 +9,7 @@ import {
 import {
   getAllBoardingHouseTypes,
   getMaxPriceBH,
-} from "../../../api/BoardingHManagement";
+} from "../../../api/BoardingHouseAPI";
 import formatAmount from "../../../utils/formatAmount";
 
 const { Option } = Select;

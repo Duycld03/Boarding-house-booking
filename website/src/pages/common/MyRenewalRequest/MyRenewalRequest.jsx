@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { TableCustom as Table } from "@/component";
-import { getExtensionRequests } from "@/api/extensionRequest";
+import { getExtensionRequests } from "@/api/extensionRequestAPI";
 import { Tag, Tooltip } from "antd";
 
 function MyRenewalRequest() {

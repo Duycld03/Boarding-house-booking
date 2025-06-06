@@ -6,7 +6,7 @@ import convertTimetap from "@/utils/convertTimetap";
 import { Tag } from "antd";
 import formatAmount from "@/utils/formatAmount";
 import CalculateRent from "./CalculateRent";
-import { getPaymentBillByBoardingHouseId } from "@/api/ownerUser/paymentBillManagement";
+import { getPaymentBillByBoardingHouseId } from "@/api/ownerUser/paymentBillAPI";
 
 const RentPaymentManagement = () => {
   const { boardingHouseId } = useParams();

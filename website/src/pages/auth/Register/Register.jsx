@@ -2,7 +2,7 @@ import { Form, Button, Card, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getUser, sendOTPRegister } from "../../../api/authManagement";
+import { getUser, sendOTPRegister } from "../../../api/authAPI";
 import { Back } from "../../../component";
 import { useTheme } from "../../../context/themeContext";
 import styles from "./Register.module.css";

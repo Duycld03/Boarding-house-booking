@@ -14,8 +14,8 @@ import {
   getBoardingHouseDetail,
   getReviewByBhId,
   getRoomTypeByBhId,
-} from "../../../api/ownerUser/boardingHouse";
-import { addReview } from "../../../api/ReviewManagement";
+} from "../../../api/ownerUser/boardingHouseAPI";
+import { addReview } from "../../../api/reviewAPI";
 import BoardingHouseGallery from "./BoardingHouseGallery";
 import formatAmount from "../../../utils/formatAmount";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
@@ -28,9 +28,9 @@ import AddReview from "./AddReview";
 import ReportModal from "./ReportModal";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../../../context/userContext";
-import { checkReportExist } from "../../../api/reportManagement";
+import { checkReportExist } from "../../../api/reportAPI";
 import { toast } from "react-toastify";
-import { addFavorite, getFavorite } from "../../../api/favoriteManagement";
+import { addFavorite, getFavorite } from "../../../api/favoriteAPI";
 import LocationPicker from "@/component/LocationPicker";
 import userRoles from "@/constants/userRole";
 import { useTheme } from "@/context/ThemeContext";

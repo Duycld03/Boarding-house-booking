@@ -19,6 +19,8 @@ import { getBhByArea } from '@/API/ownerUser/boardingHouse';
 import formatAmount from '@/utils/formatAmount';
 import { useTranslation } from 'react-i18next';
 import Loader from '@/components/ui/Loader';
+import { useCurrentUser } from '@/context/userContext'
+import { getUser } from '@/API/authAPI';
 
 const { width } = Dimensions.get('window');
 
@@ -29,11 +31,14 @@ function Home() {
   const { t } = useTranslation('home');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Thêm state để check login status
+  const { isLogin } = useCurrentUser();
 
   // Gọi lại khi tab được focus
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
+
       const fetchData = async () => {
         setLoading(true);
         try {
@@ -66,7 +71,26 @@ function Home() {
           if (isActive) setLoading(false);
         }
       };
+
+      const checkLoginStatus = async () => {
+        try {
+          const user = await getUser();
+          if (user) {
+            setIsLoggedIn(true);
+          } else {
+            setIsLoggedIn(false);
+          }
+        } catch (error) {
+          if (isActive) {
+            setIsLoggedIn(false);
+          }
+        }
+      };
+
+      // Chạy cả 2 functions
       fetchData();
+      checkLoginStatus();
+
       return () => {
         isActive = false;
       };
@@ -82,7 +106,7 @@ function Home() {
     .sort((a, b) => b.reviewCount - a.reviewCount || b.rating - a.rating)
     .slice(0, 10);
 
-  // Header Component với gradient và animation
+  // Header Component với gradient và animation + Auth buttons
   const Header = () => (
     <LinearGradient
       colors={isDarkMode ? ['#1e293b', '#334155'] : ['#0ea5e9', '#0284c7']}
@@ -91,7 +115,7 @@ function Home() {
       style={styles.header}
     >
       <View style={styles.headerContent}>
-        <View>
+        <View style={styles.headerLeft}>
           <Text style={[styles.greeting, { color: '#ffffff' }]}>
             {t('greeting', 'Xin chào!')}
           </Text>
@@ -99,10 +123,36 @@ function Home() {
             {t('welcome')}
           </Text>
         </View>
-        <TouchableOpacity style={styles.notificationButton}>
-          <Ionicons name="notifications-outline" size={24} color="#ffffff" />
-          <View style={styles.notificationBadge} />
-        </TouchableOpacity>
+
+        {/* Auth Buttons hoặc User Actions */}
+        <View style={styles.headerRight}>
+          {!isLoggedIn ? (
+            <View style={styles.authButtonsContainer}>
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={() => router.push('/login')}
+              >
+                <Text style={styles.loginButtonText}>
+                  {t('login', 'Đăng nhập')}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.registerButton}
+                onPress={() => router.push('/register')}
+              >
+                <Text style={styles.registerButtonText}>
+                  {t('register', 'Đăng ký')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity style={styles.notificationButton}>
+              <Ionicons name="notifications-outline" size={24} color="#ffffff" />
+              <View style={styles.notificationBadge} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </LinearGradient>
   );
@@ -128,7 +178,7 @@ function Home() {
             { color: isDarkMode ? '#9ca3af' : '#6b7280' },
           ]}
         >
-          {t('welcome')}
+          {t('searchPlaceholder', 'Tìm kiếm nhà trọ...')}
         </Text>
         <Ionicons
           name="filter-outline"
@@ -138,6 +188,8 @@ function Home() {
       </TouchableOpacity>
     </View>
   );
+
+
 
   // Stats Cards Component
   const StatsCards = () => (
@@ -281,6 +333,10 @@ function Home() {
       <ScrollContainer keyboardAvoiding showsVerticalScrollIndicator={false}>
         <Header />
         <SearchBar />
+
+        {/* Chỉ hiển thị Quick Actions khi chưa login */}
+        {/* {!isLoggedIn && <QuickActions />} */}
+
         <StatsCards />
 
         <View style={styles.sectionsContainer}>
@@ -326,6 +382,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerLeft: {
+    flex: 1,
+  },
+  headerRight: {
+    alignItems: 'flex-end',
+  },
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -334,6 +396,35 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 16,
     opacity: 0.9,
+  },
+  // Auth Buttons Styles
+  authButtonsContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  loginButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  loginButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  registerButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+  },
+  registerButtonText: {
+    color: '#0ea5e9',
+    fontSize: 14,
+    fontWeight: '600',
   },
   notificationButton: {
     position: 'relative',
@@ -349,6 +440,23 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: '#ef4444',
+  },
+  // Quick Actions Styles
+  quickActionsContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  quickActionsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  quickActionsButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  quickActionButton: {
+    flex: 1,
   },
   searchContainer: {
     paddingHorizontal: 20,

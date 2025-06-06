@@ -23,3 +23,4 @@ export const getMaxAmountWithdrawRequest = () => {
 export const filterWithdrawRequests = (data) => {
   return axios.post("/dashboard/withdrawRequests/filter", data);
 };
+

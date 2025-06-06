@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   TableCustom as Table,
   Button,
   ConfirmModal,
   Loader,
-} from '../../../component';
-import { toast } from 'react-toastify';
+} from "../../../component";
+import { toast } from "react-toastify";
 import {
   getReviews,
   filterReviews,
   deleteReview,
   getReviewDetail, // Import API mới
-} from '../../../api/ReviewManagement';
-import FilterReview from './FilterReview';
-import { FileTextOutlined } from '@ant-design/icons';
-import DetailModal from './DetailModal';
+} from "../../../api/reviewAPI";
+import FilterReview from "./FilterReview";
+import { FileTextOutlined } from "@ant-design/icons";
+import DetailModal from "./DetailModal";
 
 function ReviewManagement() {
   const [loading, setLoading] = useState(true);
@@ -33,16 +33,16 @@ function ReviewManagement() {
 
     try {
       const res = await getReviewDetail(record._id);
-      console.log('Review detail', res);
+      console.log("Review detail", res);
 
       if (res) {
         setSelectedDetail(res);
       } else {
-        toast.error('Failed to fetch review details.');
+        toast.error("Failed to fetch review details.");
       }
     } catch (error) {
-      console.error('Error fetching review details:', error);
-      toast.error('Error fetching review details.');
+      console.error("Error fetching review details:", error);
+      toast.error("Error fetching review details.");
     } finally {
       setDetailLoading(false);
     }
@@ -51,40 +51,40 @@ function ReviewManagement() {
   // Cấu trúc cột của bảng
   const columns = [
     {
-      title: 'Boarding House Name',
-      dataIndex: 'boardingHouseId',
-      key: 'boardingHouseId',
-      render: (house) => house?.name || 'N/A',
+      title: "Boarding House Name",
+      dataIndex: "boardingHouseId",
+      key: "boardingHouseId",
+      render: (house) => house?.name || "N/A",
     },
     {
-      title: 'Content',
-      dataIndex: 'content',
-      key: 'content',
+      title: "Content",
+      dataIndex: "content",
+      key: "content",
     },
     {
-      title: 'Rating',
-      dataIndex: 'rating',
-      key: 'rating',
+      title: "Rating",
+      dataIndex: "rating",
+      key: "rating",
       render: (rating) => <span style={{ color: [rating] }}>{rating} / 5</span>,
     },
     {
-      title: 'Created Date',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (date) => new Date(date).toLocaleDateString('en-GB'),
+      title: "Created Date",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (date) => new Date(date).toLocaleDateString("en-GB"),
     },
     {
-      title: 'Reviewer',
-      dataIndex: 'accountId',
-      key: 'accountId',
-      render: (account) => account?.username || 'N/A',
+      title: "Reviewer",
+      dataIndex: "accountId",
+      key: "accountId",
+      render: (account) => account?.username || "N/A",
     },
     {
-      title: 'Action',
+      title: "Action",
       render: (record) => (
         <div className="flex gap-2">
           <Button
-            title={'Delete'}
+            title={"Delete"}
             size="large"
             btnDelete
             onClick={() => handleDeleteModal(record)}
@@ -94,10 +94,10 @@ function ReviewManagement() {
           <Button
             onClick={() => handleDetailModal(record)}
             size="large"
-            title={'Detail'}
+            title={"Detail"}
             icon={<FileTextOutlined />}
-            className={'text-white'}
-            bgColor={'rgb(5 150 105)'}
+            className={"text-white"}
+            bgColor={"rgb(5 150 105)"}
           />
         </div>
       ),
@@ -111,11 +111,11 @@ function ReviewManagement() {
       if (Array.isArray(res)) {
         setData(res);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error('Failed to fetch filtered accounts:', error);
-      toast.error('Failed to fetch filtered accounts. Please try again later.');
+      console.error("Failed to fetch filtered accounts:", error);
+      toast.error("Failed to fetch filtered accounts. Please try again later.");
       setData([]);
     } finally {
       setLoading(false);
@@ -136,8 +136,8 @@ function ReviewManagement() {
         setData([]);
       }
     } catch (error) {
-      console.error('Failed to fetch reviews:', error);
-      toast.error('Failed to fetch reviews. Please try again later.');
+      console.error("Failed to fetch reviews:", error);
+      toast.error("Failed to fetch reviews. Please try again later.");
       setData([]);
     }
   };
@@ -154,12 +154,12 @@ function ReviewManagement() {
       if (response) {
         setIsOpenDeleteModal(!isOpenDeleteModal);
         fetchData();
-        toast.success('Delete review successful');
+        toast.success("Delete review successful");
       } else {
-        toast.error('Failed to delete review.');
+        toast.error("Failed to delete review.");
       }
     } catch (error) {
-      toast.error('An error occurred : ', error.response?.data?.error);
+      toast.error("An error occurred : ", error.response?.data?.error);
     }
   };
 

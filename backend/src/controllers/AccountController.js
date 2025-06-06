@@ -96,8 +96,6 @@ class accountController {
       const { username, password, email, phoneNumber, fullname, gender, role } =
         req.body;
 
-      console.log('data: ', req.body);
-
       if (
         !username ||
         !password ||

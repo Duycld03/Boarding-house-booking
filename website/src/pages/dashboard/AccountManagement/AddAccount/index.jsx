@@ -3,7 +3,7 @@ import { Form, Select, Modal, Input } from "antd";
 import { Button } from "../../../../component";
 import { toast } from "react-toastify";
 
-import { createAccount } from "../../../../api/AccountManagement";
+import { createAccount } from "../../../../api/accountAPI";
 
 const { Option } = Select;
 

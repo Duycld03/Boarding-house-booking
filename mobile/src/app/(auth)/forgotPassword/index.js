@@ -9,7 +9,7 @@ import { BackHeader } from "@/components/navigation/CustomHeader";
 import Button from "@/components/ui/Button";
 import { FormField } from "@/components/form";
 import { useNotification } from "@/context/NotificationProvider";
-import { forgotPassword } from "@/API/authManagement";
+import { forgotPassword } from "@/API/authAPI";
 
 function ForgotPassword() {
   const router = useRouter();

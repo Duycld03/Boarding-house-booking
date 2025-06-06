@@ -7,7 +7,7 @@ import {
   getRenewalRequestByBhID,
   acceptExtensionRequest,
   rejectExtensionRequest, // New function for reject
-} from "@/api/renewalRequestManagement";
+} from "@/api/renewalRequestAPI";
 import { Tag, Input, Modal } from "antd";
 import { toast } from "react-toastify";
 import ConfirmModal from "@/component/ConfirmModal";

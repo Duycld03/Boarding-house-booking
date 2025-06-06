@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ScreenContainer } from '@/components/layout';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getUser } from '@/API/authManagement';
+import { getUser } from '@/API/authAPI';
 import Loader from '@/components/ui/Loader';
 
 const Account = () => {

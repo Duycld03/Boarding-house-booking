@@ -72,7 +72,6 @@ class FacilitiesController {
         try {
             const { search, startDate, endDate } = req.query;
             let filter = {};
-            console.log(search);
 
             // Lọc theo khoảng thời gian
             if (startDate && endDate) {
