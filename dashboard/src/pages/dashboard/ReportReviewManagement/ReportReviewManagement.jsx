@@ -1,24 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   TableCustom as Table,
   Button,
   ConfirmModal,
   FormReplayPopup,
-} from '../../../component';
-import { toast } from 'react-toastify';
-import { Tag } from 'antd';
+} from "../../../component";
+import { toast } from "react-toastify";
+import { Tag } from "antd";
 import {
   deleteReport,
   sendReplyByEmail,
   filterReviewReports,
   getReportReviewDetail,
-} from '../../../api/reportManagement';
-import convertTimetap from '../../../utils/convertTimetap';
-import FilterReport from './FilterReport';
-import { FileTextOutlined } from '@ant-design/icons';
-import DetailReportModal from './DetailReportModal';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../../context/themeContext';
+} from "../../../api/reportAPI";
+import convertTimetap from "../../../utils/convertTimetap";
+import FilterReport from "./FilterReport";
+import { FileTextOutlined } from "@ant-design/icons";
+import DetailReportModal from "./DetailReportModal";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "../../../context/themeContext";
 
 function ReportReviewManagement() {
   const [data, setData] = useState([]);
@@ -46,11 +46,11 @@ function ReportReviewManagement() {
   const [paginationOptions, setPaginationOptions] = useState({
     page: 1,
     limit: 10,
-    sortField: 'createdAt',
-    sortOrder: 'desc',
+    sortField: "createdAt",
+    sortOrder: "desc",
   });
 
-  const { t } = useTranslation('reviewReportManagement');
+  const { t } = useTranslation("reviewReportManagement");
   const { darkMode } = useTheme();
 
   const fetchReportDetail = async (id) => {
@@ -59,7 +59,7 @@ function ReportReviewManagement() {
       setSelectedData(res || null);
     } catch (error) {
       console.error(error);
-      toast.error(t('messages.detailFetchError'));
+      toast.error(t("messages.detailFetchError"));
     }
   };
 
@@ -84,11 +84,11 @@ function ReportReviewManagement() {
           limit: res.pagination.limit,
         });
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (error) {
       console.error(error);
-      toast.error(t('messages.fetchError'));
+      toast.error(t("messages.fetchError"));
       setData([]);
     } finally {
       setLoading(false);
@@ -104,11 +104,11 @@ function ReportReviewManagement() {
     if (!selectedRequest) return;
     try {
       await deleteReport(selectedRequest._id);
-      toast.success(t('messages.deleteSuccess'));
+      toast.success(t("messages.deleteSuccess"));
       filterReportData();
     } catch (error) {
       console.error(error);
-      toast.error(t('messages.deleteFailed'));
+      toast.error(t("messages.deleteFailed"));
     } finally {
       setIsOpenDeleteModal(false);
       setSelectedRequest(null);
@@ -117,7 +117,7 @@ function ReportReviewManagement() {
 
   const handleReplaySubmit = async (formData) => {
     if (!replayReportData || !replayReportData._id || !formData.status) {
-      toast.error(t('messages.replayError'));
+      toast.error(t("messages.replayError"));
       return;
     }
     try {
@@ -129,7 +129,7 @@ function ReportReviewManagement() {
       setIsReplayPopupOpen(false);
     } catch (error) {
       console.error(error);
-      toast.error(t('messages.replayFailed'));
+      toast.error(t("messages.replayFailed"));
     }
   };
 
@@ -150,32 +150,32 @@ function ReportReviewManagement() {
 
   const columns = [
     {
-      title: t('columns.reporter'),
-      dataIndex: 'reporter',
-      key: 'reporter',
-      render: (r) => r?.fullname || 'N/A',
+      title: t("columns.reporter"),
+      dataIndex: "reporter",
+      key: "reporter",
+      render: (r) => r?.fullname || "N/A",
     },
     {
-      title: t('columns.email'),
-      dataIndex: 'reporter',
-      key: 'email',
-      render: (r) => r?.email || 'N/A',
+      title: t("columns.email"),
+      dataIndex: "reporter",
+      key: "email",
+      render: (r) => r?.email || "N/A",
     },
     {
-      title: t('columns.reason'),
-      dataIndex: 'reason',
-      key: 'reason',
+      title: t("columns.reason"),
+      dataIndex: "reason",
+      key: "reason",
       render: (reason) => t(`reasons.${reason}`) || reason,
     },
     {
-      title: t('columns.status'),
-      dataIndex: 'status',
-      key: 'status',
+      title: t("columns.status"),
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
         const statusColors = {
-          pending: 'orange',
-          resolved: 'green',
-          rejected: 'red',
+          pending: "orange",
+          resolved: "green",
+          rejected: "red",
         };
         return (
           <Tag color={statusColors[status?.toLowerCase()]}>
@@ -185,31 +185,31 @@ function ReportReviewManagement() {
       },
     },
     {
-      title: t('columns.createdAt'),
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: t("columns.createdAt"),
+      dataIndex: "createdAt",
+      key: "createdAt",
       render: (createdAt) => convertTimetap(createdAt),
     },
     {
-      title: t('columns.updatedAt'),
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
+      title: t("columns.updatedAt"),
+      dataIndex: "updatedAt",
+      key: "updatedAt",
       render: (updatedAt) => convertTimetap(updatedAt),
     },
     {
-      title: t('columns.action'),
+      title: t("columns.action"),
       render: (record) => (
         <div className="flex gap-2">
           <Button
-            title={t('buttons.delete')}
+            title={t("buttons.delete")}
             btnDelete
             onClick={() => handleDeleteModal(record)}
           />
           <Button
-            title={t('buttons.detail')}
+            title={t("buttons.detail")}
             icon={<FileTextOutlined />}
-            className={'text-white'}
-            bgColor={'rgb(5 150 105)'}
+            className={"text-white"}
+            bgColor={"rgb(5 150 105)"}
             onClick={() => handleDetailModal(record)}
           />
         </div>
@@ -222,18 +222,18 @@ function ReportReviewManagement() {
   }, [filterValue, paginationOptions]);
 
   return (
-    <div className={`txt ${darkMode ? 'bg-gray-700 text-white' : ''}`}>
+    <div className={`txt ${darkMode ? "bg-gray-700 text-white" : ""}`}>
       <div className="flex justify-end mb-4">
         <FilterReport setFilterValue={setFilterValue} />
       </div>
       <Table
-        tableName={t('tableName')}
+        tableName={t("tableName")}
         columns={columns}
         data={data}
         loading={loading}
         pagination={tablePaginationConfig}
         onChange={handleTableChange}
-        noDataText={t('messages.noData')}
+        noDataText={t("messages.noData")}
       />
       <DetailReportModal
         isOpen={isDetailModalOpen}
@@ -245,8 +245,8 @@ function ReportReviewManagement() {
         }}
       />
       <ConfirmModal
-        title={t('modals.confirmDelete.title')}
-        content={t('modals.confirmDelete.content')}
+        title={t("modals.confirmDelete.title")}
+        content={t("modals.confirmDelete.content")}
         onOk={handleDelete}
         onCancel={() => setIsOpenDeleteModal(false)}
         isOpen={isOpenDeleteModal}

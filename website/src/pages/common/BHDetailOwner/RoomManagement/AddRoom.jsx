@@ -3,7 +3,7 @@ import { Form, Input, Modal, Upload, Select } from "antd";
 import { Button } from "@/component";
 import { PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import { addRoom, getRoomTypeByBhId } from "@/api/ownerUser/boardingHouse";
+import { addRoom, getRoomTypeByBhId } from "@/api/ownerUser/boardingHouseAPI";
 
 function AddRoom({ boardingHouseId, refreshRoomData }) {
   const [form] = Form.useForm();

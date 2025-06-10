@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import {
   getAppointmentOfUser,
   updateAppointmentStatus,
-} from '@/API/appointment';
+} from '@/API/appointmentAPI';
 import { useNotification } from '@/context/NotificationProvider';
 import {
   Ionicons,

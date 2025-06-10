@@ -5,7 +5,7 @@ import {
   getAllBoardingHouseTypes,
   createBoardingHouse,
   uploadFile,
-} from "../../../api/BoardingHManagement";
+} from "../../../api/BoardingHouseAPI";
 import {
   fetchProvinces,
   fetchDistricts,
@@ -17,9 +17,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/themeContext";
-import Style from "./AddBHModal.module.css";
-import classNames from "classnames";
-
+import coverBhType from "@/utils/coverBhType";
+import i18n from "i18next";
 function AddBoardingHouseForm({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     owner: "",
@@ -51,6 +50,8 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
   const [geoLocation, setGeoLocation] = useState(null);
   const { darkMode } = useTheme();
   const { t } = useTranslation("addBoardingHouseAdmin");
+  const currentLanguage = i18n.language;
+
   const uploadOtherImgProps = {
     beforeUpload: (file) => {
       handleFileChange({ target: { files: [file] } }, false);
@@ -439,15 +440,8 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
               }}
             >
               {boardingHouseTypes.map((type) => (
-                <Select.Option
-                  key={type.value}
-                  value={type.value}
-                  style={{
-                    backgroundColor: darkMode ? "#374151" : "#ffffff",
-                    color: darkMode ? "#F9FAFB" : "#000000",
-                  }}
-                >
-                  {type.label}
+                <Select.Option key={type.value} value={type.value}>
+                  {coverBhType(type.code, currentLanguage)}
                 </Select.Option>
               ))}
             </Select>

@@ -26,7 +26,7 @@ import {
     getBoardingHouseDetails,
     updateBoardingHouseDetails,
     getAllBoardingHouseTypes,
-} from "../../../api/BoardingHManagement";
+} from "../../../api/BoardingHouseAPI";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import LocationPicker from "@/component/LocationPicker";
@@ -37,9 +37,11 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/themeContext";
 import Style from "./AddBHModal.module.css";
 import classNames from "classnames";
+import coverBhType from "@/utils/coverBhType";
+import i18n from "i18next";
+
 const BHDetailAdmin = () => {
     const { boardingHouseId } = useParams();
-    const cx = classNames.bind(Style);
     const [updatedData, setUpdatedData] = useState({}); // Updated form data
     const [loading, setLoading] = useState(false); // Loading state
     const [provinces, setProvinces] = useState([]); // Provinces list
@@ -53,6 +55,8 @@ const BHDetailAdmin = () => {
     const boardingHouseName = location.state?.name || "Default Name";
     const { darkMode } = useTheme();
     const { t } = useTranslation("boardingHouseDetailsAdmin");
+    const currentLanguage = i18n.language;
+    const cx = classNames;
 
     const fetchBoardingHouseDetails = async () => {
         if (!boardingHouseId) {
@@ -157,7 +161,16 @@ const BHDetailAdmin = () => {
         const fetchTypes = async () => {
             try {
                 const response = await getAllBoardingHouseTypes();
-                setBoardingHouseTypes(response.data || []);
+                console.log("dmtien:", response)
+
+                setBoardingHouseTypes(
+                    response.data.map((type) => ({
+                        value: type.value, // ID
+                        label: type.label, // name
+                        code: type.code,   // codeName
+                    }))
+                );
+
             } catch (error) {
                 console.error("Failed to fetch boarding house types:", error);
                 toast.error("Failed to fetch boarding house types.");
@@ -335,7 +348,7 @@ const BHDetailAdmin = () => {
             payload.append("address[detail]", updatedData.address.detail);
             payload.append("location[lat]", updatedData.location.lat);
             payload.append("location[lon]", updatedData.location.lon);
-
+            console.log("quá tr mệt: ", updatedData.boardingHouseType)
             // Append primary image (new or existing)
             const oldImg = [];
 
@@ -396,14 +409,14 @@ const BHDetailAdmin = () => {
             : ConfigProvider.defaultAlgorithm,
         token: darkMode
             ? {
-                colorText: "#F9FAFB", // Text color in dark mode
-                colorTextSecondary: "#e5e7eb", // Secondary text color
-                colorBgContainer: "#374151", // Background for both Input and Select
-                colorBorder: "#4B5563", // Border color for Input and Select
-                colorTextPlaceholder: "#9CA3AF", // Placeholder text color
-                colorPrimary: "#3b82f6", // Primary color
-                controlItemBgActive: "#3b82f6", // Active item background
-                controlItemBgHover: "#4B5563", // Hover item background
+                colorText: "#F9FAFB",
+                colorTextSecondary: "#e5e7eb",
+                colorBgContainer: "#374151",
+                colorBorder: "#4B5563",
+                colorTextPlaceholder: "#9CA3AF",
+                colorPrimary: "#3b82f6",
+                controlItemBgActive: "#3b82f6",
+                controlItemBgHover: "#4B5563",
             }
             : {
                 colorText: "#000000",
@@ -416,18 +429,18 @@ const BHDetailAdmin = () => {
                 controlItemBgHover: "#f0f0f0",
             },
         components: {
-            Input: {
-                colorBgContainer: darkMode ? "#374151" : "#f5f5f5",
-                colorText: darkMode ? "#F9FAFB" : "#000",
-                colorBorder: darkMode ? "#4B5563" : "#d9d9d9",
-                colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563",
-            },
             Select: {
                 selectorBg: darkMode ? "#374151" : "#f5f5f5",
                 colorText: darkMode ? "#F9FAFB" : "#000",
                 colorBorder: darkMode ? "#4B5563" : "#d9d9d9",
                 optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb",
                 optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0",
+            },
+            Input: {
+                colorBgContainer: darkMode ? "#374151" : "#f5f5f5",
+                colorText: darkMode ? "#F9FAFB" : "#000",
+                colorBorder: darkMode ? "#4B5563" : "#d9d9d9",
+                colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563",
             },
         },
     };
@@ -507,20 +520,16 @@ const BHDetailAdmin = () => {
                                                         target: { name: "boardingHouseType", value },
                                                     })
                                                 }
-                                                style={{
-                                                    backgroundColor: darkMode ? "#374151" : "#f5f5f5",
-                                                    color: darkMode ? "#F9FAFB" : "#000",
-                                                    borderColor: darkMode ? "#4B5563" : "#d9d9d9",
-                                                }}
+                                                className={darkMode ? "dark-mode-select" : ""}
+
                                             >
                                                 {boardingHouseTypes.map((type) => (
                                                     <Select.Option key={type.value} value={type.value}>
-                                                        {type.label}
+                                                        {coverBhType(type.code, currentLanguage)}
                                                     </Select.Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
-
                                         <Form.Item label={t("boardingHouseDetailsAdmin.description")} className="flex-grow">
                                             <Input.TextArea
                                                 name="description"

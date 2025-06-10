@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { Button } from '@/component';
-import { Form, Input, Select, Upload, InputNumber, Image, Modal } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { Button } from "@/component";
+import { Form, Input, Select, Upload, InputNumber, Image, Modal } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import {
   addRoomTypeToBoardingHouse,
   getAllFacilities,
-} from '@/api/roomTypeManagement';
+} from "@/api/roomTypeAPI";
 
 const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    typeName: '',
+    typeName: "",
     facilities: [],
-    roomSize: '',
-    price: '',
-    peopleNumber: '',
+    roomSize: "",
+    price: "",
+    peopleNumber: "",
     image: null,
   });
 
@@ -32,8 +32,8 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
           setFacilities([]); // ✅ Đảm bảo không bị lỗi khi API không trả về dữ liệu
         }
       } catch (error) {
-        console.error('Failed to fetch facilities:', error);
-        toast.error('Failed to fetch facilities.');
+        console.error("Failed to fetch facilities:", error);
+        toast.error("Failed to fetch facilities.");
         setFacilities([]); // ✅ Đảm bảo không bị lỗi nếu API fail
       }
     };
@@ -48,11 +48,11 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   // 🛠 Đóng modal
   const closeModal = () => {
     setFormData({
-      typeName: '',
+      typeName: "",
       facilities: [], // ✅ Reset facilities khi đóng modal
-      roomSize: '',
-      price: '',
-      peopleNumber: '',
+      roomSize: "",
+      price: "",
+      peopleNumber: "",
       image: null,
     });
 
@@ -79,7 +79,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
       setFormData((prev) => ({ ...prev, image: file }));
       return false;
     },
-    accept: 'image/*',
+    accept: "image/*",
     maxCount: 1,
     showUploadList: false,
   };
@@ -91,11 +91,11 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   useEffect(() => {
     if (isModalVisible) {
       setFormData({
-        typeName: '',
+        typeName: "",
         facilities: [], // ✅ Reset lại facilities khi mở modal
-        roomSize: '',
-        price: '',
-        peopleNumber: '',
+        roomSize: "",
+        price: "",
+        peopleNumber: "",
         image: null,
       });
     }
@@ -107,11 +107,11 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
       setLoading(true);
 
       if (!formData.typeName.trim()) {
-        toast.error('Type Name is required.');
+        toast.error("Type Name is required.");
         return;
       }
       if (!/^\d+x\d+$/.test(formData.roomSize)) {
-        toast.error('Room size must be in format 20x30 or 30x40.');
+        toast.error("Room size must be in format 20x30 or 30x40.");
         return;
       }
       // if (
@@ -123,28 +123,28 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
       //   return;
       // }
       if (!formData.price || formData.price < 0) {
-        toast.error('Please enter rent/month valid!');
+        toast.error("Please enter rent/month valid!");
         return;
       }
       if (!formData.peopleNumber || formData.peopleNumber < 1) {
-        toast.error('People number must be at least 1.');
+        toast.error("People number must be at least 1.");
         return;
       }
       if (!formData.image) {
-        toast.error('You must upload an image.');
+        toast.error("You must upload an image.");
         return;
       }
 
       // 🛠 Tạo FormData để gửi dữ liệu
       const payload = new FormData();
-      payload.append('typeName', formData.typeName);
-      payload.append('roomSize', formData.roomSize);
-      payload.append('price', formData.price);
-      payload.append('peopleNumber', formData.peopleNumber);
-      payload.append('roomType', formData.image);
+      payload.append("typeName", formData.typeName);
+      payload.append("roomSize", formData.roomSize);
+      payload.append("price", formData.price);
+      payload.append("peopleNumber", formData.peopleNumber);
+      payload.append("roomType", formData.image);
 
       // ✅ Fix: Chuyển `facilities` thành JSON string để gửi đi
-      payload.append('facilities', JSON.stringify(formData.facilities));
+      payload.append("facilities", JSON.stringify(formData.facilities));
 
       // 🛠 Gọi API tạo Room Type
       const response = await addRoomTypeToBoardingHouse(
@@ -152,27 +152,27 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         payload
       );
 
-      if (response?.message === 'Room Type added successfully') {
-        toast.success('Room type added successfully!');
+      if (response?.message === "Room Type added successfully") {
+        toast.success("Room type added successfully!");
         onAddData();
         setFormData({
-          typeName: '',
+          typeName: "",
           facilities: [], // ✅ Reset lại facilities sau khi add thành công
-          roomSize: '',
-          price: '',
-          peopleNumber: '',
+          roomSize: "",
+          price: "",
+          peopleNumber: "",
           image: null,
         });
         closeModal();
       } else {
-        throw new Error(response?.message || 'Failed to add room type.');
+        throw new Error(response?.message || "Failed to add room type.");
       }
     } catch (error) {
-      console.error('❌ API Error:', error.response?.data || error.message);
+      console.error("❌ API Error:", error.response?.data || error.message);
 
       // ✅ Thử lấy lỗi từ `response.data.message` nếu có
       const errorMessage =
-        error.response?.data?.message || 'Failed to submit form.';
+        error.response?.data?.message || "Failed to submit form.";
 
       toast.error(errorMessage);
     } finally {
@@ -194,7 +194,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         destroyOnClose
       >
         <Form
-          key={isModalVisible ? 'open' : 'closed'} // ✅ Key thay đổi khi mở/đóng modal
+          key={isModalVisible ? "open" : "closed"} // ✅ Key thay đổi khi mở/đóng modal
           layout="vertical"
           onSubmitCapture={handleSubmit}
         >
@@ -251,9 +251,9 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
                 setFormData((prev) => ({ ...prev, price: value }))
               }
               formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
               className="w-full"
             />
           </Form.Item>
@@ -287,13 +287,13 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
             ) : (
               <div
                 className="relative "
-                style={{ width: '200px', height: '200px' }}
+                style={{ width: "200px", height: "200px" }}
               >
                 <Image
                   src={URL.createObjectURL(formData.image)}
                   alt="Room Image"
                   className="w-full rounded"
-                  style={{ width: '200px', height: '200px' }}
+                  style={{ width: "200px", height: "200px" }}
                 />
                 <button
                   onClick={handleRemoveImage}

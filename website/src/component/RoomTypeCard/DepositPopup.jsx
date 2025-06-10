@@ -1,7 +1,7 @@
 import { Form, Modal, InputNumber, Select, Radio, DatePicker } from "antd";
 import React, { useState } from "react";
 import formatAmount from "../../utils/formatAmount";
-import { depositRoom } from "../../api/depositManagement";
+import { depositRoom } from "../../api/depositAPI";
 import { toast } from "react-toastify";
 import dayjs, { Dayjs } from "dayjs";
 

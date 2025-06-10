@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Form, Input, Modal, Upload, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import { getRoomTypeByBhId, updateRoom } from "@/api/ownerUser/boardingHouse";
+import {
+  getRoomTypeByBhId,
+  updateRoom,
+} from "@/api/ownerUser/boardingHouseAPI";
 
 function UpdateRoom({
   visible,

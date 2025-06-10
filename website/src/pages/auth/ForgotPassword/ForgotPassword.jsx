@@ -1,7 +1,7 @@
 import { Form, Button, Card, Input } from "antd";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { forgotPassword } from "../../../api/authManagement";
+import { forgotPassword } from "../../../api/authAPI";
 import { Back } from "../../../component";
 import { useTheme } from "../../../context/themeContext";
 

@@ -1,12 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Card, Spin } from 'antd';
-import {
-  getAllFavorites,
-  deleteFavorite,
-} from '../../../api/favoriteManagement';
-import { ConfirmModal } from '../../../component';
-import { toast } from 'react-toastify';
-import WatchLaterList from '@/pages/common/WatchLater/WatchLaterList';
+import { useState, useEffect } from "react";
+import { Card, Spin } from "antd";
+import { getAllFavorites, deleteFavorite } from "../../../api/favoriteAPI";
+import { ConfirmModal } from "../../../component";
+import { toast } from "react-toastify";
+import WatchLaterList from "@/pages/common/WatchLater/WatchLaterList";
 
 const FavouriteList = () => {
   const [favorites, setFavorites] = useState([]);
@@ -24,7 +21,7 @@ const FavouriteList = () => {
       setCurrentPage(res.pagination.currentPage);
       setTotalPages(res.pagination.totalPages);
     } catch (error) {
-      toast.error('Failed to fetch favorites');
+      toast.error("Failed to fetch favorites");
     } finally {
       setLoading(false);
     }
@@ -33,10 +30,10 @@ const FavouriteList = () => {
   const onRemove = async () => {
     try {
       const response = await deleteFavorite(selectedId);
-      toast.success('Deleted favorite successfully');
+      toast.success("Deleted favorite successfully");
       await fetchList();
     } catch (error) {
-      toast.error('Failed to delete favorite');
+      toast.error("Failed to delete favorite");
     } finally {
       setIsOpenDeleteModal(false);
       setSelectedId(null);

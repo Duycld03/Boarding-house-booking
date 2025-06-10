@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Select, Slider, DatePicker, Form } from "antd";
 import ButtonCustom from "@/component/Button";
 import { useParams } from "react-router-dom";
-import { getMaxDeposit, getRentTime } from "@/api/depositManagement";
+import { getMaxDeposit, getRentTime } from "@/api/depositAPI";
 import formatAmount from "@/utils/formatAmount";
 
 const { Option } = Select;

@@ -1,4 +1,4 @@
-import { payRent } from "@/api/depositManagement";
+import { payRent } from "@/api/depositAPI";
 import formatAmount from "@/utils/formatAmount";
 import { Form, Modal, Radio } from "antd";
 import React, { useState, useEffect } from "react";

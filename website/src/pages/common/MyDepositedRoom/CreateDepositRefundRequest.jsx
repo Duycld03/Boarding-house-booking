@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Form, Input, Button } from "antd";
 import { toast } from "react-toastify";
-import { createRefundRequest } from "@/api/refundRequestManagement";
+import { createRefundRequest } from "@/api/refundRequestAPI";
 
 function CreateDepositRefundRequest({ isVisible, setVisible, depositRoom }) {
   const [reasonForRefund, setReasonForRefund] = useState("");

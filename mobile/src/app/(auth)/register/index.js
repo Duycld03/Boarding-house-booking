@@ -11,7 +11,7 @@ import {
   CustomRadio,
   FormField,
 } from "@/components/form/index";
-import { sendOTPRegister } from "@/API/authManagement";
+import { sendOTPRegister } from "@/API/authAPI";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 

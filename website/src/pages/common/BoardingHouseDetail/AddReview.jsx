@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Upload, Button, Rate, Input, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { updateReviewImage, addReview } from "../../../api/ReviewManagement";
+import { updateReviewImage, addReview } from "../../../api/reviewAPI";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../../../context/userContext";

@@ -1,7 +1,7 @@
 import {
   createExtensionRequest,
   updateExtensionRequest,
-} from "@/api/extensionRequest";
+} from "@/api/extensionRequestAPI";
 import { Modal, Form, Input, Button, Select } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";

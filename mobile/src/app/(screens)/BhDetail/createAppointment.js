@@ -11,7 +11,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { useCurrentUser } from '../../../context/userContext';
-import { getRoomsByRoomType } from "@/API/room";
+import { getRoomsByRoomType } from "@/API/roomAPI";
 import { FontAwesome5 } from '@expo/vector-icons'
 import userRoles from '@/constants/userRole';
 import { useNotification } from '@/context/NotificationProvider';
@@ -20,7 +20,7 @@ import {
     getOwnerAppointmentById,
     createAppointment,
     getAppointmentOfUser,
-} from '../../../API/appointment';
+} from '../../../API/appointmentAPI';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 
 dayjs.extend(utc);

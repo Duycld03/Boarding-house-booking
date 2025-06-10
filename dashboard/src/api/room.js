@@ -1,9 +1,0 @@
-import axios from "./axios.config";
-
-export const getRoomsByRoomType = (roomTypeId) => {
-  return axios.get(`room/room-type/${roomTypeId}`);
-};
-
-export const getRoomsByBoardingHouse = (boardingHouseId) => {
-  return axios.get(`/manager/room/boarding-house/${boardingHouseId}`);
-};

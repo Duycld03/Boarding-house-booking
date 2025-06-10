@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useRouter } from "expo-router";
+import React, { use, useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
 import ScreenContainer, {
@@ -9,7 +9,7 @@ import { BackHeader } from "@/components/navigation/CustomHeader";
 import Button from "@/components/ui/Button";
 import { FormField } from "@/components/form";
 import { useNotification } from "@/context/NotificationProvider";
-import { forgotPassword } from "@/API/authManagement";
+import { forgotPassword } from "@/API/authAPI";
 
 function ForgotPassword() {
   const router = useRouter();
@@ -21,6 +21,7 @@ function ForgotPassword() {
     email: "",
   });
   const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -59,12 +60,22 @@ function ForgotPassword() {
       const res = await forgotPassword(formData);
 
       showSuccess(t("message.success"));
+      setCountdown(15);
     } catch (error) {
       showError(t("message.error"));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const intervalId = setTimeout(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(intervalId);
+    }
+  }, [countdown]);
 
   return (
     <ScreenContainer withPadding={false}>
@@ -87,10 +98,13 @@ function ForgotPassword() {
         <Button
           onPress={handleSubmit}
           loading={loading}
+          disabled={countdown > 0}
           fullWidth
           className="mt-4"
         >
-          {t("sendResetLinkButton")}
+          {countdown > 0
+            ? `${t("wait")} ${countdown}s`
+            : t("sendResetLinkButton")}
         </Button>
       </ScrollContainer>
     </ScreenContainer>

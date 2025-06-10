@@ -9,10 +9,12 @@ import {
 import {
   getAllBoardingHouseTypes,
   getMaxPriceBH,
-} from "../../../api/BoardingHManagement";
+} from "../../../api/BoardingHouseAPI";
 import formatAmount from "../../../utils/formatAmount";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/themeContext";
+import coverBhType from "@/utils/coverBhType";
+import i18n from "i18next";
 const { Option } = Select;
 
 function FilterBoardingHouse({ setFilterValue }) {
@@ -23,6 +25,8 @@ function FilterBoardingHouse({ setFilterValue }) {
   const [boardingHouseType, setBoardingHouseType] = useState([]);
   const { darkMode } = useTheme();
   const { t } = useTranslation("filterBH");
+  const currentLanguage = i18n.language;
+
   const [priceRangeValue, setPriceRangeValue] = useState({
     min: 0,
     max: 100000000000000,
@@ -343,10 +347,10 @@ function FilterBoardingHouse({ setFilterValue }) {
                   }
                   allowClear
                 >
-                  {boardingHouseType?.map((type, index) => (
-                    <Option key={type.index} value={type.value}>
-                      {type.label}
-                    </Option>
+                  {boardingHouseType.map((type) => (
+                    <Select.Option key={type.value} value={type.value}>
+                      {coverBhType(type.code, currentLanguage)}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>

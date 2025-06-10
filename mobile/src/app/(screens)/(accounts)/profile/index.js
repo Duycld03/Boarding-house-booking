@@ -11,11 +11,11 @@ import { BackHeader } from "@/components/navigation/CustomHeader";
 import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { FormField } from "@/components/form/index";
-import { getUser } from "@/API/authManagement";
+import { getUser } from "@/API/authAPI";
 import {
   updateAccountFromProfile,
   updateAvatar,
-} from "@/API/AccountManagement";
+} from "@/API/accountAPI";
 import { useNotification } from "@/context/NotificationProvider";
 import { useTheme } from "@/context/ThemeProvider";
 import { useThemedClasses } from "@/utils/useTheme";
@@ -254,9 +254,8 @@ export default function Profile() {
               className="flex-row items-center"
             >
               <View
-                className={`w-5 h-5 rounded-full border-2 ${
-                  formData.gender === g ? "border-blue-500" : "border-gray-300"
-                } items-center justify-center mr-2`}
+                className={`w-5 h-5 rounded-full border-2 ${formData.gender === g ? "border-blue-500" : "border-gray-300"
+                  } items-center justify-center mr-2`}
               >
                 {formData.gender === g && (
                   <View className="w-2.5 h-2.5 bg-blue-500 rounded-full" />

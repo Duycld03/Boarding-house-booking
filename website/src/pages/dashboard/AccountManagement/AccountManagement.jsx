@@ -8,7 +8,7 @@ import {
   filterAccount,
   updateAccount,
   createAccount,
-} from "../../../api/AccountManagement";
+} from "../../../api/accountAPI";
 import convertTimetap from "../../../utils/convertTimetap";
 import { Avatar } from "antd";
 import DefaultAvatar from "../../../assets/images/none_avatar.png";

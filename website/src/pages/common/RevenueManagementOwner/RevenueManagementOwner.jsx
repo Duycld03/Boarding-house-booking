@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import {
   getTotalAvailableYears,
   getTotalRevenueByTime,
-} from "@/api/revenueManagement";
-import { getTotalExpenseByTime } from "@/api/expense";
+} from "@/api/revenueAPI";
+import { getTotalExpenseByTime } from "@/api/boardingHouseExpenseAPI";
 
 // Colors for the charts
 export const COLORS = {

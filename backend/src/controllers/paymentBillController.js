@@ -31,7 +31,6 @@ class PaymentBillController {
       }
 
       for (const bill of paymentBills) {
-        console.log(bill);
         if (!bill.month || !bill.year) {
           return res.status(400).json({
             message: `Invalid month/year for room ${bill.roomId?.roomNumber}`,
@@ -90,7 +89,6 @@ class PaymentBillController {
         return res.status(404).json({ message: "Not found room" });
       }
 
-      console.log(additionalFees);
 
       const additionalFee = additionalFees.map((fee) => {
         return { feeName: fee.name, feeAmount: fee.amount };
@@ -121,7 +119,6 @@ class PaymentBillController {
       // Chia tiền bill cho số lượng người ở phòng
       const totalPeople = room.rentBy.length;
       const splitAmount = paymentAmount / totalPeople;
-      console.log(totalPeople, splitAmount);
 
       // Tạo UserPayment cho mỗi người ở trong phòng
       const userPayments = room.rentBy.map((user) => ({

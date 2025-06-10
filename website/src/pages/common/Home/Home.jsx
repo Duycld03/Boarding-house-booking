@@ -8,7 +8,7 @@ import formatAmount from "@/utils/formatAmount";
 import { formatTimeAgo } from "../../../utils/timeUtils";
 import truncateDetail from "../../../utils/truncateDetail";
 import SearchBar from "./SearchBar";
-import { getBhByArea } from "../../../api/ownerUser/boardingHouse";
+import { getBhByArea } from "../../../api/ownerUser/boardingHouseAPI";
 import FilterBoardingHouseUser from "./FilterBoardingHouseUser";
 import FilterButton from "./FilterButton";
 import { useTranslation } from "react-i18next";

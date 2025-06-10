@@ -2,7 +2,7 @@
     "boardingHouseAdmin": {
         "name": "Tên",
         "address": "Địa chỉ",
-        "priceRange": "Khoảng giá (VND)",
+        "priceRange": "Khoảng giá",
         "boardingHouseType": "Loại Nhà Trọ",
         "totalRooms": "Tổng số phòng",
         "createdAt": "Ngày tạo",

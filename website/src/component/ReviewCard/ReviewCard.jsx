@@ -32,7 +32,7 @@ import {
   updateReview,
   updateReviewImage,
   deleteReviewUser,
-} from "../../api/ReviewManagement";
+} from "../../api/reviewAPI";
 import { toast } from "react-toastify";
 import { useCurrentUser } from "../../context/userContext";
 import ReviewReply from "../ReviewReply/ReviewReply";
@@ -90,7 +90,7 @@ const ReviewCard = ({
   const isCurrentUserReview = user?._id === accountId?._id;
   const isLoggedIn = Boolean(user);
   const [loadingDelete, setLoadingDelete] = useState(false);
-  const isOwnerBH = user?._id === boardingHouse?.ownerId._id;
+  const isOwnerBH = user?._id === boardingHouse?.ownerId?._id;
   const hasReply = Boolean(reviewData?.replyContent);
   const [isReplying, setIsReplying] = useState(false);
 

@@ -1,23 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   TableCustom as Table,
   Button,
   ConfirmModal,
   FormReplayPopup,
-} from '../../../component';
-import { toast } from 'react-toastify';
-import { Tag } from 'antd';
+} from "../../../component";
+import { toast } from "react-toastify";
+import { Tag } from "antd";
 import {
   getReviewReports,
   deleteReport,
   sendReplyByEmail,
   filterReviewReports,
   getReportReviewDetail,
-} from '../../../api/reportManagement';
-import convertTimetap from '../../../utils/convertTimetap';
-import FilterReport from './FilterReport';
-import { FileTextOutlined } from '@ant-design/icons';
-import DetailReportModal from './DetailReportModal';
+} from "../../../api/reportAPI";
+import convertTimetap from "../../../utils/convertTimetap";
+import FilterReport from "./FilterReport";
+import { FileTextOutlined } from "@ant-design/icons";
+import DetailReportModal from "./DetailReportModal";
 
 function ReportReviewManagement() {
   const [data, setData] = useState([]);
@@ -46,9 +46,9 @@ function ReportReviewManagement() {
         setData([]);
       }
     } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
+      console.error("Failed to fetch withdrawal requests:", error);
       toast.error(
-        'Failed to fetch withdrawal requests. Please try again later.'
+        "Failed to fetch withdrawal requests. Please try again later."
       );
       setData([]);
     } finally {
@@ -60,16 +60,16 @@ function ReportReviewManagement() {
     setLoading(true);
     try {
       const res = await filterReviewReports(filterValue);
-      console.log('Filtered Data:', res); // Log the response to check its structure
+      console.log("Filtered Data:", res); // Log the response to check its structure
 
       if (res && Array.isArray(res.data)) {
         setData(res.data); // Adjusting for data field if necessary
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error('Failed to fetch filtered reports:', error);
-      toast.error('Failed to fetch filtered reports. Please try again later.');
+      console.error("Failed to fetch filtered reports:", error);
+      toast.error("Failed to fetch filtered reports. Please try again later.");
       setData([]);
     } finally {
       setLoading(false);
@@ -78,7 +78,7 @@ function ReportReviewManagement() {
   const fetchReportDetail = async (reportId) => {
     try {
       const res = await getReportReviewDetail(reportId);
-      console.log('Report deatil', res);
+      console.log("Report deatil", res);
 
       if (res) {
         setSelectedData(res);
@@ -86,8 +86,8 @@ function ReportReviewManagement() {
         setSelectedData(null);
       }
     } catch (error) {
-      console.error('Failed to fetch report details:', error);
-      toast.error('Failed to fetch report details. Please try again later.');
+      console.error("Failed to fetch report details:", error);
+      toast.error("Failed to fetch report details. Please try again later.");
     }
   };
 
@@ -107,69 +107,69 @@ function ReportReviewManagement() {
 
   //Filter account data
   useEffect(() => {
-    console.log('Filter Value:', filterValue); // This should show updated filter values when changed
+    console.log("Filter Value:", filterValue); // This should show updated filter values when changed
     filterReportData();
   }, [filterValue]);
 
   // Define columns for the Table component
   const columns = [
     {
-      title: 'Reporter',
-      dataIndex: 'reporter',
-      key: 'reporter',
-      render: (reporter) => reporter?.fullname || 'N/A',
+      title: "Reporter",
+      dataIndex: "reporter",
+      key: "reporter",
+      render: (reporter) => reporter?.fullname || "N/A",
     },
     {
-      title: 'Email',
-      dataIndex: 'reporter',
-      key: 'email',
-      render: (reporter) => reporter?.email || 'N/A',
+      title: "Email",
+      dataIndex: "reporter",
+      key: "email",
+      render: (reporter) => reporter?.email || "N/A",
     },
     {
-      title: 'Reason',
-      dataIndex: 'reason',
-      key: 'reason',
+      title: "Reason",
+      dataIndex: "reason",
+      key: "reason",
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
         const statusColors = {
-          pending: 'orange',
-          resolved: 'green',
-          rejected: 'red',
+          pending: "orange",
+          resolved: "green",
+          rejected: "red",
         };
         return <Tag color={statusColors[status.toLowerCase()]}>{status}</Tag>;
       },
     },
     {
-      title: 'Created at',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: "Created at",
+      dataIndex: "createdAt",
+      key: "createdAt",
       render: (createdAt) => convertTimetap(createdAt),
     },
     {
-      title: 'Processed Date',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
+      title: "Processed Date",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
       render: (updatedAt) => convertTimetap(updatedAt),
     },
     {
-      title: 'Action',
+      title: "Action",
       render: (record) => (
         <div className="flex gap-2">
           <Button
-            title={'Delete'}
+            title={"Delete"}
             btnDelete
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
           <Button
-            title={'Detail'}
+            title={"Detail"}
             icon={<FileTextOutlined />}
-            className={'text-white'}
-            bgColor={'rgb(5 150 105)'}
+            className={"text-white"}
+            bgColor={"rgb(5 150 105)"}
             onClick={() => handleDetailModal(record)}
           />
         </div>
@@ -187,7 +187,7 @@ function ReportReviewManagement() {
   const handleReplay = (record) => {
     setReplayReportData({
       ...record,
-      status: record.status || 'pending',
+      status: record.status || "pending",
     });
     setIsReplayPopupOpen(true);
   };
@@ -199,10 +199,10 @@ function ReportReviewManagement() {
     try {
       await deleteReport(selectedRequest._id);
       setData(data.filter((item) => item._id !== selectedRequest._id));
-      toast.success('Review report deleted successfully.');
+      toast.success("Review report deleted successfully.");
     } catch (error) {
-      console.error('Failed to fetch withdrawal requests:', error);
-      toast.error('Failed to delete review report. Please try again later.');
+      console.error("Failed to fetch withdrawal requests:", error);
+      toast.error("Failed to delete review report. Please try again later.");
     } finally {
       setIsOpenDeleteModal(false);
       setSelectedRequest(null);
@@ -210,14 +210,14 @@ function ReportReviewManagement() {
   };
 
   const handleReplaySubmit = async (formData) => {
-    console.log('Form data before submit:', formData);
-    console.log('Replay report data:', replayReportData);
+    console.log("Form data before submit:", formData);
+    console.log("Replay report data:", replayReportData);
     if (!replayReportData || !replayReportData._id) {
-      toast.error('Report data is missing. Please try again.');
+      toast.error("Report data is missing. Please try again.");
       return;
     }
     if (!formData.status) {
-      toast.error('Please select a valid status.');
+      toast.error("Please select a valid status.");
       return;
     }
     try {
@@ -230,11 +230,11 @@ function ReportReviewManagement() {
       setIsReplayPopupOpen(false);
       fetchData();
     } catch (error) {
-      console.error('Failed to fetch filtered reports:', error);
-      console.error('API error:', error.response ? error.response.data : error);
+      console.error("Failed to fetch filtered reports:", error);
+      console.error("API error:", error.response ? error.response.data : error);
 
       toast.error(
-        'Failed to send reply or update report. Please try again later.'
+        "Failed to send reply or update report. Please try again later."
       );
     }
   };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import ListCard from '@/components/ui/ListCard';
 import { BackHeader } from '@/components/navigation/CustomHeader';
-import { getAllWatchLater, deleteWatchLater } from '@/API/watchLaterManagement';
+import { getAllWatchLater, deleteWatchLater } from '@/API/watchLaterAPI';
 import { ConfirmModal } from '@/components/feedback';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';

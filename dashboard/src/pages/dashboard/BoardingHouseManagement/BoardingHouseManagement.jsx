@@ -23,7 +23,7 @@ import {
   filterBH,
   uploadFile,
   softDeleteBoardingHouse,
-} from "../../../api/BoardingHManagement";
+} from "../../../api/BoardingHouseAPI";
 import formatAmount from "../../../utils/formatAmount";
 import convertTimetap from "../../../utils/convertTimetap";
 import CreateBoardingHouse from "./CreateBoardingHouse";
@@ -95,7 +95,7 @@ function BoardingHouseManagement(onClose) {
     setLoading(true);
     try {
       const response = await getAllBoardingHDB();
-      // console.log("API Response:", response);
+      console.log("API Response:", response);
       setBoardingHData(response || []);
     } catch (error) {
       console.error("Failed to fetch boarding houses:", error);
@@ -176,6 +176,7 @@ function BoardingHouseManagement(onClose) {
         page: paginationOptions.page,
         limit: paginationOptions.limit,
       });
+      console.log("Filter response:", response); // Thêm log ở đây để kiểm tra
 
       if (response?.data) {
         setBoardingHData(response.data);

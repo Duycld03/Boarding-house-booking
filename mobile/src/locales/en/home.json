@@ -4,7 +4,7 @@
   "All": "All",
   "newest": "Newest",
   "rating": "High rating",
-    "seeMore": "See More",
+  "seeMore": "See More",
   "timeAgo": {
     "justPosted": "Just posted",
     "oneHourAgo": "1 hour ago",
@@ -12,9 +12,14 @@
     "oneDayAgo": "1 day ago",
     "manyDaysAgo": "{{count}} days ago"
   },
+  "quickActions": {
+    "title": "Quick Actions",
+    "login": "Login",
+    "register": "Register"
+  },
   "noAddress": "No address provided",
   "currencyPerMonth": "/month",
-    "location": {
+  "location": {
     "An Giang": "An Giang",
     "Bà Rịa – Vũng Tàu": "Ba Ria – Vung Tau",
     "Bạc Liêu": "Bac Lieu",

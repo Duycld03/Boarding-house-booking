@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { TableCustom as Table, Button, ConfirmModal } from "@/component";
-import { getRoomsByBoardingHouse } from "@/api/room";
+import { getRoomsByBoardingHouse } from "@/api/roomAPI";
 import { Image, Space } from "antd";
 import convertTimetap from "@/utils/convertTimetap";
 import AddRoom from "./AddRoom";
 import { toast } from "react-toastify";
-import { deleteRoom } from "@/api/ownerUser/boardingHouse";
+import { deleteRoom } from "@/api/ownerUser/boardingHouseAPI";
 import UpdateRoom from "./UpdateRoom";
 
 function RoomManagement({ boardingHouseId }) {

@@ -40,7 +40,7 @@ import {
   getRoomTypeByBhId,
 } from '@/API/ownerUser/boardingHouse';
 import { useThemedClasses } from '@/utils/useTheme';
-import { addFavorite, getFavorite } from '@/API/favoriteManagement';
+import { addFavorite, getFavorite } from '@/API/favoriteAPI';
 import i18next from 'i18next';
 import coverBhType from '@/utils/coverBhType';
 

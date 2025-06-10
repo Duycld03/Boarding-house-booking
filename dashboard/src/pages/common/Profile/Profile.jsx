@@ -21,12 +21,12 @@ import {
 } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import UserAvatar from "../../../assets/images/none_avatar.png";
-import { getUser } from "../../../api/authManagement";
-import { updateAccountFromProfile } from "../../../api/AccountManagement";
+import { getUser } from "../../../api/authAPI";
+import { updateAccountFromProfile } from "../../../api/accountAPI";
 import ChangeEmailModal from "./ChangeEmailModal";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
-import { updateAvatar } from "../../../api/AccountManagement";
+import { updateAvatar } from "../../../api/accountAPI";
 
 const { Title, Text } = Typography;
 

@@ -23,10 +23,7 @@ import "swiper/css/pagination";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
 import { Dropdown, Menu, Tooltip, message } from "antd";
-import {
-  getWatchLater,
-  createWatchLater,
-} from "../../../api/watchLaterManagement.js";
+import { getWatchLater, createWatchLater } from "../../../api/watchLaterAPI.js";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCurrentUser } from "@/context/userContext.jsx";
 import userRoles from "@/constants/userRole.js";

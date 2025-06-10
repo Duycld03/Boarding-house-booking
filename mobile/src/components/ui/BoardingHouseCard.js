@@ -13,7 +13,7 @@ import { useTheme } from '@/context/ThemeProvider';
 import { formatTimeAgo } from '@/utils/timeUtils';
 import truncateDetail from '@/utils/truncateDetail';
 import { useTranslation } from 'react-i18next';
-import { addFavorite, getFavorite } from '@/API/favoriteManagement';
+import { addFavorite, getFavorite } from '@/API/favoriteAPI';
 import emitter from '@/utils/FavoriteEvent';
 
 const BoardingHouseCard = ({
@@ -47,7 +47,7 @@ const BoardingHouseCard = ({
           const favoriteIds = response.favorites.map((fav) => fav.id);
           setIsFavorite(favoriteIds.includes(id));
         }
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchFavoriteStatus();
   }, [id]);

@@ -6,7 +6,7 @@ import { Tag, Tooltip } from "antd";
 import { Button } from "@/component";
 import { FileTextOutlined } from "@ant-design/icons";
 import DetailReportModal from "./DetailReportModal";
-import { getOwnReportReviewDetail } from "@/api/reportManagement";
+import { getOwnReportReviewDetail } from "@/api/reportAPI";
 import { toast } from "react-toastify";
 
 function MyReport() {

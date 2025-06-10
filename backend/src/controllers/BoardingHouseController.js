@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 import BoardingHouse from "../models/boardingHouse.js";
-import BoardingHouseType from "../models/boardingHouseType .js";
+import BoardingHouseType from "../models/boardingHouseType.js";
 import RoomType from "../models/roomType.js";
 import Room from "../models/room.js";
 import { v2 as cloudinary } from "cloudinary";
 import facilities from "../models/facilities.js";
-import paginate from '../utils/pagination.js'
 
 
 // import path from "path";
@@ -13,6 +12,7 @@ import fs from 'fs';
 import multer from 'multer';
 import Account from '../models/account.js';
 import Review from '../models/review.js';
+import paginate from '../utils/pagination.js';
 
 class boardingHouseController {
   async getAllBHOnDashBoard(req, res, next) {
@@ -207,7 +207,7 @@ class boardingHouseController {
         { $set: updateData },
         { new: true, runValidators: true }
       )
-        .populate('boardingHouseType', 'name')
+        .populate('boardingHouseType', 'name codeName')
         .populate('ownerId', 'email');
 
       // Check if the boarding house exists
@@ -243,6 +243,7 @@ class boardingHouseController {
       const formattedTypes = boardingHouseTypes.map((type) => ({
         value: type._id,
         label: type.name,
+        code: type.codeName,
         roomSize: type.roomSize,
         peopleNumber: type.peopleNumber,
         description: type.description,
@@ -438,7 +439,6 @@ class boardingHouseController {
         rating = 5,
       } = req.body;
 
-      console.log(location);
 
       console.log("Request body received:", req.files);
       const images = [];
@@ -464,7 +464,6 @@ class boardingHouseController {
         username: ownerUsername,
         role: 'owner',
       });
-      // console.log("Owner account found:", ownerAccount);
       if (!ownerAccount) {
         console.error('Invalid owner:', ownerUsername);
         return res.status(400).json({
@@ -634,48 +633,30 @@ class boardingHouseController {
         page = 1,
         limit = 10,
       } = req.query;
-      page = Math.max(parseInt(page) || 1, 1);
-      limit = Math.min(Math.max(parseInt(limit) || 10, 1), 100);
+
+      page = Math.max(parseInt(page), 1);
+      limit = Math.min(Math.max(parseInt(limit), 1), 100);
 
       let filter = {};
-      // let result = [];
 
       if (boardingHouseType) {
-        filter.boardingHouseType = new mongoose.Types.ObjectId(
-          boardingHouseType
-        ); // Convert string to ObjectId
+        filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType);
       }
       if (rating) {
-        const ratings = rating.split(',').map(Number); // Split and convert to numbers
-        const validRatings = ratings.filter(
-          (r) => !isNaN(r) && r >= 0 && r <= 5
-        ); // Validate ratings
-
+        const ratings = rating.split(',').map(Number);
+        const validRatings = ratings.filter((r) => !isNaN(r) && r >= 0 && r <= 5);
         if (validRatings.length > 0) {
-          filter.rating = { $in: validRatings }; // Filter for ratings in the provided array
+          filter.rating = { $in: validRatings };
         } else {
           return res.status(400).json({
             success: false,
-            message:
-              'Invalid rating format. Each rating must be a number between 0 and 5.',
+            message: 'Invalid rating format.',
           });
         }
       }
       if (priceRange && priceRange.length === 2) {
         filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
       }
-      // if (priceRange) {
-      //   console.log("Price range:", priceRange);
-      //   const prices = priceRange.split(",").map(Number);
-      //   if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
-      //     filter.priceRange = { $gte: prices[0], $lte: prices[1] };
-      //   } else {
-      //     return res.status(400).json({
-      //       success: false,
-      //       message: "Invalid price range format. Use 'priceRange=min,max'.",
-      //     });
-      //   }
-      // }
       if (startDate && endDate) {
         filter.createdAt = {
           $gte: new Date(startDate),
@@ -683,50 +664,16 @@ class boardingHouseController {
         };
       }
 
-      // Query the boarding houses based on filter
-      // const boardingHouses = await BoardingHouse.find(filter)
-      //   .populate("boardingHouseType")
-      //   .populate({
-      //     path: "ownerId",
-      //   })
-      //   .sort({ createdAt: -1 });
-      let query = BoardingHouse.find(filter)
-        .populate("boardingHouseType")
-        .populate("ownerId")
-        .sort({ createdAt: -1 });
-      // result = boardingHouses;
+      if (province) filter['address.province'] = { $regex: new RegExp(province, 'i') };
+      if (district) filter['address.district'] = { $regex: new RegExp(district, 'i') };
+      if (ward) filter['address.ward'] = { $regex: new RegExp(ward, 'i') };
+      if (name) filter.name = { $regex: new RegExp(name, 'i') };
 
-      if (province) {
-        filter['address.province'] = { $regex: new RegExp(province, 'i') };
-      }
-      if (district) {
-        filter['address.district'] = { $regex: new RegExp(district, 'i') };
-      }
-      if (ward) {
-        filter['address.ward'] = { $regex: new RegExp(ward, 'i') };
-      }
-
-      // Filter by name
-      if (name) {
-        filter.name = { $regex: new RegExp(name, 'i') };
-      }
-      // const paginationOptions = {
-      //   defaultPage: 1,
-      //   defaultLimit: 10,
-      //   maxLimit: 100,
-      //   sortField: 'createdAt',
-      //   sortOrder: 'asc',
-      //   // filter, // Gộp filter thủ công
-      //   // allowQueryFilters: ['gender', 'role', 'status'],
-      //   // allowSearchFields: ['email', 'username', 'phone'], // WHITELIST tìm kiếm
-      //   // fields: '-password', // Không trả về trường nhạy cảm
-      //   // populate: ['role'], // Ví dụ nếu account có role là ref
-      //   // includeTotalData: true // Bật nếu cần thống kê tổng toàn collection
-      // };
-
-      // // Gọi helper paginate
-      // const result = await paginate(BoardingHouse, paginationOptions, req);
       const result = await paginate(BoardingHouse, { filter, page, limit }, req);
+      result.data = await BoardingHouse.populate(result.data, {
+        path: "boardingHouseType",
+        select: "name codeName"
+      });
       res.status(200).json(result);
     } catch (error) {
       console.error('Error filtering boarding houses:', error);
@@ -897,7 +844,6 @@ class boardingHouseController {
         availableRooms = 0,
       } = req.body;
 
-      console.log('Validating boarding house type...');
       const boardingHouseTypeExists =
         await BoardingHouseType.findById(boardingHouseType);
       if (!boardingHouseTypeExists) {

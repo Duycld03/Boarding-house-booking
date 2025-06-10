@@ -12,9 +12,14 @@
     "oneDayAgo": "1 ngày trước",
     "manyDaysAgo": "{{count}} ngày trước"
   },
+  "quickActions": {
+    "title": "Thao tác nhanh",
+    "login": "Đăng nhập",
+    "register": "Đăng ký"
+  },
   "noAddress": "Không có địa chỉ",
   "currencyPerMonth": "/tháng",
-    "location": {
+  "location": {
     "An Giang": "An Giang",
     "Bà Rịa – Vũng Tàu": "Bà Rịa – Vũng Tàu",
     "Bạc Liêu": "Bạc Liêu",
