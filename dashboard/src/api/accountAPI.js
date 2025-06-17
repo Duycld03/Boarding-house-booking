@@ -1,17 +1,21 @@
 import axios from "./axios.config";
-export const getAllAccount = () => {
-  return axios.get("/dashboard/account");
+export const getAllAccount = (paginationOptions = {}) => {
+  return axios.get("/dashboard/account", { params: paginationOptions });
 };
 
 export const deleteAccount = (accountId) => {
   return axios.delete(`/dashboard/account/${accountId}`);
 };
 
-export const filterAccount = (filterValue) => {
-  return axios.get(`/dashboard/account/filter`, {
-    params: filterValue,
-  });
+export const filterAccount = (filterValue = {}, paginationOptions = {}) => {
+  const params = {
+    ...filterValue,
+    ...paginationOptions,
+  };
+
+  return axios.get(`/dashboard/account/filter`, { params });
 };
+
 
 export const createAccount = (accountData) => {
   return axios.post(`/dashboard/account/create`, accountData);
