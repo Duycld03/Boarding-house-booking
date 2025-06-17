@@ -3,6 +3,9 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { createReport } from "../../../api/reportAPI";
+import { useTheme } from "@/context/ThemeContext";
+import styles from "./ReportModal.module.css";
+import classNames from "classnames";
 
 const reasonOptions = {
   boardingHouse: [
@@ -29,7 +32,7 @@ const ReportModal = ({
   handleReportStatus,
 }) => {
   const [form] = Form.useForm();
-
+  const { darkMode } = useTheme();
   const [loading, setLoading] = useState(false);
   const [imageFileList, setImageFileList] = useState([]);
 
@@ -81,20 +84,37 @@ const ReportModal = ({
 
   return (
     <Modal
-      title="Report"
+      title={
+        <span className={darkMode ? styles.darkModalTitle : styles.modalTitle}>
+          Report
+        </span>
+      }
       open={visible}
       onCancel={onCancel}
       onOk={() => form.submit()}
       okText="Report"
       confirmLoading={loading}
       destroyOnClose
+      bodyStyle={darkMode ? { background: "#111827" } : {}}
+      className={darkMode ? "dark" : ""}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item label="Reason" name="reason" rules={[{ required: true }]}>
+        <Form.Item
+          label={
+            <span
+              className={darkMode ? styles.darkTextColor : styles.textColor}
+            >
+              Reason
+            </span>
+          }
+          name="reason"
+          rules={[{ required: true }]}
+        >
           <Select
             size="large"
             placeholder="Select a reason"
             rules={[{ required: true }]}
+            className={darkMode ? styles.darkInputStyle : styles.inputStyle}
           >
             {reasonOptions[reviewId ? "review" : "boardingHouse"].map(
               (option) => (
@@ -105,10 +125,33 @@ const ReportModal = ({
             )}
           </Select>
         </Form.Item>
-        <Form.Item label="Detail" name="detail" rules={[{ required: true }]}>
-          <Input.TextArea size="large" placeholder="Enter detail" />
+        <Form.Item
+          label={
+            <span
+              className={darkMode ? styles.darkTextColor : styles.textColor}
+            >
+              Detail
+            </span>
+          }
+          name="detail"
+          rules={[{ required: true }]}
+        >
+          <Input.TextArea
+            size="large"
+            placeholder="Enter detail"
+            className={darkMode ? styles.darkInputStyle : styles.inputStyle}
+          />
         </Form.Item>
-        <Form.Item label="Images" name="images">
+        <Form.Item
+          label={
+            <span
+              className={darkMode ? styles.darkTextColor : styles.textColor}
+            >
+              Images
+            </span>
+          }
+          name="images"
+        >
           <div className="mt-4 flex flex-wrap gap-4">
             {imageFileList?.map((file, index) => (
               <div key={index} className="relative">
@@ -136,34 +179,48 @@ const ReportModal = ({
             <Upload
               listType="picture-card"
               showUploadList={false}
-              className="custom-upload"
+              className={styles.customUpload}
               multiple
               accept="image/*"
               onChange={handleChangeImage}
               fileList={imageFileList}
               beforeUpload={() => false}
             >
-              <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                <PlusOutlined className="text-2xl text-gray-400" />
-                <p className="text-gray-500 mt-2 text-sm font-medium">
+              <div
+                className={classNames(
+                  "flex flex-col items-center justify-center border border-dashed rounded-lg p-6 hover:border-primary transition",
+                  darkMode ? styles.darkUploadBox : styles.uploadBox
+                )}
+              >
+                <PlusOutlined
+                  className={classNames(
+                    "text-2xl",
+                    darkMode
+                      ? styles.darkUploadIconColor
+                      : styles.uploadIconColor
+                  )}
+                />
+                <p
+                  className={classNames(
+                    "mt-2 text-sm font-medium font-body",
+                    darkMode ? styles.darkTextColor : styles.textColor
+                  )}
+                >
                   Add Images
                 </p>
-                <p className="text-gray-400 text-xs">
+                <p
+                  className={classNames(
+                    "text-xs font-body",
+                    darkMode
+                      ? styles.darkUploadTextColor
+                      : styles.uploadTextColor
+                  )}
+                >
                   Drag-drop or click here to choose a file
                 </p>
               </div>
             </Upload>
           </div>
-          <style>
-            {`
-                            .custom-upload .ant-upload
-                            {
-                            border: none !important;
-                            background: none !important;
-                            padding: 0 !important;
-                            }
-                        `}
-          </style>
         </Form.Item>
       </Form>
     </Modal>
