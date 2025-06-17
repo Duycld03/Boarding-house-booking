@@ -4,23 +4,13 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { createReport } from "../../../api/reportAPI";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
 import styles from "./ReportModal.module.css";
 import classNames from "classnames";
 
-const reasonOptions = {
-  boardingHouse: [
-    "Scam on Rent or Deposit",
-    "False Advertisement",
-    "Violation of Privacy",
-    "Unfriendly Landlord",
-    "Poor Security",
-  ],
-  review: [
-    "Spam",
-    "Misleading information",
-    "Privacy violation",
-    "Inappropriate content",
-  ],
+const reasonOptionsKeys = {
+  boardingHouse: ["scamRent", "falseAd", "privacy", "unfriendly", "security"],
+  review: ["spam", "misleading", "privacy", "inappropriate"],
 };
 
 const ReportModal = ({
@@ -33,6 +23,7 @@ const ReportModal = ({
 }) => {
   const [form] = Form.useForm();
   const { darkMode } = useTheme();
+  const { t } = useTranslation("reportModal");
   const [loading, setLoading] = useState(false);
   const [imageFileList, setImageFileList] = useState([]);
 
@@ -47,7 +38,7 @@ const ReportModal = ({
     if (fileList.length <= 6) {
       setImageFileList(fileList);
     } else {
-      toast.error("You can only upload up to 6 images");
+      toast.error(t("report.uploadLimit"));
     }
   };
 
@@ -82,17 +73,26 @@ const ReportModal = ({
     }
   };
 
+  // Get the appropriate reason options based on whether it's a boarding house or review report
+  const getReasonOptions = () => {
+    const type = reviewId ? "review" : "boardingHouse";
+    return reasonOptionsKeys[type].map((key) => ({
+      value: t(`report.reasons.${type}.${key}`),
+      label: t(`report.reasons.${type}.${key}`),
+    }));
+  };
+
   return (
     <Modal
       title={
         <span className={darkMode ? styles.darkModalTitle : styles.modalTitle}>
-          Report
+          {t("report.title")}
         </span>
       }
       open={visible}
       onCancel={onCancel}
       onOk={() => form.submit()}
-      okText="Report"
+      okText={t("report.submit")}
       confirmLoading={loading}
       destroyOnClose
       bodyStyle={darkMode ? { background: "#111827" } : {}}
@@ -104,7 +104,7 @@ const ReportModal = ({
             <span
               className={darkMode ? styles.darkTextColor : styles.textColor}
             >
-              Reason
+              {t("report.reason")}
             </span>
           }
           name="reason"
@@ -112,25 +112,18 @@ const ReportModal = ({
         >
           <Select
             size="large"
-            placeholder="Select a reason"
+            placeholder={t("report.selectReason")}
             rules={[{ required: true }]}
             className={darkMode ? styles.darkInputStyle : styles.inputStyle}
-          >
-            {reasonOptions[reviewId ? "review" : "boardingHouse"].map(
-              (option) => (
-                <Select.Option key={option} value={option}>
-                  {option}
-                </Select.Option>
-              )
-            )}
-          </Select>
+            options={getReasonOptions()}
+          />
         </Form.Item>
         <Form.Item
           label={
             <span
               className={darkMode ? styles.darkTextColor : styles.textColor}
             >
-              Detail
+              {t("report.detail")}
             </span>
           }
           name="detail"
@@ -138,7 +131,7 @@ const ReportModal = ({
         >
           <Input.TextArea
             size="large"
-            placeholder="Enter detail"
+            placeholder={t("report.enterDetail")}
             className={darkMode ? styles.darkInputStyle : styles.inputStyle}
           />
         </Form.Item>
@@ -147,7 +140,7 @@ const ReportModal = ({
             <span
               className={darkMode ? styles.darkTextColor : styles.textColor}
             >
-              Images
+              {t("report.images")}
             </span>
           }
           name="images"
@@ -206,7 +199,7 @@ const ReportModal = ({
                     darkMode ? styles.darkTextColor : styles.textColor
                   )}
                 >
-                  Add Images
+                  {t("report.addImages")}
                 </p>
                 <p
                   className={classNames(
@@ -216,7 +209,7 @@ const ReportModal = ({
                       : styles.uploadTextColor
                   )}
                 >
-                  Drag-drop or click here to choose a file
+                  {t("report.dragDropText")}
                 </p>
               </div>
             </Upload>
