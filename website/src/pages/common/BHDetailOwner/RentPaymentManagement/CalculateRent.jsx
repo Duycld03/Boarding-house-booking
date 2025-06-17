@@ -138,15 +138,12 @@ const CalculateRent = ({
   const calculateElectricalPrice = () =>
     Math.max(
       (electricalBill.newNumber - electricalBill.oldNumber) *
-        electricalBillPrice ?? 0,
+        electricalBillPrice,
       0
     );
 
   const calculateWaterPrice = () =>
-    Math.max(
-      (waterBill.newNumber - waterBill.oldNumber) * waterBillPrice ?? 0,
-      0
-    );
+    Math.max((waterBill.newNumber - waterBill.oldNumber) * waterBillPrice, 0);
 
   const CalculateTotalAmount = () => {
     return (

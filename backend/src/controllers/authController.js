@@ -77,7 +77,7 @@ class AuthController {
     }
   }
 
-  async register(req, res) {
+  async registerWithGoogle(req, res) {
     try {
       const user = new Account(req.body);
       user.password = await bcrypt.hash(user.password, 10);

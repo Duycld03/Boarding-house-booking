@@ -8,8 +8,8 @@ export const loginWithGoogle = (data) => {
   return axios.post("/login-with-google", data);
 };
 
-export const register = (data) => {
-  return axios.post("/register", data);
+export const registerWithGoogle = (data) => {
+  return axios.post("/register-with-google", data);
 };
 
 export const sendOTPRegister = (data) => {
