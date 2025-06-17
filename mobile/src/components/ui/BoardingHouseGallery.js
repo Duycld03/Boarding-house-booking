@@ -15,7 +15,7 @@ import { ConfirmModal } from "../feedback";
 import { useTranslation } from "react-i18next";
 import { useCurrentUser } from "@/context/userContext";
 
-const BoardingHouseGallery = ({ images }) => {
+const BoardingHouseGallery = ({ boardingHouseId, images }) => {
   const { t } = useTranslation("boardingHouseGallery");
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -39,7 +39,7 @@ const BoardingHouseGallery = ({ images }) => {
       return;
     }
     // Handle report logic here
-    console.log("Report action triggered");
+    console.log("Report action triggered: ", boardingHouseId);
   }, [isLogin, handleToggleLoginWarning]);
 
   const handleWatchLater = useCallback(() => {
@@ -48,7 +48,7 @@ const BoardingHouseGallery = ({ images }) => {
       return;
     }
     // Handle report logic here
-    console.log("Watch later action triggered");
+    console.log("Watch later action triggered: ", boardingHouseId);
   }, [isLogin, handleToggleLoginWarning]);
 
   // Kiểm tra nếu không có images hoặc images rỗng
