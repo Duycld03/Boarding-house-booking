@@ -24,7 +24,7 @@ function Login() {
       setLoading(true);
       const res = await login(values);
       const role = res.user.role;
-      loginData(res.user);
+      loginData(res.user, res.token);
 
       localStorage.setItem("access_token", res.token);
 
@@ -51,6 +51,7 @@ function Login() {
 
       if (res.isRegistered) {
         localStorage.setItem("access_token", res.token);
+        loginData(res.user, res.token);
 
         if (res.user.role === "admin") {
           navigate("/dashboard/account-management");
