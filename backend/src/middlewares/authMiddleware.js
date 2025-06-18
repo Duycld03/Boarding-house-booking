@@ -30,9 +30,9 @@ const authorize = (allowedRoles = []) => {
 };
 
 // Các middleware cụ thể
-const authMiddleware = authorize(); // Không cần role, chỉ cần token hợp lệ
-const managerMiddleware = authorize(["manager", "owner"]);
+const authMiddleware = authorize();
+const staffMiddleware = authorize(["staff", "owner"]);
 const ownerMiddleware = authorize(["owner"]);
 const adminMiddleware = authorize(["admin"]);
 
-export { authMiddleware, managerMiddleware, ownerMiddleware, adminMiddleware };
+export { authMiddleware, staffMiddleware, ownerMiddleware, adminMiddleware };

@@ -2,7 +2,7 @@ import {
   authMiddleware,
   ownerMiddleware,
   adminMiddleware,
-  managerMiddleware,
+  staffMiddleware,
 } from "../middlewares/index.js";
 import { commonRouter } from "./commonRouter.js";
 import { authRouter } from "./authRouter.js";
@@ -13,7 +13,7 @@ import { managerRouter } from "./managerRouter.js";
 function routes(app) {
   app.use("/", commonRouter);
   app.use("/auth", authMiddleware, authRouter);
-  app.use("/manager", managerMiddleware, managerRouter);
+  app.use("/manager", staffMiddleware, managerRouter);
   app.use("/owner", ownerMiddleware, ownerRouter);
   app.use("/dashboard", adminMiddleware, adminRouter);
 }
