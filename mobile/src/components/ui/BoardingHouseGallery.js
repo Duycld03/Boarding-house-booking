@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -6,21 +6,26 @@ import {
   Text,
   ImageSourcePropType,
   TouchableOpacity,
-} from "react-native";
-import Swiper from "react-native-swiper";
-import Font from "@/constants/styles/fonts";
-import { useRouter } from "expo-router";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { ConfirmModal } from "../feedback";
-import { useTranslation } from "react-i18next";
-import { useCurrentUser } from "@/context/userContext";
+} from 'react-native';
+import Swiper from 'react-native-swiper';
+import Font from '@/constants/styles/fonts';
+import { useRouter } from 'expo-router';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { ConfirmModal } from '../feedback';
+import { useTranslation } from 'react-i18next';
+import { useCurrentUser } from '@/context/userContext';
+import { getWatchLater, createWatchLater } from '@/API/watchLaterAPI';
+// import { useNavigate } from 'react-router-dom';
 
 const BoardingHouseGallery = ({ boardingHouseId, images }) => {
-  const { t } = useTranslation("boardingHouseGallery");
+  const { t } = useTranslation('boardingHouseGallery');
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [loginWarningVisible, setLoginWarningVisible] = useState(false);
   const router = useRouter();
+  const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+  // const navigate = useNavigate();
 
   const { hasRole, isLogin, user } = useCurrentUser();
 
@@ -30,7 +35,7 @@ const BoardingHouseGallery = ({ boardingHouseId, images }) => {
 
   const handleGoToLogin = useCallback(() => {
     setLoginWarningVisible(false);
-    router.push("/(auth)/login");
+    router.push('/(auth)/login');
   }, [router]);
 
   const handleReport = useCallback(() => {
@@ -39,17 +44,49 @@ const BoardingHouseGallery = ({ boardingHouseId, images }) => {
       return;
     }
     // Handle report logic here
-    console.log("Report action triggered: ", boardingHouseId);
+    console.log('Report action triggered: ', boardingHouseId);
   }, [isLogin, handleToggleLoginWarning]);
+  useEffect(() => {
+    const fetchWatchLaterStatus = async () => {
+      try {
+        const response = await getWatchLater(boardingHouseId);
+        const watchLaterList = response.watchlaterlist || [];
+        const isCurrentlySaved = watchLaterList.some(
+          (item) => item.id === boardingHouseId
+        );
 
-  const handleWatchLater = useCallback(() => {
-    if (!isLogin) {
-      setLoginWarningVisible(true);
-      return;
+        setIsSaved(isCurrentlySaved); // Cập nhật trạng thái từ API
+      } catch (error) {
+        // console.error('Error fetching watch later status:', error);
+      }
+    };
+
+    if (boardingHouseId) {
+      fetchWatchLaterStatus();
     }
-    // Handle report logic here
-    console.log("Watch later action triggered: ", boardingHouseId);
-  }, [isLogin, handleToggleLoginWarning]);
+  }, [boardingHouseId]);
+
+  const handleWatchLater = useCallback(async () => {
+    if (!boardingHouseId) return;
+
+    setLoading(true);
+    try {
+      const response = await createWatchLater(boardingHouseId); // dùng boardingHouseId thay vì 'id'
+      if (response && response.isWatchLater !== undefined) {
+        setIsSaved(response.isWatchLater);
+        // Nếu có message thành công, bạn nên dùng Toast riêng hoặc Alert (tuỳ UI lib)
+        // console.log(
+        //   response.isWatchLater ? t('savedSuccess') : t('removedSuccess')
+        // );
+      } else {
+        console.error('Response missing isWatchLater:', response);
+      }
+    } catch (error) {
+      router.push('/login');
+    } finally {
+      setLoading(false);
+    }
+  }, [boardingHouseId, t]);
 
   // Kiểm tra nếu không có images hoặc images rỗng
   if (!images || images.length === 0) {
@@ -111,8 +148,13 @@ const BoardingHouseGallery = ({ boardingHouseId, images }) => {
                 style={styles.iconButton}
                 onPress={handleWatchLater}
               >
-                <MaterialIcons name="watch-later" size={24} color="white" />
+                <MaterialIcons
+                  name="watch-later"
+                  size={24}
+                  color={isSaved ? '#FFD700' : 'white'} // 💡 Đổi màu khi đã lưu
+                />
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={styles.iconButton}
                 onPress={handleReport}
@@ -126,14 +168,14 @@ const BoardingHouseGallery = ({ boardingHouseId, images }) => {
 
       {/* Login Warning Modal */}
       <ConfirmModal
-        confirmText={t("common.goToLogin", "Go to Login")}
+        confirmText={t('common.goToLogin', 'Go to Login')}
         visible={loginWarningVisible}
         message={t(
-          "auth.loginRequired",
-          "You must login before creating an appointment"
+          'auth.loginRequired',
+          'You must login before creating an appointment'
         )}
         onConfirm={handleGoToLogin}
-        title={t("common.warning", "Warning")}
+        title={t('common.warning', 'Warning')}
         onClose={handleToggleLoginWarning}
         warningMode
       />
@@ -143,66 +185,66 @@ const BoardingHouseGallery = ({ boardingHouseId, images }) => {
 
 const styles = StyleSheet.create({
   bannerContainer: {
-    width: "100%",
+    width: '100%',
     height: 250,
     marginBottom: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   wrapper: {},
   slide: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
   bannerImage: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
   },
   paginationContainer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: -30,
-    width: "100%",
-    alignItems: "center",
+    width: '100%',
+    alignItems: 'center',
   },
   dotsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 8,
   },
   dot: {
-    backgroundColor: "#E9F0FF",
+    backgroundColor: '#E9F0FF',
     width: 8,
     height: 8,
     borderRadius: 4,
     margin: 3,
   },
   activeDot: {
-    backgroundColor: "#40B0FF",
+    backgroundColor: '#40B0FF',
     width: 10,
     height: 10,
     borderRadius: 5,
   },
   counterContainer: {
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 15,
   },
   counterText: {
-    color: "#FFF",
+    color: '#FFF',
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   title: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 120,
     left: 10,
     fontSize: 24,
-    color: "#FFF",
+    color: '#FFF',
     fontFamily: Font.pBlack,
   },
   linkContainer: {
@@ -210,19 +252,19 @@ const styles = StyleSheet.create({
   },
   // New styles for the icons
   iconControlsContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 10,
     right: 10,
-    flexDirection: "row",
+    flexDirection: 'row',
     zIndex: 10,
   },
   iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginLeft: 8,
   },
 });
