@@ -11,7 +11,7 @@
     "selectBoardingHouseType": "Please select a boarding house type.",
     "enterBoardingHouseName": "Please enter the boarding house name.",
     "selectProvince": "Please select a boarding house province.",
-    "manager": "Please select a manager.",
+    "manager": "Please select a staff.",
     "selectDistrict": "Please select a boarding house district.",
     "selectWard": "Please select a boarding house ward.",
     "enterAddressDetail": "Please enter boarding house details.",
@@ -103,7 +103,7 @@
     "labels": {
       "boardingHouseName": "Name Boarding House",
       "boardingHouseType": "Boarding House Type",
-      "manager": "Manager",
+      "manager": "Staff",
       "description": "Description",
       "priceRange": "Price Rent/month (VND)",
       "electricityPrice": "Electricity Price/kWh (VND)",

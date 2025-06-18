@@ -18,7 +18,7 @@ class ManagerController {
 
       // Retrieve managers associated with this owner's userId
       const managers = await Account.find({
-        role: 'manager',
+        role: 'staff',
         createdBy: req.user.userId,
       })
         .select(

@@ -352,7 +352,7 @@ const BHDetailOwner = () => {
       payload.append("address[detail]", updatedData.address.detail);
       payload.append("location[lat]", updatedData.location.lat);
       payload.append("location[lon]", updatedData.location.lon);
-      payload.append("managerId", updatedData.managerId);
+      payload.append("staffId", updatedData.staffId);
 
       const oldImg = [];
 
@@ -443,7 +443,7 @@ const BHDetailOwner = () => {
                     <div className="flex items-center gap-2">
                       <HeartFilled className="text-red-500 text-4xl" />
                       <span
-                        className={`text-lg ${
+                        className={`${
                           darkMode ? "text-white" : "text-gray-600"
                         }`}
                       >
@@ -519,12 +519,12 @@ const BHDetailOwner = () => {
                   {isOwner && (
                     <Form.Item label={t("form.labels.manager")}>
                       <Select
-                        name="managerId"
-                        value={updatedData.managerId || ""}
+                        name="staffId"
+                        value={updatedData.staffId || ""}
                         onChange={(value) => {
                           setUpdatedData((prev) => ({
                             ...prev,
-                            managerId: value,
+                            staffId: value,
                           }));
                         }}
                         // disabled={!isOwner}
