@@ -284,6 +284,7 @@ function MyAppointment() {
             color={isDarkMode ? '#fff' : '#333'}
           />
         }
+        onBackPress={() => router.push('/account')}
         title={t('myAppointments')}
       />
 

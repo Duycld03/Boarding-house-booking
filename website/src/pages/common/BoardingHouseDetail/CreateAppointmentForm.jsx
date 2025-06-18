@@ -119,7 +119,7 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
     return {
       disabledHours: () =>
         Array.from({ length: 24 }, (_, i) => i).filter(
-          (h) => h < 6 || h >= 18 || bookedHours.includes(h)
+          (h) => h < 7 || h >= 18 || bookedHours.includes(h)
         ),
       disabledMinutes: (hour) =>
         bookedHours.includes(hour)

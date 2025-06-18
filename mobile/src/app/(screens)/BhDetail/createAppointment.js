@@ -226,7 +226,7 @@ function CreateAppointment() {
             .filter((appt) => appt.startOf('day').isSame(selectedDay, 'day'))
             .map((appt) => appt.get('hour'));
 
-        return !(hour >= 6 && hour < 18 && !bookedHours.includes(hour));
+        return !(hour >= 7 && hour < 17 && !bookedHours.includes(hour));
     };
 
     const getMinDate = () => {
@@ -301,7 +301,7 @@ function CreateAppointment() {
             await createAppointment(appointmentData).then(() => {
                 showSuccess('Create appointment success')
                 resetForm();
-                router.back()
+                router.push('/myappointment')
             })
         } catch (error) {
             console.log('Error creating appointment:', error);
