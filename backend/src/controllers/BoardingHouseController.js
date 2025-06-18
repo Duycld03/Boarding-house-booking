@@ -396,8 +396,6 @@ class boardingHouseController {
         rating = 5,
       } = req.body;
 
-
-
       // Validate owner
       const ownerAccount = await Account.findOne({
         username: ownerUsername,
@@ -751,8 +749,8 @@ class boardingHouseController {
 
       if (account.role === 'owner') {
         filter = { ownerId: account._id };
-      } else if (account.role === 'manager') {
-        filter = { managerId: account._id };
+      } else if (account.role === 'manager' || account.role === 'staff') {
+        filter = { staffId: account._id };
       }
 
       // (Tuỳ chỉnh thêm nếu bạn muốn filter theo query string)
@@ -816,7 +814,7 @@ class boardingHouseController {
         electricityPrice,
         waterPrice,
         totalRooms = 0,
-        managerId,
+        staffId,
         availableRooms = 0,
       } = req.body;
 
@@ -850,8 +848,8 @@ class boardingHouseController {
             'Province, district, and ward are required fields in the address.',
         });
       }
-      let validManagerId = managerId;
-      if (managerId === '') {
+      let validManagerId = staffId;
+      if (staffId === '') {
         validManagerId = null;
       }
 
@@ -886,7 +884,7 @@ class boardingHouseController {
         images,
         totalRooms,
         availableRooms,
-        managerId: validManagerId, // Use validManagerId here
+        staffId: validManagerId, // Use validManagerId here
       });
 
       const savedBoardingHouse = await newBoardingHouse.save();
@@ -913,7 +911,7 @@ class boardingHouseController {
         priceRange,
         electricityPrice,
         waterPrice,
-        managerId,
+        staffId,
       } = updateData;
 
       // Validate name
@@ -1013,8 +1011,8 @@ class boardingHouseController {
           message: 'Price fields must be greater than 0.',
         });
       }
-      if (managerId === '' || managerId === 'null') {
-        updateData.managerId = null;
+      if (staffId === '' || staffId === 'null') {
+        updateData.staffId = null;
       }
       // Update the boarding house details
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
