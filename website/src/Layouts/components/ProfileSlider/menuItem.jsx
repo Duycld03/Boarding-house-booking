@@ -22,7 +22,7 @@ const getMenuItems = () => {
 
   const isOwner = hasRole(userRole.owner);
   const isUser = hasRole(userRole.user);
-  const isManager = hasRole(userRole.manager);
+  const isStaff = hasRole(userRole.staff);
 
   const menuItems = [
     {
@@ -53,7 +53,7 @@ const getMenuItems = () => {
       key: 'bh-management-owner',
       label: <Link to="/bh-management-owner">Boarding House Management</Link>,
       icon: <HomeFilled />,
-      visible: isOwner || isManager, // Chỉ Owner
+      visible: isOwner || isStaff, // Chỉ Owner
     },
     {
       key: 'my-owner-report',

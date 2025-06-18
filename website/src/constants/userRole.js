@@ -2,7 +2,7 @@ const userRoles = {
   admin: 'admin',
   owner: 'owner',
   user: 'user',
-  manager: 'manager',
+  staff: 'staff',
 };
 
 export default userRoles;
