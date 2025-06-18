@@ -147,7 +147,7 @@ const BoardingHouseGallery = ({ boardingHouseId, images }) => {
                 onPress={handleWatchLater}
               >
                 <MaterialIcons
-                  name="watch-later"
+                  name={isSaved ? 'bookmark' : 'bookmark-border'}
                   size={24}
                   color={isSaved ? '#FFD700' : 'white'} // 💡 Đổi màu khi đã lưu
                 />
