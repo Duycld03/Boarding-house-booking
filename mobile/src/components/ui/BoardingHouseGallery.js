@@ -56,9 +56,7 @@ const BoardingHouseGallery = ({ boardingHouseId, images }) => {
         );
 
         setIsSaved(isCurrentlySaved); // Cập nhật trạng thái từ API
-      } catch (error) {
-        // console.error('Error fetching watch later status:', error);
-      }
+      } catch (error) {}
     };
 
     if (boardingHouseId) {
