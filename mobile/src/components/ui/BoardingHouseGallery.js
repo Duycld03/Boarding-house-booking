@@ -39,6 +39,12 @@ const BoardingHouseGallery = ({ boardingHouseId, images }) => {
       return;
     }
     // Handle report logic here
+    router.push({
+      pathname: "/(screens)/BhDetail/reportBoardingHouse",
+      params: {
+        boardingHouseId,
+      },
+    });
     console.log("Report action triggered: ", boardingHouseId);
   }, [isLogin, handleToggleLoginWarning]);
 

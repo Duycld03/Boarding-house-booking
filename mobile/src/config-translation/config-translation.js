@@ -29,10 +29,12 @@ import en_common from "@/locales/en/common.json";
 import vi_common from "@/locales/vi/common.json";
 import en_bhDetail from "@/locales/en/bhDetail.json";
 import vi_bhDetail from "@/locales/vi/bhDetail.json";
-import vi_myAppointment from '@/locales/vi/myAppointment.json'
-import en_myAppointment from '@/locales/en/myAppointment.json'
-import en_home from '@/locales/en/home.json';
-import vi_home from '@/locales/vi/home.json';
+import vi_myAppointment from "@/locales/vi/myAppointment.json";
+import en_myAppointment from "@/locales/en/myAppointment.json";
+import en_home from "@/locales/en/home.json";
+import vi_home from "@/locales/vi/home.json";
+import en_report from "@/locales/en/report.json";
+import vi_report from "@/locales/vi/report.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -52,8 +54,8 @@ i18n.use(initReactI18next).init({
       home: en_home,
       common: en_common,
       boardingHouseDetail: en_bhDetail,
-      myAppointment: en_myAppointment
-
+      myAppointment: en_myAppointment,
+      report: en_report,
     },
     vi: {
       setting: vi_setting,
@@ -71,13 +73,14 @@ i18n.use(initReactI18next).init({
       home: vi_home,
       common: vi_common,
       boardingHouseDetail: vi_bhDetail,
-      myAppointment: vi_myAppointment
+      myAppointment: vi_myAppointment,
+      report: vi_report,
     },
   },
-  lng: 'en',
-  fallbackLng: 'en',
-  ns: ['setting', 'account'],
-  defaultNS: 'setting',
+  lng: "en",
+  fallbackLng: "en",
+  ns: ["setting", "account"],
+  defaultNS: "setting",
   interpolation: {
     escapeValue: false,
   },
