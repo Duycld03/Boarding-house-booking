@@ -3,21 +3,14 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { createReport } from "../../../api/reportAPI";
+import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
+import styles from "./ReportModal.module.css";
+import classNames from "classnames";
 
-const reasonOptions = {
-  boardingHouse: [
-    "Scam on Rent or Deposit",
-    "False Advertisement",
-    "Violation of Privacy",
-    "Unfriendly Landlord",
-    "Poor Security",
-  ],
-  review: [
-    "Spam",
-    "Misleading information",
-    "Privacy violation",
-    "Inappropriate content",
-  ],
+const reasonOptionsKeys = {
+  boardingHouse: ["scamRent", "falseAd", "privacy", "unfriendly", "security"],
+  review: ["spam", "misleading", "privacy", "inappropriate"],
 };
 
 const ReportModal = ({
@@ -29,7 +22,8 @@ const ReportModal = ({
   handleReportStatus,
 }) => {
   const [form] = Form.useForm();
-
+  const { darkMode } = useTheme();
+  const { t } = useTranslation("reportModal");
   const [loading, setLoading] = useState(false);
   const [imageFileList, setImageFileList] = useState([]);
 
@@ -44,7 +38,7 @@ const ReportModal = ({
     if (fileList.length <= 6) {
       setImageFileList(fileList);
     } else {
-      toast.error("You can only upload up to 6 images");
+      toast.error(t("report.uploadLimit"));
     }
   };
 
@@ -79,36 +73,78 @@ const ReportModal = ({
     }
   };
 
+  // Get the appropriate reason options based on whether it's a boarding house or review report
+  const getReasonOptions = () => {
+    const type = reviewId ? "review" : "boardingHouse";
+    return reasonOptionsKeys[type].map((key) => ({
+      value: t(`report.reasons.${type}.${key}`),
+      label: t(`report.reasons.${type}.${key}`),
+    }));
+  };
+
   return (
     <Modal
-      title="Report"
+      title={
+        <span className={darkMode ? styles.darkModalTitle : styles.modalTitle}>
+          {t("report.title")}
+        </span>
+      }
       open={visible}
       onCancel={onCancel}
       onOk={() => form.submit()}
-      okText="Report"
+      okText={t("report.submit")}
       confirmLoading={loading}
       destroyOnClose
+      bodyStyle={darkMode ? { background: "#111827" } : {}}
+      className={darkMode ? "dark" : ""}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item label="Reason" name="reason" rules={[{ required: true }]}>
+        <Form.Item
+          label={
+            <span
+              className={darkMode ? styles.darkTextColor : styles.textColor}
+            >
+              {t("report.reason")}
+            </span>
+          }
+          name="reason"
+          rules={[{ required: true }]}
+        >
           <Select
             size="large"
-            placeholder="Select a reason"
+            placeholder={t("report.selectReason")}
             rules={[{ required: true }]}
-          >
-            {reasonOptions[reviewId ? "review" : "boardingHouse"].map(
-              (option) => (
-                <Select.Option key={option} value={option}>
-                  {option}
-                </Select.Option>
-              )
-            )}
-          </Select>
+            className={darkMode ? styles.darkInputStyle : styles.inputStyle}
+            options={getReasonOptions()}
+          />
         </Form.Item>
-        <Form.Item label="Detail" name="detail" rules={[{ required: true }]}>
-          <Input.TextArea size="large" placeholder="Enter detail" />
+        <Form.Item
+          label={
+            <span
+              className={darkMode ? styles.darkTextColor : styles.textColor}
+            >
+              {t("report.detail")}
+            </span>
+          }
+          name="detail"
+          rules={[{ required: true }]}
+        >
+          <Input.TextArea
+            size="large"
+            placeholder={t("report.enterDetail")}
+            className={darkMode ? styles.darkInputStyle : styles.inputStyle}
+          />
         </Form.Item>
-        <Form.Item label="Images" name="images">
+        <Form.Item
+          label={
+            <span
+              className={darkMode ? styles.darkTextColor : styles.textColor}
+            >
+              {t("report.images")}
+            </span>
+          }
+          name="images"
+        >
           <div className="mt-4 flex flex-wrap gap-4">
             {imageFileList?.map((file, index) => (
               <div key={index} className="relative">
@@ -136,34 +172,48 @@ const ReportModal = ({
             <Upload
               listType="picture-card"
               showUploadList={false}
-              className="custom-upload"
+              className={styles.customUpload}
               multiple
               accept="image/*"
               onChange={handleChangeImage}
               fileList={imageFileList}
               beforeUpload={() => false}
             >
-              <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                <PlusOutlined className="text-2xl text-gray-400" />
-                <p className="text-gray-500 mt-2 text-sm font-medium">
-                  Add Images
+              <div
+                className={classNames(
+                  "flex flex-col items-center justify-center border border-dashed rounded-lg p-6 hover:border-primary transition",
+                  darkMode ? styles.darkUploadBox : styles.uploadBox
+                )}
+              >
+                <PlusOutlined
+                  className={classNames(
+                    "text-2xl",
+                    darkMode
+                      ? styles.darkUploadIconColor
+                      : styles.uploadIconColor
+                  )}
+                />
+                <p
+                  className={classNames(
+                    "mt-2 text-sm font-medium font-body",
+                    darkMode ? styles.darkTextColor : styles.textColor
+                  )}
+                >
+                  {t("report.addImages")}
                 </p>
-                <p className="text-gray-400 text-xs">
-                  Drag-drop or click here to choose a file
+                <p
+                  className={classNames(
+                    "text-xs font-body",
+                    darkMode
+                      ? styles.darkUploadTextColor
+                      : styles.uploadTextColor
+                  )}
+                >
+                  {t("report.dragDropText")}
                 </p>
               </div>
             </Upload>
           </div>
-          <style>
-            {`
-                            .custom-upload .ant-upload
-                            {
-                            border: none !important;
-                            background: none !important;
-                            padding: 0 !important;
-                            }
-                        `}
-          </style>
         </Form.Item>
       </Form>
     </Modal>
