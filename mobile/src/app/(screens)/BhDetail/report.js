@@ -6,7 +6,6 @@ import { BackHeader } from "@/components/navigation/CustomHeader";
 import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { useNotification } from "@/context/NotificationProvider";
-import { FormField } from "@/components/form/index";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -22,6 +21,7 @@ import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { createReport } from "@/API/reportAPI"; // Update this path to your actual API file
+import { Input } from "@/components/ui";
 
 const reasonOptionsKeys = {
   boardingHouse: ["scamRent", "falseAd", "privacy", "unfriendly", "security"],
@@ -38,12 +38,12 @@ export default function Report() {
 
   const [formData, setFormData] = useState({
     reason: "",
-    detail: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
   const [showReasonPicker, setShowReasonPicker] = useState(false);
+  const [detail, setDetail] = useState("");
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -60,7 +60,7 @@ export default function Report() {
       newErrors.reason = { message: t("report.reasonRequired") };
       isValid = false;
     }
-    if (!formData.detail.trim()) {
+    if (!detail.trim()) {
       newErrors.detail = { message: t("report.detailRequired") };
       isValid = false;
     }
@@ -111,7 +111,7 @@ export default function Report() {
     try {
       const formDataObj = new FormData();
       formDataObj.append("reason", formData.reason);
-      formDataObj.append("details", formData.detail);
+      formDataObj.append("details", detail);
       formDataObj.append("boardingHouseId", boardingHouseId);
 
       if (reviewId) {
@@ -278,24 +278,43 @@ export default function Report() {
           </Modal>
         </View>
 
-        <FormField
-          name="detail"
-          label={t("report.detail") || "Details"}
-          placeholder={t("report.enterDetail") || "Describe the issue"}
-          value={formData.detail}
-          onChange={handleChange}
-          error={errors.detail}
-          multiline={true}
-          numberOfLines={4}
-          required
-        />
+        <View className="mb-4">
+          <Text
+            className={`text-base font-semibold mb-2 ${
+              isDarkMode ? "text-white" : "text-black"
+            }`}
+          >
+            {t("report.detail") || "Details"}{" "}
+            <Text style={{ color: "red" }}>*</Text>
+          </Text>
+
+          <Input
+            value={detail}
+            onChangeText={(text) => setDetail(text)}
+            placeholder={t("report.enterDetail") || "Describe the issue"}
+            multiline
+            numberOfLines={4}
+            className={`min-h-[100px] text-top border rounded-lg p-3 ${
+              isDarkMode
+                ? "border-gray-600 bg-gray-800 text-gray-200"
+                : "border-gray-300 bg-white text-black"
+            } ${errors.note ? "border-red-500" : ""}`}
+            style={{ textAlignVertical: "top" }}
+            error={errors.detail ? errors.detail.message : null}
+          />
+          {errors.detail ? (
+            <Text style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>
+              {errors.detail.message}
+            </Text>
+          ) : null}
+        </View>
 
         <Text
           className={`text-base font-semibold mb-2 ${
             isDarkMode ? "text-white" : "text-black"
           }`}
         >
-          {t("report.images") || "Images"}
+          {t("report.images") || "Images"}{" "}
           <Text style={{ color: "red" }}>*</Text>
         </Text>
 
