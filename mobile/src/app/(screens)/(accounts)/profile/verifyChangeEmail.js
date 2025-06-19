@@ -63,6 +63,7 @@ export default function VerifyChangeEmail() {
       showSuccess(t("successMessage"));
       router.back();
       router.replace("/(screens)/(accounts)/profile");
+    } catch {
       showError(t("errorMessage"));
     } finally {
       setLoading(false);
@@ -74,10 +75,6 @@ export default function VerifyChangeEmail() {
       <BackHeader title={t("verifyChangeEmailTitle")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
-        <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          {t("verifyChangeEmailTitle")}
-        </Text>
-
         <FormField
           name="otp"
           label="OTP"
