@@ -1,0 +1,18 @@
+{
+  "title": "Deposit",
+  "okText": "Deposit",
+  "cancel": "Cancel",
+  "roomType": "Room Type",
+  "selectRoom": "Select a room",
+  "selectRoomRequired": "Please select a room",
+  "rentalDate": "Rental date",
+  "rentalTime": "Rental time",
+  "enterRentalTime": "Enter rental time",
+  "rentalTimeRequired": "Please enter rental time",
+  "rentalTimeMin": "Rental time must be greater than 0",
+  "selectTimeType": "Select type of time",
+  "month": "Month",
+  "year": "Year",
+  "pricePerMonth": "(VND)/ month",
+  "successMessage": "Deposit successful"
+}
