@@ -9,12 +9,18 @@ import { useNotification } from "@/context/NotificationProvider";
 import { FormField } from "@/components/form/index";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { View, Image, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  ScrollView,
+} from "react-native";
 import { useTheme } from "@/context/ThemeProvider";
 import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { Dropdown } from "react-native-element-dropdown";
 // import { createReport } from "@/API/reportAPI"; // Update this path to your actual API file
 
 const reasonOptionsKeys = {
@@ -39,6 +45,7 @@ export default function ReportBoardingHouse({ route }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
+  const [showReasonPicker, setShowReasonPicker] = useState(false);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -162,53 +169,117 @@ export default function ReportBoardingHouse({ route }) {
       />
 
       <ScrollContainer keyboardAvoiding className="px-4">
-        {/* Using Dropdown Instead of Picker */}
-        <View style={styles.formGroup}>
+        {/* Reason Selection with Modal */}
+        <View className="mb-4">
           <Text
-            style={styles.label}
-            className={isDarkMode ? "text-white" : "text-black"}
+            className={`text-base font-semibold mb-2 ${
+              isDarkMode ? "text-white" : "text-black"
+            }`}
           >
-            {t("report.reason") || "Reason"} *
+            {t("report.reason") || "Reason"}{" "}
+            <Text style={{ color: "red" }}>*</Text>
           </Text>
 
-          <Dropdown
-            style={[
-              styles.dropdown,
-              isDarkMode && styles.dropdownDark,
-              errors.reason && styles.errorInput,
-            ]}
-            containerStyle={[
-              styles.dropdownContainer,
-              isDarkMode && styles.dropdownContainerDark,
-            ]}
-            itemContainerStyle={[
-              styles.dropdownItemContainer,
-              isDarkMode && styles.dropdownItemContainerDark,
-            ]}
-            itemTextStyle={[
-              styles.dropdownItemText,
-              isDarkMode && styles.dropdownItemTextDark,
-            ]}
-            selectedTextStyle={[
-              styles.selectedText,
-              isDarkMode && styles.selectedTextDark,
-              !formData.reason && styles.placeholderText,
-            ]}
-            iconStyle={styles.dropdownIcon}
-            data={reasonOptions}
-            placeholderStyle={styles.placeholderText}
-            placeholder={t("report.selectReason") || "Select a reason"}
-            labelField="label"
-            valueField="value"
-            value={formData.reason}
-            onChange={(item) => {
-              handleChange("reason", item.value);
-            }}
-          />
+          <TouchableOpacity
+            className={`border rounded-lg p-4 ${
+              isDarkMode
+                ? "border-gray-600 bg-gray-800"
+                : "border-gray-300 bg-white"
+            } ${errors.reason ? "border-red-500" : ""}`}
+            onPress={() => setShowReasonPicker(true)}
+          >
+            <Text
+              className={`text-base ${
+                isDarkMode ? "text-gray-200" : "text-black"
+              } ${!formData.reason ? "opacity-60" : ""}`}
+            >
+              {formData.reason
+                ? formData.reason
+                : t("report.selectReason") || "Select a reason"}
+            </Text>
+          </TouchableOpacity>
 
           {errors.reason && (
-            <Text style={styles.errorText}>{errors.reason.message}</Text>
+            <Text style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>
+              {errors.reason.message}
+            </Text>
           )}
+
+          <Modal
+            visible={showReasonPicker}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setShowReasonPicker(false)}
+          >
+            <TouchableOpacity
+              className="flex-1 bg-black/50 justify-end"
+              activeOpacity={1}
+              onPress={() => setShowReasonPicker(false)}
+            >
+              <View
+                className={`rounded-t-3xl max-h-[80%] ${
+                  isDarkMode ? "bg-gray-900" : "bg-white"
+                }`}
+              >
+                <View
+                  className={`flex-row justify-between items-center p-4 border-b ${
+                    isDarkMode ? "border-gray-700" : "border-gray-200"
+                  }`}
+                >
+                  <Text
+                    className={`text-lg font-semibold ${
+                      isDarkMode ? "text-white" : "text-black"
+                    }`}
+                  >
+                    {t("report.selectReason") || "Select a reason"}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setShowReasonPicker(false)}
+                    className="p-1"
+                  >
+                    <Text
+                      className={`text-xl ${
+                        isDarkMode ? "text-white" : "text-black"
+                      }`}
+                    >
+                      ✕
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <ScrollView className="p-4">
+                  {reasonOptions.map((option) => (
+                    <TouchableOpacity
+                      key={option.value}
+                      className={`p-4 border-b ${
+                        isDarkMode ? "border-gray-700" : "border-gray-200"
+                      } ${
+                        formData.reason === option.value
+                          ? isDarkMode
+                            ? "bg-gray-700"
+                            : "bg-gray-100"
+                          : ""
+                      }`}
+                      onPress={() => {
+                        handleChange("reason", option.value);
+                        setShowReasonPicker(false);
+                      }}
+                    >
+                      <Text
+                        className={`text-base ${
+                          formData.reason === option.value
+                            ? "font-semibold"
+                            : ""
+                        } ${isDarkMode ? "text-white" : "text-black"}`}
+                      >
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </TouchableOpacity>
+          </Modal>
         </View>
 
         <FormField
@@ -224,10 +295,12 @@ export default function ReportBoardingHouse({ route }) {
         />
 
         <Text
-          style={styles.imagesLabel}
-          className={isDarkMode ? "text-white" : "text-black"}
+          className={`text-base font-semibold mb-2 ${
+            isDarkMode ? "text-white" : "text-black"
+          }`}
         >
-          {t("report.images") || "Images"} (Optional)
+          {t("report.images") || "Images"}
+          <Text style={{ color: "red" }}>*</Text>
         </Text>
 
         <View style={styles.imagesContainer}>
@@ -280,65 +353,6 @@ const styles = StyleSheet.create({
   formGroup: {
     marginBottom: 16,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 8,
-  },
-  // Dropdown styles
-  dropdown: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    backgroundColor: "#fff",
-  },
-  dropdownDark: {
-    backgroundColor: "#111827",
-    borderColor: "#555",
-  },
-  dropdownContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginTop: 4,
-  },
-  dropdownContainerDark: {
-    backgroundColor: "#111827",
-    borderColor: "#555",
-  },
-  dropdownItemContainer: {
-    backgroundColor: "#fff",
-  },
-  dropdownItemContainerDark: {
-    backgroundColor: "#111827",
-  },
-  dropdownItemText: {
-    color: "#333",
-    fontSize: 16,
-  },
-  dropdownItemTextDark: {
-    color: "#fff",
-  },
-  selectedText: {
-    color: "#333",
-    fontSize: 16,
-  },
-  selectedTextDark: {
-    color: "#fff",
-  },
-  placeholderText: {
-    color: "#aaa",
-    fontSize: 16,
-  },
-  dropdownIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "#333",
-  },
-  errorInput: {
-    borderColor: "red",
-  },
   errorText: {
     color: "red",
     fontSize: 12,
@@ -373,32 +387,30 @@ const styles = StyleSheet.create({
     right: 5,
     backgroundColor: "rgba(255, 0, 0, 0.7)",
     borderRadius: 12,
-    width: 24,
-    height: 24,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 4,
   },
   addImageButton: {
     width: 100,
     height: 100,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor: "#ccc",
     borderRadius: 8,
+    // backgroundColor: "#",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#bdbdbd",
   },
   addImageButtonDark: {
-    borderColor: "#444",
+    // backgroundColor: "#424242",
+    borderColor: "#757575",
   },
   text: {
-    fontSize: 12,
-    color: "#666",
+    color: "#333",
+    fontWeight: "500",
     marginTop: 4,
   },
   textDark: {
-    fontSize: 12,
-    color: "#ccc",
+    color: "#fff",
+    fontWeight: "500",
     marginTop: 4,
   },
 });
