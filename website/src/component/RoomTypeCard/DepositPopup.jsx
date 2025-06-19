@@ -87,9 +87,6 @@ function DepositPopup({ visible, toggleVisible, roomData, listRoomData }) {
         confirmLoading={loading}
         okText={t("okText")}
         cancelText={t("cancel")}
-        okButtonProps={{
-          style: { backgroundColor: "#ff7a45", borderColor: "#ff7a45" },
-        }}
         onCancel={onCancel}
         destroyOnClose
         className="dark:bg-background-dark"
@@ -114,6 +111,11 @@ function DepositPopup({ visible, toggleVisible, roomData, listRoomData }) {
             }}
             className="dark:text-text-dark"
           >
+            <Form.Item name="price" className="mb-2" hidden>
+              <p className="text-3xl text-orange-500 font-semibold">
+                {formatAmount(roomData?.price)} (VND)/ month
+              </p>
+            </Form.Item>
             <Form.Item
               name="roomId"
               label={
