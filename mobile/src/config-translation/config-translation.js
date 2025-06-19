@@ -35,6 +35,9 @@ import en_home from "@/locales/en/home.json";
 import vi_home from "@/locales/vi/home.json";
 import en_report from "@/locales/en/report.json";
 import vi_report from "@/locales/vi/report.json";
+import en_boardingHouseGallery from "@/locales/en/boardingHouseGallery.json";
+import vi_boardingHouseGallery from "@/locales/vi/boardingHouseGallery.json";
+import { BoardingHouseGallery } from "@/components/ui";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -56,6 +59,7 @@ i18n.use(initReactI18next).init({
       boardingHouseDetail: en_bhDetail,
       myAppointment: en_myAppointment,
       report: en_report,
+      boardingHouseGallery: en_boardingHouseGallery,
     },
     vi: {
       setting: vi_setting,
@@ -75,6 +79,7 @@ i18n.use(initReactI18next).init({
       boardingHouseDetail: vi_bhDetail,
       myAppointment: vi_myAppointment,
       report: vi_report,
+      boardingHouseGallery: vi_boardingHouseGallery,
     },
   },
   lng: "en",

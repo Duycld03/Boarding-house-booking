@@ -7,7 +7,7 @@ import Text from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
 import { useNotification } from "@/context/NotificationProvider";
 import { FormField } from "@/components/form/index";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   View,
@@ -21,22 +21,20 @@ import { useTheme } from "@/context/ThemeProvider";
 import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-// import { createReport } from "@/API/reportAPI"; // Update this path to your actual API file
+import { createReport } from "@/API/reportAPI"; // Update this path to your actual API file
 
 const reasonOptionsKeys = {
   boardingHouse: ["scamRent", "falseAd", "privacy", "unfriendly", "security"],
   review: ["spam", "misleading", "privacy", "inappropriate"],
 };
 
-export default function ReportBoardingHouse({ route }) {
+export default function Report() {
   const router = useRouter();
   const { isDarkMode } = useTheme();
-  const { t } = useTranslation("report"); // Make sure you have this translation namespace
+  const { t } = useTranslation("report");
   const { showSuccess, showError } = useNotification();
 
-  // Get parameters from route
-  const boardingHouseId = route?.params?.boardingHouseId;
-  const reviewId = route?.params?.reviewId;
+  const { boardingHouseId, reviewId } = useLocalSearchParams();
 
   const [formData, setFormData] = useState({
     reason: "",
@@ -67,6 +65,13 @@ export default function ReportBoardingHouse({ route }) {
       isValid = false;
     }
 
+    if (images.length === 0) {
+      newErrors.images = {
+        message: t("report.imagesRequired") || "At least one image is required",
+      };
+      isValid = false;
+    }
+
     setErrors(newErrors);
     return isValid;
   };
@@ -78,9 +83,9 @@ export default function ReportBoardingHouse({ route }) {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypes,
       allowsEditing: true,
-      aspect: [4, 3],
+      // aspect: [4, 3],
       quality: 1,
     });
 
@@ -125,20 +130,11 @@ export default function ReportBoardingHouse({ route }) {
         });
       });
 
-      // const response = await createReport(formDataObj);
-      // showSuccess(
-      //   response.message ||
-      //     t("report.success") ||
-      //     "Report submitted successfully"
-      // );
+      const response = await createReport(formDataObj);
+      showSuccess(t("report.success") || "Report submitted successfully");
       router.back();
     } catch (error) {
-      console.error(error);
-      // showError(
-      //   error?.response?.data?.message ||
-      //     t("report.error") ||
-      //     "Failed to submit report"
-      // );
+      showError(t("report.error") || "Failed to submit report");
     } finally {
       setLoading(false);
     }
@@ -404,11 +400,13 @@ const styles = StyleSheet.create({
     borderColor: "#757575",
   },
   text: {
+    textAlign: "center",
     color: "#333",
     fontWeight: "500",
     marginTop: 4,
   },
   textDark: {
+    textAlign: "center",
     color: "#fff",
     fontWeight: "500",
     marginTop: 4,
