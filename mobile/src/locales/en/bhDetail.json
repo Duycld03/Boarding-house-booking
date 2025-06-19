@@ -158,7 +158,7 @@
       "roomRequired": "Please select a room",
       "dateRequired": "Please select date and time",
       "pastDate": "Cannot select a date in the past",
-      "invalidTime": "Please select time between 6:00 AM to 6:00 PM",
+      "invalidTime": "Please select time between 7:00 AM to 7:00 PM",
       "dateUnavailable": "Selected date is not available",
       "timeUnavailable": "Selected time is not available",
       "noteTooLong": "Note cannot exceed 500 characters",
