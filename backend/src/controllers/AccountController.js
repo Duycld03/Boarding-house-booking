@@ -1,4 +1,4 @@
-import Account from "../models/account.js";
+import { Account } from "../models/account.js";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { generateToken, verifyToken } from "../utils/functions.js";
@@ -114,6 +114,8 @@ class accountController {
     try {
       const { phoneNumber, fullname, gender, role } = req.body;
       const { accountId } = req.params;
+
+
 
       // Chỉ cập nhật các trường có thể thay đổi
       const updatedAccountData = {
