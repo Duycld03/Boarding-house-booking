@@ -17,13 +17,7 @@ import { useTheme } from "@/context/ThemeContext";
 
 const { RangePicker } = DatePicker;
 
-function DepositPopup({
-  visible,
-  toggleVisible,
-  roomData,
-  listRoomData,
-  boardingHouse,
-}) {
+function DepositPopup({ visible, toggleVisible, roomData, listRoomData }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [dates, setDates] = useState([dayjs(), dayjs().add(1, "month")]);
@@ -93,20 +87,20 @@ function DepositPopup({
         confirmLoading={loading}
         okText={t("okText")}
         cancelText={t("cancel")}
+        okButtonProps={{
+          style: { backgroundColor: "#ff7a45", borderColor: "#ff7a45" },
+        }}
         onCancel={onCancel}
         destroyOnClose
+        className="dark:bg-background-dark"
+        rootClassName="dark:bg-background-dark"
         title={
           <h1 className="text-2xl font-semibold dark:text-text-dark">
             {t("title")}
           </h1>
         }
-        className="dark:bg-background-dark"
-        rootClassName="dark:bg-background-dark"
       >
         <div className="dark:bg-background-dark dark:text-text-dark">
-          <h1 className="text-3xl md:text-4xl font-semibold mb-4 dark:text-text-dark">
-            {boardingHouse?.name}
-          </h1>
           <Form
             form={form}
             layout="vertical"
@@ -120,22 +114,6 @@ function DepositPopup({
             }}
             className="dark:text-text-dark"
           >
-            <Form.Item
-              name="roomType"
-              className="mb-2"
-              label={
-                <span className="dark:text-text-dark">{t("roomType")}</span>
-              }
-            >
-              <p className="text-3xl dark:text-text-dark">
-                {roomData?.typeName}
-              </p>
-            </Form.Item>
-            <Form.Item name="price" className="mb-2">
-              <p className="text-3xl text-orange-500 font-semibold">
-                {formatAmount(roomData?.price)} {t("pricePerMonth")}
-              </p>
-            </Form.Item>
             <Form.Item
               name="roomId"
               label={
@@ -159,7 +137,7 @@ function DepositPopup({
                 <span className="dark:text-text-dark">{t("rentalDate")}</span>
               }
               name="rentalDate"
-              className="mb-2"
+              className="mb-8"
               rules={[{ required: true }]}
             >
               <RangePicker
@@ -169,7 +147,7 @@ function DepositPopup({
                 disabled={[false, true]}
                 allowEmpty={[false, true]}
                 onClick={() => form.setFieldsValue({ rentalDate: [] })}
-                className="dark:bg-background-dark dark:text-text-dark"
+                className="dark:bg-background-dark dark:text-text-dark w-full"
               />
             </Form.Item>
             <Form.Item

@@ -532,7 +532,10 @@ export default function BhDetailScreen() {
             key={`room-${roomData.id || index}`}
             roomData={roomData}
             onDeposit={() => {
-              console.log("deposit for room:", roomData.typeName);
+              // Ví dụ cách điều hướng đến màn hình này từ màn hình chi tiết nhà trọ
+              router.push({
+                pathname: "/(screens)/BhDetail/depositRoom",
+              });
             }}
           />
         ))}
