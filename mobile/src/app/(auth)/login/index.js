@@ -20,7 +20,7 @@ export default function Login() {
   const { t } = useTranslation("login");
   const { showSuccess, showError } = useNotification();
 
-  const { loginData } = useCurrentUser()
+  const { loginData } = useCurrentUser();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -74,10 +74,7 @@ export default function Login() {
       }
 
       // Use UserContext's loginData method
-      await loginData(
-        res.user,
-        res.token,
-      );
+      await loginData(res.user, res.token);
 
       await AsyncStorage.setItem("access_token", res.token);
       showSuccess(t("success"));
@@ -94,10 +91,6 @@ export default function Login() {
       <BackHeader title={t("login")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
-        <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          {t("login")}
-        </Text>
-
         <FormField
           name="username"
           label={t("username")}
