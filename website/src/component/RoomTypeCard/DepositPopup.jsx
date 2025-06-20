@@ -43,7 +43,7 @@ function DepositPopup({ visible, toggleVisible, roomData, listRoomData }) {
   };
 
   const disabledDate = (current) => {
-    return current && current < dayjs().startOf("day");
+    return current && current < dayjs().startOf("day").add(7, "days");
   };
 
   const handleRentalTimeChange = (value) => {

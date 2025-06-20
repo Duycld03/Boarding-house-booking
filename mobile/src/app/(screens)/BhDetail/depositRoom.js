@@ -350,7 +350,7 @@ export default function DepositRoom() {
               mode="date"
               display={Platform.OS === "ios" ? "spinner" : "default"}
               onChange={onStartDateChange}
-              minimumDate={new Date()}
+              minimumDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)} // Minimum 7 days from today
             />
           )}
         </View>
