@@ -531,10 +531,12 @@ export default function BhDetailScreen() {
           <RoomTypeCard
             key={`room-${roomData.id || index}`}
             roomData={roomData}
-            onDeposit={() => {
-              // Ví dụ cách điều hướng đến màn hình này từ màn hình chi tiết nhà trọ
+            onDeposit={(roomData) => {
               router.push({
                 pathname: "/(screens)/BhDetail/depositRoom",
+                params: {
+                  roomData: JSON.stringify(roomData),
+                },
               });
             }}
           />

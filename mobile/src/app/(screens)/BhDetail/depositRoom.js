@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Platform,
+  Modal,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -21,22 +22,31 @@ import { FormField } from "@/components/form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import formatAmount from "@/utils/formatAmount";
 import { depositRoom } from "@/API/depositAPI";
-
 import { useNotification } from "@/context/NotificationProvider";
+import { getRoomsByRoomType } from "@/API/roomAPI";
 
 export default function DepositRoom() {
   const router = useRouter();
   const { isDarkMode } = useTheme();
-  const { t } = useTranslation("depositPopup");
+  const { t } = useTranslation("depositRoom");
   const { showSuccess, showError } = useNotification();
   const params = useLocalSearchParams();
 
-  // Extract data from params
-  const boardingHouseName = params.boardingHouseName;
-  const roomTypeName = params.roomTypeName;
-  const price = parseFloat(params.price) || 0;
+  // Parse roomData from params
+  const roomData =
+    typeof params.roomData === "string"
+      ? JSON.parse(params.roomData)
+      : params.roomData;
 
-  // Form state
+  // Get roomTypeId and price directly from params
+  const roomTypeId = roomData?._id;
+  const roomTypeName = roomData?.typeName;
+  const price = roomData?.price;
+
+  // States
+  const [roomsList, setRoomsList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [selectedRoomId, setSelectedRoomId] = useState("");
   const [rentalTime, setRentalTime] = useState("1");
   const [timeType, setTimeType] = useState("month");
@@ -45,14 +55,32 @@ export default function DepositRoom() {
     calculateEndDate(new Date(), 1, "month")
   );
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showRoomPicker, setShowRoomPicker] = useState(false);
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
 
-  // Format options for room selection
-  const roomOptions = roomData.map((room) => ({
-    label: room.roomNumber,
-    value: room._id,
-  }));
+  // Fetch rooms data
+  const fetchRoomsByRoomTypeId = async () => {
+    try {
+      const res = await getRoomsByRoomType(roomTypeId);
+      setRoomsList(res);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+      showError(t("fetchRoomsError") || "Failed to load available rooms");
+    }
+  };
+
+  // Load initial data
+  useEffect(() => {
+    if (roomTypeId) {
+      setInitialLoading(true);
+      fetchRoomsByRoomTypeId().finally(() => {
+        setInitialLoading(false);
+      });
+    } else {
+      showError("Room type ID is missing");
+      router.back();
+    }
+  }, [roomTypeId]);
 
   // Calculate end date based on rental time and type
   function calculateEndDate(start, time, type) {
@@ -81,10 +109,17 @@ export default function DepositRoom() {
     setShowStartDatePicker(false);
     if (selectedDate) {
       setStartDate(selectedDate);
-      // Recalculate end date
       setEndDate(
         calculateEndDate(selectedDate, parseInt(rentalTime), timeType)
       );
+    }
+  };
+
+  // Handle room selection
+  const handleRoomChange = (roomId) => {
+    setSelectedRoomId(roomId);
+    if (errors.roomId) {
+      setErrors((prev) => ({ ...prev, roomId: null }));
     }
   };
 
@@ -117,11 +152,11 @@ export default function DepositRoom() {
           format(startDate, "yyyy-MM-dd"),
           format(endDate, "yyyy-MM-dd"),
         ],
+        price: price, // Use price directly from params
       };
 
       const response = await depositRoom(depositData);
       showSuccess(t("successMessage"));
-      // Navigate back or to success screen
       router.back();
     } catch (error) {
       console.error("Deposit error:", error);
@@ -130,6 +165,28 @@ export default function DepositRoom() {
       setLoading(false);
     }
   };
+
+  // Show loading state while fetching initial data
+  if (initialLoading) {
+    return (
+      <ScreenContainer withPadding={false}>
+        <BackHeader
+          title={t("title")}
+          backIcon={
+            <FontAwesome5
+              name="chevron-left"
+              size={18}
+              color={isDarkMode ? "#fff" : "#333"}
+            />
+          }
+        />
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#ff7a45" />
+          <Text className="mt-4">{t("loading") || "Loading..."}</Text>
+        </View>
+      </ScreenContainer>
+    );
+  }
 
   return (
     <ScreenContainer withPadding={false}>
@@ -145,41 +202,143 @@ export default function DepositRoom() {
       />
 
       <ScrollContainer keyboardAvoiding className="px-4">
-        <View className="mb-6">
-          <Text className="text-2xl font-bold mb-1">{boardingHouseName}</Text>
-          <Text className="text-lg font-semibold mb-4">{roomTypeName}</Text>
-          <Text className="text-xl text-orange-500 font-bold">
-            {formatAmount(price)} {t("pricePerMonth")}
+        {/* Room Selection */}
+        <View className="mb-5">
+          <Text
+            className={`text-base font-semibold mb-2 ${
+              isDarkMode ? "text-white" : "text-black"
+            }`}
+          >
+            {t("selectRoom")} <Text style={{ color: "red" }}>*</Text>
           </Text>
+          <TouchableOpacity
+            className={`border rounded-lg p-4 ${
+              isDarkMode
+                ? "border-gray-600 bg-gray-800"
+                : "border-gray-300 bg-white"
+            } ${errors.roomId ? "border-red-500" : ""}`}
+            onPress={() => setShowRoomPicker(true)}
+          >
+            <Text
+              className={`text-base ${
+                isDarkMode ? "text-gray-200" : "text-black"
+              } ${!selectedRoomId ? "opacity-60" : ""}`}
+            >
+              {selectedRoomId
+                ? roomsList.find((room) => room._id === selectedRoomId)
+                    ?.roomNumber
+                : t("selectRoom")}
+            </Text>
+          </TouchableOpacity>
+          {errors.roomId ? (
+            <Text style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>
+              {errors.roomId}
+            </Text>
+          ) : null}
+
+          <Modal
+            visible={showRoomPicker}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setShowRoomPicker(false)}
+          >
+            <TouchableOpacity
+              className="flex-1 bg-black/50 justify-end"
+              activeOpacity={1}
+              onPress={() => setShowRoomPicker(false)}
+            >
+              <View
+                className={`rounded-t-3xl max-h-[80%] ${
+                  isDarkMode ? "bg-gray-900" : "bg-white"
+                }`}
+              >
+                <View
+                  className={`flex-row justify-between items-center p-4 border-b ${
+                    isDarkMode ? "border-gray-700" : "border-gray-200"
+                  }`}
+                >
+                  <Text
+                    className={`text-lg font-semibold ${
+                      isDarkMode ? "text-white" : "text-black"
+                    }`}
+                  >
+                    {t("selectRoom")}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setShowRoomPicker(false)}
+                    className="p-1"
+                  >
+                    <Text
+                      className={`text-xl ${
+                        isDarkMode ? "text-white" : "text-black"
+                      }`}
+                    >
+                      ✕
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView className="p-4">
+                  {roomsList.length > 0 ? (
+                    roomsList.map((room) => (
+                      <TouchableOpacity
+                        key={room._id}
+                        className={`p-4 border-b ${
+                          isDarkMode ? "border-gray-700" : "border-gray-200"
+                        } ${
+                          selectedRoomId === room._id
+                            ? isDarkMode
+                              ? "bg-gray-700"
+                              : "bg-gray-100"
+                            : ""
+                        }`}
+                        onPress={() => {
+                          handleRoomChange(room._id);
+                          setShowRoomPicker(false);
+                        }}
+                      >
+                        <Text
+                          className={`text-base ${
+                            selectedRoomId === room._id ? "font-semibold" : ""
+                          } ${isDarkMode ? "text-white" : "text-black"}`}
+                        >
+                          {room.roomNumber}
+                        </Text>
+                      </TouchableOpacity>
+                    ))
+                  ) : (
+                    <Text
+                      className={`text-center p-4 ${
+                        isDarkMode ? "text-gray-300" : "text-gray-500"
+                      }`}
+                    >
+                      {t("noRoomsAvailable") || "No rooms available"}
+                    </Text>
+                  )}
+                </ScrollView>
+              </View>
+            </TouchableOpacity>
+          </Modal>
         </View>
 
-        {/* Room Selection */}
-        <Select
-          label={t("selectRoom")}
-          placeholder={t("selectRoom")}
-          options={roomOptions}
-          value={selectedRoomId}
-          onChange={(value) => {
-            setSelectedRoomId(value);
-            if (errors.roomId) {
-              setErrors((prev) => ({ ...prev, roomId: null }));
-            }
-          }}
-          error={errors.roomId}
-          required
-        />
-
+        {/* Rest of the code remains the same */}
         {/* Rental Start Date */}
-        <FormField label={t("rentalDate")} required containerClassName="mb-4">
+        <View className="mb-5">
+          <Text
+            className={`text-base font-semibold mb-2 ${
+              isDarkMode ? "text-white" : "text-black"
+            }`}
+          >
+            {t("rentalDate")} <Text style={{ color: "red" }}>*</Text>
+          </Text>
           <TouchableOpacity
             onPress={() => setShowStartDatePicker(true)}
-            className={`p-3 border rounded-lg ${
+            className={`p-4 border rounded-lg ${
               isDarkMode
                 ? "border-gray-700 bg-gray-800"
                 : "border-gray-300 bg-white"
             }`}
           >
-            <Text>
+            <Text className={isDarkMode ? "text-white" : "text-black"}>
               {format(startDate, "dd/MM/yyyy")} -{" "}
               {format(endDate, "dd/MM/yyyy")}
             </Text>
@@ -194,11 +353,15 @@ export default function DepositRoom() {
               minimumDate={new Date()}
             />
           )}
-        </FormField>
+        </View>
 
         {/* Rental Time */}
-        <View className="mb-4">
-          <Text className="text-base font-semibold mb-2">
+        <View className="mb-5">
+          <Text
+            className={`text-base font-semibold mb-2 ${
+              isDarkMode ? "text-white" : "text-black"
+            }`}
+          >
             {t("rentalTime")} <Text style={{ color: "red" }}>*</Text>
           </Text>
           <View className="flex-row space-x-2">
@@ -221,16 +384,32 @@ export default function DepositRoom() {
             </View>
 
             <View className="w-1/3">
-              <Select
-                options={[
-                  { label: t("month"), value: "month" },
-                  { label: t("year"), value: "year" },
-                ]}
-                value={timeType}
-                onChange={setTimeType}
-              />
+              <TouchableOpacity
+                className={`border rounded-lg p-2 ml-2 h-[42px] justify-center items-center ${
+                  isDarkMode
+                    ? "border-gray-600 bg-gray-800"
+                    : "border-gray-300 bg-white"
+                }`}
+                onPress={() => {
+                  // Toggle between month and year
+                  setTimeType(timeType === "month" ? "year" : "month");
+                }}
+              >
+                <Text
+                  className={`text-base text-center ${
+                    isDarkMode ? "text-gray-200" : "text-black"
+                  }`}
+                >
+                  {timeType === "month" ? t("month") : t("year")}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
+          {errors.rentalTime && (
+            <Text style={{ color: "#ef4444", fontSize: 12, marginTop: 4 }}>
+              {errors.rentalTime}
+            </Text>
+          )}
         </View>
 
         {/* Deposit Button */}
@@ -238,7 +417,7 @@ export default function DepositRoom() {
           onPress={handleDeposit}
           loading={loading}
           fullWidth
-          className="mt-8 mb-6"
+          className="mt-6 mb-8"
         >
           {t("okText")}
         </Button>
@@ -246,19 +425,3 @@ export default function DepositRoom() {
     </ScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  errorText: {
-    color: "red",
-    fontSize: 12,
-    marginTop: 4,
-  },
-});
