@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from "express";
 
 import {
   authController,
@@ -12,107 +12,111 @@ import {
   renewalController,
   userPaymentController,
   refundRequestController,
-} from '../controllers/index.js';
-import { upload } from '../config/cloudinary.config.js';
+} from "../controllers/index.js";
+import { upload } from "../config/cloudinary.config.js";
 
 const authRouter = Router();
 
-authRouter.get('/', (req, res) => {
-  res.send('This is an auth router');
+authRouter.get("/", (req, res) => {
+  res.send("This is an auth router");
 });
 
-authRouter.get('/user', authController.getAccountFromToken);
-authRouter.get('/favorites', favoriteController.getFavorites);
-authRouter.post('/favorites/create', favoriteController.createFavorite);
+authRouter.get("/user", authController.getAccountFromToken);
+authRouter.get("/favorites", favoriteController.getFavorites);
+authRouter.post("/favorites/create", favoriteController.createFavorite);
 authRouter.delete(
-  '/favorites/:boardingHouseId',
+  "/favorites/:boardingHouseId",
   favoriteController.deleteFavorite
 );
-authRouter.get('/allfavorites', favoriteController.getAllFavorites);
+authRouter.get("/allfavorites", favoriteController.getAllFavorites);
 
-authRouter.post('/change-password', accountController.changePassword);
-authRouter.put('/profile', accountController.updateAccountFromProfile);
+authRouter.post("/change-password", accountController.changePassword);
+authRouter.put("/profile", accountController.updateAccountFromProfile);
 
 authRouter.put(
-  '/avatar',
-  upload.single('avatar'),
+  "/avatar",
+  upload.single("avatar"),
   accountController.updateAvatar
 );
 authRouter.put(
-  '/review',
-  upload.single('review'),
+  "/review",
+  upload.single("review"),
   ReviewController.updateReviewImage
 );
 
-authRouter.post('/send-otp-change-email', accountController.sendOTPChangeEmail);
-authRouter.post('/verify-change-email', accountController.verifyChangeEmail);
+authRouter.post("/send-otp-change-email", accountController.sendOTPChangeEmail);
+authRouter.post("/verify-change-email", accountController.verifyChangeEmail);
 
 //appointment
 authRouter.get(
-  '/appointment/user',
+  "/appointment/user",
   appointmentController.getAppointmentByUserId
 );
 authRouter.put(
-  '/appointment/update-status/:id',
+  "/appointment/update-status/:id",
   appointmentController.updateAppointmentStatus
 );
 
 authRouter.post(
-  '/appointment/create-appointment/',
+  "/appointment/create-appointment/",
   appointmentController.createAppointment
 );
-authRouter.post('/reviews', ReviewController.addReview);
+authRouter.post("/reviews", ReviewController.addReview);
 
 // report
-authRouter.get('/reports/exist', reportController.checkReportExist);
+authRouter.get(
+  "/reports/boarding-house/exist",
+  reportController.checkBHReportExist
+);
+authRouter.get("/reports/exist", reportController.checkReportExist);
 authRouter.post(
-  '/reports',
-  upload.array('report'),
+  "/reports",
+  upload.array("report"),
   reportController.createReport
 );
-authRouter.get('/reports', reportController.getReportByUserId);
-authRouter.get('/reports/:reportId', reportController.getReportReviewDetail);
+authRouter.get("/reports", reportController.getReportByUserId);
+authRouter.get("/reports/:reportId", reportController.getReportReviewDetail);
 
 //review
-authRouter.put('/reviews/:reviewId', ReviewController.updateReview);
-authRouter.get('/reviews', ReviewController.getReviewsUser);
-authRouter.delete('/reviews/:reviewId', ReviewController.softDeleteReview);
+authRouter.put("/reviews/:reviewId", ReviewController.updateReview);
+authRouter.get("/reviews", ReviewController.getReviewsUser);
+authRouter.delete("/reviews/:reviewId", ReviewController.softDeleteReview);
 
-authRouter.get('/watchlater', watchLaterController.getWatchLater);
-authRouter.get('/watchlater/all', watchLaterController.getAllWatchLater);
-authRouter.post('/watchlater/create', watchLaterController.createWatchLater);
+authRouter.get("/watchlater", watchLaterController.getWatchLater);
+authRouter.get("/watchlater/all", watchLaterController.getAllWatchLater);
+authRouter.post("/watchlater/create", watchLaterController.createWatchLater);
 authRouter.delete(
-  '/watchlater/:watchLaterId',
+  "/watchlater/:watchLaterId",
   watchLaterController.deleteWatchLater
 );
 
 // deposit
-authRouter.post('/deposit', depositController.deposit);
-authRouter.get('/deposited-room', depositController.getDepositedRooms);
+authRouter.post("/deposit", depositController.deposit);
+authRouter.get("/deposited-room", depositController.getDepositedRooms);
 authRouter.get(
-  '/deposited-room/:depositRoomId',
+  "/deposited-room/:depositRoomId",
   depositController.getDepositRoom
 );
-authRouter.post('/pay-rent', depositController.payRent);
+authRouter.post("/pay-rent", depositController.payRent);
 authRouter.get(
-  '/pay-rent/:depositRoomId',
+  "/pay-rent/:depositRoomId",
   depositController.checkPayRentStatus
 );
-authRouter.post('/pay-deposit', depositController.payDeposit);
+authRouter.post("/pay-deposit", depositController.payDeposit);
 
 // refund request
-authRouter.get('/refund-requests', refundRequestController.getRefundRequests);
+authRouter.get("/refund-requests", refundRequestController.getRefundRequests);
 authRouter.post(
-  '/refund-requests',
+  "/refund-requests",
   refundRequestController.createRefundRequest
 );
 
 // userPayment
-authRouter.get('/user-payment', userPaymentController.getUserPaymentByUserId);
+authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
 
 //renewal
-authRouter.get('/renewal', renewalController.getExtensionRequests);
-authRouter.post('/renewal', renewalController.createExtensionRequest);
-authRouter.put('/renewal/:requestId', renewalController.updateExtensionRequest);
+authRouter.get("/renewal", renewalController.getExtensionRequests);
+authRouter.post("/renewal", renewalController.createExtensionRequest);
+authRouter.put("/renewal/:requestId", renewalController.updateExtensionRequest);
 
 export { authRouter };
