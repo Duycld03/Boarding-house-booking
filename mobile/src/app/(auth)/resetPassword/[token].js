@@ -82,10 +82,6 @@ export default function ResetPassword() {
       <BackHeader title={t("title")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
-        <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          {t("header")}
-        </Text>
-
         <FormField
           name="password"
           label={t("password")}
