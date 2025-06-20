@@ -185,7 +185,7 @@ function CreateAppointment() {
         setLoading(true);
         try {
             const res = await getAppointmentOfUser();
-            setUserAppointment(res || []);
+            setUserAppointment(res?.data || []);
         } catch (error) {
             console.log('Error fetching user appointments:', error);
         } finally {
@@ -266,7 +266,7 @@ function CreateAppointment() {
                 const hasSameRoom = userAppointment.some(
                     (appt) =>
                         appt.roomId === appointmentData.roomId &&
-                        (appt.status === 'pending' || appt.status === 'confirmed')
+                        (appt.status === 'pending' || appt.status === 'accepted')
                 );
 
                 if (hasSameRoom) {
@@ -275,28 +275,6 @@ function CreateAppointment() {
                 }
             }
 
-            const isWithin30Minutes = (existingDate, newDate) => {
-                const diff = Math.abs(new Date(existingDate) - new Date(newDate));
-                return diff <= 30 * 60 * 1000;
-            };
-
-            if (userAppointment.length > 0) {
-                const hasConflict = userAppointment
-                    .filter(
-                        (appt) => appt.status === 'pending' || appt.status === 'confirmed'
-                    )
-                    .some((appt) =>
-                        isWithin30Minutes(
-                            appt.appointmentDate,
-                            appointmentData.appointmentDate
-                        )
-                    );
-
-                if (hasConflict) {
-                    showError(t('createAppointment.timeConflictError'))
-                    return;
-                }
-            }
 
             await createAppointment(appointmentData).then(() => {
                 showSuccess('Create appointment success')
