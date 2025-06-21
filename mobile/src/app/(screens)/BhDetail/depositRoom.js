@@ -159,7 +159,6 @@ export default function DepositRoom() {
       showSuccess(t("successMessage"));
       router.back();
     } catch (error) {
-      console.error("Deposit error:", error);
       showError(error?.response?.data?.message || "Failed to process deposit");
     } finally {
       setLoading(false);
