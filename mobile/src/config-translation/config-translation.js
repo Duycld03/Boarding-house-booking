@@ -33,6 +33,8 @@ import vi_myAppointment from "@/locales/vi/myAppointment.json";
 import en_myAppointment from "@/locales/en/myAppointment.json";
 import en_home from "@/locales/en/home.json";
 import vi_home from "@/locales/vi/home.json";
+import en_depositRoom from "@/locales/en/depositRoom.json";
+import vi_depositRoom from "@/locales/vi/depositRoom.json";
 import en_report from "@/locales/en/report.json";
 import vi_report from "@/locales/vi/report.json";
 import en_boardingHouseGallery from "@/locales/en/boardingHouseGallery.json";
@@ -58,6 +60,7 @@ i18n.use(initReactI18next).init({
       common: en_common,
       boardingHouseDetail: en_bhDetail,
       myAppointment: en_myAppointment,
+      depositRoom: en_depositRoom,
       report: en_report,
       boardingHouseGallery: en_boardingHouseGallery,
     },
@@ -78,6 +81,7 @@ i18n.use(initReactI18next).init({
       common: vi_common,
       boardingHouseDetail: vi_bhDetail,
       myAppointment: vi_myAppointment,
+      depositRoom: vi_depositRoom,
       report: vi_report,
       boardingHouseGallery: vi_boardingHouseGallery,
     },

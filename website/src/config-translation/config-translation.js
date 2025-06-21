@@ -22,6 +22,8 @@ import en_common from "@/locales/en/common.json";
 import vi_common from "@/locales/vi/common.json";
 import en_reportModal from "@/locales/en/reportModal.json";
 import vi_reportModal from "@/locales/vi/reportModal.json";
+import en_depositPopup from "@/locales/en/depositPopup.json";
+import vi_depositPopup from "@/locales/vi/depositPopup.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -37,6 +39,7 @@ i18n.use(initReactI18next).init({
       bhManagement: en_bhManagement,
       common: en_common,
       reportModal: en_reportModal,
+      depositPopup: en_depositPopup,
     },
     vi: {
       menu: vi_menu,
@@ -50,6 +53,7 @@ i18n.use(initReactI18next).init({
       bhManagement: vi_bhManagement,
       common: vi_common,
       reportModal: vi_reportModal,
+      depositPopup: vi_depositPopup,
     },
   },
   lng: "en",

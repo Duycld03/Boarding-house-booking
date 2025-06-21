@@ -457,7 +457,7 @@ class DepositController {
     try {
       const { boardingHouseId } = req.params;
       const { status, priceRange, roomId, rentalTime } = req.query;
-      const rooms = await Room.find({ boardingHouseId })
+      const rooms = await Room.find({ boardingHouseId });
 
       const roomMap = new Map(
         rooms.map((room) => [room._id.toString(), room.roomNumber])
@@ -755,7 +755,6 @@ class DepositController {
       return res
         .status(500)
         .json({ error: "Đã có lỗi xảy ra", detail: error.message });
-
     }
   }
   async acceptRefundRequestForOwner(req, res) {

@@ -1,0 +1,18 @@
+{
+  "title": "Đặt Cọc Phòng",
+  "selectRoom": "Chọn Phòng",
+  "selectRoomRequired": "Vui lòng chọn phòng",
+  "rentalDate": "Thời Gian Thuê",
+  "rentalTime": "Thời Hạn Thuê",
+  "enterRentalTime": "Nhập thời hạn",
+  "rentalTimeMin": "Thời hạn thuê phải lớn hơn 0",
+  "month": "Tháng",
+  "year": "Năm",
+  "okText": "Đặt Cọc Ngay",
+  "cancelText": "Hủy",
+  "pricePerMonth": "/ tháng",
+  "loading": "Đang tải...",
+  "successMessage": "Đặt cọc phòng thành công!",
+  "fetchRoomsError": "Không thể tải danh sách phòng",
+  "noRoomsAvailable": "Không có phòng khả dụng"
+}
