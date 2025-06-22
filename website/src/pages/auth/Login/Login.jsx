@@ -164,6 +164,11 @@ function Login() {
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 className={darkMode ? styles.darkPasswordInput : ""}
+                style={
+                  darkMode
+                    ? { backgroundColor: "#111827", border: "#111827" }
+                    : {}
+                }
               />
             </Form.Item>
 
