@@ -1,0 +1,29 @@
+{
+  "report": {
+    "title": "Báo cáo",
+    "reason": "Lý do",
+    "detail": "Chi tiết",
+    "images": "Hình ảnh",
+    "addImages": "Thêm hình ảnh",
+    "dragDropText": "Kéo thả hoặc nhấp vào đây để chọn tệp",
+    "selectReason": "Chọn lý do",
+    "enterDetail": "Nhập chi tiết",
+    "submit": "Báo cáo",
+    "uploadLimit": "Bạn chỉ có thể tải lên tối đa 6 hình ảnh",
+    "reasons": {
+      "boardingHouse": {
+        "scamRent": "Lừa đảo tiền thuê hoặc đặt cọc",
+        "falseAd": "Quảng cáo sai sự thật",
+        "privacy": "Vi phạm quyền riêng tư",
+        "unfriendly": "Chủ nhà không thân thiện",
+        "security": "Bảo mật kém"
+      },
+      "review": {
+        "spam": "Spam",
+        "misleading": "Thông tin gây hiểu lầm",
+        "privacy": "Vi phạm quyền riêng tư",
+        "inappropriate": "Nội dung không phù hợp"
+      }
+    }
+  }
+}

@@ -1,0 +1,96 @@
+/* Login.module.css */
+
+.darkInput :global(.ant-input) {
+  background-color: #4b5563 !important;
+  border-color: #6b7280 !important;
+  color: #ffffff !important;
+}
+
+.darkInput :global(.ant-input::placeholder) {
+  color: #9ca3af !important;
+}
+
+.darkInput :global(.ant-input:focus) {
+  border-color: #40bfff !important;
+  box-shadow: 0 0 0 2px rgba(64, 191, 255, 0.2) !important;
+}
+
+.darkInput :global(.ant-input:hover) {
+  border-color: #40bfff !important;
+}
+
+/* Password input styles - More specific selectors */
+.darkPasswordInput :global(.ant-input-password) {
+  background-color: #4b5563 !important;
+  border-color: #6b7280 !important;
+}
+
+.darkPasswordInput :global(.ant-input-password .ant-input) {
+  background-color: #4b5563 !important;
+  border: none !important;
+  color: #ffffff !important;
+}
+
+.darkPasswordInput :global(.ant-input-password .ant-input::placeholder) {
+  color: #9ca3af !important;
+}
+
+.darkPasswordInput :global(.ant-input-password:hover) {
+  border-color: #40bfff !important;
+}
+
+.darkPasswordInput :global(.ant-input-password:focus-within) {
+  border-color: #40bfff !important;
+  box-shadow: 0 0 0 2px rgba(64, 191, 255, 0.2) !important;
+}
+
+.darkPasswordInput :global(.ant-input-password .anticon) {
+  color: #9ca3af !important;
+}
+
+.darkPasswordInput :global(.ant-input-password .ant-input-suffix) {
+  background-color: transparent !important;
+}
+
+/* Google Login Dark Mode */
+.googleLoginDark {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.googleLoginDark > div {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Checkbox dark mode */
+.darkCheckbox :global(.ant-checkbox-wrapper) {
+  color: #ffffff !important;
+}
+
+.darkCheckbox :global(.ant-checkbox-inner) {
+  background-color: #4b5563 !important;
+  border-color: #6b7280 !important;
+}
+
+.darkCheckbox :global(.ant-checkbox-checked .ant-checkbox-inner) {
+  background-color: #40bfff !important;
+  border-color: #40bfff !important;
+}
+
+.darkCheckbox :global(.ant-checkbox:hover .ant-checkbox-inner) {
+  border-color: #40bfff !important;
+}
+
+/* Form item label dark mode */
+.darkFormItem :global(.ant-form-item-label > label) {
+  color: #ffffff !important;
+}
+
+/* Transition effects */
+.themeTransition {
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.linkTransition {
+  transition: color 0.2s ease;
+}
