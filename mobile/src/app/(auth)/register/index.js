@@ -146,10 +146,6 @@ export default function Register() {
       <BackHeader title={t("register")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
-        <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          {t("registerTitle")}
-        </Text>
-
         <FormField
           name="fullname"
           label={t("fullname")}

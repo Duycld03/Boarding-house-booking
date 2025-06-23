@@ -78,7 +78,7 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
   const fetchDataUserAppointment = async () => {
     try {
       const res = await getAppointmentOfUser();
-      setUsrAppointment(res);
+      setUsrAppointment(res.data);
     } catch (error) {
       console.log(error);
     } finally {
@@ -119,7 +119,7 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
     return {
       disabledHours: () =>
         Array.from({ length: 24 }, (_, i) => i).filter(
-          (h) => h < 6 || h >= 18 || bookedHours.includes(h)
+          (h) => h < 7 || h >= 18 || bookedHours.includes(h)
         ),
       disabledMinutes: (hour) =>
         bookedHours.includes(hour)
@@ -147,34 +147,11 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
         const hasSameRoom = userAppointment.some(
           (appt) =>
             appt.roomId === appointmentData.roomId &&
-            (appt.status === "pending" || appt.status === "confirmed")
+            (appt.status === "pending" || appt.status === "accepted")
         );
 
         if (hasSameRoom) {
           toast.error(t("createAppointment.sameRoomError"));
-          return;
-        }
-      }
-
-      const isWithin30Minutes = (existingDate, newDate) => {
-        const diff = Math.abs(new Date(existingDate) - new Date(newDate));
-        return diff <= 30 * 60 * 1000; // 30 minutes in milliseconds
-      };
-
-      if (userAppointment.length > 0) {
-        const hasConflict = userAppointment
-          .filter(
-            (appt) => appt.status === "pending" || appt.status === "confirmed"
-          )
-          .some((appt) =>
-            isWithin30Minutes(
-              appt.appointmentDate,
-              appointmentData.appointmentDate
-            )
-          );
-
-        if (hasConflict) {
-          toast.error(t("createAppointment.timeConflictError"));
           return;
         }
       }
