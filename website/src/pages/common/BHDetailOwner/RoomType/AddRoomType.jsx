@@ -212,7 +212,11 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               : {}
           }
         >
-          <Form layout="vertical" onSubmitCapture={handleSubmit}>
+          <Form
+            layout="vertical"
+            onSubmitCapture={handleSubmit}
+            className={cx('no-margin')} // nếu dùng classNames
+          >
             <Form.Item label="Room Type Name" required>
               <Input
                 placeholder="Enter room type name"

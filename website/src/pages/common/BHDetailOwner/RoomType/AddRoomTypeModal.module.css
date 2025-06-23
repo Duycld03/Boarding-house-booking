@@ -1,3 +1,6 @@
+:global(.no-margin) :global(.ant-form-item) {
+    margin-bottom: 0 !important;
+}
 .dark-mode-input {
     background-color: #374151 !important;
     color: #ffffff !important;
