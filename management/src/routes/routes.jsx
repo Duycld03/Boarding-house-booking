@@ -78,6 +78,11 @@ const routes = [
     layout: AuthLayout,
   },
   {
+    path: "/access-denied",
+    page: CommonPages.AccessDeniedPage,
+    layout: AuthLayout,
+  },
+  {
     path: "/my-appointment",
     page: CommonPages.MyAppointment,
     layout: ProfileLayout,
