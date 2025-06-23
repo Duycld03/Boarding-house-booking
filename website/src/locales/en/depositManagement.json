@@ -4,7 +4,7 @@
     "name": "Depositor",
     "boardingHouse": "Boarding House",
     "roomNumber": "Room Number",
-    "amount": "Amount",
+    "amount": "Deposit",
     "status": "Status",
     "rentalTime": "Rental Time",
     "startDate": "Start Date",
@@ -36,5 +36,9 @@
     "noRoomSelected": "No room selected!",
     "requireReason": "Please enter a reason for rejection"
   },
-  "noData": "No data available"
+  "noData": "No data available",
+    "time": {
+    "month": "month(s)",
+    "year": "year(s)"
+  }
 }

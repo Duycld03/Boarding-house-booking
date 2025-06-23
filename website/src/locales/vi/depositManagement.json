@@ -4,7 +4,7 @@
     "name": "Người đặt",
     "boardingHouse": "Nhà trọ",
     "roomNumber": "Số phòng",
-    "amount": "Số tiền",
+    "amount": "Tiền cọc",
     "status": "Trạng thái",
     "rentalTime": "Thời gian thuê",
     "startDate": "Ngày bắt đầu",
@@ -35,5 +35,9 @@
     "noRoomSelected": "Chưa chọn phòng!",
     "requireReason": "Vui lòng nhập lý do từ chối"
   },
-  "noData": "Không có dữ liệu"
+  "noData": "Không có dữ liệu",
+    "time": {
+    "month": "tháng",
+    "year": "năm"
+  }
 }

@@ -14,6 +14,7 @@ import { Button } from '@/component';
 import ConfirmModal from '@/component/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
+import formatRentalTime from '@/utils/formatRentalTime';
 
 const DepositRoom = () => {
   const { t } = useTranslation('depositManagement');
@@ -177,8 +178,13 @@ const DepositRoom = () => {
       dataIndex: 'amount',
       key: 'amount',
       render: (price) =>
-        price ? `${formatAmount(price, currentLanguage)}` : 'N/A',
+        price ? (
+          <Tag color="processing">{formatAmount(price, currentLanguage)}</Tag>
+        ) : (
+          <Tag color="default">N/A</Tag>
+        ),
     },
+
     {
       title: t('columns.status'),
       dataIndex: 'status',
@@ -203,6 +209,7 @@ const DepositRoom = () => {
       title: t('columns.rentalTime'),
       dataIndex: 'rentalTime',
       key: 'rentalTime',
+      render: (value) => formatRentalTime(value, t),
     },
     {
       title: t('columns.startDate'),
