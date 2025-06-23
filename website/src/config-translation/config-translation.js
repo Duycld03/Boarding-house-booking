@@ -26,6 +26,9 @@ import en_depositPopup from '@/locales/en/depositPopup.json';
 import vi_depositPopup from '@/locales/vi/depositPopup.json';
 import en_roomType from '@/locales/en/roomType.json';
 import vi_roomType from '@/locales/vi/roomType.json';
+import en_depositManagement from '@/locales/en/depositManagement.json';
+import vi_depositManagement from '@/locales/vi/depositManagement.json';
+import { DepositManagement } from '@/pages/common';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -43,6 +46,7 @@ i18n.use(initReactI18next).init({
       reportModal: en_reportModal,
       depositPopup: en_depositPopup,
       roomType: en_roomType,
+      depositManagement: en_depositManagement,
     },
     vi: {
       menu: vi_menu,
@@ -58,6 +62,7 @@ i18n.use(initReactI18next).init({
       reportModal: vi_reportModal,
       depositPopup: vi_depositPopup,
       roomType: vi_roomType,
+      depositManagement: vi_depositManagement,
     },
   },
   lng: 'en',

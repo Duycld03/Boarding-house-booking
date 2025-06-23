@@ -29,7 +29,6 @@ import {
 } from '../../../api/BoardingHouseAPI';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import RoomType from './RoomType/RoomType';
-import DepositManagement from '@/pages/common/BHDetailOwner/DepositManagement';
 import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
 import TenantManagement from './TenantManagement/TenantManagement';
 import RoomManagement from './RoomManagement/RoomManagement';
@@ -451,10 +450,6 @@ const BHDetailOwner = () => {
 
         <Tabs.TabPane tab={t('tabs.room')} key="room">
           <RoomManagement boardingHouseId={boardingHouseId} />
-        </Tabs.TabPane>
-
-        <Tabs.TabPane tab={t('tabs.depositManagement')} key="depositManagement">
-          <DepositManagement />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab={t('tabs.tenantManagement')} key="tenantManagement">

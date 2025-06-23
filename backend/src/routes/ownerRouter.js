@@ -87,10 +87,10 @@ ownerRouter.delete(
 );
 
 //deposit
-ownerRouter.get(
-  '/boardinghouse/deposit/:boardingHouseId',
-  depositController.getDepositByBhId
-);
+// ownerRouter.get(
+//   '/boardinghouse/deposit/:boardingHouseId',
+//   depositController.getDepositsByAccount
+// );
 
 ownerRouter.get(
   '/boardinghouse/deposit/max-deposit/:boardingHouseId',
