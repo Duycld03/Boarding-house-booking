@@ -226,31 +226,6 @@ function Profile() {
                       @{username}
                     </span>
                   </Title>
-
-                  {isOwner && (
-                    <div
-                      className={`mt-4 p-4 rounded-lg text-center ${
-                        darkMode ? 'bg-gray-800' : 'bg-gray-50'
-                      }`}
-                    >
-                      <Text
-                        strong
-                        className={darkMode ? 'text-gray-300' : 'text-gray-600'}
-                      >
-                        {t('accountBalance.label')}
-                      </Text>
-                      <div
-                        className={`text-xl font-bold mt-2 ${
-                          darkMode ? 'text-green-400' : 'text-green-600'
-                        }`}
-                      >
-                        {new Intl.NumberFormat('vi-VN', {
-                          style: 'currency',
-                          currency: 'VND',
-                        }).format(accountBalance)}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </Card>
             </div>

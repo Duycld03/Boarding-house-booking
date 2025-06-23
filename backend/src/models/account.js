@@ -58,11 +58,6 @@ const AccountSchema = mongoose.Schema(
       type: String,
     },
     avatarImage: AvatarImageSchema,
-    accountBalance: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
     status: {
       type: String,
       default: 'inactive',
