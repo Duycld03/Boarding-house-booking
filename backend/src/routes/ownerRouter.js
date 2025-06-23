@@ -64,7 +64,7 @@ ownerRouter.delete(
 );
 
 //facilities
-ownerRouter.get('/facilities', FacilitiesController.getAllFacilities);
+// ownerRouter.get('/facilities', FacilitiesController.getAllFacilities);
 
 //roomtype
 ownerRouter.get(
