@@ -1,0 +1,16 @@
+.dark-mode-input {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+.dark-mode-select {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+.dark-mode-dropdown {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+}
