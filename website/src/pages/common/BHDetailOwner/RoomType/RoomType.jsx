@@ -3,7 +3,6 @@ import Table from '@/component/Table';
 import { Button, ConfirmModal } from '@/component';
 import { Avatar } from 'antd';
 import DefaultRoomImage from '@/assets/images/none_avatar.png';
-import { FileTextOutlined } from '@ant-design/icons';
 import { getRoomTypeByBhId, softDeleteRoomType } from '@/api/roomTypeAPI';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
@@ -22,6 +21,16 @@ const RoomType = () => {
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+  });
   const currentLanguage = i18next.language;
 
   const fetchRoomTypes = async () => {
@@ -31,14 +40,21 @@ const RoomType = () => {
     }
     setLoading(true);
     try {
-      const response = await getRoomTypeByBhId(boardingHouseId);
-      if (Array.isArray(response.data)) {
-        setRoomData(response.data);
+      const res = await getRoomTypeByBhId(boardingHouseId, paginationOptions);
+      if (res?.data && res?.pagination) {
+        setRoomData(res.data);
+        setPagination({
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
+          totalItems: res.pagination.totalItems,
+          limit: res.pagination.limit,
+        });
       } else {
         throw new Error('Invalid response format');
       }
     } catch (error) {
-      console.error('Failed to fetch room types:', error);
+      console.error(error);
+      toast.error(t('toast.error'));
       setRoomData([]);
     } finally {
       setLoading(false);
@@ -47,7 +63,7 @@ const RoomType = () => {
 
   useEffect(() => {
     fetchRoomTypes();
-  }, [boardingHouseId]);
+  }, [boardingHouseId, paginationOptions]);
 
   const handleAddNewData = async () => {
     await fetchRoomTypes();
@@ -103,6 +119,21 @@ const RoomType = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleTableChange = (pagination) => {
+    setPaginationOptions((prev) => ({
+      ...prev,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    }));
+  };
+
+  const tablePaginationConfig = {
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
   };
 
   const columns = [
@@ -186,6 +217,8 @@ const RoomType = () => {
         columns={columns}
         data={roomData}
         loading={loading}
+        pagination={tablePaginationConfig}
+        onChange={handleTableChange}
         noDataText={t('messages.noData')}
       />
 
