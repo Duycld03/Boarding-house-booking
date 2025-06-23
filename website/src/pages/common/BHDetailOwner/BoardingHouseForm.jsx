@@ -272,7 +272,7 @@ const BoardingHouseForm = ({
                       style={{
                         width: '100%',
                         height: 'auto',
-                        maxHeight: '300px',
+                        maxHeight: '530px',
                       }}
                       preview={{
                         mask: (
@@ -283,7 +283,7 @@ const BoardingHouseForm = ({
                     <button
                       type="button"
                       onClick={handleRemovePrimaryImage}
-                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                      className="absolute top-2 right-5 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
                       title={t('buttons.delete')}
                     >
                       X
@@ -331,15 +331,15 @@ const BoardingHouseForm = ({
           {/* Other Images */}
           <div className="w-full md:w-1/2">
             <Form.Item label={t('form.labels.otherImages')} className="mb-4">
-              <div className="mt-4 flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4">
                 {(updatedData.otherImages || []).map((file, index) => (
                   <div key={index} className="relative group">
                     <Image
                       src={file?.imageUrl || URL.createObjectURL(file)}
                       alt={`Other Image ${index + 1}`}
                       className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-                      width={100}
-                      height={100}
+                      width={120}
+                      height={120}
                       preview={{
                         mask: (
                           <span className="text-white">{t('preview')}</span>
