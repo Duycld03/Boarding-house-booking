@@ -131,7 +131,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
       );
 
       if (response?.message === 'Room Type added successfully') {
-        toast.success(t('toast.success'));
+        toast.success(t('toast.addSuccess'));
         onAddData();
         closeModal();
       } else {
@@ -234,7 +234,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
             <Form.Item label={t('form.facilities.label')}>
               <Select
                 mode="multiple"
-                placeholder={t('form.facilities.placeholder')}
+                placeholder={t('form.facilities.placeholde2')}
                 value={formData.facilities}
                 onChange={handleSelectChange}
                 className={cx({ 'dark-mode-select': darkMode })}
