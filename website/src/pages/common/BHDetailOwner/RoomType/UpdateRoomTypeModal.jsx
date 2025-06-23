@@ -19,11 +19,13 @@ import {
 import { useTheme } from '@/context/themeContext';
 import classNames from 'classnames';
 import Style from './UpdateRoomTypeModal.module.css';
+import { useTranslation } from 'react-i18next';
 
 const cx = classNames.bind(Style);
 
 const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
   const { darkMode } = useTheme();
+  const { t } = useTranslation('roomType');
 
   const [formData, setFormData] = useState({
     typeName: '',
@@ -45,31 +47,22 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
         setFacilitiesList(response?.data || []);
       } catch (error) {
         console.error('Failed to fetch facilities:', error);
-        toast.error('Failed to fetch facilities.');
+        toast.error(t('toast.fetchFacilitiesError'));
       }
     };
-
     fetchFacilities();
-  }, []);
-
-  useEffect(() => {
-    if (formData.facilities.length === 0) {
-      setFormData((prev) => ({ ...prev, facilities: [] }));
-    }
-  }, [formData.facilities]);
+  }, [t]);
 
   useEffect(() => {
     if (!roomData) return;
-
-    setFormData((prev) => ({
+    setFormData({
       typeName: roomData.typeName || '',
       facilities: roomData.facilities?.map((fac) => fac._id) || [],
       roomSize: roomData.roomSize || '',
       price: roomData.price || '',
       peopleNumber: roomData.peopleNumber || '',
       image: roomData.image?.imageUrl || null,
-    }));
-
+    });
     setImagePreview(roomData.image?.imageUrl || null);
   }, [roomData]);
 
@@ -117,23 +110,23 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
 
   const handleSubmit = async () => {
     if (!formData.typeName.trim()) {
-      toast.error('Type Name is required.');
+      toast.error(t('form.typeName.error'));
       return;
     }
-    if (!/^\d+x\d+$/.test(formData.roomSize)) {
-      toast.error('Room size must be in format 20x30 or 30x40.');
+    if (!/\d+x\d+/.test(formData.roomSize)) {
+      toast.error(t('form.roomSize.error'));
       return;
     }
     if (!formData.price || isNaN(Number(formData.price))) {
-      toast.error('Please enter a valid number for rent/month!');
+      toast.error(t('form.price.error'));
       return;
     }
     if (!formData.peopleNumber || formData.peopleNumber < 1) {
-      toast.error('People number must be at least 1.');
+      toast.error(t('form.peopleNumber.error'));
       return;
     }
     if (!formData.image) {
-      toast.error('You must upload an image.');
+      toast.error(t('form.image.error'));
       return;
     }
 
@@ -157,15 +150,14 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
         roomData._id,
         formDataToSend
       );
-
       if (response?.message === 'Room Type updated successfully') {
-        toast.success('Room type updated successfully!');
+        toast.success(t('toast.updateSuccess'));
         onClose();
         onUpdate();
       }
     } catch (error) {
       console.error('API Error:', error.response?.data || error.message);
-      toast.error(error.response?.data?.message || 'Failed to submit form.');
+      toast.error(error.response?.data?.message || t('toast.error'));
     } finally {
       setLoading(false);
     }
@@ -205,7 +197,9 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
     <ConfigProvider theme={themeConfig}>
       <Modal
         title={
-          <span className={darkMode ? 'text-white' : ''}>Update Room Type</span>
+          <span className={darkMode ? 'text-white' : ''}>
+            {t('modal.updateTitle')}
+          </span>
         }
         open={visible}
         onCancel={onClose}
@@ -218,58 +212,52 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
                 mask: { backgroundColor: 'rgba(0, 0, 0, 0.6)' },
                 content: {
                   backgroundColor: '#1f2937',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                 },
-                header: {
-                  backgroundColor: '#1f2937',
-                  color: '#ffffff',
-                },
-                body: {
-                  backgroundColor: '#1f2937',
-                  color: '#ffffff',
-                },
+                header: { backgroundColor: '#1f2937', color: '#ffffff' },
+                body: { backgroundColor: '#1f2937', color: '#ffffff' },
               }
             : {}
         }
       >
         <Form layout="vertical" className={cx('no-margin')}>
-          <Form.Item label="Room Type Name" required>
+          <Form.Item label={t('form.typeName.label')} required>
             <Input
               name="typeName"
               value={formData.typeName}
               onChange={handleInputChange}
-              placeholder="Enter room type name"
+              placeholder={t('form.typeName.placeholder')}
               className={cx({ 'dark-mode-input': darkMode })}
             />
           </Form.Item>
 
-          <Form.Item label="Facilities">
+          <Form.Item label={t('form.facilities.label')}>
             <Select
               mode="multiple"
-              placeholder="Select facilities"
+              placeholder={t('form.facilities.placeholder')}
               value={formData.facilities}
               onChange={handleSelectChange}
               className={cx({ 'dark-mode-select': darkMode })}
             >
               {facilitiesList.map((facility) => (
                 <Select.Option key={facility._id} value={facility._id}>
-                  {facility.name}
+                  {t(`facilityNames.${facility.name}`)}{' '}
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
 
-          <Form.Item label="Room Size (e.g., 20x30)" required>
+          <Form.Item label={t('form.roomSize.label')} required>
             <Input
               name="roomSize"
               value={formData.roomSize}
               onChange={handleInputChange}
-              placeholder="Enter room size"
+              placeholder={t('form.roomSize.placeholder')}
               className={cx({ 'dark-mode-input': darkMode })}
             />
           </Form.Item>
 
-          <Form.Item label="Rent/month" required>
+          <Form.Item label={t('form.price.label')} required>
             <InputNumber
               name="price"
               value={formData.price ? Number(formData.price) : undefined}
@@ -284,7 +272,7 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
             />
           </Form.Item>
 
-          <Form.Item label="People Number" required>
+          <Form.Item label={t('form.peopleNumber.label')} required>
             <InputNumber
               name="peopleNumber"
               value={formData.peopleNumber}
@@ -324,13 +312,13 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
           <div className="flex justify-end mt-4">
             <Button
               btnCancel
-              title="Cancel"
+              title={t('button.cancel')}
               onClick={onClose}
               className="mr-2"
             />
             <Button
               className="bg-primary text-white"
-              title="Update"
+              title={t('button.update')}
               loading={loading}
               onClick={handleSubmit}
             />

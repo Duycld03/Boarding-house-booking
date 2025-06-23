@@ -241,7 +241,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               >
                 {facilities.map((facility) => (
                   <Select.Option key={facility._id} value={facility._id}>
-                    {facility.name}
+                    {t(`facilityNames.${facility.name}`)}{' '}
                   </Select.Option>
                 ))}
               </Select>

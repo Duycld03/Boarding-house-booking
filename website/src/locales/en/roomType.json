@@ -2,10 +2,12 @@
   "button": {
     "addRoomType": "Add Room Type",
     "cancel": "Cancel",
-    "submit": "Submit"
+    "submit": "Submit",
+    "update": "Update"
   },
   "modal": {
-    "title": "Create Room Type"
+    "title": "Create Room Type",
+    "updateTitle": "Update Room Type"
   },
   "form": {
     "typeName": {
@@ -25,7 +27,7 @@
     "price": {
       "label": "Rent/month",
       "placeholder": "Enter rent/month",
-      "error": "Please enter rent/month valid!"
+      "error": "Please enter a valid number for rent/month!"
     },
     "peopleNumber": {
       "label": "People Number",
@@ -37,7 +39,16 @@
     }
   },
   "toast": {
-    "success": "Room type added successfully!",
-    "error": "Failed to submit form."
-  }
+    "addSuccess": "Room type added successfully!",
+    "updateSuccess": "Room type updated successfully!",
+    "error": "Failed to submit form.",
+    "fetchFacilitiesError": "Failed to fetch facilities."
+  },
+  "facilityNames": {
+  "Swimming Pool": "Swimming Pool",
+  "Gym": "Gym",
+  "Laundry Room": "Laundry Room",
+  "Parking Lot": "Parking Lot",
+  "Tennis Court": "Tennis Court"
+}
 }

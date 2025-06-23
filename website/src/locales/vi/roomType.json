@@ -2,10 +2,12 @@
   "button": {
     "addRoomType": "Thêm loại phòng",
     "cancel": "Hủy",
-    "submit": "Xác nhận"
+    "submit": "Xác nhận",
+    "update": "Cập nhật"
   },
   "modal": {
-    "title": "Tạo loại phòng"
+    "title": "Tạo loại phòng",
+    "updateTitle": "Cập nhật loại phòng"
   },
   "form": {
     "typeName": {
@@ -15,7 +17,7 @@
     },
     "facilities": {
       "label": "Tiện ích",
-      "placeholder": "Chọn các tiện ích"
+      "placeholder": "Chọn tiện ích"
     },
     "roomSize": {
       "label": "Kích thước phòng (ví dụ: 20x30)",
@@ -25,7 +27,7 @@
     "price": {
       "label": "Giá thuê/tháng",
       "placeholder": "Nhập giá thuê mỗi tháng",
-      "error": "Vui lòng nhập giá thuê hợp lệ!"
+      "error": "Vui lòng nhập số hợp lệ cho giá thuê/tháng!"
     },
     "peopleNumber": {
       "label": "Số người",
@@ -37,7 +39,16 @@
     }
   },
   "toast": {
-    "success": "Thêm loại phòng thành công!",
-    "error": "Gửi biểu mẫu thất bại."
-  }
+    "addSuccess": "Thêm loại phòng thành công!",
+    "updateSuccess": "Cập nhật loại phòng thành công!",
+    "error": "Gửi biểu mẫu thất bại.",
+    "fetchFacilitiesError": "Không thể tải danh sách tiện ích."
+  },
+  "facilityNames": {
+  "Swimming Pool": "Hồ bơi",
+  "Gym": "Phòng gym",
+  "Laundry Room": "Phòng giặt",
+  "Parking Lot": "Bãi đỗ xe",
+  "Tennis Court": "Sân tennis"
+}
 }
