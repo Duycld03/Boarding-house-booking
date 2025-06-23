@@ -10,7 +10,7 @@ const DASHBOARD_PATH = "/dashboard";
 const routes = [
   // Auth routes
   {
-    path: "/login",
+    path: "/",
     page: AuthPages.Login,
     layout: AuthLayout,
   },
@@ -52,7 +52,7 @@ const routes = [
 
   // Common routes
   {
-    path: "/",
+    path: "/home",
     label: "Home",
     page: CommonPages.Home,
     layout: HeaderOnly,
