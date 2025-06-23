@@ -29,7 +29,7 @@
     },
     "roomSize": {
       "label": "Room Size",
-      "placeholder": "Enter room size",
+      "placeholder": "Enter room size eg 30x50",
       "error": "Room size must be in format 20x30 or 30x40."
     },
     "price": {

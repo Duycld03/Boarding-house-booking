@@ -26,7 +26,7 @@
     },
     "roomSize": {
       "label": "Kích thước phòng",
-      "placeholder": "Nhập kích thước phòng",
+      "placeholder": "Nhập kích thước phòng ví dụ 30x50",
       "error": "Kích thước phải theo định dạng 20x30 hoặc 30x40."
     },
     "price": {

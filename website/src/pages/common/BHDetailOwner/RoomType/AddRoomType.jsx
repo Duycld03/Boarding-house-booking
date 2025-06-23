@@ -224,6 +224,39 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
             onSubmitCapture={handleSubmit}
             className={cx('no-margin')}
           >
+            <Form.Item label="Room Image" required>
+              {!formData.image ? (
+                <Upload {...uploadProps} listType="picture-card">
+                  <div className="flex flex-col items-center justify-center w-full h-full">
+                    <PlusOutlined style={{ fontSize: 22 }} />{' '}
+                    {/* dấu + to hơn */}
+                    <p style={{ marginTop: 8, fontSize: 14 }}>Upload</p>
+                  </div>
+                </Upload>
+              ) : (
+                <div className="relative w-full">
+                  <img
+                    src={URL.createObjectURL(formData.image)}
+                    alt="Room"
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      maxHeight: 350,
+                      objectFit: 'cover',
+                      borderRadius: 8,
+                      display: 'block',
+                    }}
+                  />
+                  <button
+                    onClick={handleRemoveImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded"
+                    type="button"
+                  >
+                    X
+                  </button>
+                </div>
+              )}
+            </Form.Item>
             <Form.Item label={t('form.typeName.label')} required>
               <Input
                 placeholder={t('form.typeName.placeholder')}
@@ -288,31 +321,6 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
                 }
                 className="w-full"
               />
-            </Form.Item>
-
-            <Form.Item label="Room Image" required>
-              {!formData.image ? (
-                <Upload {...uploadProps} listType="picture-card">
-                  <div>
-                    <PlusOutlined />
-                    <p>Upload</p>
-                  </div>
-                </Upload>
-              ) : (
-                <div className="relative" style={{ width: 200, height: 200 }}>
-                  <Image
-                    src={URL.createObjectURL(formData.image)}
-                    alt="Room"
-                    style={{ width: 200, height: 200 }}
-                  />
-                  <button
-                    onClick={handleRemoveImage}
-                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded"
-                  >
-                    X
-                  </button>
-                </div>
-              )}
             </Form.Item>
 
             <div className="flex justify-end mt-4">

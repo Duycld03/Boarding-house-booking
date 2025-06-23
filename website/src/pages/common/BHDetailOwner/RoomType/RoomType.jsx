@@ -12,6 +12,7 @@ import UpdateRoomTypeModal from './UpdateRoomTypeModal';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import coverFacility from '@/utils/coverFacility';
+import { Tooltip } from 'antd'; // nếu chưa import
 
 const RoomType = () => {
   const { t } = useTranslation('roomType');
@@ -159,12 +160,26 @@ const RoomType = () => {
       title: t('form.facilities.label'),
       dataIndex: 'facilities',
       key: 'facilities',
-      render: (facilities) =>
-        facilities && facilities.length > 0
-          ? facilities
-              .map((f) => coverFacility(f.codeName || f.name, currentLanguage))
-              .join(', ')
-          : t('form.facilities.placeholder'),
+      render: (facilities) => {
+        if (!facilities || facilities.length === 0)
+          return t('form.facilities.placeholder');
+
+        const translated = facilities.map((f) =>
+          coverFacility(f.codeName || f.name, currentLanguage)
+        );
+
+        const fullText = translated.join(', ');
+        const shortText =
+          translated.length > 3
+            ? `${translated.slice(0, 3).join(', ')}...`
+            : fullText;
+
+        return (
+          <Tooltip title={fullText}>
+            <span>{shortText}</span>
+          </Tooltip>
+        );
+      },
     },
     {
       title: t('form.roomSize.label'),
