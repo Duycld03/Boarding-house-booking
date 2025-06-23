@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Room from '../models/room.js';
 import DepositRoom from '../models/depositRoom.js';
-import Account from '../models/account.js';
+import { Account } from '../models/account.js';
 
 class TenantController {
   async getTenantsByBoardingHouse(req, res) {
