@@ -20,6 +20,8 @@ import { useTheme } from '@/context/themeContext';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import Style from './AddRoomTypeModal.module.css';
+import coverFacility from '@/utils/coverFacility';
+import i18n from 'i18next';
 
 const cx = classNames.bind(Style);
 
@@ -28,7 +30,8 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(false);
   const { darkMode } = useTheme();
-  const { t } = useTranslation('roomType'); // sử dụng namespace roomType
+  const { t } = useTranslation('roomType');
+  const currentLanguage = i18n.language;
 
   const [formData, setFormData] = useState({
     typeName: '',
@@ -241,7 +244,10 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               >
                 {facilities.map((facility) => (
                   <Select.Option key={facility._id} value={facility._id}>
-                    {t(`facilityNames.${facility.name}`)}{' '}
+                    {coverFacility(
+                      facility.codeName || facility.name,
+                      currentLanguage
+                    )}
                   </Select.Option>
                 ))}
               </Select>

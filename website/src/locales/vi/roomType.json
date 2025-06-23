@@ -21,7 +21,7 @@
     },
     "facilities": {
       "label": "Tiện ích",
-      "placeholder": "Khoong có tiện ích",
+      "placeholder": "Không có tiện ích",
       "placeholder2": "Chọn tiện ích"
     },
     "roomSize": {

@@ -11,6 +11,7 @@ import AddRoomTypeModal from './AddRoomType';
 import UpdateRoomTypeModal from './UpdateRoomTypeModal';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
+import coverFacility from '@/utils/coverFacility';
 
 const RoomType = () => {
   const { t } = useTranslation('roomType');
@@ -160,7 +161,9 @@ const RoomType = () => {
       key: 'facilities',
       render: (facilities) =>
         facilities && facilities.length > 0
-          ? facilities.map((f) => t(`facilityNames.${f.name}`)).join(', ')
+          ? facilities
+              .map((f) => coverFacility(f.codeName || f.name, currentLanguage))
+              .join(', ')
           : t('form.facilities.placeholder'),
     },
     {
