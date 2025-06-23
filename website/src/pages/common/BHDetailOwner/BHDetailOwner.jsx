@@ -334,6 +334,11 @@ const BHDetailOwner = () => {
         setLoading(false);
         return;
       }
+      if (updatedData.otherImages.length > 15) {
+        toast.error(t('errors.maxOtherImages'));
+        setLoading(false);
+        return;
+      }
 
       const payload = new FormData();
 
