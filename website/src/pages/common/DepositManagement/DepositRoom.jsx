@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Tag, Input, Modal, Form } from 'antd';
 import { toast } from 'react-toastify';
 import {
-  getDepositByBhId,
+  getDepositsByOwnerOrStaff,
   acceptDepositRoom,
   rejectDepositRoom,
 } from '@/api/depositAPI';
@@ -12,82 +12,101 @@ import Table from '@/component/Table';
 import formatAmount from '@/utils/formatAmount';
 import { Button } from '@/component';
 import ConfirmModal from '@/component/ConfirmModal';
-import FilterDeposit from './FilterDeposite';
+// import FilterDeposit from './FilterDeposite';
+import { useTranslation } from 'react-i18next';
 
 const DepositRoom = () => {
-  const [depositedRooms, setDepositedRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false); // State for confirmation modal visibility
-  const [confirmLoading, setConfirmLoading] = useState(false); // State to manage loading in confirm modal
-  const [selectedRoom, setSelectedRoom] = useState(null); // Store selected room for accept action
-  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false); // State for reject modal visibility
-  const [reasonForCancel, setReasonForCancel] = useState(''); // Store rejection reason
-  const [rejectLoading, setRejectLoading] = useState(false); // State to manage reject button loading state
+  const { t } = useTranslation();
   const { boardingHouseId } = useParams();
-  const [filterValue, setFilterValue] = useState(null);
 
+  const [depositedRooms, setDepositedRooms] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [reasonForCancel, setReasonForCancel] = useState('');
+  const [rejectLoading, setRejectLoading] = useState(false);
   const [listRoom, setListRoom] = useState([]);
+  const [filterValue, setFilterValue] = useState({});
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+    sortField: 'createdAt',
+    sortOrder: 'desc',
+  });
+
+  const fetchDepositedRooms = async () => {
+    setLoading(true);
+    try {
+      const res = await getDepositsByOwnerOrStaff({
+        ...filterValue,
+        ...paginationOptions,
+      });
+      if (res?.data && res?.pagination) {
+        setDepositedRooms(res.data);
+        setPagination({
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
+          totalItems: res.pagination.totalItems,
+          limit: res.pagination.limit,
+        });
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(t('messages.fetchError'));
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchListRoom = async () => {
+    if (!boardingHouseId) return;
     try {
       const response = await getRoomsByBoardingHouse(boardingHouseId);
       setListRoom(Array.isArray(response) ? response : []);
     } catch (error) {
-      toast.error('Failed to fetch deposit rooms');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchDepositedRooms = async () => {
-    try {
-      const response = await getDepositByBhId(boardingHouseId, filterValue);
-      setDepositedRooms(Array.isArray(response) ? response : []);
-    } catch (error) {
-      console.error('Error fetching deposit rooms:', error);
-      toast.error('Failed to fetch deposit rooms');
-    } finally {
-      setLoading(false);
+      toast.error('Failed to fetch room list');
     }
   };
 
   useEffect(() => {
-    if (boardingHouseId) {
-      fetchDepositedRooms();
-      fetchListRoom();
-    }
-  }, [boardingHouseId, filterValue]);
+    fetchDepositedRooms();
+  }, [filterValue, paginationOptions.page, paginationOptions.limit]);
+
+  useEffect(() => {
+    fetchListRoom();
+  }, [boardingHouseId]);
 
   const handleAccept = (record) => {
-    setSelectedRoom(record); // Store the selected room
-    setIsModalVisible(true); // Open the confirmation modal
+    setSelectedRoom(record);
+    setIsModalVisible(true);
   };
 
   const handleConfirmAccept = async () => {
-    if (!selectedRoom) {
-      toast.error('No room selected!');
-      return;
-    }
-
-    setConfirmLoading(true); // Start loading when accepting the room
-
+    if (!selectedRoom) return toast.error('No room selected!');
+    setConfirmLoading(true);
     try {
-      await acceptDepositRoom(selectedRoom._id); // Assuming you pass room ID to accept
-
+      await acceptDepositRoom(selectedRoom._id);
       toast.success('Deposit room accepted successfully.');
-      setIsModalVisible(false); // Close modal
-      fetchDepositedRooms(); // Refresh the list of rooms after accepting
+      setIsModalVisible(false);
+      fetchDepositedRooms();
     } catch (error) {
-      console.error('Error accepting deposit room:', error);
       toast.error('An error occurred while accepting the deposit room.');
     } finally {
-      setConfirmLoading(false); // Stop loading after the action is completed
+      setConfirmLoading(false);
     }
-  };
-
-  const handleCancelModal = () => {
-    setIsModalVisible(false); // Close modal
-    setSelectedRoom(null); // Reset selected room
   };
 
   const handleReject = (record) => {
@@ -96,17 +115,11 @@ const DepositRoom = () => {
   };
 
   const handleRejectConfirm = async () => {
-    if (!reasonForCancel) {
-      toast.error('Please provide a reason for rejection');
-      return;
-    }
-
-    setRejectLoading(true); // Set loading to true when the rejection is processing
-
+    if (!reasonForCancel)
+      return toast.error('Please provide a reason for rejection');
+    setRejectLoading(true);
     try {
       await rejectDepositRoom(selectedRoom._id, reasonForCancel);
-
-      // Implement the rejection logic (e.g., API call to reject the room)
       toast.success(
         `Deposit request for room ${selectedRoom.roomNumber} has been rejected.`
       );
@@ -114,10 +127,9 @@ const DepositRoom = () => {
       setReasonForCancel('');
       fetchDepositedRooms();
     } catch (error) {
-      console.error('Error rejecting deposit room:', error);
       toast.error('An error occurred while rejecting the deposit room.');
     } finally {
-      setRejectLoading(false); // Set loading back to false once the rejection is done
+      setRejectLoading(false);
     }
   };
 
@@ -126,11 +138,35 @@ const DepositRoom = () => {
     setReasonForCancel('');
   };
 
+  const handleCancelModal = () => {
+    setIsModalVisible(false);
+    setSelectedRoom(null);
+  };
+
+  const handleTableChange = (pagination) => {
+    setPaginationOptions((prev) => ({
+      ...prev,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    }));
+  };
+  const tablePaginationConfig = {
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
+  };
+
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'name',
+      dataIndex: 'name', // ✅ sửa đúng field "name"
       key: 'name',
+    },
+    {
+      title: 'Boarding House',
+      dataIndex: 'boardingHouseName', // ✅ thêm cột nếu muốn
+      key: 'boardingHouseName',
     },
     {
       title: 'Room Number',
@@ -189,9 +225,8 @@ const DepositRoom = () => {
               btnReject
               size="large"
               style={{ backgroundColor: 'red', color: 'white', border: 'none' }}
-              onClick={() => handleReject(record)} // Open reject modal
-            ></Button>
-
+              onClick={() => handleReject(record)}
+            />
             <Button
               title={'Accept'}
               size="large"
@@ -199,7 +234,7 @@ const DepositRoom = () => {
               className="text-white"
               bgColor="rgb(5 150 105)"
               onClick={() => handleAccept(record)}
-            ></Button>
+            />
           </div>
         ),
     },
@@ -208,18 +243,25 @@ const DepositRoom = () => {
   return (
     <div>
       <div className="flex justify-end">
-        <FilterDeposit setFilterValue={setFilterValue} listRoom={listRoom} />
+        {/* <FilterDeposit setFilterValue={setFilterValue} listRoom={listRoom} /> */}
       </div>
-      <Table columns={columns} data={depositedRooms || []} loading={loading} />
+      <Table
+        tableName={t('tableName')}
+        columns={columns}
+        data={depositedRooms} // ✅ Sửa dòng này
+        loading={loading}
+        onChange={handleTableChange}
+        pagination={tablePaginationConfig}
+        noDataText={t('messages.noData')}
+      />
       <ConfirmModal
         title="Confirm Acceptance"
         content={`Are you sure you want to accept the deposit request for room ${selectedRoom?.roomNumber}?`}
         onOk={handleConfirmAccept}
         onCancel={handleCancelModal}
         isOpen={isModalVisible}
-        confirmLoading={confirmLoading} // Make sure to pass confirmLoading here
+        confirmLoading={confirmLoading}
       />
-
       <Modal
         title="Reject Deposit Request"
         visible={isRejectModalOpen}
@@ -227,7 +269,7 @@ const DepositRoom = () => {
         onCancel={handleCancelRejectModal}
         okText="Reject"
         width="400px"
-        confirmLoading={rejectLoading} // Add confirm loading to reject modal
+        confirmLoading={rejectLoading}
       >
         <Form layout="vertical">
           <Form.Item
