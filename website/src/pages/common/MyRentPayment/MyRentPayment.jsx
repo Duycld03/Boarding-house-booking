@@ -77,9 +77,6 @@ function MyRentPayment() {
       },
     },
   ];
-
-  console.log(rentPayment);
-
   return (
     <>
       <Table
