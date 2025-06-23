@@ -89,8 +89,8 @@ managerRouter.delete(
 
 //deposit
 managerRouter.get(
-  '/boardinghouse/deposit/:boardingHouseId',
-  depositController.getDepositByBhId
+  '/bh/deposit-list',
+  depositController.getDepositsByOwnerOrStaff
 );
 
 managerRouter.get(
