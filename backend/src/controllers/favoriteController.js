@@ -1,4 +1,4 @@
-import Account from '../models/account.js';
+import { Account } from '../models/account.js';
 import FavoriteBH from '../models/favoriteBH.js';
 import BoardingHouse from '../models/boardingHouse.js';
 import paginate from '../utils/pagination.js';

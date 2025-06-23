@@ -4,7 +4,7 @@ import googleAuth from "google-auth-library";
 import nodemailer from "nodemailer";
 import { generateToken, verifyToken } from "../utils/functions.js";
 
-import Account from "../models/account.js";
+import { Account } from "../models/account.js";
 dotenv.config();
 
 class AuthController {

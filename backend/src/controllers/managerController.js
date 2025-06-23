@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Account from '../models/account.js';
+import { Account } from '../models/account.js';
 
 class ManagerController {
   // Function to get managers associated with a specific Owner (logged-in user)
