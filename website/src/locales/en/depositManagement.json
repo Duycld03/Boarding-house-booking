@@ -1,0 +1,40 @@
+{
+  "tableName": "Deposit Requests",
+  "columns": {
+    "name": "Depositor",
+    "boardingHouse": "Boarding House",
+    "roomNumber": "Room Number",
+    "amount": "Amount",
+    "status": "Status",
+    "rentalTime": "Rental Time",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "action": "Action"
+  },
+  "status": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "deleted": "Canceled",
+    "rejected": "Rejected",
+    "confirmed": "Confirmed"
+
+  },
+  "modal": {
+    "confirmTitle": "Confirm",
+    "confirmContent": "Are you sure you want to accept the deposit request for room {{room}}?",
+    "rejectTitle": "Reject Deposit Request",
+    "rejectReason": "Reason for Rejection",
+    "rejectPlaceholder": "Enter reason for rejection",
+    "rejectConfirm": "Reject"
+  },
+  "messages": {
+    "fetchError": "Failed to fetch deposit list.",
+    "acceptSuccess": "Deposit accepted successfully.",
+    "acceptError": "An error occurred while accepting the deposit.",
+    "rejectSuccess": "Deposit request rejected successfully.",
+    "rejectError": "An error occurred while rejecting the deposit.",
+    "noRoomSelected": "No room selected!",
+    "requireReason": "Please enter a reason for rejection"
+  },
+  "noData": "No data available"
+}

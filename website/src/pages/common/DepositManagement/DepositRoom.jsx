@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Tag, Input, Modal, Form } from 'antd';
 import { toast } from 'react-toastify';
 import {
@@ -12,16 +12,15 @@ import Table from '@/component/Table';
 import formatAmount from '@/utils/formatAmount';
 import { Button } from '@/component';
 import ConfirmModal from '@/component/ConfirmModal';
-// import FilterDeposit from './FilterDeposite';
 import { useTranslation } from 'react-i18next';
+import i18next from 'i18next';
 
 const DepositRoom = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('depositManagement');
   const { boardingHouseId } = useParams();
-
+  const currentLanguage = i18next.language;
   const [depositedRooms, setDepositedRooms] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -65,7 +64,7 @@ const DepositRoom = () => {
     } catch (error) {
       console.error(error);
       toast.error(t('messages.fetchError'));
-      setData([]);
+      setDepositedRooms([]);
     } finally {
       setLoading(false);
     }
@@ -95,15 +94,15 @@ const DepositRoom = () => {
   };
 
   const handleConfirmAccept = async () => {
-    if (!selectedRoom) return toast.error('No room selected!');
+    if (!selectedRoom) return toast.error(t('messages.noRoomSelected'));
     setConfirmLoading(true);
     try {
       await acceptDepositRoom(selectedRoom._id);
-      toast.success('Deposit room accepted successfully.');
+      toast.success(t('messages.acceptSuccess'));
       setIsModalVisible(false);
       fetchDepositedRooms();
     } catch (error) {
-      toast.error('An error occurred while accepting the deposit room.');
+      toast.error(t('messages.acceptError'));
     } finally {
       setConfirmLoading(false);
     }
@@ -115,19 +114,18 @@ const DepositRoom = () => {
   };
 
   const handleRejectConfirm = async () => {
-    if (!reasonForCancel)
-      return toast.error('Please provide a reason for rejection');
+    if (!reasonForCancel) return toast.error(t('messages.requireReason'));
     setRejectLoading(true);
     try {
       await rejectDepositRoom(selectedRoom._id, reasonForCancel);
       toast.success(
-        `Deposit request for room ${selectedRoom.roomNumber} has been rejected.`
+        t('messages.rejectSuccess', { room: selectedRoom.roomNumber })
       );
       setIsRejectModalOpen(false);
       setReasonForCancel('');
       fetchDepositedRooms();
     } catch (error) {
-      toast.error('An error occurred while rejecting the deposit room.');
+      toast.error(t('messages.rejectError'));
     } finally {
       setRejectLoading(false);
     }
@@ -150,6 +148,7 @@ const DepositRoom = () => {
       limit: pagination.pageSize,
     }));
   };
+
   const tablePaginationConfig = {
     current: pagination.currentPage,
     pageSize: pagination.limit,
@@ -159,28 +158,29 @@ const DepositRoom = () => {
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name', // ✅ sửa đúng field "name"
+      title: t('columns.name'),
+      dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Boarding House',
-      dataIndex: 'boardingHouseName', // ✅ thêm cột nếu muốn
+      title: t('columns.boardingHouse'),
+      dataIndex: 'boardingHouseName',
       key: 'boardingHouseName',
     },
     {
-      title: 'Room Number',
+      title: t('columns.roomNumber'),
       dataIndex: 'roomNumber',
       key: 'roomNumber',
     },
     {
-      title: 'Amount',
+      title: t('columns.amount'),
       dataIndex: 'amount',
       key: 'amount',
-      render: (price) => (price ? formatAmount(price) : 'N/A'),
+      render: (price) =>
+        price ? `${formatAmount(price, currentLanguage)}` : 'N/A',
     },
     {
-      title: 'Status',
+      title: t('columns.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
@@ -195,32 +195,32 @@ const DepositRoom = () => {
               : 'red'
           }
         >
-          {status}
+          {t(`status.${status}`)}
         </Tag>
       ),
     },
     {
-      title: 'Rental Time',
+      title: t('columns.rentalTime'),
       dataIndex: 'rentalTime',
       key: 'rentalTime',
     },
     {
-      title: 'Start Date',
+      title: t('columns.startDate'),
       dataIndex: 'startDate',
       key: 'startDate',
     },
     {
-      title: 'End Date',
+      title: t('columns.endDate'),
       dataIndex: 'endDate',
       key: 'endDate',
     },
     {
-      title: 'Action',
+      title: t('columns.action'),
       render: (record) =>
         record.status === 'pending' && (
           <div className="flex gap-3 items-center">
             <Button
-              title={'Reject'}
+              title={t('modal.rejectConfirm')}
               iconPosition="left"
               btnReject
               size="large"
@@ -228,7 +228,7 @@ const DepositRoom = () => {
               onClick={() => handleReject(record)}
             />
             <Button
-              title={'Accept'}
+              title={t('modal.confirmTitle')}
               size="large"
               btnAccept
               className="text-white"
@@ -248,42 +248,44 @@ const DepositRoom = () => {
       <Table
         tableName={t('tableName')}
         columns={columns}
-        data={depositedRooms} // ✅ Sửa dòng này
+        data={depositedRooms}
         loading={loading}
         onChange={handleTableChange}
         pagination={tablePaginationConfig}
-        noDataText={t('messages.noData')}
+        noDataText={t('noData')}
       />
       <ConfirmModal
-        title="Confirm Acceptance"
-        content={`Are you sure you want to accept the deposit request for room ${selectedRoom?.roomNumber}?`}
+        title={t('modal.confirmTitle')}
+        content={t('modal.confirmContent', {
+          room: selectedRoom?.roomNumber || '',
+        })}
         onOk={handleConfirmAccept}
         onCancel={handleCancelModal}
         isOpen={isModalVisible}
         confirmLoading={confirmLoading}
       />
       <Modal
-        title="Reject Deposit Request"
+        title={t('modal.rejectTitle')}
         visible={isRejectModalOpen}
         onOk={handleRejectConfirm}
         onCancel={handleCancelRejectModal}
-        okText="Reject"
+        okText={t('modal.rejectConfirm')}
         width="400px"
         confirmLoading={rejectLoading}
       >
         <Form layout="vertical">
           <Form.Item
-            label="Reason For Cancel"
+            label={t('modal.rejectReason')}
             name="reasonForCancel"
             rules={[
               {
                 required: true,
-                message: 'Please enter a reason for rejection',
+                message: t('messages.requireReason'),
               },
             ]}
           >
             <Input.TextArea
-              placeholder="Enter reason for rejection"
+              placeholder={t('modal.rejectPlaceholder')}
               value={reasonForCancel}
               onChange={(e) => setReasonForCancel(e.target.value)}
               style={{ width: '100%', height: '100px' }}
