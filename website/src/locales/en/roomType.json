@@ -1,0 +1,43 @@
+{
+  "button": {
+    "addRoomType": "Add Room Type",
+    "cancel": "Cancel",
+    "submit": "Submit"
+  },
+  "modal": {
+    "title": "Create Room Type"
+  },
+  "form": {
+    "typeName": {
+      "label": "Room Type Name",
+      "placeholder": "Enter room type name",
+      "error": "Type Name is required."
+    },
+    "facilities": {
+      "label": "Facilities",
+      "placeholder": "Select facilities"
+    },
+    "roomSize": {
+      "label": "Room Size (e.g., 20x30)",
+      "placeholder": "Enter room size",
+      "error": "Room size must be in format 20x30 or 30x40."
+    },
+    "price": {
+      "label": "Rent/month",
+      "placeholder": "Enter rent/month",
+      "error": "Please enter rent/month valid!"
+    },
+    "peopleNumber": {
+      "label": "People Number",
+      "placeholder": "Enter number of people",
+      "error": "People number must be at least 1."
+    },
+    "image": {
+      "error": "You must upload an image."
+    }
+  },
+  "toast": {
+    "success": "Room type added successfully!",
+    "error": "Failed to submit form."
+  }
+}

@@ -17,6 +17,7 @@ import {
   getAllFacilities,
 } from '@/api/roomTypeAPI';
 import { useTheme } from '@/context/themeContext';
+import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import Style from './AddRoomTypeModal.module.css';
 
@@ -27,6 +28,7 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(false);
   const { darkMode } = useTheme();
+  const { t } = useTranslation('roomType'); // sử dụng namespace roomType
 
   const [formData, setFormData] = useState({
     typeName: '',
@@ -44,17 +46,14 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
         setFacilities(response?.data || []);
       } catch (error) {
         console.error('Failed to fetch facilities:', error);
-        toast.error('Failed to fetch facilities.');
+        toast.error(t('toast.error'));
         setFacilities([]);
       }
     };
     fetchFacilities();
-  }, []);
+  }, [t]);
 
-  const openModal = () => {
-    setIsModalVisible(true);
-  };
-
+  const openModal = () => setIsModalVisible(true);
   const closeModal = () => {
     setFormData({
       typeName: '',
@@ -98,23 +97,23 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
       setLoading(true);
 
       if (!formData.typeName.trim()) {
-        toast.error('Type Name is required.');
+        toast.error(t('form.typeName.error'));
         return;
       }
       if (!/^\d+x\d+$/.test(formData.roomSize)) {
-        toast.error('Room size must be in format 20x30 or 30x40.');
+        toast.error(t('form.roomSize.error'));
         return;
       }
       if (!formData.price || formData.price < 0) {
-        toast.error('Please enter rent/month valid!');
+        toast.error(t('form.price.error'));
         return;
       }
       if (!formData.peopleNumber || formData.peopleNumber < 1) {
-        toast.error('People number must be at least 1.');
+        toast.error(t('form.peopleNumber.error'));
         return;
       }
       if (!formData.image) {
-        toast.error('You must upload an image.');
+        toast.error(t('form.image.error'));
         return;
       }
 
@@ -132,15 +131,15 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
       );
 
       if (response?.message === 'Room Type added successfully') {
-        toast.success('Room type added successfully!');
+        toast.success(t('toast.success'));
         onAddData();
         closeModal();
       } else {
-        throw new Error(response?.message || 'Failed to add room type.');
+        throw new Error(response?.message || t('toast.error'));
       }
     } catch (error) {
       console.error('API Error:', error.response?.data || error.message);
-      toast.error(error.response?.data?.message || 'Failed to submit form.');
+      toast.error(error.response?.data?.message || t('toast.error'));
     } finally {
       setLoading(false);
     }
@@ -179,12 +178,17 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
   return (
     <ConfigProvider theme={themeConfig}>
       <>
-        <Button btnAdd title="Add Room Type" size="large" onClick={openModal} />
+        <Button
+          btnAdd
+          title={t('button.addRoomType')}
+          size="large"
+          onClick={openModal}
+        />
 
         <Modal
           title={
             <span className={darkMode ? 'text-white' : ''}>
-              Create Room Type
+              {t('modal.title')}
             </span>
           }
           open={isModalVisible}
@@ -215,11 +219,11 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
           <Form
             layout="vertical"
             onSubmitCapture={handleSubmit}
-            className={cx('no-margin')} // nếu dùng classNames
+            className={cx('no-margin')}
           >
-            <Form.Item label="Room Type Name" required>
+            <Form.Item label={t('form.typeName.label')} required>
               <Input
-                placeholder="Enter room type name"
+                placeholder={t('form.typeName.placeholder')}
                 name="typeName"
                 value={formData.typeName}
                 onChange={handleInputChange}
@@ -227,10 +231,10 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               />
             </Form.Item>
 
-            <Form.Item label="Facilities">
+            <Form.Item label={t('form.facilities.label')}>
               <Select
                 mode="multiple"
-                placeholder="Select facilities"
+                placeholder={t('form.facilities.placeholder')}
                 value={formData.facilities}
                 onChange={handleSelectChange}
                 className={cx({ 'dark-mode-select': darkMode })}
@@ -243,9 +247,9 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               </Select>
             </Form.Item>
 
-            <Form.Item label="Room Size (e.g., 20x30)" required>
+            <Form.Item label={t('form.roomSize.label')} required>
               <Input
-                placeholder="Enter room size"
+                placeholder={t('form.roomSize.placeholder')}
                 name="roomSize"
                 value={formData.roomSize}
                 onChange={handleInputChange}
@@ -253,9 +257,9 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               />
             </Form.Item>
 
-            <Form.Item label="Rent/month" required>
+            <Form.Item label={t('form.price.label')} required>
               <InputNumber
-                placeholder="Enter rent/month"
+                placeholder={t('form.price.placeholder')}
                 name="price"
                 value={formData.price}
                 formatter={(value) =>
@@ -268,9 +272,9 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
               />
             </Form.Item>
 
-            <Form.Item label="People Number" required>
+            <Form.Item label={t('form.peopleNumber.label')} required>
               <InputNumber
-                placeholder="Enter number of people"
+                placeholder={t('form.peopleNumber.placeholder')}
                 name="peopleNumber"
                 value={formData.peopleNumber}
                 onChange={(value) =>
@@ -308,13 +312,13 @@ const AddRoomTypeModal = ({ onAddData, boardingHouseId }) => {
             <div className="flex justify-end mt-4">
               <Button
                 btnCancel
-                title="Cancel"
+                title={t('button.cancel')}
                 onClick={closeModal}
                 className="mr-2"
               />
               <Button
                 className="bg-primary text-white"
-                title="Submit"
+                title={t('button.submit')}
                 loading={loading}
                 onClick={handleSubmit}
               />

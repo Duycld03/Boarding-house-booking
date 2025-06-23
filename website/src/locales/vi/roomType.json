@@ -1,0 +1,43 @@
+{
+  "button": {
+    "addRoomType": "Thêm loại phòng",
+    "cancel": "Hủy",
+    "submit": "Xác nhận"
+  },
+  "modal": {
+    "title": "Tạo loại phòng"
+  },
+  "form": {
+    "typeName": {
+      "label": "Tên loại phòng",
+      "placeholder": "Nhập tên loại phòng",
+      "error": "Vui lòng nhập tên loại phòng."
+    },
+    "facilities": {
+      "label": "Tiện ích",
+      "placeholder": "Chọn các tiện ích"
+    },
+    "roomSize": {
+      "label": "Kích thước phòng (ví dụ: 20x30)",
+      "placeholder": "Nhập kích thước phòng",
+      "error": "Kích thước phòng phải có định dạng 20x30 hoặc 30x40."
+    },
+    "price": {
+      "label": "Giá thuê/tháng",
+      "placeholder": "Nhập giá thuê mỗi tháng",
+      "error": "Vui lòng nhập giá thuê hợp lệ!"
+    },
+    "peopleNumber": {
+      "label": "Số người",
+      "placeholder": "Nhập số người ở",
+      "error": "Số người tối thiểu phải là 1."
+    },
+    "image": {
+      "error": "Bạn phải tải lên hình ảnh."
+    }
+  },
+  "toast": {
+    "success": "Thêm loại phòng thành công!",
+    "error": "Gửi biểu mẫu thất bại."
+  }
+}
