@@ -1,10 +1,11 @@
-import Report from "../models/report.js";
-import Review from "../models/review.js";
-import BoardingHouse from "../models/boardingHouse.js";
-import Account from "../models/account.js";
-import nodemailer from "nodemailer";
-import { v2 as cloudinary } from "cloudinary";
-import paginate from "../utils/pagination.js";
+import Report from '../models/report.js';
+import Review from '../models/review.js';
+import BoardingHouse from '../models/boardingHouse.js';
+import { Account } from '../models/account.js';
+import nodemailer from 'nodemailer';
+import { v2 as cloudinary } from 'cloudinary';
+import paginate from '../utils/pagination.js';
+
 
 class reportController {
   async getReviewReports(req, res) {

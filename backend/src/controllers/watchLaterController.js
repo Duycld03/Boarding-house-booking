@@ -1,4 +1,4 @@
-import Account from '../models/account.js';
+import { Account } from '../models/account.js';
 import WatchLater from '../models/watchLater.js';
 import BoardingHouse from '../models/boardingHouse.js';
 import mongoose from 'mongoose';

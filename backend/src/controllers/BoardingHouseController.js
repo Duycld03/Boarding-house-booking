@@ -4,10 +4,11 @@ import BoardingHouseType from "../models/boardingHouseType.js";
 import { v2 as cloudinary } from "cloudinary";
 
 // import path from "path";
-import fs from "fs";
-import multer from "multer";
-import Account from "../models/account.js";
-import paginate from "../utils/pagination.js";
+import fs from 'fs';
+import multer from 'multer';
+import { Account } from '../models/account.js';
+import paginate from '../utils/pagination.js';
+
 
 class boardingHouseController {
   async getAllBHOnDashBoard(req, res, next) {
