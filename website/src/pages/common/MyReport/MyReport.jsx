@@ -1,12 +1,10 @@
-import { getMyReport } from '@/api/ownerUser/myReport';
 import { useEffect, useState } from 'react';
+import { getMyReport } from '@/api/ownerUser/myReport';
+import { getOwnReportReviewDetail } from '@/api/reportAPI';
 import { TableCustom as Table } from '@/component';
 import convertTimetap from '@/utils/convertTimetap';
 import { Tag, Tooltip } from 'antd';
-import { Button } from '@/component';
-import { FileTextOutlined } from '@ant-design/icons';
 import DetailReportModal from './DetailReportModal';
-import { getOwnReportReviewDetail } from '@/api/reportAPI';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
@@ -22,7 +20,7 @@ function MyReport() {
       const response = await getMyReport();
       setReport(response);
     } catch (error) {
-      console.log('Fetch report error: ', error);
+      console.error('Fetch report error:', error);
     } finally {
       setLoading(false);
     }
@@ -32,13 +30,14 @@ function MyReport() {
     fetchReport();
   }, []);
 
-  const fetchReportDetail = async (reportId) => {
+  const handleDetailModal = async (record) => {
     try {
-      const res = await getOwnReportReviewDetail(reportId);
+      const res = await getOwnReportReviewDetail(record._id);
       if (res) {
         setSelectedData(res);
+        setIsDetailModalOpen(true);
       } else {
-        setSelectedData(null);
+        toast.error(t('myReport.fetchError'));
       }
     } catch (error) {
       console.error('Failed to fetch report details:', error);
@@ -46,13 +45,9 @@ function MyReport() {
     }
   };
 
-  const handleDetailModal = (record) => {
-    fetchReportDetail(record._id);
-    setIsDetailModalOpen(true);
-  };
-
   const closeDetailModal = () => {
     setIsDetailModalOpen(false);
+    setSelectedData(null);
   };
 
   const columns = [
@@ -70,7 +65,7 @@ function MyReport() {
       title: t('myReport.reason'),
       dataIndex: 'reason',
       key: 'reason',
-      render: (reason) => t(`reasons.${reason}`) || reason,
+      render: (reason) => t(`reasons.${reason}`, { defaultValue: reason }),
     },
     {
       title: t('myReport.status'),
@@ -113,27 +108,17 @@ function MyReport() {
       key: 'createdAt',
       render: (text) => convertTimetap(text, false),
     },
-    {
-      title: t('myReport.action'),
-      key: 'action',
-      render: (_, record) => (
-        <div className="flex gap-3">
-          <Button
-            size="large"
-            title={t('myReport.detail')}
-            icon={<FileTextOutlined />}
-            onClick={() => handleDetailModal(record)}
-            className="text-white"
-            bgColor="rgb(5 150 105)"
-          />
-        </div>
-      ),
-    },
   ];
 
   return (
     <div>
-      <Table data={report} columns={columns} loading={loading} />
+      <Table
+        data={report}
+        columns={columns}
+        loading={loading}
+        onRowClick={handleDetailModal} // ✅ đúng prop mà TableCustom dùng
+        rowClassName={() => 'hover:bg-blue-50 cursor-pointer'}
+      />
       <DetailReportModal
         isOpen={isDetailModalOpen}
         onClose={closeDetailModal}
