@@ -8,6 +8,8 @@ import ReportCard from '@/components/ui/ReportCard';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { getMyReport } from '@/API/ownerUser/myReport';
 import EmptyState from '@/components/ui/EmptyState';
+import Loader from '@/components/ui/Loader';
+import { useTranslation } from 'react-i18next';
 
 function MyReportManagement() {
   const { themedClasses, isDarkMode } = useThemedClasses();
@@ -16,21 +18,23 @@ function MyReportManagement() {
   const [limit, setLimit] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
-  useEffect(() => {
-    const fetchReports = async () => {
-      setIsLoading(true);
-      try {
-        const res = await getMyReport({ page: 1, limit });
-        setReports(res?.data || []);
-        setTotalReports(res?.pagination?.totalItems || 0);
-      } catch (error) {
-        console.error('Failed to fetch reports:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { t } = useTranslation('myreport');
 
-    fetchReports();
+  const fetchReports = async (currentLimit = 5) => {
+    setIsLoading(true);
+    try {
+      const res = await getMyReport({ page: 1, limit: currentLimit });
+      setReports(res?.data || []);
+      setTotalReports(res?.pagination?.totalItems || 0);
+    } catch (error) {
+      console.error('Failed to fetch reports:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReports(limit);
   }, [limit]);
 
   const handleLoadMore = () => {
@@ -51,7 +55,7 @@ function MyReportManagement() {
         }}
       >
         <BackHeader
-          title="My Reports"
+          title={t('title')}
           backIcon={
             <FontAwesome5
               name="chevron-left"
@@ -61,24 +65,33 @@ function MyReportManagement() {
           }
         />
 
-        <ScrollView
-          ref={scrollRef}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        >
-          {reports.map((report) => (
-            <ReportCard key={report._id} report={report} />
-          ))}
-
-          <LoadMoreButton
-            hasMore={hasMore}
-            isLoading={isLoading}
-            onLoadMore={handleLoadMore}
-            currentCount={reports.length}
-            totalCount={totalReports}
-            itemsPerPage={5}
-            itemName="reports"
+        {reports.length === 0 && !isLoading ? (
+          <EmptyState
+            title={t('myReport.noReports')}
+            message={t('myReport.noReportsDesc')}
           />
-        </ScrollView>
+        ) : (
+          <ScrollView
+            ref={scrollRef}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          >
+            {reports.map((report) => (
+              <ReportCard key={report._id} report={report} />
+            ))}
+
+            <LoadMoreButton
+              hasMore={hasMore}
+              isLoading={isLoading}
+              onLoadMore={handleLoadMore}
+              currentCount={reports.length}
+              totalCount={totalReports}
+              itemsPerPage={5}
+              itemName="reports"
+            />
+          </ScrollView>
+        )}
+
+        {isLoading && <Loader overlay />}
       </View>
     </ScreenContainer>
   );

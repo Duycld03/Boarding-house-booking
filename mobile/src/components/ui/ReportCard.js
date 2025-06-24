@@ -2,79 +2,94 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card, Badge } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/context/ThemeProvider'; // 👈 Thêm hook dark mode
 
 const ReportCard = ({ report }) => {
   const router = useRouter();
-
-  const getTargetName = () => {
-    return report.target || 'Unknown';
-  };
+  const { t } = useTranslation('myreport');
+  const { isDarkMode } = useTheme(); // 👈 Lấy trạng thái dark mode
 
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending':
-        return '#facc15'; // yellow
+        return '#facc15';
       case 'resolved':
-        return '#10b981'; // green
+        return '#10b981';
       case 'rejected':
-        return '#ef4444'; // red
+        return '#ef4444';
       default:
-        return '#9ca3af'; // gray
+        return '#9ca3af';
     }
   };
 
   return (
-    <Card style={styles.card}>
+    <Card
+      style={[
+        styles.card,
+        { backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }, // 👈 BG card
+      ]}
+    >
       <Card.Content>
-        {/* Status badge */}
         <View style={styles.header}>
-          <Text style={styles.title}>Report Information</Text>
+          <Text
+            style={[
+              styles.title,
+              { color: isDarkMode ? '#f9fafb' : '#111827' }, // 👈 Title color
+            ]}
+          >
+            {t('detail.reportInfo')}
+          </Text>
           <Badge
             style={[
               styles.status,
               { backgroundColor: getStatusColor(report.status) },
             ]}
           >
-            {report.status?.toUpperCase()}
+            {t(`status.${report.status}`)}
           </Badge>
         </View>
 
-        {/* Info rows */}
-        <View style={styles.row}>
-          <Text style={styles.label}>Report Type:</Text>
-          <Text style={styles.value}>{report.reportType}</Text>
-        </View>
+        {[
+          ['reportType', report.reportType],
+          ['target', report.target || t('detail.unknown')],
+          [
+            'reason',
+            t(`reasons.${report.reason}`, { defaultValue: report.reason }),
+          ],
+          ['details', report.details],
+          ['createdAt', new Date(report.createdAt).toLocaleDateString()],
+        ].map(([labelKey, value]) => (
+          <View style={styles.row} key={labelKey}>
+            <Text
+              style={[
+                styles.label,
+                { color: isDarkMode ? '#e5e7eb' : '#374151' }, // 👈 Label color
+              ]}
+            >
+              {t(`myReport.${labelKey}`)}:
+            </Text>
+            <Text
+              style={[
+                styles.value,
+                { color: isDarkMode ? '#f3f4f6' : '#1f2937' }, // 👈 Value color
+              ]}
+            >
+              {value}
+            </Text>
+          </View>
+        ))}
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Target:</Text>
-          <Text style={styles.value}>{getTargetName()}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Reason:</Text>
-          <Text style={styles.value}>{report.reason}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Details:</Text>
-          <Text style={styles.value}>{report.details}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Created At:</Text>
-          <Text style={styles.value}>
-            {new Date(report.createdAt).toLocaleDateString()}
-          </Text>
-        </View>
-
-        {/* Detail link */}
         <Text
-          style={styles.viewDetail}
+          style={[
+            styles.viewDetail,
+            { color: isDarkMode ? '#60a5fa' : '#3b82f6' }, // 👈 Link color
+          ]}
           onPress={() =>
             router.push(`/myreportmanagement/detailReport?id=${report._id}`)
           }
         >
-          View Details &gt;
+          {t('myReport.detail')} &gt;
         </Text>
       </Card.Content>
     </Card>
@@ -89,7 +104,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 12,
     elevation: 3,
-    backgroundColor: '#f9fafb',
   },
   header: {
     flexDirection: 'row',
@@ -100,13 +114,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
   },
   status: {
     fontSize: 12,
     color: '#fff',
     paddingHorizontal: 8,
-    paddingVertical: 2,
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -117,16 +129,13 @@ const styles = StyleSheet.create({
   label: {
     width: 100,
     fontWeight: '600',
-    color: '#374151',
     fontSize: 14,
   },
   value: {
     flex: 1,
-    color: '#1f2937',
     fontSize: 14,
   },
   viewDetail: {
-    color: '#3b82f6',
     fontWeight: '500',
     marginTop: 10,
     alignSelf: 'flex-end',
