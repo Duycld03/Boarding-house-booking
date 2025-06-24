@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
-import { Avatar, Card } from 'react-native-paper';
+import { Avatar, Card, Badge } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useThemedClasses } from '@/utils/useTheme';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, AntDesign } from '@expo/vector-icons';
 
 const DetailReport = () => {
   const { themedClasses, isDarkMode } = useThemedClasses();
@@ -29,7 +29,7 @@ const DetailReport = () => {
     reason: 'Privacy violation',
     details: 'Bình luận tiết lộ thông tin cá nhân.',
     createdAt: '2025-06-24T07:27:44.008Z',
-    status: 'pending',
+    status: 'resolved',
     images: [{ imageUrl: 'https://via.placeholder.com/150' }],
   };
 
@@ -38,12 +38,65 @@ const DetailReport = () => {
 
   const textColor = { color: isDarkMode ? '#fff' : '#000' };
 
-  const renderLabelValue = (label: string, value: string | React.ReactNode) => (
-    <Text style={[styles.label, textColor]}>
-      <Text style={styles.labelBold}>{label}: </Text>
-      <Text style={styles.value}>{value}</Text>
-    </Text>
-  );
+  const renderLabelValue = (label: string, value: string | React.ReactNode) => {
+    const isReactNode = typeof value !== 'string' && typeof value !== 'number';
+
+    if (isReactNode) {
+      return (
+        <View style={[styles.labelRow]}>
+          <Text style={styles.labelBold}>{label}:</Text>
+          <View style={{ marginLeft: 8 }}>{value}</View>
+        </View>
+      );
+    }
+
+    return (
+      <Text style={[styles.label, textColor]}>
+        <Text style={styles.labelBold}>{label}: </Text>
+        <Text style={styles.value}>{value}</Text>
+      </Text>
+    );
+  };
+
+  const renderStars = (rating = 0) => {
+    const fullStars = Math.floor(rating);
+    const maxStars = 5;
+    return (
+      <View style={styles.stars}>
+        {Array.from({ length: maxStars }).map((_, i) =>
+          i < fullStars ? (
+            <AntDesign key={i} name="star" size={16} color="#facc15" />
+          ) : (
+            <AntDesign key={i} name="staro" size={16} color="#facc15" />
+          )
+        )}
+      </View>
+    );
+  };
+
+  const renderStatus = (status: string) => {
+    let backgroundColor = '#9ca3af';
+    let textColor = '#fff';
+
+    if (status === 'pending') {
+      backgroundColor = '#facc15';
+      textColor = '#fff';
+    } else if (status === 'resolved') {
+      backgroundColor = '#10b981';
+      textColor = '#fff';
+    } else if (status === 'rejected') {
+      backgroundColor = '#ef4444';
+      textColor = '#fff';
+    }
+
+    return (
+      <View style={[styles.statusTag, { backgroundColor }]}>
+        <Text style={{ color: textColor, fontSize: 13 }}>
+          {t(`status.${status}`)}
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
@@ -85,7 +138,7 @@ const DetailReport = () => {
               </Text>
             </View>
 
-            {renderLabelValue(t('detail.rating'), `${target?.rating || 0}/5`)}
+            {renderLabelValue(t('detail.rating'), renderStars(target?.rating))}
             {renderLabelValue(
               t('detail.content'),
               target?.content || t('detail.noContent')
@@ -136,11 +189,14 @@ const DetailReport = () => {
               t('detail.reportedAt'),
               new Date(createdAt).toLocaleString()
             )}
-            {renderLabelValue(t('myReport.status'), t(`status.${status}`))}
+
+            {renderLabelValue(t('myReport.status'), renderStatus(status))}
+
             {renderLabelValue(
               t('myReport.reason'),
               t(`reasons.${reason}`, { defaultValue: reason })
             )}
+
             {renderLabelValue(t('myReport.details'), details)}
 
             <Text style={[styles.subTitle, textColor]}>
@@ -209,5 +265,21 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 8,
     marginRight: 8,
+  },
+  stars: {
+    flexDirection: 'row',
+    marginTop: 4,
+  },
+  statusTag: {
+    paddingHorizontal: 14,
+    borderRadius: 9999, // bo tròn kiểu pill
+    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
   },
 });
