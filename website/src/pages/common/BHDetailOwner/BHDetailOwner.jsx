@@ -268,7 +268,6 @@ const BHDetailOwner = () => {
         }
       );
       setGeoLocation(res.data[0]);
-      console.log("GeoLocation result:", res.data[0]);
     } catch (error) {
       console.log("Error getting location:", error);
     }

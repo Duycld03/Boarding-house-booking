@@ -191,6 +191,7 @@
       "networkError": "Network error. Please try again"
     },
     "table": {
+      "title": "Room Management",
       "image": "Image",
       "roomImageAlt": "Room Image",
       "roomNumber": "Room Number",

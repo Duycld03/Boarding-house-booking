@@ -191,6 +191,7 @@
       "networkError": "Lỗi mạng. Vui lòng thử lại"
     },
     "table": {
+      "title": "Quản lý phòng",
       "image": "Hình ảnh",
       "roomImageAlt": "Hình ảnh phòng",
       "roomNumber": "Số phòng",

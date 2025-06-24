@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { TableCustom as Table } from "@/component";
 import { getRoomsByBoardingHouse } from "@/api/roomAPI";
 import { Image, Space } from "antd";
@@ -14,22 +14,50 @@ function RoomManagement({ boardingHouseId }) {
   const [loading, setLoading] = useState(true);
   const [selectRoomData, setSelectRoomData] = useState(null);
   const { t } = useTranslation("bhManagement");
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+    sortField: "createdAt",
+    sortOrder: "desc",
+  });
 
   // State để điều khiển việc hiển thị
   const [showUpdateRoom, setShowUpdateRoom] = useState(false);
 
-  //fetch data
-  const fetchRooms = async () => {
-    const res = await getRoomsByBoardingHouse(boardingHouseId);
-    if (res) {
-      setRooms(res);
-      setLoading(false);
-    }
-  };
+  const fetchRooms = useCallback(async () => {
+    try {
+      const res = await getRoomsByBoardingHouse(
+        boardingHouseId,
+        paginationOptions
+      );
 
-  useEffect(() => {
-    fetchRooms();
-  }, []);
+      console.log("Fetched rooms:", res);
+
+      if (res) {
+        setRooms(res.data || []);
+        setLoading(false);
+      }
+    } catch (error) {
+      toast.error(t("messages.fetchFailed"));
+    }
+  }, [boardingHouseId, paginationOptions, t]);
+
+  const tablePaginationConfig = useMemo(
+    () => ({
+      current: pagination.currentPage,
+      pageSize: pagination.limit,
+      total: pagination.totalItems,
+      showSizeChanger: true,
+    }),
+    [pagination, t]
+  );
 
   const columns = [
     {
@@ -139,7 +167,9 @@ function RoomManagement({ boardingHouseId }) {
       <AddRoom boardingHouseId={boardingHouseId} refreshRoomData={fetchRooms} />
       <Table
         data={rooms || []}
+        tableName={t("roomManagement.table.title")}
         columns={columns}
+        pagination={tablePaginationConfig}
         loading={loading}
         onRowClick={(record) => handleRowClick(record)}
         style={{

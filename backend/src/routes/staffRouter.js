@@ -17,174 +17,189 @@ import {
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
-const managerRouter = Router();
+const staffRouter = Router();
 
-managerRouter.get('/', (req, res) => {
-  res.send('This is a manager router');
+staffRouter.get('/', (req, res) => {
+  res.send('This is a staff router');
 });
 
 //boarding house
-managerRouter.get('/boardinghouseowner', boardingHouseController.getAllBHOwner);
-managerRouter.get(
+staffRouter.get('/boardinghouseowner', boardingHouseController.getAllBHOwner);
+staffRouter.get(
   '/boardinghouse/:id',
   boardingHouseController.getBoardingHouseDetails
 );
-managerRouter.put(
+staffRouter.put(
   '/boardinghouse/:id',
   upload.array('boardingHouse'),
   boardingHouseController.updateBoardingHouseDetailsOwner
 );
 
-managerRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
-// managerRouter.post(
+staffRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
+// staffRouter.post(
 //   "/boardinghouse",
 //   upload.array("boardingHouse"), // Cho phép tối đa 16 ảnh trong 1 lần upload
 //   boardingHouseController.createBoardingHouseOwner
 // );
-managerRouter.delete(
+staffRouter.delete(
   '/boardinghouse/:id/softDelete',
   boardingHouseController.softDeleteBoardingHouse
 );
 
 //review
-managerRouter.post('/reply', ReviewController.replyReview);
-managerRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
+staffRouter.post('/reply', ReviewController.replyReview);
+staffRouter.get('/reviews/:reviewId', ReviewController.getReviewContent);
 
 // deposit
-managerRouter.put('/review/updatereply', ReviewController.updateReplyReview);
-managerRouter.delete('/review/reply', ReviewController.softDeleteReplyReview);
+staffRouter.put('/review/updatereply', ReviewController.updateReplyReview);
+staffRouter.delete('/review/reply', ReviewController.softDeleteReplyReview);
 
 //tenant
-managerRouter.get(
+staffRouter.get(
   '/tenant/:boardingHouseId',
   tenantController.getTenantsByBoardingHouse
 );
-managerRouter.delete(
+staffRouter.delete(
   '/tenant/:boardingHouseId/:accountId',
   tenantController.deleteTenantFromBoardingHouse
 );
 
 //facilities
-managerRouter.get('/facilities', FacilitiesController.getAllFacilities);
+staffRouter.get('/facilities', FacilitiesController.getAllFacilities);
 
 //roomtype
-managerRouter.get(
+staffRouter.get(
   '/boardinghouse/room-types/:id',
   roomTypeController.getRoomTypeByBhId
 );
-managerRouter.post(
+staffRouter.post(
   '/boardinghouse/roomtype/:id/create',
   upload.single('roomType'),
   roomTypeController.addRoomTypeToBoardingHouse
 );
-managerRouter.put(
+staffRouter.put(
   '/boardinghouse/roomtype/:roomTypeId/',
   upload.single('roomType'), // Nếu có ảnh mới, upload lên Cloudinary
   roomTypeController.updateRoomTypeToBoardingHouse
 );
-managerRouter.delete(
+staffRouter.delete(
   '/boardinghouse/roomtype/:roomTypeId/',
   roomTypeController.softDeleteRoomType
 );
 
 //deposit
-managerRouter.get(
+staffRouter.get(
   '/boardinghouse/deposit/:boardingHouseId',
   depositController.getDepositByBhId
 );
 
-managerRouter.get(
+staffRouter.get(
   '/boardinghouse/deposit/max-deposit/:boardingHouseId',
   depositController.getMaxDeposit
 );
-managerRouter.get(
+staffRouter.get(
   '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
   depositController.getMaxRentTime
 );
-managerRouter.put(
+staffRouter.put(
   '/acceptdeposit/:depositId',
   depositController.acceptDepositRoom
 );
-managerRouter.put(
+staffRouter.put(
   '/rejectdeposit/:depositId',
   depositController.rejectDepositRoom
 );
 
 // room
+staffRouter.get(
+  '/room/boarding-house/:boardingHouseId',
+  roomController.getRoomsByBoardingHouse
+);
 
+staffRouter.post(
+  '/room/boarding-house',
+  upload.single('Room'),
+  roomController.addRoom
+);
+staffRouter.put(
+  '/room/boarding-house/:roomId',
+  upload.single('Room'),
+  roomController.updateRoom
+);
+staffRouter.delete('/room/boarding-house/:roomId', roomController.deleteRoom);
 
 //renewal
-managerRouter.get(
+staffRouter.get(
   '/renewal/boarding-house/:boardingHouseId',
   renewalController.getRenewalRequestByBhID
 );
-managerRouter.put(
+staffRouter.put(
   '/renewal/:requestId',
   renewalController.acceptExtensionRequest
 );
-managerRouter.put(
+staffRouter.put(
   '/rejectrenewal/:requestId',
   renewalController.rejectExtensionRequest
 );
 
 // refund request
-managerRouter.get(
+staffRouter.get(
   '/refund-requests',
   refundRequestController.getRefundRequestsForOwner
 );
-managerRouter.put(
+staffRouter.put(
   '/refund-request/:refundRequestId',
   refundRequestController.cancelRefundRequestsForOwner
 );
 
-managerRouter.post(
+staffRouter.post(
   '/refund-request/:refundRequestId',
   depositController.acceptRefundRequestForOwner
 );
 
 //expense
-managerRouter.get('/expense', bhExpenseController.getExpensesByTime);
-managerRouter.put('/expense/:expenseId', bhExpenseController.updateExpense);
-managerRouter.get('/total-expense', bhExpenseController.getTotalExpensesByTime);
+staffRouter.get('/expense', bhExpenseController.getExpensesByTime);
+staffRouter.put('/expense/:expenseId', bhExpenseController.updateExpense);
+staffRouter.get('/total-expense', bhExpenseController.getTotalExpensesByTime);
 
 //revenue
-managerRouter.get('/revenue', revenueController.getRevenue);
-managerRouter.get('/revenue/years', revenueController.getAvailableYears);
-managerRouter.get('/revenue/year', revenueController.getRevenueByYear);
+staffRouter.get('/revenue', revenueController.getRevenue);
+staffRouter.get('/revenue/years', revenueController.getAvailableYears);
+staffRouter.get('/revenue/year', revenueController.getRevenueByYear);
 
-managerRouter.get('/total-revenue', revenueController.getTotalRevenue);
-managerRouter.get(
+staffRouter.get('/total-revenue', revenueController.getTotalRevenue);
+staffRouter.get(
   '/total-revenue/years',
   revenueController.getTotalAvailableYears
 );
-managerRouter.get(
+staffRouter.get(
   '/total-revenue/year',
   revenueController.getTotalRevenueByYear
 );
 
 //rent payment
-managerRouter.get(
+staffRouter.get(
   '/rent-payment/:boardingHouseId',
   paymentBillController.getPaymentBillByBoardingHouseId
 );
 
-managerRouter.get(
+staffRouter.get(
   '/unpaid-rooms/:boardingHouseId',
   roomController.getUnpaidRoomsByBoardingHouse
 );
 
 // get electrical and water price
-managerRouter.get(
+staffRouter.get(
   '/electrical-water-price/:boardingHouseId',
   boardingHouseController.getElectricalAndWaterPrice
 );
 
-managerRouter.post(
+staffRouter.post(
   '/calculate-monthly-bill',
   paymentBillController.calculateMonthlyRoomRent
 );
 
 //manager
-managerRouter.get('/manager-owner', managerController.getManagerOwner);
+staffRouter.get('/manager-owner', managerController.getManagerOwner);
 
-export { managerRouter };
+export { staffRouter };
