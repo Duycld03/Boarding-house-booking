@@ -89,8 +89,8 @@ staffRouter.delete(
 
 //deposit
 staffRouter.get(
-  '/boardinghouse/deposit/:boardingHouseId',
-  depositController.getDepositByBhId
+  'staff/bh/deposit-list',
+  depositController.getDepositsByOwnerOrStaff
 );
 
 staffRouter.get(
