@@ -8,7 +8,7 @@
     "details": "Details",
     "createdAt": "Created At",
     "action": "Action",
-    "detail": "Detail"
+    "detail": "Click to view detail"
   },
   "detail": {
     "title": "Report Detail",
@@ -24,7 +24,9 @@
     "reportedAt": "Reported At",
     "reportImages": "Report Images",
     "noContent": "No content",
-    "noImages": "No images available"
+    "noImages": "No images available",
+    "reporter": "Reporter",
+    "reviewer": "Reviewer"
   },
   "messages": {
     "noData": "No report found",

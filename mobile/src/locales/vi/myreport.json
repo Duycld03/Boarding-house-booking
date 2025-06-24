@@ -5,7 +5,7 @@
     "target": "Đối tượng",
     "reason": "Lý do",
     "status": "Trạng thái",
-    "details": "Chi tiết",
+    "details": "Nhấp để xem chi tiết",
     "createdAt": "Ngày tạo",
     "action": "Thao tác",
     "detail": "Chi tiết"
@@ -24,7 +24,9 @@
     "reportedAt": "Thời gian báo cáo",
     "reportImages": "Hình ảnh báo cáo",
     "noContent": "Không có nội dung",
-    "noImages": "Không có hình ảnh"
+    "noImages": "Không có hình ảnh",
+    "reporter": "Người báo cáo",
+    "reviewer": "Người đánh giá"
   },
   "messages": {
     "noData": "Không tìm thấy báo cáo nào",

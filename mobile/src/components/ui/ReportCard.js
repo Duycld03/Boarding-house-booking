@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card, Badge } from 'react-native-paper';
+import { Card, Badge, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/ThemeProvider';
@@ -9,7 +9,7 @@ import convertTimetap from '@/utils/convertTimetap';
 const ReportCard = ({ report }) => {
   const router = useRouter();
   const { t } = useTranslation('myreport');
-  const { isDarkMode } = useTheme(); // 👈 Lấy trạng thái dark mode
+  const { isDarkMode } = useTheme();
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -28,7 +28,7 @@ const ReportCard = ({ report }) => {
     <Card
       style={[
         styles.card,
-        { backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }, // 👈 BG card
+        { backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' },
       ]}
     >
       <Card.Content>
@@ -36,7 +36,7 @@ const ReportCard = ({ report }) => {
           <Text
             style={[
               styles.title,
-              { color: isDarkMode ? '#f9fafb' : '#111827' }, // 👈 Title color
+              { color: isDarkMode ? '#f9fafb' : '#111827' },
             ]}
           >
             {t('detail.reportInfo')}
@@ -65,7 +65,7 @@ const ReportCard = ({ report }) => {
             <Text
               style={[
                 styles.label,
-                { color: isDarkMode ? '#e5e7eb' : '#374151' }, // 👈 Label color
+                { color: isDarkMode ? '#e5e7eb' : '#374151' },
               ]}
             >
               {t(`myReport.${labelKey}`)}:
@@ -73,7 +73,7 @@ const ReportCard = ({ report }) => {
             <Text
               style={[
                 styles.value,
-                { color: isDarkMode ? '#f3f4f6' : '#1f2937' }, // 👈 Value color
+                { color: isDarkMode ? '#f3f4f6' : '#1f2937' },
               ]}
             >
               {value}
@@ -81,17 +81,18 @@ const ReportCard = ({ report }) => {
           </View>
         ))}
 
-        <Text
-          style={[
-            styles.viewDetail,
-            { color: isDarkMode ? '#60a5fa' : '#3b82f6' },
-          ]}
+        <Button
+          mode="contained"
           onPress={() =>
             router.push(`/myreportmanagement/detailReport?id=${report._id}`)
           }
+          style={styles.detailButton}
+          labelStyle={{ color: '#fff' }}
+          buttonColor={isDarkMode ? '#2563eb' : '#3b82f6'}
+          contentStyle={{ paddingVertical: 6 }}
         >
-          {t('myReport.detail')} &gt;
-        </Text>
+          {t('myReport.detail')}
+        </Button>
       </Card.Content>
     </Card>
   );
@@ -136,9 +137,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
   },
-  viewDetail: {
-    fontWeight: '500',
-    marginTop: 10,
-    alignSelf: 'flex-end',
+  detailButton: {
+    marginTop: 16,
+    borderRadius: 8,
   },
 });
