@@ -170,9 +170,7 @@ const RoomType = () => {
 
         const fullText = translated.join(', ');
         const shortText =
-          translated.length > 3
-            ? `${translated.slice(0, 3).join(', ')}...`
-            : fullText;
+          fullText.length > 30 ? `${fullText.slice(0, 30)}...` : fullText;
 
         return (
           <Tooltip title={fullText}>
