@@ -1,4 +1,5 @@
 {
+  "tableName": "Báo cáo",
   "myReport": {
     "reportType": "Loại báo cáo",
     "target": "Đối tượng bị báo cáo",
@@ -8,6 +9,9 @@
     "createdAt": "Ngày tạo",
     "action": "Hành động",
     "detail": "Xem chi tiết"
+  },
+   "messages": {
+    "noData": "Không có báo cáo"
   },
   "status": {
     "pending": "Đang chờ xử lý",

@@ -10,17 +10,49 @@ import { useTranslation } from 'react-i18next';
 
 function MyReport() {
   const { t } = useTranslation('myreport');
+
   const [report, setReport] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
 
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 0,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  const [filterValue, setFilterValue] = useState({}); // dùng khi có filter sau này
+
   const fetchReport = async () => {
+    setLoading(true);
     try {
-      const response = await getMyReport();
-      setReport(response);
+      const res = await getMyReport({
+        ...filterValue,
+        ...paginationOptions,
+      });
+
+      if (res?.data && res?.pagination) {
+        setReport(res.data);
+        setPagination({
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
+          totalItems: res.pagination.totalItems,
+          limit: res.pagination.pageSize,
+        });
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
       console.error('Fetch report error:', error);
+      toast.error(t('messages.fetchError'));
+      setReport([]);
     } finally {
       setLoading(false);
     }
@@ -28,7 +60,7 @@ function MyReport() {
 
   useEffect(() => {
     fetchReport();
-  }, []);
+  }, [paginationOptions]);
 
   const handleDetailModal = async (record) => {
     try {
@@ -48,6 +80,21 @@ function MyReport() {
   const closeDetailModal = () => {
     setIsDetailModalOpen(false);
     setSelectedData(null);
+  };
+
+  const handleTableChange = (pagination) => {
+    setPaginationOptions((prev) => ({
+      ...prev,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    }));
+  };
+
+  const tablePaginationConfig = {
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
   };
 
   const columns = [
@@ -113,11 +160,15 @@ function MyReport() {
   return (
     <div>
       <Table
-        data={report}
+        tableName={t('tableName')}
         columns={columns}
+        data={report}
         loading={loading}
-        onRowClick={handleDetailModal} // ✅ đúng prop mà TableCustom dùng
+        onRowClick={handleDetailModal}
         rowClassName={() => 'hover:bg-blue-50 cursor-pointer'}
+        pagination={tablePaginationConfig}
+        onChange={handleTableChange}
+        noDataText={t('messages.noData')}
       />
       <DetailReportModal
         isOpen={isDetailModalOpen}

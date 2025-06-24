@@ -1,4 +1,5 @@
 {
+  "tableName": "Report",
   "myReport": {
     "reportType": "Report Type",
     "target": "Target",
@@ -8,6 +9,16 @@
     "createdAt": "Created At",
     "action": "Action",
     "detail": "Detail"
+  },
+  "messages": {
+    "noData": "No report found",
+    "fetchError": "Failed to fetch data. Please try again later.",
+    "detailFetchError": "Failed to fetch report details.",
+    "deleteSuccess": "Review report deleted successfully.",
+    "deleteFailed": "Failed to delete review report.",
+    "replayError": "Missing reply information. Please check again.",
+    "replayFailed": "Failed to send reply or update report.",
+    "replaySuccess":"Replay submitted successfully!"
   },
   "status": {
     "pending": "Pending",
