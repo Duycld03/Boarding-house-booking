@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import {
-  authController,
   boardingHouseController,
   ReviewController,
   roomTypeController,
@@ -109,23 +108,6 @@ ownerRouter.put(
   depositController.rejectDepositRoom
 );
 
-// room
-ownerRouter.get(
-  '/room/boarding-house/:boardingHouseId',
-  roomController.getRoomsByBoardingHouse
-);
-
-ownerRouter.post(
-  '/room/boarding-house',
-  upload.single('Room'),
-  roomController.addRoom
-);
-ownerRouter.put(
-  '/room/boarding-house/:roomId',
-  upload.single('Room'),
-  roomController.updateRoom
-);
-ownerRouter.delete('/room/boarding-house/:roomId', roomController.deleteRoom);
 
 //renewal
 ownerRouter.get(

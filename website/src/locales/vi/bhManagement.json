@@ -11,7 +11,7 @@
     "selectBoardingHouseType": "Vui lòng chọn loại nhà trọ.",
     "enterBoardingHouseName": "Vui lòng nhập tên nhà trọ.",
     "selectProvince": "Vui lòng chọn tỉnh/thành phố.",
-     "manager": "Vui lòng chọn nhân viên.",
+    "manager": "Vui lòng chọn nhân viên.",
     "selectDistrict": "Vui lòng chọn quận/huyện.",
     "selectWard": "Vui lòng chọn phường/xã.",
     "enterAddressDetail": "Vui lòng nhập chi tiết nhà trọ.",
@@ -118,7 +118,6 @@
       "addOtherImages": "Thêm ảnh khác",
       "dragDropOrClick": "Kéo thả hoặc bấm vào đây để chọn tệp",
       "details": "Chi tiết"
-
     },
     "placeholders": {
       "selectProvince": "Chọn tỉnh/thành phố",
@@ -150,9 +149,120 @@
     "detail": "Chi tiết",
     "delete": "Xóa"
   },
- "boardingHouseTypes": {
+  "boardingHouseTypes": {
     "Nhà trọ truyền thống": "Nhà trọ truyền thống",
     "Mini house": "Căn hộ mini",
     "Nhà trọ kiến trúc xá": "Nhà trọ kiến trúc xá"
+  },
+  "roomManagement": {
+    "updateRoom": {
+      "backToRoomManagement": "Quay lại quản lý phòng",
+      "updateRoom": "Cập nhật phòng",
+      "deleteRoom": "Xóa phòng",
+      "roomType": "Loại phòng",
+      "roomNumber": "Số phòng",
+      "description": "Mô tả",
+      "pleaseUploadImage": "Vui lòng tải lên hình ảnh cho phòng",
+      "pleaseSelectRoomType": "Vui lòng chọn loại phòng",
+      "pleaseEnterRoomNumber": "Vui lòng nhập số phòng",
+      "pleaseEnterRoomDescription": "Vui lòng nhập mô tả phòng",
+      "selectRoomType": "Chọn loại phòng",
+      "enterRoomNumber": "Nhập số phòng",
+      "enterDetailedRoomDescription": "Nhập mô tả chi tiết về phòng",
+      "clickToUploadImage": "Nhấp để tải lên hình ảnh phòng",
+      "imageFileFormat": "Hỗ trợ định dạng JPG, PNG, JPEG",
+      "noRoomTypeFound": "Không tìm thấy loại phòng nào. Vui lòng tạo loại phòng trước.",
+      "errorFetchingRoomTypes": "Đã xảy ra lỗi khi tải danh sách loại phòng",
+      "roomUpdatedSuccessfully": "Cập nhật phòng thành công",
+      "roomDeletedSuccessfully": "Xóa phòng thành công",
+      "confirmDeleteRoom": "Bạn có chắc chắn muốn xóa phòng này không?",
+      "deleteRoomWarning": "Hành động này không thể hoàn tác",
+      "cancel": "Hủy bỏ",
+      "confirm": "Xác nhận",
+      "uploading": "Đang tải lên...",
+      "uploadFailed": "Tải lên thất bại",
+      "invalidFileType": "Định dạng file không hợp lệ. Vui lòng chọn file JPG, PNG hoặc JPEG",
+      "fileSizeTooLarge": "Kích thước file quá lớn. Kích thước tối đa là 5MB",
+      "required": "Trường này là bắt buộc",
+      "roomNumberExists": "Số phòng đã tồn tại",
+      "processingRequest": "Đang xử lý yêu cầu...",
+      "updateFailed": "Cập nhật thất bại",
+      "deleteFailed": "Xóa thất bại",
+      "networkError": "Lỗi mạng. Vui lòng thử lại"
+    },
+    "table": {
+      "image": "Hình ảnh",
+      "roomImageAlt": "Hình ảnh phòng",
+      "roomNumber": "Số phòng",
+      "tenants": "Người thuê",
+      "availability": "Tình trạng",
+      "roomType": "Loại phòng",
+      "createdAt": "Ngày tạo",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "available": "Còn trống",
+      "occupied": "Đã có người thuê"
+    },
+    "actions": {
+      "delete": "Xóa",
+      "update": "Chỉnh sửa"
+    },
+    "messages": {
+      "deleteFailed": "Xóa phòng thất bại",
+      "updateSuccess": "Cập nhật phòng thành công"
+    },
+    "modal": {
+      "confirmDelete": {
+        "title": "Xác nhận xóa phòng",
+        "content": "Bạn có chắc chắn muốn xóa phòng này không?"
+      }
+    },
+    "addRoom": {
+      "button": {
+        "addRoom": "Thêm phòng"
+      },
+      "modal": {
+        "title": "Thêm phòng mới",
+        "okText": "Thêm phòng"
+      },
+      "form": {
+        "roomType": {
+          "label": "Loại phòng",
+          "placeholder": "Chọn loại phòng",
+          "required": "Vui lòng chọn loại phòng!"
+        },
+        "roomNumber": {
+          "label": "Số phòng",
+          "placeholder": "Nhập số phòng (VD: A101, B02)",
+          "required": "Vui lòng nhập số phòng!"
+        },
+        "description": {
+          "label": "Mô tả phòng",
+          "placeholder": "Nhập mô tả chi tiết về phòng, tiện nghi và đặc điểm...",
+          "required": "Vui lòng nhập mô tả phòng!"
+        },
+        "image": {
+          "label": "Hình ảnh phòng",
+          "uploadText": "Tải lên hình ảnh",
+          "uploadHint": "Nhấp hoặc kéo thả hình ảnh để tải lên",
+          "supportedFormats": "Hỗ trợ: JPG, PNG, WEBP (Tối đa: 5MB)",
+          "extra": "Tải lên hình ảnh rõ nét của phòng để thu hút người thuê"
+        }
+      },
+      "validation": {
+        "imageRequired": "Vui lòng tải lên hình ảnh phòng",
+        "invalidImageType": "Vui lòng tải lên file hình ảnh hợp lệ",
+        "imageSizeLimit": "Kích thước hình ảnh phải nhỏ hơn 5MB"
+      },
+      "noRoomType": {
+        "title": "Không tìm thấy loại phòng",
+        "content": "Vui lòng thêm loại phòng trước khi tạo phòng. Hãy vào Quản lý loại phòng để thêm loại phòng trước."
+      }
+    },
+    "common": {
+      "ok": "Đồng ý",
+      "cancel": "Hủy bỏ"
+    }
   }
 }

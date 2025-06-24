@@ -111,22 +111,7 @@ managerRouter.put(
 );
 
 // room
-managerRouter.get(
-  '/room/boarding-house/:boardingHouseId',
-  roomController.getRoomsByBoardingHouse
-);
 
-managerRouter.post(
-  '/room/boarding-house',
-  upload.single('Room'),
-  roomController.addRoom
-);
-managerRouter.put(
-  '/room/boarding-house/:roomId',
-  upload.single('Room'),
-  roomController.updateRoom
-);
-managerRouter.delete('/room/boarding-house/:roomId', roomController.deleteRoom);
 
 //renewal
 managerRouter.get(
