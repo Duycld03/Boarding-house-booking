@@ -117,8 +117,7 @@
       "addImage": "Add Primary Image",
       "addOtherImages": "Add Other Image",
       "dragDropOrClick": "Drag-drop or click here to choose a file",
-          "details": "Details"
-
+      "details": "Details"
     },
     "placeholders": {
       "selectProvince": "Select Province",
@@ -154,5 +153,117 @@
     "Nhà trọ truyền thống": "Traditional Boarding House",
     "Mini house": "Mini Apartment",
     "Nhà trọ kiến trúc xá": "Dormitory"
+  },
+  "roomManagement": {
+    "updateRoom": {
+      "backToRoomManagement": "Back to Room Management",
+      "updateRoom": "Update Room",
+      "deleteRoom": "Delete Room",
+      "roomType": "Room Type",
+      "roomNumber": "Room Number",
+      "description": "Description",
+      "pleaseUploadImage": "Please upload an image for the room",
+      "pleaseSelectRoomType": "Please select a room type",
+      "pleaseEnterRoomNumber": "Please enter room number",
+      "pleaseEnterRoomDescription": "Please enter room description",
+      "selectRoomType": "Select room type",
+      "enterRoomNumber": "Enter room number",
+      "enterDetailedRoomDescription": "Enter detailed room description",
+      "clickToUploadImage": "Click to upload room image",
+      "imageFileFormat": "Support JPG, PNG, JPEG formats",
+      "noRoomTypeFound": "No room types found. Please create room types first.",
+      "errorFetchingRoomTypes": "Error occurred while fetching room types",
+      "roomUpdatedSuccessfully": "Room updated successfully",
+      "roomDeletedSuccessfully": "Room deleted successfully",
+      "confirmDeleteRoom": "Are you sure you want to delete this room?",
+      "deleteRoomWarning": "This action cannot be undone",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "uploading": "Uploading...",
+      "uploadFailed": "Upload failed",
+      "invalidFileType": "Invalid file type. Please select JPG, PNG or JPEG file",
+      "fileSizeTooLarge": "File size too large. Maximum size is 5MB",
+      "required": "This field is required",
+      "roomNumberExists": "Room number already exists",
+      "processingRequest": "Processing request...",
+      "updateFailed": "Update failed",
+      "deleteFailed": "Delete failed",
+      "networkError": "Network error. Please try again"
+    },
+    "table": {
+      "title": "Room Management",
+      "image": "Image",
+      "roomImageAlt": "Room Image",
+      "roomNumber": "Room Number",
+      "tenants": "Tenants",
+      "availability": "Availability",
+      "roomType": "Room Type",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "status": {
+      "available": "Available",
+      "occupied": "Occupied"
+    },
+    "actions": {
+      "delete": "Delete",
+      "update": "Update"
+    },
+    "messages": {
+      "deleteFailed": "Delete failed",
+      "updateSuccess": "Room updated successfully"
+    },
+    "modal": {
+      "confirmDelete": {
+        "title": "Confirm Deletion",
+        "content": "Are you sure you want to delete this room?"
+      }
+    },
+    "addRoom": {
+      "button": {
+        "addRoom": "Add Room"
+      },
+      "modal": {
+        "title": "Add New Room",
+        "okText": "Add Room"
+      },
+      "form": {
+        "roomType": {
+          "label": "Room Type",
+          "placeholder": "Select room type",
+          "required": "Please select room type!"
+        },
+        "roomNumber": {
+          "label": "Room Number",
+          "placeholder": "Enter room number (e.g: A101, B02)",
+          "required": "Please enter room number!"
+        },
+        "description": {
+          "label": "Room Description",
+          "placeholder": "Enter detailed room description, amenities, and features...",
+          "required": "Please enter room description!"
+        },
+        "image": {
+          "label": "Room Image",
+          "uploadText": "Upload Image",
+          "uploadHint": "Click or drag image to upload",
+          "supportedFormats": "Support: JPG, PNG, WEBP (Max: 5MB)",
+          "extra": "Upload a clear photo of the room to attract tenants"
+        }
+      },
+      "validation": {
+        "imageRequired": "Please upload a room image",
+        "invalidImageType": "Please upload a valid image file",
+        "imageSizeLimit": "Image size must be less than 5MB"
+      },
+      "noRoomType": {
+        "title": "No Room Type Found",
+        "content": "Please add room types before creating rooms. Go to Room Type Management to add room types first."
+      }
+    },
+    "common": {
+      "ok": "OK",
+      "cancel": "Cancel"
+    }
   }
 }
