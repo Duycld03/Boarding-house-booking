@@ -65,6 +65,7 @@ function MyReport() {
   const handleDetailModal = async (record) => {
     try {
       const res = await getOwnReportReviewDetail(record._id);
+
       if (res) {
         setSelectedData(res);
         setIsDetailModalOpen(true);
