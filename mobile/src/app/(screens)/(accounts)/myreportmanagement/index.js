@@ -10,6 +10,7 @@ import { getMyReport } from '@/API/ownerUser/myReport';
 import EmptyState from '@/components/ui/EmptyState';
 import Loader from '@/components/ui/Loader';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 
 function MyReportManagement() {
   const { themedClasses, isDarkMode } = useThemedClasses();
@@ -19,6 +20,7 @@ function MyReportManagement() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
   const { t } = useTranslation('myreport');
+  const router = useRouter();
 
   const fetchReports = async (currentLimit = 5) => {
     setIsLoading(true);
@@ -27,7 +29,7 @@ function MyReportManagement() {
       setReports(res?.data || []);
       setTotalReports(res?.pagination?.totalItems || 0);
     } catch (error) {
-      console.error('Failed to fetch reports:', error);
+      router.push('/login');
     } finally {
       setIsLoading(false);
     }
@@ -66,10 +68,7 @@ function MyReportManagement() {
         />
 
         {reports.length === 0 && !isLoading ? (
-          <EmptyState
-            title={t('myReport.noReports')}
-            message={t('myReport.noReportsDesc')}
-          />
+          <EmptyState title={t('noReports')} message={t('noReportsDesc')} />
         ) : (
           <ScrollView
             ref={scrollRef}

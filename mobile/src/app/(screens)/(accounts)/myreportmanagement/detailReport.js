@@ -1,97 +1,100 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
-import { Avatar, Card, Badge } from 'react-native-paper';
+import { Avatar, Card } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useThemedClasses } from '@/utils/useTheme';
 import { FontAwesome5, AntDesign } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
+import { getOwnReportReviewDetail } from '@/API/reportAPI';
+import Loader from '@/components/ui/Loader';
+import convertTimetap from '@/utils/convertTimetap';
 
 const DetailReport = () => {
   const { themedClasses, isDarkMode } = useThemedClasses();
   const { t } = useTranslation('myreport');
+  const { id } = useLocalSearchParams();
+  const [reportData, setReportData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const reportData = {
-    reportType: 'review',
-    target: {
-      accountId: {
-        fullname: 'Nguyễn Văn A',
-        avatarImage: { url: 'https://randomuser.me/api/portraits/men/1.jpg' },
-      },
-      rating: 4,
-      content: 'Chất lượng kém, không giống mô tả.',
-      images: [{ imageUrl: 'https://via.placeholder.com/150' }],
-    },
-    reporter: {
-      fullname: 'Trần Thị B',
-      avatarImage: { url: '' },
-    },
-    reason: 'Privacy violation',
-    details: 'Bình luận tiết lộ thông tin cá nhân.',
-    createdAt: '2025-06-24T07:27:44.008Z',
-    status: 'resolved',
-    images: [{ imageUrl: 'https://via.placeholder.com/150' }],
-  };
+  useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        const res = await getOwnReportReviewDetail(id);
 
-  const { reporter, target, reason, details, images, createdAt, status } =
-    reportData;
+        setReportData(res);
+      } catch (error) {
+        console.error('Error fetching detail report:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (id) fetchDetail();
+  }, [id]);
+
+  if (loading) return <Loader />;
+  if (!reportData)
+    return <Text style={{ padding: 20 }}>{t('messages.noData')}</Text>;
+
+  const {
+    reporter,
+    target,
+    reason,
+    details,
+    images,
+    createdAt,
+    status,
+    reportType,
+  } = reportData;
   const textColor = { color: isDarkMode ? '#fff' : '#000' };
 
-  const renderLabelValue = (label: string, value: string | React.ReactNode) => {
+  const renderLabelValue = (label, value) => {
     const isReactNode = typeof value !== 'string' && typeof value !== 'number';
-
-    if (isReactNode) {
-      return (
-        <View style={[styles.labelRow]}>
-          <Text style={styles.labelBold}>{label}:</Text>
-          <View style={{ marginLeft: 8 }}>{value}</View>
-        </View>
-      );
-    }
-
-    return (
-      <Text style={[styles.label, textColor]}>
-        <Text style={styles.labelBold}>{label}: </Text>
-        <Text style={styles.value}>{value}</Text>
-      </Text>
+    return isReactNode ? (
+      <View style={styles.labelRow}>
+        <Text style={styles.labelBold}>{label}:</Text>
+        <View style={{ marginLeft: 8 }}>{value}</View>
+      </View>
+    ) : (
+      <View style={styles.labelRow}>
+        <Text style={[styles.labelBold, textColor]}>{label}:</Text>
+        <Text style={[styles.value, textColor]}>{value}</Text>
+      </View>
     );
   };
 
   const renderStars = (rating = 0) => {
     const fullStars = Math.floor(rating);
-    const maxStars = 5;
     return (
       <View style={styles.stars}>
-        {Array.from({ length: maxStars }).map((_, i) =>
-          i < fullStars ? (
-            <AntDesign key={i} name="star" size={16} color="#facc15" />
-          ) : (
-            <AntDesign key={i} name="staro" size={16} color="#facc15" />
-          )
-        )}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <AntDesign
+            key={i}
+            name={i < fullStars ? 'star' : 'staro'}
+            size={16}
+            color="#facc15"
+          />
+        ))}
       </View>
     );
   };
 
-  const renderStatus = (status: string) => {
-    let backgroundColor = '#9ca3af';
-    let textColor = '#fff';
-
-    if (status === 'pending') {
-      backgroundColor = '#facc15';
-      textColor = '#fff';
-    } else if (status === 'resolved') {
-      backgroundColor = '#10b981';
-      textColor = '#fff';
-    } else if (status === 'rejected') {
-      backgroundColor = '#ef4444';
-      textColor = '#fff';
-    }
-
+  const renderStatus = (status) => {
+    const colors = {
+      pending: '#facc15',
+      resolved: '#10b981',
+      rejected: '#ef4444',
+    };
     return (
-      <View style={[styles.statusTag, { backgroundColor }]}>
-        <Text style={{ color: textColor, fontSize: 13 }}>
+      <View
+        style={[
+          styles.statusTag,
+          { backgroundColor: colors[status] || '#9ca3af' },
+        ]}
+      >
+        <Text style={{ color: '#fff', fontSize: 13 }}>
           {t(`status.${status}`)}
         </Text>
       </View>
@@ -123,43 +126,81 @@ const DetailReport = () => {
         >
           <Card.Content>
             <Text style={[styles.sectionTitle, textColor]}>
-              {reportData.reportType === 'review'
+              {reportType === 'review'
                 ? t('detail.reviewInfo')
                 : t('detail.boardingInfo')}
             </Text>
 
-            <View style={styles.row}>
-              <Avatar.Image
-                source={{ uri: target?.accountId?.avatarImage?.url }}
-                size={50}
-              />
-              <Text style={[styles.text, textColor]}>
-                {target?.accountId?.fullname || t('detail.unknown')}
-              </Text>
-            </View>
-
-            {renderLabelValue(t('detail.rating'), renderStars(target?.rating))}
-            {renderLabelValue(
-              t('detail.content'),
-              target?.content || t('detail.noContent')
+            {reportType === 'review' ? (
+              <>
+                <View style={styles.row}>
+                  <Avatar.Image
+                    source={{ uri: target?.accountId?.avatarImage?.url }}
+                    size={50}
+                  />
+                  <Text style={[styles.text, textColor]}>
+                    {target?.accountId?.fullname || t('detail.unknown')}
+                  </Text>
+                </View>
+                {renderLabelValue(
+                  t('detail.rating'),
+                  renderStars(target?.rating)
+                )}
+                {renderLabelValue(
+                  t('detail.content'),
+                  target?.content || t('detail.noContent')
+                )}
+              </>
+            ) : (
+              <>
+                {renderLabelValue(
+                  t('detail.name'),
+                  target?.name || t('detail.unknown')
+                )}
+                {renderLabelValue(
+                  t('detail.type'),
+                  t(`boardingHouseTypes.${target?.boardingHouseType?.name}`, {
+                    defaultValue:
+                      target?.boardingHouseType?.name || t('detail.unknown'),
+                  })
+                )}
+                {renderLabelValue(
+                  t('detail.rating'),
+                  renderStars(target?.rating)
+                )}
+              </>
             )}
 
             <Text style={[styles.subTitle, textColor]}>
               {t('detail.images')}:
             </Text>
-            <ScrollView horizontal>
-              {target?.images?.length > 0 ? (
-                target.images.map((img, index) => (
+
+            {reportType === 'review' ? (
+              <ScrollView horizontal>
+                {target?.images?.length > 0 ? (
+                  target.images.map((img, index) => (
+                    <Image
+                      key={index}
+                      source={{ uri: img.imageUrl }}
+                      style={styles.image}
+                    />
+                  ))
+                ) : (
+                  <Text style={textColor}>{t('detail.noImages')}</Text>
+                )}
+              </ScrollView>
+            ) : (
+              <>
+                {target?.images?.[0]?.imageUrl ? (
                   <Image
-                    key={index}
-                    source={{ uri: img.imageUrl }}
-                    style={styles.image}
+                    source={{ uri: target.images[0].imageUrl }}
+                    style={[styles.image, { marginBottom: 8 }]}
                   />
-                ))
-              ) : (
-                <Text style={textColor}>{t('detail.noImages')}</Text>
-              )}
-            </ScrollView>
+                ) : (
+                  <Text style={textColor}>{t('detail.noImages')}</Text>
+                )}
+              </>
+            )}
           </Card.Content>
         </Card>
 
@@ -187,34 +228,39 @@ const DetailReport = () => {
 
             {renderLabelValue(
               t('detail.reportedAt'),
-              new Date(createdAt).toLocaleString()
+              convertTimetap(createdAt)
             )}
 
             {renderLabelValue(t('myReport.status'), renderStatus(status))}
-
             {renderLabelValue(
               t('myReport.reason'),
               t(`reasons.${reason}`, { defaultValue: reason })
             )}
-
             {renderLabelValue(t('myReport.details'), details)}
 
             <Text style={[styles.subTitle, textColor]}>
               {t('detail.reportImages')}:
             </Text>
-            <ScrollView horizontal>
-              {images?.length > 0 ? (
-                images.map((img, index) => (
-                  <Image
-                    key={index}
-                    source={{ uri: img.imageUrl }}
-                    style={styles.image}
-                  />
-                ))
-              ) : (
-                <Text style={textColor}>{t('detail.noImages')}</Text>
-              )}
-            </ScrollView>
+
+            <View style={{ width: '100%' }}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ flexDirection: 'row' }}
+              >
+                {images?.length > 0 ? (
+                  images.map((img, index) => (
+                    <Image
+                      key={index}
+                      source={{ uri: img.imageUrl }}
+                      style={styles.image}
+                    />
+                  ))
+                ) : (
+                  <Text style={textColor}>{t('detail.noImages')}</Text>
+                )}
+              </ScrollView>
+            </View>
           </Card.Content>
         </Card>
       </View>
@@ -254,10 +300,11 @@ const styles = StyleSheet.create({
   },
   value: {
     fontWeight: 'normal',
+    marginLeft: 4,
   },
   subTitle: {
     fontWeight: 'bold',
-    marginTop: 10,
+    // marginTop: 10,
     marginBottom: 4,
   },
   image: {
@@ -265,6 +312,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 8,
     marginRight: 8,
+    resizeMode: 'cover',
   },
   stars: {
     flexDirection: 'row',
@@ -272,7 +320,7 @@ const styles = StyleSheet.create({
   },
   statusTag: {
     paddingHorizontal: 14,
-    borderRadius: 9999, // bo tròn kiểu pill
+    borderRadius: 9999,
     alignSelf: 'flex-start',
     justifyContent: 'center',
     alignItems: 'center',
@@ -281,5 +329,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 6,
+    flexWrap: 'nowrap',
   },
 });

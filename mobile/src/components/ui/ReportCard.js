@@ -3,7 +3,8 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Card, Badge } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '@/context/ThemeProvider'; // 👈 Thêm hook dark mode
+import { useTheme } from '@/context/ThemeProvider';
+import convertTimetap from '@/utils/convertTimetap';
 
 const ReportCard = ({ report }) => {
   const router = useRouter();
@@ -58,7 +59,7 @@ const ReportCard = ({ report }) => {
             t(`reasons.${report.reason}`, { defaultValue: report.reason }),
           ],
           ['details', report.details],
-          ['createdAt', new Date(report.createdAt).toLocaleDateString()],
+          ['createdAt', convertTimetap(report.createdAt)],
         ].map(([labelKey, value]) => (
           <View style={styles.row} key={labelKey}>
             <Text
@@ -83,7 +84,7 @@ const ReportCard = ({ report }) => {
         <Text
           style={[
             styles.viewDetail,
-            { color: isDarkMode ? '#60a5fa' : '#3b82f6' }, // 👈 Link color
+            { color: isDarkMode ? '#60a5fa' : '#3b82f6' },
           ]}
           onPress={() =>
             router.push(`/myreportmanagement/detailReport?id=${report._id}`)
