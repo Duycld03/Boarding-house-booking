@@ -14,6 +14,7 @@ import {
   renewalController,
   paymentBillController,
   managerController,
+  roomAdditionFeeController
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -201,5 +202,24 @@ staffRouter.post(
 
 //manager
 staffRouter.get('/manager-owner', managerController.getManagerOwner);
+
+//room addition fee
+staffRouter.post(
+  '/room-addition-fee',
+  roomAdditionFeeController.createRoomAdditionFee
+);
+staffRouter.get(
+  '/room-addition-fee',
+  roomAdditionFeeController.getAllRoomAdditionFees
+);
+staffRouter.put(
+  '/room-addition-fee/:id',
+  roomAdditionFeeController.updateRoomAdditionFee
+);
+staffRouter.delete(
+  '/room-addition-fee/:id',
+  roomAdditionFeeController.deleteRoomAdditionFee
+);
+
 
 export { staffRouter };
