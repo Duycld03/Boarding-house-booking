@@ -12,7 +12,7 @@ import UserPayment from '../models/userPayment.js';
 import BoardingHouse from '../models/boardingHouse.js';
 import { query } from 'express';
 import RefundRequest from '../models/refundRequest.js';
-import Account from '../models/account.js';
+import { Account } from '../models/account.js';
 import paginate from '../utils/pagination.js';
 
 dotenv.config();
