@@ -1,0 +1,27 @@
+{
+  "myReport": {
+    "reportType": "Report Type",
+    "target": "Target",
+    "reason": "Reason",
+    "status": "Status",
+    "details": "Details",
+    "createdAt": "Created At",
+    "action": "Action",
+    "detail": "Detail"
+  },
+  "status": {
+    "pending": "Pending",
+    "resolved": "Resolved",
+    "rejected": "Rejected"
+  },
+    "reasons": {
+    "Privacy violation": "Privacy violation",
+    "Scam on Rent or Deposit": "Scam on Rent or Deposit",
+    "False Advertisement": "False Advertisement",
+    "Unfriendly Landlord": "Unfriendly Landlord",
+    "Poor Security": "Poor Security",
+    "Misleading information": "Misleading information",
+    "Spam": "Spam",
+    "Inappropriate content": "Inappropriate content"
+  }
+}

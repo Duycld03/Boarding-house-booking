@@ -1,0 +1,28 @@
+{
+  "myReport": {
+    "reportType": "Loại báo cáo",
+    "target": "Đối tượng bị báo cáo",
+    "reason": "Lý do",
+    "status": "Trạng thái",
+    "details": "Chi tiết",
+    "createdAt": "Ngày tạo",
+    "action": "Hành động",
+    "detail": "Xem chi tiết"
+  },
+  "status": {
+    "pending": "Đang chờ xử lý",
+    "resolved": "Đã xử lý",
+    "rejected": "Bị từ chối"
+  },
+     "reasons": {
+    "Privacy violation": "Xâm phạm quyền riêng tư",
+    "Scam on Rent or Deposit": "Lừa đảo tiền thuê hoặc tiền cọc",
+    "False Advertisement": "Quảng cáo sai sự thật",
+    "Unfriendly Landlord": "Chủ nhà không thân thiện",
+    "Poor Security": "An ninh kém",
+    "Misleading information": "Thông tin gây hiểu nhầm",
+    "Spam": "Nội dung spam",
+    "Inappropriate content": "Nội dung không phù hợp"
+  }
+
+}
