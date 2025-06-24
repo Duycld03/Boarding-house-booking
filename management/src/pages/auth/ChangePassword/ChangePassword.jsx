@@ -75,7 +75,6 @@ function ChangePassword() {
           onFinish={onFinish}
           autoComplete="off"
           layout="vertical"
-          className={darkMode ? "dark-form" : ""}
         >
           <Form.Item
             label={
