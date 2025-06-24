@@ -7,11 +7,7 @@ const ReportCard = ({ report }) => {
   const router = useRouter();
 
   const getTargetName = () => {
-    if (report.reportType === 'review') {
-      return report.target?.accountId?.fullname || 'Unknown';
-    } else {
-      return report.target?.name || 'Unknown';
-    }
+    return report.target || 'Unknown';
   };
 
   const getStatusColor = (status) => {

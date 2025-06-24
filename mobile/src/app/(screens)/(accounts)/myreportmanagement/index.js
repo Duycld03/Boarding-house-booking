@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import ScreenContainer from '@/components/layout/ScreenContainer';
@@ -6,102 +6,41 @@ import { useThemedClasses } from '@/utils/useTheme';
 import LoadMoreButton from '@/components/ui/LoadMoreButton';
 import ReportCard from '@/components/ui/ReportCard';
 import { FontAwesome5 } from '@expo/vector-icons';
-
-const DUMMY_REPORTS = [
-  {
-    _id: 'r1',
-    reportType: 'review',
-    target: {
-      accountId: { fullname: 'Bùi Minh Nhật' },
-    },
-    reason: 'Spam',
-    details: 'Bài viết chứa nội dung quảng cáo không liên quan.',
-    status: 'pending',
-    createdAt: '2023-11-15T10:30:00Z',
-    images: [
-      { imageUrl: 'https://via.placeholder.com/100' },
-      { imageUrl: 'https://via.placeholder.com/100' },
-    ],
-  },
-  {
-    _id: 'r2',
-    reportType: 'boardingHouse',
-    target: {
-      name: 'Sunshine Boarding House',
-    },
-    reason: 'False Advertisement',
-    details: 'Thông tin về phòng và giá cả không đúng như mô tả.',
-    status: 'resolved',
-    createdAt: '2023-10-22T09:00:00Z',
-    images: [],
-  },
-  {
-    _id: 'r3',
-    reportType: 'review',
-    target: {
-      accountId: { fullname: 'Nguyễn Thị Mai' },
-    },
-    reason: 'Inappropriate content',
-    details: 'Bình luận sử dụng ngôn từ phản cảm.',
-    status: 'rejected',
-    createdAt: '2023-09-10T13:20:00Z',
-    images: [{ imageUrl: 'https://via.placeholder.com/100' }],
-  },
-  {
-    _id: 'r4',
-    reportType: 'boardingHouse',
-    target: {
-      name: 'Green Villa',
-    },
-    reason: 'Scam on Rent or Deposit',
-    details: 'Chủ nhà thu tiền đặt cọc rồi không cho thuê.',
-    status: 'pending',
-    createdAt: '2023-08-30T08:15:00Z',
-    images: [{ imageUrl: 'https://via.placeholder.com/100' }],
-  },
-  {
-    _id: 'r5',
-    reportType: 'review',
-    target: {
-      accountId: { fullname: 'Trần Văn A' },
-    },
-    reason: 'Privacy violation',
-    details: 'Bình luận chứa thông tin cá nhân người khác.',
-    status: 'pending',
-    createdAt: '2023-08-15T17:45:00Z',
-    images: [],
-  },
-  {
-    _id: 'r6',
-    reportType: 'boardingHouse',
-    target: {
-      name: 'Happy Stay',
-    },
-    reason: 'Poor Security',
-    details: 'Khu vực có nhiều trộm cắp, không có camera giám sát.',
-    status: 'resolved',
-    createdAt: '2023-07-10T11:00:00Z',
-    images: [
-      { imageUrl: 'https://via.placeholder.com/100' },
-      { imageUrl: 'https://via.placeholder.com/100' },
-    ],
-  },
-];
+import { getMyReport } from '@/API/ownerUser/myReport';
+import EmptyState from '@/components/ui/EmptyState';
 
 function MyReportManagement() {
   const { themedClasses, isDarkMode } = useThemedClasses();
-  const [limit, setLimit] = useState(3);
+  const [reports, setReports] = useState([]);
+  const [totalReports, setTotalReports] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
+  useEffect(() => {
+    const fetchReports = async () => {
+      setIsLoading(true);
+      try {
+        const res = await getMyReport({ page: 1, limit });
+        setReports(res?.data || []);
+        setTotalReports(res?.pagination?.totalItems || 0);
+      } catch (error) {
+        console.error('Failed to fetch reports:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const visibleReports = DUMMY_REPORTS.slice(0, limit);
-  const hasMore = visibleReports.length < DUMMY_REPORTS.length;
+    fetchReports();
+  }, [limit]);
 
   const handleLoadMore = () => {
-    setLimit((prev) => prev + 3);
+    setLimit((prev) => prev + 5);
     setTimeout(() => {
       scrollRef.current?.scrollToEnd({ animated: true });
-    }, 100); // delay 1 chút cho scroll smooth
+    }, 100);
   };
+
+  const hasMore = reports.length < totalReports;
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
@@ -126,17 +65,17 @@ function MyReportManagement() {
           ref={scrollRef}
           contentContainerStyle={{ paddingBottom: 20 }}
         >
-          {visibleReports.map((report) => (
+          {reports.map((report) => (
             <ReportCard key={report._id} report={report} />
           ))}
 
           <LoadMoreButton
             hasMore={hasMore}
-            isLoading={false}
+            isLoading={isLoading}
             onLoadMore={handleLoadMore}
-            currentCount={visibleReports.length}
-            totalCount={DUMMY_REPORTS.length}
-            itemsPerPage={3}
+            currentCount={reports.length}
+            totalCount={totalReports}
+            itemsPerPage={5}
             itemName="reports"
           />
         </ScrollView>
