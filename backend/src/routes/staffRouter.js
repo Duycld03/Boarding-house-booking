@@ -89,7 +89,7 @@ staffRouter.delete(
 
 //deposit
 staffRouter.get(
-  'staff/bh/deposit-list',
+  '/bh/deposit-list',
   depositController.getDepositsByOwnerOrStaff
 );
 
