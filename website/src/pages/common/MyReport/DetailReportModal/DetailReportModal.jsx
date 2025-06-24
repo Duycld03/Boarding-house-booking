@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Image, Avatar, Button, Tag, Rate } from 'antd';
-import convertTimetap from '../../../../utils/convertTimetap';
-import { useTheme } from '@/context/themeContext'; // nhớ kiểm tra lại đường dẫn
+import { Modal, Image, Avatar, Tag, Rate } from 'antd';
+import convertTimetap from '@/utils/convertTimetap';
+import { useTheme } from '@/context/themeContext';
+import { useTranslation } from 'react-i18next';
 import DefaultAccount from '@/assets/images/none_avatar.png';
 
 const DetailReportModal = ({ isOpen, onClose, reportData }) => {
   const [currentReport, setCurrentReport] = useState(null);
   const { darkMode } = useTheme();
+  const { t } = useTranslation('myreport');
 
   useEffect(() => {
     if (isOpen && reportData) {
@@ -28,13 +30,7 @@ const DetailReportModal = ({ isOpen, onClose, reportData }) => {
       onCancel={onClose}
       footer={null}
       destroyOnClose
-      title={
-        <h2 className="text-2xl font-bold">
-          {reportData?.reportType === 'review'
-            ? 'Review Report Detail'
-            : 'Boarding House Report Detail'}
-        </h2>
-      }
+      title={<h2 className="text-2xl font-bold">{t('detail.title')}</h2>}
       className={darkMode ? 'dark-modal' : ''}
       bodyStyle={{ padding: 0 }}
     >
@@ -43,8 +39,8 @@ const DetailReportModal = ({ isOpen, onClose, reportData }) => {
         <div className="border-b pb-4">
           <h2 className="text-xl font-semibold mb-2">
             {reportData?.reportType === 'review'
-              ? 'Review information'
-              : 'Boarding house information'}
+              ? t('detail.reviewInfo')
+              : t('detail.boardingInfo')}
           </h2>
 
           <div className="flex items-center gap-3">
@@ -54,32 +50,37 @@ const DetailReportModal = ({ isOpen, onClose, reportData }) => {
                   src={target?.accountId?.avatarImage?.url ?? DefaultAccount}
                   size={50}
                 />
-                <p>{target?.accountId?.fullname || 'Unknown'}</p>
+                <p>{target?.accountId?.fullname || t('detail.unknown')}</p>
               </>
             ) : (
               <p>
-                <strong>Name:</strong> {target?.name || 'Unknown'}
+                <strong>{t('detail.name')}:</strong>{' '}
+                {target?.name || t('detail.unknown')}
               </p>
             )}
           </div>
 
           <p>
-            <strong>Rating:</strong>{' '}
+            <strong>{t('detail.rating')}:</strong>{' '}
             <Rate disabled defaultValue={Number(target?.rating)} />
           </p>
 
           {reportData?.reportType === 'review' ? (
             <p>
-              <strong>Content:</strong> {target?.content || 'No content'}
+              <strong>{t('detail.content')}:</strong>{' '}
+              {target?.content || t('detail.noContent')}
             </p>
           ) : (
             <p>
-              <strong>Type:</strong>{' '}
-              {target?.boardingHouseType?.name || 'Unknown'}
+              <strong>{t('detail.type')}:</strong>{' '}
+              {t(`boardingHouseTypes.${target?.boardingHouseType?.name}`, {
+                defaultValue:
+                  target?.boardingHouseType?.name || t('detail.unknown'),
+              })}
             </p>
           )}
 
-          <p className="font-bold">Images:</p>
+          <p className="font-bold">{t('detail.images')}:</p>
           <div className="grid grid-cols-3 gap-4">
             {target?.images?.length > 0 &&
             reportData?.reportType === 'review' ? (
@@ -88,7 +89,7 @@ const DetailReportModal = ({ isOpen, onClose, reportData }) => {
                   key={index}
                   width={150}
                   height={150}
-                  className="rounded-md transition-transform transform hover:scale-105 p-1"
+                  className="rounded-md transition-transform transform hover:scale-105"
                   style={{ objectFit: 'cover' }}
                   src={img.imageUrl}
                   alt={`Review Image ${index}`}
@@ -99,32 +100,35 @@ const DetailReportModal = ({ isOpen, onClose, reportData }) => {
               <Image
                 width={150}
                 height={150}
-                className="rounded-md transition-transform transform hover:scale-105 p-1"
+                className="rounded-md transition-transform transform hover:scale-105"
                 style={{ objectFit: 'cover' }}
                 src={images[0]?.imageUrl}
                 alt="Boarding House Image"
               />
             ) : (
-              <p>No images available</p>
+              <p>{t('detail.noImages')}</p>
             )}
           </div>
         </div>
 
         {/* Section 2 */}
         <div>
-          <h2 className="text-xl font-semibold mb-2">Report Information</h2>
+          <h2 className="text-xl font-semibold mb-2">
+            {t('detail.reportInfo')}
+          </h2>
           <div className="flex items-center gap-3 mb-2">
             <Avatar
               src={reporter?.avatarImage?.url ?? DefaultAccount}
               size={50}
             />
-            <p>{reporter?.fullname || 'Unknown'}</p>
+            <p>{reporter?.fullname || t('detail.unknown')}</p>
           </div>
           <p>
-            <strong>Reported At:</strong> {convertTimetap(createdAt)}
+            <strong>{t('detail.reportedAt')}:</strong>{' '}
+            {convertTimetap(createdAt)}
           </p>
           <p>
-            <strong>Status:</strong>{' '}
+            <strong>{t('myReport.status')}:</strong>{' '}
             <Tag
               color={
                 status === 'pending'
@@ -134,31 +138,32 @@ const DetailReportModal = ({ isOpen, onClose, reportData }) => {
                   : 'red'
               }
             >
-              {status}
+              {t(`status.${status}`)}
             </Tag>
           </p>
           <p>
-            <strong>Reason:</strong> {reason}
+            <strong>{t('myReport.reason')}:</strong>{' '}
+            {t(`reasons.${reason}`, { defaultValue: reason })}
           </p>
           <p>
-            <strong>Details:</strong> {details}
+            <strong>{t('myReport.details')}:</strong> {details}
           </p>
-          <p className="font-bold">Report Images:</p>
-          <div className="grid grid-cols-3 gap-1.5 mt-1">
+          <p className="font-bold">{t('detail.reportImages')}:</p>
+          <div className="grid grid-cols-3 gap-4">
             {images?.length > 0 ? (
               images.map((img, index) => (
                 <Image
                   key={index}
                   width={150}
                   height={150}
-                  className="rounded-md transition-transform transform hover:scale-105 p-1"
+                  className="rounded-md transition-transform transform hover:scale-105"
                   style={{ objectFit: 'cover' }}
                   src={img.imageUrl}
                   alt={`Report Image ${index}`}
                 />
               ))
             ) : (
-              <p>No images available</p>
+              <p>{t('detail.noImages')}</p>
             )}
           </div>
         </div>
