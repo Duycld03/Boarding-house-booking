@@ -5,10 +5,10 @@
     "target": "Đối tượng",
     "reason": "Lý do",
     "status": "Trạng thái",
-    "details": "Nhấp để xem chi tiết",
+    "details": "Chi tiết",
     "createdAt": "Ngày tạo",
     "action": "Thao tác",
-    "detail": "Chi tiết"
+    "detail": "Nhấp để xem chi tiết"
   },
   "detail": {
     "title": "Chi tiết báo cáo",
