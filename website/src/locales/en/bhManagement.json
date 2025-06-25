@@ -265,5 +265,198 @@
       "ok": "OK",
       "cancel": "Cancel"
     }
+  },
+  "roomAdditionFee": {
+    "title": "Room Addition Fee Management",
+    "addFee": "Add Fee",
+    "editFee": "Edit Fee",
+    "deleteFee": "Delete Fee",
+    "viewFees": "View Fees",
+    "feeList": "Fee List",
+    "feeDetails": "Fee Details",
+    "feeHistory": "Fee History",
+    "monthlyFees": "Monthly Fees",
+    "search": "Search fees...",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh",
+    "feeType": {
+      "electricity": "Electricity",
+      "water": "Water",
+      "internet": "Internet",
+      "cleaning": "Cleaning",
+      "maintenance": "Maintenance",
+      "parking": "Parking",
+      "security": "Security",
+      "garbage": "Garbage Collection",
+      "other": "Other"
+    },
+
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+
+    "category": {
+      "utility": "Utility",
+      "service": "Service",
+      "maintenance": "Maintenance",
+      "security": "Security",
+      "amenity": "Amenity",
+      "penalty": "Penalty",
+      "deposit": "Deposit",
+      "other": "Other"
+    },
+
+    "table": {
+      "columns": {
+        "feeName": "Fee Name",
+        "feeAmount": "Amount",
+        "feeType": "Type",
+        "roomNumber": "Room",
+        "tenant": "Tenant",
+        "month": "Month",
+        "year": "Year",
+        "status": "Status",
+        "paymentStatus": "Payment",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "actions": "Actions"
+      },
+      "noData": "No fees found",
+      "loading": "Loading fees...",
+      "totalItems": "Total: {{count}} items",
+      "selectedItems": "{{count}} items selected"
+    },
+
+    "actions": {
+      "add": "Add New Fee",
+      "edit": "Edit",
+      "delete": "Delete",
+      "view": "View",
+      "duplicate": "Duplicate",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "markAsPaid": "Mark as Paid",
+      "markAsUnpaid": "Mark as Unpaid",
+      "sendReminder": "Send Reminder",
+      "printReceipt": "Print Receipt",
+      "downloadPDF": "Download PDF"
+    },
+
+    "messages": {
+      "noData": "No fees available",
+      "success": {
+        "feeAdded": "Fee added successfully",
+        "feeUpdated": "Fee updated successfully",
+        "feeDeleted": "Fee deleted successfully",
+        "statusUpdated": "Status updated successfully",
+        "paymentStatusUpdated": "Payment status updated successfully",
+        "reminderSent": "Reminder sent successfully",
+        "dataExported": "Data exported successfully",
+        "dataImported": "Data imported successfully"
+      },
+      "error": {
+        "fetchFees": "Error fetching fees",
+        "addFee": "Error adding fee",
+        "updateFee": "Error updating fee",
+        "deleteFee": "Error deleting fee",
+        "exportData": "Error exporting data",
+        "importData": "Error importing data",
+        "sendReminder": "Error sending reminder",
+        "invalidData": "Invalid data format",
+        "networkError": "Network error occurred"
+      },
+      "warning": {
+        "unsavedChanges": "You have unsaved changes",
+        "deleteConfirmation": "Are you sure you want to delete this fee?",
+        "bulkDeleteConfirmation": "Are you sure you want to delete {{count}} fees?",
+        "statusChangeConfirmation": "Are you sure you want to change the status?"
+      },
+      "info": {
+        "noFeesSelected": "No fees selected",
+        "processingRequest": "Processing your request...",
+        "dataUpToDate": "Data is up to date",
+        "filterApplied": "Filter applied"
+      },
+      "confirm": {
+        "deleteFee": "Are you sure you want to delete this fee?"
+      }
+    },
+    "updateFee": {
+      "title": "Update Fee",
+      "description": "Update fee information below",
+      "successMessage": "Fee updated successfully",
+      "errorMessage": "Error updating fee"
+    },
+
+    "summary": {
+      "totalFees": "Total Fees",
+      "paidAmount": "Paid Amount",
+      "unpaidAmount": "Unpaid Amount",
+      "overdueAmount": "Overdue Amount",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "yearToDate": "Year to Date"
+    },
+
+    "filters": {
+      "all": "All",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "thisYear": "This Year",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "overdue": "Overdue",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "buttons": {
+      "addFee": "Add Fee",
+      "add": "Add",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "modal": {
+      "addFee": {
+        "title": "Add New Fee",
+        "description": "Please fill in the fee information below"
+      },
+      "editFee": {
+        "title": "Edit Fee",
+        "description": "Update fee information"
+      }
+    },
+    "form": {
+      "feeName": "Fee Name",
+      "feeAmount": "Fee Amount",
+      "monthYear": "Month and Year",
+      "month": "Month"
+    },
+    "placeholder": {
+      "feeName": "Enter fee name (e.g., Parking fee, Cleaning fee...)",
+      "feeAmount": "Enter fee amount",
+      "selectMonth": "Select month",
+      "monthYear": "Select year"
+    },
+    "validation": {
+      "feeName": {
+        "required": "Fee name is required",
+        "minLength": "Fee name must be at least 2 characters",
+        "maxLength": "Fee name cannot exceed 100 characters",
+        "pattern": "Fee name contains invalid characters"
+      },
+      "feeAmount": {
+        "required": "Fee amount is required",
+        "min": "Fee amount must be greater than or equal to 0",
+        "max": "Fee amount cannot exceed 999,999,999 VND"
+      },
+      "monthYear": {
+        "required": "Month/Year is required"
+      }
+    }
   }
 }

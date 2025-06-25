@@ -1,33 +1,19 @@
 import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  Upload,
-  Select,
-  Card,
-  Space,
-  Row,
-  Col,
-  Typography,
-} from "antd";
-import {
-  PlusOutlined,
-  ArrowLeftOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  CameraOutlined,
-} from "@ant-design/icons";
+import { Form, Input, Upload, Select, Space, Row, Col, Typography } from "antd";
+import { CameraOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import {
   getRoomTypeByBhId,
   updateRoom,
-  deleteRoom,
 } from "@/api/ownerUser/boardingHouseAPI";
+
 import { Button, ConfirmModal } from "@/component";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/ThemeContext";
+import RoomAdditionFeeList from "./RoomAdditionFeeList"; // Import the new component
+import "./updateRoom.css"; // Import custom styles if needed
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 function UpdateRoomPage({
   boardingHouseId,
@@ -45,6 +31,10 @@ function UpdateRoomPage({
   const { darkMode } = useTheme();
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
+  // Ref to hold the refresh function from RoomAdditionFeeList
+  const [refreshFeesData, setRefreshFeesData] = useState(null);
+
+  // ============ FORM HANDLERS ============
   const onFinish = async (values) => {
     if (fileList.length === 0) {
       toast.error(t("roomManagement.updateRoom.pleaseUploadImage"));
@@ -63,7 +53,6 @@ function UpdateRoomPage({
       const res = await updateRoom(roomData._id, formData);
       refreshRoomData();
       toast.success(res.message);
-      // Quay lại danh sách sau khi update thành công
       if (onBack) {
         onBack();
       }
@@ -86,6 +75,7 @@ function UpdateRoomPage({
     setFileList(fileList.slice(-1));
   };
 
+  // ============ DATA FETCHING ============
   const fetchRoomTypes = async () => {
     try {
       const res = await getRoomTypeByBhId(boardingHouseId);
@@ -122,6 +112,7 @@ function UpdateRoomPage({
     }
   };
 
+  // ============ EFFECTS ============
   useEffect(() => {
     fetchRoomTypes();
     if (roomData && roomData.images) {
@@ -129,6 +120,7 @@ function UpdateRoomPage({
     }
   }, []);
 
+  // ============ STYLE HELPERS ============
   const getContentBgClasses = () => {
     return darkMode
       ? "bg-gray-800 border-gray-700"
@@ -145,12 +137,14 @@ function UpdateRoomPage({
       : "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-300";
   };
 
-  // const handleDelete = async () => {
-  //   onDelete(roomData._id);
-  // };
-
+  // ============ MODAL HANDLERS ============
   const handleToggleConfirmDelete = () => {
     setIsOpenDeleteModal(!isOpenDeleteModal);
+  };
+
+  // ============ CALLBACK HANDLERS ============
+  const handleFeesRefresh = (refreshFn) => {
+    setRefreshFeesData(() => refreshFn);
   };
 
   return (
@@ -331,6 +325,8 @@ function UpdateRoomPage({
               </Space>
             </Form>
           </Col>
+
+          {/* Action Buttons */}
           <Col xs={24} sm={12}>
             <Button
               btnDelete
@@ -350,11 +346,20 @@ function UpdateRoomPage({
               className="w-full"
             />
           </Col>
+
+          {/* Room Addition Fees List - Now as a separate component */}
+          <Col xs={24}>
+            <RoomAdditionFeeList
+              roomId={roomData?._id}
+              onRefresh={handleFeesRefresh}
+            />
+          </Col>
         </Row>
       </div>
+
       <ConfirmModal
-        title="Confirm Deletion"
-        content={`Are you sure you want to delete this room?`}
+        title={t("roomAdditionFee.modal.deleteFee.title")}
+        content={t("roomAdditionFee.messages.warning.deleteConfirmation")}
         onOk={() => {
           onDelete(roomData._id);
           setIsOpenDeleteModal(false);
