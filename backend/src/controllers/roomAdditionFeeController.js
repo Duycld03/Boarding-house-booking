@@ -4,8 +4,8 @@ import paginate from "../utils/pagination.js";
 class RoomAdditionFeeController {
     async createRoomAdditionFee(req, res) {
         try {
-            const { roomId, feeName, feeAmount } = req.body;
-            const newFee = new RoomAdditionalFees({ roomId, feeName, feeAmount });
+            const { roomId, feeName, feeAmount, month, year } = req.body;
+            const newFee = new RoomAdditionalFees({ roomId, feeName, feeAmount, month, year });
             await newFee.save();
             res.status(201).json(newFee);
         } catch (error) {
@@ -26,15 +26,12 @@ class RoomAdditionFeeController {
     async updateRoomAdditionFee(req, res) {
         try {
             const { id } = req.params;
-            const { feeName, feeAmount } = req.body;
+            const { feeName, feeAmount, month, year } = req.body;
             const updatedFee = await RoomAdditionalFees.findByIdAndUpdate(
                 id,
-                { feeName, feeAmount },
+                { feeName, feeAmount, month, year },
                 { new: true }
             );
-            if (!updatedFee) {
-                return res.status(404).json({ message: "Fee not found" });
-            }
             res.status(200).json(updatedFee);
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -61,41 +58,15 @@ class RoomAdditionFeeController {
             const { roomId } = req.params;
             const { month, year } = req.query;
 
-            console.log("Fetching fees for room:", roomId, "Month:", month, "Year:", year);
-
-            // Validate month and year nếu có
             let dateFilter = {};
-            if (month && year) {
-                const monthNum = parseInt(month, 10);
-                const yearNum = parseInt(year, 10);
+            const monthNum = parseInt(month, 10);
+            const yearNum = parseInt(year, 10);
 
-                // Validate month and year values
-                if (monthNum < 1 || monthNum > 12) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Month must be between 1 and 12"
-                    });
-                }
 
-                if (yearNum < 1900 || yearNum > 2100) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Year must be between 1900 and 2100"
-                    });
-                }
-
-                const startDate = new Date(yearNum, monthNum - 1, 1); // Tháng trong JS là 0-11
-                const endDate = new Date(yearNum, monthNum, 0); // Ngày 0 của tháng kế tiếp = ngày cuối cùng của tháng hiện tại
-                endDate.setHours(23, 59, 59, 999); // Đặt giờ cuối ngày
-
-                dateFilter = {
-                    createdAt: {
-                        $gte: startDate,
-                        $lte: endDate
-                    }
-                };
-            }
-
+            dateFilter = {
+                month: monthNum || undefined,
+                year: yearNum || undefined,
+            };
             // Cấu hình phân trang
             const paginationOptions = {
                 defaultPage: 1,

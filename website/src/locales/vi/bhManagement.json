@@ -267,7 +267,7 @@
     }
   },
   "roomAdditionFee": {
-    "title": "Quản Lý Phí Phụ Thu Phòng",
+    "title": "Quản Lý Phí Phòng Trọ",
     "addFee": "Thêm Phí",
     "editFee": "Sửa Phí",
     "deleteFee": "Xóa Phí",
@@ -278,88 +278,17 @@
     "monthlyFees": "Phí Hàng Tháng",
     "search": "Tìm kiếm phí...",
     "filter": "Lọc",
-    "export": "Xuất",
-    "import": "Nhập",
+    "export": "Xuất Dữ Liệu",
+    "import": "Nhập Dữ Liệu",
     "refresh": "Làm Mới",
-
-    "form": {
-      "feeName": "Tên Phí",
-      "feeAmount": "Số Tiền",
-      "feeType": "Loại Phí",
-      "description": "Mô Tả",
-      "effectiveDate": "Ngày Hiệu Lực",
-      "expiryDate": "Ngày Hết Hạn",
-      "status": "Trạng Thái",
-      "priority": "Độ Ưu Tiên",
-      "category": "Danh Mục",
-      "roomNumber": "Số Phòng",
-      "tenant": "Người Thuê",
-      "month": "Tháng",
-      "year": "Năm",
-      "paymentStatus": "Trạng Thái Thanh Toán",
-      "paymentDate": "Ngày Thanh Toán",
-      "notes": "Ghi Chú"
-    },
-
-    "placeholder": {
-      "enterFeeName": "Nhập tên phí",
-      "enterFeeAmount": "Nhập số tiền",
-      "selectFeeType": "Chọn loại phí",
-      "enterDescription": "Nhập mô tả",
-      "selectEffectiveDate": "Chọn ngày hiệu lực",
-      "selectExpiryDate": "Chọn ngày hết hạn",
-      "selectStatus": "Chọn trạng thái",
-      "selectPriority": "Chọn độ ưu tiên",
-      "selectCategory": "Chọn danh mục",
-      "selectRoom": "Chọn phòng",
-      "selectTenant": "Chọn người thuê",
-      "selectMonth": "Chọn tháng",
-      "selectYear": "Chọn năm",
-      "selectPaymentStatus": "Chọn trạng thái thanh toán",
-      "selectPaymentDate": "Chọn ngày thanh toán",
-      "enterNotes": "Nhập ghi chú"
-    },
-
-    "validation": {
-      "feeNameRequired": "Tên phí là bắt buộc",
-      "feeAmountRequired": "Số tiền là bắt buộc",
-      "feeTypeRequired": "Loại phí là bắt buộc",
-      "descriptionRequired": "Mô tả là bắt buộc",
-      "effectiveDateRequired": "Ngày hiệu lực là bắt buộc",
-      "statusRequired": "Trạng thái là bắt buộc",
-      "roomRequired": "Chọn phòng là bắt buộc",
-      "tenantRequired": "Chọn người thuê là bắt buộc",
-      "monthRequired": "Tháng là bắt buộc",
-      "yearRequired": "Năm là bắt buộc",
-      "invalidAmount": "Vui lòng nhập số tiền hợp lệ",
-      "amountMustBePositive": "Số tiền phải là số dương",
-      "dateRangeInvalid": "Ngày kết thúc phải sau ngày bắt đầu"
-    },
-
-    "status": {
-      "active": "Hoạt Động",
-      "inactive": "Không Hoạt Động",
-      "pending": "Đang Chờ",
-      "expired": "Hết Hạn",
-      "cancelled": "Đã Hủy"
-    },
-
-    "paymentStatus": {
-      "paid": "Đã Thanh Toán",
-      "unpaid": "Chưa Thanh Toán",
-      "partial": "Thanh Toán Một Phần",
-      "overdue": "Quá Hạn",
-      "pending": "Đang Chờ"
-    },
-
     "feeType": {
       "electricity": "Tiền Điện",
       "water": "Tiền Nước",
       "internet": "Internet",
       "cleaning": "Vệ Sinh",
       "maintenance": "Bảo Trì",
-      "parking": "Đỗ Xe",
-      "security": "An Ninh",
+      "parking": "Gửi Xe",
+      "security": "Bảo Vệ",
       "garbage": "Thu Gom Rác",
       "other": "Khác"
     },
@@ -377,7 +306,7 @@
       "security": "An Ninh",
       "amenity": "Tiện Nghi",
       "penalty": "Phạt",
-      "deposit": "Tiền Cọc",
+      "deposit": "Đặt Cọc",
       "other": "Khác"
     },
 
@@ -385,21 +314,21 @@
       "columns": {
         "feeName": "Tên Phí",
         "feeAmount": "Số Tiền",
-        "feeType": "Loại",
+        "feeType": "Loại Phí",
         "roomNumber": "Phòng",
         "tenant": "Người Thuê",
         "month": "Tháng",
         "year": "Năm",
         "status": "Trạng Thái",
         "paymentStatus": "Thanh Toán",
-        "createdAt": "Tạo Lúc",
+        "createdAt": "Ngày Tạo",
         "updatedAt": "Cập Nhật",
         "actions": "Thao Tác"
       },
       "noData": "Không tìm thấy phí nào",
-      "loading": "Đang tải phí...",
+      "loading": "Đang tải danh sách phí...",
       "totalItems": "Tổng: {{count}} mục",
-      "selectedItems": "Đã chọn {{count}} mục"
+      "selectedItems": "{{count}} mục đã chọn"
     },
 
     "actions": {
@@ -407,17 +336,18 @@
       "edit": "Sửa",
       "delete": "Xóa",
       "view": "Xem",
-      "duplicate": "Sao Chép",
+      "duplicate": "Nhân Bản",
       "activate": "Kích Hoạt",
       "deactivate": "Vô Hiệu Hóa",
       "markAsPaid": "Đánh Dấu Đã Thanh Toán",
       "markAsUnpaid": "Đánh Dấu Chưa Thanh Toán",
       "sendReminder": "Gửi Nhắc Nhở",
-      "printReceipt": "In Biên Lai",
+      "printReceipt": "In Hóa Đơn",
       "downloadPDF": "Tải PDF"
     },
 
     "messages": {
+      "noData": "Không có phí nào được tìm thấy",
       "success": {
         "feeAdded": "Thêm phí thành công",
         "feeUpdated": "Cập nhật phí thành công",
@@ -429,15 +359,15 @@
         "dataImported": "Nhập dữ liệu thành công"
       },
       "error": {
-        "fetchFees": "Lỗi tải phí",
-        "addFee": "Lỗi thêm phí",
-        "updateFee": "Lỗi cập nhật phí",
-        "deleteFee": "Lỗi xóa phí",
-        "exportData": "Lỗi xuất dữ liệu",
-        "importData": "Lỗi nhập dữ liệu",
-        "sendReminder": "Lỗi gửi nhắc nhở",
+        "fetchFees": "Lỗi khi tải danh sách phí",
+        "addFee": "Lỗi khi thêm phí",
+        "updateFee": "Lỗi khi cập nhật phí",
+        "deleteFee": "Lỗi khi xóa phí",
+        "exportData": "Lỗi khi xuất dữ liệu",
+        "importData": "Lỗi khi nhập dữ liệu",
+        "sendReminder": "Lỗi khi gửi nhắc nhở",
         "invalidData": "Định dạng dữ liệu không hợp lệ",
-        "networkError": "Lỗi mạng xảy ra"
+        "networkError": "Lỗi kết nối mạng"
       },
       "warning": {
         "unsavedChanges": "Bạn có thay đổi chưa được lưu",
@@ -446,30 +376,20 @@
         "statusChangeConfirmation": "Bạn có chắc chắn muốn thay đổi trạng thái?"
       },
       "info": {
-        "noFeesSelected": "Không có phí nào được chọn",
+        "noFeesSelected": "Chưa chọn phí nào",
         "processingRequest": "Đang xử lý yêu cầu...",
         "dataUpToDate": "Dữ liệu đã được cập nhật",
         "filterApplied": "Đã áp dụng bộ lọc"
+      },
+      "confirm": {
+        "deleteFee": "Bạn có chắc chắn muốn xóa phí này?"
       }
     },
-
-    "modal": {
-      "addFee": {
-        "title": "Thêm Phí Mới",
-        "subtitle": "Nhập thông tin phí bên dưới"
-      },
-      "editFee": {
-        "title": "Sửa Phí",
-        "subtitle": "Cập nhật thông tin phí"
-      },
-      "deleteFee": {
-        "title": "Xóa Phí",
-        "subtitle": "Hành động này không thể hoàn tác"
-      },
-      "viewFee": {
-        "title": "Chi Tiết Phí",
-        "subtitle": "Xem thông tin phí"
-      }
+    "updateFee": {
+      "title": "Cập Nhật Phí",
+      "description": "Cập nhật thông tin phí bên dưới",
+      "successMessage": "Cập nhật phí thành công",
+      "errorMessage": "Lỗi khi cập nhật phí"
     },
 
     "summary": {
@@ -490,8 +410,53 @@
       "paid": "Đã Thanh Toán",
       "unpaid": "Chưa Thanh Toán",
       "overdue": "Quá Hạn",
-      "active": "Hoạt Động",
+      "active": "Đang Hoạt Động",
       "inactive": "Không Hoạt Động"
+    },
+    "buttons": {
+      "addFee": "Thêm Phí",
+      "add": "Thêm",
+      "cancel": "Hủy",
+      "edit": "Sửa",
+      "delete": "Xóa"
+    },
+    "modal": {
+      "addFee": {
+        "title": "Thêm Phí Mới",
+        "description": "Vui lòng điền thông tin phí bên dưới"
+      },
+      "editFee": {
+        "title": "Sửa Phí",
+        "description": "Cập nhật thông tin phí"
+      }
+    },
+    "form": {
+      "feeName": "Tên Phí",
+      "feeAmount": "Số Tiền Phí",
+      "monthYear": "Tháng và Năm",
+      "month": "Tháng"
+    },
+    "placeholder": {
+      "feeName": "Nhập tên phí (VD: Phí gửi xe, Phí vệ sinh...)",
+      "feeAmount": "Nhập số tiền phí",
+      "selectMonth": "Chọn tháng",
+      "monthYear": "Chọn năm"
+    },
+    "validation": {
+      "feeName": {
+        "required": "Tên phí là bắt buộc",
+        "minLength": "Tên phí phải có ít nhất 2 ký tự",
+        "maxLength": "Tên phí không được vượt quá 100 ký tự",
+        "pattern": "Tên phí chứa ký tự không hợp lệ"
+      },
+      "feeAmount": {
+        "required": "Số tiền phí là bắt buộc",
+        "min": "Số tiền phí phải lớn hơn hoặc bằng 0",
+        "max": "Số tiền phí không được vượt quá 999.999.999 VND"
+      },
+      "monthYear": {
+        "required": "Tháng/Năm là bắt buộc"
+      }
     }
   }
 }
