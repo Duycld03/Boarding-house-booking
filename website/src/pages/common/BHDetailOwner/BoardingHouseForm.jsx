@@ -255,133 +255,146 @@ const BoardingHouseForm = ({
           {t('form.section.images')}
         </h2>
 
-        <Form.Item label={t('form.labels.primaryImage')} className="mb-4">
-          <div className="flex flex-col gap-4">
-            {updatedData.primaryImage ? (
-              <div className="relative">
-                <Image
-                  src={
-                    updatedData?.primaryImage?.imageUrl ||
-                    URL.createObjectURL(updatedData.primaryImage)
-                  }
-                  alt="Primary"
-                  className="object-cover border rounded"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '300px',
-                  }}
-                  preview={{
-                    mask: <span className="text-white">{t('preview')}</span>,
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={handleRemovePrimaryImage}
-                  className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
-                  title={t('buttons.delete')}
-                >
-                  X
-                </button>
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Primary Image */}
+          <div className="w-full md:w-1/2">
+            <Form.Item label={t('form.labels.primaryImage')} className="mb-4">
+              <div className="flex flex-col gap-4">
+                {updatedData.primaryImage ? (
+                  <div className="relative">
+                    <Image
+                      src={
+                        updatedData?.primaryImage?.imageUrl ||
+                        URL.createObjectURL(updatedData.primaryImage)
+                      }
+                      alt="Primary"
+                      className="object-cover border rounded"
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        maxHeight: '530px',
+                      }}
+                      preview={{
+                        mask: (
+                          <span className="text-white">{t('preview')}</span>
+                        ),
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemovePrimaryImage}
+                      className="absolute top-2 right-5 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                      title={t('buttons.delete')}
+                    >
+                      X
+                    </button>
+                  </div>
+                ) : (
+                  <Upload
+                    {...uploadProps}
+                    listType="picture-card"
+                    showUploadList={false}
+                    className={darkMode ? 'dark-mode-upload' : 'custom-upload'}
+                    name="boardingHouse"
+                  >
+                    <div
+                      className={`rounded-lg p-6 transition text-center ${
+                        darkMode ? 'text-white' : ''
+                      }`}
+                    >
+                      <PlusOutlined
+                        className={`text-2xl ${
+                          darkMode ? 'text-white' : 'text-gray-400'
+                        }`}
+                      />
+                      <p
+                        className={`${
+                          darkMode ? 'text-white' : 'text-gray-500'
+                        } mt-2 text-sm font-medium`}
+                      >
+                        {t('form.labels.addImage')}
+                      </p>
+                      <p
+                        className={`${
+                          darkMode ? 'text-white' : 'text-gray-400'
+                        } text-xs`}
+                      >
+                        {t('form.labels.dragDropOrClick')}
+                      </p>
+                    </div>
+                  </Upload>
+                )}
               </div>
-            ) : (
-              <Upload
-                {...uploadProps}
-                listType="picture-card"
-                showUploadList={false}
-                className={darkMode ? 'dark-mode-upload' : 'custom-upload'}
-                name="boardingHouse"
-              >
-                <div
-                  className={`rounded-lg p-6 transition text-center ${
-                    darkMode ? 'text-white' : ''
-                  }`}
+            </Form.Item>
+          </div>
+
+          {/* Other Images */}
+          <div className="w-full md:w-1/2">
+            <Form.Item label={t('form.labels.otherImages')} className="mb-4">
+              <div className="flex flex-wrap gap-4">
+                {(updatedData.otherImages || []).map((file, index) => (
+                  <div key={index} className="relative group">
+                    <Image
+                      src={file?.imageUrl || URL.createObjectURL(file)}
+                      alt={`Other Image ${index + 1}`}
+                      className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+                      width={120}
+                      height={120}
+                      preview={{
+                        mask: (
+                          <span className="text-white">{t('preview')}</span>
+                        ),
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveOtherImage(index)}
+                      className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      title={t('buttons.delete')}
+                    >
+                      X
+                    </button>
+                  </div>
+                ))}
+
+                <Upload
+                  {...uploadOtherImgProps}
+                  listType="picture-card"
+                  showUploadList={false}
+                  name="boardingHouse"
+                  className={darkMode ? 'dark-mode-upload' : 'custom-upload'}
                 >
-                  <PlusOutlined
-                    className={`text-2xl ${
-                      darkMode ? 'text-white' : 'text-gray-400'
+                  <div
+                    className={`rounded-lg p-6 transition text-center ${
+                      darkMode ? 'text-white' : ''
                     }`}
-                  />
-                  <p
-                    className={`${
-                      darkMode ? 'text-white' : 'text-gray-500'
-                    } mt-2 text-sm font-medium`}
                   >
-                    {t('form.labels.addImage')}
-                  </p>
-                  <p
-                    className={`${
-                      darkMode ? 'text-white' : 'text-gray-400'
-                    } text-xs`}
-                  >
-                    {t('form.labels.dragDropOrClick')}
-                  </p>
-                </div>
-              </Upload>
-            )}
-          </div>
-        </Form.Item>
-
-        <Form.Item label={t('form.labels.otherImages')} className="mb-4">
-          <div className="mt-4 flex flex-wrap gap-4">
-            {(updatedData.otherImages || []).map((file, index) => (
-              <div key={index} className="relative group">
-                <Image
-                  src={file?.imageUrl || URL.createObjectURL(file)}
-                  alt={`Other Image ${index + 1}`}
-                  className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-                  width={100}
-                  height={100}
-                  preview={{
-                    mask: <span className="text-white">{t('preview')}</span>,
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveOtherImage(index)}
-                  className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  title={t('buttons.delete')}
-                >
-                  X
-                </button>
+                    <PlusOutlined
+                      className={`text-2xl ${
+                        darkMode ? 'text-white' : 'text-gray-400'
+                      }`}
+                    />
+                    <p
+                      className={`${
+                        darkMode ? 'text-white' : 'text-gray-500'
+                      } mt-2 text-sm font-medium`}
+                    >
+                      {t('form.labels.addOtherImages')}
+                    </p>
+                    <p
+                      className={`${
+                        darkMode ? 'text-white' : 'text-gray-400'
+                      } text-xs`}
+                    >
+                      {t('form.labels.dragDropOrClick')}
+                    </p>
+                  </div>
+                </Upload>
               </div>
-            ))}
-
-            <Upload
-              {...uploadOtherImgProps}
-              listType="picture-card"
-              showUploadList={false}
-              name="boardingHouse"
-              className={darkMode ? 'dark-mode-upload' : 'custom-upload'}
-            >
-              <div
-                className={`rounded-lg p-6 transition text-center ${
-                  darkMode ? 'text-white' : ''
-                }`}
-              >
-                <PlusOutlined
-                  className={`text-2xl ${
-                    darkMode ? 'text-white' : 'text-gray-400'
-                  }`}
-                />
-                <p
-                  className={`${
-                    darkMode ? 'text-white' : 'text-gray-500'
-                  } mt-2 text-sm font-medium`}
-                >
-                  {t('form.labels.addOtherImages')}
-                </p>
-                <p
-                  className={`${
-                    darkMode ? 'text-white' : 'text-gray-400'
-                  } text-xs`}
-                >
-                  {t('form.labels.dragDropOrClick')}
-                </p>
-              </div>
-            </Upload>
+            </Form.Item>
           </div>
-        </Form.Item>
+        </div>
+
         <h2
           className={`text-3xl font-bold mb-4 mt-10 ${
             darkMode ? 'text-white' : 'text-black'

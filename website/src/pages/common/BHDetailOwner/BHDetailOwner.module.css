@@ -141,3 +141,14 @@ h2 {
         padding: 0.75rem;
     }
 }
+/* Custom size and center content of Upload box */
+:global(.ant-upload.ant-upload-select) {
+    width: 120px !important;
+    height: 120px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}

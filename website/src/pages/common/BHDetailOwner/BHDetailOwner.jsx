@@ -29,7 +29,6 @@ import {
 } from '../../../api/BoardingHouseAPI';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import RoomType from './RoomType/RoomType';
-import DepositManagement from '@/pages/common/BHDetailOwner/DepositManagement';
 import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
 import TenantManagement from './TenantManagement/TenantManagement';
 import RoomManagement from './RoomManagement/RoomManagement';
@@ -268,7 +267,6 @@ const BHDetailOwner = () => {
         }
       );
       setGeoLocation(res.data[0]);
-      console.log('GeoLocation result:', res.data[0]);
     } catch (error) {
       console.log('Error getting location:', error);
     }
@@ -331,6 +329,11 @@ const BHDetailOwner = () => {
       }
       if (!updatedData.primaryImage) {
         toast.error(t('validation.uploadPrimaryImage'));
+        setLoading(false);
+        return;
+      }
+      if (updatedData.otherImages.length > 15) {
+        toast.error(t('errors.maxOtherImages'));
         setLoading(false);
         return;
       }
@@ -451,10 +454,6 @@ const BHDetailOwner = () => {
 
         <Tabs.TabPane tab={t('tabs.room')} key="room">
           <RoomManagement boardingHouseId={boardingHouseId} />
-        </Tabs.TabPane>
-
-        <Tabs.TabPane tab={t('tabs.depositManagement')} key="depositManagement">
-          <DepositManagement />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab={t('tabs.tenantManagement')} key="tenantManagement">

@@ -1,11 +1,15 @@
 import axios from './axios.config';
-export const getRoomTypeByBhId = (id) => {
-  return axios.get(`/owner/boardinghouse/room-types/${id}`);
+export const getRoomTypeByBhId = (id, paginationOptions = {}) => {
+  const params = {
+    ...paginationOptions,
+  };
+
+  return axios.get(`/staff/boardinghouse/room-types/${id}`, { params });
 };
 
 export const addRoomTypeToBoardingHouse = (boardingHouseId, data) => {
   return axios.post(
-    `/owner/boardinghouse/roomtype/${boardingHouseId}/create`,
+    `/staff/boardinghouse/roomtype/${boardingHouseId}/create`,
     data,
     {
       headers: {
@@ -16,15 +20,15 @@ export const addRoomTypeToBoardingHouse = (boardingHouseId, data) => {
 };
 
 export const getAllFacilities = () => {
-  return axios.get(`/owner/facilities`);
+  return axios.get(`/staff/facilities`);
 };
 export const updateRoomTypeToBoardingHouse = (roomTypeId, data) => {
-  return axios.put(`/owner/boardinghouse/roomtype/${roomTypeId}`, data, {
+  return axios.put(`/staff/boardinghouse/roomtype/${roomTypeId}`, data, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
 };
 export const softDeleteRoomType = (roomTypeId) => {
-  return axios.delete(`/owner/boardinghouse/roomtype/${roomTypeId}`);
+  return axios.delete(`/staff/boardinghouse/roomtype/${roomTypeId}`);
 };

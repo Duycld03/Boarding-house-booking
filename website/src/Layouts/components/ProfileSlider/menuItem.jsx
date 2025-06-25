@@ -56,6 +56,12 @@ const getMenuItems = () => {
       visible: isOwner || isStaff, // Chỉ Owner
     },
     {
+      key: 'deposit-list',
+      label: <Link to="/deposit-list">Deposit Management</Link>,
+      icon: <ContainerOutlined />,
+      visible: isOwner || isStaff, // Chỉ Owner
+    },
+    {
       key: 'my-owner-report',
       label: <Link to="/my-report-management">My report management</Link>,
       icon: <SnippetsOutlined />,
