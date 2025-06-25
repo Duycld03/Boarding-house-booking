@@ -1,0 +1,17 @@
+    {
+        "review": {
+            "title": "Add Review",
+            "rating": "Rating",
+            "content": "Review Content",
+            "contentPlaceholder": "Write your review...",
+            "images": "Images",
+            "addImages": "Add Images",
+            "submit": "Submit Review",
+            "imageLimit": "You can only upload up to 5 images.",
+            "successMessage": "Review submitted successfully!",
+            "submitError": "Failed to submit the review.",
+            "boardingHouseIdMissing": "Boarding house ID is missing.",
+            "ratingRequired": "Rating is required.",
+            "contentRequired": "Review content is required."
+        }
+    }

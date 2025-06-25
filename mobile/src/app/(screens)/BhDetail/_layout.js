@@ -20,6 +20,11 @@ export default function BhDetailLayout() {
                         headerShown: false,
                     }}
                 />
+                <Stack.Screen name="addReview"
+                    options={{
+                        headerShown: false,
+                    }}
+                />
 
             </Stack>
         </>

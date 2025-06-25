@@ -355,7 +355,7 @@ export default function BhDetailScreen() {
   // Write Review Handler
   const handleWriteReview = useCallback(() => {
     router.push({
-      pathname: "/review/write",
+      pathname: "/BhDetail/addReview",
       params: { boardingHouseId },
     });
   }, [router, boardingHouseId]);
@@ -384,9 +384,8 @@ export default function BhDetailScreen() {
               {ui.error}
             </Text>
             <Text
-              className={`text-base underline ${
-                isDarkMode ? "text-blue-400" : "text-blue-700"
-              }`}
+              className={`text-base underline ${isDarkMode ? "text-blue-400" : "text-blue-700"
+                }`}
               onPress={onRefresh}
             >
               {t("retry")}
@@ -451,9 +450,8 @@ export default function BhDetailScreen() {
         {t("address")}:
       </Text>
       <Text
-        className={`text-base ${
-          isDarkMode ? "text-gray-400" : "text-gray-600"
-        }`}
+        className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+          }`}
       >
         {formattedAddress}
       </Text>
@@ -475,9 +473,8 @@ export default function BhDetailScreen() {
             />
           </TouchableOpacity>
           <Text
-            className={`text-base font-semibold ml-2 ${
-              isDarkMode ? "text-gray-200" : "text-gray-800"
-            }`}
+            className={`text-base font-semibold ml-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+              }`}
           >
             {data.boardingHouseDetail?.likes || 0}
           </Text>
@@ -512,9 +509,8 @@ export default function BhDetailScreen() {
       return (
         <View className="mt-4" onLayout={onRoomTypesLayout}>
           <Text
-            className={`text-base ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             {t("noRoomTypesAvailable")}
           </Text>

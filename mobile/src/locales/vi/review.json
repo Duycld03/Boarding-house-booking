@@ -1,0 +1,21 @@
+{
+    "review": {
+        "title": "Thêm Đánh Giá",
+        "rating": "Xếp Hạng",
+        "content": "Nội Dung Đánh Giá",
+        "contentPlaceholder": "Viết đánh giá của bạn...",
+        "images": "Hình Ảnh",
+        "addImages": "Thêm Hình Ảnh",
+        "submit": "Gửi Đánh Giá",
+        "imageLimit": "Bạn chỉ có thể tải lên tối đa 5 hình ảnh.",
+        "successMessage": "Đánh giá đã được gửi thành công!",
+        "submitError": "Gửi đánh giá thất bại.",
+        "boardingHouseIdMissing": "Thiếu ID nhà trọ.",
+        "ratingRequired": "Cần xếp hạng.",
+        "contentRequired": "Cần nội dung đánh giá.",
+        "loginRequired": "Yêu cầu đăng nhập",
+        "loginToReview": "Bạn cần đăng nhập để gửi đánh giá",
+        "login": "Đăng nhập",
+        "cancel": "Hủy"
+    }
+}
