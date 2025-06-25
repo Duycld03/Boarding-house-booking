@@ -1,26 +1,58 @@
-import { getMyReport } from "@/api/ownerUser/myReport";
-import { useEffect, useState } from "react";
-import { TableCustom as Table } from "@/component";
-import convertTimetap from "@/utils/convertTimetap";
-import { Tag, Tooltip } from "antd";
-import { Button } from "@/component";
-import { FileTextOutlined } from "@ant-design/icons";
-import DetailReportModal from "./DetailReportModal";
-import { getOwnReportReviewDetail } from "@/api/reportAPI";
-import { toast } from "react-toastify";
+import { useEffect, useState } from 'react';
+import { getMyReport } from '@/api/ownerUser/myReport';
+import { getOwnReportReviewDetail } from '@/api/reportAPI';
+import { TableCustom as Table } from '@/component';
+import convertTimetap from '@/utils/convertTimetap';
+import { Tag, Tooltip } from 'antd';
+import DetailReportModal from './DetailReportModal';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 function MyReport() {
+  const { t } = useTranslation('myreport');
+
   const [report, setReport] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
 
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 0,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  const [filterValue, setFilterValue] = useState({}); // dùng khi có filter sau này
+
   const fetchReport = async () => {
+    setLoading(true);
     try {
-      const response = await getMyReport();
-      setReport(response);
+      const res = await getMyReport({
+        ...filterValue,
+        ...paginationOptions,
+      });
+
+      if (res?.data && res?.pagination) {
+        setReport(res.data);
+        setPagination({
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
+          totalItems: res.pagination.totalItems,
+          limit: res.pagination.pageSize,
+        });
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
-      console.log("Fetch report error: ", error);
+      console.error('Fetch report error:', error);
+      toast.error(t('messages.fetchError'));
+      setReport([]);
     } finally {
       setLoading(false);
     }
@@ -28,51 +60,88 @@ function MyReport() {
 
   useEffect(() => {
     fetchReport();
-  }, []);
+  }, [paginationOptions]);
+
+  const handleDetailModal = async (record) => {
+    try {
+      const res = await getOwnReportReviewDetail(record._id);
+
+      if (res) {
+        setSelectedData(res);
+        setIsDetailModalOpen(true);
+      } else {
+        toast.error(t('myReport.fetchError'));
+      }
+    } catch (error) {
+      console.error('Failed to fetch report details:', error);
+      toast.error(t('myReport.fetchError'));
+    }
+  };
+
+  const closeDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedData(null);
+  };
+
+  const handleTableChange = (pagination) => {
+    setPaginationOptions((prev) => ({
+      ...prev,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    }));
+  };
+
+  const tablePaginationConfig = {
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
+  };
 
   const columns = [
     {
-      title: "Report Type",
-      dataIndex: "reportType",
-      key: "reportType",
+      title: t('myReport.reportType'),
+      dataIndex: 'reportType',
+      key: 'reportType',
     },
     {
-      title: "Target",
-      dataIndex: "target",
-      key: "target",
+      title: t('myReport.target'),
+      dataIndex: 'target',
+      key: 'target',
     },
     {
-      title: "Reason",
-      dataIndex: "reason",
-      key: "reason",
+      title: t('myReport.reason'),
+      dataIndex: 'reason',
+      key: 'reason',
+      render: (reason) => t(`reasons.${reason}`, { defaultValue: reason }),
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
+      title: t('myReport.status'),
+      dataIndex: 'status',
+      key: 'status',
       render: (status) => (
         <Tag
           color={
-            status === "pending"
-              ? "orange"
-              : status === "resolved"
-              ? "green"
-              : "red"
+            status === 'pending'
+              ? 'orange'
+              : status === 'resolved'
+              ? 'green'
+              : 'red'
           }
         >
-          {status}
+          {t(`status.${status}`)}
         </Tag>
       ),
     },
     {
-      title: "Details",
-      dataIndex: "details",
-      key: "details",
+      title: t('myReport.details'),
+      dataIndex: 'details',
+      key: 'details',
       render: (text) => {
-        const maxLength = 50;
+        const maxLength = 15;
         const truncated =
           text && text.length > maxLength
-            ? text.substring(0, maxLength) + "..."
+            ? text.substring(0, maxLength) + '...'
             : text;
         return (
           <Tooltip title={text}>
@@ -82,63 +151,31 @@ function MyReport() {
       },
     },
     {
-      title: "Created At",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      title: t('myReport.createdAt'),
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       render: (text) => convertTimetap(text, false),
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <div className="flex gap-3">
-          <Button
-            size="large"
-            title={"Detail"}
-            icon={<FileTextOutlined />}
-            onClick={() => handleDetailModal(record)}
-            className="text-white"
-            bgColor="rgb(5 150 105)"
-          />
-        </div>
-      ),
     },
   ];
 
-  const fetchReportDetail = async (reportId) => {
-    try {
-      const res = await getOwnReportReviewDetail(reportId);
-      console.log("Report deatil", res);
-
-      if (res) {
-        setSelectedData(res);
-      } else {
-        setSelectedData(null);
-      }
-    } catch (error) {
-      console.error("Failed to fetch report details:", error);
-      toast.error("Failed to fetch report details. Please try again later.");
-    }
-  };
-
-  const handleDetailModal = (record) => {
-    fetchReportDetail(record._id);
-    setIsDetailModalOpen(true);
-  };
-
-  const closeDetailModal = () => {
-    setIsDetailModalOpen(false);
-  };
-
   return (
     <div>
-      <Table data={report} columns={columns} loading={loading} />
+      <Table
+        tableName={t('tableName')}
+        columns={columns}
+        data={report}
+        loading={loading}
+        onRowClick={handleDetailModal}
+        rowClassName={() => 'hover:bg-blue-50 cursor-pointer'}
+        pagination={tablePaginationConfig}
+        onChange={handleTableChange}
+        noDataText={t('messages.noData')}
+      />
       <DetailReportModal
         isOpen={isDetailModalOpen}
         onClose={closeDetailModal}
         reportData={selectedData}
       />
-      ;
     </div>
   );
 }

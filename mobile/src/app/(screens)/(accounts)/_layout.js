@@ -14,14 +14,12 @@ const AccountLayout = () => {
           name="myfavorite/index"
           options={{
             headerShown: false,
-
           }}
         />
         <Stack.Screen
           name="myappointment/index"
           options={{
             headerShown: false,
-
           }}
         />
         <Stack.Screen
@@ -32,6 +30,12 @@ const AccountLayout = () => {
         />
         <Stack.Screen
           name="myreportmanagement/index"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="myreportmanagement/detailReport"
           options={{
             headerShown: false,
           }}

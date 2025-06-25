@@ -1,0 +1,64 @@
+{
+  "title": "Báo cáo của tôi",
+  "myReport": {
+    "reportType": "Loại báo cáo",
+    "target": "Đối tượng",
+    "reason": "Lý do",
+    "status": "Trạng thái",
+    "details": "Chi tiết",
+    "createdAt": "Ngày tạo",
+    "action": "Thao tác",
+    "detail": "Nhấp để xem chi tiết"
+  },
+  "detail": {
+    "title": "Chi tiết báo cáo",
+    "reviewInfo": "Thông tin đánh giá",
+    "boardingInfo": "Thông tin phòng trọ",
+    "unknown": "Không rõ",
+    "name": "Tên",
+    "type": "Loại",
+    "rating": "Đánh giá",
+    "content": "Nội dung",
+    "images": "Hình ảnh",
+    "reportInfo": "Thông tin báo cáo",
+    "reportedAt": "Thời gian báo cáo",
+    "reportImages": "Hình ảnh báo cáo",
+    "noContent": "Không có nội dung",
+    "noImages": "Không có hình ảnh",
+    "reporter": "Người báo cáo",
+    "reviewer": "Người đánh giá"
+  },
+  "messages": {
+    "noData": "Không tìm thấy báo cáo nào",
+    "fetchError": "Không thể lấy dữ liệu. Vui lòng thử lại sau.",
+    "detailFetchError": "Không thể lấy chi tiết báo cáo.",
+    "deleteSuccess": "Xóa báo cáo thành công.",
+    "deleteFailed": "Xóa báo cáo thất bại.",
+    "replayError": "Thiếu thông tin phản hồi. Vui lòng kiểm tra lại.",
+    "replayFailed": "Gửi phản hồi hoặc cập nhật báo cáo thất bại.",
+    "replaySuccess": "Gửi phản hồi thành công!"
+  },
+  "status": {
+    "pending": "Đang chờ xử lý",
+    "resolved": "Đã xử lý",
+    "rejected": "Bị từ chối"
+  },
+  "reasons": {
+    "Violation of Privacy": "Vi phạm quyền riêng tư",
+    "Scam on Rent or Deposit": "Lừa đảo tiền thuê hoặc cọc",
+    "False Advertisement": "Quảng cáo sai sự thật",
+    "Unfriendly Landlord": "Chủ nhà không thân thiện",
+    "Poor Security": "An ninh kém",
+    "Misleading information": "Thông tin gây hiểu lầm",
+    "Spam": "Thư rác",
+    "Inappropriate content": "Nội dung không phù hợp"
+  },
+   "boardingHouseTypes": {
+    "Nhà trọ truyền thống": "Nhà trọ truyền thống",
+    "Mini house": "Căn hộ mini",
+    "Nhà trọ kiến trúc xá": "Ký túc xá"
+  },
+  "noReports": "Không có báo cáo nào",
+"noReportsDesc": "Bạn chưa gửi bất kỳ báo cáo nào."
+
+}
