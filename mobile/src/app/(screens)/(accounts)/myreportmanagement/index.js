@@ -74,8 +74,8 @@ function MyReportManagement() {
             ref={scrollRef}
             contentContainerStyle={{ paddingBottom: 20 }}
           >
-            {reports.map((report) => (
-              <ReportCard key={report._id} report={report} />
+            {reports.map((report, index) => (
+              <ReportCard key={report._id} report={report} index={index + 1} />
             ))}
 
             <LoadMoreButton

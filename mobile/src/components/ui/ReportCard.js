@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/ThemeProvider';
 import convertTimetap from '@/utils/convertTimetap';
 
-const ReportCard = ({ report }) => {
+const ReportCard = ({ report, index }) => {
   const router = useRouter();
   const { t } = useTranslation('myreport');
   const { isDarkMode } = useTheme();
@@ -39,7 +39,7 @@ const ReportCard = ({ report }) => {
               { color: isDarkMode ? '#f9fafb' : '#111827' },
             ]}
           >
-            {t('detail.reportInfo')}
+            {index}. {t('detail.reportInfo')}
           </Text>
           <Badge
             style={[
