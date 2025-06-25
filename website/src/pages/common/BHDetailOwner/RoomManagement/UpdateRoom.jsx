@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import {
   Form,
   Input,
@@ -9,23 +15,26 @@ import {
   Row,
   Col,
   Typography,
+  DatePicker,
 } from "antd";
-import {
-  PlusOutlined,
-  ArrowLeftOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  CameraOutlined,
-} from "@ant-design/icons";
+import { CameraOutlined, DollarCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import {
   getRoomTypeByBhId,
   updateRoom,
-  deleteRoom,
 } from "@/api/ownerUser/boardingHouseAPI";
-import { Button, ConfirmModal } from "@/component";
+import {
+  getRoomAdditionFeesByRoomId,
+  createRoomAdditionFee,
+  deleteRoomAdditionFee,
+  updateRoomAdditionFee,
+} from "@/api/roomAdditionFee";
+
+import { Button, ConfirmModal, TableCustom as Table } from "@/component";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/ThemeContext";
+import dayjs from "dayjs";
+import "./updateRoom.css"; // Import custom styles if needed
 
 const { Title, Text } = Typography;
 
@@ -45,6 +54,286 @@ function UpdateRoomPage({
   const { darkMode } = useTheme();
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
 
+  // ============ IMPROVED PAGINATION STATES ============
+  // Tách biệt state pagination và options như component RoomManagement
+  const [feesData, setFeesData] = useState([]);
+  const [loadingFees, setLoadingFees] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(dayjs());
+
+  // State hiển thị thông tin pagination
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  // State điều khiển pagination options
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  // Ref để handle cancel requests
+  const currentFeeRequestRef = useRef(null);
+
+  // ============ IMPROVED PAGINATION CONFIG ============
+  const tablePaginationConfig = useMemo(
+    () => ({
+      current: pagination.currentPage,
+      pageSize: pagination.limit,
+      total: pagination.totalItems,
+      showSizeChanger: true,
+      showQuickJumper: true,
+    }),
+    [pagination, t]
+  );
+
+  const fetchRoomFees = useCallback(async () => {
+    if (!roomData?._id) return;
+
+    try {
+      setLoadingFees(true);
+
+      // Cancel previous request if exists
+      if (currentFeeRequestRef.current) {
+        // currentFeeRequestRef.current.cancel("New request initiated");
+      }
+
+      const monthValue = selectedMonth.month() + 1; // dayjs month is 0-indexed
+      const yearValue = selectedMonth.year();
+
+      // Create AbortController for request cancellation
+      const controller = new AbortController();
+      currentFeeRequestRef.current = controller;
+
+      const response = await getRoomAdditionFeesByRoomId(
+        roomData._id,
+        paginationOptions,
+        monthValue,
+        yearValue,
+        { signal: controller.signal } // Pass abort signal if API supports it
+      );
+
+      // Handle different response structures
+      if (response?.data) {
+        const responseData = response.data;
+
+        // Set fees data
+        if (Array.isArray(responseData)) {
+          setFeesData(responseData);
+        } else if (responseData.data && Array.isArray(responseData.data)) {
+          setFeesData(responseData.data);
+        } else {
+          setFeesData([]);
+        }
+
+        // Handle pagination info
+        if (responseData.pagination) {
+          const paginationInfo = responseData.pagination;
+
+          // Kiểm tra nếu currentPage > totalPages thì reset về trang 1
+          if (
+            paginationInfo.currentPage > paginationInfo.totalPages &&
+            paginationInfo.totalPages > 0
+          ) {
+            setPaginationOptions((prev) => ({ ...prev, page: 1 }));
+            return; // Will trigger re-fetch with page 1
+          }
+
+          setPagination({
+            currentPage: paginationInfo.currentPage || paginationOptions.page,
+            totalPages: paginationInfo.totalPages || 1,
+            totalItems: paginationInfo.totalItems || 0,
+            limit: paginationInfo.limit || paginationOptions.limit,
+          });
+        } else if (response.currentPage !== undefined) {
+          // Alternative response structure
+          setPagination({
+            currentPage: response.currentPage || paginationOptions.page,
+            totalPages: response.totalPages || 1,
+            totalItems: response.totalItems || 0,
+            limit: response.limit || paginationOptions.limit,
+          });
+        } else {
+          // Fallback for simple array response
+          setPagination((prev) => ({
+            ...prev,
+            currentPage: paginationOptions.page,
+            totalItems: Array.isArray(responseData) ? responseData.length : 0,
+            totalPages: 1,
+          }));
+        }
+      } else {
+        // Empty or invalid response
+        setFeesData([]);
+        setPagination((prev) => ({
+          ...prev,
+          totalItems: 0,
+          totalPages: 1,
+          currentPage: 1,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching room fees:", error);
+
+      if (error.name !== "AbortError" && error.name !== "CanceledError") {
+        // Handle different error types
+        if (error.response?.status === 404) {
+          // No fees found - this is normal
+          setFeesData([]);
+          setPagination((prev) => ({
+            ...prev,
+            totalItems: 0,
+            totalPages: 1,
+            currentPage: 1,
+          }));
+        } else if (error.response?.status >= 500) {
+          // Server error - reset pagination
+          toast.error(t("roomAdditionFee.messages.error.fetchFees"));
+          setFeesData([]);
+          setPagination({
+            currentPage: 1,
+            totalPages: 1,
+            totalItems: 0,
+            limit: paginationOptions.limit,
+          });
+          setPaginationOptions((prev) => ({ ...prev, page: 1 }));
+        } else {
+          // Other errors - keep pagination state
+          toast.error(
+            error.response?.data?.message ||
+              t("roomAdditionFee.messages.error.fetchFees")
+          );
+          setFeesData([]);
+        }
+      }
+    } finally {
+      setLoadingFees(false);
+      currentFeeRequestRef.current = null;
+    }
+  }, [roomData?._id, paginationOptions, selectedMonth, t]);
+
+  // ============ IMPROVED TABLE CHANGE HANDLER ============
+  const handleTableChange = useCallback(
+    (newPagination, filters, sorter) => {
+      console.log("Fees table change:", { newPagination, filters, sorter });
+
+      // Validation input
+      const page = Math.max(1, newPagination.current || 1);
+      const limit = Math.min(100, Math.max(5, newPagination.pageSize || 10));
+
+      const newOptions = {
+        ...paginationOptions,
+        page,
+        limit,
+      };
+
+      // Xử lý sorting
+      const { field, order } = sorter || {};
+      if (field && order) {
+        newOptions.sortField = field;
+        newOptions.sortOrder = order === "ascend" ? "asc" : "desc";
+      } else if (sorter === null || (sorter && !field)) {
+        // Reset to default sort
+        newOptions.sortField = "createdAt";
+        newOptions.sortOrder = "desc";
+      }
+
+      // Xử lý filtering (nếu cần)
+      if (filters && Object.keys(filters).length > 0) {
+        newOptions.filters = Object.entries(filters)
+          .filter(([_, value]) => value && value.length > 0)
+          .reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+          }, {});
+      } else {
+        delete newOptions.filters;
+      }
+
+      setPaginationOptions(newOptions);
+    },
+    [paginationOptions]
+  );
+
+  // ============ IMPROVED MONTH CHANGE HANDLER ============
+  const handleMonthChange = useCallback((date) => {
+    if (!date) return;
+
+    setSelectedMonth(date);
+    // Reset pagination khi thay đổi tháng
+    setPaginationOptions((prev) => ({
+      ...prev,
+      page: 1,
+    }));
+  }, []);
+
+  // ============ IMPROVED EFFECTS ============
+  // Effect để fetch phí khi dependencies thay đổi
+  useEffect(() => {
+    if (roomData?._id) {
+      fetchRoomFees();
+    }
+  }, [fetchRoomFees]);
+
+  // Clean up requests khi component unmount
+  useEffect(() => {
+    return () => {
+      if (currentFeeRequestRef.current) {
+        // currentFeeRequestRef.current.cancel("Component unmounted");
+      }
+    };
+  }, []);
+
+  const refreshFeesData = useCallback(() => {
+    setPaginationOptions((prev) => ({ ...prev, page: 1 }));
+    fetchRoomFees();
+  }, [fetchRoomFees]);
+
+  // Columns cho bảng phí - Updated with sorting
+  const feesColumns = useMemo(
+    () => [
+      {
+        title: t("roomAdditionFee.form.feeName"),
+        dataIndex: "feeName",
+        key: "feeName",
+        render: (text) => (
+          <span className="font-medium text-blue-600 dark:text-blue-400">
+            {text || t("roomAdditionFee.table.unknownFee")}
+          </span>
+        ),
+      },
+      {
+        title: t("roomAdditionFee.form.feeAmount"),
+        dataIndex: "feeAmount",
+        key: "feeAmount",
+        render: (amount) => (
+          <span className="font-semibold text-green-600 dark:text-green-400">
+            {amount
+              ? new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(amount)
+              : "-"}
+          </span>
+        ),
+      },
+      {
+        title: t("roomAdditionFee.table.columns.createdAt"),
+        dataIndex: "createdAt",
+        key: "createdAt",
+        render: (date) => (
+          <span className="text-gray-600 dark:text-gray-300">
+            {date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "-"}
+          </span>
+        ),
+      },
+    ],
+    [t]
+  );
+
+  // ============ EXISTING FUNCTIONS (unchanged) ============
   const onFinish = async (values) => {
     if (fileList.length === 0) {
       toast.error(t("roomManagement.updateRoom.pleaseUploadImage"));
@@ -63,7 +352,6 @@ function UpdateRoomPage({
       const res = await updateRoom(roomData._id, formData);
       refreshRoomData();
       toast.success(res.message);
-      // Quay lại danh sách sau khi update thành công
       if (onBack) {
         onBack();
       }
@@ -144,10 +432,6 @@ function UpdateRoomPage({
       ? "bg-gradient-to-br from-gray-700 to-gray-600 border-gray-600"
       : "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-300";
   };
-
-  // const handleDelete = async () => {
-  //   onDelete(roomData._id);
-  // };
 
   const handleToggleConfirmDelete = () => {
     setIsOpenDeleteModal(!isOpenDeleteModal);
@@ -331,6 +615,8 @@ function UpdateRoomPage({
               </Space>
             </Form>
           </Col>
+
+          {/* Action Buttons */}
           <Col xs={24} sm={12}>
             <Button
               btnDelete
@@ -350,11 +636,53 @@ function UpdateRoomPage({
               className="w-full"
             />
           </Col>
+
+          {/* IMPROVED Fees Table Section */}
+          <Col xs={24}>
+            <Card
+              className={`${getContentBgClasses()} border-2 shadow-lg rounded-xl mt-6`}
+              title={
+                <Title level={4} className={"text-gray-800 dark:text-white"}>
+                  {t("roomAdditionFee.title")}
+                </Title>
+              }
+              extra={
+                <div className="flex items-center gap-3">
+                  <Text className={`${getTextColor()}`}>
+                    {t("roomAdditionFee.form.month")}:
+                  </Text>
+                  <DatePicker
+                    picker="month"
+                    value={selectedMonth}
+                    onChange={handleMonthChange}
+                    format="MM/YYYY"
+                    placeholder={t("roomAdditionFee.placeholder.selectMonth")}
+                    className={
+                      darkMode
+                        ? "[&_.ant-picker-input>input]:bg-gray-700 [&_.ant-picker-input>input]:border-gray-600 [&_.ant-picker-input>input]:text-gray-200"
+                        : ""
+                    }
+                  />
+                </div>
+              }
+            >
+              <Table
+                columns={feesColumns}
+                data={feesData}
+                loading={loadingFees}
+                pagination={tablePaginationConfig}
+                onChange={handleTableChange}
+                tableName={t("roomAdditionFee.feeList")}
+                scroll={{ x: 600 }} // Add scroll for responsive
+              />
+            </Card>
+          </Col>
         </Row>
       </div>
+
       <ConfirmModal
-        title="Confirm Deletion"
-        content={`Are you sure you want to delete this room?`}
+        title={t("roomAdditionFee.modal.deleteFee.title")}
+        content={t("roomAdditionFee.messages.warning.deleteConfirmation")}
         onOk={() => {
           onDelete(roomData._id);
           setIsOpenDeleteModal(false);

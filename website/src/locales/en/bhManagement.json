@@ -265,5 +265,233 @@
       "ok": "OK",
       "cancel": "Cancel"
     }
+  },
+  "roomAdditionFee": {
+    "title": "Room Addition Fee Management",
+    "addFee": "Add Fee",
+    "editFee": "Edit Fee",
+    "deleteFee": "Delete Fee",
+    "viewFees": "View Fees",
+    "feeList": "Fee List",
+    "feeDetails": "Fee Details",
+    "feeHistory": "Fee History",
+    "monthlyFees": "Monthly Fees",
+    "search": "Search fees...",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh",
+
+    "form": {
+      "feeName": "Fee Name",
+      "feeAmount": "Fee Amount",
+      "feeType": "Fee Type",
+      "description": "Description",
+      "effectiveDate": "Effective Date",
+      "expiryDate": "Expiry Date",
+      "status": "Status",
+      "priority": "Priority",
+      "category": "Category",
+      "roomNumber": "Room Number",
+      "tenant": "Tenant",
+      "month": "Month",
+      "year": "Year",
+      "paymentStatus": "Payment Status",
+      "paymentDate": "Payment Date",
+      "notes": "Notes"
+    },
+
+    "placeholder": {
+      "enterFeeName": "Enter fee name",
+      "enterFeeAmount": "Enter fee amount",
+      "selectFeeType": "Select fee type",
+      "enterDescription": "Enter description",
+      "selectEffectiveDate": "Select effective date",
+      "selectExpiryDate": "Select expiry date",
+      "selectStatus": "Select status",
+      "selectPriority": "Select priority",
+      "selectCategory": "Select category",
+      "selectRoom": "Select room",
+      "selectTenant": "Select tenant",
+      "selectMonth": "Select month",
+      "selectYear": "Select year",
+      "selectPaymentStatus": "Select payment status",
+      "selectPaymentDate": "Select payment date",
+      "enterNotes": "Enter notes"
+    },
+
+    "validation": {
+      "feeNameRequired": "Fee name is required",
+      "feeAmountRequired": "Fee amount is required",
+      "feeTypeRequired": "Fee type is required",
+      "descriptionRequired": "Description is required",
+      "effectiveDateRequired": "Effective date is required",
+      "statusRequired": "Status is required",
+      "roomRequired": "Room selection is required",
+      "tenantRequired": "Tenant selection is required",
+      "monthRequired": "Month is required",
+      "yearRequired": "Year is required",
+      "invalidAmount": "Please enter a valid amount",
+      "amountMustBePositive": "Amount must be positive",
+      "dateRangeInvalid": "End date must be after start date"
+    },
+
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+
+    "paymentStatus": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "partial": "Partial",
+      "overdue": "Overdue",
+      "pending": "Pending"
+    },
+
+    "feeType": {
+      "electricity": "Electricity",
+      "water": "Water",
+      "internet": "Internet",
+      "cleaning": "Cleaning",
+      "maintenance": "Maintenance",
+      "parking": "Parking",
+      "security": "Security",
+      "garbage": "Garbage Collection",
+      "other": "Other"
+    },
+
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+
+    "category": {
+      "utility": "Utility",
+      "service": "Service",
+      "maintenance": "Maintenance",
+      "security": "Security",
+      "amenity": "Amenity",
+      "penalty": "Penalty",
+      "deposit": "Deposit",
+      "other": "Other"
+    },
+
+    "table": {
+      "columns": {
+        "feeName": "Fee Name",
+        "feeAmount": "Amount",
+        "feeType": "Type",
+        "roomNumber": "Room",
+        "tenant": "Tenant",
+        "month": "Month",
+        "year": "Year",
+        "status": "Status",
+        "paymentStatus": "Payment",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "actions": "Actions"
+      },
+      "noData": "No fees found",
+      "loading": "Loading fees...",
+      "totalItems": "Total: {{count}} items",
+      "selectedItems": "{{count}} items selected"
+    },
+
+    "actions": {
+      "add": "Add New Fee",
+      "edit": "Edit",
+      "delete": "Delete",
+      "view": "View",
+      "duplicate": "Duplicate",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "markAsPaid": "Mark as Paid",
+      "markAsUnpaid": "Mark as Unpaid",
+      "sendReminder": "Send Reminder",
+      "printReceipt": "Print Receipt",
+      "downloadPDF": "Download PDF"
+    },
+
+    "messages": {
+      "success": {
+        "feeAdded": "Fee added successfully",
+        "feeUpdated": "Fee updated successfully",
+        "feeDeleted": "Fee deleted successfully",
+        "statusUpdated": "Status updated successfully",
+        "paymentStatusUpdated": "Payment status updated successfully",
+        "reminderSent": "Reminder sent successfully",
+        "dataExported": "Data exported successfully",
+        "dataImported": "Data imported successfully"
+      },
+      "error": {
+        "fetchFees": "Error fetching fees",
+        "addFee": "Error adding fee",
+        "updateFee": "Error updating fee",
+        "deleteFee": "Error deleting fee",
+        "exportData": "Error exporting data",
+        "importData": "Error importing data",
+        "sendReminder": "Error sending reminder",
+        "invalidData": "Invalid data format",
+        "networkError": "Network error occurred"
+      },
+      "warning": {
+        "unsavedChanges": "You have unsaved changes",
+        "deleteConfirmation": "Are you sure you want to delete this fee?",
+        "bulkDeleteConfirmation": "Are you sure you want to delete {{count}} fees?",
+        "statusChangeConfirmation": "Are you sure you want to change the status?"
+      },
+      "info": {
+        "noFeesSelected": "No fees selected",
+        "processingRequest": "Processing your request...",
+        "dataUpToDate": "Data is up to date",
+        "filterApplied": "Filter applied"
+      }
+    },
+
+    "modal": {
+      "addFee": {
+        "title": "Add New Fee",
+        "subtitle": "Enter fee details below"
+      },
+      "editFee": {
+        "title": "Edit Fee",
+        "subtitle": "Update fee information"
+      },
+      "deleteFee": {
+        "title": "Delete Fee",
+        "subtitle": "This action cannot be undone"
+      },
+      "viewFee": {
+        "title": "Fee Details",
+        "subtitle": "View fee information"
+      }
+    },
+
+    "summary": {
+      "totalFees": "Total Fees",
+      "paidAmount": "Paid Amount",
+      "unpaidAmount": "Unpaid Amount",
+      "overdueAmount": "Overdue Amount",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "yearToDate": "Year to Date"
+    },
+
+    "filters": {
+      "all": "All",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "thisYear": "This Year",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "overdue": "Overdue",
+      "active": "Active",
+      "inactive": "Inactive"
+    }
   }
 }

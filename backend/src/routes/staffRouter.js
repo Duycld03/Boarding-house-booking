@@ -221,5 +221,10 @@ staffRouter.delete(
   roomAdditionFeeController.deleteRoomAdditionFee
 );
 
+staffRouter.get(
+  '/room-addition-fee/:roomId',
+  roomAdditionFeeController.getRoomAdditionFeesByRoomId
+);
+
 
 export { staffRouter };
