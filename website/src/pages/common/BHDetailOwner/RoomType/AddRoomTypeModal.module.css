@@ -1,0 +1,22 @@
+:global(.no-margin) :global(.ant-form-item) {
+    margin-bottom: 0 !important;
+}
+.dark-mode-input {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+.dark-mode-select {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+.dark-mode-dropdown {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+}
+:global(.ant-modal-dark) :global(.ant-select-selection-item-remove) {
+    color: white !important;
+}

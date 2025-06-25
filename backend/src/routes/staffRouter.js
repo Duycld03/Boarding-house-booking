@@ -89,8 +89,8 @@ staffRouter.delete(
 
 //deposit
 staffRouter.get(
-  '/boardinghouse/deposit/:boardingHouseId',
-  depositController.getDepositByBhId
+  '/bh/deposit-list',
+  depositController.getDepositsByOwnerOrStaff
 );
 
 staffRouter.get(
@@ -172,10 +172,7 @@ staffRouter.get(
   '/total-revenue/years',
   revenueController.getTotalAvailableYears
 );
-staffRouter.get(
-  '/total-revenue/year',
-  revenueController.getTotalRevenueByYear
-);
+staffRouter.get('/total-revenue/year', revenueController.getTotalRevenueByYear);
 
 //rent payment
 staffRouter.get(

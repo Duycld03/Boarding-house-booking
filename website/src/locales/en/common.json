@@ -20,5 +20,12 @@
     "ward": "Ward",
     "detail": "Detail"
   },
-  "addressFormat": "Detail address: {{detail}} {{ward}} {{district}} {{province}}"
+  "addressFormat": "Detail address: {{detail}} {{ward}} {{district}} {{province}}",
+   "facilities": {
+    "swimming_pool": "Swimming Pool",
+    "gym": "Gym",
+    "laundry_room": "Laundry Room",
+    "parking_lot": "Parking Lot",
+    "tennis_court": "Tennis Court"
+  }
 }
