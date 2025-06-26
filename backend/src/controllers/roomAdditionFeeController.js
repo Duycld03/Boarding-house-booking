@@ -89,17 +89,6 @@ class RoomAdditionFeeController {
             // Sử dụng hàm paginate
             const result = await paginate(RoomAdditionalFees, paginationOptions, req);
 
-            // Kiểm tra nếu không có dữ liệu
-            if (result.data.length === 0 && result.pagination.currentPage === 1) {
-                const monthYearText = month && year ? ` in ${month}/${year}` : '';
-                return res.status(404).json({
-                    success: false,
-                    message: `No fees found for room ${roomId}${monthYearText}`,
-                    pagination: result.pagination,
-                    data: []
-                });
-            }
-
             res.status(200).json(result);
 
         } catch (error) {

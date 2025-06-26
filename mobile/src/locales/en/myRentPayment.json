@@ -1,0 +1,56 @@
+{
+  "myRentPayments": "My Rent Payments",
+  "paymentCard": {
+    "room": "Room",
+    "totalPayment": "Total Payment",
+    "monthRent": "Month's Rent",
+    "payNow": "Pay Now",
+    "viewDetails": "View Details",
+    "overduePayment": "Payment is overdue",
+    "paymentMethodTitle": "Payment Method",
+    "status": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled",
+      "failed": "Failed"
+    },
+    "paymentMethod": {
+      "cash": "Cash",
+      "bank": "Bank Transfer",
+      "card": "Credit Card",
+      "transfer": "Wire Transfer",
+      "ewallet": "E-Wallet"
+    }
+  },
+  "paymentDetail": {
+    "title": "Payment Details",
+    "status": "Payment Status",
+    "statusLabel": {
+      "paid": "PAID",
+      "pending": "PENDING",
+      "overdue": "OVERDUE",
+      "canceled": "CANCELED",
+      "failed": "FAILED"
+    },
+    "totalAmount": "Total Amount",
+    "propertyInfo": "Property Information",
+    "rentalHouse": "Rental House",
+    "roomNumber": "Room Number",
+    "rentForMonth": "Rent Period",
+    "electricityBill": "Electricity Bill",
+    "waterBill": "Water Bill",
+    "oldReading": "Previous Reading",
+    "newReading": "Current Reading",
+    "consumption": "Usage",
+    "electricityAmount": "Electricity Cost",
+    "waterAmount": "Water Cost",
+    "paymentSummary": "Payment Summary",
+    "roomRent": "Room Rent",
+    "totalAmountDue": "Total Amount Due",
+    "payNow": "Pay Now",
+    "paymentHistory": "Payment History",
+    "dueDate": "Due Date",
+    "paidDate": "Paid Date"
+  }
+}

@@ -70,6 +70,12 @@ const AccountLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="myrentpayment/paymentDetail"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </>
   );
