@@ -25,7 +25,9 @@
     "rejectTitle": "Reject Deposit Request",
     "rejectReason": "Reason for Rejection",
     "rejectPlaceholder": "Enter reason for rejection",
-    "rejectConfirm": "Reject"
+    "rejectConfirm": "Reject",
+      "cancel": "Cancel"
+
   },
   "messages": {
     "fetchError": "Failed to fetch deposit list.",

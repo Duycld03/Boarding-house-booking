@@ -24,7 +24,9 @@
     "rejectTitle": "Từ chối yêu cầu đặt cọc",
     "rejectReason": "Lý do từ chối",
     "rejectPlaceholder": "Nhập lý do từ chối",
-    "rejectConfirm": "Từ chối"
+    "rejectConfirm": "Từ chối",
+      "cancel": "Huỷ"
+
   },
   "messages": {
     "fetchError": "Lấy danh sách thất bại",
