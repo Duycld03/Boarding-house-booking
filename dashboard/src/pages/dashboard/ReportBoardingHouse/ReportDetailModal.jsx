@@ -1,202 +1,215 @@
-import { useEffect, useState } from "react";
-import { Tag } from "antd";
-import convertTimetap from "../../../utils/convertTimetap";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useState } from 'react';
+import { Modal, Image, Avatar, Button, Tag, Rate } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/context/themeContext';
+import convertTimetap from '@/utils/convertTimetap';
+import DefaultAccount from '@/assets/images/none_avatar.png';
 
-function ReportDetailModal({ isOpen, onClose, report }) {
+const ReportDetailModal = ({ isOpen, onClose, reportData, onReplay }) => {
   const [currentReport, setCurrentReport] = useState(null);
-  const { t } = useTranslation("reportBoardingHouse");
+  const { darkMode } = useTheme();
+  const { t } = useTranslation('reportBoardingHouse');
 
   useEffect(() => {
-    if (isOpen && report) {
-      setCurrentReport(report);
+    if (isOpen && reportData) {
+      setCurrentReport(reportData);
     }
-  }, [isOpen, report]);
+  }, [isOpen, reportData]);
 
+  if (!currentReport) return null;
+
+  const { reporter, target, reason, details, images, createdAt, status } =
+    currentReport;
+
+  const cardClass = darkMode
+    ? 'bg-[#1f2937] text-white'
+    : 'bg-white text-black';
+
+  // ✅ Hàm dịch lý do tố cáo
   const coverReasonToMultipleLanguage = (reasonValue) => {
     const reasonLowerCase = reasonValue?.toLowerCase();
-
     switch (reasonLowerCase) {
-      case "scam on rent or deposit".toLowerCase(): {
-        return t("reason.scamOnRentOrDeposit");
-      }
-      case "false advertisement".toLowerCase(): {
-        return t("reason.falseAdvertisement");
-      }
-      case "violation of privacy".toLowerCase(): {
-        return t("reason.violationOfPrivacy");
-      }
-      case "unfriendly landlord".toLowerCase(): {
-        return t("reason.unfriendlyLandlord");
-      }
-      case "poor security".toLowerCase(): {
-        return t("reason.poorSecurity");
-      }
-      default: {
-        return reasonValue;
-      }
+      case 'scam on rent or deposit':
+        return t('reason.scamOnRentOrDeposit');
+      case 'false advertisement':
+        return t('reason.falseAdvertisement');
+      case 'violation of privacy':
+        return t('reason.violationOfPrivacy');
+      case 'unfriendly landlord':
+        return t('reason.unfriendlyLandlord');
+      case 'poor security':
+        return t('reason.poorSecurity');
+      default:
+        return reasonValue || t('detail.unknown');
     }
-  };
-
-  if (!isOpen || !report) return null;
-
-  const getStatusColor = (status) => {
-    const statusColors = {
-      pending: "orange",
-      resolved: "green",
-      rejected: "red",
-    };
-    return statusColors[status?.toLowerCase()] || "default";
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto">
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      ></div>
-      <div className="relative bg-white dark:bg-gray-800 w-full max-w-2xl mx-auto rounded-lg shadow-lg p-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold dark:text-white">
-            {t("detailModal.title")}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+    <Modal
+      key={reportData?._id}
+      open={isOpen}
+      onCancel={onClose}
+      destroyOnClose
+      title={<h2 className="text-2xl font-bold">{t('detail.title')}</h2>}
+      className={darkMode ? 'dark-modal' : ''}
+      bodyStyle={{ padding: 0 }}
+      footer={[
+        <Button
+          key="close"
+          onClick={onClose}
+          className="bg-orange-600 text-white"
+        >
+          {t('buttons.close')}
+        </Button>,
+        status !== 'rejected' && status !== 'resolved' && (
+          <Button
+            key="replay"
+            className="bg-primary text-white ml-2 btn-replay"
+            onClick={() => {
+              onClose();
+              setTimeout(() => onReplay?.(currentReport), 200);
+            }}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
+            {t('buttons.replay')}
+          </Button>
+        ),
+      ]}
+    >
+      <div>
+        <h2 className="text-xl font-semibold mb-2">
+          {reportData?.reportType === 'review'
+            ? t('detail.reviewInfo')
+            : t('detail.boardingInfo')}
+        </h2>
+
+        <div className="flex items-center gap-3">
+          {reportData?.reportType === 'review' ? (
+            <>
+              <Avatar
+                src={target?.accountId?.avatarImage?.url ?? DefaultAccount}
+                size={50}
               />
-            </svg>
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <h3 className="font-semibold mb-2 dark:text-white">
-              {t("detailModal.reporterInfo")}
-            </h3>
-            <div className="space-y-2">
-              <p className="dark:text-gray-300">
-                <span className="font-medium">{t("columns.reporter")}:</span>{" "}
-                {report.reporter?.fullname || "N/A"}
-              </p>
-              <p className="dark:text-gray-300">
-                <span className="font-medium">{t("detailModal.email")}:</span>{" "}
-                {report.reporter?.email || "N/A"}
-              </p>
-              <p className="dark:text-gray-300">
-                <span className="font-medium">{t("detailModal.phone")}:</span>{" "}
-                {report.reporter?.phone || "N/A"}
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-2 dark:text-white">
-              {t("detailModal.reportInfo")}
-            </h3>
-            <div className="space-y-2">
-              <p className="dark:text-gray-300">
-                <span className="font-medium">
-                  {t("columns.boardingHouseName")}:
-                </span>{" "}
-                {report.targetId?.name || "N/A"}
-              </p>
-              <p className="dark:text-gray-300">
-                <span className="font-medium">{t("columns.reason")}:</span>{" "}
-                {coverReasonToMultipleLanguage(report.reason)}
-              </p>
-              <p className="dark:text-gray-300">
-                <span className="font-medium">{t("columns.status")}:</span>{" "}
-                <Tag color={getStatusColor(report.status)}>
-                  {t(`status.${report.status?.toLowerCase()}`)}
-                </Tag>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Report Details */}
-        <div className="mb-6">
-          <h3 className="font-semibold mb-2 dark:text-white">
-            {t("detailModal.details")}
-          </h3>
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
-            <p className="whitespace-pre-wrap dark:text-gray-300">
-              {report.description || t("detailModal.noDetails")}
+              <p>{target?.accountId?.fullname || t('detail.unknown')}</p>
+            </>
+          ) : (
+            <p>
+              <strong>{t('detail.name')}:</strong>{' '}
+              {target?.name || t('detail.unknown')}
             </p>
-          </div>
+          )}
         </div>
 
-        {/* Images Section */}
-        {report.images && report.images.length > 0 && (
-          <div className="mb-6">
-            <h3 className="font-semibold mb-2 dark:text-white">
-              {t("detailModal.images")}
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {report.images.map((img, index) => (
-                <div
-                  key={index}
-                  className="relative overflow-hidden rounded-md bg-gray-200 aspect-square"
-                >
-                  <img
-                    src={img.url}
-                    alt={`Report Evidence ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+        <p>
+          <strong>{t('detail.rating')}:</strong>{' '}
+          <Rate disabled defaultValue={Number(target?.rating)} />
+        </p>
+
+        {reportData?.reportType === 'review' ? (
+          <p>
+            <strong>{t('detail.content')}:</strong>{' '}
+            {target?.content || t('detail.noContent')}
+          </p>
+        ) : (
+          <p>
+            <strong>{t('detail.type')}:</strong>{' '}
+            {t(`boardingHouseTypes.${target?.boardingHouseType?.name}`, {
+              defaultValue:
+                target?.boardingHouseType?.name || t('detail.unknown'),
+            })}
+          </p>
         )}
 
-        {/* Response/Reply Section */}
-        {report.adminResponse && (
-          <div className="mb-6">
-            <h3 className="font-semibold mb-2 dark:text-white">
-              {t("detailModal.adminResponse")}
-            </h3>
-            <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 rounded-md">
-              <p className="dark:text-gray-300 whitespace-pre-wrap">
-                {report.adminResponse}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                {t("detailModal.respondedOn")}:{" "}
-                {convertTimetap(report.updatedAt)}
-              </p>
-            </div>
-          </div>
-        )}
+        <p className="font-bold">{t('detail.images')}:</p>
+        <div className="grid grid-cols-3 gap-1.5">
+          {reportData?.reportType === 'review' && target?.images?.length > 0 ? (
+            target.images.map((img, index) => (
+              <Image
+                key={index}
+                width={150}
+                height={150}
+                className="rounded-md transition-transform transform hover:scale-105"
+                style={{ objectFit: 'cover' }}
+                src={img.imageUrl}
+                alt={`Review Image ${index}`}
+              />
+            ))
+          ) : reportData?.reportType === 'boardingHouse' &&
+            target?.images?.[0]?.imageUrl ? (
+            <Image
+              width={150}
+              height={150}
+              className="rounded-md transition-transform transform hover:scale-105"
+              style={{ objectFit: 'cover' }}
+              src={images?.[0]?.imageUrl}
+              alt="Boarding House Image"
+            />
+          ) : (
+            <p>{t('detail.noImages')}</p>
+          )}
+        </div>
 
-        {/* Timestamps */}
-        <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
-          <p>
-            {t("columns.createdAt")}: {convertTimetap(report.createdAt)}
-          </p>
-          <p>
-            {t("columns.processedDate")}:{" "}
-            {report.updatedAt !== report.createdAt
-              ? convertTimetap(report.updatedAt)
-              : t("detailModal.notProcessedYet")}
-          </p>
+        <h2 className="text-xl font-semibold mb-2 mt-6">
+          {t('detail.reportInfo')}
+        </h2>
+
+        <div className="flex items-center gap-3 mb-2">
+          <Avatar
+            src={reporter?.avatarImage?.url ?? DefaultAccount}
+            size={50}
+          />
+          <p>{reporter?.fullname || t('detail.unknown')}</p>
+        </div>
+
+        <p>
+          <strong>{t('detail.reportedAt')}:</strong> {convertTimetap(createdAt)}
+        </p>
+
+        <p>
+          <strong>{t('myReport.status')}:</strong>{' '}
+          <Tag
+            color={
+              status === 'pending'
+                ? 'orange'
+                : status === 'resolved'
+                ? 'green'
+                : 'red'
+            }
+          >
+            {t(`status.${status}`)}
+          </Tag>
+        </p>
+
+        <p>
+          <strong>{t('myReport.reason')}:</strong>{' '}
+          {coverReasonToMultipleLanguage(reason)}
+        </p>
+
+        <p>
+          <strong>{t('myReport.details')}:</strong> {details}
+        </p>
+
+        <p className="font-bold">{t('detail.reportImages')}:</p>
+        <div className="grid grid-cols-3 gap-[4px]">
+          {images?.length > 0 ? (
+            images.map((img, index) => (
+              <div key={index} className="p-[2px]">
+                <Image
+                  width={150}
+                  height={150}
+                  className="rounded-md transition-transform transform hover:scale-105"
+                  style={{ objectFit: 'cover' }}
+                  src={img.imageUrl}
+                  alt={`Report Image ${index}`}
+                />
+              </div>
+            ))
+          ) : (
+            <p>{t('detail.noImages')}</p>
+          )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
-}
+};
 
 export default ReportDetailModal;
