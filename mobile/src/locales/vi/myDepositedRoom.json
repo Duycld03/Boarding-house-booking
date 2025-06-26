@@ -1,0 +1,28 @@
+{
+  "myDepositedRooms": "Phòng Đã Đặt Cọc",
+  "room": "Phòng",
+  "depositAmount": "Số Tiền Đặt Cọc",
+  "rentalPeriod": "Thời Gian Thuê",
+  "rentalTime": "Thời Hạn Thuê",
+  "month": "tháng",
+  "months": "tháng",
+  "payRent": "Thanh Toán",
+  "requestRefund": "Hoàn Tiền",
+  "loading": "Đang tải",
+  "noDeposits": "Không Tìm Thấy Phòng",
+  "noDepositsSubtext": "Bạn chưa đặt cọc phòng nào. Hãy tìm kiếm và đặt chỗ ngay hôm nay.",
+  "allDepositsLoaded": "Đã tải tất cả phòng đặt cọc",
+  "loadingMoreDeposits": "Đang tải thêm phòng...",
+  "loadMoreDeposits": "Tải thêm phòng",
+  "of": "trong số",
+  "depositsLoaded": "phòng đã tải",
+  "payRentRequestSent": "Đã gửi yêu cầu thanh toán thành công",
+  "refundRequestSent": "Đã gửi yêu cầu hoàn tiền thành công",
+  "fetchError": "Không thể tải danh sách phòng đặt cọc",
+  "status": {
+    "pending": "Chờ xác nhận",
+    "confirmed": "Đã xác nhận",
+    "rejected": "Bị từ chối",
+    "cancelled": "Đã hủy"
+  }
+}

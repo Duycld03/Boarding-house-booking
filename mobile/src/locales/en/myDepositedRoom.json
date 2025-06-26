@@ -1,0 +1,28 @@
+{
+  "myDepositedRooms": "My Deposited Rooms",
+  "room": "Room",
+  "depositAmount": "Deposit Amount",
+  "rentalPeriod": "Rental Period",
+  "rentalTime": "Rental Duration",
+  "month": "month",
+  "months": "months",
+  "payRent": "Pay Rent",
+  "requestRefund": "Request Refund",
+  "loading": "Loading",
+  "noDeposits": "No Deposits Found",
+  "noDepositsSubtext": "You haven't made any deposits yet. Browse properties and secure your next home.",
+  "allDepositsLoaded": "All deposits loaded",
+  "loadingMoreDeposits": "Loading more deposits...",
+  "loadMoreDeposits": "Load more deposits",
+  "of": "of",
+  "depositsLoaded": "deposits loaded",
+  "payRentRequestSent": "Pay rent request sent successfully",
+  "refundRequestSent": "Refund request sent successfully",
+  "fetchError": "Failed to fetch deposits",
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  }
+}
