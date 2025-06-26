@@ -15,6 +15,7 @@ class favoriteController {
       const favorites = await FavoriteBH.find({ accountId: account._id })
         .populate({
           path: 'boardingHouseId',
+          match: { deleted: false }, // Chỉ lấy BoardingHouse chưa bị xóa mềm
           select:
             'name priceRange images rating description address boardingHouseType timeAgo',
           populate: {
@@ -24,9 +25,12 @@ class favoriteController {
         })
         .lean();
 
+      // Lọc những mục mà boardingHouseId bị null (do match không thỏa)
+      const validFavorites = favorites.filter((fav) => fav.boardingHouseId);
+
       return res.status(200).json({
         message: 'Successfully retrieved favorites',
-        favorites: favorites.map((fav) => ({
+        favorites: validFavorites.map((fav) => ({
           id: fav.boardingHouseId._id,
           name: fav.boardingHouseId.name,
           price: fav.boardingHouseId.priceRange,
@@ -36,16 +40,17 @@ class favoriteController {
           address: fav.boardingHouseId.address,
           timeAgo: fav.boardingHouseId.timeAgo,
           isFavorite: true,
-
           boardingHouseType: fav.boardingHouseId.boardingHouseType
             ? fav.boardingHouseId.boardingHouseType.name
             : 'undefined',
         })),
       });
     } catch (error) {
+      console.error('Error in getFavorites:', error);
       return res.status(500).json({ error: error.message });
     }
   }
+
   async createFavorite(req, res) {
     try {
       const account = await Account.findById(req.user.userId);

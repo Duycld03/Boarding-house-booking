@@ -6,7 +6,7 @@ import {
   boardingHouseController,
   reportController,
   ReviewController,
-  depositController
+  depositController,
 } from '../controllers/index.js';
 import reviewController from '../controllers/reviewController.js';
 import facilitiesController from '../controllers/facilitiesController.js';
@@ -56,6 +56,7 @@ adminRouter.get(
   '/reportReview/:reportId',
   reportController.getReportReviewDetail
 );
+adminRouter.get('/reportBH/:reportId', reportController.getReportReviewDetail);
 
 //review
 adminRouter.get('/reviews', ReviewController.getReviews);
@@ -63,8 +64,6 @@ adminRouter.get('/reviews/filter', reviewController.filterReviews);
 adminRouter.delete('/reviews/:reviewId', reviewController.softDeleteReview);
 adminRouter.get('/boarding-house-reports', reportController.getBHReports);
 adminRouter.get('/review/:reviewId', ReviewController.getReviewDetail);
-
-
 
 //boarding house
 adminRouter.get('/boardinghouse', boardingHouseController.getAllBHOnDashBoard);
@@ -145,14 +144,11 @@ adminRouter.get('/account/filter', accountController.filterAccounts);
 adminRouter.post('/account/create', accountController.createAccount);
 adminRouter.put('/account/:accountId', accountController.updateAccount);
 
-
 //Facilities
-adminRouter.get("/facilities", facilitiesController.getAllFacilities);
-adminRouter.delete("/facilities/:id", facilitiesController.deleteFacilities); //delete
-adminRouter.put("/facilities/:id", facilitiesController.updateFacilities); //update   
-adminRouter.get("/facilities/filter", facilitiesController.filterFacilities); //filter 
-adminRouter.post("/facilities", facilitiesController.addFacilities); //add
-
-
+adminRouter.get('/facilities', facilitiesController.getAllFacilities);
+adminRouter.delete('/facilities/:id', facilitiesController.deleteFacilities); //delete
+adminRouter.put('/facilities/:id', facilitiesController.updateFacilities); //update
+adminRouter.get('/facilities/filter', facilitiesController.filterFacilities); //filter
+adminRouter.post('/facilities', facilitiesController.addFacilities); //add
 
 export { adminRouter };

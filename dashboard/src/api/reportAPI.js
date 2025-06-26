@@ -23,11 +23,11 @@ export const filterReviewReports = (
 export const filterBHReports = (filterValue = {}, paginationOptions = {}) => {
   const params = {
     ...filterValue,
-    ...paginationOptions
+    ...paginationOptions,
   };
 
   return axios.get(`/dashboard/reports/filter/boarding-house`, {
-    params
+    params,
   });
 };
 
@@ -54,4 +54,7 @@ export const getReportReviewDetail = (reportId) => {
 
 export const getOwnReportReviewDetail = (reportId) => {
   return axios.get(`/auth/reports/${reportId}`);
+};
+export const getReportBHDetail = (reportId) => {
+  return axios.get(`/dashboard/reportBH/${reportId}`);
 };

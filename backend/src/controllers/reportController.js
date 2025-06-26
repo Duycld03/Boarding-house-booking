@@ -529,17 +529,17 @@ class reportController {
 
       // Populate dựa trên loại report
       if (report.reportTypeRef === 'Review') {
-        populatedTarget = await Review.findOne(
-          { _id: report.targetId },
-          null,
-          { withDeleted: true } // Lấy cả review bị đánh dấu delete
-        ).populate({
+        populatedTarget = await Review.findOne({ _id: report.targetId }, null, {
+          withDeleted: true,
+        }).populate({
           path: 'accountId',
           select: 'fullname email avatarImage',
         });
       } else if (report.reportTypeRef === 'BoardingHouse') {
         populatedTarget = await BoardingHouse.findById(
-          report.targetId
+          report.targetId,
+          null,
+          { withDeleted: true } // 👈 để lấy cả bản ghi đã soft delete
         ).populate('boardingHouseType');
       }
 
