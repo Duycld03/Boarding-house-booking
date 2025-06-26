@@ -217,4 +217,23 @@ Button.defaultProps = {
     iconClassName: ''
 };
 
+//prop types for Button component
+Button.propTypes = {
+    variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text']),
+    fullWidth: PropTypes.bool,
+    loading: PropTypes.bool,
+    disabled: PropTypes.bool,
+    onPress: PropTypes.func,
+    size: PropTypes.oneOf(['sm', 'md', 'lg']),
+    children: PropTypes.node,
+    style: PropTypes.object,
+    textStyle: PropTypes.object,
+    className: PropTypes.string,
+    textClassName: PropTypes.string,
+    icon: PropTypes.node,
+    iconPosition: PropTypes.oneOf(['left', 'right']),
+    iconStyle: PropTypes.object,
+    iconClassName: PropTypes.string
+};
+
 export default Button;

@@ -1,0 +1,56 @@
+{
+  "myRentPayments": "Thanh Toán Thuê Nhà Của Tôi",
+  "paymentCard": {
+    "room": "Phòng",
+    "totalPayment": "Tổng Thanh Toán",
+    "monthRent": "Tiền Thuê Tháng",
+    "payNow": "Thanh Toán Ngay",
+    "viewDetails": "Xem Chi Tiết",
+    "overduePayment": "Thanh toán đã quá hạn",
+    "paymentMethodTitle": "Phương Thức Thanh Toán",
+    "status": {
+      "pending": "Chờ Xử Lý",
+      "paid": "Đã Thanh Toán",
+      "overdue": "Quá Hạn",
+      "cancelled": "Đã Hủy",
+      "failed": "Thất Bại"
+    },
+    "paymentMethod": {
+      "cash": "Tiền Mặt",
+      "bank": "Chuyển Khoản Ngân Hàng",
+      "card": "Thẻ Tín Dụng",
+      "transfer": "Chuyển Khoản",
+      "ewallet": "Ví Điện Tử"
+    }
+  },
+  "paymentDetail": {
+    "title": "Chi Tiết Thanh Toán",
+    "status": "Trạng Thái Thanh Toán",
+    "statusLabel": {
+      "paid": "ĐÃ THANH TOÁN",
+      "pending": "ĐANG CHỜ",
+      "overdue": "QUÁ HẠN",
+      "canceled": "ĐÃ HỦY",
+      "failed": "THẤT BẠI"
+    },
+    "totalAmount": "Tổng Số Tiền",
+    "propertyInfo": "Thông Tin Phòng Trọ",
+    "rentalHouse": "Nhà Trọ",
+    "roomNumber": "Số Phòng",
+    "rentForMonth": "Kỳ Thanh Toán",
+    "electricityBill": "Hóa Đơn Điện",
+    "waterBill": "Hóa Đơn Nước",
+    "oldReading": "Chỉ Số Cũ",
+    "newReading": "Chỉ Số Mới",
+    "consumption": "Lượng Tiêu Thụ",
+    "electricityAmount": "Tiền Điện",
+    "waterAmount": "Tiền Nước",
+    "paymentSummary": "Tổng Kết Thanh Toán",
+    "roomRent": "Tiền Phòng",
+    "totalAmountDue": "Tổng Cộng Phải Trả",
+    "payNow": "Thanh Toán Ngay",
+    "paymentHistory": "Lịch Sử Thanh Toán",
+    "dueDate": "Hạn Thanh Toán",
+    "paidDate": "Ngày Thanh Toán"
+  }
+}
