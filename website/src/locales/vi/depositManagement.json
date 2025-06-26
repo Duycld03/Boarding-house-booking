@@ -30,9 +30,9 @@
   },
   "messages": {
     "fetchError": "Lấy danh sách thất bại",
-    "acceptSuccess": "Chấp nhận đặt cọc thành công.",
+    "acceptSuccess": "Đã gửi kết quả xử lí yêu cầu thành công.",
     "acceptError": "Lỗi khi chấp nhận đặt cọc.",
-    "rejectSuccess": "Từ chối đặt cọc thành công.",
+    "rejectSuccess": "Đã gửi kết quả xử lí yêu cầu thành công.",
     "rejectError": "Lỗi khi từ chối đặt cọc.",
     "noRoomSelected": "Chưa chọn phòng!",
     "requireReason": "Vui lòng nhập lý do từ chối"

@@ -591,70 +591,155 @@ class DepositController {
     try {
       const { depositId } = req.params;
 
-      // Lấy thông tin khoản đặt cọc, bao gồm cả boardingHouseName
       const deposit = await DepositRoom.findById(depositId)
         .populate({ path: 'accountId', select: 'fullname email' })
         .populate({
           path: 'roomId',
-          select: 'roomNumber boardingHouseId', // Lấy boardingHouseId từ roomId
-          populate: {
-            path: 'boardingHouseId', // Populate boardingHouseId trong roomId
-            select: 'name', // Lấy trường name của boardingHouse
-          },
+          select: 'roomNumber boardingHouseId roomTypeId',
+          populate: [
+            {
+              path: 'boardingHouseId',
+              select: 'name boardingHouseType',
+              populate: {
+                path: 'boardingHouseType',
+                select: 'codeName',
+              },
+            },
+            {
+              path: 'roomTypeId',
+              select: 'typeName peopleNumber',
+            },
+          ],
         });
 
       if (!deposit) {
         return res.status(404).json({ error: 'Không tìm thấy khoản đặt cọc' });
       }
 
-      // Lấy tên nhà trọ từ boardingHouseId đã populate
-      const boardingHouseName = deposit.roomId.boardingHouseId
-        ? deposit.roomId.boardingHouseId.name
-        : 'Không có tên nhà trọ';
+      const boardingHouse = deposit.roomId.boardingHouseId;
+      const boardingHouseName = boardingHouse?.name || 'Không có tên nhà trọ';
+      const boardingHouseTypeCode =
+        boardingHouse?.boardingHouseType?.codeName || '';
 
-      // Cập nhật status thành 'accepted'
-      deposit.status = 'accepted';
-      await deposit.save();
-
-      // Config mail server (nhớ đổi tài khoản của bạn)
+      // Tạo transporter gửi email
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
           user: 'todohongy@gmail.com',
-          pass: 'ersq syrb ihov ilvx', // App Password
+          pass: 'ersq syrb ihov ilvx',
         },
       });
 
-      const mailOptions = {
-        from: 'support@example.com',
-        to: deposit.accountId.email,
-        subject: 'Đặt cọc phòng trọ đã được chấp nhận ✅',
-        html: `
-        <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
-        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã được <span style="color:green;"><strong>chấp nhận</strong></span> thành công.</p>
-        <ul>
-          <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
-          <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
-          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format('DD/MM/YYYY')}</li>
-          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format('DD/MM/YYYY')}</li>
-        </ul>
-        <p>Hãy giữ liên lạc với chủ nhà để hoàn tất thủ tục tiếp theo nhé!</p>
-        <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
-      `,
+      const sendEmail = async (to, subject, html) => {
+        await transporter.sendMail({
+          from: 'support@example.com',
+          to,
+          subject,
+          html,
+        });
       };
 
-      // Gửi mail
-      await transporter.sendMail(mailOptions);
+      // Xử lý nếu là ký túc xá
+      if (boardingHouseTypeCode === 'nha_tro_kien_truc_xa') {
+        const currentAcceptedCount = await DepositRoom.countDocuments({
+          roomId: deposit.roomId._id,
+          status: 'accepted',
+        });
+
+        const limit = parseInt(
+          deposit.roomId.roomTypeId?.peopleNumber || '0',
+          10
+        );
+
+        if (currentAcceptedCount >= limit) {
+          // Từ chối vì quá giới hạn
+          deposit.status = 'rejected';
+          deposit.rejectReason = 'Phòng ký túc xá đã đủ số lượng người.';
+          await deposit.save();
+
+          await sendEmail(
+            deposit.accountId.email,
+            'Yêu cầu đặt cọc đã bị từ chối ❌',
+            `
+          <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
+          <p>Rất tiếc! Phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã đủ số người đăng ký.</p>
+          <p>Khoản đặt cọc của bạn <strong>không được chấp nhận</strong>.</p>
+          <p>Vui lòng chọn phòng khác hoặc liên hệ chủ trọ để được hỗ trợ thêm.</p>
+          <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
+        `
+          );
+
+          return res.status(200).json({
+            message:
+              'Phòng đã đủ người, đơn đã bị từ chối và email đã được gửi.',
+            status: 'rejected',
+            depositId: deposit._id,
+          });
+        }
+      }
+
+      // Nếu không quá giới hạn → chấp nhận
+      deposit.status = 'accepted';
+      await deposit.save();
+
+      await sendEmail(
+        deposit.accountId.email,
+        'Đặt cọc phòng trọ đã được chấp nhận ✅',
+        `
+      <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
+      <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã được <span style="color:green;"><strong>chấp nhận</strong></span>.</p>
+      <ul>
+        <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
+        <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
+        <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format('DD/MM/YYYY')}</li>
+        <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format('DD/MM/YYYY')}</li>
+      </ul>
+      <p>Hãy liên hệ chủ nhà để hoàn tất thủ tục tiếp theo nhé!</p>
+      <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
+    `
+      );
+
+      // Nếu là mini_house hoặc nhà trọ truyền thống → từ chối đơn pending khác
+      if (
+        ['mini_house', 'nha_tro_truyen_thong'].includes(boardingHouseTypeCode)
+      ) {
+        const rejectedDeposits = await DepositRoom.find({
+          _id: { $ne: depositId },
+          roomId: deposit.roomId._id,
+          status: 'pending',
+        }).populate({ path: 'accountId', select: 'fullname email' });
+
+        for (const rejected of rejectedDeposits) {
+          rejected.status = 'rejected';
+          rejected.rejectReason = 'Phòng đã được đặt cọc bởi người khác.';
+          await rejected.save();
+
+          await sendEmail(
+            rejected.accountId.email,
+            'Yêu cầu đặt cọc đã bị từ chối ❌',
+            `
+          <p>Xin chào <strong>${rejected.accountId.fullname}</strong>,</p>
+          <p>Rất tiếc! Phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã được người khác đặt cọc trước.</p>
+          <p>Khoản đặt cọc của bạn <strong>không được chấp nhận</strong>.</p>
+          <p>Vui lòng chọn phòng khác hoặc liên hệ với chủ trọ để được hỗ trợ thêm.</p>
+          <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
+        `
+          );
+        }
+      }
 
       return res.status(200).json({
-        message: 'Đã chấp nhận khoản đặt cọc và gửi email thành công.',
+        message:
+          'Đã chấp nhận khoản đặt cọc và xử lý các đơn liên quan (nếu có).',
+        status: 'accepted',
         depositId: deposit._id,
       });
     } catch (error) {
       console.error('Error accepting deposit room:', error);
-      return res
-        .status(500)
-        .json({ error: 'Đã có lỗi xảy ra', detail: error.message });
+      return res.status(500).json({
+        error: 'Đã có lỗi xảy ra',
+        detail: error.message,
+      });
     }
   }
 
