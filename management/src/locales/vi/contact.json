@@ -1,0 +1,31 @@
+{
+  "title": "Liên hệ với chúng tôi",
+  "description": "Chúng tôi là nhóm 4 từ Đại học FPT Cần Thơ, sẵn sàng học hỏi và sáng tạo!",
+  "firstName": {
+    "label": "Họ và tên",
+    "placeholder": "Nhập họ và tên...",
+    "required": "Vui lòng nhập họ và tên!",
+    "minLength": "Phải có ít nhất 2 ký tự!",
+    "invalidFormat": "Không được chứa số hoặc ký tự đặc biệt!"
+  },
+  "email": {
+    "label": "Email",
+    "placeholder": "Nhập email...",
+    "required": "Vui lòng nhập một địa chỉ email hợp lệ!"
+  },
+  "phone": {
+    "label": "Số điện thoại",
+    "placeholder": "Nhập số điện thoại...",
+    "required": "Vui lòng nhập số điện thoại!",
+    "invalidFormat": "Phải gồm 10 chữ số!"
+  },
+  "message": {
+    "label": "Nội dung",
+    "placeholder": "Nhập câu hỏi của bạn...",
+    "required": "Nội dung không được để trống!"
+  },
+  "submit": "Gửi",
+  "sending": "Đang gửi...",
+  "success": "Gửi email thành công!",
+  "error": "Gửi email thất bại, vui lòng thử lại."
+}
