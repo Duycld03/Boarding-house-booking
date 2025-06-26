@@ -7,6 +7,7 @@ import { changePassword } from "../../../api/accountAPI";
 import { Back } from "../../../component";
 import { useTheme } from "../../../context/themeContext";
 import { useTranslation } from "react-i18next";
+import styles from "./ChangePassword.module.css";
 
 function ChangePassword() {
   const [form] = Form.useForm();
@@ -98,6 +99,12 @@ function ChangePassword() {
               size="large"
               placeholder={t("changePassword.oldPassword.placeholder")}
               autoComplete="old-password"
+              style={
+                darkMode
+                  ? { backgroundColor: "#111827", border: "#111827" }
+                  : {}
+              }
+              className={darkMode ? styles.darkPasswordInput : ""}
             />
           </Form.Item>
           <Form.Item
@@ -122,6 +129,12 @@ function ChangePassword() {
               size="large"
               placeholder={t("changePassword.newPassword.placeholder")}
               autoComplete="new-password"
+              style={
+                darkMode
+                  ? { backgroundColor: "#111827", border: "#111827" }
+                  : {}
+              }
+              className={darkMode ? styles.darkPasswordInput : ""}
             />
           </Form.Item>
           <Form.Item
@@ -157,6 +170,12 @@ function ChangePassword() {
               size="large"
               placeholder={t("changePassword.confirmPassword.placeholder")}
               autoComplete="new-password"
+              style={
+                darkMode
+                  ? { backgroundColor: "#111827", border: "#111827" }
+                  : {}
+              }
+              className={darkMode ? styles.darkPasswordInput : ""}
             />
           </Form.Item>
 
