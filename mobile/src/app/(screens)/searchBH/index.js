@@ -26,10 +26,12 @@ function SearchScreen() {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
   const limit = 6;
 
   const fetchSearchResults = async (term, currentPage = 1) => {
+    if (currentPage === 1) setInitialLoading(true);
     setLoading(true);
     try {
       const res = await searchBoardingHouses(
@@ -41,7 +43,7 @@ function SearchScreen() {
         res?.data?.map((item) => ({
           id: item._id,
           name: item.name,
-          price: formatAmount(item.priceRange),
+          price: item.priceRange,
           detail: item.address?.province,
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0,
@@ -65,6 +67,7 @@ function SearchScreen() {
       setTotalItems(0);
     } finally {
       setLoading(false);
+      if (currentPage === 1) setInitialLoading(false);
     }
   };
 
@@ -85,62 +88,66 @@ function SearchScreen() {
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
-      <BackHeader title={t('search', 'Tìm kiếm')} />
+      {initialLoading ? (
+        <Loader overlay />
+      ) : (
+        <>
+          <BackHeader title={t('search', 'Tìm kiếm')} />
+          <View style={styles.searchContainer}>
+            <View
+              style={[
+                styles.searchBar,
+                { backgroundColor: isDarkMode ? '#374151' : '#ffffff' },
+              ]}
+            >
+              <Ionicons
+                name="search-outline"
+                size={20}
+                color={isDarkMode ? '#9ca3af' : '#6b7280'}
+              />
+              <TextInput
+                value={searchTerm}
+                onChangeText={setSearchTerm}
+                placeholder={t('searchPlaceholder', 'Tìm kiếm nhà trọ...')}
+                placeholderTextColor={isDarkMode ? '#9ca3af' : '#6b7280'}
+                style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
+              />
+              <TouchableOpacity onPress={() => router.push('/explore')}>
+                <Ionicons
+                  name="filter-outline"
+                  size={20}
+                  color={isDarkMode ? '#9ca3af' : '#6b7280'}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      <View style={styles.searchContainer}>
-        <View
-          style={[
-            styles.searchBar,
-            { backgroundColor: isDarkMode ? '#374151' : '#ffffff' },
-          ]}
-        >
-          <Ionicons
-            name="search-outline"
-            size={20}
-            color={isDarkMode ? '#9ca3af' : '#6b7280'}
-          />
-          <TextInput
-            value={searchTerm}
-            onChangeText={setSearchTerm}
-            placeholder={t('searchPlaceholder', 'Tìm kiếm nhà trọ...')}
-            placeholderTextColor={isDarkMode ? '#9ca3af' : '#6b7280'}
-            style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
-          />
-          <TouchableOpacity onPress={() => router.push('/explore')}>
-            <Ionicons
-              name="filter-outline"
-              size={20}
-              color={isDarkMode ? '#9ca3af' : '#6b7280'}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={{ flex: 1, paddingHorizontal: 16 }}>
-        {data.length === 0 && !loading ? (
-          <EmptyState
-            title={t('noResult', 'Không tìm thấy')}
-            message={t(
-              'noResultDesc',
-              'Không có nhà trọ nào phù hợp với tìm kiếm của bạn.'
+          <View style={{ flex: 1, paddingHorizontal: 16 }}>
+            {data.length === 0 && !loading ? (
+              <EmptyState
+                title={t('noResult', 'Không tìm thấy')}
+                message={t(
+                  'noResultDesc',
+                  'Không có nhà trọ nào phù hợp với tìm kiếm của bạn.'
+                )}
+              />
+            ) : (
+              <>
+                <VerticalList data={data} loading={loading} />
+                <LoadMoreButton
+                  hasMore={hasMore}
+                  isLoading={loading}
+                  onLoadMore={handleLoadMore}
+                  currentCount={data.length}
+                  totalCount={totalItems}
+                  itemsPerPage={limit}
+                  itemName="boarding houses"
+                />
+              </>
             )}
-          />
-        ) : (
-          <>
-            <VerticalList data={data} loading={loading} />
-            <LoadMoreButton
-              hasMore={hasMore}
-              isLoading={loading}
-              onLoadMore={handleLoadMore}
-              currentCount={data.length}
-              totalCount={totalItems}
-              itemsPerPage={limit}
-              itemName="boarding houses"
-            />
-          </>
-        )}
-        {loading && data.length === 0 && <Loader overlay />}
-      </View>
+          </View>
+        </>
+      )}
     </ScreenContainer>
   );
 }
