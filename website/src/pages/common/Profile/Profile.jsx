@@ -170,7 +170,6 @@ function Profile() {
     border: darkMode ? "1px solid #333" : "1px solid #eaeaea",
     transition: "all 0.3s ease",
   };
-  console.log("Translated title:", t("title"));
 
   return (
     <div
@@ -193,21 +192,22 @@ function Profile() {
                   <Upload
                     name="avatar"
                     listType="picture-circle"
-                    className="avatar-uploader mb-4"
+                    className="avatar-uploader mb-6"
                     showUploadList={false}
-                    onChange={handleAvatarChange}
                     customRequest={handleUpload}
                     beforeUpload={beforeUpload}
+                    onChange={handleAvatarChange}
+                    style={{ width: 135 }}
                   >
                     {imageUrl ? (
-                      <div className="relative group">
+                      <div className="relative aspect-square w-70 rounded-full overflow-hidden">
                         <img
                           src={imageUrl}
                           alt="avatar"
-                          className="w-28 h-28 rounded-full object-cover"
+                          className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <EditOutlined className="text-white text-lg" />
+                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                          <EditOutlined className="text-white text-4xl" />
                         </div>
                       </div>
                     ) : (
@@ -224,30 +224,6 @@ function Profile() {
                       @{username}
                     </span>
                   </Title>
-                  {isOwner && (
-                    <div
-                      className={`mt-4 p-4 rounded-lg text-center ${
-                        darkMode ? "bg-gray-800" : "bg-gray-50"
-                      }`}
-                    >
-                      <Text
-                        strong
-                        className={darkMode ? "text-gray-300" : "text-gray-600"}
-                      >
-                        {t("accountBalance.label")}
-                      </Text>
-                      <div
-                        className={`text-xl font-bold mt-2 ${
-                          darkMode ? "text-green-400" : "text-green-600"
-                        }`}
-                      >
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(accountBalance)}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </Card>
             </div>

@@ -82,7 +82,7 @@
     "availableRooms": "Available Rooms",
     "name": "Name",
     "address": "Address",
-    "priceRange": "Price Range (VND)",
+    "priceRange": "Price Range",
     "boardingHouseType": "Boarding House Type",
     "primaryImage": "Primary Image",
     "otherImages": "Other Images",
@@ -105,9 +105,9 @@
       "boardingHouseType": "Boarding House Type",
       "manager": "Staff",
       "description": "Description",
-      "priceRange": "Price Rent/month (VND)",
-      "electricityPrice": "Electricity Price/kWh (VND)",
-      "waterPrice": "Water Price/m³ (VND)",
+      "priceRange": "Price Rent/month",
+      "electricityPrice": "Electricity Price/kWh",
+      "waterPrice": "Water Price/m³",
       "primaryImage": "Primary Image",
       "otherImages": "Other Images",
       "province": "Province",
@@ -117,8 +117,7 @@
       "addImage": "Add Primary Image",
       "addOtherImages": "Add Other Image",
       "dragDropOrClick": "Drag-drop or click here to choose a file",
-          "details": "Details"
-
+      "details": "Details"
     },
     "placeholders": {
       "selectProvince": "Select Province",
@@ -154,5 +153,310 @@
     "Nhà trọ truyền thống": "Traditional Boarding House",
     "Mini house": "Mini Apartment",
     "Nhà trọ kiến trúc xá": "Dormitory"
+  },
+  "roomManagement": {
+    "updateRoom": {
+      "backToRoomManagement": "Back to Room Management",
+      "updateRoom": "Update Room",
+      "deleteRoom": "Delete Room",
+      "roomType": "Room Type",
+      "roomNumber": "Room Number",
+      "description": "Description",
+      "pleaseUploadImage": "Please upload an image for the room",
+      "pleaseSelectRoomType": "Please select a room type",
+      "pleaseEnterRoomNumber": "Please enter room number",
+      "pleaseEnterRoomDescription": "Please enter room description",
+      "selectRoomType": "Select room type",
+      "enterRoomNumber": "Enter room number",
+      "enterDetailedRoomDescription": "Enter detailed room description",
+      "clickToUploadImage": "Click to upload room image",
+      "imageFileFormat": "Support JPG, PNG, JPEG formats",
+      "noRoomTypeFound": "No room types found. Please create room types first.",
+      "errorFetchingRoomTypes": "Error occurred while fetching room types",
+      "roomUpdatedSuccessfully": "Room updated successfully",
+      "roomDeletedSuccessfully": "Room deleted successfully",
+      "confirmDeleteRoom": "Are you sure you want to delete this room?",
+      "deleteRoomWarning": "This action cannot be undone",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "uploading": "Uploading...",
+      "uploadFailed": "Upload failed",
+      "invalidFileType": "Invalid file type. Please select JPG, PNG or JPEG file",
+      "fileSizeTooLarge": "File size too large. Maximum size is 5MB",
+      "required": "This field is required",
+      "roomNumberExists": "Room number already exists",
+      "processingRequest": "Processing request...",
+      "updateFailed": "Update failed",
+      "deleteFailed": "Delete failed",
+      "networkError": "Network error. Please try again"
+    },
+    "table": {
+      "title": "Room Management",
+      "image": "Image",
+      "roomImageAlt": "Room Image",
+      "roomNumber": "Room Number",
+      "tenants": "Tenants",
+      "availability": "Availability",
+      "roomType": "Room Type",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "status": {
+      "available": "Available",
+      "occupied": "Occupied"
+    },
+    "actions": {
+      "delete": "Delete",
+      "update": "Update"
+    },
+    "messages": {
+      "deleteFailed": "Delete failed",
+      "updateSuccess": "Room updated successfully"
+    },
+    "modal": {
+      "confirmDelete": {
+        "title": "Confirm Deletion",
+        "content": "Are you sure you want to delete this room?"
+      }
+    },
+    "addRoom": {
+      "button": {
+        "addRoom": "Add Room"
+      },
+      "modal": {
+        "title": "Add New Room",
+        "okText": "Add Room"
+      },
+      "form": {
+        "roomType": {
+          "label": "Room Type",
+          "placeholder": "Select room type",
+          "required": "Please select room type!"
+        },
+        "roomNumber": {
+          "label": "Room Number",
+          "placeholder": "Enter room number (e.g: A101, B02)",
+          "required": "Please enter room number!"
+        },
+        "description": {
+          "label": "Room Description",
+          "placeholder": "Enter detailed room description, amenities, and features...",
+          "required": "Please enter room description!"
+        },
+        "image": {
+          "label": "Room Image",
+          "uploadText": "Upload Image",
+          "uploadHint": "Click or drag image to upload",
+          "supportedFormats": "Support: JPG, PNG, WEBP (Max: 5MB)",
+          "extra": "Upload a clear photo of the room to attract tenants"
+        }
+      },
+      "validation": {
+        "imageRequired": "Please upload a room image",
+        "invalidImageType": "Please upload a valid image file",
+        "imageSizeLimit": "Image size must be less than 5MB"
+      },
+      "noRoomType": {
+        "title": "No Room Type Found",
+        "content": "Please add room types before creating rooms. Go to Room Type Management to add room types first."
+      }
+    },
+    "common": {
+      "ok": "OK",
+      "cancel": "Cancel"
+    }
+  },
+  "roomAdditionFee": {
+    "title": "Room Addition Fee Management",
+    "addFee": "Add Fee",
+    "editFee": "Edit Fee",
+    "deleteFee": "Delete Fee",
+    "viewFees": "View Fees",
+    "feeList": "Fee List",
+    "feeDetails": "Fee Details",
+    "feeHistory": "Fee History",
+    "monthlyFees": "Monthly Fees",
+    "search": "Search fees...",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh",
+    "feeType": {
+      "electricity": "Electricity",
+      "water": "Water",
+      "internet": "Internet",
+      "cleaning": "Cleaning",
+      "maintenance": "Maintenance",
+      "parking": "Parking",
+      "security": "Security",
+      "garbage": "Garbage Collection",
+      "other": "Other"
+    },
+
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+
+    "category": {
+      "utility": "Utility",
+      "service": "Service",
+      "maintenance": "Maintenance",
+      "security": "Security",
+      "amenity": "Amenity",
+      "penalty": "Penalty",
+      "deposit": "Deposit",
+      "other": "Other"
+    },
+
+    "table": {
+      "columns": {
+        "feeName": "Fee Name",
+        "feeAmount": "Amount",
+        "feeType": "Type",
+        "roomNumber": "Room",
+        "tenant": "Tenant",
+        "month": "Month",
+        "year": "Year",
+        "status": "Status",
+        "paymentStatus": "Payment",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "actions": "Actions"
+      },
+      "noData": "No fees found",
+      "loading": "Loading fees...",
+      "totalItems": "Total: {{count}} items",
+      "selectedItems": "{{count}} items selected"
+    },
+
+    "actions": {
+      "add": "Add New Fee",
+      "edit": "Edit",
+      "delete": "Delete",
+      "view": "View",
+      "duplicate": "Duplicate",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "markAsPaid": "Mark as Paid",
+      "markAsUnpaid": "Mark as Unpaid",
+      "sendReminder": "Send Reminder",
+      "printReceipt": "Print Receipt",
+      "downloadPDF": "Download PDF"
+    },
+
+    "messages": {
+      "noData": "No fees available",
+      "success": {
+        "feeAdded": "Fee added successfully",
+        "feeUpdated": "Fee updated successfully",
+        "feeDeleted": "Fee deleted successfully",
+        "statusUpdated": "Status updated successfully",
+        "paymentStatusUpdated": "Payment status updated successfully",
+        "reminderSent": "Reminder sent successfully",
+        "dataExported": "Data exported successfully",
+        "dataImported": "Data imported successfully"
+      },
+      "error": {
+        "fetchFees": "Error fetching fees",
+        "addFee": "Error adding fee",
+        "updateFee": "Error updating fee",
+        "deleteFee": "Error deleting fee",
+        "exportData": "Error exporting data",
+        "importData": "Error importing data",
+        "sendReminder": "Error sending reminder",
+        "invalidData": "Invalid data format",
+        "networkError": "Network error occurred"
+      },
+      "warning": {
+        "unsavedChanges": "You have unsaved changes",
+        "deleteConfirmation": "Are you sure you want to delete this fee?",
+        "bulkDeleteConfirmation": "Are you sure you want to delete {{count}} fees?",
+        "statusChangeConfirmation": "Are you sure you want to change the status?"
+      },
+      "info": {
+        "noFeesSelected": "No fees selected",
+        "processingRequest": "Processing your request...",
+        "dataUpToDate": "Data is up to date",
+        "filterApplied": "Filter applied"
+      },
+      "confirm": {
+        "deleteFee": "Are you sure you want to delete this fee?"
+      }
+    },
+    "updateFee": {
+      "title": "Update Fee",
+      "description": "Update fee information below",
+      "successMessage": "Fee updated successfully",
+      "errorMessage": "Error updating fee"
+    },
+
+    "summary": {
+      "totalFees": "Total Fees",
+      "paidAmount": "Paid Amount",
+      "unpaidAmount": "Unpaid Amount",
+      "overdueAmount": "Overdue Amount",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "yearToDate": "Year to Date"
+    },
+
+    "filters": {
+      "all": "All",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "thisYear": "This Year",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "overdue": "Overdue",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "buttons": {
+      "addFee": "Add Fee",
+      "add": "Add",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "modal": {
+      "addFee": {
+        "title": "Add New Fee",
+        "description": "Please fill in the fee information below"
+      },
+      "editFee": {
+        "title": "Edit Fee",
+        "description": "Update fee information"
+      }
+    },
+    "form": {
+      "feeName": "Fee Name",
+      "feeAmount": "Fee Amount",
+      "monthYear": "Month and Year",
+      "month": "Month"
+    },
+    "placeholder": {
+      "feeName": "Enter fee name (e.g., Parking fee, Cleaning fee...)",
+      "feeAmount": "Enter fee amount",
+      "selectMonth": "Select month",
+      "monthYear": "Select year"
+    },
+    "validation": {
+      "feeName": {
+        "required": "Fee name is required",
+        "minLength": "Fee name must be at least 2 characters",
+        "maxLength": "Fee name cannot exceed 100 characters",
+        "pattern": "Fee name contains invalid characters"
+      },
+      "feeAmount": {
+        "required": "Fee amount is required",
+        "min": "Fee amount must be greater than or equal to 0",
+        "max": "Fee amount cannot exceed 999,999,999 VND"
+      },
+      "monthYear": {
+        "required": "Month/Year is required"
+      }
+    }
   }
 }

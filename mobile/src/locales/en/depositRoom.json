@@ -1,0 +1,18 @@
+{
+  "title": "Room Deposit",
+  "selectRoom": "Select Room",
+  "selectRoomRequired": "Please select a room",
+  "rentalDate": "Rental Period",
+  "rentalTime": "Rental Duration",
+  "enterRentalTime": "Enter duration",
+  "rentalTimeMin": "Rental duration must be greater than 0",
+  "month": "Month",
+  "year": "Year",
+  "okText": "Deposit Now",
+  "cancelText": "Cancel",
+  "pricePerMonth": "/ month",
+  "loading": "Loading...",
+  "successMessage": "Room deposit successful!",
+  "fetchRoomsError": "Failed to load available rooms",
+  "noRoomsAvailable": "No rooms available"
+}

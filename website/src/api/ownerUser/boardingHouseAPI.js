@@ -37,11 +37,11 @@ export const addRoom = async (data) => {
 };
 
 export const deleteRoom = async (id) => {
-  return axios.delete(`/owner/room/boarding-house/${id}`);
+  return axios.delete(`/staff/room/boarding-house/${id}`);
 };
 
 export const updateRoom = async (roomId, data) => {
-  return axios.put(`/owner/room/boarding-house/${roomId}`, data, {
+  return axios.put(`/staff/room/boarding-house/${roomId}`, data, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

@@ -1,6 +1,10 @@
-import axios from "../axios.config";
+import axios from '../axios.config';
 
-export const getMyReport = async () => {
-    const response = await axios.get("/auth/reports");
-    return response.data;
-}
+export const getMyReport = (filterValue = {}, paginationOptions = {}) => {
+  const params = {
+    ...filterValue,
+    ...paginationOptions,
+  };
+
+  return axios.get(`/auth/reports`, { params });
+};

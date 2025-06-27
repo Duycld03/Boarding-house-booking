@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
 import Room from "../models/room.js";
 import PaymentBill from "../models/paymentBill.js";
+import paginate from "../utils/pagination.js";
 
 
 class RoomController {
@@ -98,21 +99,37 @@ class RoomController {
     try {
       const { boardingHouseId } = req.params;
 
-      if (!boardingHouseId) {
-        return res.status(400).json({ message: "Missing required parameters" });
-      }
 
-      const rooms = await Room.find({
-        boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId),
-      })
-        .populate("roomTypeId")
-        .populate("rentBy")
-        .sort({ createdAt: -1 });
+      const filter = {
+        boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId)
+      };
 
-      res.status(200).json(rooms);
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter,
+        populate: [
+          { path: 'roomTypeId' },
+          { path: 'rentBy' }
+        ],
+        includeTotalData: true
+      };
+
+      // Gọi helper paginate
+      const result = await paginate(Room, paginationOptions, req);
+
+      return res.status(200).json(result);
+
     } catch (error) {
       console.error("Error fetching rooms:", error);
-      res.status(500).json({ message: "Server error", error });
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message
+      });
     }
   }
 

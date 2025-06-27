@@ -50,7 +50,7 @@ export default function Layout() {
   useEffect(() => {
     if (fontsLoaded && appReady) {
       if (!segments || segments.length === 0) {
-        router.replace('/(tabs)/home');
+        router.replace('/(tabs)/home'); // Chuyển hướng đến trang mặc định nếu không có segments
       }
     }
   }, [fontsLoaded, appReady, segments]);

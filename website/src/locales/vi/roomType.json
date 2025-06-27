@@ -1,0 +1,66 @@
+{
+  "button": {
+    "addRoomType": "Thêm loại phòng",
+    "cancel": "Hủy",
+    "submit": "Tạo",
+    "update": "Cập nhật",
+    "delete": "Xóa",
+    "action": "Hành động"
+  },
+  "modal": {
+    "title": "Tạo loại phòng",
+    "updateTitle": "Cập nhật loại phòng",
+    "confirmDeleteTitle": "Xác nhận xóa",
+    "confirmDeleteContent": "Bạn có chắc muốn xóa loại phòng này?"
+  },
+  "form": {
+    "typeName": {
+      "label": "Tên loại phòng",
+      "placeholder": "Nhập tên loại phòng",
+      "error": "Tên loại phòng không được để trống."
+    },
+    "facilities": {
+      "label": "Tiện ích",
+      "placeholder": "Không có tiện ích",
+      "placeholder2": "Chọn tiện ích"
+    },
+    "roomSize": {
+      "label": "Kích thước phòng",
+      "placeholder": "Nhập kích thước phòng ví dụ 30x50",
+      "error": "Kích thước phải theo định dạng 20x30 hoặc 30x40."
+    },
+    "price": {
+      "label": "Giá thuê/tháng",
+      "placeholder": "Nhập giá thuê/tháng",
+      "error": "Vui lòng nhập số hợp lệ cho giá thuê/tháng!"
+    },
+    "peopleNumber": {
+      "label": "Số người",
+      "placeholder": "Nhập số người",
+      "error": "Số người phải ít nhất là 1."
+    },
+    "image": {
+      "label": "Ảnh phòng",
+      "error": "Bạn cần tải lên một ảnh."
+    }
+  },
+"toast": {
+  "addSuccess": "Thêm loại phòng thành công!",
+  "updateSuccess": "Cập nhật loại phòng thành công!",
+  "deleteSuccess": "Xóa loại phòng thành công!",
+  "error": "Gửi dữ liệu thất bại.",
+  "fetchFacilitiesError": "Lấy danh sách tiện ích thất bại."
+}
+,
+  "facilityNames": {
+    "Swimming Pool": "Hồ bơi",
+    "Gym": "Phòng gym",
+    "Laundry Room": "Phòng giặt",
+    "Parking Lot": "Bãi đậu xe",
+    "Tennis Court": "Sân tennis"
+  },
+  "messages": {
+    "noData": "Không có dữ liệu"
+  },
+  "tableName": "Danh sách loại phòng"
+}

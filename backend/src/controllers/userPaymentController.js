@@ -1,29 +1,42 @@
 import UserPayment from '../models/userPayment.js';
+import paginate from '../utils/pagination.js';
 
 class UserPaymentController {
     async getUserPaymentByUserId(req, res) {
         try {
             const userId = req.user.userId;
-
-            const userPayment = await UserPayment.find({ accountId: userId })
-                .populate('accountId')
-                .populate({
-                    path: 'paymentBillId',
-                    populate: {
-                        path: 'roomId',
-                        populate: { path: 'boardingHouseId' }
+            const paginationOptions = {
+                defaultPage: 1,
+                defaultLimit: 10,
+                filter: { accountId: userId },
+                sortField: 'createdAt',
+                populate: [
+                    'accountId',
+                    {
+                        path: 'paymentBillId',
+                        populate: {
+                            path: 'roomId',
+                            populate: { path: 'boardingHouseId' }
+                        }
                     }
-                })
-                .sort({ createdAt: 'desc' });
+                ],
+                allowQueryFilters: [
+                    'status',
+                    'paymentMethod',
+                    'amount'
+                ]
+            };
 
-            if (!userPayment || userPayment.length === 0) {
-                return res.status(404).json({ message: 'No user payment found' });
-            }
+            const result = await paginate(UserPayment, paginationOptions, req);
 
-            return res.json(userPayment);
+            return res.json(result);
+
         } catch (error) {
             console.error("Error fetching user payments:", error);
-            return res.status(500).json({ message: "Internal server error" });
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error"
+            });
         }
     }
 

@@ -16,7 +16,9 @@
   },
   "buttons": {
     "delete": "Xóa",
-    "replay": "Phản hồi"
+    "replay": "Phản hồi",
+    "detail": "Chi tiết",
+    "close":"Đóng"
   },
   "modals": {
     "deleteTitle": "Xác nhận xóa",
@@ -29,7 +31,9 @@
     "status": "Trạng thái",
     "details": "Chi tiết",
     "submit": "Gửi",
-    "cancel": "Hủy"
+    "cancel": "Hủy",
+    "close": "Đóng"
+
   },
   "filter": {
     "filterButton": "Lọc",
@@ -70,5 +74,25 @@
     "violationOfPrivacy": "Vi phạm quyền riêng tư",
     "unfriendlyLandlord": "Chủ nhà không thân thiện",
     "poorSecurity": "An ninh kém"
+  },
+  "detail": {
+    "title": "Chi tiết báo cáo nhà trọ",
+    "boardingInfo": "Thông tin nhà trọ",
+    "reviewInfo": "Thông tin đánh giá",
+    "name": "Tên",
+    "rating": "Đánh giá",
+    "type": "Loại nhà trọ",
+    "images": "Hình ảnh nhà trọ",
+    "noImages": "Không có hình ảnh",
+    "noContent": "Không có nội dung",
+    "reportInfo": "Thông tin báo cáo",
+    "reportedAt": "Ngày báo cáo",
+    "reportImages": "Hình ảnh báo cáo",
+    "unknown": "Không xác định"
+  },
+  "myReport": {
+    "status": "Trạng thái",
+    "reason": "Lý do",
+    "details": "Chi tiết"
   }
 }

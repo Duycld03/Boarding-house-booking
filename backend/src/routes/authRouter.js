@@ -101,12 +101,17 @@ authRouter.get(
   "/deposited-room/:depositRoomId",
   depositController.getDepositRoom
 );
+
+
+//payment
 authRouter.post("/pay-rent", depositController.payRent);
 authRouter.get(
   "/pay-rent/:depositRoomId",
   depositController.checkPayRentStatus
 );
 authRouter.post("/pay-deposit", depositController.payDeposit);
+authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
+
 
 // refund request
 authRouter.get("/refund-requests", refundRequestController.getRefundRequests);
@@ -115,8 +120,6 @@ authRouter.post(
   refundRequestController.createRefundRequest
 );
 
-// userPayment
-authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
 
 //renewal
 authRouter.get("/renewal", renewalController.getExtensionRequests);

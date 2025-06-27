@@ -1,156 +1,181 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { Modal, Image, Avatar, Button, Tag, Rate } from "antd";
-import convertTimetap from "../../../../utils/convertTimetap";
-import DefaultAccount from "@/assets/images/none_avatar.png";
+import React, { useEffect, useState } from 'react';
+import { Modal, Image, Avatar, Tag, Rate, Card } from 'antd';
+import convertTimetap from '@/utils/convertTimetap';
+import { useTheme } from '@/context/themeContext';
+import { useTranslation } from 'react-i18next';
+import DefaultAccount from '@/assets/images/none_avatar.png';
 
 const DetailReportModal = ({ isOpen, onClose, reportData }) => {
   const [currentReport, setCurrentReport] = useState(null);
+  const { darkMode } = useTheme();
+  const { t } = useTranslation('myreport');
+
   useEffect(() => {
     if (isOpen && reportData) {
-      setCurrentReport(reportData); // Chỉ cập nhật khi modal mở
+      setCurrentReport(reportData);
     }
   }, [isOpen, reportData]);
 
   if (!currentReport) return null;
 
-  if (!reportData) return null;
-
   const { reporter, target, reason, details, images, createdAt, status } =
-    reportData;
+    currentReport;
+
+  const cardClass = darkMode
+    ? 'bg-[#1f2937] text-white'
+    : 'bg-white text-black';
 
   return (
     <Modal
       key={reportData?._id}
-      title={
-        <h2 style={{ fontSize: "20px", fontWeight: "bold" }}>
-          {reportData?.reportType === "review"
-            ? "Review Report Detail"
-            : "Boarding House Report Detail"}
-        </h2>
-      }
       open={isOpen}
       onCancel={onClose}
       footer={null}
       destroyOnClose
+      title={<h2 className="text-2xl font-bold">{t('detail.title')}</h2>}
+      className={darkMode ? 'dark-modal' : ''}
+      bodyStyle={{ padding: 0 }}
     >
-      <div className="space-y-4">
-        {/* Phần 1: bị tố cáo */}
-        <div className="border-b pb-4">
-          <h2 className="text-2xl font-semibold">
-            {reportData?.reportType === "review"
-              ? "Review information"
-              : "Boarding house information"}
+      <div className="space-y-6 p-6">
+        {/* Section 1: Review / Boarding House Info */}
+        <Card bordered={false} className={`shadow-sm ${cardClass}`}>
+          <h2 className="text-xl font-semibold mb-2">
+            {reportData?.reportType === 'review'
+              ? t('detail.reviewInfo')
+              : t('detail.boardingInfo')}
           </h2>
+
           <div className="flex items-center gap-3">
-            {reportData?.reportType === "review" ? (
+            {reportData?.reportType === 'review' ? (
               <>
                 <Avatar
                   src={target?.accountId?.avatarImage?.url ?? DefaultAccount}
                   size={50}
                 />
-                <div>
-                  <p>{target?.accountId?.fullname || "Unknown"}</p>
-                </div>
+                <p>{target?.accountId?.fullname || t('detail.unknown')}</p>
               </>
             ) : (
               <p>
-                <strong>Name:</strong> {target?.name || "Unknown"}
+                <strong>{t('detail.name')}:</strong>{' '}
+                {target?.name || t('detail.unknown')}
               </p>
             )}
           </div>
+
           <p>
-            <strong>Rating:</strong>{" "}
+            <strong>{t('detail.rating')}:</strong>{' '}
             <Rate disabled defaultValue={Number(target?.rating)} />
           </p>
-          {reportData?.reportType === "review" ? (
+
+          {reportData?.reportType === 'review' ? (
             <p>
-              <strong>Content:</strong> {target?.content || "No content"}
+              <strong>{t('detail.content')}:</strong>{' '}
+              {target?.content || t('detail.noContent')}
             </p>
           ) : (
             <p>
-              <strong>Type:</strong>{" "}
-              {target?.boardingHouseType?.name || "Unknown"}
+              <strong>{t('detail.type')}:</strong>{' '}
+              {t(`boardingHouseTypes.${target?.boardingHouseType?.name}`, {
+                defaultValue:
+                  target?.boardingHouseType?.name || t('detail.unknown'),
+              })}
             </p>
           )}
-          <p>
-            <strong>Review Images:</strong>
-          </p>
-          <div className="grid grid-cols-3 gap-1.5">
-            {target?.images?.length > 0 ? (
+
+          <p className="font-bold">{t('detail.images')}:</p>
+          <div className="grid grid-cols-3">
+            {reportData?.reportType === 'review' &&
+            target?.images?.length > 0 ? (
               target.images.map((img, index) => (
                 <Image
                   key={index}
                   width={150}
                   height={150}
                   className="rounded-md transition-transform transform hover:scale-105"
-                  style={{ objectFit: "cover" }}
+                  style={{ objectFit: 'cover' }}
                   src={img.imageUrl}
                   alt={`Review Image ${index}`}
                 />
               ))
+            ) : reportData?.reportType === 'boardingHouse' &&
+              target?.images?.[0]?.imageUrl ? (
+              <Image
+                width={130}
+                height={130}
+                className="rounded-md transition-transform transform hover:scale-105 p-1"
+                style={{ objectFit: 'cover' }}
+                src={images?.[0]?.imageUrl}
+                alt="Boarding House Image"
+              />
             ) : (
-              <p>No images available</p>
+              <p>{t('detail.noImages')}</p>
             )}
           </div>
-        </div>
+        </Card>
 
-        {/* Phần 2: Đơn tố cáo */}
-        <div>
-          <h2 className="text-2xl font-semibold">Report Information</h2>
-          <div className="flex items-center gap-3">
+        {/* Section 2: Report Info */}
+        <Card bordered={false} className={`shadow-sm ${cardClass}`}>
+          <h2 className="text-xl font-semibold mb-2">
+            {t('detail.reportInfo')}
+          </h2>
+
+          <div className="flex items-center gap-3 mb-2">
             <Avatar
-              src={reporter.avatarImage?.url ?? DefaultAccount}
+              src={reporter?.avatarImage?.url ?? DefaultAccount}
               size={50}
             />
-            <div>
-              <p className="">{reporter.fullname || "Unknown"}</p>
-            </div>
+            <p>{reporter?.fullname || t('detail.unknown')}</p>
           </div>
+
           <p>
-            <strong>Reported At:</strong> {convertTimetap(createdAt)}
+            <strong>{t('detail.reportedAt')}:</strong>{' '}
+            {convertTimetap(createdAt)}
           </p>
+
           <p>
-            <strong>Status:</strong>{" "}
+            <strong>{t('myReport.status')}:</strong>{' '}
             <Tag
               color={
-                status === "pending"
-                  ? "orange"
-                  : status === "resolved"
-                  ? "green"
-                  : "red"
+                status === 'pending'
+                  ? 'orange'
+                  : status === 'resolved'
+                  ? 'green'
+                  : 'red'
               }
             >
-              {status}
+              {t(`status.${status}`)}
             </Tag>
           </p>
+
           <p>
-            <strong>Reason:</strong> {reason}
+            <strong>{t('myReport.reason')}:</strong>{' '}
+            {t(`reasons.${reason}`, { defaultValue: reason })}
           </p>
+
           <p>
-            <strong>Details:</strong> {details}
+            <strong>{t('myReport.details')}:</strong> {details}
           </p>
-          <p>
-            <strong>Report Images:</strong>
-          </p>
-          <div className="grid grid-cols-3 gap-1.5">
+
+          <p className="font-bold">{t('detail.reportImages')}:</p>
+          <div className="grid grid-cols-3">
             {images?.length > 0 ? (
               images.map((img, index) => (
-                <Image
-                  key={index}
-                  width={150}
-                  height={150}
-                  className="rounded-md transition-transform transform hover:scale-105"
-                  style={{ objectFit: "cover" }}
-                  src={img.imageUrl}
-                  alt={`Report Image ${index}`}
-                />
+                <div key={index} className="p-1">
+                  <Image
+                    width={130}
+                    height={130}
+                    className="rounded-md transition-transform transform hover:scale-105"
+                    style={{ objectFit: 'cover' }}
+                    src={img.imageUrl}
+                    alt={`Review Image ${index}`}
+                  />
+                </div>
               ))
             ) : (
-              <p>No images available</p>
+              <p>{t('detail.noImages')}</p>
             )}
           </div>
-        </div>
+        </Card>
       </div>
     </Modal>
   );

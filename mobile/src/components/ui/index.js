@@ -11,6 +11,7 @@ import Line from './Line';
 import Avatar from './Avatar';
 import LoadMoreButton from './LoadMoreButton';
 import ListCard from './ListCard';
+import EmptyState from './EmptyState';
 
 export {
   Button,
@@ -26,4 +27,5 @@ export {
   Avatar,
   LoadMoreButton,
   ListCard,
+  EmptyState
 };

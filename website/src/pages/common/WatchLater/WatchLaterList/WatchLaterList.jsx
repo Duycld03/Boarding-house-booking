@@ -50,11 +50,21 @@ const WatchLaterList = ({
     navigate(`/boarding-house/${id}`);
   };
 
+  // ✅ Lọc bỏ các item có boardingHouseType không hợp lệ
+  const filteredData = data.filter((item) => {
+    const house = item?.boardingHouseId || item;
+    const type =
+      typeof house?.boardingHouseType === 'object'
+        ? house?.boardingHouseType?.name
+        : house?.boardingHouseType;
+    return type && type !== 'undefined' && type !== 'Unknown';
+  });
+
   return (
     <>
       <List
         itemLayout="horizontal"
-        dataSource={data}
+        dataSource={filteredData}
         renderItem={(item, index) => {
           const house = item?.boardingHouseId || item;
           const navigateId = house?._id;
@@ -62,6 +72,11 @@ const WatchLaterList = ({
             mode === 'favorite'
               ? item?.boardingHouseId?._id
               : item?._id || item?.id;
+
+          const type =
+            typeof house?.boardingHouseType === 'object'
+              ? house?.boardingHouseType?.name
+              : house?.boardingHouseType;
 
           return (
             <Card
@@ -90,16 +105,7 @@ const WatchLaterList = ({
                   }
                   description={
                     <div className="flex flex-col justify-between text-black dark:text-gray-300">
-                      <p>
-                        {t(
-                          `boardingHouseTypes.${
-                            typeof house?.boardingHouseType === 'object'
-                              ? house?.boardingHouseType?.name
-                              : house?.boardingHouseType || 'Unknown'
-                          }`
-                        )}
-                      </p>
-
+                      <p>{t(`boardingHouseTypes.${type}`)}</p>
                       <Rate
                         disabled
                         defaultValue={Math.round(house?.rating || 0)}
