@@ -4,7 +4,7 @@ import googleAuth from "google-auth-library";
 import nodemailer from "nodemailer";
 import { generateToken, verifyToken } from "../utils/functions.js";
 
-import Account from "../models/account.js";
+import { Account } from "../models/account.js";
 dotenv.config();
 
 class AuthController {
@@ -77,7 +77,7 @@ class AuthController {
     }
   }
 
-  async register(req, res) {
+  async registerWithGoogle(req, res) {
     try {
       const user = new Account(req.body);
       user.password = await bcrypt.hash(user.password, 10);

@@ -1,0 +1,68 @@
+{
+  "button": {
+    "addRoomType": "Add Room Type",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "update": "Update",
+    "delete": "Delete",
+    "action": "Action"
+
+  },
+  "modal": {
+    "title": "Create Room Type",
+    "updateTitle": "Update Room Type",
+    "confirmDeleteTitle": "Confirm Deletion",
+    "confirmDeleteContent": "Do you want to delete this room type?"
+  },
+  "form": {
+    "typeName": {
+      "label": "Room Type Name",
+      "placeholder": "Enter room type name",
+      "error": "Type Name is required."
+    },
+    "facilities": {
+      "label": "Facilities",
+      "placeholder": "No facilities",
+      "placeholde2": "Select facilities"
+
+
+    },
+    "roomSize": {
+      "label": "Room Size",
+      "placeholder": "Enter room size eg 30x50",
+      "error": "Room size must be in format 20x30 or 30x40."
+    },
+    "price": {
+      "label": "Rent/month",
+      "placeholder": "Enter rent/month",
+      "error": "Please enter a valid number for rent/month!"
+    },
+    "peopleNumber": {
+      "label": "People Number",
+      "placeholder": "Enter number of people",
+      "error": "People number must be at least 1."
+    },
+    "image": {
+      "label": "Room Image",
+      "error": "You must upload an image."
+    }
+  },
+ "toast": {
+  "addSuccess": "Room type added successfully!",
+  "updateSuccess": "Room type updated successfully!",
+  "deleteSuccess": "Room type deleted successfully!",
+  "error": "Failed to submit form.",
+  "fetchFacilitiesError": "Failed to fetch facilities."
+},
+  "facilityNames": {
+    "Swimming Pool": "Swimming Pool",
+    "Gym": "Gym",
+    "Laundry Room": "Laundry Room",
+    "Parking Lot": "Parking Lot",
+    "Tennis Court": "Tennis Court"
+  },
+  "messages": {
+    "noData": "No data available"
+  },
+  "tableName": "Room Type List"
+}

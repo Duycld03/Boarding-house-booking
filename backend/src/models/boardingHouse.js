@@ -38,7 +38,7 @@ const BoardingHouseSchema = new mongoose.Schema(
       ref: 'Account',
       required: true,
     },
-    managerId: {
+    staffId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Account',
       default: null,

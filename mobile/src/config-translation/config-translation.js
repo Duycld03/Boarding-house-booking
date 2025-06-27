@@ -1,38 +1,49 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import "intl-pluralrules";
-import en_setting from "@/locales/en/setting.json";
-import vi_setting from "@/locales/vi/setting.json";
-import en_account from "@/locales/en/account.json";
-import vi_account from "@/locales/vi/account.json";
-import en_changePassword from "@/locales/en/changePassword.json";
-import vi_changePassword from "@/locales/vi/changePassword.json";
-import en_profile from "@/locales/en/profile.json";
-import vi_profile from "@/locales/vi/profile.json";
-import en_feedbackComponent from "@/locales/en/feedbackComponent.json";
-import vi_feedbackComponent from "@/locales/vi/feedbackComponent.json";
-import en_login from "@/locales/en/login.json";
-import vi_login from "@/locales/vi/login.json";
-import en_register from "@/locales/en/register.json";
-import vi_register from "@/locales/vi/register.json";
-import en_verifyRegister from "@/locales/en/verifyRegister.json";
-import vi_verifyRegister from "@/locales/vi/verifyRegister.json";
-import en_verifyChangeEmail from "@/locales/en/verifyChangeEmail.json";
-import vi_verifyChangeEmail from "@/locales/vi/verifyChangeEmail.json";
-import en_changeEmail from "@/locales/en/changeEmail.json";
-import vi_changeEmail from "@/locales/vi/changeEmail.json";
-import en_forgotPassword from "@/locales/en/forgotPassword.json";
-import vi_forgotPassword from "@/locales/vi/forgotPassword.json";
-import en_resetPassword from "@/locales/en/resetPassword.json";
-import vi_resetPassword from "@/locales/vi/resetPassword.json";
-import en_common from "@/locales/en/common.json";
-import vi_common from "@/locales/vi/common.json";
-import en_bhDetail from "@/locales/en/bhDetail.json";
-import vi_bhDetail from "@/locales/vi/bhDetail.json";
-import vi_myAppointment from '@/locales/vi/myAppointment.json'
-import en_myAppointment from '@/locales/en/myAppointment.json'
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import 'intl-pluralrules';
+import en_setting from '@/locales/en/setting.json';
+import vi_setting from '@/locales/vi/setting.json';
+import en_account from '@/locales/en/account.json';
+import vi_account from '@/locales/vi/account.json';
+import en_changePassword from '@/locales/en/changePassword.json';
+import vi_changePassword from '@/locales/vi/changePassword.json';
+import en_profile from '@/locales/en/profile.json';
+import vi_profile from '@/locales/vi/profile.json';
+import en_feedbackComponent from '@/locales/en/feedbackComponent.json';
+import vi_feedbackComponent from '@/locales/vi/feedbackComponent.json';
+import en_login from '@/locales/en/login.json';
+import vi_login from '@/locales/vi/login.json';
+import en_register from '@/locales/en/register.json';
+import vi_register from '@/locales/vi/register.json';
+import en_verifyRegister from '@/locales/en/verifyRegister.json';
+import vi_verifyRegister from '@/locales/vi/verifyRegister.json';
+import en_verifyChangeEmail from '@/locales/en/verifyChangeEmail.json';
+import vi_verifyChangeEmail from '@/locales/vi/verifyChangeEmail.json';
+import en_changeEmail from '@/locales/en/changeEmail.json';
+import vi_changeEmail from '@/locales/vi/changeEmail.json';
+import en_forgotPassword from '@/locales/en/forgotPassword.json';
+import vi_forgotPassword from '@/locales/vi/forgotPassword.json';
+import en_resetPassword from '@/locales/en/resetPassword.json';
+import vi_resetPassword from '@/locales/vi/resetPassword.json';
+import en_common from '@/locales/en/common.json';
+import vi_common from '@/locales/vi/common.json';
+import en_bhDetail from '@/locales/en/bhDetail.json';
+import vi_bhDetail from '@/locales/vi/bhDetail.json';
+import vi_myAppointment from '@/locales/vi/myAppointment.json';
+import en_myAppointment from '@/locales/en/myAppointment.json';
 import en_home from '@/locales/en/home.json';
 import vi_home from '@/locales/vi/home.json';
+import en_depositRoom from '@/locales/en/depositRoom.json';
+import vi_depositRoom from '@/locales/vi/depositRoom.json';
+import en_report from '@/locales/en/report.json';
+import vi_report from '@/locales/vi/report.json';
+import en_boardingHouseGallery from '@/locales/en/boardingHouseGallery.json';
+import vi_boardingHouseGallery from '@/locales/vi/boardingHouseGallery.json';
+import en_myreport from '@/locales/en/myreport.json';
+import vi_myreport from '@/locales/vi/myreport.json';
+import vi_myRentPayment from '@/locales/vi/myRentPayment.json';
+import en_myRentPayment from '@/locales/en/myRentPayment.json';
+
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -52,8 +63,12 @@ i18n.use(initReactI18next).init({
       home: en_home,
       common: en_common,
       boardingHouseDetail: en_bhDetail,
-      myAppointment: en_myAppointment
-
+      myAppointment: en_myAppointment,
+      depositRoom: en_depositRoom,
+      report: en_report,
+      boardingHouseGallery: en_boardingHouseGallery,
+      myreport: en_myreport,
+      myRentPayment: en_myRentPayment,
     },
     vi: {
       setting: vi_setting,
@@ -71,7 +86,12 @@ i18n.use(initReactI18next).init({
       home: vi_home,
       common: vi_common,
       boardingHouseDetail: vi_bhDetail,
-      myAppointment: vi_myAppointment
+      myAppointment: vi_myAppointment,
+      depositRoom: vi_depositRoom,
+      report: vi_report,
+      boardingHouseGallery: vi_boardingHouseGallery,
+      myreport: vi_myreport,
+      myRentPayment: vi_myRentPayment,
     },
   },
   lng: 'en',

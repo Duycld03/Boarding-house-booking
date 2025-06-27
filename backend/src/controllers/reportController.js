@@ -1,7 +1,7 @@
 import Report from '../models/report.js';
 import Review from '../models/review.js';
 import BoardingHouse from '../models/boardingHouse.js';
-import Account from '../models/account.js';
+import { Account } from '../models/account.js';
 import nodemailer from 'nodemailer';
 import { v2 as cloudinary } from 'cloudinary';
 import paginate from '../utils/pagination.js';
@@ -157,14 +157,15 @@ class reportController {
           subject: `Kết quả xử lý báo cáo: #${relatedReport._id}`,
           html: `
             <p>Kính gửi Anh/Chị ${relatedReport.reporter.fullname},</p>
-            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${relatedReport.reason || 'undefined'
+            <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${
+              relatedReport.reason || 'undefined'
             }"</strong> ${reportSubject} trên nền tảng của chúng tôi.</p>
             <p>Chúng tôi xin thông báo rằng báo cáo của bạn đã được xử lý với kết quả như sau:</p>
             <ul>
                 <li><strong>Trạng thái báo cáo:</strong> ${status}</li>
                 <li><strong>Ngày gửi báo cáo:</strong> ${new Date(
-              relatedReport.createdAt
-            ).toLocaleDateString()}</li>
+                  relatedReport.createdAt
+                ).toLocaleDateString()}</li>
                 <li><strong>Người xử lý:</strong> ${processedByName}</li>
                 <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
                 <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>
@@ -308,8 +309,8 @@ class reportController {
             model: 'BoardingHouse',
             options: { withDeleted: true },
           },
-          { path: 'reporter' }
-        ]
+          { path: 'reporter' },
+        ],
       };
 
       // Xử lý trường hợp tìm kiếm theo tên boardingHouse
@@ -352,9 +353,9 @@ class reportController {
             totalData: allResults.length,
             limit,
             hasNextPage: page < Math.ceil(filteredData.length / limit),
-            hasPrevPage: page > 1
+            hasPrevPage: page > 1,
           },
-          data: paginatedData
+          data: paginatedData,
         };
 
         res.status(200).json(result);
@@ -485,6 +486,32 @@ class reportController {
       return res.status(500).json({ message: error.message });
     }
   }
+
+  async checkBHReportExist(req, res) {
+    try {
+      const { boardingHouseId } = req.query;
+      const reporter = req.user.userId;
+
+      const existingReport = await Report.findOne({
+        reporter,
+        targetId: boardingHouseId,
+        status: 'pending',
+        reportType: 'boardingHouse',
+      });
+
+      if (existingReport) {
+        return res.status(200).json({
+          boardingHouseReported: true,
+        });
+      } else {
+        return res.status(200).json({ boardingHouseReported: false });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: error.message });
+    }
+  }
+
   async getReportReviewDetail(req, res) {
     try {
       const { reportId } = req.params;
@@ -502,17 +529,17 @@ class reportController {
 
       // Populate dựa trên loại report
       if (report.reportTypeRef === 'Review') {
-        populatedTarget = await Review.findOne(
-          { _id: report.targetId },
-          null,
-          { withDeleted: true } // Lấy cả review bị đánh dấu delete
-        ).populate({
+        populatedTarget = await Review.findOne({ _id: report.targetId }, null, {
+          withDeleted: true,
+        }).populate({
           path: 'accountId',
           select: 'fullname email avatarImage',
         });
       } else if (report.reportTypeRef === 'BoardingHouse') {
         populatedTarget = await BoardingHouse.findById(
-          report.targetId
+          report.targetId,
+          null,
+          { withDeleted: true } // 👈 để lấy cả bản ghi đã soft delete
         ).populate('boardingHouseType');
       }
 
@@ -527,25 +554,37 @@ class reportController {
 
   async getReportByUserId(req, res) {
     try {
-      const reports = await Report.find({
-        reporter: req.user.userId,
-        reportType: { $in: ['review', 'boardingHouse'] },
-      })
-        .sort({ createdAt: -1 })
-        .populate({
-          path: 'reporter',
-          select: 'fullname email',
-        })
-        .populate({
-          path: 'processedBy',
-          select: 'fullname',
-        })
-        .populate({
-          path: 'targetId',
-          select: 'content name',
-        });
+      const userId = req.user.userId;
 
-      const formattedReports = reports.map((report) => ({
+      // Cấu hình bộ lọc
+      const filter = {
+        reporter: userId,
+        reportType: { $in: ['review', 'boardingHouse'] },
+      };
+
+      // Cấu hình phân trang
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter,
+        fields: '', // hoặc có thể select cụ thể field bạn cần
+        allowSearchFields: [],
+        includeTotalData: true,
+        populate: [
+          { path: 'reporter', select: 'fullname email' },
+          { path: 'processedBy', select: 'fullname' },
+          { path: 'targetId', select: 'content name' },
+        ],
+      };
+
+      // Gọi hàm paginate
+      const result = await paginate(Report, paginationOptions, req);
+
+      // Format lại data
+      const formattedReports = result.data.map((report) => ({
         _id: report._id,
         reportType:
           report.reportType === 'review' ? 'Review' : 'Boarding House',
@@ -559,12 +598,23 @@ class reportController {
         createdAt: report.createdAt,
       }));
 
-      res.status(200).json({ success: true, data: formattedReports });
+      return res.status(200).json({
+        success: true,
+        data: formattedReports,
+        pagination: {
+          totalItems: result.pagination.totalItems,
+          currentPage: result.pagination.currentPage,
+          totalPages: result.pagination.totalPages,
+          pageSize: result.pagination.pageSize,
+        },
+      });
     } catch (error) {
       console.error('Error fetching reports:', error);
-      res
-        .status(500)
-        .json({ success: false, message: 'Lỗi khi lấy danh sách báo cáo.' });
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi khi lấy danh sách báo cáo.',
+        error: error.message,
+      });
     }
   }
 }

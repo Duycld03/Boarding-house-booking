@@ -19,7 +19,7 @@ import { getBhByArea } from '@/API/ownerUser/boardingHouse';
 import formatAmount from '@/utils/formatAmount';
 import { useTranslation } from 'react-i18next';
 import Loader from '@/components/ui/Loader';
-import { useCurrentUser } from '@/context/userContext'
+import { useCurrentUser } from '@/context/userContext';
 import { getUser } from '@/API/authAPI';
 
 const { width } = Dimensions.get('window');
@@ -55,7 +55,7 @@ function Home() {
             return {
               id: item._id?.$oid || item._id,
               name: item.name,
-              price: formatAmount(item.priceRange),
+              price: item.priceRange,
               detail: item.address?.province,
               rating: item.rating || 0,
               reviewCount: item.reviewCount || 0,
@@ -148,7 +148,11 @@ function Home() {
             </View>
           ) : (
             <TouchableOpacity style={styles.notificationButton}>
-              <Ionicons name="notifications-outline" size={24} color="#ffffff" />
+              <Ionicons
+                name="notifications-outline"
+                size={24}
+                color="#ffffff"
+              />
               <View style={styles.notificationBadge} />
             </TouchableOpacity>
           )}
@@ -188,8 +192,6 @@ function Home() {
       </TouchableOpacity>
     </View>
   );
-
-
 
   // Stats Cards Component
   const StatsCards = () => (

@@ -19,6 +19,7 @@ import userPaymentController from './userPaymentController.js';
 import refundRequestController from './refundRequestController.js'; // Fixed typo here
 import paymentBillController from './paymentBillController.js';
 import managerController from './managerController.js';
+import roomAdditionFeeController from './roomAdditionFeeController.js';
 
 export {
   authController,
@@ -42,4 +43,5 @@ export {
   refundRequestController,
   paymentBillController,
   managerController,
+  roomAdditionFeeController
 };

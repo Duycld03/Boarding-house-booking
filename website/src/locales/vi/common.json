@@ -20,5 +20,12 @@
     "ward": "Phường/Xã",
     "detail": "Địa chỉ chi tiết"
   },
-  "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}"
+  "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}",
+   "facilities": {
+    "swimming_pool": "Hồ bơi",
+    "gym": "Phòng tập thể hình",
+    "laundry_room": "Phòng giặt đồ",
+    "parking_lot": "Bãi đậu xe",
+    "tennis_court": "Sân tennis"
+  }
 }

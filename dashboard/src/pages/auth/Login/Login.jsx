@@ -17,14 +17,14 @@ function Login() {
 
   const { darkMode } = useTheme();
 
-  const { loginData } = useCurrentUser();
+  const { loginData, isLogin, user } = useCurrentUser();
 
   const onFinish = async (values) => {
     try {
       setLoading(true);
       const res = await login(values);
       const role = res.user.role;
-      loginData(res.user);
+      loginData(res.user, res.token);
 
       localStorage.setItem("access_token", res.token);
 
@@ -43,44 +43,11 @@ function Login() {
     }
   };
 
-  const loginWithGoogleHandler = async (response) => {
-    try {
-      const remember = form.getFieldValue("remember");
-      const data = { ...response, remember };
-      const res = await loginWithGoogle(data);
-
-      if (res.isRegistered) {
-        localStorage.setItem("access_token", res.token);
-
-        if (res.user.role === "admin") {
-          navigate("/dashboard/account-management");
-        } else if (location.key !== "default") {
-          navigate(-1);
-        } else {
-          navigate("/");
-        }
-
-        toast.success("Login successful");
-      } else {
-        navigate("/register-with-google", { state: { user: res.user } });
-      }
-    } catch (error) {
-      toast.error(error?.response?.data?.message);
-    }
-  };
-
   useEffect(() => {
-    checkUser();
-  }, []);
-
-  const checkUser = async () => {
-    try {
-      await getUser();
+    if (isLogin && user.role === "admin") {
       navigate("/dashboard/account-management");
-    } catch (error) {
-      // User is not logged in, do nothing
     }
-  };
+  }, []);
 
   // Dark mode styles for Card
   const cardStyle = {
@@ -218,17 +185,6 @@ function Login() {
               >
                 Login
               </Button>
-            </Form.Item>
-
-            <Form.Item>
-              <div className={darkMode ? styles.googleLoginDark : ""}>
-                <GoogleLogin
-                  onSuccess={loginWithGoogleHandler}
-                  onError={() => {
-                    console.log("error");
-                  }}
-                />
-              </div>
             </Form.Item>
           </Form>
         </div>

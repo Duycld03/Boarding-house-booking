@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Account from '../models/account.js';
+import { Account } from '../models/account.js';
 
 class ManagerController {
   // Function to get managers associated with a specific Owner (logged-in user)
@@ -18,7 +18,7 @@ class ManagerController {
 
       // Retrieve managers associated with this owner's userId
       const managers = await Account.find({
-        role: 'manager',
+        role: 'staff',
         createdBy: req.user.userId,
       })
         .select(

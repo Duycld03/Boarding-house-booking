@@ -10,25 +10,26 @@ import facilities from "../models/facilities.js";
 // import path from "path";
 import fs from 'fs';
 import multer from 'multer';
-import Account from '../models/account.js';
+import { Account } from '../models/account.js';
 import Review from '../models/review.js';
 import paginate from '../utils/pagination.js';
+
 
 class boardingHouseController {
   async getAllBHOnDashBoard(req, res, next) {
     try {
       const boardingHData = await BoardingHouse.find()
-        .populate('boardingHouseType')
+        .populate("boardingHouseType")
         .populate({
-          path: 'ownerId',
+          path: "ownerId",
         })
         .sort({ createdAt: -1 });
 
       return res.status(200).json(boardingHData);
     } catch (error) {
-      console.error('Error fetching boarding house data:', error);
+      console.error("Error fetching boarding house data:", error);
       return res.status(500).json({
-        message: 'Failed to fetch boarding house data. Please try again later.',
+        message: "Failed to fetch boarding house data. Please try again later.",
         error: error.message,
       });
     }
@@ -38,14 +39,14 @@ class boardingHouseController {
     try {
       const { id } = req.params;
       const boardingHouse = await BoardingHouse.findById(id)
-        .populate('boardingHouseType', 'name')
-        .populate('ownerId', 'email username fullname')
+        .populate("boardingHouseType", "name")
+        .populate("ownerId", "email username fullname")
         .exec();
 
       if (!boardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found',
+          message: "Boarding house not found",
         });
       }
       return res.status(200).json({
@@ -53,11 +54,11 @@ class boardingHouseController {
         data: boardingHouse,
       });
     } catch (error) {
-      console.error('Error fetching boarding house details:', error);
+      console.error("Error fetching boarding house details:", error);
       return res.status(500).json({
         success: false,
         message:
-          'Failed to fetch boarding house details. Please try again later.',
+          "Failed to fetch boarding house details. Please try again later.",
         error: error.message,
       });
     }
@@ -67,23 +68,23 @@ class boardingHouseController {
     try {
       const { id } = req.params;
       const boardingHouse = await BoardingHouse.findById(id)
-        .populate('boardingHouseType')
-        .populate('ownerId')
+        .populate("boardingHouseType")
+        .populate("ownerId")
         .exec();
 
       if (!boardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found',
+          message: "Boarding house not found",
         });
       }
       return res.status(200).json(boardingHouse);
     } catch (error) {
-      console.error('Error fetching boarding house details:', error);
+      console.error("Error fetching boarding house details:", error);
       return res.status(500).json({
         success: false,
         message:
-          'Failed to fetch boarding house details. Please try again later.',
+          "Failed to fetch boarding house details. Please try again later.",
         error: error.message,
       });
     }
@@ -91,145 +92,95 @@ class boardingHouseController {
 
   async updateBoardingHouseDetails(req, res, next) {
     try {
-      const { id } = req.params; // Boarding house ID
+      const { id } = req.params;
       const updateData = req.body;
+      console.log("mtiennnn", req.files)
+      let images = [];
+      let primaryImageCount = 0;
 
-      // Destructure data for validation
-      const {
-        name,
-        address,
-        priceRange,
-        electricityPrice,
-        waterPrice,
-      } = updateData;
-      // Validate name
-      if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Name is required and must not contain special characters.',
+      // Xử lý primary image mới
+      if (req.files?.primaryImage?.[0]) {
+        images.push({
+          imageUrl: req.files.primaryImage[0].path,
+          publicId: req.files.primaryImage[0].filename,
+          isPrimary: true
         });
+        primaryImageCount++;
+      } else if (req.body.existingPrimaryImage) {
+        const existingPrimary = JSON.parse(req.body.existingPrimaryImage);
+        images.push({ ...existingPrimary, isPrimary: true });
+        primaryImageCount++;
       }
 
-      // Check if the name already exists
-      const existingBoardingHouse = await BoardingHouse.findOne({
-        name,
-        _id: { $ne: id },
-      });
-      if (existingBoardingHouse) {
-        return res.status(400).json({
-          success: false,
-          message: 'A boarding house with this name already exists.',
-        });
-      }
-
-      // Validate address
-      if (!address || !address.province || !address.district || !address.ward) {
-        return res.status(400).json({
-          success: false,
-          message:
-            'Province, district, and ward are required fields in the address.',
-        });
-      }
-
-      // Fetch existing boarding house data
-      const boardingHouse = await BoardingHouse.findById(id);
-      if (!boardingHouse) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Boarding house not found." });
-      }
-
-      // Handle image upload to Cloudinary
-      const images = [];
-      let hasPrimary = false;
-      if (req.body.boardingHouse) {
-        const data = JSON.parse(req.body.boardingHouse);
-
-        for (const img of data) {
-          if (img.isPrimary) hasPrimary = true;
-        }
-
-        if (Array.isArray(data)) {
-          images.push(...data);
-        }
-      }
-      if (req.files) {
-        req.files.forEach((file, index) => {
+      // Xử lý other images mới
+      if (req.files?.otherImages?.length) {
+        req.files.otherImages.forEach(file => {
           images.push({
             imageUrl: file.path,
             publicId: file.filename,
-            isPrimary: !hasPrimary && index === 0,
+            isPrimary: false
           });
         });
-        // Delete old images from Cloudinary
-        for (const oldImage of boardingHouse.images) {
-          await cloudinary.uploader.destroy(oldImage.publicId);
-        }
-
-        updateData.images = images;
       }
 
-
-      // // Validate images
-      // const primaryImageCount =
-      //   images?.filter((img) => img.isPrimary).length || 0;
-      // if (primaryImageCount !== 1) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: "You must upload exactly one primary image.",
-      //   });
-      // }
-      // if (images?.length > 15) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: "You can't upload more than 15 images.",
-      //   });
-      // }
-
-      // Validate price fields
-      if (
-        !priceRange ||
-        priceRange <= 0 ||
-        !electricityPrice ||
-        electricityPrice <= 0 ||
-        !waterPrice ||
-        waterPrice <= 0
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: 'Price fields must be greater than 0.',
+      // Xử lý other images cũ
+      if (req.body.existingOtherImages) {
+        const existingOthers = JSON.parse(req.body.existingOtherImages);
+        existingOthers.forEach(img => {
+          images.push({ ...img, isPrimary: false });
         });
       }
 
-      // Update the boarding house details
+      if (primaryImageCount !== 1) {
+        return res.status(400).json({
+          success: false,
+          message: "You must upload exactly one primary image.",
+        });
+      }
+
+      if (images.length > 15) {
+        return res.status(400).json({
+          success: false,
+          message: "You can't upload more than 15 images.",
+        });
+      }
+
+      // Xóa ảnh cũ nếu có upload ảnh mới
+      const boardingHouse = await BoardingHouse.findById(id);
+      const oldPublicIds = boardingHouse.images.map(img => img.publicId);
+      const newPublicIds = images.map(img => img.publicId);
+      const imagesToDelete = oldPublicIds.filter(id => !newPublicIds.includes(id));
+
+      for (const publicId of imagesToDelete) {
+        await cloudinary.uploader.destroy(publicId);
+      }
+
+      // Cập nhật thông tin boarding house
+      updateData.images = images;
+
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
         id,
         { $set: updateData },
         { new: true, runValidators: true }
-      )
-        .populate('boardingHouseType', 'name codeName')
-        .populate('ownerId', 'email');
+      ).populate("boardingHouseType", "name codeName").populate("ownerId", "email");
 
-      // Check if the boarding house exists
       if (!updatedBoardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found.',
+          message: "Boarding house not found.",
         });
       }
 
-      // Successfully updated
       return res.status(200).json({
         success: true,
-        message: 'Boarding house updated successfully.',
+        message: "Boarding house updated successfully.",
         data: updatedBoardingHouse,
       });
     } catch (error) {
-      console.error('Error updating boarding house details:', error);
+      console.error("Error updating boarding house details:", error);
       return res.status(500).json({
         success: false,
-        message:
-          'Failed to update boarding house details. Please try again later.',
+        message: "Failed to update boarding house details. Please try again later.",
         error: error.message,
       });
     }
@@ -256,11 +207,11 @@ class boardingHouseController {
         data: formattedTypes,
       });
     } catch (error) {
-      console.error('Error fetching boarding house types:', error.message);
+      console.error("Error fetching boarding house types:", error.message);
       return res.status(500).json({
         success: false,
         message:
-          'Failed to fetch boarding house types. Please try again later.',
+          "Failed to fetch boarding house types. Please try again later.",
       });
     }
   }
@@ -273,7 +224,7 @@ class boardingHouseController {
       if (!boardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found',
+          message: "Boarding house not found",
         });
       }
 
@@ -293,14 +244,14 @@ class boardingHouseController {
 
       return res.status(201).json({
         success: true,
-        message: 'Image added successfully',
+        message: "Image added successfully",
         data: boardingHouse,
       });
     } catch (error) {
-      console.error('Error adding boarding house image:', error);
+      console.error("Error adding boarding house image:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to add image. Please try again later.',
+        message: "Failed to add image. Please try again later.",
         error: error.message,
       });
     }
@@ -315,7 +266,7 @@ class boardingHouseController {
       if (!boardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found',
+          message: "Boarding house not found",
         });
       }
 
@@ -323,7 +274,7 @@ class boardingHouseController {
       if (!image) {
         return res.status(404).json({
           success: false,
-          message: 'Image not found',
+          message: "Image not found",
         });
       }
 
@@ -341,14 +292,14 @@ class boardingHouseController {
 
       return res.status(200).json({
         success: true,
-        message: 'Image updated successfully',
+        message: "Image updated successfully",
         data: boardingHouse,
       });
     } catch (error) {
-      console.error('Error updating boarding house image:', error);
+      console.error("Error updating boarding house image:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to update image. Please try again later.',
+        message: "Failed to update image. Please try again later.",
         error: error.message,
       });
     }
@@ -362,7 +313,7 @@ class boardingHouseController {
       if (!boardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found',
+          message: "Boarding house not found",
         });
       }
 
@@ -373,7 +324,7 @@ class boardingHouseController {
       if (imageIndex === -1) {
         return res.status(404).json({
           success: false,
-          message: 'Image not found',
+          message: "Image not found",
         });
       }
 
@@ -382,13 +333,13 @@ class boardingHouseController {
 
       return res.status(200).json({
         success: true,
-        message: 'Image deleted successfully',
+        message: "Image deleted successfully",
       });
     } catch (error) {
-      console.error('Error deleting boarding house image:', error);
+      console.error("Error deleting boarding house image:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to delete image. Please try again later.',
+        message: "Failed to delete image. Please try again later.",
         error: error.message,
       });
     }
@@ -398,12 +349,12 @@ class boardingHouseController {
       const { id } = req.params;
 
       // Tìm boarding house theo ID và chỉ lấy danh sách ảnh
-      const boardingHouse = await BoardingHouse.findById(id).select('images');
+      const boardingHouse = await BoardingHouse.findById(id).select("images");
 
       if (!boardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found',
+          message: "Boarding house not found",
         });
       }
 
@@ -412,10 +363,10 @@ class boardingHouseController {
         data: boardingHouse.images,
       });
     } catch (error) {
-      console.error('Error fetching boarding house images:', error);
+      console.error("Error fetching boarding house images:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to fetch boarding house images.',
+        message: "Failed to fetch boarding house images.",
         error: error.message,
       });
     }
@@ -462,12 +413,12 @@ class boardingHouseController {
       // Validate owner
       const ownerAccount = await Account.findOne({
         username: ownerUsername,
-        role: 'owner',
+        role: "owner",
       });
       if (!ownerAccount) {
-        console.error('Invalid owner:', ownerUsername);
+        console.error("Invalid owner:", ownerUsername);
         return res.status(400).json({
-          message: 'Invalid owner username or the user is not a landlord.',
+          message: "Invalid owner username or the user is not a landlord.",
         });
       }
       const ownerId = ownerAccount._id;
@@ -476,48 +427,48 @@ class boardingHouseController {
       const boardingHouseTypeExists =
         await BoardingHouseType.findById(boardingHouseType);
       if (!boardingHouseTypeExists) {
-        console.error('Invalid boarding house type:', boardingHouseType);
+        console.error("Invalid boarding house type:", boardingHouseType);
         return res
           .status(400)
-          .json({ message: 'Invalid boarding house type.' });
+          .json({ message: "Invalid boarding house type." });
       }
 
       // Validate name
       if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
-        console.error('Invalid name:', name);
+        console.error("Invalid name:", name);
         return res.status(400).json({
-          message: 'Name is required and must not contain special characters.',
+          message: "Name is required and must not contain special characters.",
         });
       }
       // Check if the boarding house name already exists
       const existingBoardingHouse = await BoardingHouse.findOne({ name });
       if (existingBoardingHouse) {
-        console.error('Boarding house name already exists:', name);
+        console.error("Boarding house name already exists:", name);
         return res
           .status(400)
-          .json({ message: 'A boarding house with this name already exists.' });
+          .json({ message: "A boarding house with this name already exists." });
       }
 
       // Validate address
       const { province, district, ward, detail } = address;
       if (!province || !district || !ward) {
-        console.error('Invalid address:', address);
+        console.error("Invalid address:", address);
         return res.status(400).json({
           message:
-            'Province, district, and ward are required fields in the address.',
+            "Province, district, and ward are required fields in the address.",
         });
       }
 
       // Validate images
       const primaryImageCount = images.filter((img) => img.isPrimary).length;
       if (primaryImageCount !== 1) {
-        console.error('Invalid primary images count:', primaryImageCount);
+        console.error("Invalid primary images count:", primaryImageCount);
         return res
           .status(400)
-          .json({ message: 'You must upload exactly one primary image.' });
+          .json({ message: "You must upload exactly one primary image." });
       }
       if (images.length > 15) {
-        console.error('Too many images:', images.length);
+        console.error("Too many images:", images.length);
         return res.status(400).json({
           message: "You can't upload more than 15 images for other image.",
         });
@@ -525,21 +476,21 @@ class boardingHouseController {
 
       // Validate price fields
       if (priceRange <= 0 || electricityPrice <= 0 || waterPrice <= 0) {
-        console.error('Invalid price fields:', {
+        console.error("Invalid price fields:", {
           priceRange,
           electricityPrice,
           waterPrice,
         });
         return res
           .status(400)
-          .json({ message: 'Price fields must be greater than 0.' });
+          .json({ message: "Price fields must be greater than 0." });
       }
 
       // Tạo mới boarding house
       const newBoardingHouse = new BoardingHouse({
         ownerId,
         name,
-        description: description || '',
+        description: description || "",
         priceRange,
         electricityPrice,
         waterPrice,
@@ -548,7 +499,7 @@ class boardingHouseController {
           province,
           district,
           ward,
-          detail: detail || '',
+          detail: detail || "",
         },
         location: {
           lat: location.lat,
@@ -565,20 +516,20 @@ class boardingHouseController {
       const savedBoardingHouse = await newBoardingHouse.save();
 
       return res.status(201).json({
-        message: 'Boarding house created successfully!',
+        message: "Boarding house created successfully!",
         data: savedBoardingHouse,
       });
     } catch (error) {
-      console.error('Error creating boarding house:', error);
+      console.error("Error creating boarding house:", error);
       return res.status(500).json({
-        message: 'An unexpected error occurred while creating boarding house.',
+        message: "An unexpected error occurred while creating boarding house.",
         error: error.message,
       });
     }
   }
 
   async uploadFile(req, res) {
-    const storagePath = './public/images/boardingHouse';
+    const storagePath = "./public/images/boardingHouse";
 
     // Tạo thư mục lưu file nếu chưa tồn tại
     if (!fs.existsSync(storagePath)) {
@@ -595,16 +546,16 @@ class boardingHouseController {
         },
       });
 
-      const upload = multer({ storage }).single('file');
+      const upload = multer({ storage }).single("file");
 
       upload(req, res, (err) => {
         if (err) {
-          console.error('Error uploading file:', err);
-          return res.status(500).json({ message: 'Failed to upload file.' });
+          console.error("Error uploading file:", err);
+          return res.status(500).json({ message: "Failed to upload file." });
         }
 
         if (!req.file) {
-          return res.status(400).json({ message: 'No file provided.' });
+          return res.status(400).json({ message: "No file provided." });
         }
         // Trả về đường dẫn file
         const filePath = `/public/images/boardingHouse/${req.file.filename}`;
@@ -613,8 +564,8 @@ class boardingHouseController {
         // res.status(200).json({ filePath });
       });
     } catch (error) {
-      console.error('Error in uploadFile:', error);
-      res.status(500).json({ message: 'Internal server error.' });
+      console.error("Error in uploadFile:", error);
+      res.status(500).json({ message: "Internal server error." });
     }
   }
 
@@ -650,7 +601,8 @@ class boardingHouseController {
         } else {
           return res.status(400).json({
             success: false,
-            message: 'Invalid rating format.',
+            message:
+              "Invalid rating format. Each rating must be a number between 0 and 5.",
           });
         }
       }
@@ -664,20 +616,25 @@ class boardingHouseController {
         };
       }
 
-      if (province) filter['address.province'] = { $regex: new RegExp(province, 'i') };
-      if (district) filter['address.district'] = { $regex: new RegExp(district, 'i') };
-      if (ward) filter['address.ward'] = { $regex: new RegExp(ward, 'i') };
-      if (name) filter.name = { $regex: new RegExp(name, 'i') };
+      // Sử dụng paginate
+      const paginatedResult = await paginate(BoardingHouse, { filter, page, limit }, req);
+      paginatedResult.data = await BoardingHouse.populate(paginatedResult.data, [
+        { path: "boardingHouseType", select: "name codeName" },
+        { path: "ownerId" }
+      ]);
 
-      const result = await paginate(BoardingHouse, { filter, page, limit }, req);
-      result.data = await BoardingHouse.populate(result.data, {
-        path: "boardingHouseType",
-        select: "name codeName"
+      // Lọc bổ sung dựa trên province, district, ward, name (nếu cần thiết)
+      paginatedResult.data = paginatedResult.data.filter(bh => {
+        return (!province || (bh.address?.province && bh.address.province.toLowerCase().includes(province.toLowerCase())))
+          && (!district || (bh.address?.district && bh.address.district.toLowerCase().includes(district.toLowerCase())))
+          && (!ward || (bh.address?.ward && bh.address.ward.toLowerCase().includes(ward.toLowerCase())))
+          && (!name || (bh.name && bh.name.toLowerCase().includes(name.toLowerCase())));
       });
-      res.status(200).json(result);
+
+      res.status(200).json(paginatedResult);
     } catch (error) {
-      console.error('Error filtering boarding houses:', error);
-      res.status(500).json({ message: 'Server Error' });
+      console.error("Error filtering boarding houses:", error);
+      res.status(500).json({ message: "Server Error" });
     }
   }
 
@@ -687,17 +644,17 @@ class boardingHouseController {
         priceRange: -1,
       });
       if (!maxPriceHouse || maxPriceHouse === 0) {
-        return res.status(404).json({ message: 'No boarding house found' });
+        return res.status(404).json({ message: "No boarding house found" });
       }
 
       const roundedPrice = Math.ceil(maxPriceHouse.priceRange / 100) * 100;
 
       res.status(200).json({ maxPrice: roundedPrice });
     } catch (error) {
-      console.error('Error fetching max price:', error);
+      console.error("Error fetching max price:", error);
       res
         .status(500)
-        .json({ message: 'Internal Server Error', error: error.message });
+        .json({ message: "Internal Server Error", error: error.message });
     }
   }
 
@@ -712,9 +669,9 @@ class boardingHouseController {
 
       return res.status(200).json(boardingHData);
     } catch (error) {
-      console.error('Error fetching boarding house data:', error);
+      console.error("Error fetching boarding house data:", error);
       return res.status(500).json({
-        message: 'Failed to fetch boarding house data. Please try again later.',
+        message: "Failed to fetch boarding house data. Please try again later.",
         error: error.message,
       });
     }
@@ -729,7 +686,7 @@ class boardingHouseController {
       if (!boardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found',
+          message: "Boarding house not found",
         });
       }
 
@@ -737,7 +694,7 @@ class boardingHouseController {
       if (boardingHouse.deleted) {
         return res.status(400).json({
           success: false,
-          message: 'Boarding house is already soft deleted',
+          message: "Boarding house is already soft deleted",
         });
       }
 
@@ -747,14 +704,14 @@ class boardingHouseController {
 
       return res.status(200).json({
         success: true,
-        message: 'Boarding house soft deleted successfully',
+        message: "Boarding house soft deleted successfully",
       });
     } catch (error) {
-      console.error('Error soft deleting boarding house:', error);
+      console.error("Error soft deleting boarding house:", error);
       return res.status(500).json({
         success: false,
         message:
-          'Failed to soft delete boarding house. Please try again later.',
+          "Failed to soft delete boarding house. Please try again later.",
         error: error.message,
       });
     }
@@ -767,16 +724,16 @@ class boardingHouseController {
       if (!account) {
         return res
           .status(404)
-          .json({ success: false, message: 'User not found' });
+          .json({ success: false, message: "User not found" });
       }
 
       // Xây dựng filter theo ownerId
       let filter = {};
 
-      if (account.role === 'owner') {
+      if (account.role === "owner") {
         filter = { ownerId: account._id };
-      } else if (account.role === 'manager') {
-        filter = { managerId: account._id };
+      } else if (account.role === "manager" || account.role === "staff") {
+        filter = { staffId: account._id };
       }
 
       // (Tuỳ chỉnh thêm nếu bạn muốn filter theo query string)
@@ -795,13 +752,13 @@ class boardingHouseController {
         defaultPage: 1,
         defaultLimit: 10,
         maxLimit: 100,
-        sortField: 'createdAt',
-        sortOrder: 'desc', // Theo code gốc bạn dùng sort({ createdAt: -1 })
+        sortField: "createdAt",
+        sortOrder: "desc", // Theo code gốc bạn dùng sort({ createdAt: -1 })
         filter, // filter ownerId + các filter khác
-        allowQueryFilters: ['status'], // whitelist những query filter cho BoardingHouse
-        allowSearchFields: ['name', 'address'], // nếu bạn muốn search theo tên hoặc địa chỉ
-        fields: '-__v', // không trả về trường __v
-        populate: ['boardingHouseType'], // populate ref tới type
+        allowQueryFilters: ["status"], // whitelist những query filter cho BoardingHouse
+        allowSearchFields: ["name", "address"], // nếu bạn muốn search theo tên hoặc địa chỉ
+        fields: "-__v", // không trả về trường __v
+        populate: ["boardingHouseType"], // populate ref tới type
         includeTotalData: true, // nếu cần totalCount, totalPages…
       };
 
@@ -813,10 +770,10 @@ class boardingHouseController {
         ...result,
       });
     } catch (error) {
-      console.error('Error fetching boarding house data:', error);
+      console.error("Error fetching boarding house data:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to fetch boarding house data. Please try again later.',
+        message: "Failed to fetch boarding house data. Please try again later.",
         error: error.message,
       });
     }
@@ -825,8 +782,8 @@ class boardingHouseController {
     try {
       const account = await Account.findById(req.user.userId);
       if (!account) {
-        console.error('User not found for ID:', req.user.userId);
-        return res.status(404).json({ message: 'User not found' });
+        console.error("User not found for ID:", req.user.userId);
+        return res.status(404).json({ message: "User not found" });
       }
 
       const ownerId = account._id;
@@ -840,42 +797,42 @@ class boardingHouseController {
         electricityPrice,
         waterPrice,
         totalRooms = 0,
-        managerId,
+        staffId,
         availableRooms = 0,
       } = req.body;
 
       const boardingHouseTypeExists =
         await BoardingHouseType.findById(boardingHouseType);
       if (!boardingHouseTypeExists) {
-        console.error('Invalid boarding house type:', boardingHouseType);
+        console.error("Invalid boarding house type:", boardingHouseType);
         return res
           .status(400)
-          .json({ message: 'Invalid boarding house type.' });
+          .json({ message: "Invalid boarding house type." });
       }
 
       if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
-        console.error('Invalid name:', name);
+        console.error("Invalid name:", name);
         return res.status(400).json({
-          message: 'Name is required and must not contain special characters.',
+          message: "Name is required and must not contain special characters.",
         });
       }
       const existingBoardingHouse = await BoardingHouse.findOne({ name });
       if (existingBoardingHouse) {
-        console.error('Boarding house name already exists:', name);
+        console.error("Boarding house name already exists:", name);
         return res.status(400).json({
-          message: 'A boarding house with this name already exists.',
+          message: "A boarding house with this name already exists.",
         });
       }
 
       if (!address || !address.province || !address.district || !address.ward) {
-        console.error('Invalid address:', address);
+        console.error("Invalid address:", address);
         return res.status(400).json({
           message:
-            'Province, district, and ward are required fields in the address.',
+            "Province, district, and ward are required fields in the address.",
         });
       }
-      let validManagerId = managerId;
-      if (managerId === '') {
+      let validManagerId = staffId;
+      if (staffId === "") {
         validManagerId = null;
       }
 
@@ -891,10 +848,10 @@ class boardingHouseController {
       }
 
       if (images.length === 0) {
-        console.error('No images uploaded.');
+        console.error("No images uploaded.");
         return res
           .status(400)
-          .json({ message: 'You must upload at least one image.' });
+          .json({ message: "You must upload at least one image." });
       }
 
       const newBoardingHouse = new BoardingHouse({
@@ -910,19 +867,19 @@ class boardingHouseController {
         images,
         totalRooms,
         availableRooms,
-        managerId: validManagerId, // Use validManagerId here
+        staffId: validManagerId, // Use validManagerId here
       });
 
       const savedBoardingHouse = await newBoardingHouse.save();
 
       return res.status(201).json({
-        message: 'Boarding house created successfully!',
+        message: "Boarding house created successfully!",
         data: savedBoardingHouse,
       });
     } catch (error) {
-      console.error('Error creating boarding house:', error);
+      console.error("Error creating boarding house:", error);
       return res.status(500).json({
-        message: 'An unexpected error occurred while creating boarding house.',
+        message: "An unexpected error occurred while creating boarding house.",
         error: error.message,
       });
     }
@@ -937,14 +894,14 @@ class boardingHouseController {
         priceRange,
         electricityPrice,
         waterPrice,
-        managerId,
+        staffId,
       } = updateData;
 
       // Validate name
       if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
         return res.status(400).json({
           success: false,
-          message: 'Name is required and must not contain special characters.',
+          message: "Name is required and must not contain special characters.",
         });
       }
 
@@ -956,7 +913,7 @@ class boardingHouseController {
       if (existingBoardingHouse) {
         return res.status(400).json({
           success: false,
-          message: 'A boarding house with this name already exists.',
+          message: "A boarding house with this name already exists.",
         });
       }
 
@@ -965,7 +922,7 @@ class boardingHouseController {
         return res.status(400).json({
           success: false,
           message:
-            'Province, district, and ward are required fields in the address.',
+            "Province, district, and ward are required fields in the address.",
         });
       }
 
@@ -974,7 +931,7 @@ class boardingHouseController {
       if (!boardingHouse) {
         return res
           .status(404)
-          .json({ success: false, message: 'Boarding house not found.' });
+          .json({ success: false, message: "Boarding house not found." });
       }
 
       // Handle image upload to Cloudinary
@@ -1034,11 +991,11 @@ class boardingHouseController {
       ) {
         return res.status(400).json({
           success: false,
-          message: 'Price fields must be greater than 0.',
+          message: "Price fields must be greater than 0.",
         });
       }
-      if (managerId === '' || managerId === 'null') {
-        updateData.managerId = null;
+      if (staffId === "" || staffId === "null") {
+        updateData.staffId = null;
       }
       // Update the boarding house details
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
@@ -1046,20 +1003,20 @@ class boardingHouseController {
         { $set: updateData },
         { new: true, runValidators: true }
       )
-        .populate('boardingHouseType', 'name')
-        .populate('ownerId', 'email');
+        .populate("boardingHouseType", "name")
+        .populate("ownerId", "email");
 
       return res.status(200).json({
         success: true,
-        message: 'Boarding house updated successfully.',
+        message: "Boarding house updated successfully.",
         data: updatedBoardingHouse,
       });
     } catch (error) {
-      console.error('Error updating boarding house details:', error);
+      console.error("Error updating boarding house details:", error);
       return res.status(500).json({
         success: false,
         message:
-          'Failed to update boarding house details. Please try again later.',
+          "Failed to update boarding house details. Please try again later.",
         error: error.message,
       });
     }
@@ -1088,7 +1045,7 @@ class boardingHouseController {
 
       // Nếu có rating, chuyển thành mảng số và kiểm tra hợp lệ
       if (rating) {
-        const ratings = rating.split(',').map(Number);
+        const ratings = rating.split(",").map(Number);
         const validRatings = ratings.filter(
           (r) => !isNaN(r) && r >= 0 && r <= 5
         );
@@ -1098,14 +1055,14 @@ class boardingHouseController {
           return res.status(400).json({
             success: false,
             message:
-              'Invalid rating format. Each rating must be a number between 0 and 5.',
+              "Invalid rating format. Each rating must be a number between 0 and 5.",
           });
         }
       }
 
       // Nếu có priceRange, kiểm tra định dạng và áp dụng bộ lọc
       if (priceRange) {
-        const prices = priceRange.split(',').map(Number);
+        const prices = priceRange.split(",").map(Number);
         if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
           filter.priceRange = { $gte: prices[0], $lte: prices[1] };
         } else {
@@ -1157,7 +1114,7 @@ class boardingHouseController {
       res.status(200).json(result);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: "Server error" });
     }
   }
   async createBoardingHouseType(req, res) {
@@ -1165,10 +1122,10 @@ class boardingHouseController {
       const { name, description } = req.body;
 
       // Kiểm tra xem tên loại nhà trọ đã được cung cấp hay chưa
-      if (!name || name.trim() === '') {
+      if (!name || name.trim() === "") {
         return res.status(400).json({
           success: false,
-          message: 'Name is required.',
+          message: "Name is required.",
         });
       }
 
@@ -1177,7 +1134,7 @@ class boardingHouseController {
       if (existingType) {
         return res.status(400).json({
           success: false,
-          message: 'Boarding house type already exists.',
+          message: "Boarding house type already exists.",
         });
       }
 
@@ -1192,14 +1149,14 @@ class boardingHouseController {
 
       return res.status(201).json({
         success: true,
-        message: 'Boarding house type created successfully.',
+        message: "Boarding house type created successfully.",
         data: savedType,
       });
     } catch (error) {
-      console.error('Error creating boarding house type:', error);
+      console.error("Error creating boarding house type:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to create boarding house type.',
+        message: "Failed to create boarding house type.",
         error: error.message,
       });
     }
@@ -1211,7 +1168,7 @@ class boardingHouseController {
       if (!id) {
         return res.status(400).json({
           success: false,
-          message: 'Boarding house type ID is required.',
+          message: "Boarding house type ID is required.",
         });
       }
 
@@ -1220,7 +1177,7 @@ class boardingHouseController {
       if (!boardingHouseType) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house type not found.',
+          message: "Boarding house type not found.",
         });
       }
 
@@ -1229,10 +1186,10 @@ class boardingHouseController {
         data: boardingHouseType,
       });
     } catch (error) {
-      console.error('Error fetching boarding house type details:', error);
+      console.error("Error fetching boarding house type details:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to fetch boarding house type details.',
+        message: "Failed to fetch boarding house type details.",
         error: error.message,
       });
     }
@@ -1244,13 +1201,13 @@ class boardingHouseController {
       if (!id) {
         return res.status(400).json({
           success: false,
-          message: 'Boarding house type ID is required.',
+          message: "Boarding house type ID is required.",
         });
       }
-      if (!name || name.trim() === '') {
+      if (!name || name.trim() === "") {
         return res.status(400).json({
           success: false,
-          message: 'Name is required and cannot be empty.',
+          message: "Name is required and cannot be empty.",
         });
       }
 
@@ -1262,7 +1219,7 @@ class boardingHouseController {
       if (existingType) {
         return res.status(400).json({
           success: false,
-          message: 'A boarding house type with this name already exists.',
+          message: "A boarding house type with this name already exists.",
         });
       }
 
@@ -1274,19 +1231,19 @@ class boardingHouseController {
       if (!updatedType) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house type not found.',
+          message: "Boarding house type not found.",
         });
       }
       return res.status(200).json({
         success: true,
-        message: 'Boarding house type updated successfully.',
+        message: "Boarding house type updated successfully.",
         data: updatedType,
       });
     } catch (error) {
-      console.error('Error updating boarding house type:', error);
+      console.error("Error updating boarding house type:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to update boarding house type.',
+        message: "Failed to update boarding house type.",
         error: error.message,
       });
     }
@@ -1297,14 +1254,14 @@ class boardingHouseController {
       if (!id) {
         return res.status(400).json({
           success: false,
-          message: 'Boarding house type ID is required.',
+          message: "Boarding house type ID is required.",
         });
       }
       const boardingHouseType = await BoardingHouseType.findById(id);
       if (!boardingHouseType) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house type not found.',
+          message: "Boarding house type not found.",
         });
       }
 
@@ -1313,14 +1270,14 @@ class boardingHouseController {
 
       return res.status(200).json({
         success: true,
-        message: 'Boarding house type soft deleted successfully.',
+        message: "Boarding house type soft deleted successfully.",
       });
     } catch (error) {
-      console.error('Error soft deleting boarding house type:', error);
+      console.error("Error soft deleting boarding house type:", error);
       return res.status(500).json({
         success: false,
         message:
-          'Failed to soft delete boarding house type. Please try again later.',
+          "Failed to soft delete boarding house type. Please try again later.",
         error: error.message,
       });
     }
@@ -1331,7 +1288,7 @@ class boardingHouseController {
 
       const filter = {};
       if (name) {
-        filter.name = { $regex: new RegExp(name, 'i') };
+        filter.name = { $regex: new RegExp(name, "i") };
       }
 
       if (startDate && endDate) {
@@ -1347,7 +1304,7 @@ class boardingHouseController {
       if (!boardingHouseTypes || boardingHouseTypes.length === 0) {
         return res.status(404).json({
           success: false,
-          message: 'No boarding house types found matching the criteria.',
+          message: "No boarding house types found matching the criteria.",
         });
       }
       return res.status(200).json({
@@ -1355,10 +1312,10 @@ class boardingHouseController {
         data: boardingHouseTypes,
       });
     } catch (error) {
-      console.error('Error filtering boarding house types:', error);
+      console.error("Error filtering boarding house types:", error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to filter boarding house types.',
+        message: "Failed to filter boarding house types.",
         error: error.message,
       });
     }
@@ -1368,11 +1325,11 @@ class boardingHouseController {
     try {
       const { boardingHouseId } = req.params;
       if (!boardingHouseId) {
-        return res.status(400).json({ message: 'boardingHouseId is required' });
+        return res.status(400).json({ message: "boardingHouseId is required" });
       }
       const boardingHouse = await BoardingHouse.findById(boardingHouseId);
       if (!boardingHouse) {
-        return res.status(404).json({ message: 'Boarding house not found' });
+        return res.status(404).json({ message: "Boarding house not found" });
       }
       const { electricityPrice, waterPrice } = boardingHouse;
       res.status(200).json({
@@ -1380,9 +1337,9 @@ class boardingHouseController {
         waterPrice,
       });
     } catch (error) {
-      console.error('Error fetching prices:', error);
+      console.error("Error fetching prices:", error);
       res.status(500).json({
-        message: 'An error occurred while fetching prices',
+        message: "An error occurred while fetching prices",
         error: error.message,
       });
     }

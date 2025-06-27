@@ -11,7 +11,7 @@
     "selectBoardingHouseType": "Vui lòng chọn loại nhà trọ.",
     "enterBoardingHouseName": "Vui lòng nhập tên nhà trọ.",
     "selectProvince": "Vui lòng chọn tỉnh/thành phố.",
-     "manager": "Vui lòng chọn quản lí.",
+    "manager": "Vui lòng chọn nhân viên.",
     "selectDistrict": "Vui lòng chọn quận/huyện.",
     "selectWard": "Vui lòng chọn phường/xã.",
     "enterAddressDetail": "Vui lòng nhập chi tiết nhà trọ.",
@@ -82,7 +82,7 @@
     "availableRooms": "Phòng trống",
     "name": "Tên",
     "address": "Địa chỉ",
-    "priceRange": "Khoảng giá (VND)",
+    "priceRange": "Khoảng giá",
     "boardingHouseType": "Loại nhà trọ",
     "primaryImage": "Ảnh chính",
     "otherImages": "Ảnh khác",
@@ -104,12 +104,12 @@
       "boardingHouseName": "Tên nhà trọ",
       "boardingHouseType": "Loại nhà trọ",
       "description": "Mô tả",
-      "priceRange": "Giá thuê/tháng (VND)",
-      "electricityPrice": "Giá điện/kWh (VND)",
-      "waterPrice": "Giá nước/m³ (VND)",
+      "priceRange": "Giá thuê/tháng",
+      "electricityPrice": "Giá điện/kWh",
+      "waterPrice": "Giá nước/m³",
       "primaryImage": "Ảnh chính",
       "otherImages": "Ảnh khác",
-      "manager": "Quản lí",
+      "manager": "Nhân viên",
       "province": "Tỉnh/Thành phố",
       "district": "Quận/Huyện",
       "ward": "Phường/Xã",
@@ -118,7 +118,6 @@
       "addOtherImages": "Thêm ảnh khác",
       "dragDropOrClick": "Kéo thả hoặc bấm vào đây để chọn tệp",
       "details": "Chi tiết"
-
     },
     "placeholders": {
       "selectProvince": "Chọn tỉnh/thành phố",
@@ -150,9 +149,314 @@
     "detail": "Chi tiết",
     "delete": "Xóa"
   },
- "boardingHouseTypes": {
+  "boardingHouseTypes": {
     "Nhà trọ truyền thống": "Nhà trọ truyền thống",
     "Mini house": "Căn hộ mini",
     "Nhà trọ kiến trúc xá": "Nhà trọ kiến trúc xá"
+  },
+  "roomManagement": {
+    "updateRoom": {
+      "backToRoomManagement": "Quay lại quản lý phòng",
+      "updateRoom": "Cập nhật phòng",
+      "deleteRoom": "Xóa phòng",
+      "roomType": "Loại phòng",
+      "roomNumber": "Số phòng",
+      "description": "Mô tả",
+      "pleaseUploadImage": "Vui lòng tải lên hình ảnh cho phòng",
+      "pleaseSelectRoomType": "Vui lòng chọn loại phòng",
+      "pleaseEnterRoomNumber": "Vui lòng nhập số phòng",
+      "pleaseEnterRoomDescription": "Vui lòng nhập mô tả phòng",
+      "selectRoomType": "Chọn loại phòng",
+      "enterRoomNumber": "Nhập số phòng",
+      "enterDetailedRoomDescription": "Nhập mô tả chi tiết về phòng",
+      "clickToUploadImage": "Nhấp để tải lên hình ảnh phòng",
+      "imageFileFormat": "Hỗ trợ định dạng JPG, PNG, JPEG",
+      "noRoomTypeFound": "Không tìm thấy loại phòng nào. Vui lòng tạo loại phòng trước.",
+      "errorFetchingRoomTypes": "Đã xảy ra lỗi khi tải danh sách loại phòng",
+      "roomUpdatedSuccessfully": "Cập nhật phòng thành công",
+      "roomDeletedSuccessfully": "Xóa phòng thành công",
+      "confirmDeleteRoom": "Bạn có chắc chắn muốn xóa phòng này không?",
+      "deleteRoomWarning": "Hành động này không thể hoàn tác",
+      "cancel": "Hủy bỏ",
+      "confirm": "Xác nhận",
+      "uploading": "Đang tải lên...",
+      "uploadFailed": "Tải lên thất bại",
+      "invalidFileType": "Định dạng file không hợp lệ. Vui lòng chọn file JPG, PNG hoặc JPEG",
+      "fileSizeTooLarge": "Kích thước file quá lớn. Kích thước tối đa là 5MB",
+      "required": "Trường này là bắt buộc",
+      "roomNumberExists": "Số phòng đã tồn tại",
+      "processingRequest": "Đang xử lý yêu cầu...",
+      "updateFailed": "Cập nhật thất bại",
+      "deleteFailed": "Xóa thất bại",
+      "networkError": "Lỗi mạng. Vui lòng thử lại"
+    },
+    "table": {
+      "title": "Quản lý phòng",
+      "image": "Hình ảnh",
+      "roomImageAlt": "Hình ảnh phòng",
+      "roomNumber": "Số phòng",
+      "tenants": "Người thuê",
+      "availability": "Tình trạng",
+      "roomType": "Loại phòng",
+      "createdAt": "Ngày tạo",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "available": "Còn trống",
+      "occupied": "Đã có người thuê"
+    },
+    "actions": {
+      "delete": "Xóa",
+      "update": "Chỉnh sửa"
+    },
+    "messages": {
+      "deleteFailed": "Xóa phòng thất bại",
+      "updateSuccess": "Cập nhật phòng thành công"
+    },
+    "modal": {
+      "confirmDelete": {
+        "title": "Xác nhận xóa phòng",
+        "content": "Bạn có chắc chắn muốn xóa phòng này không?"
+      }
+    },
+    "addRoom": {
+      "button": {
+        "addRoom": "Thêm phòng"
+      },
+      "modal": {
+        "title": "Thêm phòng mới",
+        "okText": "Thêm phòng"
+      },
+      "form": {
+        "roomType": {
+          "label": "Loại phòng",
+          "placeholder": "Chọn loại phòng",
+          "required": "Vui lòng chọn loại phòng!"
+        },
+        "roomNumber": {
+          "label": "Số phòng",
+          "placeholder": "Nhập số phòng (VD: A101, B02)",
+          "required": "Vui lòng nhập số phòng!"
+        },
+        "description": {
+          "label": "Mô tả phòng",
+          "placeholder": "Nhập mô tả chi tiết về phòng, tiện nghi và đặc điểm...",
+          "required": "Vui lòng nhập mô tả phòng!"
+        },
+        "image": {
+          "label": "Hình ảnh phòng",
+          "uploadText": "Tải lên hình ảnh",
+          "uploadHint": "Nhấp hoặc kéo thả hình ảnh để tải lên",
+          "supportedFormats": "Hỗ trợ: JPG, PNG, WEBP (Tối đa: 5MB)",
+          "extra": "Tải lên hình ảnh rõ nét của phòng để thu hút người thuê"
+        }
+      },
+      "validation": {
+        "imageRequired": "Vui lòng tải lên hình ảnh phòng",
+        "invalidImageType": "Vui lòng tải lên file hình ảnh hợp lệ",
+        "imageSizeLimit": "Kích thước hình ảnh phải nhỏ hơn 5MB"
+      },
+      "noRoomType": {
+        "title": "Không tìm thấy loại phòng",
+        "content": "Vui lòng thêm loại phòng trước khi tạo phòng. Hãy vào Quản lý loại phòng để thêm loại phòng trước."
+      }
+    },
+    "common": {
+      "ok": "Đồng ý",
+      "cancel": "Hủy bỏ"
+    }
+  },
+  "roomAdditionFee": {
+    "title": "Quản Lý Phí Phòng Trọ",
+    "addFee": "Thêm Phí",
+    "editFee": "Sửa Phí",
+    "deleteFee": "Xóa Phí",
+    "viewFees": "Xem Phí",
+    "feeList": "Danh Sách Phí",
+    "feeDetails": "Chi Tiết Phí",
+    "feeHistory": "Lịch Sử Phí",
+    "monthlyFees": "Phí Hàng Tháng",
+    "search": "Tìm kiếm phí...",
+    "filter": "Lọc",
+    "export": "Xuất Dữ Liệu",
+    "import": "Nhập Dữ Liệu",
+    "refresh": "Làm Mới",
+    "feeType": {
+      "electricity": "Tiền Điện",
+      "water": "Tiền Nước",
+      "internet": "Internet",
+      "cleaning": "Vệ Sinh",
+      "maintenance": "Bảo Trì",
+      "parking": "Gửi Xe",
+      "security": "Bảo Vệ",
+      "garbage": "Thu Gom Rác",
+      "other": "Khác"
+    },
+
+    "priority": {
+      "high": "Cao",
+      "medium": "Trung Bình",
+      "low": "Thấp"
+    },
+
+    "category": {
+      "utility": "Tiện Ích",
+      "service": "Dịch Vụ",
+      "maintenance": "Bảo Trì",
+      "security": "An Ninh",
+      "amenity": "Tiện Nghi",
+      "penalty": "Phạt",
+      "deposit": "Đặt Cọc",
+      "other": "Khác"
+    },
+
+    "table": {
+      "columns": {
+        "feeName": "Tên Phí",
+        "feeAmount": "Số Tiền",
+        "feeType": "Loại Phí",
+        "roomNumber": "Phòng",
+        "tenant": "Người Thuê",
+        "month": "Tháng",
+        "year": "Năm",
+        "status": "Trạng Thái",
+        "paymentStatus": "Thanh Toán",
+        "createdAt": "Ngày Tạo",
+        "updatedAt": "Cập Nhật",
+        "actions": "Thao Tác"
+      },
+      "noData": "Không tìm thấy phí nào",
+      "loading": "Đang tải danh sách phí...",
+      "totalItems": "Tổng: {{count}} mục",
+      "selectedItems": "{{count}} mục đã chọn"
+    },
+
+    "actions": {
+      "add": "Thêm Phí Mới",
+      "edit": "Sửa",
+      "delete": "Xóa",
+      "view": "Xem",
+      "duplicate": "Nhân Bản",
+      "activate": "Kích Hoạt",
+      "deactivate": "Vô Hiệu Hóa",
+      "markAsPaid": "Đánh Dấu Đã Thanh Toán",
+      "markAsUnpaid": "Đánh Dấu Chưa Thanh Toán",
+      "sendReminder": "Gửi Nhắc Nhở",
+      "printReceipt": "In Hóa Đơn",
+      "downloadPDF": "Tải PDF"
+    },
+
+    "messages": {
+      "noData": "Không có phí nào được tìm thấy",
+      "success": {
+        "feeAdded": "Thêm phí thành công",
+        "feeUpdated": "Cập nhật phí thành công",
+        "feeDeleted": "Xóa phí thành công",
+        "statusUpdated": "Cập nhật trạng thái thành công",
+        "paymentStatusUpdated": "Cập nhật trạng thái thanh toán thành công",
+        "reminderSent": "Gửi nhắc nhở thành công",
+        "dataExported": "Xuất dữ liệu thành công",
+        "dataImported": "Nhập dữ liệu thành công"
+      },
+      "error": {
+        "fetchFees": "Lỗi khi tải danh sách phí",
+        "addFee": "Lỗi khi thêm phí",
+        "updateFee": "Lỗi khi cập nhật phí",
+        "deleteFee": "Lỗi khi xóa phí",
+        "exportData": "Lỗi khi xuất dữ liệu",
+        "importData": "Lỗi khi nhập dữ liệu",
+        "sendReminder": "Lỗi khi gửi nhắc nhở",
+        "invalidData": "Định dạng dữ liệu không hợp lệ",
+        "networkError": "Lỗi kết nối mạng"
+      },
+      "warning": {
+        "unsavedChanges": "Bạn có thay đổi chưa được lưu",
+        "deleteConfirmation": "Bạn có chắc chắn muốn xóa phí này?",
+        "bulkDeleteConfirmation": "Bạn có chắc chắn muốn xóa {{count}} phí?",
+        "statusChangeConfirmation": "Bạn có chắc chắn muốn thay đổi trạng thái?"
+      },
+      "info": {
+        "noFeesSelected": "Chưa chọn phí nào",
+        "processingRequest": "Đang xử lý yêu cầu...",
+        "dataUpToDate": "Dữ liệu đã được cập nhật",
+        "filterApplied": "Đã áp dụng bộ lọc"
+      },
+      "confirm": {
+        "deleteFee": "Bạn có chắc chắn muốn xóa phí này?"
+      }
+    },
+    "updateFee": {
+      "title": "Cập Nhật Phí",
+      "description": "Cập nhật thông tin phí bên dưới",
+      "successMessage": "Cập nhật phí thành công",
+      "errorMessage": "Lỗi khi cập nhật phí"
+    },
+
+    "summary": {
+      "totalFees": "Tổng Phí",
+      "paidAmount": "Số Tiền Đã Thanh Toán",
+      "unpaidAmount": "Số Tiền Chưa Thanh Toán",
+      "overdueAmount": "Số Tiền Quá Hạn",
+      "thisMonth": "Tháng Này",
+      "lastMonth": "Tháng Trước",
+      "yearToDate": "Từ Đầu Năm"
+    },
+
+    "filters": {
+      "all": "Tất Cả",
+      "thisMonth": "Tháng Này",
+      "lastMonth": "Tháng Trước",
+      "thisYear": "Năm Này",
+      "paid": "Đã Thanh Toán",
+      "unpaid": "Chưa Thanh Toán",
+      "overdue": "Quá Hạn",
+      "active": "Đang Hoạt Động",
+      "inactive": "Không Hoạt Động"
+    },
+    "buttons": {
+      "addFee": "Thêm Phí",
+      "add": "Thêm",
+      "cancel": "Hủy",
+      "edit": "Sửa",
+      "delete": "Xóa"
+    },
+    "modal": {
+      "addFee": {
+        "title": "Thêm Phí Mới",
+        "description": "Vui lòng điền thông tin phí bên dưới"
+      },
+      "editFee": {
+        "title": "Sửa Phí",
+        "description": "Cập nhật thông tin phí"
+      }
+    },
+    "form": {
+      "feeName": "Tên Phí",
+      "feeAmount": "Số Tiền Phí",
+      "monthYear": "Tháng và Năm",
+      "month": "Tháng"
+    },
+    "placeholder": {
+      "feeName": "Nhập tên phí (VD: Phí gửi xe, Phí vệ sinh...)",
+      "feeAmount": "Nhập số tiền phí",
+      "selectMonth": "Chọn tháng",
+      "monthYear": "Chọn năm"
+    },
+    "validation": {
+      "feeName": {
+        "required": "Tên phí là bắt buộc",
+        "minLength": "Tên phí phải có ít nhất 2 ký tự",
+        "maxLength": "Tên phí không được vượt quá 100 ký tự",
+        "pattern": "Tên phí chứa ký tự không hợp lệ"
+      },
+      "feeAmount": {
+        "required": "Số tiền phí là bắt buộc",
+        "min": "Số tiền phí phải lớn hơn hoặc bằng 0",
+        "max": "Số tiền phí không được vượt quá 999.999.999 VND"
+      },
+      "monthYear": {
+        "required": "Tháng/Năm là bắt buộc"
+      }
+    }
   }
 }

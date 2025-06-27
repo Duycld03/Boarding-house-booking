@@ -9,6 +9,7 @@ import {
   SendOutlined,
   CheckOutlined,
   CloseOutlined,
+  ArrowLeftOutlined,
 } from "@ant-design/icons";
 
 const ButtonCustom = ({
@@ -22,8 +23,9 @@ const ButtonCustom = ({
   btnFilter = false,
   btnReplay = false,
   btnCancel = false,
-  btnReject = false, // New btnReject prop
-  btnAccept = false, // New btnAccept prop
+  btnReject = false,
+  btnAccept = false,
+  btnBack = false, // New btnBack prop
   width = "auto",
   height = "auto",
   onClick,
@@ -48,12 +50,14 @@ const ButtonCustom = ({
     <PlusOutlined />
   ) : btnFilter ? (
     <FilterOutlined />
-  ) : btnReplay ? ( // Icon cho Replay
+  ) : btnReplay ? (
     <SendOutlined />
   ) : btnReject ? (
-    <CloseOutlined /> // Reject icon
+    <CloseOutlined />
   ) : btnAccept ? (
-    <CheckOutlined /> // Accept icon
+    <CheckOutlined />
+  ) : btnBack ? (
+    <ArrowLeftOutlined /> // Back icon
   ) : null;
 
   const backgroundClass = btnDelete
@@ -73,9 +77,11 @@ const ButtonCustom = ({
     : btnCancel
     ? "bg-red-500 hover:bg-red-600 text-white"
     : btnReject
-    ? "bg-red-600 hover:bg-red-700 text-white" // btnReject color
+    ? "bg-red-600 hover:bg-red-700 text-white"
     : btnAccept
-    ? "bg-green-600 hover:bg-green-700 text-white" // btnAccept color
+    ? "bg-green-600 hover:bg-green-700 text-white"
+    : btnBack
+    ? "bg-blue-600 hover:bg-blue-700 text-white" // btnBack color
     : "bg-gray-200 hover:bg-gray-300";
 
   const customStyle = {

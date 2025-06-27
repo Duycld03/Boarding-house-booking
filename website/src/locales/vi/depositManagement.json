@@ -1,0 +1,43 @@
+{
+  "tableName": "Danh sách đặt cọc",
+  "columns": {
+    "name": "Người đặt",
+    "boardingHouse": "Nhà trọ",
+    "roomNumber": "Số phòng",
+    "amount": "Tiền cọc",
+    "status": "Trạng thái",
+    "rentalTime": "Thời gian thuê",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "action": "Hành động"
+  },
+  "status": {
+    "pending": "Chờ xử lý",
+    "accepted": "Đã chấp nhận",
+    "deleted": "Đã hủy",
+    "rejected": "Bị từ chối",
+    "confirmed": "Xác nhận"
+  },
+  "modal": {
+    "confirmTitle": "Xác nhận",
+    "confirmContent": "Bạn có chắc muốn chấp nhận yêu cầu đặt cọc cho phòng {{room}} không?",
+    "rejectTitle": "Từ chối yêu cầu đặt cọc",
+    "rejectReason": "Lý do từ chối",
+    "rejectPlaceholder": "Nhập lý do từ chối",
+    "rejectConfirm": "Từ chối"
+  },
+  "messages": {
+    "fetchError": "Lấy danh sách thất bại",
+    "acceptSuccess": "Chấp nhận đặt cọc thành công.",
+    "acceptError": "Lỗi khi chấp nhận đặt cọc.",
+    "rejectSuccess": "Từ chối đặt cọc thành công.",
+    "rejectError": "Lỗi khi từ chối đặt cọc.",
+    "noRoomSelected": "Chưa chọn phòng!",
+    "requireReason": "Vui lòng nhập lý do từ chối"
+  },
+  "noData": "Không có dữ liệu",
+    "time": {
+    "month": "tháng",
+    "year": "năm"
+  }
+}

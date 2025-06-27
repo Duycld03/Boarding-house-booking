@@ -1,0 +1,39 @@
+{
+    "header": {
+        "title": "We Are MotelLease Tech",
+        "subtitle": "At MotelLease Tech, we believe in simplifying the rental experience for everyone. Our platform bridges the gap between landlords and tenants by providing a seamless, efficient, and transparent rental process. From helping tenants find their ideal rental properties to giving landlords tools to manage their listings, we strive to make the process stress-free and modern."
+    },
+    "aboutUs": {
+        "title": "WHO ARE WE?",
+        "subtitle": "ABOUT MOTELLEASE TECH"
+    },
+    "cards": {
+        "team": {
+            "title": "Meet Our Team",
+            "membersTitle": "Members and Roles:",
+            "members": [
+                "Doan Thanh Phuc - Team Leader",
+                "Nguyen Truong Duy - Backend Developer",
+                "Tran Gia Vy - Backend Developer",
+                "Duong My Tien - Website Developer",
+                "To Do Hong Y - Website Developer"
+            ],
+            "goalTitle": "Our Goal:",
+            "goal": "To create a platform that connects tenants and landlords efficiently, using modern technology."
+        },
+        "project": {
+            "title": "Why This Project & Goals",
+            "whyTitle": "Why This Project?",
+            "why": "Addressing real-world problems: Difficulty in finding and managing rental properties, leveraging technology to optimize the rental process for both tenants and landlords, and aligning with market trends and the growing demand for digital platforms.",
+            "goalsTitle": "Project Goals:",
+            "goals": "Build a platform that connects landlords and tenants easily, provide features like online booking, electronic payments, and contract management, and enhance the rental experience by utilizing modern technologies."
+        },
+        "technologies": {
+            "title": "Technologies & Future Vision",
+            "usedTitle": "Technologies Used:",
+            "used": "ReactJS, Node.js, MongoDB, integration with electronic payment systems (Momo, VNPay), and modern deployment and security tools (CI/CD, Cloud Hosting).",
+            "futureTitle": "Vision & Future Development:",
+            "future": "Adding features like user reviews and feedback, expanding the platform to cover more regions, and enhancing user experience with AI-powered rental recommendations."
+        }
+    }
+}

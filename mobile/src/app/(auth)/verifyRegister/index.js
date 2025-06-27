@@ -78,10 +78,6 @@ export default function VerifyRegister() {
       <BackHeader title={t("verifyRegisterTitle")} animationType="slide" />
 
       <ScrollContainer keyboardAvoiding className="px-4">
-        <Text variant="h2" weight="bold" className="mt-4 mb-6">
-          {t("verifyRegisterTitle")}
-        </Text>
-
         <FormField
           name="otp"
           label="OTP"

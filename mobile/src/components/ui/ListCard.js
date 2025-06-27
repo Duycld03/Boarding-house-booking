@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  useColorScheme,
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -68,6 +67,17 @@ const ListCard = ({
 
   const renderItem = ({ item }) => {
     const house = item?.boardingHouseId || item;
+
+    const type =
+      typeof house?.boardingHouseType === 'object'
+        ? house?.boardingHouseType?.name
+        : house?.boardingHouseType;
+
+    // ❌ Bỏ qua nếu không có loại nhà trọ hợp lệ
+    if (!type || type === 'undefined' || type === 'Unknown') {
+      return null;
+    }
+
     const navigateId = house?._id;
     const itemId = mode === 'favorite' ? house?._id : item?._id || item?.id;
 
@@ -90,13 +100,7 @@ const ListCard = ({
             {house?.name}
           </Text>
           <Text style={[styles.type, { color: isDarkMode ? '#ccc' : '#666' }]}>
-            {t(
-              `boardingHouseTypes.${
-                typeof house?.boardingHouseType === 'object'
-                  ? house?.boardingHouseType?.name
-                  : house?.boardingHouseType || 'Unknown'
-              }`
-            )}
+            {t(`boardingHouseTypes.${type}`)}
           </Text>
           {renderStars(house?.rating)}
           <Text

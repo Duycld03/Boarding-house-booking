@@ -185,7 +185,7 @@ function CreateAppointment() {
         setLoading(true);
         try {
             const res = await getAppointmentOfUser();
-            setUserAppointment(res || []);
+            setUserAppointment(res?.data || []);
         } catch (error) {
             console.log('Error fetching user appointments:', error);
         } finally {
@@ -226,7 +226,7 @@ function CreateAppointment() {
             .filter((appt) => appt.startOf('day').isSame(selectedDay, 'day'))
             .map((appt) => appt.get('hour'));
 
-        return !(hour >= 6 && hour < 18 && !bookedHours.includes(hour));
+        return !(hour >= 7 && hour < 17 && !bookedHours.includes(hour));
     };
 
     const getMinDate = () => {
@@ -266,7 +266,7 @@ function CreateAppointment() {
                 const hasSameRoom = userAppointment.some(
                     (appt) =>
                         appt.roomId === appointmentData.roomId &&
-                        (appt.status === 'pending' || appt.status === 'confirmed')
+                        (appt.status === 'pending' || appt.status === 'accepted')
                 );
 
                 if (hasSameRoom) {
@@ -275,33 +275,11 @@ function CreateAppointment() {
                 }
             }
 
-            const isWithin30Minutes = (existingDate, newDate) => {
-                const diff = Math.abs(new Date(existingDate) - new Date(newDate));
-                return diff <= 30 * 60 * 1000;
-            };
-
-            if (userAppointment.length > 0) {
-                const hasConflict = userAppointment
-                    .filter(
-                        (appt) => appt.status === 'pending' || appt.status === 'confirmed'
-                    )
-                    .some((appt) =>
-                        isWithin30Minutes(
-                            appt.appointmentDate,
-                            appointmentData.appointmentDate
-                        )
-                    );
-
-                if (hasConflict) {
-                    showError(t('createAppointment.timeConflictError'))
-                    return;
-                }
-            }
 
             await createAppointment(appointmentData).then(() => {
                 showSuccess('Create appointment success')
                 resetForm();
-                router.back()
+                router.push('/myappointment')
             })
         } catch (error) {
             console.log('Error creating appointment:', error);

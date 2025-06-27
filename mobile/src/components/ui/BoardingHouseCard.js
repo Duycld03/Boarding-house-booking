@@ -15,6 +15,8 @@ import truncateDetail from '@/utils/truncateDetail';
 import { useTranslation } from 'react-i18next';
 import { addFavorite, getFavorite } from '@/API/favoriteAPI';
 import emitter from '@/utils/FavoriteEvent';
+import formatAmount from '@/utils/formatAmount';
+import i18next from 'i18next';
 
 const BoardingHouseCard = ({
   id,
@@ -30,6 +32,7 @@ const BoardingHouseCard = ({
   const [isFavorite, setIsFavorite] = useState(false); // khởi đầu false
   const { t } = useTranslation('home');
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
+  const currentLanguage = i18next.language;
 
   const timeAgoText = formatTimeAgo(updatedAt, t);
   const translatedDetail = truncateDetail(
@@ -47,7 +50,7 @@ const BoardingHouseCard = ({
           const favoriteIds = response.favorites.map((fav) => fav.id);
           setIsFavorite(favoriteIds.includes(id));
         }
-      } catch (error) { }
+      } catch (error) {}
     };
     fetchFavoriteStatus();
   }, [id]);
@@ -109,7 +112,7 @@ const BoardingHouseCard = ({
         </View>
 
         <Text style={styles.price}>
-          {price} {t('currencyPerMonth')}
+          {formatAmount(price, currentLanguage)} {t('currencyPerMonth')}{' '}
         </Text>
 
         <View style={styles.bottomRow}>

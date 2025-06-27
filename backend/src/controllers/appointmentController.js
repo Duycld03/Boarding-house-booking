@@ -59,16 +59,6 @@ class AppointmentController {
             // Cập nhật status và format dữ liệu
             const updatedAppointments = await Promise.all(
                 appointmentList.map(async (appointment) => {
-                    const appointmentDate = new Date(appointment.appointmentDate);
-                    appointmentDate.setHours(0, 0, 0, 0);
-
-                    // Cập nhật status nếu cần
-                    if (appointmentDate < today &&
-                        appointment.status !== "completed" &&
-                        appointment.status !== "canceled") {
-                        await Appointment.findByIdAndUpdate(appointment._id, { status: "completed" });
-                        appointment.status = "completed";
-                    }
 
                     return {
                         _id: appointment._id,

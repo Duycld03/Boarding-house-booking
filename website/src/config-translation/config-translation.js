@@ -20,6 +20,17 @@ import en_bhManagement from '@/locales/en/bhManagement';
 import vi_bhManagement from '@/locales/vi/bhManagement';
 import en_common from '@/locales/en/common.json';
 import vi_common from '@/locales/vi/common.json';
+import en_reportModal from '@/locales/en/reportModal.json';
+import vi_reportModal from '@/locales/vi/reportModal.json';
+import en_depositPopup from '@/locales/en/depositPopup.json';
+import vi_depositPopup from '@/locales/vi/depositPopup.json';
+import en_myreport from '@/locales/en/myreport.json';
+import vi_myreport from '@/locales/vi/myreport.json';
+import en_roomType from '@/locales/en/roomType.json';
+import vi_roomType from '@/locales/vi/roomType.json';
+import en_depositManagement from '@/locales/en/depositManagement.json';
+import vi_depositManagement from '@/locales/vi/depositManagement.json';
+import { DepositManagement } from '@/pages/common';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -34,6 +45,11 @@ i18n.use(initReactI18next).init({
       boardingHouseDetail: en_bhDetail,
       bhManagement: en_bhManagement,
       common: en_common,
+      reportModal: en_reportModal,
+      depositPopup: en_depositPopup,
+      myreport: en_myreport,
+      roomType: en_roomType,
+      depositManagement: en_depositManagement,
     },
     vi: {
       menu: vi_menu,
@@ -46,6 +62,11 @@ i18n.use(initReactI18next).init({
       boardingHouseDetail: vi_bhDetail,
       bhManagement: vi_bhManagement,
       common: vi_common,
+      reportModal: vi_reportModal,
+      depositPopup: vi_depositPopup,
+      myreport: vi_myreport,
+      roomType: vi_roomType,
+      depositManagement: vi_depositManagement,
     },
   },
   lng: 'en',

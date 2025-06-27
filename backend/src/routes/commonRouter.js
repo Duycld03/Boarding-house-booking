@@ -17,7 +17,7 @@ commonRouter.post("/login", authController.login);
 
 commonRouter.post("/login", authController.login);
 commonRouter.post("/login-with-google", authController.loginWithGoogle);
-commonRouter.post("/register", authController.register);
+commonRouter.post("/register-with-google", authController.registerWithGoogle);
 commonRouter.post("/forgot-password", authController.forgotPassword);
 commonRouter.post(
   "/forgot-password-mobile",

@@ -1,0 +1,20 @@
+{
+  "common": {
+    "goToLogin": "Go to Login",
+    "warning": "Warning",
+    "ok": "OK"
+  },
+  "auth": {
+    "loginRequired": "You must login before using this feature"
+  },
+  "watchLater": {
+    "savedSuccess": "Saved to Watch Later",
+    "removedSuccess": "Removed from Watch Later"
+  },
+  "noImages": "No images to display",
+  "report": {
+    "alreadyReported": "You have already reported this boarding house. Your report is being processed.",
+    "reportExists": "Report Exists",
+    "successMessage": "Your report has been submitted successfully"
+  }
+}
