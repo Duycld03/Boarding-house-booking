@@ -190,7 +190,7 @@ function Home() {
             { color: isDarkMode ? '#9ca3af' : '#6b7280' },
           ]}
         >
-          {t('searchPlaceholder', 'Tìm kiếm nhà trọ...')}
+          {t('welcome', 'Tìm kiếm nhà trọ...')}
         </Text>
         <Ionicons
           name="filter-outline"

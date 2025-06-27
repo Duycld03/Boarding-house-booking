@@ -804,6 +804,45 @@ class boardingHouseController {
       });
     }
   }
+  async searchBoardingHouses(req, res, next) {
+    try {
+      const { name } = req.query;
+
+      const filter = {
+        deleted: false,
+        totalRooms: { $gt: 0 },
+      };
+
+      // Thêm điều kiện tìm kiếm nếu có tên
+      if (name && name.trim() !== '') {
+        filter.name = { $regex: name.trim(), $options: 'i' }; // Không phân biệt hoa thường
+      }
+
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: 'updatedAt',
+        sortOrder: 'desc',
+        filter,
+        allowSearchFields: ['name', 'address'],
+        fields: '-reviews',
+        populate: [],
+        includeTotalData: true,
+      };
+
+      const result = await paginate(BoardingHouse, paginationOptions, req);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error('Error searching boarding house data:', error);
+      return res.status(500).json({
+        message:
+          'Failed to search boarding house data. Please try again later.',
+        error: error.message,
+      });
+    }
+  }
 
   async softDeleteBoardingHouse(req, res) {
     try {

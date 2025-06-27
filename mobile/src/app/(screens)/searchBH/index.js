@@ -9,9 +9,11 @@ import { useThemedClasses } from '@/utils/useTheme';
 import { useTheme } from '@/context/ThemeProvider';
 import { useTranslation } from 'react-i18next';
 import useDebounce from '@/utils/useDebounce';
-import { getAllBHHome } from '@/API/boardingHouseAPI';
+import { searchBoardingHouses } from '@/API/boardingHouseAPI';
 import formatAmount from '@/utils/formatAmount';
 import { BackHeader } from '@/components/navigation/CustomHeader';
+import EmptyState from '@/components/ui/EmptyState';
+import Loader from '@/components/ui/Loader';
 
 function SearchScreen() {
   const { themedClasses, isDarkMode } = useThemedClasses();
@@ -30,17 +32,10 @@ function SearchScreen() {
   const fetchSearchResults = async (term, currentPage = 1) => {
     setLoading(true);
     try {
-      const queryParams = {
-        page: currentPage,
-        limit,
-      };
-
-      // Nếu có search, thêm name vào query
-      if (term?.trim()) {
-        queryParams.name = term.trim();
-      }
-
-      const res = await getAllBHHome(queryParams);
+      const res = await searchBoardingHouses(
+        term?.trim() ? { name: term.trim() } : {},
+        { page: currentPage, limit }
+      );
 
       const newData =
         res?.data?.map((item) => ({
@@ -122,16 +117,29 @@ function SearchScreen() {
       </View>
 
       <View style={{ flex: 1, paddingHorizontal: 16 }}>
-        <VerticalList data={data} loading={loading} />
-        <LoadMoreButton
-          hasMore={hasMore}
-          isLoading={loading}
-          onLoadMore={handleLoadMore}
-          currentCount={data.length}
-          totalCount={totalItems}
-          itemsPerPage={limit}
-          itemName="boarding houses"
-        />
+        {data.length === 0 && !loading ? (
+          <EmptyState
+            title={t('noResult', 'Không tìm thấy')}
+            message={t(
+              'noResultDesc',
+              'Không có nhà trọ nào phù hợp với tìm kiếm của bạn.'
+            )}
+          />
+        ) : (
+          <>
+            <VerticalList data={data} loading={loading} />
+            <LoadMoreButton
+              hasMore={hasMore}
+              isLoading={loading}
+              onLoadMore={handleLoadMore}
+              currentCount={data.length}
+              totalCount={totalItems}
+              itemsPerPage={limit}
+              itemName="boarding houses"
+            />
+          </>
+        )}
+        {loading && data.length === 0 && <Loader overlay />}
       </View>
     </ScreenContainer>
   );

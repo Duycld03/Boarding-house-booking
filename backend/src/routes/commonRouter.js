@@ -46,6 +46,10 @@ commonRouter.get(
   boardingHouseController.getHighRatingBH
 );
 commonRouter.get('/boardinghouse/newest', boardingHouseController.getNewestBH);
+commonRouter.get(
+  '/boardinghouse/search',
+  boardingHouseController.searchBoardingHouses
+);
 
 commonRouter.get(
   '/boardinghouse/chore/get-max',

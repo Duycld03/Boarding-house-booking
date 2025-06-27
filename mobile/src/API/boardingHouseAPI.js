@@ -25,3 +25,14 @@ export const getNewestBH = (filterValue = {}, paginationOptions = {}) => {
 
   return axios.get('/boardinghouse/newest', { params });
 };
+export const searchBoardingHouses = (
+  filterValue = {},
+  paginationOptions = {}
+) => {
+  const params = {
+    ...filterValue,
+    ...paginationOptions,
+  };
+
+  return axios.get('/boardinghouse/search', { params });
+};
