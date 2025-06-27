@@ -16,6 +16,12 @@ import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import HorizontalList from '@/components/ui/HorizontalList';
 import { getBhByArea } from '@/API/ownerUser/boardingHouse';
+import {
+  getAllBHHome,
+  getHighRatingBH,
+  getNewestBH,
+} from '@/API/boardingHouseAPI';
+
 import formatAmount from '@/utils/formatAmount';
 import { useTranslation } from 'react-i18next';
 import Loader from '@/components/ui/Loader';
@@ -29,7 +35,11 @@ function Home() {
   const { theme } = useTheme();
   const router = useRouter();
   const { t } = useTranslation('home');
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({
+    all: [],
+    newest: [],
+    highRating: [],
+  });
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Thêm state để check login status
   const { isLogin } = useCurrentUser();
@@ -42,31 +52,39 @@ function Home() {
       const fetchData = async () => {
         setLoading(true);
         try {
-          const res = await getBhByArea({});
-          if (!Array.isArray(res)) {
-            if (isActive) setData([]);
-            return;
-          }
-          const formatted = res.map((item) => {
-            const img =
-              item.images?.find((i) => i.isPrimary)?.imageUrl ||
-              item.images?.[0]?.imageUrl ||
-              '';
-            return {
-              id: item._id?.$oid || item._id,
+          const [allRes, newestRes, highRatingRes] = await Promise.all([
+            getAllBHHome(),
+            getNewestBH(),
+            getHighRatingBH(),
+          ]);
+
+          const format = (arr) =>
+            arr?.map((item) => ({
+              id: item._id,
               name: item.name,
               price: item.priceRange,
               detail: item.address?.province,
               rating: item.rating || 0,
               reviewCount: item.reviewCount || 0,
-              img,
               updatedAt: item.updatedAt || 0,
-            };
-          });
-          if (isActive) setData(formatted);
+              img:
+                item.images?.find((i) => i.isPrimary)?.imageUrl ||
+                item.images?.[0]?.imageUrl ||
+                '',
+            })) || [];
+
+          if (isActive) {
+            setData({
+              all: format(allRes?.data || []),
+              newest: format(newestRes?.data || []),
+              highRating: format(highRatingRes?.data || []),
+            });
+          }
         } catch (error) {
           console.error('Error fetching BH:', error);
-          if (isActive) setData([]);
+          if (isActive) {
+            setData({ all: [], newest: [], highRating: [] });
+          }
         } finally {
           if (isActive) setLoading(false);
         }
@@ -80,14 +98,11 @@ function Home() {
           } else {
             setIsLoggedIn(false);
           }
-        } catch (error) {
-          if (isActive) {
-            setIsLoggedIn(false);
-          }
+        } catch {
+          if (isActive) setIsLoggedIn(false);
         }
       };
 
-      // Chạy cả 2 functions
       fetchData();
       checkLoginStatus();
 
@@ -96,15 +111,8 @@ function Home() {
       };
     }, [])
   );
-
-  const newestData = [...data]
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    .slice(0, 10);
-
-  const highRatingData = [...data]
-    .filter((i) => i.rating >= 3)
-    .sort((a, b) => b.reviewCount - a.reviewCount || b.rating - a.rating)
-    .slice(0, 10);
+  const newestData = data.newest;
+  const highRatingData = data.highRating;
 
   // Header Component với gradient và animation + Auth buttons
   const Header = () => (
@@ -194,7 +202,7 @@ function Home() {
   );
 
   // Stats Cards Component
-  const StatsCards = () => (
+  const StatsCards = ({ allCount, newestCount, highRatingCount }) => (
     <View style={styles.statsContainer}>
       <View
         style={[
@@ -208,22 +216,8 @@ function Home() {
         >
           <Ionicons name="home-outline" size={20} color="#ffffff" />
         </LinearGradient>
-        <Text
-          style={[
-            styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#1f2937' },
-          ]}
-        >
-          {data.length}
-        </Text>
-        <Text
-          style={[
-            styles.statsLabel,
-            { color: isDarkMode ? '#9ca3af' : '#6b7280' },
-          ]}
-        >
-          {t('All')}
-        </Text>
+        <Text style={styles.statsNumber}>{allCount}</Text>
+        <Text style={styles.statsLabel}>{t('All')}</Text>
       </View>
 
       <View
@@ -238,22 +232,8 @@ function Home() {
         >
           <Ionicons name="star-outline" size={20} color="#ffffff" />
         </LinearGradient>
-        <Text
-          style={[
-            styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#1f2937' },
-          ]}
-        >
-          {highRatingData.length}
-        </Text>
-        <Text
-          style={[
-            styles.statsLabel,
-            { color: isDarkMode ? '#9ca3af' : '#6b7280' },
-          ]}
-        >
-          {t('rating')}
-        </Text>
+        <Text style={styles.statsNumber}>{highRatingCount}</Text>
+        <Text style={styles.statsLabel}>{t('rating')}</Text>
       </View>
 
       <View
@@ -268,22 +248,8 @@ function Home() {
         >
           <Ionicons name="time-outline" size={20} color="#ffffff" />
         </LinearGradient>
-        <Text
-          style={[
-            styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#1f2937' },
-          ]}
-        >
-          {newestData.length}
-        </Text>
-        <Text
-          style={[
-            styles.statsLabel,
-            { color: isDarkMode ? '#9ca3af' : '#6b7280' },
-          ]}
-        >
-          {t('newest', 'Mới nhất')}
-        </Text>
+        <Text style={styles.statsNumber}>{newestCount}</Text>
+        <Text style={styles.statsLabel}>{t('newest', 'Mới nhất')}</Text>
       </View>
     </View>
   );
@@ -339,7 +305,11 @@ function Home() {
         {/* Chỉ hiển thị Quick Actions khi chưa login */}
         {/* {!isLoggedIn && <QuickActions />} */}
 
-        <StatsCards />
+        <StatsCards
+          allCount={data.all.length}
+          newestCount={data.newest.length}
+          highRatingCount={data.highRating.length}
+        />
 
         <View style={styles.sectionsContainer}>
           <SectionHeader
@@ -348,7 +318,7 @@ function Home() {
             icon="grid-outline"
             gradient={['#06b6d4', '#0891b2']}
           />
-          <HorizontalList data={data} />
+          <HorizontalList data={data.all} />
 
           <SectionHeader
             title={t('newest', 'Mới nhất')}

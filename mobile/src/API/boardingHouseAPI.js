@@ -1,5 +1,27 @@
 import axios from './axios.config';
 
-export const getAllBHHome = () => {
-    return axios.get('/boardinghouse');
+export const getAllBHHome = (filterValue = {}, paginationOptions = {}) => {
+  const params = {
+    ...filterValue,
+    ...paginationOptions,
+  };
+
+  return axios.get('/boardinghouse', { params });
+};
+export const getHighRatingBH = (filterValue = {}, paginationOptions = {}) => {
+  const params = {
+    ...filterValue,
+    ...paginationOptions,
+  };
+
+  return axios.get('/boardinghouse/highrating', { params });
+};
+
+export const getNewestBH = (filterValue = {}, paginationOptions = {}) => {
+  const params = {
+    ...filterValue,
+    ...paginationOptions,
+  };
+
+  return axios.get('/boardinghouse/newest', { params });
 };

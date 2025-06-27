@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   appointmentController,
   authController,
@@ -7,77 +7,83 @@ import {
   depositController,
   ReviewController,
   roomTypeController,
-} from "../controllers/index.js";
+} from '../controllers/index.js';
 
 const commonRouter = Router();
 
 //auth
 
-commonRouter.post("/login", authController.login);
+commonRouter.post('/login', authController.login);
 
-commonRouter.post("/login", authController.login);
-commonRouter.post("/login-with-google", authController.loginWithGoogle);
-commonRouter.post("/register-with-google", authController.registerWithGoogle);
-commonRouter.post("/forgot-password", authController.forgotPassword);
+commonRouter.post('/login', authController.login);
+commonRouter.post('/login-with-google', authController.loginWithGoogle);
+commonRouter.post('/register-with-google', authController.registerWithGoogle);
+commonRouter.post('/forgot-password', authController.forgotPassword);
 commonRouter.post(
-  "/forgot-password-mobile",
+  '/forgot-password-mobile',
   authController.forgotPasswordMobile
 );
 commonRouter.get(
-  "/reset-password-mobile/:token",
+  '/reset-password-mobile/:token',
   authController.resetPasswordMobile
 );
-commonRouter.post("/reset-password", authController.resetPassword);
-commonRouter.post("/send-otp-register", authController.sendOTPRegister);
-commonRouter.post("/verify-register", authController.verifyRegister);
+commonRouter.post('/reset-password', authController.resetPassword);
+commonRouter.post('/send-otp-register', authController.sendOTPRegister);
+commonRouter.post('/verify-register', authController.verifyRegister);
 
 //boarding house
 commonRouter.get(
-  "/boardinghouse/filter",
+  '/boardinghouse/filter',
   boardingHouseController.filterBoardingHouse
 );
 commonRouter.get(
-  "/boardinghousetype",
+  '/boardinghousetype',
   boardingHouseController.getAllBoardingHouseTypes
 );
-commonRouter.get("/boardinghouse", boardingHouseController.getAllBHOnHome);
+commonRouter.get('/boardinghouse', boardingHouseController.getAllBHOnHome);
 commonRouter.get(
-  "/boardinghouse/chore/get-max",
+  '/boardinghouse/highrating',
+  boardingHouseController.getHighRatingBH
+);
+commonRouter.get('/boardinghouse/newest', boardingHouseController.getNewestBH);
+
+commonRouter.get(
+  '/boardinghouse/chore/get-max',
   boardingHouseController.getMaxPriceBH
 );
 commonRouter.get(
-  "/boardinghouse/:id",
+  '/boardinghouse/:id',
   boardingHouseController.getBoardingHouseDetailInUser
 );
 
 commonRouter.get(
-  "/boardinghouse/room-types/:id",
+  '/boardinghouse/room-types/:id',
   roomTypeController.getRoomTypeByBhId
 );
 
 commonRouter.get(
-  "/boardinghouse/home/area",
+  '/boardinghouse/home/area',
   boardingHouseController.getBhByArea
 );
 
 //review
 commonRouter.get(
-  "/boardinghouse/reviews/:id",
+  '/boardinghouse/reviews/:id',
   ReviewController.getReviewByBhId
 );
 
 commonRouter.get(
-  "/room/room-type/:roomTypeId",
+  '/room/room-type/:roomTypeId',
   roomController.getRoomsByRoomType
 );
 
 commonRouter.get(
-  "/appointment/owner/:ownerId",
+  '/appointment/owner/:ownerId',
   appointmentController.getAppointmentsByOwnerId
 );
 
 // deposit
-commonRouter.get("/deposit/vnpay-return", depositController.vnpayReturn);
-commonRouter.get("/deposit/momo-return", depositController.momoReturn);
+commonRouter.get('/deposit/vnpay-return', depositController.vnpayReturn);
+commonRouter.get('/deposit/momo-return', depositController.momoReturn);
 
 export { commonRouter };

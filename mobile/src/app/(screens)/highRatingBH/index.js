@@ -1,82 +1,85 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router'; // Nếu bạn dùng expo-router
-import ScreenContainer, {
-  ScrollContainer,
-} from '@/components/layout/ScreenContainer';
+import { View } from 'react-native';
+import { useRouter } from 'expo-router';
+import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import VerticalList from '@/components/ui/VerticalList';
-import { getBhByArea } from '@/API/ownerUser/boardingHouse';
+import LoadMoreButton from '@/components/ui/LoadMoreButton';
+import { getHighRatingBH } from '@/API/boardingHouseAPI';
 import formatAmount from '@/utils/formatAmount';
 import { useTranslation } from 'react-i18next';
 
 function HighRatingBHScreen() {
   const { themedClasses } = useThemedClasses();
-  const { theme } = useTheme(); // light | dark
+  const { theme } = useTheme();
   const router = useRouter();
-  const [dataFromApi, setDataFromApi] = useState([]);
-  const [loading, setLoading] = useState(false);
   const { t } = useTranslation('home');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await getBhByArea({}); // truyền filter nếu có
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const limit = 6;
 
-        if (!Array.isArray(res)) {
-          setDataFromApi([]);
-          return;
-        }
+  const fetchData = async (currentPage = 1) => {
+    setLoading(true);
+    try {
+      const res = await getHighRatingBH({ page: currentPage, limit });
 
-        const formattedData = res.map((item) => {
+      const newData =
+        res?.data?.map((item) => {
           const imgPath =
             item.images?.find((img) => img.isPrimary)?.imageUrl ||
             item.images?.[0]?.imageUrl ||
             '';
           return {
-            id: item._id?.$oid || item._id,
+            id: item._id,
             name: item.name,
-            price: formatAmount(item.priceRange),
+            price: item.priceRange,
             detail: item.address?.province,
             rating: item.rating || 0,
             reviewCount: item.reviewCount || 0,
             img: imgPath,
             updatedAt: item.updatedAt || 0,
           };
-        });
+        }) || [];
 
-        setDataFromApi(formattedData);
-      } catch (error) {
-        console.error('Error fetching boarding houses:', error);
-        setDataFromApi([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setData((prev) => (currentPage === 1 ? newData : [...prev, ...newData]));
+    } catch (error) {
+      console.error('Error fetching high rating boarding houses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    fetchData(page);
+  }, [page]);
 
-  // Dữ liệu dùng để render
-  const dataToUse = dataFromApi;
-  const highRatingData = [...dataToUse]
-    .filter((item) => item.rating >= 3)
-    .sort((a, b) => {
-      if (b.reviewCount !== a.reviewCount) {
-        return b.reviewCount - a.reviewCount;
-      }
-      return b.rating - a.rating;
-    })
-    .slice(0, 10);
+  // ✅ Nếu dữ liệu nhận được đúng bằng `page * limit`, có thể còn trang sau
+  const hasMore = data.length === page * limit;
+
+  const handleLoadMore = () => {
+    if (hasMore && !loading) {
+      setPage((prev) => prev + 1);
+    }
+  };
 
   return (
     <ScreenContainer className={themedClasses.bg} withPadding={false}>
-      <BackHeader title={t('rating')} />
+      <BackHeader title={t('rating', 'Đánh giá cao')} />
       <View className="px-4" style={{ flex: 1 }}>
-        <VerticalList data={highRatingData} loading={loading} />
+        <VerticalList data={data} loading={loading} />
+        <LoadMoreButton
+          hasMore={hasMore}
+          isLoading={loading}
+          onLoadMore={handleLoadMore}
+          currentCount={data.length}
+          totalCount={data.length + (hasMore ? 1 : 0)} // giả lập
+          itemsPerPage={limit}
+          itemName="boarding houses"
+        />
       </View>
     </ScreenContainer>
   );
