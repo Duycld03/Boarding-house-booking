@@ -177,7 +177,7 @@ function Home() {
           styles.searchBar,
           { backgroundColor: isDarkMode ? '#374151' : '#ffffff' },
         ]}
-        onPress={() => router.push('/explore')}
+        onPress={() => router.push('/searchBH')}
       >
         <Ionicons
           name="search-outline"
@@ -216,8 +216,22 @@ function Home() {
         >
           <Ionicons name="home-outline" size={20} color="#ffffff" />
         </LinearGradient>
-        <Text style={styles.statsNumber}>{allCount}</Text>
-        <Text style={styles.statsLabel}>{t('All')}</Text>
+        <Text
+          style={[
+            styles.statsNumber,
+            { color: isDarkMode ? '#ffffff' : '#111827' },
+          ]}
+        >
+          {allCount}
+        </Text>
+        <Text
+          style={[
+            styles.statsLabel,
+            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
+          ]}
+        >
+          {t('All')}
+        </Text>
       </View>
 
       <View
@@ -232,8 +246,23 @@ function Home() {
         >
           <Ionicons name="star-outline" size={20} color="#ffffff" />
         </LinearGradient>
-        <Text style={styles.statsNumber}>{highRatingCount}</Text>
-        <Text style={styles.statsLabel}>{t('rating')}</Text>
+
+        <Text
+          style={[
+            styles.statsNumber,
+            { color: isDarkMode ? '#ffffff' : '#111827' },
+          ]}
+        >
+          {highRatingCount}
+        </Text>
+        <Text
+          style={[
+            styles.statsLabel,
+            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
+          ]}
+        >
+          {t('rating')}
+        </Text>
       </View>
 
       <View
@@ -248,8 +277,22 @@ function Home() {
         >
           <Ionicons name="time-outline" size={20} color="#ffffff" />
         </LinearGradient>
-        <Text style={styles.statsNumber}>{newestCount}</Text>
-        <Text style={styles.statsLabel}>{t('newest', 'Mới nhất')}</Text>
+        <Text
+          style={[
+            styles.statsNumber,
+            { color: isDarkMode ? '#ffffff' : '#111827' },
+          ]}
+        >
+          {newestCount}
+        </Text>
+        <Text
+          style={[
+            styles.statsLabel,
+            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
+          ]}
+        >
+          {t('newest', 'Mới nhất')}
+        </Text>
       </View>
     </View>
   );
