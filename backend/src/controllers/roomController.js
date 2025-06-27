@@ -3,7 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import Room from "../models/room.js";
 import PaymentBill from "../models/paymentBill.js";
 import paginate from "../utils/pagination.js";
-
+import DepositRoom from "../models/depositRoom.js";
 
 class RoomController {
   async getRoomsByRoomType(req, res) {
@@ -15,18 +15,25 @@ class RoomController {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
+      // Get deposit room IDs with confirmed status
+      const depositRoomIds = await DepositRoom.find({
+        status: "confirmed",
+      }).distinct("roomId");
+
+      // Create filter with roomTypeId and exclude depositRoomIds
       const filter = {
         roomTypeId: new mongoose.Types.ObjectId(roomTypeId),
         isAvailable: true,
+        _id: { $nin: depositRoomIds },
       };
 
       if (boardingHouseId) {
         filter.boardingHouseId = new mongoose.Types.ObjectId(boardingHouseId);
       }
 
-      const rooms = await Room.find(filter);
+      const availableRooms = await Room.find(filter);
 
-      res.status(200).json(rooms);
+      res.status(200).json(availableRooms);
     } catch (error) {
       console.error("Error fetching rooms:", error);
       res.status(500).json({ message: "Server error", error });
@@ -99,36 +106,31 @@ class RoomController {
     try {
       const { boardingHouseId } = req.params;
 
-
       const filter = {
-        boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId)
+        boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId),
       };
 
       const paginationOptions = {
         defaultPage: 1,
         defaultLimit: 10,
         maxLimit: 100,
-        sortField: 'createdAt',
-        sortOrder: 'desc',
+        sortField: "createdAt",
+        sortOrder: "desc",
         filter,
-        populate: [
-          { path: 'roomTypeId' },
-          { path: 'rentBy' }
-        ],
-        includeTotalData: true
+        populate: [{ path: "roomTypeId" }, { path: "rentBy" }],
+        includeTotalData: true,
       };
 
       // Gọi helper paginate
       const result = await paginate(Room, paginationOptions, req);
 
       return res.status(200).json(result);
-
     } catch (error) {
       console.error("Error fetching rooms:", error);
       return res.status(500).json({
         success: false,
         message: "Server error",
-        error: error.message
+        error: error.message,
       });
     }
   }
