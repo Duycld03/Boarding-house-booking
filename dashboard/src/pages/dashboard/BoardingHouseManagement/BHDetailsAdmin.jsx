@@ -60,15 +60,15 @@ const BHDetailAdmin = () => {
 
     const fetchBoardingHouseDetails = async () => {
         if (!boardingHouseId) {
-            toast.error("Boarding house ID not found.");
+            toast.error(t("errors.noId"));
             navigate("/dashboard/boarding-house-management");
         }
         try {
             const response = await getBoardingHouseDetails(boardingHouseId);
-            console.log(response)
+            console.log("respone", response)
             // Ensure the response structure is valid
             if (!response?.success || !response?.data) {
-                throw new Error("Invalid API response");
+                throw new Error(t("errors.fetchFailed"));
             }
             const data = response.data;
             console.log(data)
@@ -98,7 +98,7 @@ const BHDetailAdmin = () => {
             ]);
         } catch (error) {
             console.error("Failed to fetch boarding house data:", error);
-            toast.error("Failed to fetch boarding house data.");
+            toast.error(t("errors.fetchFailed"));
         }
     };
     useEffect(() => {
@@ -147,7 +147,7 @@ const BHDetailAdmin = () => {
                 }
             } catch (error) {
                 console.error("Error fetching address data:", error);
-                toast.error("Failed to fetch address data.");
+                toast.error(t("errors.fetchAddressFailed"));
             }
         };
 
@@ -173,7 +173,7 @@ const BHDetailAdmin = () => {
 
             } catch (error) {
                 console.error("Failed to fetch boarding house types:", error);
-                toast.error("Failed to fetch boarding house types.");
+                toast.error(t("errors.fetchBoardingHouseTypes"));
             }
         };
 
@@ -213,7 +213,7 @@ const BHDetailAdmin = () => {
         }
 
         if (updatedData.otherImages.length >= 15) {
-            toast.error("You can only upload up to 15 other images.");
+            toast.error(t("errors.maxOtherImages"));
             return;
         }
 
@@ -238,7 +238,7 @@ const BHDetailAdmin = () => {
                 otherImages: updatedOtherImages,
             };
         });
-        toast.success("Temporary image removed.");
+        toast.success(t("messages.imageRemoved"));
     };
 
     const handleSelectedTypesChange = (event) => {
@@ -296,41 +296,50 @@ const BHDetailAdmin = () => {
 
             const payload = new FormData();
             if (!updatedData.boardingHouseType) {
-                toast.error("Please select a boarding house type.");
+                toast.error(t("validation.selectBoardingHouseType"));
                 return;
             }
+
             if (!updatedData.name) {
-                toast.error("Please enter a boarding house name.");
+                toast.error(t("validation.enterBoardingHouseName"));
                 return;
             }
+
             if (!updatedData.address.province) {
-                toast.error("Please select a boarding house province.");
+                toast.error(t("validation.selectProvince"));
                 return;
             }
+
             if (!updatedData.address.district) {
-                toast.error("Please select a boarding house district.");
+                toast.error(t("validation.selectDistrict"));
                 return;
             }
+
             if (!updatedData.address.ward) {
-                toast.error("Please select a boarding house ward.");
+                toast.error(t("validation.selectWard"));
                 return;
             }
+
             if (!updatedData.address.detail) {
-                toast.error("Please enter a boarding house details.");
+                toast.error(t("validation.enterDetailAddress"));
                 return;
             }
+
             if (!updatedData.priceRange) {
-                toast.error("Please enter price range.");
+                toast.error(t("validation.enterPriceRange"));
                 return;
             }
+
             if (!updatedData.electricityPrice) {
-                toast.error("Please enter electricity price.");
+                toast.error(t("validation.enterElectricityPrice"));
                 return;
             }
+
             if (!updatedData.waterPrice) {
-                toast.error("Please enter water price.");
+                toast.error(t("validation.enterWaterPrice"));
                 return;
             }
+
 
             // Append basic form fields
             payload.append(
@@ -352,29 +361,24 @@ const BHDetailAdmin = () => {
             // Append primary image (new or existing)
             const oldImg = [];
 
-            if (updatedData.primaryImage) {
-                if (updatedData.primaryImage instanceof File) {
-                    payload.append("boardingHouse", updatedData.primaryImage);
-                } else {
-                    oldImg.push(updatedData.primaryImage);
-                }
+            if (updatedData.primaryImage instanceof File) {
+                payload.append('boardingHouse', updatedData.primaryImage);
             } else {
-                toast.error("A primary image is required.");
-                return;
+                oldImg.push(updatedData.primaryImage);
             }
 
-            if (updatedData.otherImages) {
-                updatedData.otherImages.forEach((file) => {
-                    if (file instanceof File) {
-                        payload.append("boardingHouse", file);
-                    } else {
-                        oldImg.push(file);
-                    }
-                });
-            }
+            (updatedData.otherImages || []).forEach((file) => {
+                if (file instanceof File) {
+                    payload.append('boardingHouse', file);
+                } else {
+                    oldImg.push(file);
+                }
+            });
+
             if (oldImg.length > 0) {
-                payload.append("boardingHouse", JSON.stringify(oldImg));
+                payload.append('boardingHouse', JSON.stringify(oldImg));
             }
+            console.log("payload", payload)
             const response = await updateBoardingHouseDetails(
                 updatedData._id, // Boarding house ID
                 payload
@@ -417,6 +421,7 @@ const BHDetailAdmin = () => {
                 colorPrimary: "#3b82f6",
                 controlItemBgActive: "#3b82f6",
                 controlItemBgHover: "#4B5563",
+                colorBgElevated: "#374151"
             }
             : {
                 colorText: "#000000",
@@ -427,6 +432,7 @@ const BHDetailAdmin = () => {
                 colorPrimary: "#3b82f6",
                 controlItemBgActive: "#e5e7eb",
                 controlItemBgHover: "#f0f0f0",
+                colorBgElevated: "#ffffff"
             },
         components: {
             Select: {
@@ -435,6 +441,7 @@ const BHDetailAdmin = () => {
                 colorBorder: darkMode ? "#4B5563" : "#d9d9d9",
                 optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb",
                 optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0",
+                colorBgElevated: darkMode ? "#374151" : "#ffffff",
             },
             Input: {
                 colorBgContainer: darkMode ? "#374151" : "#f5f5f5",
@@ -514,10 +521,10 @@ const BHDetailAdmin = () => {
                                         <Form.Item label={t("boardingHouseDetailsAdmin.boardingHouseType")} className="mb-2">
                                             <Select
                                                 name="boardingHouseType"
-                                                value={updatedData.boardingHouseType?._id || ""}
+                                                value={updatedData.boardingHouseType?._id || ''}
                                                 onChange={(value) =>
                                                     handleSelectedTypesChange({
-                                                        target: { name: "boardingHouseType", value },
+                                                        target: { name: 'boardingHouseType', value },
                                                     })
                                                 }
                                                 className={darkMode ? "dark-mode-select" : ""}
@@ -530,6 +537,7 @@ const BHDetailAdmin = () => {
                                                 ))}
                                             </Select>
                                         </Form.Item>
+
                                         <Form.Item label={t("boardingHouseDetailsAdmin.description")} className="flex-grow">
                                             <Input.TextArea
                                                 name="description"
@@ -606,7 +614,8 @@ const BHDetailAdmin = () => {
                                         {updatedData.primaryImage ? (
                                             <div className="relative">
                                                 <Image
-                                                    src={updatedData?.primaryImage?.imageUrl}
+                                                    src={updatedData?.primaryImage?.imageUrl ||
+                                                        URL.createObjectURL(updatedData.primaryImage)}
                                                     alt="Primary"
                                                     className="object-cover border rounded"
                                                     style={{

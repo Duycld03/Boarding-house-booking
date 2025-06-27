@@ -249,7 +249,7 @@ function FilterBoardingHouse({ setFilterValue }) {
               layout="vertical"
               className="py-4 px-6"
             >
-              <Form.Item label={t("filterBH.boardingHouseName")} name="name">
+              <Form.Item label={t("filterBH.boardingHouseName")} name="name" className="mb-2">
                 <Input
                   placeholder={t("filterBH.enterBoardingHouseName")}
                   onChange={(e) => {
@@ -257,7 +257,7 @@ function FilterBoardingHouse({ setFilterValue }) {
                   }}
                 />
               </Form.Item>
-              <Form.Item label={t("filterBH.province")} name="province">
+              <Form.Item label={t("filterBH.province")} name="province" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectProvince")}
                   onChange={(code) => {
@@ -277,7 +277,7 @@ function FilterBoardingHouse({ setFilterValue }) {
                 </Select>
               </Form.Item>
 
-              <Form.Item label={t("filterBH.district")} name="district">
+              <Form.Item label={t("filterBH.district")} name="district" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectDistrict")}
                   onChange={(code) => {
@@ -297,7 +297,7 @@ function FilterBoardingHouse({ setFilterValue }) {
                 </Select>
               </Form.Item>
 
-              <Form.Item label={t("filterBH.ward")} name="ward">
+              <Form.Item label={t("filterBH.ward")} name="ward" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectWard")}
                   onChange={(code) => {
@@ -317,7 +317,7 @@ function FilterBoardingHouse({ setFilterValue }) {
                 </Select>
               </Form.Item>
 
-              <Form.Item label={t("filterBH.priceRange")} name="priceRange">
+              <Form.Item label={t("filterBH.priceRange")} name="priceRange" className="mb-2">
                 <div className="flex justify-between text-2xl mt-1 mb-2">
                   <p className="truncate max-w-[40%]">
                     min: {formatAmount(currentPrice.min)}
@@ -339,7 +339,7 @@ function FilterBoardingHouse({ setFilterValue }) {
                 />
               </Form.Item>
 
-              <Form.Item label={t("filterBH.boardingHouseType")} name="boardingHouseType">
+              <Form.Item label={t("filterBH.boardingHouseType")} name="boardingHouseType" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectBoardingHouseType")}
                   onChange={(value) =>
@@ -362,12 +362,14 @@ function FilterBoardingHouse({ setFilterValue }) {
                     size="large"
                     htmlType="submit"
                     className="w-40"
+                    title={t("filterBH.filterButton")}
                   />
                   <ButtonCustom
                     onClick={handleClear}
                     btnDelete
                     size="large"
                     className="w-40"
+                    title={t("filterBH.deleteButton")}
                   />
                 </div>
               </Form.Item>

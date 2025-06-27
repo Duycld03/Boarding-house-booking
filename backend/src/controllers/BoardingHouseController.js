@@ -95,68 +95,102 @@ class boardingHouseController {
       const { id } = req.params;
       const updateData = req.body;
       console.log("mtiennnn", req.files)
-      let images = [];
-      let primaryImageCount = 0;
-
-      // Xử lý primary image mới
-      if (req.files?.primaryImage?.[0]) {
-        images.push({
-          imageUrl: req.files.primaryImage[0].path,
-          publicId: req.files.primaryImage[0].filename,
-          isPrimary: true
-        });
-        primaryImageCount++;
-      } else if (req.body.existingPrimaryImage) {
-        const existingPrimary = JSON.parse(req.body.existingPrimaryImage);
-        images.push({ ...existingPrimary, isPrimary: true });
-        primaryImageCount++;
+      const boardingHouse = await BoardingHouse.findById(id);
+      if (!boardingHouse) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Boarding house not found." });
       }
+      // let images = [];
+      // let primaryImageCount = 0;
 
-      // Xử lý other images mới
-      if (req.files?.otherImages?.length) {
-        req.files.otherImages.forEach(file => {
+      // // Xử lý primary image mới
+      // if (req.files?.primaryImage?.[0]) {
+      //   images.push({
+      //     imageUrl: req.files.primaryImage[0].path,
+      //     publicId: req.files.primaryImage[0].filename,
+      //     isPrimary: true
+      //   });
+      //   primaryImageCount++;
+      // } else if (req.body.existingPrimaryImage) {
+      //   const existingPrimary = JSON.parse(req.body.existingPrimaryImage);
+      //   images.push({ ...existingPrimary, isPrimary: true });
+      //   primaryImageCount++;
+      // }
+
+      // // Xử lý other images mới
+      // if (req.files?.otherImages?.length) {
+      //   req.files.otherImages.forEach(file => {
+      //     images.push({
+      //       imageUrl: file.path,
+      //       publicId: file.filename,
+      //       isPrimary: false
+      //     });
+      //   });
+      // }
+
+      // // Xử lý other images cũ
+      // if (req.body.existingOtherImages) {
+      //   const existingOthers = JSON.parse(req.body.existingOtherImages);
+      //   existingOthers.forEach(img => {
+      //     images.push({ ...img, isPrimary: false });
+      //   });
+      // }
+
+      // if (primaryImageCount !== 1) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "You must upload exactly one primary image.",
+      //   });
+      // }
+
+      // if (images.length > 15) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "You can't upload more than 15 images.",
+      //   });
+      // }
+
+      // // Xóa ảnh cũ nếu có upload ảnh mới
+      // const boardingHouse = await BoardingHouse.findById(id);
+      // const oldPublicIds = boardingHouse.images.map(img => img.publicId);
+      // const newPublicIds = images.map(img => img.publicId);
+      // const imagesToDelete = oldPublicIds.filter(id => !newPublicIds.includes(id));
+
+      // for (const publicId of imagesToDelete) {
+      //   await cloudinary.uploader.destroy(publicId);
+      // }
+
+      // // Cập nhật thông tin boarding house
+      // updateData.images = images;
+      const images = [];
+      let hasPrimary = false;
+      if (req.body.boardingHouse) {
+        const data = JSON.parse(req.body.boardingHouse);
+
+        for (const img of data) {
+          if (img.isPrimary) hasPrimary = true;
+        }
+
+        if (Array.isArray(data)) {
+          images.push(...data);
+        }
+      }
+      if (req.files) {
+        req.files.forEach((file, index) => {
           images.push({
             imageUrl: file.path,
             publicId: file.filename,
-            isPrimary: false
+            isPrimary: !hasPrimary && index === 0,
           });
         });
+        // Delete old images from Cloudinary
+        for (const oldImage of boardingHouse.images) {
+          await cloudinary.uploader.destroy(oldImage.publicId);
+        }
+
+        updateData.images = images;
       }
-
-      // Xử lý other images cũ
-      if (req.body.existingOtherImages) {
-        const existingOthers = JSON.parse(req.body.existingOtherImages);
-        existingOthers.forEach(img => {
-          images.push({ ...img, isPrimary: false });
-        });
-      }
-
-      if (primaryImageCount !== 1) {
-        return res.status(400).json({
-          success: false,
-          message: "You must upload exactly one primary image.",
-        });
-      }
-
-      if (images.length > 15) {
-        return res.status(400).json({
-          success: false,
-          message: "You can't upload more than 15 images.",
-        });
-      }
-
-      // Xóa ảnh cũ nếu có upload ảnh mới
-      const boardingHouse = await BoardingHouse.findById(id);
-      const oldPublicIds = boardingHouse.images.map(img => img.publicId);
-      const newPublicIds = images.map(img => img.publicId);
-      const imagesToDelete = oldPublicIds.filter(id => !newPublicIds.includes(id));
-
-      for (const publicId of imagesToDelete) {
-        await cloudinary.uploader.destroy(publicId);
-      }
-
-      // Cập nhật thông tin boarding house
-      updateData.images = images;
 
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
         id,

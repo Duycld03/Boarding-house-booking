@@ -13,6 +13,8 @@
         "minPrice": "Min Price",
         "maxPrice": "Max Price",
         "boardingHouseType": "Boarding House Type",
-        "selectBoardingHouseType": "Select boarding house type"
+        "selectBoardingHouseType": "Select boarding house type",
+        "filterButton": "Apply",
+        "deleteButton": "CLear"
     }
 }

@@ -66,5 +66,10 @@
         "enterElectricityPrice": "Please enter electricity price.",
         "enterWaterPrice": "Please enter water price.",
         "uploadPrimaryImage": "A primary image is required."
+    },
+    "boardingHouseTypes": {
+        "Nhà trọ truyền thống": "Traditional Boarding House",
+        "Mini house": "Mini Apartment",
+        "Nhà trọ kiến trúc xá": "Dormitory"
     }
 }

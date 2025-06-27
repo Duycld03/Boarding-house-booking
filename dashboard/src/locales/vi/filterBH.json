@@ -13,6 +13,8 @@
         "minPrice": "Giá thấp nhất",
         "maxPrice": "Giá cao nhất",
         "boardingHouseType": "Loại nhà trọ",
-        "selectBoardingHouseType": "Chọn loại nhà trọ"
+        "selectBoardingHouseType": "Chọn loại nhà trọ",
+        "filterButton": "Áp dụng",
+        "deleteButton": "Xóa"
     }
 }

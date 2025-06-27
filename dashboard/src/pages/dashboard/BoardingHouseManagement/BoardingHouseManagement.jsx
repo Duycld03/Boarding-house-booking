@@ -513,13 +513,22 @@ function BoardingHouseManagement(onClose) {
       title: t("boardingHouseAdmin.priceRange"),
       dataIndex: "priceRange",
       key: "priceRange",
-      render: (text) => `${formatAmount(text)}/month`,
+      render: (text) => `${formatAmount(text)}`,
     },
+    // {
+    //   title: t("boardingHouseAdmin.boardingHouseType"),
+    //   dataIndex: "boardingHouseType",
+    //   key: "boardingHouseType",
+    //   render: (text) => (text ? text.name : ""),
+    // },
     {
-      title: t("boardingHouseAdmin.boardingHouseType"),
-      dataIndex: "boardingHouseType",
-      key: "boardingHouseType",
-      render: (text) => (text ? text.name : ""),
+      title: t('boardingHouseAdmin.boardingHouseType'),
+      dataIndex: 'boardingHouseType',
+      key: 'boardingHouseType',
+      render: (type) => {
+        if (!type) return t('messages.noData');
+        return t(`boardingHouseTypes.${type.name}`) || t('messages.noData');
+      },
     },
     {
       title: t("boardingHouseAdmin.totalRooms"),

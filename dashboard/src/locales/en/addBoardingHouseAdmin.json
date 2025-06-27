@@ -77,5 +77,9 @@
         "enterElectricityPrice": "Please enter electricity price.",
         "enterWaterPrice": "Please enter water price.",
         "uploadPrimaryImage": "A primary image is required."
-    }
+    },
+    "selectProvince": "Select Province",
+    "selectDistrict": "Select District",
+    "selectWard": "Select Ward",
+    "enterDetailAddress": "Input details boarding house address"
 }

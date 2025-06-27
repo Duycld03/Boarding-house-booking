@@ -191,31 +191,31 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
     console.log("Form Data:", formData);
     // console.log("Boarding House Type:", formData.boardingHouseType);
     if (!formData.owner) {
-      toast.error("Please enter owner username.");
+      toast.error(t("validation.enterName"));
       return;
     }
     if (!formData.boardingHouseType) {
-      toast.error("Please select a boarding house type.");
+      toast.error(t("validation.selectBoardingHouseType"));
       return;
     }
     if (!formData.name) {
-      toast.error("Please enter a boarding house name.");
+      toast.error(t("validation.enterBoardingHouseName"));
       return;
     }
     if (!formData.address.province) {
-      toast.error("Please select a boarding house province.");
+      toast.error(t("validation.selectProvince"));
       return;
     }
     if (!formData.address.district) {
-      toast.error("Please select a boarding house district.");
+      toast.error(t("validation.selectDistrict"));
       return;
     }
     if (!formData.address.ward) {
-      toast.error("Please select a boarding house ward.");
+      toast.error(t("validation.selectWard"));
       return;
     }
     if (!formData.address.detail) {
-      toast.error("Please enter a boarding house details.");
+      toast.error(t("validation.enterDetailAddress"));
       return;
     }
 
@@ -256,12 +256,12 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
     const allImages = [];
     if (formData.primaryImage) allImages.push(formData.primaryImage);
     if (formData.otherImages.length > 15) {
-      toast.error("You can't upload more than 15 other images.");
+      toast.error(t("validation.maxOtherImages"));
       return;
     }
     allImages.push(...formData.otherImages);
     if (allImages.length === 0) {
-      toast.error("You must upload at least one image.");
+      toast.error(t("validation.uploadPrimaryImage"));
       return;
     }
     let form = {

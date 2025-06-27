@@ -66,5 +66,10 @@
         "enterElectricityPrice": "Vui lòng nhập giá điện.",
         "enterWaterPrice": "Vui lòng nhập giá nước.",
         "uploadPrimaryImage": "Bạn phải tải lên ảnh chính."
+    },
+    "boardingHouseTypes": {
+        "Nhà trọ truyền thống": "Nhà trọ truyền thống",
+        "Mini house": "Căn hộ mini",
+        "Nhà trọ kiến trúc xá": "Nhà trọ kiến trúc xá"
     }
 }
