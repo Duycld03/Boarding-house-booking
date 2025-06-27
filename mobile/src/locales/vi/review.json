@@ -1,6 +1,7 @@
 {
     "review": {
-        "title": "Thêm Đánh Giá",
+        "titleAdd": "Thêm Đánh Giá",
+        "titleUpdate": "Cập Nhật Đánh Giá",
         "rating": "Xếp Hạng",
         "content": "Nội Dung Đánh Giá",
         "contentPlaceholder": "Viết đánh giá của bạn...",
@@ -16,6 +17,12 @@
         "loginRequired": "Yêu cầu đăng nhập",
         "loginToReview": "Bạn cần đăng nhập để gửi đánh giá",
         "login": "Đăng nhập",
-        "cancel": "Hủy"
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "confirmDelete": "Xác Nhận Xóa",
+        "deleteMessage": "Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác.",
+        "confirm": "Xóa",
+        "deleteSuccess": "Đánh giá đã được xóa thành công!",
+        "deleteFailed": "Không thể xóa đánh giá."
     }
 }

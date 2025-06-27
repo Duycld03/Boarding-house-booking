@@ -149,7 +149,7 @@ const AddReview = () => {
     return (
         <ScreenContainer withPadding={false}>
             <BackHeader
-                title={t("review.title") || "Add Review"}
+                title={t("review.titleAdd") || "Add Review"}
                 backIcon={
                     <AntDesign name="left" size={20} color={isDarkMode ? "#fff" : "#333"} />
                 }

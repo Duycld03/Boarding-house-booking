@@ -107,7 +107,9 @@
     "reportReview": "Báo cáo đánh giá này",
     "alreadyReported": "Bạn đã báo cáo đánh giá này. Vui lòng đợi quản trị viên xử lý.",
     "replyToReview": "Trả lời đánh giá này",
-    "alreadyReplied": "Bạn đã trả lời đánh giá này."
+    "alreadyReplied": "Bạn đã trả lời đánh giá này.",
+    "deleteMessage": "Bạn có chắc chắn muốn xóa đánh giá này?",
+    "confirm": "Xóa"
   },
   "reviewList": {
     "allReviewsLoaded": "Tất cả đánh giá đã được tải",

@@ -8,6 +8,7 @@ import * as Linking from 'expo-linking';
 import '../../global.css';
 import { UserProvider } from '@/context/userContext';
 import { initLanguage } from '@/utils/initLanguage'; // <-- Thêm dòng này
+import { MenuProvider } from 'react-native-popup-menu';
 
 export default function Layout() {
   const [fontsLoaded, error] = useFonts({
@@ -59,23 +60,25 @@ export default function Layout() {
   }
 
   return (
-    <ThemeProvider>
-      <UserProvider>
-        <NotificationProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(auth)"
-              options={{
-                headerShown: false,
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-              }}
-            />
-            <Stack.Screen name="(screens)" options={{ headerShown: false }} />
-          </Stack>
-        </NotificationProvider>
-      </UserProvider>
-    </ThemeProvider>
+    <MenuProvider>
+      <ThemeProvider>
+        <UserProvider>
+          <NotificationProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(auth)"
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen name="(screens)" options={{ headerShown: false }} />
+            </Stack>
+          </NotificationProvider>
+        </UserProvider>
+      </ThemeProvider>
+    </MenuProvider>
   );
 }

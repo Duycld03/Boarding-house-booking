@@ -78,9 +78,13 @@ authRouter.get("/reports", reportController.getReportByUserId);
 authRouter.get("/reports/:reportId", reportController.getReportReviewDetail);
 
 //review
-authRouter.put("/reviews/:reviewId", ReviewController.updateReview);
-authRouter.get("/reviews", ReviewController.getReviewsUser);
+authRouter.put(
+  "/reviews/:reviewId",
+  upload.fields([{ name: "images", maxCount: 5 }]),
+  ReviewController.updateReview
+); authRouter.get("/reviews", ReviewController.getReviewsUser);
 authRouter.delete("/reviews/:reviewId", ReviewController.softDeleteReview);
+authRouter.get('/review/:reviewId', ReviewController.getReviewDetail);
 
 authRouter.get("/watchlater", watchLaterController.getWatchLater);
 authRouter.get("/watchlater/all", watchLaterController.getAllWatchLater);

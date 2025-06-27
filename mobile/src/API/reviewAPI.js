@@ -13,9 +13,10 @@ export const filterReviews = (filterValue) => {
     params: filterValue,
   });
 };
-
 export const updateReview = (reviewId, updatedData) => {
-  return axios.put(`/auth/reviews/${reviewId}`, updatedData);
+  return axios.put(`/auth/reviews/${reviewId}`, updatedData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 export const getReviewsUser = () => {
   return axios.get('/auth/reviews');
@@ -64,4 +65,7 @@ export const softDeleteReplyReview = (replyId) => {
   return axios.delete('/owner/review/reply', {
     data: { replyId }, // ✅ Đặt `replyId` vào `data`
   });
+};
+export const getReviewDetailUser = (reviewId) => {
+  return axios.get(`/auth/review/${reviewId}`);
 };
