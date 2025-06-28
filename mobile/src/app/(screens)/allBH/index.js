@@ -67,7 +67,7 @@ function AllBHScreen() {
   const hasMore = data.length < totalItems;
 
   return (
-    <ScreenContainer className={themedClasses.bg} withPadding={false}>
+    <ScreenContainer withPadding={false}>
       <BackHeader title={t('All')} />
       <View className="px-4" style={{ flex: 1 }}>
         <VerticalList data={data} loading={loading} />

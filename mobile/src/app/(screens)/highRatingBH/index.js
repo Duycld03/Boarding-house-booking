@@ -67,7 +67,7 @@ function HighRatingBHScreen() {
   };
 
   return (
-    <ScreenContainer className={themedClasses.bg} withPadding={false}>
+    <ScreenContainer withPadding={false}>
       <BackHeader title={t('rating', 'Đánh giá cao')} />
       <View className="px-4" style={{ flex: 1 }}>
         <VerticalList data={data} loading={loading} />

@@ -14,6 +14,12 @@ import formatAmount from '@/utils/formatAmount';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import EmptyState from '@/components/ui/EmptyState';
 import Loader from '@/components/ui/Loader';
+import {
+  MaterialIcons,
+  AntDesign,
+  FontAwesome,
+  FontAwesome5,
+} from '@expo/vector-icons';
 
 function SearchScreen() {
   const { themedClasses, isDarkMode } = useThemedClasses();
@@ -92,8 +98,17 @@ function SearchScreen() {
         <Loader overlay />
       ) : (
         <>
-          <BackHeader title={t('search', 'Tìm kiếm')} />
           <View style={styles.searchContainer}>
+            <BackHeader
+              backIcon={
+                <FontAwesome5
+                  name="chevron-left"
+                  size={18}
+                  color={isDarkMode ? '#fff' : '#333'}
+                />
+              }
+              title={t('search', 'Tìm kiếm')}
+            />
             <View
               style={[
                 styles.searchBar,
@@ -155,7 +170,7 @@ function SearchScreen() {
 const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 4,
     paddingBottom: 8,
   },
   searchBar: {
