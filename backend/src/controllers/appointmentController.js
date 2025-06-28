@@ -165,6 +165,40 @@ class AppointmentController {
             res.status(500).json({ message: "Server error", error });
         }
     }
+    async getAppointmentsByStaffId(req, res) {
+        try {
+            const { staffId } = req.params;
+
+            if (!staffId) {
+                return res.status(400).json({ message: "Missing staffId parameter" });
+            }
+
+            const boardingHouses = await BoardingHouse.find({ staffId }).select("_id");
+
+            if (!boardingHouses.length) {
+                return res.status(404).json({ message: "No boarding houses found for this staff" });
+            }
+
+            const rooms = await Room.find({
+                boardingHouseId: { $in: boardingHouses.map((bh) => bh._id) },
+            }).select("_id");
+
+            if (!rooms.length) {
+                return res.status(404).json({ message: "No rooms found for this staff" });
+            }
+
+            const appointments = await Appointment.find({
+                roomId: { $in: rooms.map((room) => room._id) },
+                status: "confirmed",
+            }).populate("roomId", "roomNumber");
+
+
+
+            res.status(200).json(appointments);
+        } catch (error) {
+            res.status(500).json({ message: "Server error", error });
+        }
+    }
 
     async createAppointment(req, res) {
         try {

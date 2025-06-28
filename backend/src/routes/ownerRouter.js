@@ -12,6 +12,7 @@ import {
   refundRequestController,
   renewalController,
   paymentBillController,
+  appointmentController
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -177,5 +178,6 @@ ownerRouter.post(
   '/calculate-monthly-bill',
   paymentBillController.calculateMonthlyRoomRent
 );
-
+//appointment
+ownerRouter.get("/:ownerId", appointmentController.getAppointmentsByOwnerId)
 export { ownerRouter };

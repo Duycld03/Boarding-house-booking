@@ -20,3 +20,6 @@ export const getOwnerAppointmentById = (id) => {
 export const createAppointment = (value) => {
     return axios.post(`/auth/appointment/create-appointment/`, value)
 }
+export const getAppointmentsByOwnerId = (id) => {
+    return axios.get(`/owner/${id}`)
+}
