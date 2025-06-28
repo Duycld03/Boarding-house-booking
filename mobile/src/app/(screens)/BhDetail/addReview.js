@@ -118,19 +118,18 @@ const AddReview = () => {
                 const imageType =
                     "image/" + (imageName.split(".").pop() === "png" ? "png" : "jpeg");
 
-                formData.append("images", {
+                formData.append("review", {
                     uri: image.uri,
                     name: imageName,
                     type: imageType,
                 });
             });
 
-            for (const pair of formData.entries()) {
-                console.log(`${pair[0]}:`, pair[1]);
-            }
+            // for (const pair of formData.entries()) {
+            //     console.log(`${pair[0]}:`, pair[1]);
+            // }
 
             const response = await addReview(formData);
-
             if (response.success) {
                 showSuccess(t("review.successMessage") || "Review submitted successfully!");
                 router.back();
@@ -138,7 +137,11 @@ const AddReview = () => {
                 showError(response.message || t("review.submitError") || "Failed to submit the review.");
             }
         } catch (error) {
-            console.error("Error submitting review:", error.response?.data || error.message);
+            // console.error("Error submitting review:", error.response?.data || error.message);
+            if (error.response?.status === 401) {
+                router.replace('/login');
+                return;
+            }
             showError(error.response?.data?.message || "Failed to submit the review.");
 
         } finally {

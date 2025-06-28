@@ -61,7 +61,9 @@ authRouter.post(
   "/appointment/create-appointment/",
   appointmentController.createAppointment
 );
-authRouter.post("/reviews", ReviewController.addReview);
+authRouter.post("/reviews",
+  upload.array("review"),
+  ReviewController.addReview);
 
 // report
 authRouter.get(

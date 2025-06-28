@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { useCurrentUser } from '@/context/userContext';
 import { deleteReviewUser } from '@/API/reviewAPI';
 import { useNotification } from "@/context/NotificationProvider";
+import { ConfirmModal } from '@/components/feedback';
 
 
 // Enable relative time plugin
@@ -32,6 +33,7 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const [deleteReviewId, setDeleteReviewId] = useState(null);
     const { showSuccess, showError } = useNotification();
+    const [loading, setLoading] = useState(false);
 
     // State for image modal
     const [modalVisible, setModalVisible] = useState(false);
@@ -171,9 +173,10 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
                 }
 
                 router.push({
-                    pathname: '/(screens)/BhDetail/report',
+                    pathname: "/(screens)/BhDetail/report",
                     params: {
-                        reviewId: review._id,
+                        reviewId: review?.id,
+                        boardingHouseId: boardingHouse._id
                     },
                 });
                 break;
@@ -183,18 +186,21 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
     };
     const handleDeleteReview = async () => {
         if (!deleteReviewId) return;
+        setLoading(true);
 
         try {
             const response = await deleteReviewUser(deleteReviewId);
             if (response?.success) {
                 showSuccess(t("reviewCard.deleteSuccess") || "Review deleted successfully!");
-                router.back();
             } else {
                 showError(response.message || t('reviewCard.deleteFailed'));
             }
         } catch (error) {
             console.error('Error deleting review:', error);
             showError(t('reviewCard.deleteFailed'));
+
+        } finally {
+            setLoading(false);
         }
     };
     return (
@@ -367,82 +373,16 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
                     </View>
                 )}
             </Wrapper>
-            <Modal
+            <ConfirmModal
                 visible={isDeleteModalVisible}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setIsDeleteModalVisible(false)} // Đóng modal khi nhấn ra ngoài
-            >
-                <View style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                    padding: 20,
-                }}>
-                    <View style={{
-                        backgroundColor: isDarkMode ? '#2D3748' : '#FFFFFF',
-                        borderRadius: 10,
-                        padding: 20,
-                        width: '90%',
-                        alignItems: 'center',
-                    }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 'bold',
-                            marginBottom: 10,
-                            color: isDarkMode ? '#E2E8F0' : '#1A202C',
-                        }}>
-                            {t('reviewCard.confirmDelete')}
-                        </Text>
-                        <Text style={{
-                            fontSize: 14,
-                            marginBottom: 20,
-                            color: isDarkMode ? '#A0AEC0' : '#4A5568',
-                            textAlign: 'center',
-                        }}>
-                            {t('reviewCard.deleteMessage')}
-                        </Text>
-
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-                            <TouchableOpacity
-                                onPress={() => setIsDeleteModalVisible(false)} // Hủy
-                                style={{
-                                    flex: 1,
-                                    alignItems: 'center',
-                                    paddingVertical: 10,
-                                    marginHorizontal: 5,
-                                    backgroundColor: isDarkMode ? '#4A5568' : '#CBD5E0',
-                                    borderRadius: 8,
-                                }}
-                            >
-                                <Text style={{
-                                    color: isDarkMode ? '#E2E8F0' : '#1A202C',
-                                    fontWeight: 'bold',
-                                }}>
-                                    {t('reviewCard.cancel')}
-                                </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={handleDeleteReview} // Xóa review
-                                style={{
-                                    flex: 1,
-                                    alignItems: 'center',
-                                    paddingVertical: 10,
-                                    marginHorizontal: 5,
-                                    backgroundColor: '#E53E3E',
-                                    borderRadius: 8,
-                                }}
-                            >
-                                <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>
-                                    {t('reviewCard.confirm')}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+                onClose={() => setIsDeleteModalVisible(false)}
+                onConfirm={handleDeleteReview}
+                title={t('reviewCard.confirmDelete')}
+                message={t('reviewCard.deleteMessage')}
+                confirmText={t('reviewCard.confirm')}
+                cancelText={t('reviewCard.cancel')}
+                dangerMode
+            />
             {/* Image Modal */}
             <Modal
                 visible={modalVisible}
@@ -460,6 +400,7 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
                     {/* Close button */}
                     <TouchableOpacity
                         onPress={closeModal}
+                        loading={loading}
                         style={{
                             position: 'absolute',
                             top: 50,

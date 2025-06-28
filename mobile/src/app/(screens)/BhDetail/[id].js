@@ -566,6 +566,7 @@ export default function BhDetailScreen() {
             console.log("Set review ID:", reviewId);
           }}
           reportedReviews={[]}
+          pagination={pagination}
         />
       </View>
     );

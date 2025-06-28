@@ -134,6 +134,7 @@ export default function Report() {
       showSuccess(t("report.success") || "Report submitted successfully");
       router.back();
     } catch (error) {
+      console.log(error.message)
       showError(t("report.error") || "Failed to submit report");
     } finally {
       setLoading(false);

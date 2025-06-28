@@ -21,8 +21,12 @@ export const updateReview = (reviewId, updatedData) => {
 export const getReviewsUser = () => {
   return axios.get('/auth/reviews');
 };
-export const addReview = (reviewData) => {
-  return axios.post('/auth/reviews', reviewData);
+export const addReview = (data) => {
+  return axios.post('/auth/reviews', data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 export const updateReviewImage = async (imageFile) => {
   const formData = new FormData();

@@ -337,6 +337,11 @@ class ReviewController {
       });
 
       if (existingReview) {
+        if (req.files && req.files.length > 0) {
+          for (const file of req.files) {
+            cloudinary.uploader.destroy(file.filename);
+          }
+        }
         return res.status(400).json({
           success: false,
           message: 'You have already reviewed this boarding house.',
@@ -350,14 +355,21 @@ class ReviewController {
         });
       }
 
+
+
       // Tạo review mới
       const newReview = new Review({
         accountId,
         boardingHouseId,
         content,
         rating,
-        images,
       });
+      if (req.files && req.files.length > 0) {
+        newReview.images = req.files.map((file) => ({
+          imageUrl: file.path,
+          publicId: file.filename,
+        }));
+      }
 
       await newReview.save();
 
