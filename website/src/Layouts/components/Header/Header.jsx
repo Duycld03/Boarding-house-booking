@@ -147,7 +147,7 @@ const CustomHeader = () => {
         </p>
       </Link>
       {/* Main Menu (Desktop) */}
-      <Menu
+      {/* <Menu
         className="hidden lg:block"
         theme={darkMode ? "dark" : "light"}
         mode="horizontal"
@@ -165,7 +165,7 @@ const CustomHeader = () => {
           whiteSpace: "nowrap",
           marginLeft: 330,
         }}
-      />
+      /> */}
       {/* User Section */}
       <div className="hidden lg:flex items-center gap-4">
         {/* Added prominent theme toggle button */}
