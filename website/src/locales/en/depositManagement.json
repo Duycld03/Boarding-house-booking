@@ -25,13 +25,15 @@
     "rejectTitle": "Reject Deposit Request",
     "rejectReason": "Reason for Rejection",
     "rejectPlaceholder": "Enter reason for rejection",
-    "rejectConfirm": "Reject"
+    "rejectConfirm": "Reject",
+      "cancel": "Cancel"
+
   },
   "messages": {
     "fetchError": "Failed to fetch deposit list.",
-    "acceptSuccess": "Deposit accepted successfully.",
+    "acceptSuccess": "Request processing results sent successfully.",
     "acceptError": "An error occurred while accepting the deposit.",
-    "rejectSuccess": "Deposit request rejected successfully.",
+    "rejectSuccess": "Request processing results sent successfully.",
     "rejectError": "An error occurred while rejecting the deposit.",
     "noRoomSelected": "No room selected!",
     "requireReason": "Please enter a reason for rejection"
