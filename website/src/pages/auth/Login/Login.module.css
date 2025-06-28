@@ -2,7 +2,7 @@
 
 /* Username input styles */
 .darkInput :global(.ant-input) {
-  background-color: #1f2937 !important;
+  background-color: #111827 !important;
   border-color: #6b7280 !important;
   color: #ffffff !important;
 }
@@ -21,18 +21,18 @@
 }
 
 .darkInput span {
-  background-color: #1f2937 !important;
+  background-color: #111827 !important;
 }
 
 /* Password input styles - More specific selectors */
 .darkPasswordInput :global(.ant-input-affix-wrapper) {
-  background-color: #1f2937 !important;
+  background-color: #111827 !important;
   border-color: #6b7280 !important;
 }
 
 /* Fix the input field inside password input */
 .darkPasswordInput :global(.ant-input) {
-  background-color: #1f2937 !important;
+  background-color: #111827 !important;
   color: #ffffff !important;
   border: none !important;
 }
@@ -75,7 +75,7 @@
 
 .darkPasswordInput
   :global(.ant-input-affix-wrapper-status-error .ant-input-suffix) {
-  background-color: #1f2937 !important;
+  background-color: #111827 !important;
 }
 
 /* Google Login Dark Mode */
@@ -93,7 +93,7 @@
 }
 
 .darkCheckbox :global(.ant-checkbox-inner) {
-  background-color: #1f2937 !important;
+  background-color: #111827 !important;
   border-color: #6b7280 !important;
 }
 
