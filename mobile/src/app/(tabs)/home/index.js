@@ -340,7 +340,7 @@ function Home() {
   }
 
   return (
-    <ScreenContainer className={themedClasses.bg} withPadding={false}>
+    <ScreenContainer withPadding={false}>
       <ScrollContainer keyboardAvoiding showsVerticalScrollIndicator={false}>
         <Header />
         <SearchBar />
