@@ -1,0 +1,16 @@
+{
+  "payRent": "Pay Rent",
+  "room": "Room",
+  "rentalPeriod": "Rental Period",
+  "amountToPay": "Amount to Pay",
+  "selectPaymentMethod": "Select Payment Method",
+  "vnpayDescription": "Pay via VNPay using bank cards or QR",
+  "momoDescription": "Pay via MoMo e-wallet",
+  "paymentInstructions": "Payment Instructions",
+  "paymentInstructionsDetail": "You will be redirected to the selected payment gateway to complete your transaction. After successful payment, you will receive a confirmation email and SMS.",
+  "confirmPayment": "Confirm Payment",
+  "processing": "Processing...",
+  "invalidDepositData": "Invalid deposit information",
+  "paymentFailed": "Payment failed. Please try again.",
+  "paymentInitiated": "Payment initiated successfully"
+}

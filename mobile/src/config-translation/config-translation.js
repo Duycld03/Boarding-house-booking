@@ -45,6 +45,8 @@ import vi_myRentPayment from "@/locales/vi/myRentPayment.json";
 import en_myRentPayment from "@/locales/en/myRentPayment.json";
 import en_myDepositedRoom from "@/locales/en/myDepositedRoom.json";
 import vi_myDepositedRoom from "@/locales/vi/myDepositedRoom.json";
+import en_payRent from "@/locales/en/payRent.json";
+import vi_payRent from "@/locales/vi/payRent.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -71,6 +73,7 @@ i18n.use(initReactI18next).init({
       myreport: en_myreport,
       myRentPayment: en_myRentPayment,
       myDepositedRoom: en_myDepositedRoom,
+      payRent: en_payRent,
     },
     vi: {
       setting: vi_setting,
@@ -95,6 +98,7 @@ i18n.use(initReactI18next).init({
       myreport: vi_myreport,
       myRentPayment: vi_myRentPayment,
       myDepositedRoom: vi_myDepositedRoom,
+      payRent: vi_payRent,
     },
   },
   lng: "en",
