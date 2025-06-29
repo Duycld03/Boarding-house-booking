@@ -57,6 +57,7 @@ export default function BhDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const currentLanguage = i18next.language;
+  const [reviews, setReviews] = useState([]);
 
   const { themedClasses } = useThemedClasses();
 
@@ -204,7 +205,7 @@ export default function BhDetailScreen() {
             hasNext: paginationData.hasNext || false,
             hasPrev: paginationData.hasPrev || false,
           });
-
+          setReviews(response.data);
           return response;
         }
 

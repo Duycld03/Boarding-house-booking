@@ -89,6 +89,8 @@ const EmptyState = ({ themedClasses, t, onWriteReview }) => (
             onPress={onWriteReview}
             variant="primary"
             size="md"
+
+
         >
             {t('writeAReview')}
         </Button>
@@ -312,7 +314,10 @@ const ReviewList = ({
             onReport={onReport}
             setReviewId={setReviewId}
             reportedReviews={reportedReviews}
+            onDeleted={() => { fetchReviews() }}
+
         />
+
     );
 
     // ✅ Improved Load More Button Component

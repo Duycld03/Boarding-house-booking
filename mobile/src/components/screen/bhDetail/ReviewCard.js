@@ -23,7 +23,7 @@ dayjs.extend(relativeTime);
 // Get screen dimensions
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigation }) {
+function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigation, onDeleted }) {
     const { i18n } = useTranslation();
     const { isDarkMode } = useTheme();
     const { themedClasses } = useThemedClasses();
@@ -175,8 +175,8 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
                 router.push({
                     pathname: "/(screens)/BhDetail/report",
                     params: {
-                        reviewId: review?.id,
-                        boardingHouseId: boardingHouse._id
+                        reviewId: review?._id,
+                        // boardingHouseId,
                     },
                 });
                 break;
@@ -190,8 +190,12 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
 
         try {
             const response = await deleteReviewUser(deleteReviewId);
+            // onDeleted();
             if (response?.success) {
                 showSuccess(t("reviewCard.deleteSuccess") || "Review deleted successfully!");
+                if (onDeleted) {
+                    onDeleted(); // Callback lại cho component cha
+                }
             } else {
                 showError(response.message || t('reviewCard.deleteFailed'));
             }

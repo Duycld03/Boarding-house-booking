@@ -129,7 +129,6 @@ export default function Report() {
           type: imageType,
         });
       });
-
       const response = await createReport(formDataObj);
       showSuccess(t("report.success") || "Report submitted successfully");
       router.back();
