@@ -22,7 +22,7 @@ const config = {
   vnp_HashSecret: "4RMXXWH9GZAR4QPBVJN8OLADH87F8BQ8",
   vnp_Url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
   vnp_Api: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction",
-  vnp_ReturnUrl: "http://localhost:3000/deposit/vnpay-return",
+  vnp_ReturnUrl: process.env.NGROK_URL + "/deposit/vnpay-return",
 };
 
 class DepositController {
@@ -242,7 +242,7 @@ class DepositController {
 
         await depositRoom.save();
 
-        const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+        const redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=success`;
         return res.redirect(redirectUrl);
       } else if (type == "payRent") {
         const userId = orderInfo[1];
@@ -278,7 +278,7 @@ class DepositController {
           );
         }
 
-        const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+        const redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=success`;
         return res.redirect(redirectUrl);
       }
       // refund
@@ -309,13 +309,13 @@ class DepositController {
 
       await refundRequest.save();
 
-      const redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=success`;
+      const redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=success`;
       return res.redirect(redirectUrl);
     }
     //failed
-    let redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+    let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
     if (type == "refund") {
-      redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=fail`;
+      redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
     }
     res.redirect(redirectUrl);
   }
@@ -357,7 +357,7 @@ class DepositController {
 
           await depositRoom.save();
 
-          const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+          const redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=success`;
           return res.redirect(redirectUrl);
         } else if (type == "payRent") {
           const userId = info[1];
@@ -393,7 +393,7 @@ class DepositController {
             );
           }
 
-          const redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=success`;
+          const redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=success`;
           return res.redirect(redirectUrl);
         }
         // refund
@@ -424,15 +424,15 @@ class DepositController {
 
         await refundRequest.save();
 
-        const redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=success`;
+        const redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=success`;
         return res.redirect(redirectUrl);
       }
     } catch (error) {
       console.log("Error momo return:", error);
 
-      let redirectUrl = `${process.env.CLIENT_URL}/my-deposited-room?status=fail`;
+      let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
       if (type == "refund") {
-        redirectUrl = `${process.env.CLIENT_URL}/refund-request-management?status=fail`;
+        redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
       }
       res.redirect(redirectUrl);
     }
@@ -650,20 +650,20 @@ class DepositController {
       const deposit = await DepositRoom.findById(depositId)
         .populate({ path: "accountId", select: "fullname email" })
         .populate({
-          path: 'roomId',
-          select: 'roomNumber boardingHouseId roomTypeId',
+          path: "roomId",
+          select: "roomNumber boardingHouseId roomTypeId",
           populate: [
             {
-              path: 'boardingHouseId',
-              select: 'name boardingHouseType',
+              path: "boardingHouseId",
+              select: "name boardingHouseType",
               populate: {
-                path: 'boardingHouseType',
-                select: 'codeName',
+                path: "boardingHouseType",
+                select: "codeName",
               },
             },
             {
-              path: 'roomTypeId',
-              select: 'typeName peopleNumber',
+              path: "roomTypeId",
+              select: "typeName peopleNumber",
             },
           ],
         });
@@ -673,22 +673,22 @@ class DepositController {
       }
 
       const boardingHouse = deposit.roomId.boardingHouseId;
-      const boardingHouseName = boardingHouse?.name || 'Không có tên nhà trọ';
+      const boardingHouseName = boardingHouse?.name || "Không có tên nhà trọ";
       const boardingHouseTypeCode =
-        boardingHouse?.boardingHouseType?.codeName || '';
+        boardingHouse?.boardingHouseType?.codeName || "";
 
       // Tạo transporter gửi email
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: 'todohongy@gmail.com',
-          pass: 'ersq syrb ihov ilvx',
+          user: "todohongy@gmail.com",
+          pass: "ersq syrb ihov ilvx",
         },
       });
 
       const sendEmail = async (to, subject, html) => {
         await transporter.sendMail({
-          from: 'support@example.com',
+          from: "support@example.com",
           to,
           subject,
           html,
@@ -696,26 +696,26 @@ class DepositController {
       };
 
       // Xử lý nếu là ký túc xá
-      if (boardingHouseTypeCode === 'nha_tro_kien_truc_xa') {
+      if (boardingHouseTypeCode === "nha_tro_kien_truc_xa") {
         const currentAcceptedCount = await DepositRoom.countDocuments({
           roomId: deposit.roomId._id,
-          status: 'accepted',
+          status: "accepted",
         });
 
         const limit = parseInt(
-          deposit.roomId.roomTypeId?.peopleNumber || '0',
+          deposit.roomId.roomTypeId?.peopleNumber || "0",
           10
         );
 
         if (currentAcceptedCount >= limit) {
           // Từ chối vì quá giới hạn
-          deposit.status = 'rejected';
-          deposit.rejectReason = 'Phòng ký túc xá đã đủ số lượng người.';
+          deposit.status = "rejected";
+          deposit.rejectReason = "Phòng ký túc xá đã đủ số lượng người.";
           await deposit.save();
 
           await sendEmail(
             deposit.accountId.email,
-            'Yêu cầu đặt cọc đã bị từ chối ❌',
+            "Yêu cầu đặt cọc đã bị từ chối ❌",
             `
           <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
           <p>Rất tiếc! Phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã đủ số người đăng ký.</p>
@@ -727,28 +727,28 @@ class DepositController {
 
           return res.status(200).json({
             message:
-              'Phòng đã đủ người, đơn đã bị từ chối và email đã được gửi.',
-            status: 'rejected',
+              "Phòng đã đủ người, đơn đã bị từ chối và email đã được gửi.",
+            status: "rejected",
             depositId: deposit._id,
           });
         }
       }
 
       // Nếu không quá giới hạn → chấp nhận
-      deposit.status = 'accepted';
+      deposit.status = "accepted";
       await deposit.save();
 
       await sendEmail(
         deposit.accountId.email,
-        'Đặt cọc phòng trọ đã được chấp nhận ✅',
+        "Đặt cọc phòng trọ đã được chấp nhận ✅",
         `
       <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
       <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã được <span style="color:green;"><strong>chấp nhận</strong></span>.</p>
       <ul>
         <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
         <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
-        <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format('DD/MM/YYYY')}</li>
-        <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format('DD/MM/YYYY')}</li>
+        <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format("DD/MM/YYYY")}</li>
+        <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format("DD/MM/YYYY")}</li>
       </ul>
       <p>Hãy liên hệ chủ nhà để hoàn tất thủ tục tiếp theo nhé!</p>
       <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
@@ -757,22 +757,22 @@ class DepositController {
 
       // Nếu là mini_house hoặc nhà trọ truyền thống → từ chối đơn pending khác
       if (
-        ['mini_house', 'nha_tro_truyen_thong'].includes(boardingHouseTypeCode)
+        ["mini_house", "nha_tro_truyen_thong"].includes(boardingHouseTypeCode)
       ) {
         const rejectedDeposits = await DepositRoom.find({
           _id: { $ne: depositId },
           roomId: deposit.roomId._id,
-          status: 'pending',
-        }).populate({ path: 'accountId', select: 'fullname email' });
+          status: "pending",
+        }).populate({ path: "accountId", select: "fullname email" });
 
         for (const rejected of rejectedDeposits) {
-          rejected.status = 'rejected';
-          rejected.rejectReason = 'Phòng đã được đặt cọc bởi người khác.';
+          rejected.status = "rejected";
+          rejected.rejectReason = "Phòng đã được đặt cọc bởi người khác.";
           await rejected.save();
 
           await sendEmail(
             rejected.accountId.email,
-            'Yêu cầu đặt cọc đã bị từ chối ❌',
+            "Yêu cầu đặt cọc đã bị từ chối ❌",
             `
           <p>Xin chào <strong>${rejected.accountId.fullname}</strong>,</p>
           <p>Rất tiếc! Phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã được người khác đặt cọc trước.</p>
@@ -786,14 +786,14 @@ class DepositController {
 
       return res.status(200).json({
         message:
-          'Đã chấp nhận khoản đặt cọc và xử lý các đơn liên quan (nếu có).',
-        status: 'accepted',
+          "Đã chấp nhận khoản đặt cọc và xử lý các đơn liên quan (nếu có).",
+        status: "accepted",
         depositId: deposit._id,
       });
     } catch (error) {
-      console.error('Error accepting deposit room:', error);
+      console.error("Error accepting deposit room:", error);
       return res.status(500).json({
-        error: 'Đã có lỗi xảy ra',
+        error: "Đã có lỗi xảy ra",
         detail: error.message,
       });
     }
@@ -1028,8 +1028,8 @@ const createMomoUrl = async (req, res, amount, orderInfo) => {
   var accessKey = "F8BBA842ECF85";
   var secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
   var partnerCode = "MOMO";
-  var redirectUrl = "http://localhost:3000/deposit/momo-return";
-  var ipnUrl = "http://localhost:3000/deposit/momo-return";
+  var redirectUrl = process.env.NGROK_URL + "/deposit/momo-return";
+  var ipnUrl = process.env.NGROK_URL + "/deposit/momo-return";
   var requestType = "payWithMethod";
   var orderId = partnerCode + new Date().getTime();
   var requestId = orderId;

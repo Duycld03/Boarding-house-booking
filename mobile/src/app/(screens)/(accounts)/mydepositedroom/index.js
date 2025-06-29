@@ -564,7 +564,6 @@ function MyDepositedRoom() {
 
   // Action handlers
   const handlePayRent = useCallback((deposit) => {
-    console.log("Pay rent for deposit:", deposit);
     // Navigate to PayRent screen with deposit data
     router.push({
       pathname: "/mydepositedroom/payRent",

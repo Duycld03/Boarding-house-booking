@@ -3,7 +3,7 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator,
-  Linking,
+  BackHandler,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Text } from "@/components/ui";
@@ -23,6 +23,7 @@ import {
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCurrentUser } from "@/context/userContext";
+import WebView from "react-native-webview";
 
 const PayRent = () => {
   const { isDarkMode } = useTheme();
@@ -37,6 +38,8 @@ const PayRent = () => {
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [depositInfo, setDepositInfo] = useState(null);
   const [checking, setChecking] = useState(true);
+  const [paymentUrl, setPaymentUrl] = useState(null);
+  const [webviewVisible, setWebviewVisible] = useState(false);
 
   // Memoize formatDate and formatCurrency to prevent recreation on each render
   const formatCurrency = useCallback((value) => {
@@ -91,6 +94,25 @@ const PayRent = () => {
     }
   }, [isLogin, params.deposit, router, showError, t, checking]);
 
+  // Handle hardware back button when WebView is open
+  useEffect(() => {
+    const backAction = () => {
+      if (webviewVisible) {
+        setWebviewVisible(false);
+        setPaymentUrl(null);
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [webviewVisible]);
+
   const handlePayment = useCallback(async () => {
     if (!paymentMethod) {
       showError(t("selectPaymentMethod"));
@@ -107,12 +129,11 @@ const PayRent = () => {
       });
 
       // Check if response contains a payment URL
-      if (response.paymentUrl) {
+      if (response.payUrl) {
         setLoading(false);
-        showSuccess(t("redirectingToPayment"));
-
-        // Open the payment URL in the device's browser
-        Linking.openURL(response.paymentUrl);
+        // Instead of opening in browser, show in WebView
+        setPaymentUrl(response.payUrl);
+        setWebviewVisible(true);
       } else if (response.success) {
         setLoading(false);
         showSuccess(t("paymentInitiated"));
@@ -122,10 +143,29 @@ const PayRent = () => {
       }
     } catch (error) {
       console.error("Payment error:", error);
-      showError(error.message || t("paymentFailed"));
+      showError(
+        error.response?.data?.message || error.message || t("paymentFailed")
+      );
       setLoading(false);
     }
   }, [paymentMethod, user, depositInfo, t, showError, showSuccess, router]);
+
+  // Handle WebView navigation state changes to detect payment completion
+  const handleNavigationStateChange = (navState) => {
+    // Look for URL patterns that match your vnpay-return or momo-return endpoints
+    if (navState.url.includes("status=success")) {
+      setWebviewVisible(false);
+      setPaymentUrl(null);
+      showSuccess(t("paymentSuccessful"));
+      router.back();
+    }
+    // Check for failure indicators
+    else if (navState.url.includes("status=fail")) {
+      setWebviewVisible(false);
+      setPaymentUrl(null);
+      showError(t("paymentFailed"));
+    }
+  };
 
   if (checking || !depositInfo) {
     return (
@@ -133,6 +173,41 @@ const PayRent = () => {
         <ActivityIndicator
           size="large"
           color={isDarkMode ? "#3b82f6" : "#2563eb"}
+        />
+      </View>
+    );
+  }
+
+  // Show WebView when payment URL is available
+  if (webviewVisible && paymentUrl) {
+    return (
+      <View className="flex-1">
+        <BackHeader
+          backIcon={
+            <FontAwesome5
+              name="chevron-left"
+              size={18}
+              color={isDarkMode ? "#fff" : "#333"}
+            />
+          }
+          onBackPress={() => {
+            setWebviewVisible(false);
+            setPaymentUrl(null);
+          }}
+          title={paymentMethod === "vnpay" ? "VNPay" : "MoMo"}
+        />
+        <WebView
+          source={{ uri: paymentUrl }}
+          onNavigationStateChange={handleNavigationStateChange}
+          startInLoadingState={true}
+          renderLoading={() => (
+            <View className="absolute inset-0 flex justify-center items-center bg-gray-100">
+              <ActivityIndicator
+                size="large"
+                color={isDarkMode ? "#3b82f6" : "#2563eb"}
+              />
+            </View>
+          )}
         />
       </View>
     );
@@ -152,6 +227,8 @@ const PayRent = () => {
         title={t("payRent")}
       />
 
+      {/* The rest of your component remains unchanged */}
+      {/* Payment selection UI */}
       <View className="flex-1">
         {/* Deposit Summary Card */}
         <View className="px-4 py-4">
