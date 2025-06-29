@@ -26,438 +26,7 @@ import {
 import { useCurrentUser } from "@/context/userContext";
 import { useFocusEffect, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-
-// Animated Deposit Card Component
-const DepositCard = ({ item, onPayRent, onRefund, index }) => {
-  const { isDarkMode } = useTheme();
-  const { themedClasses } = useThemedClasses();
-  const { t } = useTranslation("myDepositedRoom");
-  const slideAnim = React.useRef(new Animated.Value(50)).current;
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
-
-  React.useEffect(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 400,
-        delay: index * 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        delay: index * 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [slideAnim, fadeAnim, index]);
-
-  // Status colors
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "confirmed":
-        return isDarkMode ? "#22c55e" : "#16a34a"; // Green
-      case "pending":
-        return isDarkMode ? "#f59e0b" : "#d97706"; // Amber
-      case "rejected":
-        return isDarkMode ? "#ef4444" : "#dc2626"; // Red
-      case "cancelled":
-        return isDarkMode ? "#6b7280" : "#4b5563"; // Gray
-      default:
-        return isDarkMode ? "#3b82f6" : "#2563eb"; // Blue
-    }
-  };
-
-  // Status icons
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "confirmed":
-        return (
-          <MaterialIcons
-            name="verified"
-            size={14}
-            color={getStatusColor(status)}
-          />
-        );
-      case "pending":
-        return (
-          <MaterialCommunityIcons
-            name="progress-clock"
-            size={14}
-            color={getStatusColor(status)}
-          />
-        );
-      case "rejected":
-        return (
-          <MaterialIcons
-            name="cancel"
-            size={14}
-            color={getStatusColor(status)}
-          />
-        );
-      case "cancelled":
-        return (
-          <MaterialIcons
-            name="do-not-disturb"
-            size={14}
-            color={getStatusColor(status)}
-          />
-        );
-      default:
-        return (
-          <AntDesign name="question" size={14} color={getStatusColor(status)} />
-        );
-    }
-  };
-
-  // Add this formatDate function to display dates in dd/mm/yyyy format
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-
-    // Check if the date is already in dd/mm/yyyy format
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
-      return dateString;
-    }
-
-    // Otherwise parse and format the date
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString; // Return original if invalid
-
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-
-    return `${day}/${month}/${year}`;
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(value);
-  };
-
-  // Add this function to check if refund should be available
-  const shouldShowRefund = (endDateStr) => {
-    if (!endDateStr) return false;
-
-    let endDate;
-
-    // Check if the date is in dd/mm/yyyy format
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(endDateStr)) {
-      const [day, month, year] = endDateStr.split("/").map(Number);
-      endDate = new Date(year, month - 1, day);
-    } else {
-      endDate = new Date(endDateStr);
-    }
-
-    if (isNaN(endDate.getTime())) return false;
-
-    const currentDate = new Date();
-
-    // Calculate the date that is 2 months (approximately 60 days) before the end date
-    const twoMonthsBeforeEnd = new Date(endDate);
-    twoMonthsBeforeEnd.setMonth(twoMonthsBeforeEnd.getMonth() - 2);
-
-    // Check if current date is before the calculated date (at least 2 months before end date)
-    return currentDate <= twoMonthsBeforeEnd;
-  };
-
-  return (
-    <Animated.View
-      style={{
-        transform: [{ translateY: slideAnim }],
-        opacity: fadeAnim,
-        marginHorizontal: 16,
-        marginVertical: 8,
-      }}
-    >
-      <LinearGradient
-        colors={isDarkMode ? ["#1f2937", "#111827"] : ["#ffffff", "#f9fafb"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        className="rounded-2xl p-0.5"
-        style={{
-          shadowColor: isDarkMode ? "#000" : "#5c93bb",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: isDarkMode ? 0.3 : 0.15,
-          shadowRadius: 12,
-          elevation: 8,
-        }}
-      >
-        <View
-          className={themedClasses(
-            "bg-white rounded-2xl p-5",
-            "bg-gray-800 rounded-2xl p-5"
-          )}
-        >
-          {/* Status Badge - Top Right */}
-          <View
-            style={{
-              position: "absolute",
-              top: 12,
-              right: 12,
-              backgroundColor: `${getStatusColor(item.status)}15`,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: `${getStatusColor(item.status)}30`,
-              flexDirection: "row",
-              alignItems: "center",
-              zIndex: 10,
-            }}
-          >
-            {getStatusIcon(item.status)}
-            <Text
-              style={{
-                color: getStatusColor(item.status),
-                fontWeight: "600",
-                fontSize: 12,
-                marginLeft: 4,
-              }}
-            >
-              {t(`status.${item.status}`)}
-            </Text>
-          </View>
-
-          {/* Property & Room Info */}
-          <View className="mb-4 pr-28">
-            <View className="flex-row items-center mb-1">
-              <MaterialIcons
-                name="home-work"
-                size={18}
-                color={isDarkMode ? "#9ca3af" : "#4b5563"}
-                style={{ marginRight: 6 }}
-              />
-              <Text
-                className={themedClasses(
-                  "text-lg font-bold text-gray-900",
-                  "text-lg font-bold text-gray-100"
-                )}
-              >
-                {item.name}
-              </Text>
-            </View>
-
-            <View className="flex-row items-center">
-              <FontAwesome5
-                name="door-open"
-                size={14}
-                color={isDarkMode ? "#9ca3af" : "#4b5563"}
-                style={{ marginRight: 8, marginLeft: 2 }}
-              />
-              <Text
-                className={themedClasses(
-                  "text-base font-medium text-gray-700",
-                  "text-base font-medium text-gray-300"
-                )}
-              >
-                {t("room")} {item.roomNumber}
-              </Text>
-            </View>
-          </View>
-
-          {/* Divider with gradient */}
-          <LinearGradient
-            colors={
-              isDarkMode
-                ? [
-                    "rgba(75, 85, 99, 0)",
-                    "rgba(75, 85, 99, 0.5)",
-                    "rgba(75, 85, 99, 0)",
-                  ]
-                : [
-                    "rgba(229, 231, 235, 0)",
-                    "rgba(229, 231, 235, 0.8)",
-                    "rgba(229, 231, 235, 0)",
-                  ]
-            }
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="h-[1px] my-3"
-          />
-
-          {/* Deposit Details */}
-          <View className="space-y-3 mb-4">
-            {/* Amount */}
-            <View className="flex-row justify-between items-center">
-              <View className="flex-row items-center">
-                <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
-                  }`}
-                >
-                  <FontAwesome
-                    name="money"
-                    size={14}
-                    color={isDarkMode ? "#60a5fa" : "#3b82f6"}
-                  />
-                </View>
-                <Text
-                  className={themedClasses("text-gray-700", "text-gray-300")}
-                >
-                  {t("depositAmount")}
-                </Text>
-              </View>
-              <Text
-                className={themedClasses(
-                  "font-bold text-gray-800",
-                  "font-bold text-gray-100"
-                )}
-              >
-                {formatCurrency(item.amount)}
-              </Text>
-            </View>
-
-            {/* Rental Period */}
-            <View className="flex-row justify-between items-center">
-              <View className="flex-row items-center">
-                <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-green-900/30" : "bg-green-100"
-                  }`}
-                >
-                  <MaterialCommunityIcons
-                    name="calendar-range"
-                    size={14}
-                    color={isDarkMode ? "#4ade80" : "#22c55e"}
-                  />
-                </View>
-                <Text
-                  className={themedClasses("text-gray-700", "text-gray-300")}
-                >
-                  {t("rentalPeriod")}
-                </Text>
-              </View>
-              <Text
-                className={themedClasses(
-                  "font-semibold text-gray-800",
-                  "font-semibold text-gray-100"
-                )}
-              >
-                {formatDate(item.startDate)} - {formatDate(item.endDate)}
-              </Text>
-            </View>
-
-            {/* Rental Time */}
-            <View className="flex-row justify-between items-center">
-              <View className="flex-row items-center">
-                <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-purple-900/30" : "bg-purple-100"
-                  }`}
-                >
-                  <MaterialIcons
-                    name="timer"
-                    size={14}
-                    color={isDarkMode ? "#c084fc" : "#a855f7"}
-                  />
-                </View>
-                <Text
-                  className={themedClasses("text-gray-700", "text-gray-300")}
-                >
-                  {t("rentalTime")}
-                </Text>
-              </View>
-              <Text
-                className={themedClasses(
-                  "font-semibold text-gray-800",
-                  "font-semibold text-gray-100"
-                )}
-              >
-                {item.rentalTime}{" "}
-                {item.rentalTime === 1 ? t("month") : t("months")}
-              </Text>
-            </View>
-          </View>
-
-          {/* Actions */}
-          {item.status === "confirmed" && (
-            <>
-              <LinearGradient
-                colors={
-                  isDarkMode
-                    ? [
-                        "rgba(75, 85, 99, 0)",
-                        "rgba(75, 85, 99, 0.5)",
-                        "rgba(75, 85, 99, 0)",
-                      ]
-                    : [
-                        "rgba(229, 231, 235, 0)",
-                        "rgba(229, 231, 235, 0.8)",
-                        "rgba(229, 231, 235, 0)",
-                      ]
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="h-[1px] my-3"
-              />
-
-              <View className="flex-row justify-between mt-2">
-                <TouchableOpacity
-                  onPress={() => onPayRent(item)}
-                  className={
-                    shouldShowRefund(item.endDate) ? "flex-1 mr-2" : "flex-1"
-                  }
-                >
-                  <LinearGradient
-                    colors={
-                      isDarkMode
-                        ? ["#1d4ed8", "#2563eb"]
-                        : ["#3b82f6", "#2563eb"]
-                    }
-                    className="px-4 py-3 rounded-xl flex-row items-center justify-center"
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    <FontAwesome
-                      name="dollar"
-                      size={14}
-                      color="#fff"
-                      style={{ marginRight: 8 }}
-                    />
-                    <Text className="text-white font-medium">
-                      {t("payRent")}
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-
-                {shouldShowRefund(item.endDate) && (
-                  <TouchableOpacity
-                    onPress={() => onRefund(item)}
-                    className="flex-1 ml-2"
-                  >
-                    <LinearGradient
-                      colors={
-                        isDarkMode
-                          ? ["#991b1b", "#b91c1c"]
-                          : ["#dc2626", "#b91c1c"]
-                      }
-                      className="px-4 py-3 rounded-xl flex-row items-center justify-center"
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                    >
-                      <Ionicons
-                        name="refresh"
-                        size={16}
-                        color="#fff"
-                        style={{ marginRight: 8 }}
-                      />
-                      <Text className="text-white font-medium">
-                        {t("requestRefund")}
-                      </Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </>
-          )}
-        </View>
-      </LinearGradient>
-    </Animated.View>
-  );
-};
+import DepositCard from "@/components/screen/myDepositedRoom/depositCard";
 
 function MyDepositedRoom() {
   const { isDarkMode } = useTheme();
@@ -563,13 +132,16 @@ function MyDepositedRoom() {
   }, [fetchData]);
 
   // Action handlers
-  const handlePayRent = useCallback((deposit) => {
-    // Navigate to PayRent screen with deposit data
-    router.push({
-      pathname: "/mydepositedroom/payRent",
-      params: { deposit: JSON.stringify(deposit) },
-    });
-  }, []);
+  const handlePayRent = useCallback(
+    (deposit) => {
+      // Navigate to PayRent screen with deposit data
+      router.push({
+        pathname: "/mydepositedroom/payRent",
+        params: { deposit: JSON.stringify(deposit) },
+      });
+    },
+    [router]
+  );
 
   const handleRefund = useCallback(
     (deposit) => {
@@ -613,6 +185,10 @@ function MyDepositedRoom() {
             "bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-3xl mx-4 p-6 shadow-xl",
             "bg-gray-800/95 backdrop-blur-sm border-gray-700/50 shadow-2xl shadow-black/30"
           )}
+          style={{
+            borderRadius: 24, // Explicitly set borderRadius to match rounded-3xl
+            overflow: "hidden", // Ensure content doesn't overflow rounded corners
+          }}
         >
           <View className="flex-row items-center justify-center">
             <View className="animate-spin mr-4">
@@ -646,6 +222,8 @@ function MyDepositedRoom() {
         style={{
           opacity: 1, // Instead of using Animated.FadeInDown
           transform: [{ translateY: 0 }], // Instead of using Animated.FadeInDown
+          borderRadius: 24, // Explicitly set borderRadius to match rounded-3xl
+          overflow: "hidden", // Ensure content doesn't overflow rounded corners
         }}
       >
         <View className="items-center">
@@ -658,21 +236,8 @@ function MyDepositedRoom() {
                   : ["rgba(139, 92, 246, 0.2)", "rgba(99, 102, 241, 0.05)"]
               }
               className="absolute -inset-5 rounded-full opacity-80 blur-xl"
+              style={{ borderRadius: 9999 }} // Ensure the gradient blob is properly rounded
             />
-            <LinearGradient
-              colors={
-                isDarkMode ? ["#312e81", "#1e3a8a"] : ["#c7d2fe", "#e0e7ff"]
-              }
-              className="p-8 rounded-full relative shadow-lg"
-            >
-              <View>
-                <MaterialCommunityIcons
-                  name="home-city-outline"
-                  size={72}
-                  color={isDarkMode ? "#a5b4fc" : "#6366f1"}
-                />
-              </View>
-            </LinearGradient>
           </View>
 
           <Text
@@ -691,31 +256,6 @@ function MyDepositedRoom() {
           >
             {t("noDepositsSubtext")}
           </Text>
-
-          {/* Add a browse homes button */}
-          <View className="mt-6">
-            <TouchableOpacity
-              onPress={() => router.push("/")}
-              className="flex-row items-center"
-            >
-              <LinearGradient
-                colors={
-                  isDarkMode ? ["#4338ca", "#3730a3"] : ["#6366f1", "#4f46e5"]
-                }
-                className="px-5 py-3 rounded-xl flex-row items-center"
-              >
-                <Ionicons
-                  name="search"
-                  size={16}
-                  color="#fff"
-                  style={{ marginRight: 8 }}
-                />
-                <Text className="text-white font-medium">
-                  {t("browseHomes")}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
     </View>
@@ -747,6 +287,7 @@ function MyDepositedRoom() {
           container: { paddingHorizontal: 0, marginBottom: 24 },
           button: {
             marginHorizontal: 16,
+            borderRadius: 12, // Ensure consistent border radius on load more button
           },
         }}
       />
@@ -773,32 +314,6 @@ function MyDepositedRoom() {
             {t("totalDeposits")}: {pagination.totalItems}
           </Text>
         </View>
-
-        {depositData.length > 0 && (
-          <View
-            className="flex-row items-center py-1 px-3 rounded-full bg-opacity-20"
-            style={{
-              backgroundColor: isDarkMode
-                ? "rgba(79, 70, 229, 0.2)"
-                : "rgba(79, 70, 229, 0.1)",
-            }}
-          >
-            <MaterialCommunityIcons
-              name="sort-variant"
-              size={16}
-              color={isDarkMode ? "#a5b4fc" : "#4f46e5"}
-              style={{ marginRight: 4 }}
-            />
-            <Text
-              className={themedClasses(
-                "text-gray-700 text-sm",
-                "text-gray-300 text-sm"
-              )}
-            >
-              {t("recent")}
-            </Text>
-          </View>
-        )}
       </View>
     </View>
   );
@@ -819,15 +334,6 @@ function MyDepositedRoom() {
         }
         onBackPress={() => router.push("/account")}
         title={t("myDepositedRooms")}
-        rightComponent={
-          <MaterialCommunityIcons
-            name="home-search"
-            size={22}
-            color={isDarkMode ? "#a5b4fc" : "#4f46e5"}
-            style={{ marginRight: 4 }}
-            onPress={() => router.push("/")}
-          />
-        }
       />
 
       <FlatList

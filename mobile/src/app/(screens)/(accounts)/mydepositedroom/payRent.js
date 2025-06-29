@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  TouchableOpacity,
-  ActivityIndicator,
-  BackHandler,
-} from "react-native";
+import { View, ActivityIndicator, BackHandler } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Text } from "@/components/ui";
+import Button from "@/components/ui/Button"; // Import the Button component
 import { BackHeader } from "@/components/navigation/CustomHeader";
 import { ScrollContainer } from "@/components/layout";
 import { useTheme } from "@/context/ThemeProvider";
@@ -24,11 +20,12 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { useCurrentUser } from "@/context/userContext";
 import WebView from "react-native-webview";
+import formatAmount from "@/utils/formatAmount"; // Import formatAmount utility
 
 const PayRent = () => {
   const { isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
-  const { t } = useTranslation("payRent");
+  const { t, i18n } = useTranslation("payRent");
   const router = useRouter();
   const { showSuccess, showError } = useNotification();
   const { isLogin, user } = useCurrentUser();
@@ -41,13 +38,19 @@ const PayRent = () => {
   const [paymentUrl, setPaymentUrl] = useState(null);
   const [webviewVisible, setWebviewVisible] = useState(false);
 
-  // Memoize formatDate and formatCurrency to prevent recreation on each render
-  const formatCurrency = useCallback((value) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(value);
-  }, []);
+  // Get current language for formatAmount
+  const currentLanguage = i18n.language || "vi";
+
+  // Use formatAmount from utility
+  const formatCurrency = useCallback(
+    (value) => {
+      return formatAmount(value, currentLanguage, {
+        showCurrency: true,
+        showFullFormat: true,
+      });
+    },
+    [currentLanguage]
+  );
 
   const formatDate = useCallback((dateString) => {
     if (!dateString) return "";
@@ -213,6 +216,75 @@ const PayRent = () => {
     );
   }
 
+  // Render payment method item with consistent border-radius
+  const PaymentMethodItem = ({ method, title, icon, color, darkColor }) => (
+    <View
+      className={`mb-3 rounded-xl overflow-hidden`}
+      style={{ borderRadius: 12 }} // Explicitly set borderRadius for consistent corners
+    >
+      <Button
+        onPress={() => setPaymentMethod(method)}
+        variant={paymentMethod === method ? "primary" : "outline"}
+        fullWidth={true}
+        size="md"
+        className={
+          paymentMethod === method
+            ? isDarkMode
+              ? `bg-${color}-700 border-${color}-500`
+              : `bg-${color}-50 border-${color}-500`
+            : isDarkMode
+            ? "bg-gray-800 border-gray-700"
+            : "bg-white border-gray-200"
+        }
+        style={{
+          borderRadius: 12,
+          paddingVertical: 16, // More vertical padding than the default
+        }}
+      >
+        <View className="flex-row items-center justify-between w-full">
+          <View className="flex-row items-center">
+            <View
+              className={`rounded-full p-2 mr-3 ${
+                isDarkMode ? `bg-${color}-900/40` : `bg-${color}-100`
+              }`}
+              style={{ borderRadius: 9999 }} // Explicitly set borderRadius for rounded-full
+            >
+              <FontAwesome5
+                name={icon}
+                size={16}
+                color={isDarkMode ? darkColor : color}
+              />
+            </View>
+            <Text
+              className={themedClasses(
+                "font-bold text-gray-800",
+                "font-bold text-gray-100"
+              )}
+            >
+              {title}
+            </Text>
+          </View>
+          {paymentMethod === method && (
+            <View
+              className={
+                isDarkMode
+                  ? `bg-${color}-800 p-1 rounded-full`
+                  : `bg-${color}-100 p-1 rounded-full`
+              }
+              style={{ borderRadius: 9999 }} // Explicitly set borderRadius for rounded-full
+            >
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color={isDarkMode ? darkColor : color}
+              />
+            </View>
+          )}
+        </View>
+      </Button>
+    </View>
+  );
+
   return (
     <ScrollContainer withPadding={false}>
       <BackHeader
@@ -227,8 +299,6 @@ const PayRent = () => {
         title={t("payRent")}
       />
 
-      {/* The rest of your component remains unchanged */}
-      {/* Payment selection UI */}
       <View className="flex-1">
         {/* Deposit Summary Card */}
         <View className="px-4 py-4">
@@ -245,6 +315,7 @@ const PayRent = () => {
               shadowOpacity: isDarkMode ? 0.3 : 0.15,
               shadowRadius: 12,
               elevation: 8,
+              borderRadius: 16, // Explicitly set borderRadius to match rounded-2xl
             }}
           >
             <View
@@ -252,12 +323,14 @@ const PayRent = () => {
                 "bg-white rounded-2xl p-5",
                 "bg-gray-800 rounded-2xl p-5"
               )}
+              style={{ borderRadius: 16 }} // Explicitly set borderRadius for consistent corners
             >
               <View className="flex-row items-center mb-4">
                 <View
                   className={`p-2 rounded-full mr-3 ${
                     isDarkMode ? "bg-indigo-900/30" : "bg-indigo-100"
                   }`}
+                  style={{ borderRadius: 9999 }} // Explicitly set borderRadius for rounded-full
                 >
                   <MaterialIcons
                     name="home-work"
@@ -312,6 +385,7 @@ const PayRent = () => {
                       className={`p-2 rounded-full mr-3 ${
                         isDarkMode ? "bg-green-900/30" : "bg-green-100"
                       }`}
+                      style={{ borderRadius: 9999 }} // Explicitly set borderRadius for rounded-full
                     >
                       <MaterialCommunityIcons
                         name="calendar-range"
@@ -339,13 +413,14 @@ const PayRent = () => {
                   </Text>
                 </View>
 
-                {/* Amount */}
+                {/* Amount - Now using formatAmount */}
                 <View className="flex-row justify-between items-center">
                   <View className="flex-row items-center">
                     <View
                       className={`p-2 rounded-full mr-3 ${
                         isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
                       }`}
+                      style={{ borderRadius: 9999 }} // Explicitly set borderRadius for rounded-full
                     >
                       <FontAwesome
                         name="money"
@@ -387,157 +462,53 @@ const PayRent = () => {
             {t("selectPaymentMethod")}
           </Text>
 
-          {/* VNPay Option */}
-          <TouchableOpacity
-            onPress={() => setPaymentMethod("vnpay")}
-            className={`mb-3 rounded-xl border p-4 ${
-              paymentMethod === "vnpay"
-                ? isDarkMode
-                  ? "border-blue-500 bg-blue-900/20"
-                  : "border-blue-500 bg-blue-50"
-                : isDarkMode
-                ? "border-gray-700 bg-gray-800"
-                : "border-gray-200 bg-white"
-            }`}
-          >
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center">
-                <View
-                  className={`rounded-full p-2 mr-3 ${
-                    isDarkMode ? "bg-blue-900/40" : "bg-blue-100"
-                  }`}
-                >
-                  <FontAwesome5
-                    name="credit-card"
-                    size={16}
-                    color={isDarkMode ? "#60a5fa" : "#3b82f6"}
-                  />
-                </View>
-                <Text
-                  className={themedClasses(
-                    "font-bold text-gray-800",
-                    "font-bold text-gray-100"
-                  )}
-                >
-                  VNPay
-                </Text>
-              </View>
-              {paymentMethod === "vnpay" && (
-                <View
-                  className={
-                    isDarkMode
-                      ? "bg-blue-800 p-1 rounded-full"
-                      : "bg-blue-100 p-1 rounded-full"
-                  }
-                >
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={24}
-                    color={isDarkMode ? "#60a5fa" : "#3b82f6"}
-                  />
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
+          {/* VNPay Option - Using Button component */}
+          <PaymentMethodItem
+            method="vnpay"
+            title="VNPay"
+            icon="credit-card"
+            color="blue"
+            darkColor="#60a5fa"
+          />
 
-          {/* MoMo Option */}
-          <TouchableOpacity
-            onPress={() => setPaymentMethod("momo")}
-            className={`mb-3 rounded-xl border p-4 ${
-              paymentMethod === "momo"
-                ? isDarkMode
-                  ? "border-pink-500 bg-pink-900/20"
-                  : "border-pink-500 bg-pink-50"
-                : isDarkMode
-                ? "border-gray-700 bg-gray-800"
-                : "border-gray-200 bg-white"
-            }`}
-          >
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center">
-                <View
-                  className={`rounded-full p-2 mr-3 ${
-                    isDarkMode ? "bg-pink-900/40" : "bg-pink-100"
-                  }`}
-                >
-                  <FontAwesome5
-                    name="wallet"
-                    size={16}
-                    color={isDarkMode ? "#f472b6" : "#ec4899"}
-                  />
-                </View>
-                <Text
-                  className={themedClasses(
-                    "font-bold text-gray-800",
-                    "font-bold text-gray-100"
-                  )}
-                >
-                  MoMo
-                </Text>
-              </View>
-              {paymentMethod === "momo" && (
-                <View
-                  className={
-                    isDarkMode
-                      ? "bg-pink-800 p-1 rounded-full"
-                      : "bg-pink-100 p-1 rounded-full"
-                  }
-                >
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={24}
-                    color={isDarkMode ? "#f472b6" : "#ec4899"}
-                  />
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
+          {/* MoMo Option - Using Button component */}
+          <PaymentMethodItem
+            method="momo"
+            title="MoMo"
+            icon="wallet"
+            color="pink"
+            darkColor="#f472b6"
+          />
         </View>
       </View>
 
-      {/* Payment Button */}
+      {/* Payment Button - Using Button component */}
       <View
         className={`p-4 ${isDarkMode ? "bg-gray-900" : "bg-white"} border-t ${
           isDarkMode ? "border-gray-800" : "border-gray-200"
         }`}
       >
-        <TouchableOpacity
+        <Button
           onPress={handlePayment}
           disabled={loading || !paymentMethod}
-          className={`rounded-xl py-4 ${
+          loading={loading}
+          variant="primary"
+          fullWidth={true}
+          size="lg"
+          icon={<FontAwesome5 name="credit-card" size={16} color="#ffffff" />}
+          style={{ borderRadius: 12 }}
+          className={
             !paymentMethod
               ? isDarkMode
                 ? "bg-gray-700"
                 : "bg-gray-300"
-              : loading
-              ? isDarkMode
-                ? "bg-indigo-700"
-                : "bg-indigo-400"
               : isDarkMode
               ? "bg-indigo-600"
               : "bg-indigo-600"
-          }`}
+          }
         >
-          <View className="flex-row justify-center items-center">
-            {loading ? (
-              <ActivityIndicator
-                size="small"
-                color="#ffffff"
-                style={{ marginRight: 8 }}
-              />
-            ) : (
-              <FontAwesome5
-                name="credit-card"
-                size={16}
-                color="#ffffff"
-                style={{ marginRight: 8 }}
-              />
-            )}
-            <Text className="text-white font-bold text-lg">
-              {loading ? t("processing") : t("confirmPayment")}
-            </Text>
-          </View>
-        </TouchableOpacity>
+          {loading ? t("processing") : t("confirmPayment")}
+        </Button>
       </View>
     </ScrollContainer>
   );
