@@ -67,7 +67,7 @@ function Favorite() {
   const hasMore = favorites.length < totalItems;
 
   return (
-    <ScreenContainer className={themedClasses.bg} withPadding={false}>
+    <ScreenContainer withPadding={false}>
       <View
         style={{
           flex: 1,
