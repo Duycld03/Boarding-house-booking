@@ -186,7 +186,7 @@ class PaymentBillController {
       const currentMonth = (currentDate.getMonth() + 1).toString();
       const currentYear = currentDate.getFullYear().toString();
 
-      // Find the latest payment bill for this room in the current month
+      // Find the latest payment bill for this room in the current month with case-insensitive "pending" status
       const paymentBill = await PaymentBill.findOne({
         roomId: deposit.roomId,
         month: currentMonth,
@@ -196,7 +196,9 @@ class PaymentBillController {
       if (!paymentBill) {
         return res
           .status(404)
-          .json({ message: "No payment bill found for the current month" });
+          .json({
+            message: "No pending payment bill found for the current month",
+          });
       }
 
       // Check if user has already paid

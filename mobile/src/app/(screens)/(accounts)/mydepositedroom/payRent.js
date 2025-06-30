@@ -364,18 +364,6 @@ const PayRent = () => {
               >
                 {title}
               </Text>
-              <Text
-                className={
-                  paymentMethod === method
-                    ? "text-white text-xs opacity-80"
-                    : themedClasses(
-                        "text-gray-500 text-xs",
-                        "text-gray-400 text-xs"
-                      )
-                }
-              >
-                {method === "vnpay" ? t("creditDebitCard") : t("eWallet")}
-              </Text>
             </View>
           </View>
           {paymentMethod === method && (

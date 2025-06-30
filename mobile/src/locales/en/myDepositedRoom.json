@@ -37,5 +37,6 @@
   "paymentSuccessful": "Payment successful!",
   "paymentFailed": "Payment failed. Please try again.",
   "invalidDepositData": "Invalid deposit data",
-  "pleaseSelectPaymentMethod": "Please select a payment method"
+  "pleaseSelectPaymentMethod": "Please select a payment method",
+  "noBillThisMonth": "No bill this month"
 }

@@ -513,6 +513,7 @@ class DepositController {
         paymentBillId: { $in: paymentBillIds },
         status: { $regex: /^paid$/i },
       }).lean();
+      console.log("Payment found:", payment);
 
       const isPaid = !!payment;
       // Return payment information including current month/year for debugging

@@ -16,6 +16,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import formatAmount from "@/utils/formatAmount";
 import { checkPayRentStatus } from "@/API/depositAPI";
+import { getPaymentBillForRent } from "@/API/paymentBillAPI";
 import { useFocusEffect } from "expo-router";
 
 const DepositCard = ({ item, onPayRent, onRefund, index }) => {
@@ -28,34 +29,56 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
   // Create unique state keys for each card based on item ID
   const [paymentStatusMap, setPaymentStatusMap] = useState({});
   const [checkingPaymentMap, setCheckingPaymentMap] = useState({});
+  // New state to track if a payment bill exists for the month
+  const [paymentBillExistsMap, setPaymentBillExistsMap] = useState({});
 
   // Define getters for this specific card
   const isRentPaid = paymentStatusMap[item._id] || false;
   const checkingPayment = checkingPaymentMap[item._id] || false;
+  const paymentBillExists = paymentBillExistsMap[item._id] || false;
 
   // Replace useEffect with useFocusEffect for checking payment status
   useFocusEffect(
     React.useCallback(() => {
       const checkPaymentStatus = async () => {
         if (item.status === "confirmed") {
-          // Update checking state only for this specific card
+          // Update checking state
           setCheckingPaymentMap((prev) => ({
             ...prev,
             [item._id]: true,
           }));
 
           try {
+            // First, check if there's a payment bill for the current month
+            const paymentBillResponse = await getPaymentBillForRent(item._id);
+
+            // Safe check for response data structure
+            const hasBill = !!paymentBillResponse;
+
+            // Set whether a bill exists for this month
+            setPaymentBillExistsMap((prev) => ({
+              ...prev,
+              [item._id]: hasBill,
+            }));
+
+            // Then check if it's paid
             const response = await checkPayRentStatus(item._id);
 
-            // Update paid state only for this specific card
+            // Update paid state
             setPaymentStatusMap((prev) => ({
               ...prev,
               [item._id]: response.isPaid,
             }));
           } catch (error) {
-            console.error("Error checking payment status:", error);
+            // If error is 404 (no payment bill found), set paymentBillExists to false
+            if (error.response && error.response.status === 404) {
+              setPaymentBillExistsMap((prev) => ({
+                ...prev,
+                [item._id]: false,
+              }));
+            }
           } finally {
-            // Reset checking state only for this specific card
+            // Reset checking state
             setCheckingPaymentMap((prev) => ({
               ...prev,
               [item._id]: false,
@@ -197,7 +220,8 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
     return currentDate <= twoMonthsBeforeEnd;
   };
 
-  // Update the renderPayRentButton function
+  // Update the renderPayRentButton function to correctly show payment button
+
   const renderPayRentButton = () => {
     if (checkingPayment) {
       return (
@@ -227,6 +251,7 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
       );
     }
 
+    // Show "Rent Paid" button if already paid
     if (isRentPaid) {
       return (
         <Button
@@ -237,7 +262,7 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
           icon={<MaterialIcons name="check-circle" size={16} color="#fff" />}
           style={{
             borderRadius: 12,
-            backgroundColor: isDarkMode ? "#15803d" : "#16a34a", // Explicitly set green color
+            backgroundColor: isDarkMode ? "#15803d" : "#16a34a",
           }}
         >
           {t("rentPaid")}
@@ -245,19 +270,42 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
       );
     }
 
+    // Show "Pay Rent" button if there's a bill and it hasn't been paid
+    if (paymentBillExists) {
+      return (
+        <Button
+          onPress={() => onPayRent(item)}
+          variant="primary"
+          fullWidth={true}
+          size="md"
+          icon={<FontAwesome name="dollar" size={14} color="#fff" />}
+          style={{
+            borderRadius: 12,
+            backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb",
+          }}
+        >
+          {t("payRent")}
+        </Button>
+      );
+    }
+
+    // Default: No bill for the month
     return (
       <Button
-        onPress={() => onPayRent(item)}
-        variant="primary"
+        disabled={true}
+        variant="outline"
         fullWidth={true}
         size="md"
-        icon={<FontAwesome name="dollar" size={14} color="#fff" />}
         style={{
           borderRadius: 12,
-          backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb", // Explicitly set blue color
+          backgroundColor: isDarkMode ? "#1f2937" : "#f9fafb",
+          borderColor: isDarkMode ? "#374151" : "#e5e7eb",
+          opacity: 0.7,
         }}
       >
-        {t("payRent")}
+        <Text className={themedClasses("text-gray-500", "text-gray-400")}>
+          {t("noBillThisMonth")}
+        </Text>
       </Button>
     );
   };
