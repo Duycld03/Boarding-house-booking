@@ -26,7 +26,7 @@ import {
 import { useCurrentUser } from "@/context/userContext";
 import { useFocusEffect, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import DepositCard from "@/components/screen/myDepositedRoom/depositCard";
+import DepositCard from "@/components/screen/myDepositedRoom/DepositCard";
 
 function MyDepositedRoom() {
   const { isDarkMode } = useTheme();
