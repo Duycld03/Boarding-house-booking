@@ -493,19 +493,35 @@ class DepositController {
         return res.status(400).json({ message: "Deposit room not found" });
       }
 
+      // Get current month and year
+      const currentDate = new Date();
+      const currentMonth = (currentDate.getMonth() + 1).toString(); // JavaScript months are 0-based
+      const currentYear = currentDate.getFullYear().toString();
+
+      const paymentBills = await PaymentBill.find({
+        roomId: deposit.roomId,
+        status: { $regex: /^paid$/i },
+        month: currentMonth,
+        year: currentYear,
+      }).select("_id");
+
+      const paymentBillIds = paymentBills.map((bill) => bill._id);
+
+      // Then check if user has paid for any of these bills
       const payment = await UserPayment.findOne({
         accountId: req.user.userId,
+        paymentBillId: { $in: paymentBillIds },
         status: { $regex: /^paid$/i },
-      })
-        .populate({
-          path: "paymentBillId",
-          match: { roomId: deposit.roomId },
-        })
-        .lean();
+      }).lean();
 
       const isPaid = !!payment;
-
-      return res.json({ isPaid });
+      // Return payment information including current month/year for debugging
+      return res.json({
+        isPaid,
+        currentMonth,
+        currentYear,
+        paymentBillsFound: paymentBillIds.length,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Internal Server Error" });

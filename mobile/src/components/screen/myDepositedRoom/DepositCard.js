@@ -25,24 +25,41 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
   const slideAnim = React.useRef(new Animated.Value(50)).current;
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
-  // Add state for payment status
-  const [isRentPaid, setIsRentPaid] = useState(false);
-  const [checkingPayment, setCheckingPayment] = useState(false);
+  // Create unique state keys for each card based on item ID
+  const [paymentStatusMap, setPaymentStatusMap] = useState({});
+  const [checkingPaymentMap, setCheckingPaymentMap] = useState({});
+
+  // Define getters for this specific card
+  const isRentPaid = paymentStatusMap[item._id] || false;
+  const checkingPayment = checkingPaymentMap[item._id] || false;
 
   // Replace useEffect with useFocusEffect for checking payment status
   useFocusEffect(
     React.useCallback(() => {
       const checkPaymentStatus = async () => {
         if (item.status === "confirmed") {
-          setCheckingPayment(true);
+          // Update checking state only for this specific card
+          setCheckingPaymentMap((prev) => ({
+            ...prev,
+            [item._id]: true,
+          }));
+
           try {
             const response = await checkPayRentStatus(item._id);
-            console.log("Payment status response:", response);
-            setIsRentPaid(response.isPaid);
+
+            // Update paid state only for this specific card
+            setPaymentStatusMap((prev) => ({
+              ...prev,
+              [item._id]: response.isPaid,
+            }));
           } catch (error) {
             console.error("Error checking payment status:", error);
           } finally {
-            setCheckingPayment(false);
+            // Reset checking state only for this specific card
+            setCheckingPaymentMap((prev) => ({
+              ...prev,
+              [item._id]: false,
+            }));
           }
         }
       };
@@ -180,7 +197,7 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
     return currentDate <= twoMonthsBeforeEnd;
   };
 
-  // Add this function before the return statement
+  // Update the renderPayRentButton function
   const renderPayRentButton = () => {
     if (checkingPayment) {
       return (
@@ -189,7 +206,11 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
           variant="outline"
           fullWidth={true}
           size="md"
-          style={{ borderRadius: 12 }}
+          style={{
+            borderRadius: 12,
+            backgroundColor: isDarkMode ? "#1f2937" : "#f9fafb",
+            borderColor: isDarkMode ? "#374151" : "#e5e7eb",
+          }}
         >
           <View className="flex-row items-center justify-center">
             <MaterialCommunityIcons
@@ -214,8 +235,10 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
           fullWidth={true}
           size="md"
           icon={<MaterialIcons name="check-circle" size={16} color="#fff" />}
-          style={{ borderRadius: 12 }}
-          className={`${isDarkMode ? "bg-green-700" : "bg-green-600"}`}
+          style={{
+            borderRadius: 12,
+            backgroundColor: isDarkMode ? "#15803d" : "#16a34a", // Explicitly set green color
+          }}
         >
           {t("rentPaid")}
         </Button>
@@ -229,8 +252,10 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
         fullWidth={true}
         size="md"
         icon={<FontAwesome name="dollar" size={14} color="#fff" />}
-        style={{ borderRadius: 12 }}
-        className={`${isDarkMode ? "bg-blue-700" : "bg-blue-600"}`}
+        style={{
+          borderRadius: 12,
+          backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb", // Explicitly set blue color
+        }}
       >
         {t("payRent")}
       </Button>
@@ -485,8 +510,8 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
                   {renderPayRentButton()}
                 </View>
 
-                {/* Request Refund Button - Only show if refund is available */}
-                {shouldShowRefund(item.endDate) && !isRentPaid && (
+                {/* Request Refund Button - Show if refund is available, regardless of payment status */}
+                {shouldShowRefund(item.endDate) && (
                   <View className="flex-1 ml-2">
                     <Button
                       onPress={() => onRefund(item)}
@@ -494,8 +519,10 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
                       fullWidth={true}
                       size="md"
                       icon={<Ionicons name="refresh" size={16} color="#fff" />}
-                      style={{ borderRadius: 12 }}
-                      className={`${isDarkMode ? "bg-red-800" : "bg-red-600"}`}
+                      style={{
+                        borderRadius: 12,
+                        backgroundColor: isDarkMode ? "#b91c1c" : "#dc2626", // Explicitly set red color
+                      }}
                     >
                       {t("requestRefund")}
                     </Button>

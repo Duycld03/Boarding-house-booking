@@ -216,7 +216,7 @@ const PayRent = () => {
     );
   }
 
-  // Render payment method item with consistent border-radius
+  // Render payment method item with consistent border-radius and fixed color issues
   const PaymentMethodItem = ({ method, title, icon, color, darkColor }) => (
     <View
       className={`mb-3 rounded-xl overflow-hidden`}
@@ -227,57 +227,74 @@ const PayRent = () => {
         variant={paymentMethod === method ? "primary" : "outline"}
         fullWidth={true}
         size="md"
-        className={
-          paymentMethod === method
-            ? isDarkMode
-              ? `bg-${color}-700 border-${color}-500`
-              : `bg-${color}-50 border-${color}-500`
-            : isDarkMode
-            ? "bg-gray-800 border-gray-700"
-            : "bg-white border-gray-200"
-        }
         style={{
           borderRadius: 12,
           paddingVertical: 16, // More vertical padding than the default
+          backgroundColor:
+            paymentMethod === method
+              ? isDarkMode
+                ? "#4f46e5" // Indigo-700 for dark mode selection
+                : "#4f46e5" // Indigo-600 for light mode selection
+              : isDarkMode
+              ? "#1f2937" // Dark gray for dark mode unselected
+              : "#ffffff", // White for light mode unselected
+          borderColor:
+            paymentMethod === method
+              ? isDarkMode
+                ? "#6366f1" // Indigo-500 for dark mode selection border
+                : "#6366f1" // Indigo-500 for light mode selection border
+              : isDarkMode
+              ? "#374151" // Gray-700 for dark mode unselected border
+              : "#e5e7eb", // Gray-200 for light mode unselected border
         }}
       >
         <View className="flex-row items-center justify-between w-full">
           <View className="flex-row items-center">
             <View
-              className={`rounded-full p-2 mr-3 ${
-                isDarkMode ? `bg-${color}-900/40` : `bg-${color}-100`
-              }`}
-              style={{ borderRadius: 9999 }} // Explicitly set borderRadius for rounded-full
+              className={`rounded-full p-2 mr-3`}
+              style={{
+                borderRadius: 9999, // Explicitly set borderRadius for rounded-full
+                backgroundColor: isDarkMode
+                  ? `${color === "blue" ? "#1e3a8a" : "#831843"}80` // Darker colors with opacity for dark mode
+                  : `${color === "blue" ? "#dbeafe" : "#fce7f3"}`, // Light colors for light mode
+              }}
             >
               <FontAwesome5
                 name={icon}
                 size={16}
-                color={isDarkMode ? darkColor : color}
+                color={
+                  color === "blue"
+                    ? isDarkMode
+                      ? "#60a5fa"
+                      : "#2563eb" // Blue colors
+                    : isDarkMode
+                    ? "#f472b6"
+                    : "#db2777" // Pink colors
+                }
               />
             </View>
             <Text
-              className={themedClasses(
-                "font-bold text-gray-800",
-                "font-bold text-gray-100"
-              )}
+              className={
+                paymentMethod === method
+                  ? "font-bold text-white"
+                  : themedClasses(
+                      "font-bold text-gray-800",
+                      "font-bold text-gray-100"
+                    )
+              }
             >
               {title}
             </Text>
           </View>
           {paymentMethod === method && (
             <View
-              className={
-                isDarkMode
-                  ? `bg-${color}-800 p-1 rounded-full`
-                  : `bg-${color}-100 p-1 rounded-full`
-              }
-              style={{ borderRadius: 9999 }} // Explicitly set borderRadius for rounded-full
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                padding: 4,
+                borderRadius: 9999,
+              }}
             >
-              <Ionicons
-                name="checkmark-circle"
-                size={24}
-                color={isDarkMode ? darkColor : color}
-              />
+              <Ionicons name="checkmark-circle" size={24} color="#ffffff" />
             </View>
           )}
         </View>
