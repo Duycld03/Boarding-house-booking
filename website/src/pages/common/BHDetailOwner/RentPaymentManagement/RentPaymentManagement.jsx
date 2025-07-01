@@ -47,21 +47,23 @@ const RentPaymentManagement = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <Tag
-          color={
-            status === "pending"
-              ? "orange"
-              : status === "paid"
-              ? "green"
-              : status === "deleted"
-              ? "volcano"
-              : "red"
-          }
-        >
-          {status}
-        </Tag>
-      ),
+      render: (status) => {
+        const statusLower = status?.toLowerCase() || "";
+
+        // Determine color based on case-insensitive comparison
+        let color;
+        if (statusLower === "pending") {
+          color = "orange";
+        } else if (statusLower === "paid") {
+          color = "green";
+        } else if (statusLower === "deleted") {
+          color = "volcano";
+        } else {
+          color = "red";
+        }
+
+        return <Tag color={color}>{status}</Tag>;
+      },
     },
     {
       title: "Additional Fee",
