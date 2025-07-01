@@ -183,8 +183,6 @@ class ReviewController {
       const { reviewId } = req.params;
       const accountId = req.user?.userId;
 
-      console.log("req.body:", req.body);
-      console.log("req.files:", req.files);
 
       const { content, rating, boardingHouseId } = req.body;
 

@@ -70,7 +70,6 @@ const UpdateReview = () => {
             setContent(data.content);
             setExistingImages(data.images || []);
         } catch (error) {
-            console.error("Error fetching review data:", error);
             showError("Failed to load review data.");
             router.back();
         } finally {
@@ -148,7 +147,6 @@ const UpdateReview = () => {
                 showError(response.message || t("review.submitError") || "Failed to submit the review.");
             }
         } catch (error) {
-            console.error("Error updating review:", error.response?.data || error.message);
             showError("Failed to update the review.");
         } finally {
             setLoading(false);
