@@ -181,12 +181,15 @@ class PaymentBillController {
         return res.status(400).json({ message: "Deposit room not found" });
       }
 
-      // Get current month and year
+      // Calculate previous month
       const currentDate = new Date();
-      const currentMonth = (currentDate.getMonth() + 1).toString();
+      // Go back one month
+      currentDate.setMonth(currentDate.getMonth() - 1);
+
+      const currentMonth = (currentDate.getMonth() + 1).toString(); // JavaScript months are 0-based
       const currentYear = currentDate.getFullYear().toString();
 
-      // Find the latest payment bill for this room in the current month with case-insensitive "pending" status
+      // Find the latest payment bill for this room in the previous month with case-insensitive "pending" status
       const paymentBill = await PaymentBill.findOne({
         roomId: deposit.roomId,
         month: currentMonth,
@@ -194,11 +197,9 @@ class PaymentBillController {
       }).sort({ createdAt: -1 });
 
       if (!paymentBill) {
-        return res
-          .status(404)
-          .json({
-            message: "No pending payment bill found for the current month",
-          });
+        return res.status(404).json({
+          message: "No pending payment bill found for the previous month",
+        });
       }
 
       // Check if user has already paid

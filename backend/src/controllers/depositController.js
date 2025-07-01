@@ -493,8 +493,11 @@ class DepositController {
         return res.status(400).json({ message: "Deposit room not found" });
       }
 
-      // Get current month and year
+      // Calculate previous month
       const currentDate = new Date();
+      // Go back one month
+      currentDate.setMonth(currentDate.getMonth() - 1);
+
       const currentMonth = (currentDate.getMonth() + 1).toString(); // JavaScript months are 0-based
       const currentYear = currentDate.getFullYear().toString();
 
@@ -516,7 +519,7 @@ class DepositController {
       console.log("Payment found:", payment);
 
       const isPaid = !!payment;
-      // Return payment information including current month/year for debugging
+      // Return payment information including previous month/year for debugging
       return res.json({
         isPaid,
         currentMonth,
