@@ -210,6 +210,9 @@ function BHManagementOwner() {
         onChange={handleTableChange}
         pagination={tablePaginationConfig}
         noDataText={t('messages.noData')}
+        onRowClick={(data) => {
+          console.log("data", data);
+        }}
       />
 
       <ConfirmModal

@@ -147,7 +147,11 @@ const routes = [
     page: CommonPages.DepositManagement,
     layout: ProfileLayout,
   },
-
+  {
+    path: '/appointment-owner/',
+    page: CommonPages.AppointmentOwner,
+    layout: ProfileLayout,
+  },
   // Dashboard routes
   {
     path: `${DASHBOARD_PATH}/boarding-house-management`,

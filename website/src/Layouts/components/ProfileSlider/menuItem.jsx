@@ -108,10 +108,10 @@ const getMenuItems = () => {
       visible: isOwner,
     },
     {
-      key: 'appointment-management',
-      label: <Link to="/my-appointment">My appointment</Link>,
+      key: 'appointment-owner',
+      label: <Link to="/appointment-owner">Appointment Management</Link>,
       icon: <ScheduleOutlined />,
-      visible: isOwner,
+      visible: isOwner || isStaff
     },
   ];
   return menuItems.filter((item) => item.visible);
