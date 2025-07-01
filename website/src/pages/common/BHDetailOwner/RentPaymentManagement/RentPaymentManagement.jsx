@@ -62,6 +62,8 @@ const RentPaymentManagement = () => {
           color = "red";
         }
 
+        status = statusLower.charAt(0).toUpperCase() + statusLower.slice(1);
+
         return <Tag color={color}>{status}</Tag>;
       },
     },
