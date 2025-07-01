@@ -30,9 +30,10 @@ import en_roomType from "@/locales/en/roomType.json";
 import vi_roomType from "@/locales/vi/roomType.json";
 import en_depositManagement from "@/locales/en/depositManagement.json";
 import vi_depositManagement from "@/locales/vi/depositManagement.json";
-import { DepositManagement } from "@/pages/common";
 import en_calculateRent from "@/locales/en/calculateRent.json";
 import vi_calculateRent from "@/locales/vi/calculateRent.json";
+import en_rentPayment from "@/locales/en/rentPayment.json";
+import vi_rentPayment from "@/locales/vi/rentPayment.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -53,6 +54,7 @@ i18n.use(initReactI18next).init({
       roomType: en_roomType,
       depositManagement: en_depositManagement,
       calculateRent: en_calculateRent,
+      rentPayment: en_rentPayment,
     },
     vi: {
       menu: vi_menu,
@@ -71,6 +73,7 @@ i18n.use(initReactI18next).init({
       roomType: vi_roomType,
       depositManagement: vi_depositManagement,
       calculateRent: vi_calculateRent,
+      rentPayment: vi_rentPayment,
     },
   },
   lng: "en",

@@ -1,0 +1,16 @@
+{
+  "roomNumber": "Room Number",
+  "monthlyRent": "Monthly Rent",
+  "status": "Status",
+  "additionalFee": "Additional Fee",
+  "electricalBill": "Electrical Bill",
+  "waterBill": "Water Bill",
+  "paymentAmount": "Payment Amount",
+  "calculateMonthly": "Calculate Monthly",
+  "noRentData": "No rent payment data available",
+  "notApplicable": "N/A",
+  "pending": "Pending",
+  "paid": "Paid",
+  "deleted": "Deleted",
+  "unknown": "Unknown"
+}
