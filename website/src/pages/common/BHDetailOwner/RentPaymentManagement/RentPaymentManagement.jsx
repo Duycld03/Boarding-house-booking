@@ -7,10 +7,8 @@ import { Tag } from "antd";
 import formatAmount from "@/utils/formatAmount";
 import CalculateRent from "./CalculateRent";
 import { getPaymentBillByBoardingHouseId } from "@/api/ownerUser/paymentBillAPI";
-import { useTranslation } from "react-i18next";
 
 const RentPaymentManagement = () => {
-  const { t } = useTranslation("rentPayment"); // Initialize translation namespace
   const { boardingHouseId } = useParams();
   const [rentPaymentData, setRentPaymentData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,73 +34,74 @@ const RentPaymentManagement = () => {
 
   const columns = [
     {
-      title: t("roomNumber"),
+      title: "Room Number",
       dataIndex: "roomNumber",
       key: "roomNumber",
     },
     {
-      title: t("monthlyRent"),
+      title: "Monthly rent",
       dataIndex: "rentMonth",
       key: "rentMonth",
     },
     {
-      title: t("status"),
+      title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => {
-        const statusLower = status?.toLowerCase() || "";
-
-        // Determine color based on case-insensitive comparison
-        let color;
-        if (statusLower === "pending") {
-          color = "orange";
-        } else if (statusLower === "paid") {
-          color = "green";
-        } else if (statusLower === "deleted") {
-          color = "volcano";
-        } else {
-          color = "red";
-        }
-
-        // Translate the status
-        let translatedStatus;
-        if (statusLower === "pending") {
-          translatedStatus = t("pending");
-        } else if (statusLower === "paid") {
-          translatedStatus = t("paid");
-        } else if (statusLower === "deleted") {
-          translatedStatus = t("deleted");
-        } else {
-          translatedStatus = t("unknown");
-        }
-
-        return <Tag color={color}>{translatedStatus}</Tag>;
-      },
+      render: (status) => (
+        <Tag
+          color={
+            status === "pending"
+              ? "orange"
+              : status === "paid"
+              ? "green"
+              : status === "deleted"
+              ? "volcano"
+              : "red"
+          }
+        >
+          {status}
+        </Tag>
+      ),
     },
     {
-      title: t("additionalFee"),
+      title: "Additional Fee",
       dataIndex: "additionalFee",
       key: "additionalFee",
       render: (price) => (price ? formatAmount(price) : 0),
     },
     {
-      title: t("electricalBill"),
+      title: "Electrical Bill",
       dataIndex: "electricalBill",
       key: "electricalBill",
-      render: (price) => (price ? formatAmount(price) : t("notApplicable")),
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
     {
-      title: t("waterBill"),
+      title: "Water Bill",
       dataIndex: "waterBill",
       key: "waterBill",
-      render: (price) => (price ? formatAmount(price) : t("notApplicable")),
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
     {
-      title: t("paymentAmount"),
+      title: "Payment Amount",
       dataIndex: "paymentAmount",
       key: "paymentAmount",
-      render: (price) => (price ? formatAmount(price) : t("notApplicable")),
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
+    // {
+    //   title: "Action",
+    //   key: "action",
+    //   render: (record) => (
+    //     <Button
+    //       size="large"
+    //       btnDelete
+    //       title="Delete"
+    //       onClick={() => {
+    //         setSelectedTenant(record);
+    //         setIsOpen(true);
+    //       }}
+    //     />
+    //   ),
+    // },
   ];
 
   return (
@@ -110,7 +109,7 @@ const RentPaymentManagement = () => {
       <div className="flex justify-between items-center mb-4">
         <Button
           btnAdd
-          title={t("calculateMonthly")}
+          title="Calculate monthly"
           size="large"
           onClick={() => {
             setIsOpen(true);
@@ -122,7 +121,6 @@ const RentPaymentManagement = () => {
         columns={columns}
         data={rentPaymentData?.length > 0 ? rentPaymentData : []}
         loading={loading}
-        emptyText={t("noRentData")}
       />
       <CalculateRent
         visible={isOpen}
