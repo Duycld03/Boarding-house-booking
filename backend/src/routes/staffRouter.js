@@ -210,7 +210,7 @@ staffRouter.get(
   roomAdditionFeeController.getAllRoomAdditionFees
 );
 staffRouter.get(
-  "/room-addition-fee/:id",
+  "/room-addition-fee/calculate-rent/:roomId",
   roomAdditionFeeController.getRoomAdditionFeeForMonthlyCalculate
 );
 staffRouter.put(

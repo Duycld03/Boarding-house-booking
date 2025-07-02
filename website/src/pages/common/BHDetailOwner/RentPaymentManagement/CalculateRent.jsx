@@ -7,6 +7,7 @@ import { calculateMonthlyBill } from "@/api/ownerUser/paymentBillAPI";
 import { getRoomAdditionFeeForMonthlyCalculate } from "@/api/staffUser/roomAdditionFee";
 import { useTheme } from "@/context/themeContext";
 import { useTranslation } from "react-i18next";
+import formatAmount, { useFormatAmount } from "@/utils/formatAmount";
 
 const CalculateRent = ({
   visible,
@@ -14,7 +15,7 @@ const CalculateRent = ({
   boardingHouseId,
   fetchRentPaymentData,
 }) => {
-  const { t } = useTranslation("calculateRent"); // Initialize translation
+  const { t, i18n } = useTranslation("calculateRent"); // Get both t and i18n
   const { darkMode } = useTheme();
   const [form] = Form.useForm();
   const [additionalFees, setAdditionalFees] = useState([]);
@@ -33,6 +34,9 @@ const CalculateRent = ({
   const [loadingFees, setLoadingFees] = useState(false);
   const [previousMonth, setPreviousMonth] = useState(null);
   const [previousYear, setPreviousYear] = useState(null);
+
+  // Use the useFormatAmount hook to get language-aware formatting functions
+  const { formatPrice, formatNumber } = useFormatAmount(i18n.language);
 
   const onClose = () => {
     setVisible(false);
@@ -336,15 +340,15 @@ const CalculateRent = ({
     // Function to inject styles into document head
     const injectStyles = () => {
       // Remove any existing style element first
-      const existingStyle = document.getElementById('calculate-rent-styles');
+      const existingStyle = document.getElementById("calculate-rent-styles");
       if (existingStyle) {
         existingStyle.remove();
       }
-      
+
       if (visible && darkMode) {
         // Create style element for dark mode styles
-        const style = document.createElement('style');
-        style.id = 'calculate-rent-styles';
+        const style = document.createElement("style");
+        style.id = "calculate-rent-styles";
         style.innerHTML = `
           .ant-input-group-addon {
             background-color: #374151 !important;
@@ -371,15 +375,20 @@ const CalculateRent = ({
     };
 
     injectStyles();
-    
+
     return () => {
       // Clean up styles on unmount
-      const existingStyle = document.getElementById('calculate-rent-styles');
+      const existingStyle = document.getElementById("calculate-rent-styles");
       if (existingStyle) {
         existingStyle.remove();
       }
     };
   }, [visible, darkMode]);
+
+  // Update the table column for amount formatting
+  const renderAmountColumn = (amount) => {
+    return <span>{formatPrice(amount, { showFullFormat: true })}</span>;
+  };
 
   return (
     <Modal
@@ -581,7 +590,7 @@ const CalculateRent = ({
               <Table.Column
                 title={t("amount")}
                 dataIndex="feeAmount"
-                render={(text) => <span>{text.toLocaleString()} VND</span>}
+                render={(amount) => renderAmountColumn(amount)}
                 align="right"
                 style={styles.tableHeaderStyle}
               />
@@ -599,18 +608,19 @@ const CalculateRent = ({
           )}
         </Form.Item>
 
-        {/* Summary Section */}
+        {/* Room Price with updated formatting */}
         <Form.Item label={t("roomPrice")}>
           <Input
-            value={`${roomPrice?.toLocaleString()} VND`}
+            value={formatPrice(roomPrice, { showFullFormat: true })}
             readOnly
             style={styles.readOnlyStyle}
           />
         </Form.Item>
 
+        {/* Total Amount with updated formatting */}
         <Form.Item label={t("totalAmount")}>
           <Input
-            value={`${totalAmount?.toLocaleString()} VND`}
+            value={formatPrice(totalAmount, { showFullFormat: true })}
             readOnly
             style={styles.totalAmountStyle}
           />

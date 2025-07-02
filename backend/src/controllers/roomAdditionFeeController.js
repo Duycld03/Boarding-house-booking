@@ -123,10 +123,6 @@ class RoomAdditionFeeController {
       const previousMonth = currentDate.getMonth() + 1; // getMonth() is 0-indexed
       const previousYear = currentDate.getFullYear();
 
-      console.log(
-        `Fetching additional fees for room ${roomId} for ${previousMonth}/${previousYear}`
-      );
-
       // Find all additional fees for the room in the previous month/year
       const additionalFees = await RoomAdditionalFees.find({
         roomId,
