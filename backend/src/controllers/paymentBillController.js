@@ -58,7 +58,6 @@ class PaymentBillController {
 
       return res.status(200).json(formattedBills);
     } catch (error) {
-      console.error("Error fetching payment bills:", error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }
@@ -156,7 +155,6 @@ class PaymentBillController {
         paymentBill: newPaymentBill,
       });
     } catch (error) {
-      console.error("Error calculating monthly rent:", error);
       res
         .status(500)
         .json({ message: "Error calculate", error: error.message });
@@ -217,7 +215,6 @@ class PaymentBillController {
         currentYear,
       });
     } catch (error) {
-      console.error(error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }

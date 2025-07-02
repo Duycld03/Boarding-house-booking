@@ -58,7 +58,6 @@ class DepositController {
 
       res.status(200).json({ message: "Deposit successfully" });
     } catch (error) {
-      console.error("Error depositing:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -148,7 +147,6 @@ class DepositController {
         data: formattedDeposits,
       });
     } catch (error) {
-      console.error("Error in getMyDepositedRooms:", error);
       return res.status(500).json({
         success: false,
         message: "There is something wrong!",
@@ -428,8 +426,6 @@ class DepositController {
         return res.redirect(redirectUrl);
       }
     } catch (error) {
-      console.log("Error momo return:", error);
-
       let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
       if (type == "refund") {
         redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
@@ -471,7 +467,6 @@ class DepositController {
         createMomoUrl(req, res, userPayment.paymentAmount, orderInfo);
       }
     } catch (error) {
-      console.error("Error paying rent:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -526,7 +521,6 @@ class DepositController {
         paymentBillsFound: paymentBillIds.length,
       });
     } catch (error) {
-      console.error(error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }
@@ -585,9 +579,7 @@ class DepositController {
           if (!isNaN(min) && !isNaN(max)) {
             filter.amount = { $gte: min, $lte: max };
           }
-        } catch (e) {
-          console.error("Error parsing priceRange:", e);
-        }
+        } catch (e) {}
       }
 
       if (rentalTime) {
@@ -599,9 +591,7 @@ class DepositController {
           if (!isNaN(min) && !isNaN(max)) {
             filter.rentalTime = { $gte: min, $lte: max };
           }
-        } catch (e) {
-          console.error("Error parsing rentalTime:", e);
-        }
+        } catch (e) {}
       }
 
       // 4. Cấu hình phân trang
@@ -653,7 +643,6 @@ class DepositController {
         ...paginatedResult,
       });
     } catch (error) {
-      console.error("Error getting deposits:", error);
       return res.status(500).json({
         message: "Server error",
         success: false,
@@ -810,7 +799,6 @@ class DepositController {
         depositId: deposit._id,
       });
     } catch (error) {
-      console.error("Error accepting deposit room:", error);
       return res.status(500).json({
         error: "Đã có lỗi xảy ra",
         detail: error.message,
@@ -835,7 +823,6 @@ class DepositController {
 
       res.status(200).json(maxDeposit?.amount || 0);
     } catch (error) {
-      console.error("Error getting max deposit:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -858,9 +845,7 @@ class DepositController {
         .select("rentalTime");
 
       res.status(200).json(maxRentTime?.rentalTime || 0);
-    } catch (error) {
-      console.error("Error getting max rent time:", error);
-    }
+    } catch (error) {}
   }
 
   async payDeposit(req, res) {
@@ -885,7 +870,6 @@ class DepositController {
         createMomoUrl(req, res, amount, orderInfo);
       }
     } catch (error) {
-      console.error("Error confirming deposit:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -962,7 +946,6 @@ class DepositController {
         depositId: deposit._id,
       });
     } catch (error) {
-      console.error("Error rejecting deposit room:", error);
       return res
         .status(500)
         .json({ error: "Đã có lỗi xảy ra", detail: error.message });
@@ -990,7 +973,6 @@ class DepositController {
         createMomoUrl(req, res, amountRefunded, orderInfo);
       }
     } catch (error) {
-      console.error("Error paying deposit refund:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }

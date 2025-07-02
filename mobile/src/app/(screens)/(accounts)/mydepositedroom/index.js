@@ -101,7 +101,6 @@ function MyDepositedRoom() {
           showError(t("fetchError"));
         }
       } catch (error) {
-        console.error("Error fetching deposits:", error);
         showError(t("fetchError"));
       } finally {
         if (isLoadMore) {
@@ -145,7 +144,6 @@ function MyDepositedRoom() {
 
   const handleRefund = useCallback(
     (deposit) => {
-      console.log("Request refund for deposit:", deposit);
       showSuccess(t("refundRequestSent"));
     },
     [t, showSuccess]

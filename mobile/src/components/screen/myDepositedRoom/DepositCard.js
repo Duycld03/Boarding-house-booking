@@ -580,35 +580,6 @@ const DepositCard = ({ item, onPayRent, onRefund, onPayDeposit, index }) => {
                 )}
               >
                 {item.rentalTime}{" "}
-              </Text>
-            </View>
-          </View>
-
-          {/* Actions Buttons */}
-          {(item.status === "confirmed" || item.status === "accepted") && (
-            <>
-              <LinearGradient
-                colors={
-                  isDarkMode
-                    ? [
-                        "rgba(75, 85, 99, 0)",
-                        "rgba(75, 85, 99, 0.5)",
-                        "rgba(75, 85, 99, 0)",
-                      ]
-                    : [
-                        "rgba(229, 231, 235, 0)",
-                        "rgba(229, 231, 235, 0.8)",
-                        "rgba(229, 231, 235, 0)",
-                      ]
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="h-[1px] my-3"
-              />
-              {renderActionButtons()}
-            </>
-          )}
-        </View>
       </LinearGradient>
     </Animated.View>
   );
