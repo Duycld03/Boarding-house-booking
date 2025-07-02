@@ -196,6 +196,14 @@ staffRouter.post(
   "/calculate-monthly-bill",
   paymentBillController.calculateMonthlyRoomRent
 );
+staffRouter.put(
+  "/payment-bill/:paymentBillId",
+  paymentBillController.updatePaymentBill
+);
+staffRouter.get(
+  "/payment-bill/:paymentBillId",
+  paymentBillController.getPaymentBillById
+);
 
 //manager
 staffRouter.get("/manager-owner", managerController.getManagerOwner);
