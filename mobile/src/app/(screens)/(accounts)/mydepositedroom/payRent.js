@@ -98,12 +98,10 @@ const PayRent = () => {
         setDepositInfo(depositData);
         setChecking(false);
       } catch (error) {
-        showError(t("invalidDepositData"));
         router.back();
         setChecking(false);
       }
     } else if (checking && !params.deposit) {
-      showError(t("invalidDepositData"));
       router.back();
       setChecking(false);
     }
@@ -131,7 +129,6 @@ const PayRent = () => {
           setBillError(
             error.response?.data?.message || error.message || t("noBillFound")
           );
-          showError(t("noBillFound"));
 
           // Auto navigate back after a delay when no bill is found
           const timer = setTimeout(() => {
@@ -180,7 +177,6 @@ const PayRent = () => {
     }
 
     if (!paymentBill) {
-      showError(t("noBillFound"));
       return;
     }
 

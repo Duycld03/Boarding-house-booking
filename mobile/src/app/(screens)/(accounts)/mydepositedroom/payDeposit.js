@@ -93,12 +93,10 @@ const PayDeposit = () => {
         setDepositInfo(depositData);
         setChecking(false);
       } catch (error) {
-        showError(t("invalidDepositData"));
         router.back();
         setChecking(false);
       }
     } else if (checking && !params.deposit) {
-      showError(t("invalidDepositData"));
       router.back();
       setChecking(false);
     }
@@ -316,11 +314,10 @@ const PayDeposit = () => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }}>
-      <ScrollView 
-        className="flex-1"
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
+    <View
+      style={{ flex: 1, backgroundColor: isDarkMode ? "#0f172a" : "#f8fafc" }}
+    >
+      <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
         <ScrollContainer
           withPadding={false}
           keyboardAvoiding={false}

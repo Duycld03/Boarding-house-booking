@@ -98,10 +98,8 @@ function MyDepositedRoom() {
             setDepositData(res.data);
           }
         } else {
-          showError(t("fetchError"));
         }
       } catch (error) {
-        showError(t("fetchError"));
       } finally {
         if (isLoadMore) {
           setLoadingMore(false);
