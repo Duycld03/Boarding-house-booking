@@ -151,6 +151,18 @@ function MyDepositedRoom() {
     [t, showSuccess]
   );
 
+  // Add to your MyDepositedRoom screen
+  const handlePayDeposit = useCallback(
+    (item) => {
+      // Navigate to pay deposit screen with deposit data
+      router.push({
+        pathname: "/mydepositedroom/payDeposit",
+        params: { deposit: JSON.stringify(item) },
+      });
+    },
+    [router]
+  );
+
   // Update the handleLoadMore function
   const handleLoadMore = useCallback(() => {
     if (pagination.hasNextPage && !loadingMore) {
@@ -170,10 +182,11 @@ function MyDepositedRoom() {
         item={item}
         onPayRent={handlePayRent}
         onRefund={handleRefund}
+        onPayDeposit={handlePayDeposit} // Add this prop
         index={index}
       />
     ),
-    [handlePayRent, handleRefund]
+    [handlePayRent, handleRefund, handlePayDeposit]
   );
 
   const renderFooter = () => {

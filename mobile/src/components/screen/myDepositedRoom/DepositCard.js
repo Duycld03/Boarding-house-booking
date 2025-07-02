@@ -19,7 +19,7 @@ import { checkPayRentStatus } from "@/API/depositAPI";
 import { getPaymentBillForRent } from "@/API/paymentBillAPI";
 import { useFocusEffect } from "expo-router";
 
-const DepositCard = ({ item, onPayRent, onRefund, index }) => {
+const DepositCard = ({ item, onPayRent, onRefund, onPayDeposit, index }) => {
   const { isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
   const { t, i18n } = useTranslation("myDepositedRoom"); // Get i18n to access current language
@@ -310,6 +310,65 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
     );
   };
 
+  // Add this function to your DepositCard component
+  const renderActionButtons = () => {
+    if (item.status === "confirmed") {
+      return (
+        <>
+          <View className="flex-row justify-between mt-2">
+            {/* Pay Rent Button */}
+            <View
+              className={
+                shouldShowRefund(item.endDate) ? "flex-1 mr-2" : "flex-1"
+              }
+            >
+              {renderPayRentButton()}
+            </View>
+
+            {/* Request Refund Button - Show if refund is available */}
+            {shouldShowRefund(item.endDate) && (
+              <View className="flex-1 ml-2">
+                <Button
+                  onPress={() => onRefund(item)}
+                  variant="secondary"
+                  fullWidth={true}
+                  size="md"
+                  icon={<Ionicons name="refresh" size={16} color="#fff" />}
+                  style={{
+                    borderRadius: 12,
+                    backgroundColor: isDarkMode ? "#b91c1c" : "#dc2626",
+                  }}
+                >
+                  {t("requestRefund")}
+                </Button>
+              </View>
+            )}
+          </View>
+        </>
+      );
+    } else if (item.status === "accepted") {
+      return (
+        <View className="mt-2">
+          <Button
+            onPress={() => onPayDeposit(item)}
+            variant="primary"
+            fullWidth={true}
+            size="md"
+            icon={<FontAwesome name="dollar" size={14} color="#fff" />}
+            style={{
+              borderRadius: 12,
+              backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb",
+            }}
+          >
+            {t("payDeposit")}
+          </Button>
+        </View>
+      );
+    }
+
+    return null;
+  };
+
   // Card rendering with Button component
   return (
     <Animated.View
@@ -521,13 +580,12 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
                 )}
               >
                 {item.rentalTime}{" "}
-                {item.rentalTime === 1 ? t("month") : t("months")}
               </Text>
             </View>
           </View>
 
-          {/* Actions - Using Button Component */}
-          {item.status === "confirmed" && (
+          {/* Actions Buttons */}
+          {(item.status === "confirmed" || item.status === "accepted") && (
             <>
               <LinearGradient
                 colors={
@@ -547,36 +605,7 @@ const DepositCard = ({ item, onPayRent, onRefund, index }) => {
                 end={{ x: 1, y: 0 }}
                 className="h-[1px] my-3"
               />
-
-              <View className="flex-row justify-between mt-2">
-                {/* Pay Rent Button */}
-                <View
-                  className={
-                    shouldShowRefund(item.endDate) ? "flex-1 mr-2" : "flex-1"
-                  }
-                >
-                  {renderPayRentButton()}
-                </View>
-
-                {/* Request Refund Button - Show if refund is available, regardless of payment status */}
-                {shouldShowRefund(item.endDate) && (
-                  <View className="flex-1 ml-2">
-                    <Button
-                      onPress={() => onRefund(item)}
-                      variant="secondary"
-                      fullWidth={true}
-                      size="md"
-                      icon={<Ionicons name="refresh" size={16} color="#fff" />}
-                      style={{
-                        borderRadius: 12,
-                        backgroundColor: isDarkMode ? "#b91c1c" : "#dc2626", // Explicitly set red color
-                      }}
-                    >
-                      {t("requestRefund")}
-                    </Button>
-                  </View>
-                )}
-              </View>
+              {renderActionButtons()}
             </>
           )}
         </View>
