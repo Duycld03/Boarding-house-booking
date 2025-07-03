@@ -147,6 +147,11 @@ const routes = [
     page: CommonPages.BoardingHouseDetail,
     layout: HeaderOnly,
   },
+  {
+    path: "/deposit-list",
+    page: CommonPages.DepositManagement,
+    layout: ProfileLayout,
+  },
 
   // Dashboard routes
   {

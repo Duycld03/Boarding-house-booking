@@ -1,0 +1,18 @@
+{
+  "payDeposit": "Pay Deposit",
+  "room": "Room",
+  "rentalPeriod": "Rental Period",
+  "rentalTime": "Rental Time",
+  "month": "month",
+  "months": "months",
+  "depositAmount": "Deposit Amount",
+  "selectPaymentMethod": "Select Payment Method",
+  "processing": "Processing...",
+  "selectMethodFirst": "Select a payment method first",
+  "confirmPayment": "Confirm Payment",
+  "invalidDepositData": "Invalid deposit information",
+  "pleaseSelectPaymentMethod": "Please select a payment method",
+  "paymentFailed": "Payment process failed",
+  "paymentInitiated": "Payment initiated successfully",
+  "paymentSuccessful": "Deposit payment successful!"
+}
