@@ -145,16 +145,6 @@ function UserPaymentCard({ count, payment, isDarkMode, themedClasses, onPressDet
 
                 {/* Action Buttons */}
                 <View className={`flex-row gap-3 ${status === 'pending' ? 'space-x-3' : ''}`}>
-                    {status === 'pending' && (
-                        <Button
-                            onPress={() => onPressPay(payment)}
-                            style={{ backgroundColor: '#F97316' }}
-                        >
-                            <Text style={{ color: 'white' }}>
-                                {t('paymentCard.payNow')}
-                            </Text>
-                        </Button>
-                    )}
 
                     <Button
                         className="flex-1"
