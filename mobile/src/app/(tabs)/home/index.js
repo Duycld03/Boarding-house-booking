@@ -4,7 +4,7 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
+  Image,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,27 +12,32 @@ import { Ionicons } from '@expo/vector-icons';
 import ScreenContainer, {
   ScrollContainer,
 } from '@/components/layout/ScreenContainer';
-import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import HorizontalList from '@/components/ui/HorizontalList';
-import { getBhByArea } from '@/API/ownerUser/boardingHouse';
-import formatAmount from '@/utils/formatAmount';
+import {
+  getAllBHHome,
+  getHighRatingBH,
+  getNewestBH,
+} from '@/API/boardingHouseAPI';
+
+import Logo from '../../../assets/images/newLogo.png';
+
 import { useTranslation } from 'react-i18next';
 import Loader from '@/components/ui/Loader';
-import { useCurrentUser } from '@/context/userContext';
 import { getUser } from '@/API/authAPI';
 
-const { width } = Dimensions.get('window');
 
 function Home() {
-  const { themedClasses, isDarkMode } = useThemedClasses();
-  const { theme } = useTheme();
+  const { isDarkMode } = useThemedClasses();
   const router = useRouter();
   const { t } = useTranslation('home');
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({
+    all: [],
+    newest: [],
+    highRating: [],
+  });
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Thêm state để check login status
-  const { isLogin } = useCurrentUser();
 
   // Gọi lại khi tab được focus
   useFocusEffect(
@@ -42,31 +47,39 @@ function Home() {
       const fetchData = async () => {
         setLoading(true);
         try {
-          const res = await getBhByArea({});
-          if (!Array.isArray(res)) {
-            if (isActive) setData([]);
-            return;
-          }
-          const formatted = res.map((item) => {
-            const img =
-              item.images?.find((i) => i.isPrimary)?.imageUrl ||
-              item.images?.[0]?.imageUrl ||
-              '';
-            return {
-              id: item._id?.$oid || item._id,
+          const [allRes, newestRes, highRatingRes] = await Promise.all([
+            getAllBHHome(),
+            getNewestBH(),
+            getHighRatingBH(),
+          ]);
+
+          const format = (arr) =>
+            arr?.map((item) => ({
+              id: item._id,
               name: item.name,
               price: item.priceRange,
               detail: item.address?.province,
               rating: item.rating || 0,
               reviewCount: item.reviewCount || 0,
-              img,
               updatedAt: item.updatedAt || 0,
-            };
-          });
-          if (isActive) setData(formatted);
+              img:
+                item.images?.find((i) => i.isPrimary)?.imageUrl ||
+                item.images?.[0]?.imageUrl ||
+                '',
+            })) || [];
+
+          if (isActive) {
+            setData({
+              all: format(allRes?.data || []),
+              newest: format(newestRes?.data || []),
+              highRating: format(highRatingRes?.data || []),
+            });
+          }
         } catch (error) {
           console.error('Error fetching BH:', error);
-          if (isActive) setData([]);
+          if (isActive) {
+            setData({ all: [], newest: [], highRating: [] });
+          }
         } finally {
           if (isActive) setLoading(false);
         }
@@ -80,14 +93,11 @@ function Home() {
           } else {
             setIsLoggedIn(false);
           }
-        } catch (error) {
-          if (isActive) {
-            setIsLoggedIn(false);
-          }
+        } catch {
+          if (isActive) setIsLoggedIn(false);
         }
       };
 
-      // Chạy cả 2 functions
       fetchData();
       checkLoginStatus();
 
@@ -96,17 +106,10 @@ function Home() {
       };
     }, [])
   );
+  const newestData = data.newest;
+  const highRatingData = data.highRating;
 
-  const newestData = [...data]
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    .slice(0, 10);
-
-  const highRatingData = [...data]
-    .filter((i) => i.rating >= 3)
-    .sort((a, b) => b.reviewCount - a.reviewCount || b.rating - a.rating)
-    .slice(0, 10);
-
-  // Header Component với gradient và animation + Auth buttons
+  // Header Component với gradient và animation + Auth buttons + Logo
   const Header = () => (
     <LinearGradient
       colors={isDarkMode ? ['#1e293b', '#334155'] : ['#0ea5e9', '#0284c7']}
@@ -116,12 +119,18 @@ function Home() {
     >
       <View style={styles.headerContent}>
         <View style={styles.headerLeft}>
-          <Text style={[styles.greeting, { color: '#ffffff' }]}>
-            {t('greeting', 'Xin chào!')}
-          </Text>
-          <Text style={[styles.welcomeText, { color: '#e0f2fe' }]}>
-            {t('welcome')}
-          </Text>
+          {/* Logo Section */}
+          <View style={styles.logoSection}>
+            <Image source={Logo} style={styles.logo} resizeMode="contain" />
+            <View style={styles.textSection}>
+              <Text style={[styles.greeting, { color: '#ffffff' }]}>
+                {t('greeting', 'Xin chào!')}
+              </Text>
+              <Text style={[styles.welcomeText, { color: '#e0f2fe' }]}>
+                {t('welcome')}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Auth Buttons hoặc User Actions */}
@@ -169,7 +178,7 @@ function Home() {
           styles.searchBar,
           { backgroundColor: isDarkMode ? '#374151' : '#ffffff' },
         ]}
-        onPress={() => router.push('/explore')}
+        onPress={() => router.push('/searchBH')}
       >
         <Ionicons
           name="search-outline"
@@ -182,7 +191,7 @@ function Home() {
             { color: isDarkMode ? '#9ca3af' : '#6b7280' },
           ]}
         >
-          {t('searchPlaceholder', 'Tìm kiếm nhà trọ...')}
+          {t('welcome', 'Tìm kiếm nhà trọ...')}
         </Text>
         <Ionicons
           name="filter-outline"
@@ -194,7 +203,7 @@ function Home() {
   );
 
   // Stats Cards Component
-  const StatsCards = () => (
+  const StatsCards = ({ allCount, newestCount, highRatingCount }) => (
     <View style={styles.statsContainer}>
       <View
         style={[
@@ -211,15 +220,15 @@ function Home() {
         <Text
           style={[
             styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#1f2937' },
+            { color: isDarkMode ? '#ffffff' : '#111827' },
           ]}
         >
-          {data.length}
+          {allCount}
         </Text>
         <Text
           style={[
             styles.statsLabel,
-            { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
           ]}
         >
           {t('All')}
@@ -238,18 +247,19 @@ function Home() {
         >
           <Ionicons name="star-outline" size={20} color="#ffffff" />
         </LinearGradient>
+
         <Text
           style={[
             styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#1f2937' },
+            { color: isDarkMode ? '#ffffff' : '#111827' },
           ]}
         >
-          {highRatingData.length}
+          {highRatingCount}
         </Text>
         <Text
           style={[
             styles.statsLabel,
-            { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
           ]}
         >
           {t('rating')}
@@ -271,15 +281,15 @@ function Home() {
         <Text
           style={[
             styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#1f2937' },
+            { color: isDarkMode ? '#ffffff' : '#111827' },
           ]}
         >
-          {newestData.length}
+          {newestCount}
         </Text>
         <Text
           style={[
             styles.statsLabel,
-            { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
           ]}
         >
           {t('newest', 'Mới nhất')}
@@ -331,7 +341,7 @@ function Home() {
   }
 
   return (
-    <ScreenContainer className={themedClasses.bg} withPadding={false}>
+    <ScreenContainer withPadding={false}>
       <ScrollContainer keyboardAvoiding showsVerticalScrollIndicator={false}>
         <Header />
         <SearchBar />
@@ -339,7 +349,11 @@ function Home() {
         {/* Chỉ hiển thị Quick Actions khi chưa login */}
         {/* {!isLoggedIn && <QuickActions />} */}
 
-        <StatsCards />
+        <StatsCards
+          allCount={data.all.length}
+          newestCount={data.newest.length}
+          highRatingCount={data.highRating.length}
+        />
 
         <View style={styles.sectionsContainer}>
           <SectionHeader
@@ -348,7 +362,7 @@ function Home() {
             icon="grid-outline"
             gradient={['#06b6d4', '#0891b2']}
           />
-          <HorizontalList data={data} />
+          <HorizontalList data={data.all} />
 
           <SectionHeader
             title={t('newest', 'Mới nhất')}
@@ -389,6 +403,21 @@ const styles = StyleSheet.create({
   },
   headerRight: {
     alignItems: 'flex-end',
+  },
+  // Logo Section Styles
+  logoSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    marginRight: 12,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  textSection: {
+    flex: 1,
   },
   greeting: {
     fontSize: 24,

@@ -9,6 +9,8 @@ import '../../global.css';
 import { UserProvider } from '@/context/userContext';
 import { initLanguage } from '@/utils/initLanguage'; // <-- Thêm dòng này
 import { MenuProvider } from 'react-native-popup-menu';
+import { initLanguage } from '@/utils/initLanguage';
+
 
 export default function Layout() {
   const [fontsLoaded, error] = useFonts({

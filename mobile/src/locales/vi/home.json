@@ -84,5 +84,10 @@
     "Vĩnh Phúc": "Vĩnh Phúc",
     "Yên Bái": "Yên Bái",
     "No address provided": "Không có địa chỉ"
-  }
+  },
+   "search": "Tìm kiếm",
+  "searchPlaceholder": "Tìm kiếm nhà trọ...",
+  "noResult": "Không tìm thấy",
+  "noResultDesc": "Không có nhà trọ nào phù hợp với tìm kiếm của bạn.",
+  "filter": "Bộ lọc"
 }

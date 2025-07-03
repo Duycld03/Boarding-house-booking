@@ -17,7 +17,13 @@ function Login() {
 
   const { darkMode } = useTheme();
 
-  const { loginData } = useCurrentUser();
+  const { loginData, isLogin, user } = useCurrentUser();
+
+  useEffect(() => {
+    if (isLogin && (user.role === "staff" || user.role === "owner")) {
+      navigate("/profile");
+    }
+  }, []);
 
   const onFinish = async (values) => {
     try {
@@ -28,47 +34,18 @@ function Login() {
 
       localStorage.setItem("access_token", res.token);
 
-      if (role === "admin") {
-        navigate("/dashboard/account-management");
-      } else if (location.key !== "default") {
-        navigate(-1);
+      if (role === "staff" || role === "owner") {
+        navigate("/profile");
+        toast.success("Login successful");
       } else {
-        navigate("/");
+        navigate("/access-denied");
       }
-      toast.success("Login successful");
 
       setLoading(false);
     } catch (error) {
       toast.error(error?.response?.data?.message);
       form.resetFields();
       setLoading(false);
-    }
-  };
-
-  const loginWithGoogleHandler = async (response) => {
-    try {
-      const remember = form.getFieldValue("remember");
-      const data = { ...response, remember };
-      const res = await loginWithGoogle(data);
-
-      if (res.isRegistered) {
-        localStorage.setItem("access_token", res.token);
-        loginData(res.user, res.token);
-
-        if (res.user.role === "admin") {
-          navigate("/dashboard/account-management");
-        } else if (location.key !== "default") {
-          navigate(-1);
-        } else {
-          navigate("/");
-        }
-
-        toast.success("Login successful");
-      } else {
-        navigate("/register-with-google", { state: { user: res.user } });
-      }
-    } catch (error) {
-      toast.error(error?.response?.data?.message);
     }
   };
 
@@ -214,36 +191,7 @@ function Login() {
                 Login
               </Button>
             </Form.Item>
-
-            <Form.Item>
-              <div className={darkMode ? styles.googleLoginDark : ""}>
-                <GoogleLogin
-                  onSuccess={loginWithGoogleHandler}
-                  onError={() => {
-                    console.log("error");
-                  }}
-                />
-              </div>
-            </Form.Item>
           </Form>
-
-          <p
-            className={`text-center ${
-              darkMode ? "text-gray-300" : "text-gray-600"
-            }`}
-          >
-            Don't have an account?{" "}
-            <span
-              className={`${
-                darkMode
-                  ? "text-blue-400 hover:text-blue-300"
-                  : "text-blue-500 hover:text-blue-600"
-              } ${styles.linkTransition} cursor-pointer`}
-              onClick={() => navigate("/register")}
-            >
-              Register
-            </span>
-          </p>
         </div>
       </Card>
     </div>

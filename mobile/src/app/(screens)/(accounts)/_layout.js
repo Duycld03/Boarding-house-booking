@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
 const AccountLayout = () => {
   return (
@@ -42,6 +42,18 @@ const AccountLayout = () => {
         />
         <Stack.Screen
           name="mydepositedroom/index"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="mydepositedroom/payRent"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="mydepositedroom/payDeposit"
           options={{
             headerShown: false,
           }}

@@ -29,9 +29,11 @@
   "confirmRemoveWatchLater": "Bạn có chắc muốn xoá khỏi danh sách xem sau?",
   "noWatchLater": "Không có mục nào để xem sau",
   "noWatchLaterDesc": "Bạn chưa lưu mục nào để xem sau.",
-   "noFavorites": "Chưa có mục yêu thích nào",
-  "noFavoritesDesc": "Bạn chưa thêm mục nào vào danh sách yêu thích."
+  "noFavorites": "Chưa có mục yêu thích nào",
+  "noFavoritesDesc": "Bạn chưa thêm mục nào vào danh sách yêu thích.",
+  "tabs": {
+    "home": "Trang chủ",
+    "explore": "Khám phá",
+    "account": "Tài khoản"
+  }
 }
-
-
-

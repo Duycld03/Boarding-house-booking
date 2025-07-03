@@ -1,73 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router'; // Nếu bạn dùng expo-router
-import ScreenContainer, {
-  ScrollContainer,
-} from '@/components/layout/ScreenContainer';
-import { useTheme } from '@/context/ThemeProvider';
-import { useThemedClasses } from '@/utils/useTheme';
+import { View } from 'react-native';
+import ScreenContainer from '@/components/layout/ScreenContainer';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import VerticalList from '@/components/ui/VerticalList';
-import { getBhByArea } from '@/API/ownerUser/boardingHouse';
-import formatAmount from '@/utils/formatAmount';
+import LoadMoreButton from '@/components/ui/LoadMoreButton';
+import { getAllBHHome } from '@/API/boardingHouseAPI';
 import { useTranslation } from 'react-i18next';
 
 function AllBHScreen() {
-  const { themedClasses } = useThemedClasses();
-  const { theme } = useTheme(); // light | dark
-  const router = useRouter();
-  const [dataFromApi, setDataFromApi] = useState([]);
+
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const limit = 6;
   const { t } = useTranslation('home');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await getBhByArea({}); // truyền filter nếu có
+  const fetchData = async (currentPage = 1) => {
+    setLoading(true);
+    try {
+      const res = await getAllBHHome({ page: currentPage, limit });
 
-        if (!Array.isArray(res)) {
-          setDataFromApi([]);
-          return;
-        }
-
-        const formattedData = res.map((item) => {
+      const newData =
+        res?.data?.map((item) => {
           const imgPath =
             item.images?.find((img) => img.isPrimary)?.imageUrl ||
             item.images?.[0]?.imageUrl ||
             '';
           return {
-            id: item._id?.$oid || item._id,
+            id: item._id,
             name: item.name,
-            price: formatAmount(item.priceRange),
+            price: item.priceRange,
             detail: item.address?.province,
             rating: item.rating || 0,
             reviewCount: item.reviewCount || 0,
             img: imgPath,
             updatedAt: item.updatedAt || 0,
           };
-        });
+        }) || [];
 
-        setDataFromApi(formattedData);
-      } catch (error) {
-        console.error('Error fetching boarding houses:', error);
-        setDataFromApi([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setData((prev) => (currentPage === 1 ? newData : [...prev, ...newData]));
+      setTotalItems(res?.pagination?.totalItems || newData.length);
+    } catch (error) {
+      console.error('Error fetching boarding houses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    fetchData(page);
+  }, [page]);
 
-  // Dữ liệu dùng để render
-  const dataToUse = dataFromApi;
+  const handleLoadMore = () => {
+    if (data.length < totalItems) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const hasMore = data.length < totalItems;
 
   return (
-    <ScreenContainer className={themedClasses.bg} withPadding={false}>
+    <ScreenContainer withPadding={false}>
       <BackHeader title={t('All')} />
       <View className="px-4" style={{ flex: 1 }}>
-        <VerticalList data={dataToUse} loading={loading} />
+        <VerticalList data={data} loading={loading} />
+        <LoadMoreButton
+          hasMore={hasMore}
+          isLoading={loading}
+          onLoadMore={handleLoadMore}
+          currentCount={data.length}
+          totalCount={totalItems}
+          itemsPerPage={limit}
+          itemName="boarding houses"
+        />
       </View>
     </ScreenContainer>
   );

@@ -279,6 +279,7 @@ const DepositRoom = () => {
         okText={t('modal.rejectConfirm')}
         width="400px"
         confirmLoading={rejectLoading}
+        cancelText={t('modal.cancel')}
       >
         <Form layout="vertical">
           <Form.Item
