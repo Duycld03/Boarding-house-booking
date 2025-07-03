@@ -7,37 +7,24 @@ import {
   StyleSheet,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import i18n from '@/config-translation/config-translation';
 import { useTranslation } from 'react-i18next';
-import { useThemedClasses } from '@/utils/useTheme';
+import i18n from '@/config-translation/config-translation';
 import { useTheme } from '@/context/ThemeProvider';
 import Color from '@/constants/styles/color';
 import Font from '@/constants/styles/fonts';
 import Text from '@/components/ui/Text';
 
 export default function LanguagePicker() {
-  const [language, setLanguage] = useState('en');
   const [modalVisible, setModalVisible] = useState(false);
   const { t } = useTranslation();
   const { isDarkMode } = useTheme();
-  const { themedClasses } = useThemedClasses();
 
-  useEffect(() => {
-    const loadLanguage = async () => {
-      const savedLang = await AsyncStorage.getItem('appLanguage');
-      if (savedLang) {
-        setLanguage(savedLang);
-        i18n.changeLanguage(savedLang);
-      }
-    };
-    loadLanguage();
-  }, []);
+  const currentLang = i18n.language || 'en';
 
-  const handleSelect = async (value: string) => {
-    setLanguage(value);
+  const handleSelect = async (value) => {
     setModalVisible(false);
     await AsyncStorage.setItem('appLanguage', value);
-    i18n.changeLanguage(value);
+    await i18n.changeLanguage(value);
   };
 
   return (
@@ -58,7 +45,7 @@ export default function LanguagePicker() {
             fontFamily: Font.pRegular,
           }}
         >
-          {language === 'vi' ? 'Tiếng Việt' : 'English'} {' ›'}
+          {currentLang === 'vi' ? 'Tiếng Việt' : 'English'} {' ›'}
         </Text>
       </Pressable>
 
@@ -92,7 +79,7 @@ export default function LanguagePicker() {
                 style={[
                   styles.optionText,
                   {
-                    fontWeight: language === 'en' ? '700' : '400',
+                    fontWeight: currentLang === 'en' ? '700' : '400',
                     color: isDarkMode ? Color.white : '#333',
                   },
                 ]}
@@ -109,7 +96,7 @@ export default function LanguagePicker() {
                 style={[
                   styles.optionText,
                   {
-                    fontWeight: language === 'vi' ? '700' : '400',
+                    fontWeight: currentLang === 'vi' ? '700' : '400',
                     color: isDarkMode ? Color.white : '#333',
                   },
                 ]}
