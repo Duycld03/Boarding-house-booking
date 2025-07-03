@@ -1,22 +1,22 @@
-import { View, Text, Pressable, ScrollView, Animated } from "react-native";
-import { useFocusEffect, useRouter } from "expo-router";
+import { View, Text, Pressable, ScrollView, Animated, Image } from "react-native";
+import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useThemedClasses } from "@/utils/useTheme";
 import { useTheme } from "@/context/ThemeProvider";
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ScreenContainer } from "@/components/layout";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUser } from "@/API/authAPI";
 import Loader from "@/components/ui/Loader";
 import { useCurrentUser } from "@/context/userContext";
+import Logo from '../../../assets/images/newLogo.png';
+
 
 const Account = () => {
   const router = useRouter();
   const { themedClasses } = useThemedClasses();
   const { isDarkMode } = useTheme();
   const { t } = useTranslation("account");
-  const { contextLogout, isLogin, user } = useCurrentUser();
+  const { contextLogout, isLogin } = useCurrentUser();
 
   const [loading, setLoading] = useState(false);
 
@@ -135,21 +135,36 @@ const Account = () => {
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="p-5">
+          {/* Header with Logo */}
           <View
             className={themedClasses(
-              "mb-6 border-b border-gray-200 pb-3",
-              "mb-6 border-b border-gray-700 pb-3"
+              "mb-6 border-b border-gray-200 pb-4",
+              "mb-6 border-b border-gray-700 pb-4"
             )}
           >
-            <Text
-              className={themedClasses(
-                "text-2xl text-text-light",
-                "text-2xl text-text-dark"
-              )}
-              style={{ fontFamily: "Poppins-Bold" }}
-            >
-              {t("account")}
-            </Text>
+            <View className="flex-row items-center">
+              <View
+                className={themedClasses(
+                  "mr-3 p-2 rounded-full bg-gray-100",
+                  "mr-3 p-2 rounded-full bg-gray-800"
+                )}
+              >
+                <Image
+                  source={Logo}
+                  className="w-8 h-8"
+                  resizeMode="contain"
+                />
+              </View>
+              <Text
+                className={themedClasses(
+                  "text-2xl text-text-light",
+                  "text-2xl text-text-dark"
+                )}
+                style={{ fontFamily: "Poppins-Bold" }}
+              >
+                {t("account")}
+              </Text>
+            </View>
           </View>
 
           <View className="gap-3">

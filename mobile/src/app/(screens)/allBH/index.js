@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View } from 'react-native';
 import ScreenContainer from '@/components/layout/ScreenContainer';
-import { useTheme } from '@/context/ThemeProvider';
-import { useThemedClasses } from '@/utils/useTheme';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import VerticalList from '@/components/ui/VerticalList';
 import LoadMoreButton from '@/components/ui/LoadMoreButton';
 import { getAllBHHome } from '@/API/boardingHouseAPI';
-import formatAmount from '@/utils/formatAmount';
 import { useTranslation } from 'react-i18next';
 
 function AllBHScreen() {
-  const { themedClasses } = useThemedClasses();
-  const { theme } = useTheme();
-  const router = useRouter();
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
