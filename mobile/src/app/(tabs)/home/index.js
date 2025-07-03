@@ -4,7 +4,7 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
+  Image,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,27 +12,23 @@ import { Ionicons } from '@expo/vector-icons';
 import ScreenContainer, {
   ScrollContainer,
 } from '@/components/layout/ScreenContainer';
-import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import HorizontalList from '@/components/ui/HorizontalList';
-import { getBhByArea } from '@/API/ownerUser/boardingHouse';
 import {
   getAllBHHome,
   getHighRatingBH,
   getNewestBH,
 } from '@/API/boardingHouseAPI';
 
-import formatAmount from '@/utils/formatAmount';
+import Logo from '../../../assets/images/newLogo.png';
+
 import { useTranslation } from 'react-i18next';
 import Loader from '@/components/ui/Loader';
-import { useCurrentUser } from '@/context/userContext';
 import { getUser } from '@/API/authAPI';
 
-const { width } = Dimensions.get('window');
 
 function Home() {
-  const { themedClasses, isDarkMode } = useThemedClasses();
-  const { theme } = useTheme();
+  const { isDarkMode } = useThemedClasses();
   const router = useRouter();
   const { t } = useTranslation('home');
   const [data, setData] = useState({
@@ -42,7 +38,6 @@ function Home() {
   });
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Thêm state để check login status
-  const { isLogin } = useCurrentUser();
 
   // Gọi lại khi tab được focus
   useFocusEffect(
@@ -114,7 +109,7 @@ function Home() {
   const newestData = data.newest;
   const highRatingData = data.highRating;
 
-  // Header Component với gradient và animation + Auth buttons
+  // Header Component với gradient và animation + Auth buttons + Logo
   const Header = () => (
     <LinearGradient
       colors={isDarkMode ? ['#1e293b', '#334155'] : ['#0ea5e9', '#0284c7']}
@@ -124,12 +119,18 @@ function Home() {
     >
       <View style={styles.headerContent}>
         <View style={styles.headerLeft}>
-          <Text style={[styles.greeting, { color: '#ffffff' }]}>
-            {t('greeting', 'Xin chào!')}
-          </Text>
-          <Text style={[styles.welcomeText, { color: '#e0f2fe' }]}>
-            {t('welcome')}
-          </Text>
+          {/* Logo Section */}
+          <View style={styles.logoSection}>
+            <Image source={Logo} style={styles.logo} resizeMode="contain" />
+            <View style={styles.textSection}>
+              <Text style={[styles.greeting, { color: '#ffffff' }]}>
+                {t('greeting', 'Xin chào!')}
+              </Text>
+              <Text style={[styles.welcomeText, { color: '#e0f2fe' }]}>
+                {t('welcome')}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Auth Buttons hoặc User Actions */}
@@ -402,6 +403,21 @@ const styles = StyleSheet.create({
   },
   headerRight: {
     alignItems: 'flex-end',
+  },
+  // Logo Section Styles
+  logoSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    marginRight: 12,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  textSection: {
+    flex: 1,
   },
   greeting: {
     fontSize: 24,

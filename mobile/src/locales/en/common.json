@@ -24,10 +24,15 @@
   "favorites": "Favorites",
   "confirmDeletion": "Confirm Deletion",
   "confirmRemoveFavorite": "Are you sure you want to remove this favorite?",
-   "watchLater": "Watch later",
+  "watchLater": "Watch later",
   "confirmRemoveWatchLater": "Are you sure you want to remove this from your watch later list?",
   "noWatchLater": "No watch later items",
   "noWatchLaterDesc": "You have no saved items to watch later.",
-    "noFavorites": "No favorites yet",
-  "noFavoritesDesc": "You have not added any favorites yet."
+  "noFavorites": "No favorites yet",
+  "noFavoritesDesc": "You have not added any favorites yet.",
+  "tabs": {
+    "home": "Home",
+    "explore": "Explore",
+    "account": "Account"
+  }
 }
