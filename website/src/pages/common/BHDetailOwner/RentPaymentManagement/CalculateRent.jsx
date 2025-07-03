@@ -555,7 +555,7 @@ const CalculateRent = ({
             >
               <span>{t("additionalFees")}</span>
               {previousMonth && previousYear && (
-                <span style={styles.fromMonthStyle}>
+                <span style={{ ...styles.fromMonthStyle, marginLeft: "10px" }}>
                   {t("fromMonth")} {previousMonth}/{previousYear}
                 </span>
               )}
