@@ -7,7 +7,8 @@ import { NotificationProvider } from '@/context/NotificationProvider';
 import * as Linking from 'expo-linking';
 import '../../global.css';
 import { UserProvider } from '@/context/userContext';
-import { initLanguage } from '@/utils/initLanguage'; // <-- Thêm dòng này
+import { initLanguage } from '@/utils/initLanguage';
+
 
 export default function Layout() {
   const [fontsLoaded, error] = useFonts({

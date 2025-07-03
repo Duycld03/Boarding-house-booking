@@ -147,11 +147,13 @@ const CustomHeader = ({
     };
 
     return (
-        <View className={headerClassName} style={style} {...props}>
+        <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={handleBackPress}
+            className={headerClassName} style={style} {...props}>
             <View className="flex-row items-center">
                 {showBack && (
                     <TouchableOpacity
-                        onPress={handleBackPress}
                         className={`mr-3 p-1 ${backButtonClassName}`}
                         style={backButtonStyle}
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -179,7 +181,7 @@ const CustomHeader = ({
                     {rightComponent}
                 </View>
             )}
-        </View>
+        </TouchableOpacity>
     );
 };
 

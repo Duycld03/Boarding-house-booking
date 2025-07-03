@@ -2,7 +2,8 @@ import PaymentBill from "../models/paymentBill.js";
 import Revenue from "../models/revenue.js";
 import Room from "../models/room.js";
 import UserPayment from "../models/userPayment.js";
-import mongoose from "mongoose"; // Add this import
+import mongoose from "mongoose";
+import DepositRoom from "../models/depositRoom.js";
 
 class PaymentBillController {
   async getPaymentBillByBoardingHouseId(req, res) {
@@ -330,6 +331,63 @@ class PaymentBillController {
       };
 
       return res.status(200).json(formattedBill);
+      } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  
+  async getPaymentBillForRent(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+
+      if (!depositRoomId) {
+        return res.status(400).json({ message: "Missing required parameters" });
+      }
+
+      // Find the deposit room to get the roomId
+      const deposit = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: req.user.userId,
+      }).select("roomId");
+
+      if (!deposit) {
+        return res.status(400).json({ message: "Deposit room not found" });
+      }
+
+      // Calculate previous month
+      const currentDate = new Date();
+      // Go back one month
+      currentDate.setMonth(currentDate.getMonth() - 1);
+
+      const currentMonth = (currentDate.getMonth() + 1).toString(); // JavaScript months are 0-based
+      const currentYear = currentDate.getFullYear().toString();
+
+      // Find the latest payment bill for this room in the previous month with case-insensitive "pending" status
+      const paymentBill = await PaymentBill.findOne({
+        roomId: deposit.roomId,
+        month: currentMonth,
+        year: currentYear,
+      }).sort({ createdAt: -1 });
+
+      if (!paymentBill) {
+        return res.status(404).json({
+          message: "No pending payment bill found for the previous month",
+        });
+      }
+
+      // Check if user has already paid
+      const existingPayment = await UserPayment.findOne({
+        accountId: req.user.userId,
+        paymentBillId: paymentBill._id,
+        status: { $regex: /^paid$/i },
+      });
+
+      // Return both the payment bill and whether it's already paid
+      return res.json({
+        paymentBill,
+        isPaid: !!existingPayment,
+        currentMonth,
+        currentYear,
+      });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
