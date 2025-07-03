@@ -2,7 +2,6 @@ import PaymentBill from "../models/paymentBill.js";
 import Revenue from "../models/revenue.js";
 import Room from "../models/room.js";
 import UserPayment from "../models/userPayment.js";
-import mongoose from "mongoose";
 import DepositRoom from "../models/depositRoom.js";
 
 class PaymentBillController {
