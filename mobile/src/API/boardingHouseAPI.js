@@ -36,3 +36,14 @@ export const searchBoardingHouses = (
 
   return axios.get('/boardinghouse/search', { params });
 };
+export const getAllBoardingHouseTypeUser = () => {
+  return axios.get('/boardinghousetype');
+};
+export const getMaxPriceBHUser = async () => {
+  return axios.get('/boardinghouse/chore/get-max');
+};
+export const getBhByArea = async (filterValue) => {
+  return axios.get(`/boardinghouse/home/area`, {
+    params: filterValue,
+  });
+};
