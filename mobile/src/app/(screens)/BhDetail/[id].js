@@ -357,8 +357,7 @@ export default function BhDetailScreen() {
     }, SCROLL_TO_ROOM_DELAY);
   }, [ui.roomTypesPosition, ui.isScrollReady]);
   const hasUserReviewed = useMemo(() => {
-    console.log("1", user)
-    console.log("2", reviews)
+
 
     if (!user?._id || !reviews?.length) return false;
     return reviews.some(
