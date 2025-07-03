@@ -167,5 +167,10 @@
       "fixErrors": "Vui lòng sửa các lỗi trước khi gửi"
     },
     "submitting": "Đang tạo..."
+  },
+  "review": {
+    "alreadySubmittedTitle": "Thông báo",
+    "alreadySubmittedMessage": "Bạn đã gửi đánh giá cho nhà trọ này rồi.",
+    "confirmButton": "Đóng"
   }
 }

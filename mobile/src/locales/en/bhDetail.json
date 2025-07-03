@@ -167,5 +167,10 @@
       "fixErrors": "Please fix the errors before submitting"
     },
     "submitting": "Creating..."
+  },
+  "review": {
+    "alreadySubmittedTitle": "Notice",
+    "alreadySubmittedMessage": "You have already reviewed this boarding house.",
+    "confirmButton": "Close"
   }
 }

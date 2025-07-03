@@ -32,6 +32,7 @@ import ExtraPrices from "@/components/screen/bhDetail/ExtraPrices";
 import { useTheme } from "@/context/ThemeProvider";
 import formatAmount from "@/utils/formatAmount";
 import emitter from "@/utils/FavoriteEvent";
+import { useCurrentUser } from "@/context/userContext";
 
 // API
 import {
@@ -43,6 +44,7 @@ import { useThemedClasses } from "@/utils/useTheme";
 import { addFavorite, getFavorite } from "@/API/favoriteAPI";
 import i18next from "i18next";
 import coverBhType from "@/utils/coverBhType";
+import ConfirmModal from "@/components/feedback/ConfirmModal";
 
 // Constants
 const DEFAULT_BOARDING_HOUSE_ID = "64ab1cd234abcd1234567878";
@@ -60,6 +62,8 @@ export default function BhDetailScreen() {
   const [reviews, setReviews] = useState([]);
 
   const { themedClasses } = useThemedClasses();
+  const { contextLogout, isLogin, user } = useCurrentUser();
+  const [showReviewError, setShowReviewError] = useState(false);
 
   // Refs
   const scrollViewRef = useRef(null);
@@ -352,14 +356,30 @@ export default function BhDetailScreen() {
       }
     }, SCROLL_TO_ROOM_DELAY);
   }, [ui.roomTypesPosition, ui.isScrollReady]);
+  const hasUserReviewed = useMemo(() => {
+    console.log("1", user)
+    console.log("2", reviews)
+
+    if (!user?._id || !reviews?.length) return false;
+    return reviews.some(
+      (review) =>
+        // review.accountId === user._id ||
+        review.accountId?._id === user._id
+    );
+  }, [reviews, user?._id]);
 
   // Write Review Handler
   const handleWriteReview = useCallback(() => {
+    if (hasUserReviewed) {
+      setShowReviewError(true);
+      return;
+    }
+
     router.push({
       pathname: "/BhDetail/addReview",
       params: { boardingHouseId },
     });
-  }, [router, boardingHouseId]);
+  }, [hasUserReviewed, router, boardingHouseId]);
 
   // Render Functions - Memoized for better performance
   const LoadingState = useMemo(
@@ -624,6 +644,17 @@ export default function BhDetailScreen() {
 
         {renderReviewList()}
       </ScrollView>
+      <ConfirmModal
+        visible={showReviewError}
+        onClose={() => setShowReviewError(false)}
+        onConfirm={() => setShowReviewError(false)}
+        title={t("review.alreadySubmittedTitle")}
+        message={t("review.alreadySubmittedMessage")}
+        confirmText={t("review.confirmButton")}
+        cancelText=""
+      />
+
+
     </ScreenContainer>
   );
 }

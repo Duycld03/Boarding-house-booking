@@ -133,12 +133,14 @@ export default function Report() {
       showSuccess(t("report.success") || "Report submitted successfully");
       router.back();
     } catch (error) {
-      console.log(error.message)
-      showError(t("report.error") || "Failed to submit report");
-    } finally {
-      setLoading(false);
+      if (error.response?.data?.message) {
+        showError(error.response.data.message);
+        router.back();
+      } else {
+        showError(t("report.error") || "Failed to submit report");
+      }
     }
-  };
+  }
 
   // Get reason options based on whether it's a boarding house or review report
   const getReasonOptions = () => {

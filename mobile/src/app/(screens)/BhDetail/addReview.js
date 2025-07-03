@@ -47,6 +47,7 @@ const AddReview = () => {
             }
         }, [isLogin, router])
     );
+
     const handleImagePick = async () => {
         if (images.length >= 5) {
             showError(
@@ -134,7 +135,14 @@ const AddReview = () => {
                 showSuccess(t("review.successMessage") || "Review submitted successfully!");
                 router.back();
             } else {
-                showError(response.message || t("review.submitError") || "Failed to submit the review.");
+                if (
+                    response.message === "You have already reviewed this boarding house."
+                ) {
+                    showError("Bạn đã đánh giá nhà trọ này trước đó.");
+                    router.back();
+                } else {
+                    showError(response.message || t("review.submitError") || "Failed to submit the review.");
+                }
             }
         } catch (error) {
             // console.error("Error submitting review:", error.response?.data || error.message);
