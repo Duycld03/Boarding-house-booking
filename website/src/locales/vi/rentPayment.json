@@ -36,5 +36,6 @@
   "oldNumber": "Chỉ số cũ",
   "newNumber": "Chỉ số mới",
   "roomPrice": "Giá Phòng",
-  "totalAmount": "Tổng Tiền"
+  "totalAmount": "Tổng Tiền",
+  "cancel": "Hủy"
 }
