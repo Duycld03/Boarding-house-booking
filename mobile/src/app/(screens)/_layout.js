@@ -38,6 +38,12 @@ const ScreenLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="searchBH"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </>
   );

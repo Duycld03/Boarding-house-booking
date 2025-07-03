@@ -16,8 +16,9 @@ export { default as FavouriteList } from './FavouriteList';
 export { default as AppointmentOwner } from './AppointmentOwner';
 
 // Re-export tất cả các components trong thư mục owner
-export { default as BHManagementOwner } from './BHManagementOwner';
-export { default as BHDetailOwner } from './BHDetailOwner';
-export { default as DepositRefundRequestOwner } from './DepositRefundRequestOwner';
-export { default as RevenueManagementOwner } from './RevenueManagementOwner';
-export { default as DepositManagement } from './DepositManagement';
+export { default as BHManagementOwner } from "./BHManagementOwner";
+export { default as BHDetailOwner } from "./BHDetailOwner";
+export { default as DepositRefundRequestOwner } from "./DepositRefundRequestOwner";
+export { default as RevenueManagementOwner } from "./RevenueManagementOwner";
+export { default as DepositManagement } from "./DepositManagement";
+export { default as AccessDeniedPage } from "./AccessDeniedPage";
