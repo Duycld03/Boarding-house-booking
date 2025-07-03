@@ -331,10 +331,11 @@ class PaymentBillController {
       };
 
       return res.status(200).json(formattedBill);
-      } catch (error) {
+    } catch (error) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
-  
+  }
+
   async getPaymentBillForRent(req, res) {
     try {
       const { depositRoomId } = req.params;
