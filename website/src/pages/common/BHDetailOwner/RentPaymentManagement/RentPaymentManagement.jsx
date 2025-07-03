@@ -4,32 +4,22 @@ import { TableCustom as Table, Button, ConfirmModal } from "@/component";
 import { toast } from "react-toastify";
 import convertTimetap from "@/utils/convertTimetap";
 import { Tag } from "antd";
-import formatAmount, { useFormatAmount } from "@/utils/formatAmount";
+import formatAmount from "@/utils/formatAmount";
 import CalculateRent from "./CalculateRent";
-import UpdateRentModal from "./UpdateRentModal";
 import { getPaymentBillByBoardingHouseId } from "@/api/ownerUser/paymentBillAPI";
-import { useTranslation } from "react-i18next";
 
 const RentPaymentManagement = () => {
-  const { t, i18n } = useTranslation("rentPayment"); // Get current language from i18n
-  const { formatPrice } = useFormatAmount(i18n.language); // Use current language for formatting
   const { boardingHouseId } = useParams();
   const [rentPaymentData, setRentPaymentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedPaymentBill, setSelectedPaymentBill] = useState(null);
 
-  const fetchPaymentBillDetails = async () => {
+  const fetchRentPaymentData = async () => {
     if (!boardingHouseId) return;
     setLoading(true);
     try {
       const res = await getPaymentBillByBoardingHouseId(boardingHouseId);
-      const updatedData = res.map((bill) => ({
-        ...bill,
-        _id: bill._id,
-      }));
-      setRentPaymentData(updatedData);
+      setRentPaymentData(res);
     } catch (error) {
       console.log(error);
       setRentPaymentData([]);
@@ -39,123 +29,87 @@ const RentPaymentManagement = () => {
   };
 
   useEffect(() => {
-    fetchPaymentBillDetails();
+    fetchRentPaymentData();
   }, [boardingHouseId]);
-
-  // Re-render when language changes to update currency formatting
-  useEffect(() => {
-    // No need to refetch data, just force a re-render to update currency format
-  }, [i18n.language]);
 
   const columns = [
     {
-      title: t("roomNumber"),
+      title: "Room Number",
       dataIndex: "roomNumber",
       key: "roomNumber",
     },
     {
-      title: t("monthlyRent"),
+      title: "Monthly rent",
       dataIndex: "rentMonth",
       key: "rentMonth",
     },
     {
-      title: t("status"),
+      title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => {
-        const statusLower = status?.toLowerCase() || "";
-        let color;
-        if (statusLower === "pending") color = "orange";
-        else if (statusLower === "paid") color = "green";
-        else if (statusLower === "deleted") color = "volcano";
-        else color = "red";
-
-        let translatedStatus;
-        if (statusLower === "pending") translatedStatus = t("pending");
-        else if (statusLower === "paid") translatedStatus = t("paid");
-        else if (statusLower === "deleted") translatedStatus = t("deleted");
-        else translatedStatus = t("unknown");
-
-        return <Tag color={color}>{translatedStatus}</Tag>;
-      },
+      render: (status) => (
+        <Tag
+          color={
+            status === "pending"
+              ? "orange"
+              : status === "paid"
+              ? "green"
+              : status === "deleted"
+              ? "volcano"
+              : "red"
+          }
+        >
+          {status}
+        </Tag>
+      ),
     },
     {
-      title: t("additionalFee"),
+      title: "Additional Fee",
       dataIndex: "additionalFee",
       key: "additionalFee",
-      render: (price) => price ? formatPrice(price) : formatPrice(0),
+      render: (price) => (price ? formatAmount(price) : 0),
     },
     {
-      title: t("electricalBill"),
+      title: "Electrical Bill",
       dataIndex: "electricalBill",
       key: "electricalBill",
-      render: (price) => {
-        // If price is an object with totalAmount, use that
-        if (price && typeof price === 'object' && price.totalAmount) {
-          return formatPrice(price.totalAmount);
-        }
-        // If price is a number, use it directly
-        else if (typeof price === 'number') {
-          return formatPrice(price);
-        }
-        // Otherwise, show not applicable
-        return t("notApplicable");
-      },
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
     {
-      title: t("waterBill"),
+      title: "Water Bill",
       dataIndex: "waterBill",
       key: "waterBill",
-      render: (price) => {
-        // If price is an object with totalAmount, use that
-        if (price && typeof price === 'object' && price.totalAmount) {
-          return formatPrice(price.totalAmount);
-        }
-        // If price is a number, use it directly
-        else if (typeof price === 'number') {
-          return formatPrice(price);
-        }
-        // Otherwise, show not applicable
-        return t("notApplicable");
-      },
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
     {
-      title: t("paymentAmount"),
+      title: "Payment Amount",
       dataIndex: "paymentAmount",
       key: "paymentAmount",
-      render: (price) => price ? formatPrice(price) : t("notApplicable"),
+      render: (price) => (price ? formatAmount(price) : "N/A"),
     },
-    {
-      title: t("actions"),
-      key: "actions",
-      render: (_, record) => {
-        const isPending = record.status?.toLowerCase() === "pending";
-        return isPending ? (
-          <Button
-            btnUpdate
-            title={t("update")}
-            onClick={() => handleOpenUpdateModal(record)}
-          />
-        ) : null;
-      },
-    },
+    // {
+    //   title: "Action",
+    //   key: "action",
+    //   render: (record) => (
+    //     <Button
+    //       size="large"
+    //       btnDelete
+    //       title="Delete"
+    //       onClick={() => {
+    //         setSelectedTenant(record);
+    //         setIsOpen(true);
+    //       }}
+    //     />
+    //   ),
+    // },
   ];
-
-  const handleOpenUpdateModal = (record) => {
-    if (!record._id) {
-      toast.error(t("missingPaymentId"));
-      return;
-    }
-    setSelectedPaymentBill(record);
-    setIsUpdateModalOpen(true);
-  };
 
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-4">
         <Button
           btnAdd
-          title={t("calculateMonthly")}
+          title="Calculate monthly"
           size="large"
           onClick={() => {
             setIsOpen(true);
@@ -167,20 +121,12 @@ const RentPaymentManagement = () => {
         columns={columns}
         data={rentPaymentData?.length > 0 ? rentPaymentData : []}
         loading={loading}
-        emptyText={t("noRentData")}
       />
       <CalculateRent
         visible={isOpen}
         setVisible={setIsOpen}
         boardingHouseId={boardingHouseId}
-        fetchRentPaymentData={fetchPaymentBillDetails}
-      />
-      <UpdateRentModal
-        visible={isUpdateModalOpen}
-        setVisible={setIsUpdateModalOpen}
-        paymentBill={selectedPaymentBill}
-        boardingHouseId={boardingHouseId}
-        fetchRentPaymentData={fetchPaymentBillDetails}
+        fetchRentPaymentData={fetchRentPaymentData}
       />
     </div>
   );
