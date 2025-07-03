@@ -1,0 +1,44 @@
+{
+    "columns": {
+        "name": "Nhà trọ",
+        "customerName": "Tên khách hàng",
+        "roomNumber": "Số phòng",
+        "date": "Ngày hẹn",
+        "note": "Ghi chú",
+        "status": "Trạng thái",
+        "actions": "Hành động"
+    },
+    "fields": {
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "roomNumber": "Số phòng",
+        "date": "Ngày hẹn",
+        "note": "Ghi chú",
+        "status": "Trạng thái",
+        "cancelReason": "Lý do hủy",
+        "noEmail": "Không có email",
+        "noPhone": "Không có số điện thoại",
+        "noRoom": "Không có số phòng",
+        "noDate": "Không có ngày hẹn",
+        "noNote": "Không có ghi chú",
+        "noName": "Không có tên"
+    },
+    "status": {
+        "pending": "Đang chờ",
+        "accepted": "Đã chấp nhận",
+        "cancelled": "Đã hủy",
+        "rejected": "Đã từ chối",
+        "unknown": "Không xác định"
+    },
+    "buttons": {
+        "detail": "Chi tiết",
+        "accept": "Chấp nhận",
+        "reject": "Từ chối"
+    },
+    "modal": {
+        "title": "Chi tiết cuộc hẹn",
+        "rejectTitle": "Xác nhận từ chối",
+        "rejectContent": "Bạn có chắc chắn muốn từ chối cuộc hẹn này không?"
+    },
+    "loading": "Đang tải..."
+}

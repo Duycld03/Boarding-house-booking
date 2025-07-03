@@ -34,6 +34,8 @@ import en_calculateRent from "@/locales/en/calculateRent.json";
 import vi_calculateRent from "@/locales/vi/calculateRent.json";
 import en_rentPayment from "@/locales/en/rentPayment.json";
 import vi_rentPayment from "@/locales/vi/rentPayment.json";
+import en_appointment from "@/locales/en/appointment.json";
+import vi_appointment from "@/locales/vi/appointment.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -55,6 +57,7 @@ i18n.use(initReactI18next).init({
       depositManagement: en_depositManagement,
       calculateRent: en_calculateRent,
       rentPayment: en_rentPayment,
+      appointment: en_appointment
     },
     vi: {
       menu: vi_menu,
@@ -74,6 +77,7 @@ i18n.use(initReactI18next).init({
       depositManagement: vi_depositManagement,
       calculateRent: vi_calculateRent,
       rentPayment: vi_rentPayment,
+      appointment: vi_appointment
     },
   },
   lng: "en",

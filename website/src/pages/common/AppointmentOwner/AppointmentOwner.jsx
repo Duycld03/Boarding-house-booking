@@ -1,147 +1,204 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
-import { getAppointmentsByOwnerId, updateAppointmentStatus } from "../../../api/appointmentAPI";
-import { TableCustom as Table, Button, ConfirmModal } from "../../../component";
-import { toast } from "react-toastify";
-import convertTimetap from "../../../utils/convertTimetap";
-import { Tag, Tooltip } from "antd";
-import { useTranslation } from "react-i18next";
-import { useTheme } from "@/context/ThemeContext";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Tag, Tooltip, message, Modal } from "antd";
+import { getAppointmentsByOwnerId, getAppointmentDetailForOwner, updateAppointmentStatus } from "../../../api/appointmentAPI";
+import moment from "moment";
+import AppointmentDetail from "./AppointmentDetails";
+import { useCurrentUser } from '@/context/userContext';
+import { TableCustom as Table, Button, ConfirmModal } from '../../../component';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../../context/themeContext';
+import { FileTextOutlined } from '@ant-design/icons';
 
-function OwnerAppointments() {
-    const [appointmentData, setAppointmentData] = useState([]);
-    const { t } = useTranslation("ownerAppointments");
-    const [loading, setLoading] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
+const ViewListAppointmentOwner = () => {
+    const [appointments, setAppointments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { boardingHouseId } = useParams();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [appointment, setAppointment] = useState(null);
+    const { t } = useTranslation('appointment');
     const { darkMode } = useTheme();
-    const { ownerId } = useParams(); // Lấy ownerId từ route
-    const [selectedData, setSelectedData] = useState(null);
-    const [pagination, setPagination] = useState({
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: 0,
-        limit: 10,
-    });
 
-    const [paginationOptions, setPaginationOptions] = useState({
-        page: 1,
-        limit: 10,
-        sortField: "createdAt",
-        sortOrder: "desc",
-    });
+    const { user } = useCurrentUser();
+    const ownerId = user?._id;
 
-    const tablePaginationConfig = useMemo(
-        () => ({
-            current: pagination.currentPage,
-            pageSize: pagination.limit,
-            total: pagination.totalItems,
-            showSizeChanger: true,
-        }),
-        [pagination]
-    );
+    const fetchAppointments = async () => {
+        try {
+            setLoading(true);
+            const response = await getAppointmentsByOwnerId(ownerId);
+            console.log("1", ownerId);
+            console.log("2", response);
 
-    const statusColors = {
-        pending: "blue",
-        accepted: "orange",
-        canceled: "red",
-        completed: "green",
+
+            if (response?.data) {
+                const numberedAppointments = response.data.map((item, index) => ({
+                    ...item,
+                    number: index + 1,
+                }));
+                setAppointments(numberedAppointments);
+            } else {
+                setAppointments([]);
+                message.warning("Không có dữ liệu.");
+            }
+        } catch (error) {
+            console.error("Error fetching appointments:", error);
+            message.error("Không thể lấy danh sách lịch hẹn.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        if (ownerId) {
+            fetchAppointments();
+        } else {
+            message.error("Không tìm thấy thông tin chủ trọ.");
+        }
+    }, [ownerId]);
+    const fetchAppointmentDetail = async (appointmentId) => {
+        try {
+            const res = await getAppointmentDetailForOwner(appointmentId);
+
+            console.log(res);
+
+            const formattedAppointment = {
+                _id: res._id,
+                tenant: res.tenant ? { ...res.tenant } : {},
+                room: res.room ? { ...res.room } : {},
+                appointmentDate: res.appointmentDate ? moment(res.appointmentDate).format("YYYY-MM-DD HH:mm") : "no date",
+                userNote: res.userNote || "No note",
+                status: res.status || "unknown",
+                reasonForCancel: res.reasonForCancel || null,
+            };
+
+            setAppointment(formattedAppointment);
+            setIsModalOpen(true);
+
+        } catch (error) {
+            message.error("Lỗi lấy thông tin chi tiết cuộc hẹn.");
+            console.error("API Error:", error);
+        }
+    };
+    const handleUpdateStatus = async (id, newStatus) => {
+        try {
+            await updateAppointmentStatus(id, newStatus); // gọi API
+            message.success("Cập nhật trạng thái thành công");
+            fetchAppointments(); // reload lại bảng
+        } catch (err) {
+            message.error("Lỗi cập nhật trạng thái");
+        }
     };
 
-    // Cột hiển thị thông tin của bảng
-    const appointmentCol = [
+    useEffect(() => {
+        fetchAppointments(); // Gọi hàm
+    }, [isModalOpen]);
+    const columns = [
         {
-            title: t("boardingHouseName"), // Tên nhà trọ
+            title: t('columns.name'),
             dataIndex: "boardingHouseName",
             key: "boardingHouseName",
         },
         {
-            title: t("userName"), // Tên người đặt hẹn
-            dataIndex: "userName",
-            key: "userName",
+            title: t('columns.customerName'),
+            dataIndex: "tenantName",
+            key: "tenantName",
         },
         {
-            title: t("roomNumber"), // Số phòng
+            title: t('columns.roomNumber'),
             dataIndex: "roomNumber",
             key: "roomNumber",
         },
         {
-            title: t("appointmentDate"), // Ngày hẹn
+            title: t('columns.date'),
             dataIndex: "appointmentDate",
             key: "appointmentDate",
-            render: (date) => convertTimetap(date, true),
+            render: (date) => moment(date).format("DD/MM/YYYY HH:mm"),
         },
         {
-            title: t("note"), // Ghi chú
+            title: t('columns.note'),
             dataIndex: "note",
             key: "note",
-            render: (note) =>
-                note?.length > 30 ? (
-                    <Tooltip title={note}>{note.substring(0, 30)}...</Tooltip>
-                ) : (
-                    note
-                ),
+            render: (text) => (
+                <Tooltip title={text}>
+                    {text && text.length > 50 ? `${text.slice(0, 50)}...` : text}
+                </Tooltip>
+            ),
         },
         {
-            title: t("status"), // Trạng thái
+            title: t('columns.status'),
             dataIndex: "status",
             key: "status",
-            render: (status) => <Tag color={statusColors[status]}>{status}</Tag>,
+            render: (status) => (
+                <Tag color={
+                    status === "pending"
+                        ? "orange"
+                        : status === "accepted"
+                            ? "green"
+                            : status === "rejected"
+                                ? "red"
+                                : "default"
+                }>
+                    {t(`status.${status}`)}
+                </Tag>
+            )
+        },
+        {
+            title: t('columns.actions'),
+            key: "action",
+            render: (_, record) => (
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <Button
+                        title={t('buttons.detail')}
+                        icon={<FileTextOutlined />}
+                        style={{
+                            backgroundColor: "rgb(5, 150, 105)",
+                            color: "white",
+                        }}
+                        className="text-white"
+                        bgColor="rgb(5 150 105)"
+                        size="large"
+                        onClick={() => fetchAppointmentDetail(record._id)}
+                    >
+                        {t('buttons.detail')}
+                    </Button>
+                </div>
+            ),
         },
     ];
 
-    // Hàm lấy danh sách appointments từ API
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await getAppointmentsByOwnerId(ownerId, paginationOptions);
-            setPagination({
-                currentPage: res.currentPage,
-                totalPages: res.totalPages,
-                totalItems: res.pagination.totalItems,
-                limit: res.limit,
-            });
-            if (res.data === 0) {
-                toast.info(t("noData"));
-            } else {
-                setAppointmentData(res.data);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    }, [ownerId, paginationOptions]);
-
-    // Gọi API khi component được mount hoặc khi paginationOptions thay đổi
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    const handleTableChange = useCallback(
-        (pagination, filters, sorter) => {
-            const newPaginationOptions = {
-                ...paginationOptions,
-                page: pagination.current,
-                limit: pagination.pageSize,
-            };
-
-            setPaginationOptions(newPaginationOptions);
-        },
-        [paginationOptions]
-    );
-
     return (
         <div className="min-h-[500px]">
+
             <Table
+                columns={columns}
+                data={appointments}
                 loading={loading}
-                tableName={t("appointmentTableName")}
-                columns={appointmentCol}
-                data={appointmentData ?? []}
-                onChange={handleTableChange}
-                pagination={tablePaginationConfig}
+                rowKey="_id"
+                pagination={{ pageSize: 10 }}
+                onRow={(record) => ({
+                    onClick: () => fetchAppointmentDetail(record._id),
+                })}
             />
+            <Modal
+                title={<span style={{ fontSize: "16px", fontWeight: "bold" }}>{t('modal.title')}</span>}
+                open={isModalOpen}
+                onCancel={() => setIsModalOpen(false)}
+                footer={null}
+                width="400px"
+                style={{ top: 20 }}
+                bodyStyle={darkMode ? { background: "#1f2937", color: "#f9fafb" } : {}}
+            >
+                {appointment ? (
+                    <AppointmentDetail appointment={appointment}
+                        onAcceptSuccess={() => {
+                            fetchAppointments();
+                            setIsModalOpen(false);
+                        }} />
+                ) : (
+                    <p>{t('loading')}</p>
+                )}
+            </Modal>
         </div>
     );
-}
+};
 
-export default OwnerAppointments;
+export default ViewListAppointmentOwner;

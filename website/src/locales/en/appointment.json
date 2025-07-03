@@ -1,0 +1,45 @@
+{
+    "columns": {
+        "name": "Boarding House",
+        "customerName": "Customer Name",
+        "roomNumber": "Room Number",
+        "date": "Appointment Date",
+        "note": "Note",
+        "status": "Status",
+        "actions": "Actions"
+    },
+    "fields": {
+        "email": "Email",
+        "phone": "Phone Number",
+        "roomNumber": "Room Number",
+        "date": "Appointment Date",
+        "note": "Note",
+        "status": "Status",
+        "cancelReason": "Cancel Reason",
+        "noEmail": "No Email",
+        "noPhone": "No Phone Number",
+        "noRoom": "No Room Number",
+        "noDate": "No Appointment Date",
+        "noNote": "No Note",
+        "noName": "No Name"
+    },
+    "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "cancelled": "Cancelled",
+        "rejected": "Rejected",
+        "unknown": "Unknown"
+    },
+    "buttons": {
+        "detail": "Detail",
+        "accept": "Accept",
+        "reject": "Reject",
+        "cancel": "Cancel"
+    },
+    "modal": {
+        "title": "Appointment Details",
+        "rejectTitle": "Confirm Rejection",
+        "rejectContent": "Are you sure you want to reject this appointment?"
+    },
+    "loading": "Loading..."
+}

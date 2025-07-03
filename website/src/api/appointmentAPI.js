@@ -23,3 +23,15 @@ export const createAppointment = (value) => {
 export const getAppointmentsByOwnerId = (id) => {
     return axios.get(`/owner/${id}`)
 }
+export const getAppointmentsByBoardingHouseId = (boardingHouseId) => {
+    return axios.get(`/owner/${boardingHouseId}`);
+};
+export const getAppointmentDetailForOwner = (id) => {
+    return axios.get(`/owner/appointment/${id}`);
+};
+export const acceptAppointment = (appointmentId, confirmOverlap = false) => {
+    return axios.post(`/owner/appointments/accept/${appointmentId}`, { confirmOverlap });
+};
+export const rejectAppointment = (appointmentId) => {
+    return axios.post(`/owner/appointments/reject/${appointmentId}`);
+};
