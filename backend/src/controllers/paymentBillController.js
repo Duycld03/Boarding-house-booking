@@ -70,7 +70,7 @@ class PaymentBillController {
         paymentAmount,
         electricalBill,
         waterBill,
-        additionalFees,
+        additionalFees = [],
       } = req.body;
 
       const now = new Date();
