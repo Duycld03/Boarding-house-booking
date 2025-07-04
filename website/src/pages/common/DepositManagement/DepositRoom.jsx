@@ -3,8 +3,7 @@ import { Tag, Input, Modal, Form } from 'antd';
 import { toast } from 'react-toastify';
 import {
   getDepositsByOwnerOrStaff,
-  acceptDepositRoom,
-  rejectDepositRoom,
+  handleDepositDecision,
 } from '@/api/depositAPI';
 import { getRoomsByBoardingHouse } from '@/api/roomAPI';
 import { useParams } from 'react-router-dom';
@@ -98,7 +97,7 @@ const DepositRoom = () => {
     if (!selectedRoom) return toast.error(t('messages.noRoomSelected'));
     setConfirmLoading(true);
     try {
-      await acceptDepositRoom(selectedRoom._id);
+      await handleDepositDecision(selectedRoom._id, 'accept');
       toast.success(t('messages.acceptSuccess'));
       setIsModalVisible(false);
       fetchDepositedRooms();
@@ -118,7 +117,7 @@ const DepositRoom = () => {
     if (!reasonForCancel) return toast.error(t('messages.requireReason'));
     setRejectLoading(true);
     try {
-      await rejectDepositRoom(selectedRoom._id, reasonForCancel);
+      await handleDepositDecision(selectedRoom._id, 'reject', reasonForCancel);
       toast.success(
         t('messages.rejectSuccess', { room: selectedRoom.roomNumber })
       );
