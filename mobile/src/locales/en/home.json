@@ -84,5 +84,10 @@
     "Vĩnh Phúc": "Vinh Phuc",
     "Yên Bái": "Yen Bai",
     "No address provided": "No address provided"
-  }
+  },
+   "search": "Search",
+  "searchPlaceholder": "Search for boarding houses...",
+  "noResult": "No results found",
+  "noResultDesc": "No boarding houses matched your search.",
+  "filter": "Filter"
 }

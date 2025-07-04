@@ -38,7 +38,7 @@ export const getDepositsByOwnerOrStaff = (
 };
 
 export const acceptDepositRoom = (depositId) => {
-  return axios.put(`owner/acceptdeposit/${depositId}`);
+  return axios.put(`staff/acceptdeposit/${depositId}`);
 };
 
 // export const getMaxDeposit = (boardingHouseId) => {
@@ -57,5 +57,5 @@ export const payDeposit = (data) => {
   return axios.post('auth/pay-deposit', data);
 };
 export const rejectDepositRoom = (depositId, reasonForCancel) => {
-  return axios.put(`owner/rejectdeposit/${depositId}`, { reasonForCancel });
+  return axios.put(`staff/rejectdeposit/${depositId}`, { reasonForCancel });
 };

@@ -12,6 +12,7 @@ import {
   renewalController,
   userPaymentController,
   refundRequestController,
+  paymentBillController,
 } from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -98,7 +99,6 @@ authRouter.get(
   depositController.getDepositRoom
 );
 
-
 //payment
 authRouter.post("/pay-rent", depositController.payRent);
 authRouter.get(
@@ -107,7 +107,10 @@ authRouter.get(
 );
 authRouter.post("/pay-deposit", depositController.payDeposit);
 authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
-
+authRouter.get(
+  "/deposit-payment-bill/:depositRoomId",
+  paymentBillController.getPaymentBillForRent
+);
 
 // refund request
 authRouter.get("/refund-requests", refundRequestController.getRefundRequests);
@@ -115,7 +118,6 @@ authRouter.post(
   "/refund-requests",
   refundRequestController.createRefundRequest
 );
-
 
 //renewal
 authRouter.get("/renewal", renewalController.getExtensionRequests);
