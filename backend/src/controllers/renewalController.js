@@ -2,6 +2,7 @@ import ExtensionRequest from '../models/extensionRequest.js';
 import Room from '../models/room.js';
 import BoardingHouse from '../models/boardingHouse.js';
 import DepositRoom from '../models/depositRoom.js';
+import paginate from '../utils/pagination.js';
 
 class renewalController {
   async getExtensionRequests(req, res) {
@@ -105,75 +106,85 @@ class renewalController {
   }
   async getRenewalRequestByBhID(req, res, next) {
     try {
-      // Lấy boardingHouseId từ tham số URL
       const boardingHouseId = req.params.boardingHouseId;
 
-      // Lấy danh sách các phòng thuộc nhà trọ này
+      // Tìm tất cả các phòng thuộc nhà trọ này
       const rooms = await Room.find({ boardingHouseId });
 
       if (!rooms || rooms.length === 0) {
-        // Nếu không có phòng nào trong nhà trọ, trả về lỗi
         return res.status(404).json({
           success: false,
           message: 'No rooms found for this boarding house',
         });
       }
 
-      // Lấy danh sách các yêu cầu gia hạn phòng trọ liên quan đến các phòng này
-      const extensionRequests = await ExtensionRequest.find({
-        roomId: { $in: rooms.map((room) => room._id) },
-      }).populate('accountId roomId'); // Populating accountId và roomId
+      const roomIds = rooms.map((room) => room._id);
 
-      if (!extensionRequests || extensionRequests.length === 0) {
-        // Nếu không có yêu cầu gia hạn nào, trả về thông báo
-        return res.status(404).json({
-          success: false,
-          message: 'No extension requests found for this boarding house',
-        });
-      }
+      // Tạo filter cho paginate
+      const filter = {
+        roomId: { $in: roomIds },
+      };
 
-      // Tạo mảng kết quả với thông tin chi tiết
-      const results = await Promise.all(
-        extensionRequests.map(async (request) => {
-          // Lấy thông tin tên người tạo yêu cầu (tenant) từ accountId (sau khi populate)
-          const tenant = request.accountId
-            ? request.accountId.fullname
-            : 'Unknown';
+      // Cấu hình paginate options
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter,
+        allowSearchFields: [],
+        fields: '',
+        populate: [
+          {
+            path: 'accountId',
+            select: 'fullname email',
+          },
+          {
+            path: 'roomId',
+            select: 'roomNumber boardingHouseId',
+            populate: {
+              path: 'boardingHouseId',
+              select: 'name',
+            },
+          },
+        ],
+        includeTotalData: true,
+      };
 
-          // Lấy thông tin phòng từ request.roomId
-          const room = await Room.findById(request.roomId);
-          const roomNumber = room ? room.roomNumber : 'Unknown';
+      // Gọi paginate
+      const result = await paginate(ExtensionRequest, paginationOptions, req);
 
-          // Lấy thông tin nhà trọ
-          const boardingHouse = await BoardingHouse.findById(
-            room.boardingHouseId
-          );
+      // Biến đổi kết quả để phù hợp với định dạng bạn mong muốn
+      const results = result.data.map((request) => {
+        const tenantName = request.accountId?.fullname || 'Unknown';
+        const roomNumber = request.roomId?.roomNumber || 'Unknown';
+        const boardingHouseName =
+          request.roomId?.boardingHouseId?.name || 'Unknown';
+        const status = request.status || 'pending';
 
-          // Lấy status của yêu cầu gia hạn
-          const status = request.status || 'pending'; // Default to 'pending' if no status
+        return {
+          requestId: request._id,
+          tenantName,
+          roomNumber,
+          boardingHouseName,
+          currentEndDate: request.currentEndDate,
+          requestedEndDate: request.requestedEndDate,
+          status,
+        };
+      });
 
-          return {
-            requestId: request._id,
-            tenantName: tenant, // Tên người tạo yêu cầu
-            roomNumber: roomNumber, // Số phòng
-            boardingHouseName: boardingHouse ? boardingHouse.name : 'Unknown',
-            currentEndDate: request.currentEndDate,
-            requestedEndDate: request.requestedEndDate,
-            status: status, // Trả về trạng thái của yêu cầu
-          };
-        })
-      );
-
-      // Trả kết quả về cho người dùng
-      res.status(200).json({
+      // Trả về kết quả có phân trang
+      return res.status(200).json({
         success: true,
         data: results,
+        pagination: result.pagination,
       });
     } catch (error) {
-      // Nếu có lỗi, chuyển qua middleware error handling
       next(error);
     }
   }
+
   async acceptExtensionRequest(req, res, next) {
     const { requestId } = req.params; // ExtensionRequest ID
 
