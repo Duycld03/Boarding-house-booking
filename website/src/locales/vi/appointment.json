@@ -6,7 +6,8 @@
         "date": "Ngày hẹn",
         "note": "Ghi chú",
         "status": "Trạng thái",
-        "actions": "Hành động"
+        "actions": "Hành động",
+        "tableName": "Lịch hẹn"
     },
     "fields": {
         "email": "Email",
@@ -21,7 +22,8 @@
         "noRoom": "Không có số phòng",
         "noDate": "Không có ngày hẹn",
         "noNote": "Không có ghi chú",
-        "noName": "Không có tên"
+        "noName": "Không có tên",
+        "enterCancelReason": "Nhập lý do từ chối"
     },
     "status": {
         "pending": "Đang chờ",
@@ -40,5 +42,10 @@
         "rejectTitle": "Xác nhận từ chối",
         "rejectContent": "Bạn có chắc chắn muốn từ chối cuộc hẹn này không?"
     },
-    "loading": "Đang tải..."
+    "loading": "Đang tải...",
+    "messages": {
+        "rejectSuccess": "Từ chối lịch hẹn thành công.",
+        "rejectFailed": "Từ chối lịch hẹn thất bại.",
+        "rejectReasonRequired": "Vui lòng nhập lý do từ chối."
+    }
 }

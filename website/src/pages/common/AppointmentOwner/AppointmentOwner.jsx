@@ -21,21 +21,36 @@ const ViewListAppointmentOwner = () => {
 
     const { user } = useCurrentUser();
     const ownerId = user?._id;
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        total: 0,
+    });
+
+    const [paginationOptions, setPaginationOptions] = useState({
+        page: 1,
+        limit: 10,
+    });
 
     const fetchAppointments = async () => {
         try {
             setLoading(true);
-            const response = await getAppointmentsByOwnerId(ownerId);
-            console.log("1", ownerId);
-            console.log("2", response);
+            const response = await getAppointmentsByOwnerId(ownerId, paginationOptions);
+            // console.log("1", ownerId);
+            // console.log("2", response);
 
 
             if (response?.data) {
                 const numberedAppointments = response.data.map((item, index) => ({
                     ...item,
-                    number: index + 1,
+                    number: (paginationOptions.page - 1) * paginationOptions.limit + index + 1,
                 }));
                 setAppointments(numberedAppointments);
+                setPagination({
+                    current: response.pagination.currentPage,
+                    pageSize: response.pagination.limit,
+                    total: response.pagination.totalItems,
+                });
             } else {
                 setAppointments([]);
                 message.warning("Không có dữ liệu.");
@@ -47,13 +62,22 @@ const ViewListAppointmentOwner = () => {
             setLoading(false);
         }
     };
+    const handleTableChange = (pagination) => {
+        setPaginationOptions({
+            ...paginationOptions,
+            page: pagination.current,
+            limit: pagination.pageSize,
+        });
+    };
+
     useEffect(() => {
         if (ownerId) {
             fetchAppointments();
         } else {
             message.error("Không tìm thấy thông tin chủ trọ.");
         }
-    }, [ownerId]);
+    }, [ownerId, paginationOptions]);
+
     const fetchAppointmentDetail = async (appointmentId) => {
         try {
             const res = await getAppointmentDetailForOwner(appointmentId);
@@ -133,7 +157,7 @@ const ViewListAppointmentOwner = () => {
                         ? "orange"
                         : status === "accepted"
                             ? "green"
-                            : status === "rejected"
+                            : status === "cancelled"
                                 ? "red"
                                 : "default"
                 }>
@@ -169,11 +193,20 @@ const ViewListAppointmentOwner = () => {
         <div className="min-h-[500px]">
 
             <Table
+                tableName={t('columns.tableName')}
                 columns={columns}
                 data={appointments}
                 loading={loading}
                 rowKey="_id"
-                pagination={{ pageSize: 10 }}
+                pagination={{
+                    current: pagination.current,
+                    pageSize: pagination.pageSize,
+                    total: pagination.total,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['10', '20', '50', '100'],
+                }}
+                onChange={handleTableChange}
+
                 onRow={(record) => ({
                     onClick: () => fetchAppointmentDetail(record._id),
                 })}

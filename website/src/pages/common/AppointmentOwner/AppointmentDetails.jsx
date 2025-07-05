@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Avatar, Tag, Typography, Form, Modal } from "antd";
 import { Button } from '@/component';
 import moment from "moment";
@@ -7,6 +7,7 @@ import { acceptAppointment, rejectAppointment } from "../../../api/appointmentAP
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../context/themeContext';
+import { Input } from 'antd';
 
 const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
     const { Title, Text } = Typography;
@@ -74,10 +75,22 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
 
     const handleReject = () => {
         const textStyle = { color: darkMode ? '#fff' : undefined };
+        let reason = '';
 
         Modal.confirm({
             title: <span style={textStyle}>{t('modal.rejectTitle')}</span>,
-            content: <span style={textStyle}>{t('modal.rejectContent')}</span>,
+            content: (
+                <div>
+                    <p style={textStyle}>{t('modal.rejectContent')}</p>
+                    <Input.TextArea
+                        rows={4}
+                        placeholder={t('fields.enterCancelReason')}
+                        onChange={(e) => {
+                            reason = e.target.value;
+                        }}
+                    />
+                </div>
+            ),
             okText: t('buttons.reject'),
             okType: "danger",
             cancelText: t('buttons.cancel'),
@@ -92,21 +105,25 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
                 style: {
                     backgroundColor: darkMode ? '#374151' : undefined,
                     color: darkMode ? '#fff' : undefined,
-                    // border: darkMode ? '1px solid #4b5563' : undefined,
                 },
             },
-
             onOk: async () => {
+                if (!reason.trim()) {
+                    toast.error(t('messages.rejectReasonRequired'));
+                    throw new Error("Reason required");
+                }
+
                 try {
-                    await rejectAppointment(appointment._id);
-                    toast.success("Appointment rejected successfully.");
+                    await rejectAppointment(appointment._id, { reason });
+                    toast.success(t('messages.rejectSuccess'));
                     onAcceptSuccess();
                 } catch (err) {
-                    toast.error(err.response?.data?.message || "Failed to reject appointment.");
+                    toast.error(err.response?.data?.message || t('messages.rejectFailed'));
                 }
-            },
+            }
         });
     };
+
 
     const labelStyle = { color: darkMode ? '#ddd' : undefined };
     const textStyle = { color: darkMode ? '#fff' : undefined };
@@ -153,8 +170,12 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
                     {getStatusTag(status)}
                 </Form.Item>
                 {reasonForCancel && (
-                    <Form.Item label={<span style={labelStyle}>{t('fields.cancelReason')}</span>}>
-                        <Text type="danger">{reasonForCancel}</Text>
+                    <Form.Item
+                        label={<span style={labelStyle}>{t('fields.cancelReason')}</span>}
+                    >
+                        <Text style={{ ...textStyle, color: 'white' }}>
+                            {reasonForCancel}
+                        </Text>
                     </Form.Item>
                 )}
             </Form>

@@ -32,6 +32,6 @@ export const getAppointmentDetailForOwner = (id) => {
 export const acceptAppointment = (appointmentId, confirmOverlap = false) => {
     return axios.post(`/owner/appointments/accept/${appointmentId}`, { confirmOverlap });
 };
-export const rejectAppointment = (appointmentId) => {
-    return axios.post(`/owner/appointments/reject/${appointmentId}`);
+export const rejectAppointment = (appointmentId, data) => {
+    return axios.post(`/owner/appointments/reject/${appointmentId}`, data);
 };

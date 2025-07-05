@@ -6,7 +6,8 @@
         "date": "Appointment Date",
         "note": "Note",
         "status": "Status",
-        "actions": "Actions"
+        "actions": "Actions",
+        "tableName": "Appointments"
     },
     "fields": {
         "email": "Email",
@@ -21,7 +22,8 @@
         "noRoom": "No Room Number",
         "noDate": "No Appointment Date",
         "noNote": "No Note",
-        "noName": "No Name"
+        "noName": "No Name",
+        "enterCancelReason": "Enter the reason for rejection"
     },
     "status": {
         "pending": "Pending",
@@ -41,5 +43,10 @@
         "rejectTitle": "Confirm Rejection",
         "rejectContent": "Are you sure you want to reject this appointment?"
     },
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "messages": {
+        "rejectSuccess": "Appointment rejected successfully.",
+        "rejectFailed": "Failed to reject appointment.",
+        "rejectReasonRequired": "Please enter a reason for rejection."
+    }
 }
