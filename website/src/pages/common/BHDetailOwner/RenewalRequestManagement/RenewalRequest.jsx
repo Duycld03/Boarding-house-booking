@@ -9,13 +9,18 @@ import {
 import { Tag, Input, Modal, Form } from 'antd';
 import { toast } from 'react-toastify';
 import ConfirmModal from '@/component/ConfirmModal';
+import { useTranslation } from 'react-i18next';
 
 const RenewalRequest = ({ boardingHouseId }) => {
+  const { t } = useTranslation('renewalManagement');
+
   const statusColors = {
     pending: 'orange',
     accepted: 'green',
     rejected: 'red',
   };
+
+  const statusLabel = (status) => t(`status.${status}`);
 
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,21 +50,19 @@ const RenewalRequest = ({ boardingHouseId }) => {
         paginationOptions
       );
 
-      if (res?.data && res?.pagination) {
-        setRequests(res.data);
-        // ✅ Sửa key cho đúng
-        setPagination({
-          currentPage: res?.currentPage || 1,
-          totalPages: res?.totalPages || 1,
-          totalItems: res?.totalItems || 0,
-          limit: res?.limit || 10,
-        });
-      } else {
-        throw new Error('Invalid response format');
-      }
+      const requestList = res.data || [];
+      const paginationInfo = res.pagination || {};
+
+      setRequests(requestList);
+      setPagination({
+        currentPage: paginationInfo.currentPage || 1,
+        totalPages: paginationInfo.totalPages || 1,
+        totalItems: paginationInfo.totalItems || 0,
+        limit: paginationInfo.limit || 10,
+      });
     } catch (error) {
       console.error('❌ Failed to fetch renewal requests:', error);
-      toast.error('Failed to load renewal requests');
+      toast.error(t('messages.fetchError'));
       setRequests([]);
     } finally {
       setLoading(false);
@@ -76,12 +79,12 @@ const RenewalRequest = ({ boardingHouseId }) => {
     setSelectedRequest(record);
     setIsRejectModalOpen(true);
   };
-
   const handleTableChange = (pagination) => {
-    setPaginationOptions({
+    setPaginationOptions((prev) => ({
+      ...prev,
       page: pagination.current,
       limit: pagination.pageSize,
-    });
+    }));
   };
 
   const tablePaginationConfig = {
@@ -94,18 +97,18 @@ const RenewalRequest = ({ boardingHouseId }) => {
   const handleRejectConfirm = async () => {
     try {
       if (!reasonForCancel) {
-        toast.error('Please provide a reason for rejecting.');
+        toast.error(t('messages.rejectReasonRequired'));
         return;
       }
 
       await rejectExtensionRequest(selectedRequest?.requestId, reasonForCancel);
-      toast.success('Request rejected successfully.');
+      toast.success(t('messages.rejectSuccess'));
       setIsRejectModalOpen(false);
       setReasonForCancel('');
       fetchRequests();
     } catch (error) {
       console.error('Error rejecting renewal request:', error);
-      toast.error('An error occurred while rejecting the renewal request.');
+      toast.error(t('messages.rejectError'));
     }
   };
 
@@ -122,12 +125,12 @@ const RenewalRequest = ({ boardingHouseId }) => {
       }
 
       await acceptExtensionRequest(selectedRequest?.requestId);
-      toast.success('Accepted renewal request successfully.');
+      toast.success(t('messages.acceptSuccess'));
       setIsModalOpen(false);
       fetchRequests();
     } catch (error) {
       console.error('Error accepting renewal request:', error);
-      toast.error('An error occurred while accepting the renewal request.');
+      toast.error(t('messages.acceptError'));
     }
   };
 
@@ -143,52 +146,54 @@ const RenewalRequest = ({ boardingHouseId }) => {
 
   const columns = [
     {
-      title: 'Tenant Name',
+      title: t('table.tenantName'),
       dataIndex: 'tenantName',
       key: 'tenantName',
     },
     {
-      title: 'Room Number',
+      title: t('table.roomNumber'),
       dataIndex: 'roomNumber',
       key: 'roomNumber',
     },
     {
-      title: 'Boarding House',
+      title: t('table.boardingHouse'),
       dataIndex: 'boardingHouseName',
       key: 'boardingHouseName',
     },
     {
-      title: 'Status',
+      title: t('table.status'),
       dataIndex: 'status',
       key: 'status',
-      render: (status) => <Tag color={statusColors[status]}>{status}</Tag>,
+      render: (status) => (
+        <Tag color={statusColors[status]}>{statusLabel(status)}</Tag>
+      ),
     },
     {
-      title: 'Current End Date',
+      title: t('table.currentEndDate'),
       dataIndex: 'currentEndDate',
       key: 'currentEndDate',
       render: (text) => convertTimetap(text, false),
     },
     {
-      title: 'Requested End Date',
+      title: t('table.requestedEndDate'),
       dataIndex: 'requestedEndDate',
       key: 'requestedEndDate',
       render: (text) => convertTimetap(text, false),
     },
     {
-      title: 'Action',
+      title: t('table.action'),
       render: (record) =>
         record.status === 'pending' && (
           <div className="flex gap-3 items-center">
             <Button
-              title="Reject"
+              title={t('action.reject')}
               btnReject
               size="large"
               style={{ backgroundColor: 'red', color: 'white', border: 'none' }}
               onClick={() => handleReject(record)}
             />
             <Button
-              title="Accept"
+              title={t('action.accept')}
               size="large"
               btnAccept
               className="text-white"
@@ -203,42 +208,47 @@ const RenewalRequest = ({ boardingHouseId }) => {
   return (
     <div>
       <Table
+        tableName={t('table.tableName')}
         columns={columns}
         data={requests}
         loading={loading}
         pagination={tablePaginationConfig}
         onChange={handleTableChange}
+        noDataText={t('messages.noData')}
       />
 
       <ConfirmModal
-        title="Confirm Acceptance"
-        content={`Are you sure you want to accept the renewal request for room ${selectedRequest?.roomNumber}?`}
+        title={t('modal.confirmTitle')}
+        content={t('modal.confirmContent', {
+          room: selectedRequest?.roomNumber || '',
+        })}
         onOk={handleConfirmAccept}
         onCancel={handleCancelModal}
         isOpen={isModalOpen}
       />
 
       <Modal
-        title="Reject Renewal Request"
+        title={t('modal.rejectTitle')}
         open={isRejectModalOpen}
         onOk={handleRejectConfirm}
         onCancel={handleCancelRejectModal}
-        okText="Reject"
+        okText={t('action.reject')}
         width="400px"
+        cancelText={t('action.cancel')}
       >
         <Form layout="vertical">
           <Form.Item
-            label="Reason For Cancel"
+            label={t('form.rejectReason')}
             name="reasonForCancel"
             rules={[
               {
                 required: true,
-                message: 'Please enter a reason for rejection',
+                message: t('form.rejectReasonRequired'),
               },
             ]}
           >
             <Input.TextArea
-              placeholder="Enter reason for rejection"
+              placeholder={t('form.rejectReasonPlaceholder')}
               value={reasonForCancel}
               onChange={(e) => setReasonForCancel(e.target.value)}
               style={{ width: '100%', height: '100px' }}
