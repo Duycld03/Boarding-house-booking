@@ -108,7 +108,7 @@ function FilterBoardingHouse({ setFilterValue }) {
 
     if (province) {
       setLoadingStates((prev) => ({ ...prev, districts: true }));
-      const districtsData = await fetchDistricts(province?.code);
+      const districtsData = await fetchDistricts(province?.id);
       setDistricts(districtsData);
       setWards([]);
       setLoadingStates((prev) => ({ ...prev, districts: false }));
@@ -127,7 +127,7 @@ function FilterBoardingHouse({ setFilterValue }) {
     form.setFieldsValue({ ward: null });
     if (district) {
       setLoadingStates((prev) => ({ ...prev, wards: true }));
-      const wardsData = await fetchWards(district?.code);
+      const wardsData = await fetchWards(district?.id);
       setWards(wardsData);
       setLoadingStates((prev) => ({ ...prev, wards: false }));
     } else {
@@ -260,9 +260,9 @@ function FilterBoardingHouse({ setFilterValue }) {
               <Form.Item label={t("filterBH.province")} name="province" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectProvince")}
-                  onChange={(code) => {
+                  onChange={(id) => {
                     const selectedProvince = provinces?.find(
-                      (province) => province.code === code
+                      (province) => province.id === id
                     );
                     handleProvinceChange(selectedProvince);
                   }}
@@ -270,7 +270,7 @@ function FilterBoardingHouse({ setFilterValue }) {
                   loading={loadingStates.provinces}
                 >
                   {provinces?.map((province) => (
-                    <Option key={province.code} value={province.code}>
+                    <Option key={province.id} value={province.id}>
                       {province.name}
                     </Option>
                   ))}
@@ -280,9 +280,9 @@ function FilterBoardingHouse({ setFilterValue }) {
               <Form.Item label={t("filterBH.district")} name="district" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectDistrict")}
-                  onChange={(code) => {
+                  onChange={(id) => {
                     const selectedDistrict = districts?.find(
-                      (district) => district.code === code
+                      (district) => district.id === id
                     );
                     handleDistrictChange(selectedDistrict);
                   }}
@@ -290,7 +290,7 @@ function FilterBoardingHouse({ setFilterValue }) {
                   loading={loadingStates.districts}
                 >
                   {districts?.map((district) => (
-                    <Option key={district.code} value={district.code}>
+                    <Option key={district.id} value={district.id}>
                       {district.name}
                     </Option>
                   ))}
@@ -300,9 +300,9 @@ function FilterBoardingHouse({ setFilterValue }) {
               <Form.Item label={t("filterBH.ward")} name="ward" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectWard")}
-                  onChange={(code) => {
+                  onChange={(id) => {
                     const selectedWard = wards?.find(
-                      (ward) => ward.code === code
+                      (ward) => ward.id === id
                     );
                     setFilters((prev) => ({ ...prev, ward: selectedWard?.name }));
                   }}
@@ -310,7 +310,7 @@ function FilterBoardingHouse({ setFilterValue }) {
                   loading={loadingStates.wards}
                 >
                   {wards?.map((ward) => (
-                    <Option key={ward.code} value={ward.code}>
+                    <Option key={ward.id} value={ward.id}>
                       {ward.name}
                     </Option>
                   ))}

@@ -35,6 +35,8 @@ import { useNavigate } from "react-router-dom";
 import BHDetailAdmin from "./BHDetailsAdmin";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../context/themeContext";
+import { Tooltip } from 'antd';
+
 function BoardingHouseManagement(onClose) {
   const [boardingHData, setBoardingHData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -163,7 +165,7 @@ function BoardingHouseManagement(onClose) {
       setImages(data);
     } catch (error) {
       console.error("Failed to fetch images:", error);
-      toast.error("Failed to fetch images.");
+      toast.error(t("errors.fetchImages"));
     }
   };
 
@@ -226,7 +228,7 @@ function BoardingHouseManagement(onClose) {
             (p) => p.name === formData.address.province
           );
           if (selectedProvince) {
-            const districtsData = await fetchDistricts(selectedProvince.code);
+            const districtsData = await fetchDistricts(selectedProvince.id);
             setDistricts(districtsData);
 
             // Nếu đã chọn quận, fetch wards
@@ -235,7 +237,7 @@ function BoardingHouseManagement(onClose) {
                 (d) => d.name === formData.address.district
               );
               if (selectedDistrict) {
-                const wardsData = await fetchWards(selectedDistrict.code);
+                const wardsData = await fetchWards(selectedDistrict.id);
                 setWards(wardsData);
               }
             }
@@ -330,7 +332,7 @@ function BoardingHouseManagement(onClose) {
     }
     try {
       if (!formData._id) {
-        toast.error("Invalid form data. Please try again.");
+        toast.error(t("errors.invalidFormData"));
         return;
       }
 
@@ -504,10 +506,17 @@ function BoardingHouseManagement(onClose) {
       title: t("boardingHouseAdmin.address"),
       dataIndex: "address",
       key: "address",
+      width: 200,
       render: (text) =>
-        text
-          ? `${text.detail}, ${text.ward}, ${text.district}, ${text.province}`
-          : "",
+        text ? (
+          <Tooltip
+            title={`${text.detail}, ${text.ward}, ${text.district}, ${text.province}`}
+          >
+            {`${text.detail}, ${text.ward}, ${text.district}, ${text.province}`}
+          </Tooltip>
+        ) : (
+          t('messages.noData')
+        ),
     },
     {
       title: t("boardingHouseAdmin.priceRange"),

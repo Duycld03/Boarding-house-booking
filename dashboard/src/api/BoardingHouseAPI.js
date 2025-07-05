@@ -55,7 +55,11 @@ export const getBoardingHouseImages = async (boardingHouseId) => {
   return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
 };
 export const createBoardingHouse = (data) => {
-  return axios.post('/dashboard/boardinghouse/create', data);
+  return axios.post('/dashboard/boardinghouse/create', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };
 export const uploadFile = (data) => {
   return axios.post('/dashboard/boardinghouse/uploadFile', data, {

@@ -47,7 +47,7 @@ const AddressSelector = ({
           rules={[{ required: true, message: t("validation.selectProvince") }]}
         >
           <Select
-            placeholder={t("selectProvince")}
+            placeholder={t("validation.selectProvince")}
             value={formData?.address?.province || undefined}
             onChange={(value) => {
               // Reset district and ward when province changes
@@ -79,7 +79,7 @@ const AddressSelector = ({
           rules={[{ required: true, message: t("validation.selectDistrict") }]}
         >
           <Select
-            placeholder={t("selectDistrict")}
+            placeholder={t("validation.selectDistrict")}
             value={formData?.address?.district || undefined}
             onChange={(value) => {
               // Reset ward when district changes
@@ -109,7 +109,7 @@ const AddressSelector = ({
           rules={[{ required: true, message: t("validation.selectWard") }]}
         >
           <Select
-            placeholder={t("selectWard")}
+            placeholder={t("validation.selectWard")}
             value={formData?.address?.ward || undefined}
             onChange={(value) => {
               onInputChange({

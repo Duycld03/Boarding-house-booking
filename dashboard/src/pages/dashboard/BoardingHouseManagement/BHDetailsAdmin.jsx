@@ -124,6 +124,8 @@ const BHDetailAdmin = () => {
         const fetchAddressData = async () => {
             try {
                 const provincesData = await fetchProvinces();
+                console.log("mt", provincesData);
+
                 setProvinces(provincesData);
 
                 if (updatedData?.address?.province) {
@@ -131,7 +133,7 @@ const BHDetailAdmin = () => {
                         (p) => p.name === updatedData.address.province
                     );
                     if (selectedProvince) {
-                        const districtsData = await fetchDistricts(selectedProvince.code);
+                        const districtsData = await fetchDistricts(selectedProvince.id);
                         setDistricts(districtsData);
 
                         if (updatedData?.address?.district) {
@@ -139,7 +141,7 @@ const BHDetailAdmin = () => {
                                 (d) => d.name === updatedData.address.district
                             );
                             if (selectedDistrict) {
-                                const wardsData = await fetchWards(selectedDistrict.code);
+                                const wardsData = await fetchWards(selectedDistrict.id);
                                 setWards(wardsData);
                             }
                         }
