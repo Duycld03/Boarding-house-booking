@@ -14,9 +14,14 @@ export const getRenewalRequestByBhID = (
   });
 };
 
-export const acceptExtensionRequest = (requestId) => {
-  return axios.put(`owner/renewal/${requestId}`);
-};
-export const rejectExtensionRequest = (requestId, reasonForCancel) => {
-  return axios.put(`owner/rejectrenewal/${requestId}`, { reasonForCancel });
+export const handleExtensionRequestAction = (
+  requestId,
+  action,
+  reasonForCancel = ''
+) => {
+  const payload = { action };
+  if (action === 'reject') {
+    payload.reasonForCancel = reasonForCancel;
+  }
+  return axios.put(`staff/renewal/${requestId}`, payload);
 };

@@ -3,8 +3,7 @@ import { TableCustom as Table, Button } from '@/component';
 import convertTimetap from '@/utils/convertTimetap';
 import {
   getRenewalRequestByBhID,
-  acceptExtensionRequest,
-  rejectExtensionRequest,
+  handleExtensionRequestAction,
 } from '@/api/renewalRequestAPI';
 import { Tag, Input, Modal, Form } from 'antd';
 import { toast } from 'react-toastify';
@@ -79,6 +78,11 @@ const RenewalRequest = ({ boardingHouseId }) => {
     setSelectedRequest(record);
     setIsRejectModalOpen(true);
   };
+  const handleAccept = (record) => {
+    setSelectedRequest(record);
+    setIsModalOpen(true);
+  };
+
   const handleTableChange = (pagination) => {
     setPaginationOptions((prev) => ({
       ...prev,
@@ -101,7 +105,11 @@ const RenewalRequest = ({ boardingHouseId }) => {
         return;
       }
 
-      await rejectExtensionRequest(selectedRequest?.requestId, reasonForCancel);
+      await handleExtensionRequestAction(
+        selectedRequest?.requestId,
+        'reject',
+        reasonForCancel
+      );
       toast.success(t('messages.rejectSuccess'));
       setIsRejectModalOpen(false);
       setReasonForCancel('');
@@ -112,11 +120,6 @@ const RenewalRequest = ({ boardingHouseId }) => {
     }
   };
 
-  const handleAccept = (record) => {
-    setSelectedRequest(record);
-    setIsModalOpen(true);
-  };
-
   const handleConfirmAccept = async () => {
     try {
       if (!selectedRequest?.requestId) {
@@ -124,7 +127,7 @@ const RenewalRequest = ({ boardingHouseId }) => {
         return;
       }
 
-      await acceptExtensionRequest(selectedRequest?.requestId);
+      await handleExtensionRequestAction(selectedRequest.requestId, 'accept');
       toast.success(t('messages.acceptSuccess'));
       setIsModalOpen(false);
       fetchRequests();

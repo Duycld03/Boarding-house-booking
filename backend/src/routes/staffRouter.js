@@ -129,11 +129,7 @@ staffRouter.get(
 );
 staffRouter.put(
   '/renewal/:requestId',
-  renewalController.acceptExtensionRequest
-);
-staffRouter.put(
-  '/rejectrenewal/:requestId',
-  renewalController.rejectExtensionRequest
+  renewalController.handleExtensionRequestAction
 );
 
 // refund request

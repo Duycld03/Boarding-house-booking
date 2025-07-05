@@ -185,11 +185,12 @@ class renewalController {
     }
   }
 
-  async acceptExtensionRequest(req, res, next) {
-    const { requestId } = req.params; // ExtensionRequest ID
+  async handleExtensionRequestAction(req, res, next) {
+    const { requestId } = req.params;
+    const { action, reasonForCancel } = req.body; // action: "accept" | "reject"
 
     try {
-      // Step 1: Find the extension request by ID
+      // Bước 1: Tìm ExtensionRequest
       const extensionRequest = await ExtensionRequest.findById(requestId)
         .populate('roomId')
         .populate('accountId');
@@ -198,79 +199,53 @@ class renewalController {
         return res.status(404).json({ message: 'Extension request not found' });
       }
 
-      // Step 2: Check if the request is pending
       if (extensionRequest.status !== 'pending') {
         return res
           .status(400)
-          .json({ message: 'Only pending requests can be accepted' });
+          .json({ message: 'Only pending requests can be processed' });
       }
 
-      // Step 4: Find the corresponding DepositRoom and update the endDate
+      // Bước 2: Tìm deposit liên quan
+      // Fix trong controller
       const deposit = await DepositRoom.findOne({
-        accountId: extensionRequest.accountId,
-        roomId: extensionRequest.roomId,
+        accountId: extensionRequest.accountId?._id,
+        roomId: extensionRequest.roomId?._id,
       });
 
-      if (!deposit) {
+      if (!deposit && action === 'accept') {
         return res
           .status(404)
           .json({ message: 'Deposit record not found for the room' });
       }
 
-      // Update the deposit's endDate to the requested end date from ExtensionRequest
-      deposit.endDate = extensionRequest.requestedEndDate;
-      await deposit.save();
-      // Step 3: Update the status of the extension request to 'accepted'
-      extensionRequest.status = 'accepted';
-      extensionRequest.depositRoomId = deposit._id;
-      await extensionRequest.save();
+      // Bước 3: Xử lý theo action
+      if (action === 'accept') {
+        deposit.endDate = extensionRequest.requestedEndDate;
+        await deposit.save();
 
-      // Step 5: Respond with success
-      res.status(200).json({
-        message: 'Extension request accepted and deposit updated successfully',
-        data: extensionRequest,
-      });
-    } catch (error) {
-      console.error('Error accepting extension request:', error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  }
-  async rejectExtensionRequest(req, res, next) {
-    const { requestId } = req.params; // ExtensionRequest ID
-    const { reasonForCancel } = req.body; // Reason for cancellation when rejecting
-
-    try {
-      // Step 1: Find the extension request by ID
-      const extensionRequest = await ExtensionRequest.findById(requestId)
-        .populate('roomId')
-        .populate('accountId');
-
-      if (!extensionRequest) {
-        return res.status(404).json({ message: 'Extension request not found' });
-      }
-      // Step 3: Reject the request
-      extensionRequest.status = 'rejected';
-      extensionRequest.reasonForCancel = reasonForCancel;
-
-      // Optional: gán depositRoomId nếu schema yêu cầu
-      const deposit = await DepositRoom.findOne({
-        accountId: extensionRequest.accountId,
-        roomId: extensionRequest.roomId,
-      });
-      if (deposit) {
+        extensionRequest.status = 'accepted';
         extensionRequest.depositRoomId = deposit._id;
+      } else if (action === 'reject') {
+        extensionRequest.status = 'rejected';
+        extensionRequest.reasonForCancel = reasonForCancel || '';
+
+        if (deposit) {
+          extensionRequest.depositRoomId = deposit._id;
+        }
+      } else {
+        return res.status(400).json({ message: 'Invalid action type' });
       }
 
       await extensionRequest.save();
 
-      // Step 4: Respond with success
-      res.status(200).json({
-        message: 'Extension request rejected successfully',
+      // Bước 4: Trả kết quả
+      return res.status(200).json({
+        message: `Extension request ${action}ed successfully`,
         data: extensionRequest,
       });
     } catch (error) {
-      console.error('Error rejecting extension request:', error);
-      res.status(500).json({ message: 'Server error' });
+      console.error('Error handling extension request action:', error);
+      return res.status(500).json({ message: 'Server error' });
     }
   }
 }
