@@ -1,57 +1,283 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Modal, Upload, Select, Row, Col, Typography } from "antd";
+import {
+  Form,
+  Input,
+  Modal,
+  Upload,
+  Select,
+  Row,
+  Col,
+  Typography,
+  InputNumber,
+  Divider,
+  Card,
+  Checkbox,
+  Space,
+  Collapse,
+  Alert,
+  Tag,
+} from "antd";
 import { Button } from "@/component";
-import { PlusOutlined, CameraOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  CameraOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CopyOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { addRoom, getRoomTypeByBhId } from "@/api/ownerUser/boardingHouseAPI";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/ThemeContext";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
+const { Panel } = Collapse;
 
-function AddRoom({ boardingHouseId, refreshRoomData }) {
+function BulkAddRoom({ boardingHouseId, refreshRoomData }) {
   const [form] = Form.useForm();
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [fileList, setFileList] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
+  const [step, setStep] = useState(1); // 1: Configuration, 2: Review
+  const [rooms, setRooms] = useState([]);
+  const [selectedRooms, setSelectedRooms] = useState([]);
+  const [editingRoom, setEditingRoom] = useState(null);
+  const [duplicateRooms, setDuplicateRooms] = useState(new Set());
+  const [existingRoomNumbers, setExistingRoomNumbers] = useState(new Set());
+
   const { t } = useTranslation("bhManagement");
   const { darkMode } = useTheme();
 
-  const onFinish = async (values) => {
-    if (fileList.length === 0) {
-      toast.error(t("roomManagement.addRoom.validation.imageRequired"));
+  // Room numbering format options
+  const numberingFormats = [
+    {
+      value: "floor_room",
+      label: "101, 102, 103...",
+      pattern: (floor, room) => `${floor}${room.toString().padStart(2, "0")}`,
+    },
+    {
+      value: "floor_dash_room",
+      label: "1-1, 1-2, 1-3...",
+      pattern: (floor, room) => `${floor}-${room}`,
+    },
+    {
+      value: "prefix_sequential",
+      label: "A1, A2, A3...",
+      pattern: (floor, room) => `${String.fromCharCode(64 + floor)}${room}`,
+    },
+    {
+      value: "prefix_floor_room",
+      label: "R101, R102, R103...",
+      pattern: (floor, room) => `R${floor}${room.toString().padStart(2, "0")}`,
+    },
+  ];
+
+  const generateRooms = (values) => {
+    const {
+      floors,
+      roomsPerFloor,
+      roomTypes: floorRoomTypes,
+      numberingFormat,
+    } = values;
+    const selectedFormat = numberingFormats.find(
+      (f) => f.value === numberingFormat
+    );
+    const generatedRooms = [];
+
+    for (let floor = 1; floor <= floors; floor++) {
+      const roomsCount = roomsPerFloor[floor - 1] || 0;
+      const roomTypeId = floorRoomTypes[floor - 1];
+
+      for (let room = 1; room <= roomsCount; room++) {
+        const roomNumber = selectedFormat.pattern(floor, room);
+        generatedRooms.push({
+          id: `${floor}-${room}`,
+          floor: floor,
+          roomNumber: roomNumber,
+          roomTypeId: roomTypeId,
+          description: "",
+          image: null,
+          hasError: false,
+          errorMessage: "",
+        });
+      }
+    }
+
+    return generatedRooms;
+  };
+
+  const checkDuplicates = (roomsToCheck) => {
+    const roomNumbers = roomsToCheck.map((room) => room.roomNumber);
+    const duplicates = new Set();
+    const seen = new Set(existingRoomNumbers);
+
+    roomNumbers.forEach((roomNumber) => {
+      if (seen.has(roomNumber)) {
+        duplicates.add(roomNumber);
+      } else {
+        seen.add(roomNumber);
+      }
+    });
+
+    // Check for duplicates within the current batch
+    const currentBatch = new Set();
+    roomNumbers.forEach((roomNumber) => {
+      if (currentBatch.has(roomNumber)) {
+        duplicates.add(roomNumber);
+      } else {
+        currentBatch.add(roomNumber);
+      }
+    });
+
+    setDuplicateRooms(duplicates);
+    return duplicates;
+  };
+
+  const onConfigurationSubmit = (values) => {
+    const generatedRooms = generateRooms(values);
+    const duplicates = checkDuplicates(generatedRooms);
+
+    // Mark rooms with errors
+    const roomsWithErrors = generatedRooms.map((room) => ({
+      ...room,
+      hasError: duplicates.has(room.roomNumber),
+      errorMessage: duplicates.has(room.roomNumber)
+        ? "Room number already exists"
+        : "",
+    }));
+
+    setRooms(roomsWithErrors);
+    setStep(2);
+  };
+
+  const onBulkSubmit = async () => {
+    // Check if there are any errors
+    const hasErrors = rooms.some((room) => room.hasError);
+    if (hasErrors) {
+      toast.error(t("roomManagement.bulkAddRoom.validation.fixErrorsFirst"));
+      return;
+    }
+
+    // Check if all rooms have required fields
+    const missingFields = rooms.filter(
+      (room) => !room.roomTypeId || !room.description || !room.image
+    );
+
+    if (missingFields.length > 0) {
+      toast.error(
+        t("roomManagement.bulkAddRoom.validation.missingRequiredFields")
+      );
       return;
     }
 
     setLoadingSubmit(true);
-    const formData = new FormData();
-    formData.append("roomNumber", values.roomNumber);
-    formData.append("boardingHouseId", boardingHouseId);
-    formData.append("description", values.description);
-    formData.append("roomTypeId", values.roomType);
-    formData.append("Room", fileList[0].originFileObj);
 
     try {
-      const res = await addRoom(formData);
+      // Submit all rooms
+      const promises = rooms.map((room) => {
+        const formData = new FormData();
+        formData.append("roomNumber", room.roomNumber);
+        formData.append("boardingHouseId", boardingHouseId);
+        formData.append("description", room.description);
+        formData.append("roomTypeId", room.roomTypeId);
+        formData.append("Room", room.image);
+        return addRoom(formData);
+      });
+
+      await Promise.all(promises);
+
       refreshRoomData();
-      toast.success(res.message);
+      toast.success(
+        t("roomManagement.bulkAddRoom.success", { count: rooms.length })
+      );
+      onCancel();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(
+        error.response?.data?.message || t("roomManagement.bulkAddRoom.error")
+      );
     } finally {
       setLoadingSubmit(false);
-      onCancel();
     }
   };
 
   const onCancel = () => {
     setVisible(false);
+    setStep(1);
     form.resetFields();
-    setFileList([]);
+    setRooms([]);
+    setSelectedRooms([]);
+    setEditingRoom(null);
+    setDuplicateRooms(new Set());
   };
 
-  const handleChange = ({ fileList }) => {
-    setFileList(fileList.slice(-1));
+  const handleRoomUpdate = (roomId, field, value) => {
+    setRooms((prevRooms) => {
+      const newRooms = prevRooms.map((room) => {
+        if (room.id === roomId) {
+          const updatedRoom = { ...room, [field]: value };
+
+          // Re-check duplicates for room number changes
+          if (field === "roomNumber") {
+            const otherRooms = prevRooms.filter((r) => r.id !== roomId);
+            const allRoomNumbers = [
+              ...otherRooms.map((r) => r.roomNumber),
+              value,
+            ];
+            const duplicates = checkDuplicates(allRoomNumbers);
+
+            updatedRoom.hasError = duplicates.has(value);
+            updatedRoom.errorMessage = duplicates.has(value)
+              ? "Room number already exists"
+              : "";
+          }
+
+          return updatedRoom;
+        }
+        return room;
+      });
+
+      return newRooms;
+    });
+  };
+
+  const handleBulkUpdate = (field, value) => {
+    if (selectedRooms.length === 0) {
+      toast.warning(
+        t("roomManagement.bulkAddRoom.validation.selectRoomsFirst")
+      );
+      return;
+    }
+
+    setRooms((prevRooms) =>
+      prevRooms.map((room) =>
+        selectedRooms.includes(room.id) ? { ...room, [field]: value } : room
+      )
+    );
+
+    toast.success(
+      t("roomManagement.bulkAddRoom.success.bulkUpdate", {
+        count: selectedRooms.length,
+      })
+    );
+  };
+
+  const handleRoomSelection = (roomId, checked) => {
+    setSelectedRooms((prev) =>
+      checked ? [...prev, roomId] : prev.filter((id) => id !== roomId)
+    );
+  };
+
+  const handleFloorSelection = (floor, checked) => {
+    const floorRooms = rooms
+      .filter((room) => room.floor === floor)
+      .map((room) => room.id);
+    setSelectedRooms((prev) =>
+      checked
+        ? [...prev, ...floorRooms.filter((id) => !prev.includes(id))]
+        : prev.filter((id) => !floorRooms.includes(id))
+    );
   };
 
   const fetchRoomTypes = async () => {
@@ -59,7 +285,7 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
     try {
       const res = await getRoomTypeByBhId(boardingHouseId);
       setRoomTypes(res.data);
-      if (res.data.length == 0) {
+      if (res.data.length === 0) {
         throw new Error("No room type found");
       }
     } catch (error) {
@@ -72,7 +298,6 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
         okText: t("common.ok"),
         cancelButtonProps: { style: { display: "none" } },
       });
-      console.log(error);
     }
   };
 
@@ -80,21 +305,373 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
     fetchRoomTypes();
   }, [visible]);
 
-  const getImageContainerClasses = () => {
+  const getCardClasses = () => {
     return darkMode
-      ? "bg-gradient-to-br from-gray-700 to-gray-600 border-gray-600"
-      : "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-300";
+      ? "bg-gray-800 border-gray-600"
+      : "bg-white border-gray-200";
   };
 
   const getTextColor = () => {
     return darkMode ? "text-gray-200" : "text-gray-800";
   };
 
+  // Group rooms by floor for display
+  const roomsByFloor = rooms.reduce((acc, room) => {
+    if (!acc[room.floor]) {
+      acc[room.floor] = [];
+    }
+    acc[room.floor].push(room);
+    return acc;
+  }, {});
+
+  const renderConfigurationStep = () => (
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={onConfigurationSubmit}
+      initialValues={{
+        floors: 1,
+        roomsPerFloor: [1],
+        numberingFormat: "floor_room",
+      }}
+    >
+      <Row gutter={24}>
+        <Col span={12}>
+          <Form.Item
+            label={<Text strong>Number of Floors</Text>}
+            name="floors"
+            rules={[
+              { required: true, message: "Please enter number of floors" },
+            ]}
+          >
+            <InputNumber
+              min={1}
+              max={50}
+              className="w-full"
+              onChange={(value) => {
+                const currentValues = form.getFieldsValue();
+                const newRoomsPerFloor = new Array(value).fill(1);
+                const newRoomTypes = new Array(value).fill(roomTypes[0]?._id);
+
+                form.setFieldsValue({
+                  roomsPerFloor: newRoomsPerFloor,
+                  roomTypes: newRoomTypes,
+                });
+              }}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label={<Text strong>Room Numbering Format</Text>}
+            name="numberingFormat"
+            rules={[
+              { required: true, message: "Please select numbering format" },
+            ]}
+          >
+            <Select>
+              {numberingFormats.map((format) => (
+                <Select.Option key={format.value} value={format.value}>
+                  {format.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Divider />
+
+      <Form.Item dependencies={["floors"]}>
+        {({ getFieldValue }) => {
+          const floors = getFieldValue("floors") || 1;
+          return (
+            <div>
+              <Text strong>Floor Configuration</Text>
+              <Row gutter={16} className="mt-4">
+                {Array.from({ length: floors }, (_, index) => (
+                  <Col span={24} key={index} className="mb-4">
+                    <Card
+                      size="small"
+                      title={`Floor ${index + 1}`}
+                      className={getCardClasses()}
+                    >
+                      <Row gutter={16}>
+                        <Col span={8}>
+                          <Form.Item
+                            label="Rooms Count"
+                            name={["roomsPerFloor", index]}
+                            rules={[{ required: true, message: "Required" }]}
+                          >
+                            <InputNumber min={1} max={100} className="w-full" />
+                          </Form.Item>
+                        </Col>
+                        <Col span={16}>
+                          <Form.Item
+                            label="Room Type"
+                            name={["roomTypes", index]}
+                            rules={[{ required: true, message: "Required" }]}
+                          >
+                            <Select placeholder="Select room type">
+                              {roomTypes.map((type) => (
+                                <Select.Option key={type._id} value={type._id}>
+                                  {type.typeName}
+                                </Select.Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </div>
+          );
+        }}
+      </Form.Item>
+    </Form>
+  );
+
+  const renderReviewStep = () => (
+    <div>
+      {/* Error Summary */}
+      {duplicateRooms.size > 0 && (
+        <Alert
+          message="Duplicate Room Numbers Found"
+          description={`Please fix the following duplicate room numbers: ${Array.from(
+            duplicateRooms
+          ).join(", ")}`}
+          type="error"
+          showIcon
+          className="mb-4"
+        />
+      )}
+
+      {/* Bulk Edit Controls */}
+      <Card className={`${getCardClasses()} mb-4`}>
+        <Title level={5}>Bulk Edit ({selectedRooms.length} selected)</Title>
+        <Row gutter={16}>
+          <Col span={8}>
+            <Select
+              placeholder="Change room type"
+              className="w-full"
+              onChange={(value) => handleBulkUpdate("roomTypeId", value)}
+            >
+              {roomTypes.map((type) => (
+                <Select.Option key={type._id} value={type._id}>
+                  {type.typeName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col span={8}>
+            <Input
+              placeholder="Set description"
+              onBlur={(e) => handleBulkUpdate("description", e.target.value)}
+            />
+          </Col>
+          <Col span={8}>
+            <Upload
+              accept="image/*"
+              beforeUpload={(file) => {
+                handleBulkUpdate("image", file);
+                return false;
+              }}
+              showUploadList={false}
+            >
+              <Button icon={<CameraOutlined />}>Set Image</Button>
+            </Upload>
+          </Col>
+        </Row>
+      </Card>
+
+      {/* Rooms by Floor */}
+      <Collapse defaultActiveKey={Object.keys(roomsByFloor)}>
+        {Object.entries(roomsByFloor).map(([floor, floorRooms]) => (
+          <Panel
+            key={floor}
+            header={
+              <div className="flex items-center justify-between">
+                <Text strong>
+                  Floor {floor} ({floorRooms.length} rooms)
+                </Text>
+                <Checkbox
+                  checked={floorRooms.every((room) =>
+                    selectedRooms.includes(room.id)
+                  )}
+                  indeterminate={
+                    floorRooms.some((room) =>
+                      selectedRooms.includes(room.id)
+                    ) &&
+                    !floorRooms.every((room) => selectedRooms.includes(room.id))
+                  }
+                  onChange={(e) =>
+                    handleFloorSelection(parseInt(floor), e.target.checked)
+                  }
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Select All
+                </Checkbox>
+              </div>
+            }
+          >
+            <Row gutter={16}>
+              {floorRooms.map((room) => (
+                <Col span={12} key={room.id} className="mb-4">
+                  <Card
+                    size="small"
+                    className={`${getCardClasses()} ${
+                      room.hasError ? "border-red-500" : ""
+                    }`}
+                    title={
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Checkbox
+                            checked={selectedRooms.includes(room.id)}
+                            onChange={(e) =>
+                              handleRoomSelection(room.id, e.target.checked)
+                            }
+                          />
+                          <Text className="ml-2">{room.roomNumber}</Text>
+                          {room.hasError && (
+                            <ExclamationCircleOutlined className="text-red-500 ml-2" />
+                          )}
+                        </div>
+                        <Button
+                          size="small"
+                          icon={<EditOutlined />}
+                          onClick={() => setEditingRoom(room.id)}
+                        />
+                      </div>
+                    }
+                  >
+                    {room.hasError && (
+                      <Alert
+                        message={room.errorMessage}
+                        type="error"
+                        size="small"
+                        className="mb-2"
+                      />
+                    )}
+
+                    <div className="space-y-2">
+                      <div>
+                        <Text type="secondary">Room Type:</Text>
+                        <Text className="ml-2">
+                          {roomTypes.find((t) => t._id === room.roomTypeId)
+                            ?.typeName || "Not selected"}
+                        </Text>
+                      </div>
+                      <div>
+                        <Text type="secondary">Description:</Text>
+                        <Text className="ml-2">
+                          {room.description || "No description"}
+                        </Text>
+                      </div>
+                      <div>
+                        <Text type="secondary">Image:</Text>
+                        <Text className="ml-2">
+                          {room.image ? "Uploaded" : "Not uploaded"}
+                        </Text>
+                      </div>
+                    </div>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </Panel>
+        ))}
+      </Collapse>
+
+      {/* Edit Room Modal */}
+      <Modal
+        title={`Edit Room ${
+          editingRoom ? rooms.find((r) => r.id === editingRoom)?.roomNumber : ""
+        }`}
+        open={editingRoom !== null}
+        onCancel={() => setEditingRoom(null)}
+        footer={null}
+        width={600}
+      >
+        {editingRoom &&
+          (() => {
+            const room = rooms.find((r) => r.id === editingRoom);
+            return (
+              <div className="space-y-4">
+                <div>
+                  <Text strong>Room Number:</Text>
+                  <Input
+                    value={room.roomNumber}
+                    onChange={(e) =>
+                      handleRoomUpdate(
+                        editingRoom,
+                        "roomNumber",
+                        e.target.value
+                      )
+                    }
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Text strong>Room Type:</Text>
+                  <Select
+                    value={room.roomTypeId}
+                    onChange={(value) =>
+                      handleRoomUpdate(editingRoom, "roomTypeId", value)
+                    }
+                    className="w-full mt-1"
+                  >
+                    {roomTypes.map((type) => (
+                      <Select.Option key={type._id} value={type._id}>
+                        {type.typeName}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <Text strong>Description:</Text>
+                  <Input.TextArea
+                    value={room.description}
+                    onChange={(e) =>
+                      handleRoomUpdate(
+                        editingRoom,
+                        "description",
+                        e.target.value
+                      )
+                    }
+                    rows={3}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Text strong>Image:</Text>
+                  <Upload
+                    accept="image/*"
+                    beforeUpload={(file) => {
+                      handleRoomUpdate(editingRoom, "image", file);
+                      return false;
+                    }}
+                    showUploadList={false}
+                    className="mt-1"
+                  >
+                    <Button icon={<CameraOutlined />}>
+                      {room.image ? "Change Image" : "Upload Image"}
+                    </Button>
+                  </Upload>
+                </div>
+              </div>
+            );
+          })()}
+      </Modal>
+    </div>
+  );
+
   return (
     <div>
       <div className="flex justify-between mb-4 ml-2">
         <Button
-          title={t("roomManagement.addRoom.button.addRoom")}
+          title={t("roomManagement.bulkAddRoom.button.bulkAddRoom")}
           btnAdd
           size="large"
           onClick={() => setVisible(true)}
@@ -103,345 +680,50 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
 
       <Modal
         confirmLoading={loadingSubmit}
-        title={t("roomManagement.addRoom.modal.title")}
+        title={
+          step === 1
+            ? "Bulk Add Rooms - Configuration"
+            : "Bulk Add Rooms - Review"
+        }
         onCancel={onCancel}
         open={visible}
-        onOk={form.submit}
-        okText={t("roomManagement.addRoom.modal.okText")}
-        cancelText={t("roomManagement.common.cancel")}
+        width={step === 1 ? 800 : 1200}
+        footer={
+          <div className="flex justify-between">
+            <div>
+              {step === 2 && (
+                <Button onClick={() => setStep(1)}>
+                  Back to Configuration
+                </Button>
+              )}
+            </div>
+            <div>
+              <Button onClick={onCancel} className="mr-2">
+                Cancel
+              </Button>
+              {step === 1 ? (
+                <Button type="primary" onClick={() => form.submit()}>
+                  Generate Rooms
+                </Button>
+              ) : (
+                <Button
+                  type="primary"
+                  onClick={onBulkSubmit}
+                  loading={loadingSubmit}
+                  disabled={rooms.some((room) => room.hasError)}
+                >
+                  Create All Rooms ({rooms.length})
+                </Button>
+              )}
+            </div>
+          </div>
+        }
         destroyOnClose
-        width={900}
-        className="add-room-modal"
       >
-        <Form layout="vertical" form={form} onFinish={onFinish}>
-          <Row gutter={24} align="stretch">
-            {/* Left side - Room Image */}
-            <Col span={10}>
-              <Form.Item
-                label={
-                  <Text strong className={`${getTextColor()}`}>
-                    {t("roomManagement.addRoom.form.image.label")}
-                  </Text>
-                }
-                name="image"
-                extra={
-                  <Text
-                    className={`
-                      ${darkMode ? "text-gray-400" : "text-gray-500"}`}
-                  >
-                    {t("roomManagement.addRoom.form.image.extra")}
-                  </Text>
-                }
-                className="upload-form-item"
-              >
-                <div
-                  className={`${getImageContainerClasses()} rounded-xl h-[380px] flex items-center justify-center relative overflow-hidden border-2 border-dashed transition-all duration-300 hover:border-blue-500`}
-                >
-                  {fileList.length > 0 ? (
-                    <img
-                      src={
-                        fileList[0].url ||
-                        URL.createObjectURL(fileList[0].originFileObj)
-                      }
-                      alt="Room Preview"
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center text-gray-500">
-                      <CameraOutlined
-                        className={`text-6xl mb-4 ${
-                          darkMode ? "text-blue-400" : "text-blue-600"
-                        }`}
-                      />
-                      <Text
-                        className={`${
-                          darkMode ? "text-gray-300" : "text-gray-600"
-                        } font-medium text-center text-lg`}
-                      >
-                        {t("roomManagement.addRoom.form.image.uploadText")}
-                      </Text>
-                      <Text
-                        className={`${
-                          darkMode ? "text-gray-400" : "text-gray-500"
-                        } text-sm mt-2 text-center`}
-                      >
-                        {t("roomManagement.addRoom.form.image.uploadHint")}
-                      </Text>
-                      <Text
-                        className={`${
-                          darkMode ? "text-gray-500" : "text-gray-400"
-                        } text-xs mt-1 text-center`}
-                      >
-                        {t(
-                          "roomManagement.addRoom.form.image.supportedFormats"
-                        )}
-                      </Text>
-                    </div>
-                  )}
-
-                  {/* Upload overlay */}
-                  <Upload
-                    fileList={[]}
-                    maxCount={1}
-                    accept="image/png,image/jpeg,image/jpg,image/webp"
-                    beforeUpload={(file) => {
-                      const isImage = file.type.startsWith("image/");
-                      if (!isImage) {
-                        toast.error(
-                          t(
-                            "roomManagement.addRoom.validation.invalidImageType"
-                          )
-                        );
-                        return false;
-                      }
-                      const isLt5M = file.size / 1024 / 1024 < 5;
-                      if (!isLt5M) {
-                        toast.error(
-                          t("roomManagement.addRoom.validation.imageSizeLimit")
-                        );
-                        return false;
-                      }
-
-                      // Add file to fileList
-                      const newFile = {
-                        uid: Date.now().toString(),
-                        name: file.name,
-                        status: "done",
-                        originFileObj: file,
-                      };
-                      setFileList([newFile]);
-                      return false; // Prevent auto upload
-                    }}
-                    showUploadList={false}
-                    className="absolute inset-0"
-                  >
-                    <div className="absolute inset-0 bg-blue-600/10 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer rounded-lg">
-                      <div className="bg-white dark:bg-gray-700 rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
-                        <CameraOutlined
-                          className={`${
-                            darkMode ? "text-blue-400" : "text-blue-600"
-                          }`}
-                        />
-                      </div>
-                    </div>
-                  </Upload>
-                </div>
-              </Form.Item>
-            </Col>
-
-            {/* Right side - Form fields */}
-            <Col span={14}>
-              <div className="form-fields-container h-[380px] flex flex-col justify-between">
-                {/* Room Type */}
-                <Form.Item
-                  label={
-                    <Text strong className={`${getTextColor()}`}>
-                      {t("roomManagement.addRoom.form.roomType.label")}
-                    </Text>
-                  }
-                  name="roomType"
-                  rules={[
-                    {
-                      required: true,
-                      message: t(
-                        "roomManagement.addRoom.form.roomType.required"
-                      ),
-                    },
-                  ]}
-                  className="form-field-item"
-                >
-                  <Select
-                    size="large"
-                    placeholder={t(
-                      "roomManagement.addRoom.form.roomType.placeholder"
-                    )}
-                    showSearch
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    className={`rounded-lg h-14 ${
-                      darkMode
-                        ? "[&_.ant-select-selector]:bg-gray-700 [&_.ant-select-selector]:border-gray-600 [&_.ant-select-selector]:text-gray-200"
-                        : ""
-                    }`}
-                  >
-                    {roomTypes.map((roomType) => (
-                      <Select.Option key={roomType._id} value={roomType._id}>
-                        {roomType.typeName}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-
-                {/* Room Number */}
-                <Form.Item
-                  label={
-                    <Text strong className={`${getTextColor()}`}>
-                      {t("roomManagement.addRoom.form.roomNumber.label")}
-                    </Text>
-                  }
-                  name="roomNumber"
-                  rules={[
-                    {
-                      required: true,
-                      message: t(
-                        "roomManagement.addRoom.form.roomNumber.required"
-                      ),
-                    },
-                  ]}
-                  className="form-field-item"
-                >
-                  <Input
-                    size="large"
-                    placeholder={t(
-                      "roomManagement.addRoom.form.roomNumber.placeholder"
-                    )}
-                    className={`rounded-lg h-14 ${
-                      darkMode
-                        ? "bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
-                        : ""
-                    }`}
-                  />
-                </Form.Item>
-
-                {/* Description */}
-                <Form.Item
-                  label={
-                    <Text strong className={`${getTextColor()}`}>
-                      {t("roomManagement.addRoom.form.description.label")}
-                    </Text>
-                  }
-                  name="description"
-                  rules={[
-                    {
-                      required: true,
-                      message: t(
-                        "roomManagement.addRoom.form.description.required"
-                      ),
-                    },
-                  ]}
-                  className="form-field-item flex-1"
-                >
-                  <Input.TextArea
-                    size="large"
-                    placeholder={t(
-                      "roomManagement.addRoom.form.description.placeholder"
-                    )}
-                    autoSize={{ minRows: 5, maxRows: 7 }}
-                    showCount
-                    maxLength={500}
-                    className={`rounded-lg ${
-                      darkMode
-                        ? "bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
-                        : ""
-                    }`}
-                  />
-                </Form.Item>
-              </div>
-            </Col>
-          </Row>
-        </Form>
+        {step === 1 ? renderConfigurationStep() : renderReviewStep()}
       </Modal>
-
-      <style jsx>{`
-        .add-room-modal .ant-modal-body {
-          padding: 24px;
-        }
-
-        .add-room-modal .ant-modal-header {
-          border-bottom: 1px solid ${darkMode ? "#374151" : "#f0f0f0"};
-          background: ${darkMode ? "#1f2937" : "#fff"};
-        }
-
-        .add-room-modal .ant-modal-content {
-          background: ${darkMode ? "#1f2937" : "#fff"};
-        }
-
-        .add-room-modal .ant-modal-footer {
-          border-top: 1px solid ${darkMode ? "#374151" : "#f0f0f0"};
-          background: ${darkMode ? "#1f2937" : "#fff"};
-        }
-
-        /* Upload container styling */
-        .upload-form-item {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .upload-form-item .ant-form-item-control {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        /* Form fields container */
-        .form-fields-container {
-          padding: 4px 0;
-        }
-
-        .form-field-item {
-          margin-bottom: 16px;
-        }
-
-        .form-field-item:last-child {
-          margin-bottom: 0;
-        }
-
-        .form-field-item.flex-1 {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .form-field-item.flex-1 .ant-form-item-control {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .form-field-item.flex-1 .ant-form-item-control-input {
-          flex: 1;
-        }
-
-        .form-field-item.flex-1 .ant-input {
-          height: 100% !important;
-          min-height: 120px;
-        }
-
-        /* Dark mode specific styles */
-        ${darkMode
-          ? `
-          .add-room-modal .ant-modal-title {
-            color: #f3f4f6;
-          }
-          
-          .add-room-modal .ant-form-item-label > label {
-            color: #f3f4f6;
-          }
-          
-          .add-room-modal .ant-form-item-extra {
-            color: #9ca3af;
-          }
-        `
-          : ""}
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-          .add-room-modal {
-            width: 95% !important;
-            max-width: none !important;
-          }
-
-          .form-fields-container {
-            height: auto !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
 
-export default AddRoom;
+export default BulkAddRoom;
