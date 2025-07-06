@@ -1,5 +1,6 @@
 {
   "table": {
+        "tableName": "Renewal Request",
     "tenantName": "Tenant Name",
     "roomNumber": "Room Number",
     "boardingHouse": "Boarding House",
