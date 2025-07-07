@@ -27,5 +27,6 @@
     "deleteSuccess": "Phản hồi đã được xoá.",
     "deleteFailed": "Xoá phản hồi thất bại.",
     "emptyReply": "Nội dung phản hồi không được để trống."
-  }
+  },
+  "replyPlaceholder": "Nhập phản hồi tại đây..."
 }

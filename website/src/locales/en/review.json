@@ -27,5 +27,7 @@
     "deleteSuccess": "Reply deleted successfully.",
     "deleteFailed": "Failed to delete reply.",
     "emptyReply": "Reply content cannot be empty."
-  }
+  },
+    "replyPlaceholder": "Enter reply content..."
+
 }

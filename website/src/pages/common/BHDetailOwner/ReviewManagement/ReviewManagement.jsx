@@ -3,18 +3,20 @@ import { TableCustom as Table, Button } from '@/component';
 import { Modal, Input, Image, Space, Tooltip, Avatar } from 'antd';
 import { useTranslation } from 'react-i18next';
 import convertTimetap from '@/utils/convertTimetap';
-import { getReviewByBhId } from '@/api/ownerUser/boardingHouseAPI';
 import {
   replyReview,
   updateReplyReview,
   softDeleteReplyReview,
 } from '@/api/reviewAPI';
+import { getReviewByBhId } from '@/api/ownerUser/boardingHouseAPI';
 import { toast } from 'react-toastify';
+import { useTheme } from '@/context/themeContext';
 
 const { TextArea } = Input;
 
 function ReviewManagement({ boardingHouseId }) {
   const { t } = useTranslation('review');
+  const { darkMode } = useTheme();
 
   const [reviewList, setReviewList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,6 @@ function ReviewManagement({ boardingHouseId }) {
     limit: 10,
   });
 
-  // Fetch reviews
   useEffect(() => {
     const fetchReviews = async () => {
       if (!boardingHouseId) return;
@@ -155,8 +156,6 @@ function ReviewManagement({ boardingHouseId }) {
           )
         );
         handleCloseModal();
-        setReplyContent('');
-        setEditingReply(false);
       } else {
         throw new Error(res.data?.message);
       }
@@ -233,7 +232,7 @@ function ReviewManagement({ boardingHouseId }) {
   ];
 
   return (
-    <div>
+    <div className={darkMode ? 'bg-gray-900 text-white' : ''}>
       <Table
         tableName={t('tableName')}
         data={reviewList}
@@ -251,6 +250,11 @@ function ReviewManagement({ boardingHouseId }) {
         onCancel={handleCloseModal}
         footer={null}
         title={t('detail.title')}
+        className={darkMode ? 'dark-modal' : ''}
+        bodyStyle={{
+          backgroundColor: darkMode ? '#111827' : undefined,
+          color: darkMode ? '#f9fafb' : undefined,
+        }}
       >
         {selectedReview && (
           <div>
@@ -280,7 +284,11 @@ function ReviewManagement({ boardingHouseId }) {
                     src={img.imageUrl}
                     width={80}
                     height={80}
-                    style={{ objectFit: 'cover', borderRadius: 4 }}
+                    style={{
+                      objectFit: 'cover',
+                      borderRadius: 4,
+                      backgroundColor: darkMode ? '#374151' : '#f0f0f0',
+                    }}
                   />
                 ))}
               </Space>
@@ -294,6 +302,13 @@ function ReviewManagement({ boardingHouseId }) {
                 rows={3}
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
+                placeholder={
+                  t('replyPlaceholder') || 'Enter your reply here...'
+                }
+                style={{
+                  backgroundColor: darkMode ? '#374151' : '#fff',
+                  color: darkMode ? '#fff' : undefined,
+                }}
               />
 
               <Space style={{ marginTop: 16 }}>
