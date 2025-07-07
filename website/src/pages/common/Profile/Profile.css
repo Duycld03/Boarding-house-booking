@@ -236,7 +236,7 @@
 
 /* Profile.css hoặc global.css */
 /* ✅ Chỉ áp dụng cho avatar upload trong profile */
-.avatarUpload .ant-upload-select {
+.avatarUpload .ant-upload.ant-upload-select{
   width: 200px !important;
   height: 200px !important;
 }
