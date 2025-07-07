@@ -1,0 +1,19 @@
+{
+  "table": {
+    "reviewer": "Reviewer",
+    "content": "Content",
+    "date": "Date & Time"
+  },
+  "detail": {
+    "title": "Review Details",
+    "reviewer": "Reviewer",
+    "content": "Content",
+    "time": "Review Time",
+    "reply": "Reply"
+  },
+  "actions": {
+    "reply": "Reply",
+    "update": "Update",
+    "delete": "Delete"
+  }
+}

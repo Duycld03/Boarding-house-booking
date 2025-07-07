@@ -1,0 +1,19 @@
+{
+  "table": {
+    "reviewer": "Người đánh giá",
+    "content": "Nội dung",
+    "date": "Ngày giờ"
+  },
+  "detail": {
+    "title": "Chi tiết đánh giá",
+    "reviewer": "Người đánh giá",
+    "content": "Nội dung",
+    "time": "Thời gian đánh giá",
+    "reply": "Phản hồi"
+  },
+  "actions": {
+    "reply": "Phản hồi",
+    "update": "Cập nhật",
+    "delete": "Xoá"
+  }
+}

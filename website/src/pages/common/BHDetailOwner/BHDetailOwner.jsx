@@ -46,6 +46,7 @@ import './darkModeOverrides.css';
 import { useCurrentUser } from '@/context/userContext';
 import userRole from '@/constants/userRole';
 import BoardingHouseForm from './BoardingHouseForm';
+import ReviewManagement from './ReviewManagement';
 
 const { TabPane } = Tabs;
 
@@ -473,6 +474,9 @@ const BHDetailOwner = () => {
           key="rentPaymentManagement"
         >
           <RentPaymentManagement />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={t('tabs.reviewManagement')} key="reviewManagement">
+          <ReviewManagement />
         </Tabs.TabPane>
       </Tabs>
     </div>
