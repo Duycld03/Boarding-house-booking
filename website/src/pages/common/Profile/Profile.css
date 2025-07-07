@@ -57,11 +57,11 @@
 }
 
 /* Dark mode styles for form labels */
-.dark-form .ant-form-item-label > label {
+.dark-form .ant-form-item-label>label {
   color: #e5e5e5 !important;
 }
 
-.dark-form .ant-form-item-label > label.ant-form-item-required::before {
+.dark-form .ant-form-item-label>label.ant-form-item-required::before {
   color: #ff4d4f !important;
 }
 
@@ -144,7 +144,6 @@
 
 /* Dark mode styles for buttons in forms */
 .dark-form .ant-btn-default {
-  background-color: #2a2a2a !important;
   border-color: #555555 !important;
   color: #e5e5e5 !important;
 }
@@ -224,7 +223,8 @@
   }
 
   .dark-form .ant-input {
-    font-size: 16px; /* Prevent zoom on mobile */
+    font-size: 16px;
+    /* Prevent zoom on mobile */
   }
 }
 
@@ -233,7 +233,10 @@
   transition: background-color 0.3s ease, border-color 0.3s ease,
     color 0.3s ease !important;
 }
-.ant-upload-select {
+
+/* Profile.css hoặc global.css */
+/* ✅ Chỉ áp dụng cho avatar upload trong profile */
+.avatarUpload .ant-upload-select {
   width: 200px !important;
   height: 200px !important;
 }
