@@ -1,81 +1,170 @@
-import { useState } from 'react';
-import { Table, Modal, Button, Input, Image, Space } from 'antd';
+import { useEffect, useState } from 'react';
+import { TableCustom as Table, Button } from '@/component';
+import { Modal, Input, Image, Space, Tooltip, Avatar } from 'antd';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
+import convertTimetap from '@/utils/convertTimetap';
+import { getReviewByBhId } from '@/api/ownerUser/boardingHouseAPI';
+import {
+  replyReview,
+  updateReplyReview,
+  softDeleteReplyReview,
+} from '@/api/reviewAPI';
+import { toast } from 'react-toastify';
 
 const { TextArea } = Input;
 
-function ReviewManagement({ reviews }) {
+function ReviewManagement({ boardingHouseId }) {
   const { t } = useTranslation('review');
 
-  // Dữ liệu cứng nếu không truyền từ props
-  const defaultReviews = [
-    {
-      id: 1,
-      reviewerName: 'John Doe',
-      content: 'The room was clean and well-maintained.',
-      createdAt: '2025-07-06T14:00:00Z',
-      images: ['https://via.placeholder.com/100'],
-      reply: '',
-    },
-    {
-      id: 2,
-      reviewerName: 'Jane Smith',
-      content: 'Great location and helpful staff!',
-      createdAt: '2025-07-05T10:30:00Z',
-      images: [],
-      reply: 'Thank you for your kind words!',
-    },
-    {
-      id: 3,
-      reviewerName: 'Nguyen Van A',
-      content: 'Ổn nhưng cần cải thiện wifi.',
-      createdAt: '2025-07-04T08:20:00Z',
-      images: ['https://via.placeholder.com/120'],
-      reply: '',
-    },
-  ];
-
-  const [reviewList, setReviewList] = useState(reviews || defaultReviews);
+  const [reviewList, setReviewList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedReview, setSelectedReview] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [editingReply, setEditingReply] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!boardingHouseId) return;
+
+      try {
+        setLoading(true);
+        const response = await getReviewByBhId(boardingHouseId, {
+          page: pagination.currentPage,
+          limit: pagination.limit,
+        });
+
+        if (response?.success && Array.isArray(response.data)) {
+          setReviewList(response.data);
+          setPagination((prev) => ({
+            ...prev,
+            totalItems: response.pagination?.totalItems || response.data.length,
+          }));
+        } else {
+          toast.error(t('messages.fetchFailed'));
+        }
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message || t('messages.fetchFailed')
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [boardingHouseId, pagination.currentPage, pagination.limit, t]);
 
   const handleRowClick = (record) => {
     setSelectedReview(record);
-    setReplyContent(record.reply || '');
-    setEditingReply(!!record.reply);
+    setReplyContent(record.replyContent?.content || '');
+    setEditingReply(!!record.replyContent?.content);
     setIsModalVisible(true);
   };
 
-  const handleReply = () => {
-    if (!replyContent.trim()) return;
-    setReviewList((prev) =>
-      prev.map((item) =>
-        item.id === selectedReview.id ? { ...item, reply: replyContent } : item
-      )
-    );
-    setEditingReply(true);
+  const handleReply = async () => {
+    if (!replyContent.trim()) return toast.error(t('messages.emptyReply'));
+    if (!selectedReview?._id) return;
+
+    try {
+      setActionLoading(true);
+      const res = await replyReview({
+        parentId: selectedReview._id,
+        content: replyContent.trim(),
+      });
+
+      if (res.success) {
+        toast.success(t('messages.replySuccess'));
+        setReviewList((prev) =>
+          prev.map((item) =>
+            item._id === selectedReview._id
+              ? { ...item, replyContent: { content: replyContent.trim() } }
+              : item
+          )
+        );
+        setEditingReply(true);
+        handleCloseModal();
+      } else {
+        throw new Error(res.data?.message);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || t('messages.replyFailed'));
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const handleUpdateReply = () => {
-    if (!replyContent.trim()) return;
-    setReviewList((prev) =>
-      prev.map((item) =>
-        item.id === selectedReview.id ? { ...item, reply: replyContent } : item
-      )
-    );
+  const handleUpdateReply = async () => {
+    if (!replyContent.trim()) return toast.error(t('messages.emptyReply'));
+    if (!selectedReview?.replyContent?._id) return;
+
+    try {
+      setActionLoading(true);
+      const res = await updateReplyReview({
+        replyId: selectedReview.replyContent._id,
+        content: replyContent.trim(),
+      });
+
+      if (res.success) {
+        toast.success(t('messages.updateSuccess'));
+        setReviewList((prev) =>
+          prev.map((item) =>
+            item._id === selectedReview._id
+              ? {
+                  ...item,
+                  replyContent: {
+                    ...item.replyContent,
+                    content: replyContent.trim(),
+                  },
+                }
+              : item
+          )
+        );
+        handleCloseModal();
+      } else {
+        throw new Error(res.data?.message);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || t('messages.updateFailed'));
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const handleDeleteReply = () => {
-    setReviewList((prev) =>
-      prev.map((item) =>
-        item.id === selectedReview.id ? { ...item, reply: '' } : item
-      )
-    );
-    setReplyContent('');
-    setEditingReply(false);
+  const handleDeleteReply = async () => {
+    if (!selectedReview?.replyContent?._id) return;
+
+    try {
+      setActionLoading(true);
+      const res = await softDeleteReplyReview(selectedReview.replyContent._id);
+
+      if (res.success) {
+        toast.success(t('messages.deleteSuccess'));
+        setReviewList((prev) =>
+          prev.map((item) =>
+            item._id === selectedReview._id
+              ? { ...item, replyContent: null }
+              : item
+          )
+        );
+        handleCloseModal();
+        setReplyContent('');
+        setEditingReply(false);
+      } else {
+        throw new Error(res.data?.message);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || t('messages.deleteFailed'));
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -85,36 +174,76 @@ function ReviewManagement({ reviews }) {
     setEditingReply(false);
   };
 
+  const handleTableChange = (paginationData) => {
+    setPagination((prev) => ({
+      ...prev,
+      currentPage: paginationData.current,
+      limit: paginationData.pageSize,
+    }));
+  };
+
+  const tablePaginationConfig = {
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
+  };
+
   const columns = [
     {
       title: t('table.reviewer'),
-      dataIndex: 'reviewerName',
-      key: 'reviewerName',
+      key: 'reviewer',
+      render: (_, record) => (
+        <Space>
+          <Avatar
+            src={record.accountId?.avatarImage?.url}
+            alt="avatar"
+            size={32}
+          />
+          <span>{record.accountId?.fullname || '-'}</span>
+        </Space>
+      ),
     },
     {
       title: t('table.content'),
       dataIndex: 'content',
       key: 'content',
+      render: (text) => (
+        <Tooltip title={text}>
+          <span
+            style={{
+              display: 'inline-block',
+              maxWidth: 200,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {text}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       title: t('table.date'),
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (text) => dayjs(text).format('DD/MM/YYYY HH:mm'),
+      render: (text) => convertTimetap(text, true),
     },
   ];
 
   return (
     <div>
       <Table
-        rowKey="id"
-        dataSource={reviewList}
+        tableName={t('tableName')}
+        data={reviewList}
         columns={columns}
-        onRow={(record) => ({
-          onClick: () => handleRowClick(record),
-        })}
+        loading={loading}
+        onRowClick={handleRowClick}
         scroll={{ x: 600 }}
         style={{ cursor: 'pointer' }}
+        pagination={tablePaginationConfig}
+        onChange={handleTableChange}
       />
 
       <Modal
@@ -125,27 +254,39 @@ function ReviewManagement({ reviews }) {
       >
         {selectedReview && (
           <div>
-            <p>
-              <strong>{t('detail.reviewer')}:</strong>{' '}
-              {selectedReview.reviewerName}
-            </p>
+            <Space align="center" style={{ marginBottom: 8 }}>
+              <Avatar
+                src={selectedReview.accountId?.avatarImage?.url}
+                alt="avatar"
+              />
+              <span>{selectedReview.accountId?.fullname}</span>
+            </Space>
             <p>
               <strong>{t('detail.content')}:</strong> {selectedReview.content}
             </p>
             <p>
               <strong>{t('detail.time')}:</strong>{' '}
-              {dayjs(selectedReview.createdAt).format('DD/MM/YYYY HH:mm')}
+              {convertTimetap(selectedReview.createdAt, true)}
+            </p>
+            <p>
+              <strong>{t('detail.image')}:</strong>
             </p>
 
             {selectedReview.images?.length > 0 && (
-              <Space style={{ marginBottom: 16 }}>
+              <Space style={{ flexWrap: 'wrap' }}>
                 {selectedReview.images.map((img, idx) => (
-                  <Image key={idx} src={img} width={80} height={80} />
+                  <Image
+                    key={idx}
+                    src={img.imageUrl}
+                    width={80}
+                    height={80}
+                    style={{ objectFit: 'cover', borderRadius: 4 }}
+                  />
                 ))}
               </Space>
             )}
 
-            <div style={{ marginTop: 20 }}>
+            <div>
               <p>
                 <strong>{t('detail.reply')}:</strong>
               </p>
@@ -157,18 +298,27 @@ function ReviewManagement({ reviews }) {
 
               <Space style={{ marginTop: 16 }}>
                 {!editingReply && (
-                  <Button type="primary" onClick={handleReply}>
-                    {t('actions.reply')}
-                  </Button>
+                  <Button
+                    onClick={handleReply}
+                    loading={actionLoading}
+                    title={t('actions.reply')}
+                    btnReplay
+                  />
                 )}
                 {editingReply && (
                   <>
-                    <Button type="primary" onClick={handleUpdateReply}>
-                      {t('actions.update')}
-                    </Button>
-                    <Button danger onClick={handleDeleteReply}>
-                      {t('actions.delete')}
-                    </Button>
+                    <Button
+                      onClick={handleUpdateReply}
+                      loading={actionLoading}
+                      title={t('actions.update')}
+                      btnUpdate
+                    />
+                    <Button
+                      onClick={handleDeleteReply}
+                      loading={actionLoading}
+                      title={t('actions.delete')}
+                      btnDelete
+                    />
                   </>
                 )}
               </Space>

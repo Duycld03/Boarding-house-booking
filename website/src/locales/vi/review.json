@@ -1,4 +1,5 @@
 {
+  "tableName": "Đánh giá",
   "table": {
     "reviewer": "Người đánh giá",
     "content": "Nội dung",
@@ -9,11 +10,22 @@
     "reviewer": "Người đánh giá",
     "content": "Nội dung",
     "time": "Thời gian đánh giá",
-    "reply": "Phản hồi"
+    "reply": "Phản hồi",
+    "image": "Ảnh"
   },
   "actions": {
     "reply": "Phản hồi",
     "update": "Cập nhật",
     "delete": "Xoá"
+  },
+  "messages": {
+    "fetchFailed": "Không thể tải danh sách đánh giá.",
+    "replySuccess": "Phản hồi đã được gửi thành công!",
+    "replyFailed": "Gửi phản hồi thất bại.",
+    "updateSuccess": "Cập nhật phản hồi thành công!",
+    "updateFailed": "Cập nhật phản hồi thất bại.",
+    "deleteSuccess": "Phản hồi đã được xoá.",
+    "deleteFailed": "Xoá phản hồi thất bại.",
+    "emptyReply": "Nội dung phản hồi không được để trống."
   }
 }

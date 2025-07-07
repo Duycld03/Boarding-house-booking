@@ -476,7 +476,7 @@ const BHDetailOwner = () => {
           <RentPaymentManagement />
         </Tabs.TabPane>
         <Tabs.TabPane tab={t('tabs.reviewManagement')} key="reviewManagement">
-          <ReviewManagement />
+          <ReviewManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
       </Tabs>
     </div>
