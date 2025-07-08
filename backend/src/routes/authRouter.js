@@ -79,6 +79,7 @@ authRouter.post(
 );
 authRouter.get("/reports", reportController.getReportByUserId);
 authRouter.get("/reports/:reportId", reportController.getReportReviewDetail);
+authRouter.get('/review-reports', reportController.getReviewReports);
 
 //review
 authRouter.put(

@@ -15,7 +15,7 @@ import { useCurrentUser } from '@/context/userContext';
 import { deleteReviewUser } from '@/API/reviewAPI';
 import { useNotification } from "@/context/NotificationProvider";
 import { ConfirmModal } from '@/components/feedback';
-
+import { getReviewReportsAuth } from '@/API/reportAPI';
 
 // Enable relative time plugin
 dayjs.extend(relativeTime);
@@ -34,7 +34,7 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
     const [deleteReviewId, setDeleteReviewId] = useState(null);
     const { showSuccess, showError } = useNotification();
     const [loading, setLoading] = useState(false);
-
+    const [showReviewError, setShowReviewError] = useState(false);
     // State for image modal
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -151,7 +151,7 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
     };
 
     const Wrapper = onPress ? TouchableOpacity : View;
-    const handleMenuAction = (action) => {
+    const handleMenuAction = async (action) => {
         if (action === 'report' && !isLogin) {
             router.push('/login');
             return;
@@ -171,7 +171,17 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigatio
                     showError("Review ID is missing or invalid!");
                     return;
                 }
+                const getReports = await getReviewReportsAuth()
 
+                if (!user?._id || !getReports) return false;
+                if (getReports.some(
+                    (report) =>
+                        // review.accountId === user._id ||
+                        report.reporter?._id === user._id
+                )) {
+                    showError(t("reviewCard.alreadyReported"));
+                    return false;
+                }
                 router.push({
                     pathname: "/(screens)/BhDetail/report",
                     params: {
