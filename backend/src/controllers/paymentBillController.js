@@ -3,47 +3,60 @@ import Revenue from "../models/revenue.js";
 import Room from "../models/room.js";
 import UserPayment from "../models/userPayment.js";
 import DepositRoom from "../models/depositRoom.js";
+import paginate from "../utils/pagination.js";
 
 class PaymentBillController {
   async getPaymentBillByBoardingHouseId(req, res) {
     try {
       const { boardingHouseId } = req.params;
 
+      // First check if boarding house has rooms
       const rooms = await Room.find({ boardingHouseId });
-
       if (!rooms.length) {
-        return res
-          .status(404)
-          .json({ message: "No rooms found for this boarding house." });
+        return res.status(404).json({
+          success: false,
+          message: "No rooms found for this boarding house.",
+        });
       }
 
       const roomIds = rooms.map((room) => room._id);
 
-      const paymentBills = await PaymentBill.find({
-        roomId: { $in: roomIds },
-      })
-        .populate("roomId")
-        .sort({ createdAt: -1 });
+      // Setup pagination options with filter for payment bills
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: "createdAt",
+        sortOrder: "desc",
+        filter: {
+          roomId: { $in: roomIds },
+        },
+        allowQueryFilters: ["status", "month", "year"],
+        allowSearchFields: ["roomId", "status"],
+        populate: [
+          {
+            path: "roomId",
+            select: "roomNumber price",
+          },
+        ],
+        includeTotalData: true,
+      };
 
-      if (!paymentBills.length) {
-        return res
-          .status(404)
-          .json({ message: "No payment bills found for this boarding house." });
+      // Use pagination utility
+      const result = await paginate(PaymentBill, paginationOptions, req);
+
+      if (!result.success) {
+        return res.status(500).json(result);
       }
 
-      for (const bill of paymentBills) {
-        if (!bill.month || !bill.year) {
-          return res.status(400).json({
-            message: `Invalid month/year for room ${bill.roomId?.roomNumber}`,
+      // Format the payment bills data
+      const formattedBills = result.data.map((bill) => {
+        let totalFee = 0;
+        if (Array.isArray(bill.additionalFee)) {
+          bill.additionalFee.forEach((fee) => {
+            totalFee += fee.feeAmount || 0;
           });
         }
-      }
-
-      const formattedBills = paymentBills.map((bill) => {
-        let totalFee = 0;
-        bill.additionalFee.forEach((fee) => {
-          totalFee += fee.feeAmount || 0;
-        });
 
         return {
           _id: bill._id,
@@ -54,12 +67,28 @@ class PaymentBillController {
           electricalBill: bill.electricalBill?.totalAmount || 0,
           waterBill: bill.waterBill?.totalAmount || 0,
           paymentAmount: bill.paymentAmount || 0,
+          createdAt: bill.createdAt,
+          month: bill.month,
+          year: bill.year,
         };
       });
 
-      return res.status(200).json(formattedBills);
+      return res.status(200).json({
+        success: true,
+        data: formattedBills,
+        pagination: result.pagination,
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        limit: result.limit,
+        totalItems: result.pagination.totalItems,
+      });
     } catch (error) {
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.error("Error in getPaymentBillByBoardingHouseId:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        error: error.message,
+      });
     }
   }
 
@@ -70,7 +99,7 @@ class PaymentBillController {
         paymentAmount,
         electricalBill,
         waterBill,
-        additionalFees,
+        additionalFees = [],
       } = req.body;
 
       const now = new Date();
