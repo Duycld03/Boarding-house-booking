@@ -20,7 +20,8 @@ import ScreenContainer, {
 } from '@/components/layout/ScreenContainer';
 import { Picker } from '@react-native-picker/picker';
 import { useCallback } from 'react';
-
+import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import { fetchProvinces, fetchDistricts, fetchWards } from "@/API/apiAddress";
 const ExploreFilterScreen = () => {
   const router = useRouter();
   const [nameFilter, setNameFilter] = useState("");
@@ -39,7 +40,9 @@ const ExploreFilterScreen = () => {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
-
+  const selectedProvinceName = provinces.find(p => p.code === selectedProvince)?.name || '';
+  const selectedDistrictName = districts.find(d => d.code === selectedDistrict)?.name || '';
+  const selectedWardName = wards.find(w => w.code === selectedWard)?.name || '';
   const styles = getStyles(isDarkMode);
 
   useFocusEffect(
@@ -59,19 +62,19 @@ const ExploreFilterScreen = () => {
     }, [])
   );
 
-  const fetchAreas = async () => {
-    try {
-      const res = await getBhByArea();
-      const uniqueProvinces = [...new Set(res.map(bh => bh.address?.province).filter(Boolean))];
-      const uniqueDistricts = [...new Set(res.map(bh => bh.address?.district).filter(Boolean))];
-      const uniqueWards = [...new Set(res.map(bh => bh.address?.ward).filter(Boolean))];
-      setProvinces(uniqueProvinces);
-      setDistricts(uniqueDistricts);
-      setWards(uniqueWards);
-    } catch (err) {
-      console.error("Failed to fetch areas:", err);
-    }
-  };
+  // const fetchAreas = async () => {
+  //   try {
+  //     const res = await getBhByArea();
+  //     const uniqueProvinces = [...new Set(res.map(bh => bh.address?.province).filter(Boolean))];
+  //     const uniqueDistricts = [...new Set(res.map(bh => bh.address?.district).filter(Boolean))];
+  //     const uniqueWards = [...new Set(res.map(bh => bh.address?.ward).filter(Boolean))];
+  //     setProvinces(uniqueProvinces);
+  //     setDistricts(uniqueDistricts);
+  //     setWards(uniqueWards);
+  //   } catch (err) {
+  //     console.error("Failed to fetch areas:", err);
+  //   }
+  // };
   const fetchData = async () => {
     try {
       const priceRes = await getMaxPriceBHUser();
@@ -106,25 +109,63 @@ const ExploreFilterScreen = () => {
     router.push({
       pathname: "/(screens)/filterBH",
       params: {
-        name: nameFilter || "",
         priceRange: `${currentPrice[0]},${currentPrice[1]}`,
         boardingHouseType: selectedType || "",
         rating: ratings.join(","),
-        province: selectedProvince,
-        district: selectedDistrict,
-        ward: selectedWard,
+        province: selectedProvinceName,
+        district: selectedDistrictName,
+        ward: selectedWardName,
       },
     });
 
   };
+  const fetchAreas = async () => {
+    try {
+      const provincesData = await fetchProvinces();
+      setProvinces(provincesData);
+    } catch (err) {
+      console.error("Failed to fetch provinces:", err);
+    }
+  };
+
+  const handleProvinceChange = async (provinceCode) => {
+    setSelectedProvince(provinceCode);
+    setSelectedDistrict('');
+    setSelectedWard('');
+    try {
+      const districtsData = await fetchDistricts(provinceCode);
+      setDistricts(districtsData);
+      setWards([]); // reset wards
+    } catch (err) {
+      console.error("Failed to fetch districts:", err);
+    }
+  };
+
+  const handleDistrictChange = async (districtCode) => {
+    setSelectedDistrict(districtCode);
+    setSelectedWard('');
+    try {
+      const wardsData = await fetchWards(districtCode);
+      setWards(wardsData);
+    } catch (err) {
+      console.error("Failed to fetch wards:", err);
+    }
+  };
+  const pickerStyle = [
+    styles.input,
+    {
+      backgroundColor: isDarkMode ? '#1e1e1e' : '#fff',
+      color: isDarkMode ? '#fff' : '#000',
+    },
+  ];
 
   return (
     <ScreenContainer withPadding={false} className={isDarkMode ? 'bg-black' : 'bg-white'}>
-      <BackHeader title={t('filterTitle')} />
+      {/* <BackHeader title={t('filterTitle')} /> */}
       <ScrollContainer
         contentContainerStyle={{ padding: 16 }}
       >
-        <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 16 }}>
+        {/* <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 16 }}>
           {t("name")}
         </Text>
         <TextInput
@@ -140,32 +181,37 @@ const ExploreFilterScreen = () => {
           placeholderTextColor={isDarkMode ? "#9ca3af" : "#6b7280"}
           value={nameFilter}
           onChangeText={setNameFilter}
-        />
+        /> */}
 
-        <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 16 }}>
+        <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600' }}>
           {t("priceRange")}
         </Text>
-        <Text style={{ color: isDarkMode ? "#d1d5db" : "#374151", marginBottom: 4 }}>
-          {`${t("min")}: ${currentPrice[0]} - ${t("max")}: ${currentPrice[1]}`}
-        </Text>
-        <Slider
-          minimumValue={priceRange.min}
-          maximumValue={priceRange.max}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 14 }}>
+          <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
+            {t("min")}: {currentPrice[0].toLocaleString()}
+          </Text>
+          <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
+            {t("max")}: {currentPrice[1].toLocaleString()}
+          </Text>
+        </View>
+        <MultiSlider
+          values={currentPrice}
+          min={priceRange.min}
+          max={priceRange.max}
           step={100000}
-          value={currentPrice[1]}
-          onValueChange={(value) => setCurrentPrice([currentPrice[0], value])}
-          minimumTrackTintColor={isDarkMode ? "#60a5fa" : "#2563eb"}
-          maximumTrackTintColor={isDarkMode ? "#374151" : "#d1d5db"}
-          thumbTintColor={isDarkMode ? "#60a5fa" : "#2563eb"}
+          onValuesChange={(values) => setCurrentPrice(values)}
+          selectedStyle={{ backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb" }}
+          unselectedStyle={{ backgroundColor: isDarkMode ? "#374151" : "#d1d5db" }}
+          markerStyle={{ backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb" }}
         />
 
-        <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 16 }}>
+        <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 12 }}>
           {t("type")}
         </Text>
         {types.map((type: any) => (
           <TouchableOpacity
             key={type.value}
-            style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}
+            style={{ flexDirection: "row", alignItems: "center", marginBottom: 8, marginTop: 4 }}
             onPress={() => setSelectedType(type.value)}
           >
             <RadioButton
@@ -202,61 +248,36 @@ const ExploreFilterScreen = () => {
         </Text>
         <Picker
           selectedValue={selectedProvince}
-          onValueChange={(value) => setSelectedProvince(value)}
-          style={[
-            styles.input,
-            {
-              backgroundColor: isDarkMode ? '#1e1e1e' : '#fff',
-              color: isDarkMode ? '#fff' : '#000',
-            },
-          ]}
-          dropdownIconColor={isDarkMode ? '#fff' : '#000'}
+          onValueChange={handleProvinceChange}
+          style={pickerStyle}
         >
           <Picker.Item label={t("selectProvince")} value="" />
-          {provinces.map((p, index) => (
-            <Picker.Item key={index} label={p} value={p} />
+          {provinces.map((p) => (
+            <Picker.Item key={p.code} label={p.name} value={p.code} />
           ))}
         </Picker>
 
-        <Text style={[styles.label, { color: isDarkMode ? '#fff' : '#000' }]}>
-          {t("district")}
-        </Text>
+        {/* District Picker */}
         <Picker
           selectedValue={selectedDistrict}
-          onValueChange={(value) => setSelectedDistrict(value)}
-          style={[
-            styles.input,
-            {
-              backgroundColor: isDarkMode ? '#1e1e1e' : '#fff',
-              color: isDarkMode ? '#fff' : '#000',
-            },
-          ]}
-          dropdownIconColor={isDarkMode ? '#fff' : '#000'}
+          onValueChange={handleDistrictChange}
+          style={pickerStyle}
         >
           <Picker.Item label={t("selectDistrict")} value="" />
-          {districts.map((d, index) => (
-            <Picker.Item key={index} label={d} value={d} />
+          {districts.map((d) => (
+            <Picker.Item key={d.code} label={d.name} value={d.code} />
           ))}
         </Picker>
 
-        <Text style={[styles.label, { color: isDarkMode ? '#fff' : '#000' }]}>
-          {t("ward")}
-        </Text>
+        {/* Ward Picker */}
         <Picker
           selectedValue={selectedWard}
           onValueChange={(value) => setSelectedWard(value)}
-          style={[
-            styles.input,
-            {
-              backgroundColor: isDarkMode ? '#1e1e1e' : '#fff',
-              color: isDarkMode ? '#fff' : '#000',
-            },
-          ]}
-          dropdownIconColor={isDarkMode ? '#fff' : '#000'}
+          style={pickerStyle}
         >
           <Picker.Item label={t("selectWard")} value="" />
-          {wards.map((w, index) => (
-            <Picker.Item key={index} label={w} value={w} />
+          {wards.map((w) => (
+            <Picker.Item key={w.code} label={w.name} value={w.code} />
           ))}
         </Picker>
 

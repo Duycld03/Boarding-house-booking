@@ -11,7 +11,6 @@ import EmptyState from '@/components/ui/EmptyState';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useThemedClasses } from '@/utils/useTheme';
-import { useTheme } from '@/context/ThemeProvider';
 import { useTranslation } from 'react-i18next';
 
 const FilteredResultScreen = () => {
@@ -25,6 +24,7 @@ const FilteredResultScreen = () => {
     const [totalItems, setTotalItems] = useState(0);
     const limit = 6;
     const { t } = useTranslation('filter');
+    const hasMore = data.length < totalItems;
 
     // Giả sử frontend đang nhập theo đơn vị đồng (VND), thì convert sang nghìn đồng nếu backend dùng 1000 VND:
     const parsePriceRange = (rangeStr: string) => {
@@ -38,14 +38,13 @@ const FilteredResultScreen = () => {
 
     const { priceMin, priceMax } = parsePriceRange(priceRange);
 
-    const fetchFilteredData = useCallback(async (currentPage = 1) => {
-        if (currentPage === 1) setInitialLoading(true);
+    const fetchFilteredData = useCallback(async () => {
+        if (page === 1) setInitialLoading(true);
         setLoading(true);
 
         try {
-            // ⚠️ Chuẩn bị bộ lọc gửi tới backend
             const filters = {
-                page: currentPage,
+                page,
                 limit,
                 ...(name?.trim() && { name: name.trim() }),
                 ...(priceMin !== undefined && { priceMin }),
@@ -57,37 +56,17 @@ const FilteredResultScreen = () => {
                 ...(ward && ward !== 'null' && { 'address.ward': ward }),
             };
 
-            console.log("🚀 Sent filters:", filters);
-
-            // Gọi API lấy dữ liệu
             const res = await getBhByArea(filters);
-            console.log("mtien", res);
-
-            // Dữ liệu trả về từ backend
             const list = Array.isArray(res) ? res : res?.data || res?.results || [];
-            let filteredList = list;
 
-            // Filter theo địa chỉ (ở frontend vì backend không xử lý được)
-            if (province) {
-                filteredList = filteredList.filter((bh) =>
-                    bh.address?.province?.toLowerCase().includes(province.toLowerCase())
-                );
-            }
-            if (district) {
-                filteredList = filteredList.filter((bh) =>
-                    bh.address?.district?.toLowerCase().includes(district.toLowerCase())
-                );
-            }
-            if (ward) {
-                filteredList = filteredList.filter((bh) =>
-                    bh.address?.ward?.toLowerCase().includes(ward.toLowerCase())
-                );
-            }
+            // const filteredList = list.filter((bh) => {
+            //     const matchesProvince = province ? bh.address?.province?.toLowerCase().includes(province.toLowerCase()) : true;
+            //     const matchesDistrict = district ? bh.address?.district?.toLowerCase().includes(district.toLowerCase()) : true;
+            //     const matchesWard = ward ? bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) : true;
+            //     return matchesProvince && matchesDistrict && matchesWard;
+            // });
 
-            console.log("📦 Received list:", list);
-
-            // Xử lý dữ liệu trả về để hiển thị
-            const formatted = filteredList.map((item) => ({
+            const formatted = list.map((item) => ({
                 id: item._id,
                 name: item.name,
                 price: item.priceRange ? `${item.priceRange}k VND` : 'N/A',
@@ -95,45 +74,37 @@ const FilteredResultScreen = () => {
                 availableRooms: item.availableRooms || 0,
                 rating: item.rating || 0,
                 img: item.images?.find((img) => img.isPrimary)?.imageUrl || item.images?.[0]?.imageUrl || '',
-                updatedAt: new Date(item.updatedAt).toLocaleDateString(), // Format ngày
+                updatedAt: new Date(item.updatedAt).toLocaleDateString(),
             }));
 
-            // Cập nhật state
-            if (currentPage === 1) {
-                setData(formatted); // Dữ liệu trang đầu tiên
-            } else {
-                setData((prev) => [...prev, ...formatted]); // Load thêm dữ liệu
-            }
+            setData((prev) => (page === 1 ? formatted : [...prev, ...formatted]));
+            setTotalItems(res?.totalDocs ?? list.length);
 
-            setTotalItems(filteredList.length);
         } catch (err) {
-            console.error('Filtered fetch failed:', err);
-            setData([]);
+            console.error(err);
+            if (page === 1) setData([]);
             setTotalItems(0);
         } finally {
             setLoading(false);
-            if (currentPage === 1) setInitialLoading(false);
+            if (page === 1) setInitialLoading(false);
         }
-    }, [name, priceMin, priceMax, boardingHouseType, rating, province, district, ward]);
-
+    }, [page, name, priceMin, priceMax, boardingHouseType, rating, province, district, ward]);
 
     useEffect(() => {
+    }, [data, totalItems]);
+    useEffect(() => {
+        fetchFilteredData();
+    }, [page]);
+    useEffect(() => {
         setPage(1);
-        fetchFilteredData(1);
     }, [name, priceRange, boardingHouseType, rating, province, district, ward]);
-
     const handleLoadMore = () => {
-        const nextPage = page + 1;
-        if (data.length < totalItems && !loading) {
-            setPage(nextPage);
-            fetchFilteredData(nextPage);
+        if (hasMore && !loading) {
+            setPage((prev) => prev + 1);
         }
     };
-
-    const hasMore = data.length < totalItems;
-
     return (
-        <ScreenContainer className={themedClasses.bg} withPadding={false}>
+        <ScreenContainer withPadding={false}>
             {initialLoading ? (
                 <Loader overlay />
             ) : (
@@ -159,15 +130,17 @@ const FilteredResultScreen = () => {
                     ) : (
                         <>
                             <VerticalList data={data} loading={loading} />
-                            <LoadMoreButton
-                                hasMore={hasMore}
-                                isLoading={loading}
-                                onLoadMore={handleLoadMore}
-                                currentCount={data.length}
-                                totalCount={totalItems}
-                                itemsPerPage={limit}
-                                itemName={t('itemName')}
-                            />
+                            {hasMore && (
+                                <LoadMoreButton
+                                    hasMore={hasMore}
+                                    isLoading={loading}
+                                    onLoadMore={handleLoadMore}
+                                    currentCount={data.length}
+                                    totalCount={totalItems}
+                                    itemsPerPage={limit}
+                                    itemName={t('itemName')}
+                                />
+                            )}
                         </>
                     )}
                 </>
