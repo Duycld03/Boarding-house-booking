@@ -70,7 +70,7 @@ class DepositController {
         return res.status(403).json({ message: "User not found" });
       }
 
-      // Get pagination parameters from query
+      // Sử dụng page và limit thay vì chỉ limit
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 5;
       const skip = (page - 1) * limit;
@@ -91,13 +91,12 @@ class DepositController {
             totalItems: 0,
             limit,
             hasNextPage: false,
-            hasPrevPage: false,
           },
           data: [],
         });
       }
 
-      // Get deposits list with pagination
+      // Get deposits list with proper pagination
       const depositList = await DepositRoom.find(filter)
         .populate({
           path: "roomId",
@@ -107,7 +106,7 @@ class DepositController {
           },
         })
         .sort({ createdAt: -1 })
-        .skip(skip)
+        .skip(skip) // Thêm skip để bỏ qua các item đã load
         .limit(limit)
         .lean();
 
@@ -127,10 +126,9 @@ class DepositController {
         };
       });
 
-      // Calculate pagination
+      // Calculate pagination info
       const totalPages = Math.ceil(totalItems / limit);
       const hasNextPage = page < totalPages;
-      const hasPrevPage = page > 1;
 
       const pagination = {
         currentPage: page,
@@ -138,7 +136,8 @@ class DepositController {
         totalItems,
         limit,
         hasNextPage,
-        hasPrevPage,
+        hasPrevPage: page > 1,
+        currentCount: depositList.length,
       };
 
       return res.status(200).json({

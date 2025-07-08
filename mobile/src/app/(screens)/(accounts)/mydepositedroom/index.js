@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   View,
   RefreshControl,
@@ -34,19 +34,22 @@ function MyDepositedRoom() {
   const { t } = useTranslation("myDepositedRoom");
   const { isLogin } = useCurrentUser();
   const router = useRouter();
-
   const { showSuccess, showError } = useNotification();
 
+  // State management
   const [depositData, setDepositData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // Pagination state
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
     limit: 5,
+    hasNextPage: false,
+    hasPrevPage: false,
   });
 
   const [paginationOptions, setPaginationOptions] = useState({
@@ -66,7 +69,7 @@ function MyDepositedRoom() {
     }, [isLogin, router])
   );
 
-  // Update the fetchData function to properly handle pagination
+  // Fetch data function with proper pagination handling
   const fetchData = useCallback(
     async (isLoadMore = false) => {
       if (isLoadMore) {
@@ -76,12 +79,10 @@ function MyDepositedRoom() {
       }
 
       try {
-        const res = await getMyDepositedRoom({
-          page: paginationOptions.page,
-          limit: paginationOptions.limit,
-        });
+        const res = await getMyDepositedRoom(paginationOptions);
 
         if (res.success) {
+          // Update pagination state
           setPagination({
             currentPage: res.pagination.currentPage,
             totalPages: res.pagination.totalPages,
@@ -91,15 +92,32 @@ function MyDepositedRoom() {
             hasPrevPage: res.pagination.hasPrevPage,
           });
 
-          // If loading more, append new data; otherwise, replace existing data
+          // Handle data based on load more or initial load
           if (isLoadMore) {
-            setDepositData((prev) => [...prev, ...res.data]);
+            setDepositData((prev) => {
+              // Create a Set of existing IDs to prevent duplicates
+              const existingIds = new Set(prev.map((item) => item._id));
+
+              // Filter out any items that already exist
+              const newUniqueItems = res.data.filter(
+                (item) => !existingIds.has(item._id)
+              );
+
+              return [...prev, ...newUniqueItems];
+            });
           } else {
             setDepositData(res.data);
           }
         } else {
+          showError(res.message || t("errorLoadingDeposits"));
         }
       } catch (error) {
+        console.error("Error fetching deposit data:", error);
+        showError(
+          error.response?.data?.message ||
+            error.message ||
+            t("errorLoadingDeposits")
+        );
       } finally {
         if (isLoadMore) {
           setLoadingMore(false);
@@ -111,31 +129,100 @@ function MyDepositedRoom() {
     [paginationOptions, t, showError]
   );
 
+  // Initial load effect
   useEffect(() => {
-    if (isLogin) {
+    if (isLogin && paginationOptions.page === 1) {
       fetchData();
     }
-  }, [fetchData, isLogin]);
+  }, [isLogin]); // Don't include fetchData to prevent infinite loop
 
+  // Load more effect
+  useEffect(() => {
+    if (paginationOptions.page > 1) {
+      fetchData(true);
+    }
+  }, [paginationOptions.page]); // Don't include fetchData to prevent infinite loop
+
+  // Handle refresh
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setPaginationOptions((prev) => ({
-      ...prev,
+
+    // Reset pagination to page 1
+    setPaginationOptions({
       page: 1,
       limit: 5,
-    }));
-    await fetchData();
-    setRefreshing(false);
-  }, [fetchData]);
+      sortField: "createdAt",
+      sortOrder: "desc",
+    });
 
+    // Clear existing data
+    setDepositData([]);
+
+    try {
+      const res = await getMyDepositedRoom({
+        page: 1,
+        limit: 5,
+        sortField: "createdAt",
+        sortOrder: "desc",
+      });
+
+      if (res.success) {
+        setPagination({
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
+          totalItems: res.pagination.totalItems,
+          limit: res.pagination.limit,
+          hasNextPage: res.pagination.hasNextPage,
+          hasPrevPage: res.pagination.hasPrevPage,
+        });
+
+        setDepositData(res.data);
+      }
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      showError(t("errorLoadingDeposits"));
+    } finally {
+      setRefreshing(false);
+    }
+  }, [showError, t]);
+
+  // Handle load more
+  const handleLoadMore = useCallback(() => {
+    // Check if we can load more
+    if (pagination.hasNextPage && !loadingMore && !loading) {
+      setPaginationOptions((prev) => ({
+        ...prev,
+        page: prev.page + 1, // Increment page to get next 5 items
+      }));
+    }
+  }, [
+    pagination.hasNextPage,
+    loadingMore,
+    loading,
+    paginationOptions.page,
+    depositData.length,
+    pagination.totalItems,
+  ]);
+
+  // Calculate if we should show load more button
+  const hasMoreDeposits = useMemo(() => {
+    return depositData.length < pagination.totalItems && pagination.hasNextPage;
+  }, [depositData.length, pagination.totalItems, pagination.hasNextPage]);
+
+  // Handle refund
   const handleRefund = useCallback(
     (deposit) => {
-      showSuccess(t("refundRequestSent"));
+      // Navigate to refund screen or handle refund logic
+      // router.push({
+      //   pathname: "/refund",
+      //   params: { depositId: deposit._id },
+      // });
+      console.log("Refund clicked for deposit:", deposit);
     },
-    [t, showSuccess]
+    [router]
   );
 
-  // Add to your MyDepositedRoom screen
+  // Handle pay deposit
   const handlePayDeposit = useCallback(
     (item) => {
       // Navigate to pay deposit screen with deposit data
@@ -147,25 +234,13 @@ function MyDepositedRoom() {
     [router]
   );
 
-  // Update the handleLoadMore function
-  const handleLoadMore = useCallback(() => {
-    if (pagination.hasNextPage && !loadingMore) {
-      setPaginationOptions((prev) => ({
-        ...prev,
-        page: prev.page + 1, // Increment page instead of limit
-      }));
-      fetchData(true);
-    }
-  }, [pagination.hasNextPage, loadingMore, fetchData]);
-
-  const hasMoreDeposits = depositData.length < pagination.totalItems;
-
+  // Render functions
   const renderDepositItem = useCallback(
     ({ item, index }) => (
       <DepositCard
         item={item}
         onRefund={handleRefund}
-        onPayDeposit={handlePayDeposit} // Add this prop
+        onPayDeposit={handlePayDeposit}
         index={index}
       />
     ),
@@ -182,8 +257,8 @@ function MyDepositedRoom() {
             "bg-gray-800/95 backdrop-blur-sm border-gray-700/50 shadow-2xl shadow-black/30"
           )}
           style={{
-            borderRadius: 24, // Explicitly set borderRadius to match rounded-3xl
-            overflow: "hidden", // Ensure content doesn't overflow rounded corners
+            borderRadius: 24,
+            overflow: "hidden",
           }}
         >
           <View className="flex-row items-center justify-center">
@@ -216,14 +291,13 @@ function MyDepositedRoom() {
           "bg-gray-800/95 backdrop-blur-sm border-gray-700/50 shadow-2xl shadow-black/40"
         )}`}
         style={{
-          opacity: 1, // Instead of using Animated.FadeInDown
-          transform: [{ translateY: 0 }], // Instead of using Animated.FadeInDown
-          borderRadius: 24, // Explicitly set borderRadius to match rounded-3xl
-          overflow: "hidden", // Ensure content doesn't overflow rounded corners
+          opacity: 1,
+          transform: [{ translateY: 0 }],
+          borderRadius: 24,
+          overflow: "hidden",
         }}
       >
         <View className="items-center">
-          {/* Enhanced empty state with animation */}
           <View className="relative mb-8">
             <LinearGradient
               colors={
@@ -232,7 +306,12 @@ function MyDepositedRoom() {
                   : ["rgba(139, 92, 246, 0.2)", "rgba(99, 102, 241, 0.05)"]
               }
               className="absolute -inset-5 rounded-full opacity-80 blur-xl"
-              style={{ borderRadius: 9999 }} // Ensure the gradient blob is properly rounded
+              style={{ borderRadius: 9999 }}
+            />
+            <MaterialCommunityIcons
+              name="home-search"
+              size={80}
+              color={isDarkMode ? "#8B5CF6" : "#6366F1"}
             />
           </View>
 
@@ -257,7 +336,6 @@ function MyDepositedRoom() {
     </View>
   );
 
-  // Enhanced LoadMoreButton
   const renderLoadMoreButton = () => {
     if (depositData.length === 0 || loading) return null;
 
@@ -283,14 +361,13 @@ function MyDepositedRoom() {
           container: { paddingHorizontal: 0, marginBottom: 24 },
           button: {
             marginHorizontal: 16,
-            borderRadius: 12, // Ensure consistent border radius on load more button
+            borderRadius: 12,
           },
         }}
       />
     );
   };
 
-  // Enhanced Header
   const renderHeader = () => (
     <View className="px-4 py-2 mb-2">
       <View className="flex-row items-center justify-between">
@@ -335,7 +412,7 @@ function MyDepositedRoom() {
       <FlatList
         data={depositData}
         renderItem={renderDepositItem}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item, index) => item._id || `deposit-${index}`}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -354,6 +431,12 @@ function MyDepositedRoom() {
           paddingBottom: 32,
           flexGrow: 1,
         }}
+        // Performance optimizations
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={50}
+        initialNumToRender={5}
+        windowSize={10}
       />
 
       {renderLoadMoreButton()}
