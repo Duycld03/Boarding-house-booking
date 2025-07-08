@@ -15,86 +15,13 @@ import {
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import formatAmount from "@/utils/formatAmount";
-import { checkPayRentStatus } from "@/API/depositAPI";
-import { getPaymentBillForRent } from "@/API/paymentBillAPI";
-import { useFocusEffect } from "expo-router";
 
-const DepositCard = ({ item, onPayRent, onRefund, onPayDeposit, index }) => {
+const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
   const { isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
   const { t, i18n } = useTranslation("myDepositedRoom"); // Get i18n to access current language
   const slideAnim = React.useRef(new Animated.Value(50)).current;
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
-
-  // Create unique state keys for each card based on item ID
-  const [paymentStatusMap, setPaymentStatusMap] = useState({});
-  const [checkingPaymentMap, setCheckingPaymentMap] = useState({});
-  // New state to track if a payment bill exists for the month
-  const [paymentBillExistsMap, setPaymentBillExistsMap] = useState({});
-
-  // Define getters for this specific card
-  const isRentPaid = paymentStatusMap[item._id] || false;
-  const checkingPayment = checkingPaymentMap[item._id] || false;
-  const paymentBillExists = paymentBillExistsMap[item._id] || false;
-
-  // Replace useEffect with useFocusEffect for checking payment status
-  useFocusEffect(
-    React.useCallback(() => {
-      const checkPaymentStatus = async () => {
-        if (item.status === "confirmed") {
-          // Update checking state
-          setCheckingPaymentMap((prev) => ({
-            ...prev,
-            [item._id]: true,
-          }));
-
-          try {
-            // First, check if there's a payment bill for the current month
-            const paymentBillResponse = await getPaymentBillForRent(item._id);
-
-            // Safe check for response data structure
-            const hasBill = !!paymentBillResponse;
-
-            // Set whether a bill exists for this month
-            setPaymentBillExistsMap((prev) => ({
-              ...prev,
-              [item._id]: hasBill,
-            }));
-
-            // Then check if it's paid
-            const response = await checkPayRentStatus(item._id);
-
-            // Update paid state
-            setPaymentStatusMap((prev) => ({
-              ...prev,
-              [item._id]: response.isPaid,
-            }));
-          } catch (error) {
-            // If error is 404 (no payment bill found), set paymentBillExists to false
-            if (error.response && error.response.status === 404) {
-              setPaymentBillExistsMap((prev) => ({
-                ...prev,
-                [item._id]: false,
-              }));
-            }
-          } finally {
-            // Reset checking state
-            setCheckingPaymentMap((prev) => ({
-              ...prev,
-              [item._id]: false,
-            }));
-          }
-        }
-      };
-
-      checkPaymentStatus();
-
-      // Clean up function
-      return () => {
-        // Any cleanup code if needed
-      };
-    }, [item._id, item.status])
-  );
 
   // Animation effect
   React.useEffect(() => {
@@ -195,7 +122,6 @@ const DepositCard = ({ item, onPayRent, onRefund, onPayDeposit, index }) => {
   const formatCurrency = (value) => {
     return formatAmount(value, currentLanguage, {
       showCurrency: true,
-      showFullFormat: true,
     });
   };
 
@@ -220,111 +146,12 @@ const DepositCard = ({ item, onPayRent, onRefund, onPayDeposit, index }) => {
     return currentDate <= twoMonthsBeforeEnd;
   };
 
-  // Update the renderPayRentButton function to correctly show payment button
-
-  const renderPayRentButton = () => {
-    if (checkingPayment) {
-      return (
-        <Button
-          disabled={true}
-          variant="outline"
-          fullWidth={true}
-          size="md"
-          style={{
-            borderRadius: 12,
-            backgroundColor: isDarkMode ? "#1f2937" : "#f9fafb",
-            borderColor: isDarkMode ? "#374151" : "#e5e7eb",
-          }}
-        >
-          <View className="flex-row items-center justify-center">
-            <MaterialCommunityIcons
-              name="loading"
-              size={16}
-              color={isDarkMode ? "#60a5fa" : "#3b82f6"}
-              className="animate-spin mr-2"
-            />
-            <Text className={themedClasses("text-gray-700", "text-gray-300")}>
-              {t("checking")}...
-            </Text>
-          </View>
-        </Button>
-      );
-    }
-
-    // Show "Rent Paid" button if already paid
-    if (isRentPaid) {
-      return (
-        <Button
-          disabled={true}
-          variant="success"
-          fullWidth={true}
-          size="md"
-          icon={<MaterialIcons name="check-circle" size={16} color="#fff" />}
-          style={{
-            borderRadius: 12,
-            backgroundColor: isDarkMode ? "#15803d" : "#16a34a",
-          }}
-        >
-          {t("rentPaid")}
-        </Button>
-      );
-    }
-
-    // Show "Pay Rent" button if there's a bill and it hasn't been paid
-    if (paymentBillExists) {
-      return (
-        <Button
-          onPress={() => onPayRent(item)}
-          variant="primary"
-          fullWidth={true}
-          size="md"
-          icon={<FontAwesome name="dollar" size={14} color="#fff" />}
-          style={{
-            borderRadius: 12,
-            backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb",
-          }}
-        >
-          {t("payRent")}
-        </Button>
-      );
-    }
-
-    // Default: No bill for the month
-    return (
-      <Button
-        disabled={true}
-        variant="outline"
-        fullWidth={true}
-        size="md"
-        style={{
-          borderRadius: 12,
-          backgroundColor: isDarkMode ? "#1f2937" : "#f9fafb",
-          borderColor: isDarkMode ? "#374151" : "#e5e7eb",
-          opacity: 0.7,
-        }}
-      >
-        <Text className={themedClasses("text-gray-500", "text-gray-400")}>
-          {t("noBillThisMonth")}
-        </Text>
-      </Button>
-    );
-  };
-
   // Add this function to your DepositCard component
   const renderActionButtons = () => {
     if (item.status === "confirmed") {
       return (
         <>
           <View className="flex-row justify-between mt-2">
-            {/* Pay Rent Button */}
-            <View
-              className={
-                shouldShowRefund(item.endDate) ? "flex-1 mr-2" : "flex-1"
-              }
-            >
-              {renderPayRentButton()}
-            </View>
-
             {/* Request Refund Button - Show if refund is available */}
             {shouldShowRefund(item.endDate) && (
               <View className="flex-1 ml-2">

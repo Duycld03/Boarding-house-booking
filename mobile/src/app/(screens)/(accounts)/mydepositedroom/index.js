@@ -129,16 +129,16 @@ function MyDepositedRoom() {
   }, [fetchData]);
 
   // Action handlers
-  const handlePayRent = useCallback(
-    (deposit) => {
-      // Navigate to PayRent screen with deposit data
-      router.push({
-        pathname: "/mydepositedroom/payRent",
-        params: { deposit: JSON.stringify(deposit) },
-      });
-    },
-    [router]
-  );
+  // const handlePayRent = useCallback(
+  //   (deposit) => {
+  //     // Navigate to PayRent screen with deposit data
+  //     router.push({
+  //       pathname: "/mydepositedroom/payRent",
+  //       params: { deposit: JSON.stringify(deposit) },
+  //     });
+  //   },
+  //   [router]
+  // );
 
   const handleRefund = useCallback(
     (deposit) => {
@@ -176,13 +176,12 @@ function MyDepositedRoom() {
     ({ item, index }) => (
       <DepositCard
         item={item}
-        onPayRent={handlePayRent}
         onRefund={handleRefund}
         onPayDeposit={handlePayDeposit} // Add this prop
         index={index}
       />
     ),
-    [handlePayRent, handleRefund, handlePayDeposit]
+    [handleRefund, handlePayDeposit]
   );
 
   const renderFooter = () => {
