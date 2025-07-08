@@ -163,56 +163,35 @@ class PaymentBillController {
 
   async getPaymentBillForRent(req, res) {
     try {
-      const { depositRoomId } = req.params;
-
-      if (!depositRoomId) {
-        return res.status(400).json({ message: "Missing required parameters" });
-      }
-
-      // Find the deposit room to get the roomId
-      const deposit = await DepositRoom.findOne({
-        _id: depositRoomId,
-        accountId: req.user.userId,
-      }).select("roomId");
-
-      if (!deposit) {
-        return res.status(400).json({ message: "Deposit room not found" });
-      }
-
-      // Calculate previous month
-      const currentDate = new Date();
-      // Go back one month
-      currentDate.setMonth(currentDate.getMonth() - 1);
-
-      const currentMonth = (currentDate.getMonth() + 1).toString(); // JavaScript months are 0-based
-      const currentYear = currentDate.getFullYear().toString();
-
-      // Find the latest payment bill for this room in the previous month with case-insensitive "pending" status
+      const { paymentBillId } = req.params;
       const paymentBill = await PaymentBill.findOne({
-        roomId: deposit.roomId,
-        month: currentMonth,
-        year: currentYear,
-      }).sort({ createdAt: -1 });
-
+        _id: paymentBillId,
+      }).lean();
       if (!paymentBill) {
-        return res.status(404).json({
-          message: "No pending payment bill found for the previous month",
-        });
+        return res.status(404).json({ message: "Payment bill not found" });
       }
 
-      // Check if user has already paid
-      const existingPayment = await UserPayment.findOne({
-        accountId: req.user.userId,
-        paymentBillId: paymentBill._id,
-        status: { $regex: /^paid$/i },
-      });
-
-      // Return both the payment bill and whether it's already paid
-      return res.json({
+      const depositRoom = await DepositRoom.findOne({
+        roomId: paymentBill.roomId,
+      })
+        .populate({
+          path: "roomId",
+          populate: {
+            path: "boardingHouseId",
+            select: "name address",
+          },
+        })
+        .lean();
+      if (!depositRoom) {
+        return res.status(404).json({ message: "Deposit room not found" });
+      }
+      return res.status(200).json({
         paymentBill,
-        isPaid: !!existingPayment,
-        currentMonth,
-        currentYear,
+        depositRoom: {
+          ...depositRoom,
+          name: depositRoom.roomId?.boardingHouseId?.name || "Unknown Property",
+          roomNumber: depositRoom.roomId?.roomNumber || "Unknown Room",
+        },
       });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error" });
