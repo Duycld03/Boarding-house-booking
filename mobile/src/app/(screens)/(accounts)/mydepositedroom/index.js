@@ -128,18 +128,6 @@ function MyDepositedRoom() {
     setRefreshing(false);
   }, [fetchData]);
 
-  // Action handlers
-  // const handlePayRent = useCallback(
-  //   (deposit) => {
-  //     // Navigate to PayRent screen with deposit data
-  //     router.push({
-  //       pathname: "/mydepositedroom/payRent",
-  //       params: { deposit: JSON.stringify(deposit) },
-  //     });
-  //   },
-  //   [router]
-  // );
-
   const handleRefund = useCallback(
     (deposit) => {
       showSuccess(t("refundRequestSent"));
