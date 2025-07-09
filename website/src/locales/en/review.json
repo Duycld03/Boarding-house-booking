@@ -1,0 +1,33 @@
+{
+  "tableName": "Reviews",
+  "table": {
+    "reviewer": "Reviewer",
+    "content": "Content",
+    "date": "Date & Time"
+  },
+  "detail": {
+    "title": "Review Details",
+    "reviewer": "Reviewer",
+    "content": "Content",
+    "time": "Review Time",
+    "reply": "Reply",
+    "image": "Image"
+  },
+  "actions": {
+    "reply": "Reply",
+    "update": "Update",
+    "delete": "Delete"
+  },
+  "messages": {
+    "fetchFailed": "Failed to fetch review list.",
+    "replySuccess": "Reply sent successfully!",
+    "replyFailed": "Failed to send reply.",
+    "updateSuccess": "Reply updated successfully!",
+    "updateFailed": "Failed to update reply.",
+    "deleteSuccess": "Reply deleted successfully.",
+    "deleteFailed": "Failed to delete reply.",
+    "emptyReply": "Reply content cannot be empty."
+  },
+    "replyPlaceholder": "Enter reply content..."
+
+}

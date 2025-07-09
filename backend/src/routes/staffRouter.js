@@ -228,4 +228,6 @@ staffRouter.get(
   roomAdditionFeeController.getRoomAdditionFeesByRoomId
 );
 
+staffRouter.get('/boardinghouse/reviews/:id', ReviewController.getReviewByBhId);
+
 export { staffRouter };
