@@ -19,9 +19,8 @@ const getTableStyles = (isDarkMode) => `
   }
 
   /* Dark mode styles */
-  ${
-    isDarkMode
-      ? `
+  ${isDarkMode
+    ? `
     /* Table styles */
     .ant-table-dark {
       background-color: rgb(55 65 81);
@@ -114,7 +113,7 @@ const getTableStyles = (isDarkMode) => `
       border-color: #3b82f6;
     }
   `
-      : ""
+    : ""
   }
 `;
 
@@ -135,7 +134,7 @@ const TableCustom = ({
   onRowClick,
   scrollY = null,
   pagination = {},
-  onChange = () => {},
+  onChange = () => { },
   tableName,
   noDataText = "No data available",
 }) => {
@@ -179,7 +178,8 @@ const TableCustom = ({
 
   const numberedData = useMemo(() => {
     if (!data || data.length === 0) return [];
-
+    console.log("mtienneeeeeeeeeeeeee")
+    console.log(data)
     return data.map((item, index) => {
       const pageSize = paginationConfig.pageSize || 10;
       const currentPage = paginationConfig.current || 1;
@@ -285,9 +285,8 @@ const TableCustom = ({
               type="primary"
               onClick={handleProcessData}
               disabled={isSubmitDisabled}
-              className={`${styles.formButton} ${
-                darkMode ? "table-action-button" : ""
-              }`}
+              className={`${styles.formButton} ${darkMode ? "table-action-button" : ""
+                }`}
             >
               Submit
             </Button>
@@ -306,9 +305,8 @@ const TableCustom = ({
               x: "max-content",
               y: scrollY,
             }}
-            className={`text-xs sm:text-sm md:text-base ${
-              darkMode ? "ant-table-dark" : ""
-            } custom-table`}
+            className={`text-xs sm:text-sm md:text-base ${darkMode ? "ant-table-dark" : ""
+              } custom-table`}
             rowKey="_id"
             rowSelection={checkbox ? rowSelection : null}
             columns={numberedColumns}
@@ -324,29 +322,29 @@ const TableCustom = ({
             components={
               darkMode
                 ? {
-                    header: {
-                      cell: (props) => (
-                        <th
-                          {...props}
-                          className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
-                        />
-                      ),
-                    },
-                    body: {
-                      row: (props) => (
-                        <tr
-                          {...props}
-                          className="dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-                        />
-                      ),
-                      cell: (props) => (
-                        <td
-                          {...props}
-                          className="dark:text-gray-100 dark:border-gray-700"
-                        />
-                      ),
-                    },
-                  }
+                  header: {
+                    cell: (props) => (
+                      <th
+                        {...props}
+                        className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                      />
+                    ),
+                  },
+                  body: {
+                    row: (props) => (
+                      <tr
+                        {...props}
+                        className="dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+                      />
+                    ),
+                    cell: (props) => (
+                      <td
+                        {...props}
+                        className="dark:text-gray-100 dark:border-gray-700"
+                      />
+                    ),
+                  },
+                }
                 : undefined
             }
           />

@@ -12,9 +12,13 @@ import {
   fetchWards,
 } from "../../../api/apiAddress";
 import { Loader, Button } from "../../../component";
-import { Form, Input, Select, Upload, InputNumber, Image } from "antd";
+import { Form, Input, Select, Upload, InputNumber, Image, ConfigProvider } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/themeContext";
+import coverBhType from "@/utils/coverBhType";
+import i18n from "i18next";
 function AddBoardingHouseForm({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     owner: "",
@@ -44,6 +48,10 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
   const [primaryImage, setPrimaryImage] = useState(null);
   const [otherImages, setOtherImages] = useState([]);
   const [geoLocation, setGeoLocation] = useState(null);
+  const { darkMode } = useTheme();
+  const { t } = useTranslation("addBoardingHouseAdmin");
+  const currentLanguage = i18n.language;
+
   const uploadOtherImgProps = {
     beforeUpload: (file) => {
       handleFileChange({ target: { files: [file] } }, false);
@@ -183,76 +191,86 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
     console.log("Form Data:", formData);
     // console.log("Boarding House Type:", formData.boardingHouseType);
     if (!formData.owner) {
-      toast.error("Please enter owner username.");
+      toast.error(t("validation.enterName"));
       return;
     }
     if (!formData.boardingHouseType) {
-      toast.error("Please select a boarding house type.");
+      toast.error(t("validation.selectBoardingHouseType"));
       return;
     }
     if (!formData.name) {
-      toast.error("Please enter a boarding house name.");
+      toast.error(t("validation.enterBoardingHouseName"));
       return;
     }
     if (!formData.address.province) {
-      toast.error("Please select a boarding house province.");
+      toast.error(t("validation.selectProvince"));
       return;
     }
     if (!formData.address.district) {
-      toast.error("Please select a boarding house district.");
+      toast.error(t("validation.selectDistrict"));
       return;
     }
     if (!formData.address.ward) {
-      toast.error("Please select a boarding house ward.");
+      toast.error(t("validation.selectWard"));
       return;
     }
     if (!formData.address.detail) {
-      toast.error("Please enter a boarding house details.");
+      toast.error(t("validation.enterDetailAddress"));
       return;
     }
 
-    const imagesData = [];
-    const payloadPrimary = new FormData();
-    payloadPrimary.append("file", formData.primaryImage);
-    try {
-      // Gửi file đến BE để lưu
-      const responsePrimary = await uploadFile(payloadPrimary);
+    // const imagesData = [];
+    // const payloadPrimary = new FormData();
+    // payloadPrimary.append("file", formData.primaryImage);
+    // try {
+    //   // Gửi file đến BE để lưu
+    //   const responsePrimary = await uploadFile(payloadPrimary);
 
-      imagesData.push({
-        imageUrl: responsePrimary.filePath, // Đường dẫn trả về từ BE
-        isPrimary: true,
-      });
-    } catch (error) {
-      console.error("Failed to upload image:", error);
-      toast.error("Please upload primary image.");
+    //   imagesData.push({
+    //     imageUrl: responsePrimary.filePath, // Đường dẫn trả về từ BE
+    //     isPrimary: true,
+    //   });
+    // } catch (error) {
+    //   console.error("Failed to upload image:", error);
+    //   toast.error("Please upload primary image.");
+    //   return;
+    // }
+
+    // for (const image of formData.otherImages) {
+    //   const payload = new FormData();
+    //   payload.append("file", image);
+    //   try {
+    //     // Gửi file đến BE để lưu
+    //     const response = await uploadFile(payload);
+
+    //     imagesData.push({
+    //       imageUrl: response.filePath, // Đường dẫn trả về từ BE
+    //       isPrimary: false,
+    //     });
+    //   } catch (error) {
+    //     console.error("Failed to upload image:", error);
+    //     toast.error("Please upload other image.");
+    //     return;
+    //   }
+    // }
+    const allImages = [];
+    if (formData.primaryImage) allImages.push(formData.primaryImage);
+    if (formData.otherImages.length > 15) {
+      toast.error(t("validation.maxOtherImages"));
       return;
     }
-
-    for (const image of formData.otherImages) {
-      const payload = new FormData();
-      payload.append("file", image);
-      try {
-        // Gửi file đến BE để lưu
-        const response = await uploadFile(payload);
-
-        imagesData.push({
-          imageUrl: response.filePath, // Đường dẫn trả về từ BE
-          isPrimary: false,
-        });
-      } catch (error) {
-        console.error("Failed to upload image:", error);
-        toast.error("Please upload other image.");
-        return;
-      }
+    allImages.push(...formData.otherImages);
+    if (allImages.length === 0) {
+      toast.error(t("validation.uploadPrimaryImage"));
+      return;
     }
-
-    const form = {
+    let form = {
       ownerUsername: formData.owner,
       boardingHouseType: formData.boardingHouseType,
       name: formData.name,
       address: formData.address,
       description: formData.description,
-      images: imagesData,
+      // images: allImages,
       priceRange: formData.priceRange,
       electricityPrice: formData.electricityPrice,
       waterPrice: formData.waterPrice,
@@ -269,12 +287,15 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
     //     form[key] = value;
     // }
     console.log("test: ", form);
-
+    allImages.forEach((file, index) => {
+      // form.append("boardingHouse", file);
+      form = { ...form, boardingHouse: file }
+    });
     setLoading(true);
     try {
       // console.log("test: ", formData);
       await createBoardingHouse(form); // Call API to create boarding house
-      toast.success("Boarding house created successfully!");
+      toast.success(t("messages.createdSuccess"));
       onSuccess(); // Callback to refresh data
       onClose(); // Close the form
     } catch (error) {
@@ -287,349 +308,437 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
       setLoading(false);
     }
   };
+  const themeConfig = {
+    algorithm: darkMode
+      ? ConfigProvider.darkAlgorithm
+      : ConfigProvider.defaultAlgorithm,
+    token: darkMode
+      ? {
+        colorText: "#ffffff", // Văn bản sáng
+        colorTextSecondary: "#e5e7eb", // Văn bản phụ nhạt hơn
+        colorBgContainer: "#1f2937", // Nền tối
+        colorBorder: "#4b5563", // Viền rõ hơn
+        colorPrimary: "#3b82f6", // Màu chính (xanh lam)
 
+        // Thiết lập màu sắc cho Input
+        colorBgElevated: "#374151", // Nền cho các thành phần thả xuống
+        colorFillSecondary: "#374151", // Nền cho các ô input
+        colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
+        colorBorderSecondary: "#4B5563", // Viền phụ
+        controlItemBgActive: "#3b82f6", // Nền khi được chọn
+        controlItemBgHover: "#4B5563", // Nền khi hover
+      }
+      : {
+        colorText: "#000", // Văn bản tối
+        colorTextSecondary: "#4b5563", // Văn bản phụ
+        colorBgContainer: "#ffffff", // Nền sáng
+        colorBorder: "#d9d9d9", // Viền nhạt
+        colorPrimary: "#3b82f6", // Màu chính (xanh lam)
+
+        // Thiết lập màu sắc cho Input
+        colorBgElevated: "#f5f5f5", // Nền cho các thành phần thả xuống
+        colorFillSecondary: "#f5f5f5", // Nền cho các ô input
+        colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
+        colorBorderSecondary: "#d9d9d9", // Viền phụ
+        controlItemBgActive: "#e5e7eb", // Nền khi được chọn
+        controlItemBgHover: "#f0f0f0", // Nền khi hover
+      },
+    components: {
+      // Cấu hình cho Select
+      Select: {
+        selectorBg: darkMode ? "#374151" : "#f5f5f5", // Nền của Select
+        colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Select
+        colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
+        optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb", // Nền khi được chọn
+        optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0", // Nền khi hover
+      },
+      // Cấu hình cho Input
+      Input: {
+        colorBgContainer: darkMode ? "#374151" : "#f5f5f5", // Nền Input
+        colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Input
+        colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
+        colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563", // Placeholder
+      },
+      // Cấu hình cho Form
+      Form: {
+        labelColor: darkMode ? "#F9FAFB" : "#000", // Màu nhãn Form
+      },
+    },
+  };
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-    >
-      <Form
-        layout="vertical"
-        onSubmitCapture={handleSubmit}
-        className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
+    <ConfigProvider theme={themeConfig}>
+      <div
+        className={`fixed inset-0 ${darkMode ? "bg-gray-900 bg-opacity-90" : "bg-black bg-opacity-50"
+          } flex items-center justify-center z-50`}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
       >
-        <h2 className="text-4xl font-bold mb-8">Create New Boarding House</h2>
-        <h2 className="text-3xl font-bold mb-4 ">1. Owner and information</h2>
-        {/* Owner */}
-        <Form.Item
-          label="Owner"
-          name="owner"
-          rules={[{ required: true, message: "Please enter owner's username" }]}
-          className="mb-2"
+        <Form
+          layout="vertical"
+          onSubmitCapture={handleSubmit}
+          className={`p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg ${darkMode ? "bg-gray-800 text-white" : "bg-white text-black"
+            }`}
         >
-          <Input
-            placeholder="Enter owner's username"
-            name="owner"
-            value={formData.owner}
-            onChange={handleInputChange}
-          />
-        </Form.Item>
-
-        {/* Boarding House Type */}
-        <Form.Item
-          label="Boarding House Type"
-          name="boardingHouseType"
-          rules={[
-            { required: true, message: "Please select a boarding house type" },
-          ]}
-          className="mb-2"
-        >
-          <Select
-            placeholder="Select Type"
-            value={formData.boardingHouseType}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, boardingHouseType: value }))
-            }
+          {/* Tiêu đề */}
+          <h2
+            className={`text-4xl font-bold mb-8 ${darkMode ? "text-gray-200" : "text-gray-900"
+              }`}
           >
-            {boardingHouseTypes.map((type) => (
-              <Select.Option key={type.value} value={type.value}>
-                {type.label}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
+            {t("addBoardingHouseAdmin.title")}
+          </h2>
+          <h2
+            className={`text-3xl font-bold mb-4 ${darkMode ? "text-gray-300" : "text-gray-800"
+              }`}
+          >
+            {t("addBoardingHouseAdmin.ownerSection")}
+          </h2>
 
-        {/* Boarding House Name */}
-        <Form.Item
-          label="Name Boarding House"
-          name="name"
-          rules={[
-            { required: true, message: "Please enter the boarding house name" },
-          ]}
-          className="mb-2"
-        >
-          <Input
-            placeholder="Enter boarding house name"
+          {/* Chủ Sở Hữu */}
+          <Form.Item
+            label={t("addBoardingHouseAdmin.owner")}
+            name="owner"
+            rules={[
+              { required: true, message: t("addBoardingHouseAdmin.fieldRequired") },
+            ]}
+            className="mb-2"
+          >
+            <Input
+              placeholder={t("addBoardingHouseAdmin.ownerPlaceholder")}
+              name="owner"
+              value={formData.owner}
+              onChange={handleInputChange}
+              style={{
+                backgroundColor: darkMode ? "#374151" : "#ffffff",
+                color: darkMode ? "#F9FAFB" : "#000000",
+                borderColor: darkMode ? "#4B5563" : "#d9d9d9",
+              }}
+            />
+          </Form.Item>
+
+          {/* Loại Nhà Trọ */}
+          <Form.Item
+            label={t("addBoardingHouseAdmin.boardingHouseType")}
+            name="boardingHouseType"
+            rules={[
+              { required: true, message: t("addBoardingHouseAdmin.fieldRequired") },
+            ]}
+            className="mb-2"
+          >
+            <Select
+              placeholder={t("addBoardingHouseAdmin.boardingHouseTypePlaceholder")}
+              value={formData.boardingHouseType}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, boardingHouseType: value }))
+              }
+              style={{
+                backgroundColor: darkMode ? "#374151" : "#ffffff",
+                color: darkMode ? "#F9FAFB" : "#000000",
+                borderColor: darkMode ? "#4B5563" : "#d9d9d9",
+              }}
+            >
+              {boardingHouseTypes.map((type) => (
+                <Select.Option key={type.value} value={type.value}>
+                  {coverBhType(type.code, currentLanguage)}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          {/* Tên Nhà Trọ */}
+          <Form.Item
+            label={t("addBoardingHouseAdmin.name")}
             name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-          />
-        </Form.Item>
-        {/* Description */}
-        <Form.Item label="Description" name="description" className="mb-2">
-          <Input.TextArea
-            placeholder="Enter description"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows={4}
-          />
-        </Form.Item>
+            rules={[
+              { required: true, message: t("addBoardingHouseAdmin.fieldRequired") },
+            ]}
+            className="mb-2"
+          >
+            <Input
+              placeholder={t("addBoardingHouseAdmin.namePlaceholder")}
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              style={{
+                backgroundColor: darkMode ? "#374151" : "#ffffff",
+                color: darkMode ? "#F9FAFB" : "#000000",
+                borderColor: darkMode ? "#4B5563" : "#d9d9d9",
+              }}
+            />
+          </Form.Item>
 
-        <h2 className="text-3xl font-bold mb-4 mt-10 ">2. Address</h2>
-        {/* Address Selector */}
-        <AddressSelector
-          provinces={provinces}
-          districts={districts}
-          wards={wards}
-          onProvinceChange={handleInputChange}
-          onDistrictChange={handleInputChange}
-          onInputChange={handleInputChange}
-          formData={formData}
-          location={geoLocation}
-          initialPosition={formData?.location}
-          setGeoLocation={setGeoLocation}
-        />
-        <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
-        {/* Primary Image */}
-        <Form.Item label={<span>Primary Image</span>} className="mb-4">
-          <div className="flex flex-col gap-4">
-            {/* Nút Upload Primary Image */}
-            {!formData.primaryImage && (
+          {/* Mô tả */}
+          <Form.Item
+            label={t("addBoardingHouseAdmin.description")}
+            name="description"
+            className="mb-2"
+          >
+            <Input.TextArea
+              placeholder={t("addBoardingHouseAdmin.descriptionPlaceholder")}
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              rows={4}
+              style={{
+                backgroundColor: darkMode ? "#374151" : "#ffffff",
+                color: darkMode ? "#F9FAFB" : "#000000",
+                borderColor: darkMode ? "#4B5563" : "#d9d9d9",
+              }}
+            />
+          </Form.Item>
+
+          {/* Địa chỉ */}
+          <h2
+            className={`text-3xl font-bold mb-4 mt-10 ${darkMode ? "text-gray-300" : "text-gray-800"
+              }`}
+          >
+            {t("addBoardingHouseAdmin.addressSection")}
+          </h2>
+          <AddressSelector
+            provinces={provinces}
+            districts={districts}
+            wards={wards}
+            onProvinceChange={handleInputChange}
+            onDistrictChange={handleInputChange}
+            onInputChange={handleInputChange}
+            formData={formData}
+            location={geoLocation}
+            initialPosition={formData?.location}
+            setGeoLocation={setGeoLocation}
+          />
+
+          {/* Hình ảnh */}
+          <h2
+            className={`text-3xl font-bold mb-4 mt-10 ${darkMode ? "text-gray-300" : "text-gray-800"
+              }`}
+          >
+            {t("addBoardingHouseAdmin.imageSection")}
+          </h2>
+          <Form.Item label={t("addBoardingHouseAdmin.primaryImage")} className="mb-4">
+            <div className="flex flex-col gap-4">
+              {!formData.primaryImage && (
+                <Upload
+                  {...uploadProps}
+                  listType="picture-card"
+                  showUploadList={false}
+                  className="custom-upload w-full max-w-lg"
+                >
+                  <div
+                    className={`flex flex-col items-center justify-center border ${darkMode
+                      ? "border-gray-600 hover:bg-gray-700"
+                      : "border-gray-300 hover:bg-gray-50"
+                      } rounded-lg p-6 transition`}
+                  >
+                    <PlusOutlined
+                      className={`text-2xl ${darkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                    />
+                    <p
+                      className={`mt-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                    >
+                      {t("addBoardingHouseAdmin.addPrimaryImage")}
+                    </p>
+                    <p
+                      className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"
+                        }`}
+                    >
+                      {t("addBoardingHouseAdmin.dragDrop")}
+                    </p>
+                  </div>
+                </Upload>
+              )}
+
+              {formData.primaryImage && (
+                <div className="relative">
+                  <Image
+                    src={URL.createObjectURL(formData.primaryImage)}
+                    alt="Primary"
+                    className="object-cover border rounded"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: "300px",
+                    }}
+                    preview={{
+                      mask: (
+                        <span
+                          className={`text-white bg-opacity-50 bg-black p-1`}
+                        >
+                          Preview
+                        </span>
+                      ),
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemovePrimaryImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-3 py-1 rounded-full z-10 shadow-lg"
+                  >
+                    X
+                  </button>
+                </div>
+              )}
+            </div>
+          </Form.Item>
+          {/* Other Images */}
+          <Form.Item label={<span>Other Images</span>} className="mb-4">
+            <div className="mt-4 flex flex-wrap gap-4">
+              {formData.otherImages.map((file, index) => (
+                <div key={index} className="relative">
+                  {/* Hiển thị ảnh bằng Ant Design Image */}
+                  <Image
+                    src={URL.createObjectURL(file)}
+                    alt={`Other ${index + 1}`}
+                    className="object-cover border rounded"
+                    width={100}
+                    height={100}
+                    preview={{
+                      mask: <span>Preview</span>,
+                    }}
+                  />
+                  {/* Nút delete */}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveOtherImage(index)}
+                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+
+              {/* Upload component */}
               <Upload
-                {...uploadProps}
+                {...uploadOtherImgProps}
                 listType="picture-card"
                 showUploadList={false}
-                className="custom-upload w-full max-w-lg"
+                className="custom-upload"
               >
                 <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
                   <PlusOutlined className="text-2xl text-gray-400" />
                   <p className="text-gray-500 mt-2 text-sm font-medium">
-                    Add Image
+                    Add Images
                   </p>
                   <p className="text-gray-400 text-xs">
                     Drag-drop or click here to choose a file
                   </p>
                 </div>
               </Upload>
-            )}
-
-            {/* Hiển thị Primary Image nếu đã upload */}
-            {formData.primaryImage && (
-              <div className="items-center justify-center flex flex-col gap-4">
-                <Image
-                  src={URL.createObjectURL(formData.primaryImage)}
-                  alt="Primary"
-                  className="object-cover border rounded"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: "300px",
-                  }}
-                  preview={{
-                    mask: <span className="text-white">Preview</span>,
-                  }}
-                />
-                {/* Nút xóa ảnh */}
-                <button
-                  type="button"
-                  onClick={handleRemovePrimaryImage}
-                  className="absolute top-2 right-2 bg-red-500 text-white text-xs px-3 py-1 rounded-full z-10 shadow-lg"
-                >
-                  X
-                </button>
-              </div>
-            )}
-          </div>
-          {/* thêm css để bỏ đường viền khung của antd*/}
-          <style>
-            {`
-                            .custom-upload .ant-upload
-                            {
-                            border: none !important;
-                            background: none !important;
-                            padding: 0 !important;
-                            }
-                        `}
-          </style>
-        </Form.Item>
-
-        {/* Other Images */}
-        <Form.Item label={<span>Other Images</span>} className="mb-4">
-          <div className="mt-4 flex flex-wrap gap-4">
-            {formData.otherImages.map((file, index) => (
-              <div key={index} className="relative">
-                {/* Hiển thị ảnh bằng Ant Design Image */}
-                <Image
-                  src={URL.createObjectURL(file)}
-                  alt={`Other ${index + 1}`}
-                  className="object-cover border rounded"
-                  width={100}
-                  height={100}
-                  preview={{
-                    mask: <span>Preview</span>,
-                  }}
-                />
-                {/* Nút delete */}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveOtherImage(index)}
-                  className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
-                >
-                  X
-                </button>
-              </div>
-            ))}
-
-            {/* Upload component */}
-            <Upload
-              {...uploadOtherImgProps}
-              listType="picture-card"
-              showUploadList={false}
-              className="custom-upload"
-            >
-              <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                <PlusOutlined className="text-2xl text-gray-400" />
-                <p className="text-gray-500 mt-2 text-sm font-medium">
-                  Add Images
-                </p>
-                <p className="text-gray-400 text-xs">
-                  Drag-drop or click here to choose a file
-                </p>
-              </div>
-            </Upload>
-          </div>
-          {/* thêm css để bỏ đường viền khung của antd*/}
-          <style>
-            {`
-                            .custom-upload .ant-upload
-                            {
-                            border: none !important;
-                            background: none !important;
-                            padding: 0 !important;
-                            }
-                        `}
-          </style>
-        </Form.Item>
-        <h2 className="text-3xl font-bold mb-4 mt-10 ">4. Price</h2>
-        {/* Price Range */}
-        <Form.Item
-          label="Price Rent/month (VND)"
-          name="priceRange"
-          rules={[{ required: true, message: "Please enter the price rent" }]}
-          className="mb-2"
-        >
-          <InputNumber
-            placeholder="Enter price rent"
+            </div>
+            {/* thêm css để bỏ đường viền khung của antd*/}
+            <style>
+              {`
+                        .custom-upload .ant-upload
+                        {
+                        border: none !important;
+                        background: none !important;
+                        padding: 0 !important;
+                        }
+                    `}
+            </style>
+          </Form.Item>
+          <h2 className="text-3xl font-bold mb-4 mt-10">{t("addBoardingHouseAdmin.priceSection")}</h2>
+          {/* Giá Thuê */}
+          <Form.Item
+            label={t("addBoardingHouseAdmin.priceRent")}
             name="priceRange"
-            value={formData.priceRange}
-            onChange={(value) =>
-              handleInputChange({ target: { name: "priceRange", value } })
-            }
-            formatter={(value) =>
-              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            } // Thêm dấu phẩy ngăn cách hàng nghìn
-            parser={(value) => value.replace(/\$\s?|(,*)/g, "")} // Loại bỏ dấu phẩy khi nhập
-            className="w-full"
-            min={0}
-          />
-        </Form.Item>
+            rules={[
+              { required: true, message: t("addBoardingHouseAdmin.fieldRequired") },
+            ]}
+            className="mb-2"
+          >
+            <InputNumber
+              placeholder={t("addBoardingHouseAdmin.enterPriceRent")}
+              name="priceRange"
+              value={formData.priceRange}
+              onChange={(value) =>
+                handleInputChange({ target: { name: "priceRange", value } })
+              }
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+              className="w-full"
+              min={0}
+            />
+          </Form.Item>
 
-        {/* Electricity Price */}
-        <Form.Item
-          label="Electricity Price/kWh (VND)"
-          name="electricityPrice"
-          rules={[
-            { required: true, message: "Please enter the electricity price" },
-          ]}
-          className="mb-2"
-        >
-          <InputNumber
-            placeholder="Enter electricity price"
+          {/* Giá Điện */}
+          <Form.Item
+            label={t("addBoardingHouseAdmin.electricityPrice")}
             name="electricityPrice"
-            value={formData.electricityPrice}
-            onChange={(value) =>
-              handleInputChange({ target: { name: "electricityPrice", value } })
-            }
-            formatter={(value) =>
-              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            }
-            parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-            className="w-full"
-            min={0}
-          />
-        </Form.Item>
+            rules={[
+              { required: true, message: t("addBoardingHouseAdmin.fieldRequired") },
+            ]}
+            className="mb-2"
+          >
+            <InputNumber
+              placeholder={t("addBoardingHouseAdmin.enterElectricityPrice")}
+              name="electricityPrice"
+              value={formData.electricityPrice}
+              onChange={(value) =>
+                handleInputChange({ target: { name: "electricityPrice", value } })
+              }
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+              className="w-full"
+              min={0}
+            />
+          </Form.Item>
 
-        {/* Water Price */}
-        <Form.Item
-          label="Water Price/m³ (VND)"
-          name="waterPrice"
-          rules={[{ required: true, message: "Please enter the water price" }]}
-          className="mb-2"
-        >
-          <InputNumber
-            placeholder="Enter water price"
+          {/* Giá Nước */}
+          <Form.Item
+            label={t("addBoardingHouseAdmin.waterPrice")}
             name="waterPrice"
-            value={formData.waterPrice}
-            onChange={(value) =>
-              handleInputChange({ target: { name: "waterPrice", value } })
-            }
-            formatter={(value) =>
-              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            }
-            parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-            className="w-full"
-            min={0}
-          />
-        </Form.Item>
-        {/* Total Rooms */}
-        {/* <Form.Item
-                    label="Total Rooms"
-                    name="totalRooms"
-                    rules={[{ required: true, message: "Please enter the total number of rooms" }]}
-                    className="mb-2"
-                >
-                    <Input
-                        type="number"
-                        placeholder="Enter total rooms"
-                        name="totalRooms"
-                        value={formData.totalRooms}
-                        onChange={handleInputChange}
-                    />
-                </Form.Item>
-
-                {/* Available Rooms */}
-        {/* <Form.Item
-                    label="Available Rooms"
-                    name="availableRooms"
-                    rules={[{ required: true, message: "Please enter the available rooms" }]}
-                    className="mb-2"
-                >
-                    <Input
-                        type="number"
-                        placeholder="Enter available rooms"
-                        name="availableRooms"
-                        value={formData.availableRooms}
-                        onChange={handleInputChange}
-                    />
-                </Form.Item> */}
-
-        {/* Form Buttons */}
-        <div className="flex justify-end mt-4 ">
-          <Button
-            title="Cancel"
-            btnCancel={true}
-            onClick={onClose}
-            className="bg-red-500 hover:bg-red-600 text-white mr-2"
-            size="large"
+            rules={[
+              { required: true, message: t("addBoardingHouseAdmin.fieldRequired") },
+            ]}
+            className="mb-2"
           >
-            Cancel
-          </Button>
-          <Button
-            className="bg-primary w-full text-white ml-2"
-            size="large"
-            onClick={handleSubmit}
-            title="Submit"
-          >
-            Submit
-          </Button>
-        </div>
-      </Form>
-    </div>
+            <InputNumber
+              placeholder={t("addBoardingHouseAdmin.enterWaterPrice")}
+              name="waterPrice"
+              value={formData.waterPrice}
+              onChange={(value) =>
+                handleInputChange({ target: { name: "waterPrice", value } })
+              }
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+              className="w-full"
+              min={0}
+            />
+          </Form.Item>
+
+          <div className="flex justify-end mt-4">
+            <Button
+              title={t("addBoardingHouseAdmin.cancel")}
+              btnCancel={true}
+              onClick={onClose}
+              className="bg-red-500 hover:bg-red-600 text-white mr-2"
+              size="large"
+            >
+              {t("addBoardingHouseAdmin.cancel")}
+            </Button>
+            <Button
+              className="bg-primary w-full text-white ml-2"
+              size="large"
+              onClick={handleSubmit}
+              title={t("addBoardingHouseAdmin.submit")}
+            >
+              {t("addBoardingHouseAdmin.submit")}
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </ConfigProvider>
+
   );
 }
 

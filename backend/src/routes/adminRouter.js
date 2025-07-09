@@ -10,6 +10,7 @@ import {
 } from '../controllers/index.js';
 import reviewController from '../controllers/reviewController.js';
 import facilitiesController from '../controllers/facilitiesController.js';
+import { upload } from "../config/cloudinary.config.js";
 
 const adminRouter = Router();
 
@@ -73,6 +74,7 @@ adminRouter.get(
 );
 adminRouter.put(
   '/boardinghouse/:id',
+  upload.array("boardingHouse"),
   boardingHouseController.updateBoardingHouseDetails
 );
 adminRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
@@ -94,10 +96,12 @@ adminRouter.get(
 );
 adminRouter.post(
   '/boardinghouse/create',
+  upload.array("boardingHouse"),
   boardingHouseController.createBoardingHouse
 );
 adminRouter.post(
   '/boardinghouse/uploadFile',
+  upload.array("boardingHouse"),
   boardingHouseController.uploadFile
 );
 adminRouter.get(

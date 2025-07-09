@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import AddressSelector from "../../../component/AddressSelector";
 import { Button, TableCustom as Table, ConfirmModal } from "../../../component";
 import {
@@ -31,6 +31,10 @@ import FilterBoardingHouse from "./FilterBoardingHouse";
 import { Form, Input, Select, Upload, InputNumber, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import BHDetailAdmin from "./BHDetailsAdmin";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "../../../context/themeContext";
 function BoardingHouseManagement(onClose) {
   const [boardingHData, setBoardingHData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +68,24 @@ function BoardingHouseManagement(onClose) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [filterValue, setFilterValue] = useState();
   const [geoLocation, setGeoLocation] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Current page number
+  const [pageSize, setPageSize] = useState(10); // Number of items per page
+  const [totalItems, setTotalItems] = useState(0); // Total number of items
+  const { darkMode } = useTheme();
+
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+    sortField: "createdAt",
+    sortOrder: "desc",
+  });
+  const { t } = useTranslation("boardingHouseAdmin");
   // Handle opening the delete modal
   const handleDeleteModal = (record) => {
     setSelectedRequest(record);
@@ -73,7 +95,7 @@ function BoardingHouseManagement(onClose) {
     setLoading(true);
     try {
       const response = await getAllBoardingHDB();
-      // console.log("API Response:", response);
+      console.log("API Response:", response);
       setBoardingHData(response || []);
     } catch (error) {
       console.error("Failed to fetch boarding houses:", error);
@@ -145,20 +167,42 @@ function BoardingHouseManagement(onClose) {
     }
   };
 
+
   const fetchFilterData = async () => {
+    setLoading(true);
     try {
-      const res = await filterBH(filterValue);
-      setBoardingHData(res);
+      const response = await filterBH({
+        ...filterValue,
+        page: paginationOptions.page,
+        limit: paginationOptions.limit,
+      });
+      console.log("Filter response:", response); // Thêm log ở đây để kiểm tra
+
+      if (response?.data) {
+        setBoardingHData(response.data);
+        setPagination({
+          currentPage: response.pagination.currentPage,
+          totalPages: response.pagination.totalPages,
+          totalItems: response.pagination.totalItems,
+          limit: response.pagination.limit,
+        });
+      }
     } catch (error) {
       console.error("Failed to fetch data:", error);
       toast.error("Failed to fetch filter data.");
+    } finally {
+      setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchFilterData();
-  }, [filterValue]);
+  }, [filterValue, paginationOptions]);
 
+  // Handle page change
+  const handlePageChange = (page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+  };
   // Fetch  Boarding House types
   const fetchBoardingHouseTypes = async () => {
     try {
@@ -261,23 +305,27 @@ function BoardingHouseManagement(onClose) {
     e.preventDefault();
 
     if (!formData.name) {
-      toast.error("Please enter a boarding house name.");
+      toast.error(t("errors.enterBoardingHouseName"));
       return;
     }
     if (!formData.address.province) {
-      toast.error("Please select a boarding house province.");
+      toast.error(t("errors.selectProvince"));
+      return;
+    }
+    if (formData.otherImages.length > 15) {
+      toast.error(t("errors.maxOtherImages"));
       return;
     }
     if (!formData.address.district) {
-      toast.error("Please select a boarding house district.");
+      toast.error(t("errors.selectDistrict"));
       return;
     }
     if (!formData.address.ward) {
-      toast.error("Please select a boarding house ward.");
+      toast.error(t("errors.selectWard"));
       return;
     }
     if (!formData.address.detail) {
-      toast.error("Please enter a boarding house details.");
+      toast.error(t("validation.enterDetailAddress"));
       return;
     }
     try {
@@ -286,49 +334,24 @@ function BoardingHouseManagement(onClose) {
         return;
       }
 
-      const imagesData = [...images];
-      const payloadPrimary = new FormData();
-
-      // Upload primary image
-      if (formData.primaryImage) {
-        payloadPrimary.append("file", formData.primaryImage);
-
-        try {
-          const responsePrimary = await uploadFile(payloadPrimary);
-          imagesData.push({
-            imageUrl: responsePrimary.filePath,
-            isPrimary: true,
-          });
-        } catch (error) {
-          toast.error("Please upload a primary image.");
-          return;
-        }
+      const allImages = [];
+      if (formData.primaryImage) allImages.push(formData.primaryImage);
+      if (formData.otherImages.length > 15) {
+        toast.error("You can't upload more than 15 other images.");
+        return;
       }
-
-      // Validate and upload other images
-      for (const image of formData.otherImages) {
-        const payload = new FormData();
-        payload.append("file", image);
-
-        try {
-          const response = await uploadFile(payload);
-          imagesData.push({
-            imageUrl: response.filePath,
-            isPrimary: false,
-          });
-        } catch (error) {
-          toast.error("Failed to upload an image.");
-          return;
-        }
+      allImages.push(...formData.otherImages);
+      if (allImages.length === 0) {
+        toast.error("You must upload at least one image.");
+        return;
       }
-
-      const form = {
+      let form = {
         ownerUsername: formData.owner,
         boardingHouseType: formData.boardingHouseType,
         name: formData.name,
         address: formData.address,
         description: formData.description,
-        images: imagesData,
+        // images: imagesData,
         priceRange: formData.priceRange,
         electricityPrice: formData.electricityPrice,
         waterPrice: formData.waterPrice,
@@ -337,7 +360,10 @@ function BoardingHouseManagement(onClose) {
           lon: geoLocation?.lon,
         },
       };
-
+      allImages.forEach((file, index) => {
+        // form.append("boardingHouse", file);
+        form = { ...form, boardingHouse: file }
+      });
       setLoading(true);
 
       //API  update boarding house details
@@ -427,7 +453,7 @@ function BoardingHouseManagement(onClose) {
     try {
       const response = await softDeleteBoardingHouse(selectedRequest._id); // Pass the correct _id
       if (response.success) {
-        toast.success("Boarding house deleted successfully.");
+        toast.success(t("messages.deleteSuccess"));
         fetchData(); // Refresh the data
         setIsOpenDeleteModal(false); // Close the modal
         setSelectedRequest(null); // Clear the selected request
@@ -439,8 +465,12 @@ function BoardingHouseManagement(onClose) {
       toast.error("Failed to delete boarding house. Please try again later.");
     }
   };
+  const navigate = useNavigate();
+
   // mở form details
   const onProcessData = async (record) => {
+
+    navigate(`/dashboard/bh-management/${record._id}`);
     try {
       const { data } = await getBoardingHouseDetails(record._id);
       setFormData({
@@ -466,12 +496,12 @@ function BoardingHouseManagement(onClose) {
   // Cấu hình cột trong bảng
   const columns = [
     {
-      title: "Name",
+      title: t("boardingHouseAdmin.name"),
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "Address",
+      title: t("boardingHouseAdmin.address"),
       dataIndex: "address",
       key: "address",
       render: (text) =>
@@ -480,44 +510,51 @@ function BoardingHouseManagement(onClose) {
           : "",
     },
     {
-      title: "Price Range (VND)",
+      title: t("boardingHouseAdmin.priceRange"),
       dataIndex: "priceRange",
       key: "priceRange",
-      render: (text) => `${formatAmount(text)}/month`,
+      render: (text) => `${formatAmount(text)}`,
+    },
+    // {
+    //   title: t("boardingHouseAdmin.boardingHouseType"),
+    //   dataIndex: "boardingHouseType",
+    //   key: "boardingHouseType",
+    //   render: (text) => (text ? text.name : ""),
+    // },
+    {
+      title: t('boardingHouseAdmin.boardingHouseType'),
+      dataIndex: 'boardingHouseType',
+      key: 'boardingHouseType',
+      render: (type) => {
+        if (!type) return t('messages.noData');
+        return t(`boardingHouseTypes.${type.name}`) || t('messages.noData');
+      },
     },
     {
-      title: "Boarding House Type",
-      dataIndex: "boardingHouseType",
-      key: "boardingHouseType",
-      render: (text) => (text ? text.name : ""),
-    },
-    {
-      title: "Total Rooms",
+      title: t("boardingHouseAdmin.totalRooms"),
       dataIndex: "totalRooms",
       key: "totalRooms",
     },
     {
-      title: "Created At",
+      title: t("boardingHouseAdmin.createdAt"),
       dataIndex: "createdAt",
       key: "createdAt",
       render: (text) => convertTimetap(text),
     },
     {
-      title: "Action",
+      title: t("boardingHouseAdmin.action"),
       key: "action",
       render: (text, record) => (
         <div className="flex gap-3">
           <Button
-            title="Delete"
-            size="large"
+            title={t("boardingHouseAdmin.delete")}
             btnDelete
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
           <Button
             onClick={() => onProcessData(record)}
-            size="large"
-            title="Detail"
+            title={t("boardingHouseAdmin.update")}
             icon={<FileTextOutlined />}
             className="text-white"
             bgColor="rgb(5 150 105)"
@@ -526,28 +563,61 @@ function BoardingHouseManagement(onClose) {
       ),
     },
   ];
-
+  const handleTableChange = (pagination, filters, sorter) => {
+    const newPaginationOptions = {
+      ...paginationOptions,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    };
+    setPaginationOptions(newPaginationOptions);
+  };
+  const tablePaginationConfig = useMemo(() => ({
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
+    showTotal: (total, range) => (
+      <span
+        style={{
+          color: darkMode ? "#ffffff" : "#000000",
+        }}
+      >
+        {t("boardingHouseAdmin.pagination.showTotal", {
+          start: range[0],
+          end: range[1],
+          total,
+        })}
+      </span>
+    ),
+  }), [pagination, t]);
   return (
     <div className="boarding-house-management">
-      <div className="flex justify-between">
+      <div className="flex justify-between mb-4">
         <Button
           btnAdd
-          title="Add new"
+          title={t("boardingHouseAdmin.addNew")}
           size="large"
           onClick={handleOpenForm}
-        ></Button>
+        />
 
         <FilterBoardingHouse
           setFilterValue={setFilterValue}
           boardingHouseTypes={boardingHouseTypes}
         />
       </div>
-      <Table columns={columns} data={boardingHData} loading={loading} />
+      <Table
+        columns={columns}
+        data={boardingHData}
+        loading={loading}
+        onChange={handleTableChange}
+        pagination={tablePaginationConfig}
+      />
+
       <ConfirmModal
-        title="Confirm Deletion"
-        content={`Are you sure you want to delete "${
-          selectedRequest?.name || "this boarding house"
-        }"?`}
+        title={t("boardingHouseAdmin.confirmDeletion.title")}
+        content={t("boardingHouseAdmin.confirmDeletion.content", {
+          name: selectedRequest?.name || t("boardingHouseAdmin.delete"),
+        })}
         onOk={handleSelectDelete}
         onCancel={() => {
           setIsOpenDeleteModal(false);
@@ -562,384 +632,26 @@ function BoardingHouseManagement(onClose) {
         />
       )}
       {isDetailOpen && formData && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          // click out close details
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              handleCloseDetail();
-              setGeoLocation(null);
-            }
-          }}
-        >
-          <Form
-            layout="vertical"
-            onSubmit={handleSubmit}
-            className="bg-white p-6 rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-lg"
-          >
-            <h2 className="text-4xl font-bold mb-8">Boarding House Detail</h2>
-            <h2 className="text-3xl font-bold mb-4 ">
-              1. Owner and information
-            </h2>
-            {/* <div className="  gap-4 max-h-[600px] "> */}
-
-            <Form.Item label="Name Owner" className="mb-2">
-              <Input
-                value={formData.ownerId?.fullname || ""}
-                readOnly
-                className="bg-gray-100 text-gray-500 cursor-not-allowed"
-              />
-            </Form.Item>
-
-            <Form.Item label="Owner" className="mb-2">
-              <Input
-                value={formData.ownerId?.username || ""}
-                readOnly
-                className="bg-gray-100 text-gray-500 cursor-not-allowed"
-              />
-            </Form.Item>
-
-            <Form.Item label="Name Boarding House" className="mb-2">
-              <Input
-                name="name"
-                value={formData.name || ""}
-                onChange={handleInputChange}
-              />
-            </Form.Item>
-
-            <Form.Item label="Boarding House Type" className="mb-2">
-              <Select
-                name="boardingHouseType"
-                value={formData.boardingHouseType?._id || ""}
-                onChange={(value) =>
-                  handleSelectedTypesChange({
-                    target: {
-                      name: "boardingHouseType",
-                      value,
-                    },
-                  })
-                }
-              >
-                {boardingHouseTypes.map((type) => (
-                  <Select.Option key={type.value} value={type.value}>
-                    {type.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <div className="col-span-2">
-              <Form.Item label="Description">
-                <Input.TextArea
-                  name="description"
-                  value={formData.description || ""}
-                  onChange={handleInputChange}
-                  rows={4}
-                />
-              </Form.Item>
-            </div>
-
-            <h2 className="text-3xl font-bold mb-4 mt-10 ">Address</h2>
-            <AddressSelector
-              provinces={provinces}
-              districts={districts}
-              wards={wards}
-              onProvinceChange={handleInputChange}
-              onDistrictChange={handleInputChange}
-              onInputChange={handleInputChange}
-              formData={formData}
-              location={geoLocation}
-              initialPosition={formData?.location}
-              setGeoLocation={setGeoLocation}
-            />
-            <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
-            {/* Primary Image */}
-            <Form.Item label="Primary Image" className="mb-4">
-              <div className="flex flex-col gap-4">
-                {/* Check primary Image exists */}
-                {formData.primaryImage ||
-                images?.find((img) => img.isPrimary) ? (
-                  <div className="relative">
-                    <Image
-                      src={
-                        formData.primaryImage
-                          ? URL.createObjectURL(formData.primaryImage)
-                          : `http://localhost:3000${
-                              images.find((img) => img.isPrimary)?.imageUrl
-                            }`
-                      }
-                      alt="Primary"
-                      className="object-cover border rounded"
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        maxHeight: "300px",
-                      }}
-                      preview={{
-                        mask: <span className="text-white">Preview</span>,
-                      }}
-                    />
-                    {/* Delete Button */}
-                    <button
-                      type="button"
-                      onClick={handleRemovePrimaryImage}
-                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
-                    >
-                      X
-                    </button>
-                  </div>
-                ) : (
-                  // If no primary image exists, show the upload button
-                  <Upload
-                    {...uploadProps}
-                    listType="picture-card"
-                    showUploadList={false}
-                    className="custom-upload"
-                  >
-                    <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                      <PlusOutlined className="text-2xl text-gray-400" />
-                      <p className="text-gray-500 mt-2 text-sm font-medium">
-                        Add Primary Image
-                      </p>
-                      <p className="text-gray-400 text-xs">
-                        Drag-drop or click here to choose a file
-                      </p>
-                    </div>
-                  </Upload>
-                )}
-              </div>
-            </Form.Item>
-
-            <Form.Item label="Other Images" className="mb-4">
-              <div className="mt-4 flex flex-wrap gap-4">
-                {/* Display Other Images*/}
-                {images
-                  .filter((img) => !img.isPrimary) // Exclude primary images
-                  .map((img) => (
-                    <div key={img._id} className="relative">
-                      <Image
-                        src={`http://localhost:3000${img.imageUrl}`}
-                        alt="Other Image"
-                        className="object-cover border rounded"
-                        width={100}
-                        height={100}
-                        preview={{
-                          mask: <span className="text-white">Preview</span>,
-                        }}
-                      />
-                      {/* Delete Button */}
-                      <button
-                        type="button"
-                        onClick={() => handleImageDelete(img._id)}
-                        className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
-                      >
-                        X
-                      </button>
-                    </div>
-                  ))}
-
-                {/* Display Uploaded Other Images */}
-                {(formData.otherImages || []).map((file, index) => (
-                  <div key={index} className="relative group">
-                    <Image
-                      src={URL.createObjectURL(file)}
-                      alt={`Other Image ${index + 1}`}
-                      className="object-cover border border-gray-200 rounded-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-                      width={100}
-                      height={100}
-                      preview={{
-                        mask: <span className="text-white">Preview</span>,
-                      }}
-                    />
-                    {/* Delete Button */}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveOtherImage(index)}
-                      className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full z-10 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    >
-                      X
-                    </button>
-                  </div>
-                ))}
-
-                {/* Upload Other Images */}
-                <Upload
-                  {...uploadOtherImgProps}
-                  listType="picture-card"
-                  showUploadList={false}
-                  className="custom-upload"
-                >
-                  <div className="border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                    <PlusOutlined className="text-2xl text-gray-400" />
-                    <p className="text-gray-500 mt-2 text-sm font-medium">
-                      Add Primary Image
-                    </p>
-                    <p className="text-gray-400 text-xs">
-                      Drag-drop or click here to choose a file
-                    </p>
-                  </div>
-                </Upload>
-              </div>
-            </Form.Item>
-
-            <h2 className="text-3xl font-bold mb-4 mt-10 ">4. Price</h2>
-            <div>
-              <Form.Item label="Price Rent/month (VND)" className="mb-2">
-                <InputNumber
-                  name="priceRange"
-                  value={formData.priceRange || ""}
-                  onChange={(value) =>
-                    handleInputChange({ target: { name: "priceRange", value } })
-                  }
-                  formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  } // Thêm dấu phẩy ngăn cách hàng nghìn
-                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                  className="w-full"
-                  min={0}
-                />
-              </Form.Item>
-
-              <Form.Item label="Electricity Price/kWh (VND)" className="mb-2">
-                <InputNumber
-                  name="electricityPrice"
-                  value={formData.electricityPrice || ""}
-                  onChange={(value) =>
-                    handleInputChange({
-                      target: { name: "electricityPrice", value },
-                    })
-                  }
-                  formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                  className="w-full"
-                  min={0}
-                />
-              </Form.Item>
-
-              <Form.Item label="Water Price/m³ (VND)" className="mb-2">
-                <InputNumber
-                  name="waterPrice"
-                  value={formData.waterPrice || ""}
-                  onChange={(value) =>
-                    handleInputChange({ target: { name: "waterPrice", value } })
-                  }
-                  formatter={(value) =>
-                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                  className="w-full"
-                  min={0}
-                />
-              </Form.Item>
-              <h2 className="text-3xl font-bold mb-4 mt-10 ">5. Room</h2>
-              <Form.Item label="Total Rooms" className="mb-2">
-                <InputNumber
-                  value={formData.totalRooms || "0"}
-                  readOnly
-                  className="bg-gray-100 text-gray-500 cursor-not-allowed"
-                  style={{ width: "100%" }}
-                />
-              </Form.Item>
-
-              <Form.Item label="Available Rooms" className="mb-2">
-                <InputNumber
-                  value={formData.availableRooms || "0"}
-                  readOnly
-                  className="bg-gray-100 text-gray-500 cursor-not-allowed"
-                  style={{ width: "100%" }}
-                />
-              </Form.Item>
-
-              <h2 className="text-3xl font-bold mb-4 mt-10 ">
-                6. Like and Rating
-              </h2>
-              <Form.Item>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: "16px",
-                  }}
-                >
-                  {/* like */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <HeartFilled style={{ fontSize: "24px", color: "red" }} />
-                    <span style={{ fontSize: "16px", color: "#595959" }}>
-                      {formData.likes
-                        ? Number(formData.likes).toLocaleString("en-US") // Format big numbers with commas
-                        : "0"}
-                    </span>
-                  </div>
-
-                  {/* Rating */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                    }}
-                  >
-                    {Array.from({ length: 5 }, (_, index) => {
-                      if (index < Math.floor(formData.rating || 0)) {
-                        return (
-                          <StarFilled
-                            key={index}
-                            style={{ fontSize: "24px", color: "#FFD700" }}
-                          />
-                        );
-                      } else if (
-                        index === Math.floor(formData.rating || 0) &&
-                        (formData.rating || 0) % 1 !== 0
-                      ) {
-                        return (
-                          <StarOutlined
-                            key={index}
-                            style={{ fontSize: "24px", color: "#FFD700" }}
-                          />
-                        );
-                      } else {
-                        return (
-                          <StarOutlined
-                            key={index}
-                            style={{ fontSize: "24px", color: "#FFD700" }}
-                          />
-                        );
-                      }
-                    })}
-                  </div>
-                </div>
-              </Form.Item>
-            </div>
-            {/* </div> */}
-            <div className="flex justify-end">
-              <Button
-                className="bg-orange-600 text-white"
-                size="large"
-                onClick={handleCancel}
-                title="Cancel"
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-primary text-white ml-2"
-                size="large"
-                onClick={handleSubmit}
-                title="Update"
-              >
-                Update
-              </Button>
-            </div>
-          </Form>
-        </div>
+        <BHDetailAdmin
+          formData={formData}
+          provinces={provinces}
+          districts={districts}
+          wards={wards}
+          boardingHouseTypes={boardingHouseTypes}
+          geoLocation={geoLocation}
+          setGeoLocation={setGeoLocation}
+          images={images}
+          handleInputChange={handleInputChange}
+          handleSelectedTypesChange={handleSelectedTypesChange}
+          handleRemovePrimaryImage={handleRemovePrimaryImage}
+          handleRemoveOtherImage={handleRemoveOtherImage}
+          handleFileChange={handleFileChange}
+          handleImageDelete={handleImageDelete}
+          uploadProps={uploadProps}
+          uploadOtherImgProps={uploadOtherImgProps}
+          handleSubmit={handleSubmit}
+          handleCancel={handleCancel}
+        />
       )}
     </div>
   );
