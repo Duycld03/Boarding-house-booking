@@ -7,7 +7,8 @@ import { useTranslation } from "react-i18next";
 
 import ConfigurationStep from "./ConfigurationStep";
 import ReviewStep from "./ReviewStep";
-import { generateRooms, checkDuplicates } from "@/utils/roomUtils";
+import { checkDuplicates } from "@/utils/roomUtils";
+import "./AddRoom.css"; // Import custom styles
 
 function AddRoom({ boardingHouseId, refreshRoomData }) {
   const [form] = Form.useForm();

@@ -191,30 +191,17 @@ class RoomController {
         images: room.images || null
       }));
 
-      // Handle file uploads for single room
-      if (!isArray && req.file) {
-        roomDocs[0].images = {
-          imageUrl: req.file.path,
-          publicId: req.file.filename,
-        };
-      }
+
 
       // Save all rooms
       const savedRooms = await Room.insertMany(roomDocs);
 
-      // Return appropriate response
-      if (isArray) {
-        res.status(201).json({
-          message: `${savedRooms.length} rooms added successfully`,
-          rooms: savedRooms,
-          count: savedRooms.length
-        });
-      } else {
-        res.status(201).json({
-          message: "Room added successfully",
-          room: savedRooms[0]
-        });
-      }
+
+      res.status(201).json({
+        message: "Room added successfully",
+        room: savedRooms[0]
+      });
+
 
     } catch (error) {
       console.error("Error adding room:", error);

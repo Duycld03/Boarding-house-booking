@@ -31,6 +31,7 @@ import { Button } from "@/component";
 import { useTranslation } from "react-i18next"; // Thêm useTranslation
 import { useTheme } from "@/context/ThemeContext"; // Thêm useTheme
 import { toast } from "react-toastify"; // Thêm toast
+import "./AddRoom.css"; // Import custom styles
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -694,7 +695,7 @@ function ConfigurationStep({ form, roomTypes, addMode, setAddMode, onSubmit }) {
                         icon={<PlusOutlined />}
                         className={
                           darkMode
-                            ? "text-gray-300 border-gray-600 hover:border-blue-400 hover:text-blue-400"
+                            ? "text-gray-300 dark:text-gray-700 border-gray-600 hover:border-blue-400 hover:text-blue-400"
                             : ""
                         }
                       >

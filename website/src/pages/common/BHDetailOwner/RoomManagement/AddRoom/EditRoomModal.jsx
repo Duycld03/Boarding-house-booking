@@ -426,17 +426,15 @@ function EditRoomModal({ room, roomTypes, onClose, onUpdate, visible }) {
         <Form.Item>
           <div className="flex justify-end space-x-2 mt-4">
             <Button
-              title={t("common.cancel") || "Cancel"}
+              title={t("roomManagement.common.cancel") || "Cancel"}
               onClick={handleCancel}
               btnCancel
-              className="h-10"
             />
             <Button
-              title={t("common.save") || "Save Changes"}
+              title={t("roomManagement.common.save") || "Save Changes"}
               htmlType="submit"
               loading={loading}
               btnAdd
-              className="h-10"
             />
           </div>
         </Form.Item>

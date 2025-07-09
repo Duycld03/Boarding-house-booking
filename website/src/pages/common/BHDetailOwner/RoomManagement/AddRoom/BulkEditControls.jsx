@@ -13,6 +13,7 @@ import {
   Alert,
 } from "antd";
 import { Button } from "@/component";
+import "./AddRoom.css"; // Import custom styles
 import {
   CameraOutlined,
   DeleteOutlined,
