@@ -36,7 +36,12 @@
     "deleteSuccess": "Xóa nhà trọ thành công.",
     "deleteFailed": "Xóa nhà trọ thất bại.",
     "confirmDeleteTitle": "Xác nhận xóa",
-    "confirmDeleteContent": "Bạn có chắc chắn muốn xóa nhà trọ này không?"
+    "confirmDeleteContent": "Bạn có chắc chắn muốn xóa nhà trọ này không?",
+    "imageUploadSuccess": "Tải hình ảnh lên thành công",
+    "imageRemoveFailed": "Không thể xóa hình ảnh",
+    "roomTypeChanged": "Đã thay đổi loại phòng thành: {type}",
+    "roomTypeChangeFailed": "Không thể thay đổi loại phòng",
+    "descriptionChangeFailed": "Không thể thay đổi mô tả"
   },
 
   "validation": {
@@ -155,6 +160,35 @@
     "Nhà trọ kiến trúc xá": "Nhà trọ kiến trúc xá"
   },
   "roomManagement": {
+    "form": {
+      "roomType": {
+        "placeholder": "Chọn loại phòng",
+        "label": "Loại phòng",
+        "required": "Vui lòng chọn loại phòng!"
+      },
+      "roomNumber": {
+        "placeholder": "Nhập số phòng",
+        "label": "Số phòng",
+        "required": "Vui lòng nhập số phòng!"
+      },
+      "description": {
+        "placeholder": "Nhập mô tả",
+        "label": "Mô tả",
+        "required": "Vui lòng nhập mô tả!"
+      },
+
+      "uploadImage": "Tải lên hình ảnh",
+      "uploadHint": "Nhấp hoặc kéo thả hình ảnh để tải lên",
+      "supportedFormats": "Hỗ trợ: JPG, PNG tối đa 10MB",
+      "extra": "Tải lên hình ảnh rõ nét của phòng để thu hút người thuê",
+      "image": {
+        "label": "Hình ảnh phòng",
+        "uploadText": "Tải lên hình ảnh",
+        "uploadHint": "Nhấp hoặc kéo thả hình ảnh để tải lên",
+        "supportedFormats": "Hỗ trợ: JPG, PNG tối đa 10MB",
+        "extra": "Tải lên hình ảnh rõ nét của phòng để thu hút người thuê"
+      }
+    },
     "updateRoom": {
       "backToRoomManagement": "Quay lại quản lý phòng",
       "updateRoom": "Cập nhật phòng",
@@ -180,7 +214,7 @@
       "cancel": "Hủy bỏ",
       "confirm": "Xác nhận",
       "uploading": "Đang tải lên...",
-      "uploadFailed": "Tải lên thất bại",
+      "uploadFailed": "Không thể đọc tập tin hình ảnh",
       "invalidFileType": "Định dạng file không hợp lệ. Vui lòng chọn file JPG, PNG hoặc JPEG",
       "fileSizeTooLarge": "Kích thước file quá lớn. Kích thước tối đa là 5MB",
       "required": "Trường này là bắt buộc",
@@ -199,34 +233,65 @@
       "availability": "Tình trạng",
       "roomType": "Loại phòng",
       "createdAt": "Ngày tạo",
-      "actions": "Thao tác"
-    },
-    "status": {
-      "available": "Còn trống",
-      "occupied": "Đã có người thuê"
-    },
-    "actions": {
-      "delete": "Xóa",
-      "update": "Chỉnh sửa"
-    },
-    "messages": {
-      "deleteFailed": "Xóa phòng thất bại",
-      "updateSuccess": "Cập nhật phòng thành công"
-    },
-    "modal": {
-      "confirmDelete": {
-        "title": "Xác nhận xóa phòng",
-        "content": "Bạn có chắc chắn muốn xóa phòng này không?"
-      }
+      "actions": "Hành động"
     },
     "addRoom": {
       "button": {
-        "addRoom": "Thêm phòng"
+        "addRoom": "Thêm phòng",
+        "bulkAddRoom": "Thêm phòng hàng loạt",
+        "btnCancel": "Hủy",
+        "btnSelect": "Chọn"
       },
       "modal": {
         "title": "Thêm phòng mới",
-        "okText": "Thêm phòng"
+        "okText": "Thêm phòng",
+        "singleModeTitle": "Thêm phòng đơn",
+        "bulkModeTitle": "Cấu hình tầng tùy chỉnh",
+        "singleModeReviewTitle": "Thêm phòng đơn - Xem lại",
+        "bulkModeReviewTitle": "Thêm phòng hàng loạt - Xem lại"
       },
+      "chooseAddMode": "Chọn chế độ thêm phòng",
+      "singleRoom": "Phòng đơn",
+      "addOneRoomAtATime": "Thêm từng phòng một",
+      "bulkAdd": "Thêm hàng loạt",
+      "generateMultipleRooms": "Tạo nhiều phòng cùng lúc",
+      "roomInformation": "Thông tin phòng",
+      "floorConfiguration": "Cấu hình tầng",
+      "total": "Tổng cộng",
+      "rooms": "phòng",
+      "floor": "Tầng",
+      "floorNumberRequired": "Cần nhập số tầng",
+      "roomCount": "Số lượng phòng",
+      "roomCountRequired": "Cần nhập số lượng phòng",
+      "prefix": "Tiền tố (Tùy chọn)",
+      "prefixTooltip": "Tiền tố sẽ được thêm vào trước số phòng. Ví dụ: 'Đông101'",
+      "prefixPlaceholder": "Ví dụ: Đông, Tây",
+      "addFloor": "Thêm tầng",
+      "numberingFormat": "Định dạng đánh số",
+      "selectNumberingFormat": "Chọn định dạng đánh số",
+      "floorRoomFormat": "Tầng-Phòng (101, 102, 201, 202)",
+      "sequentialFormat": "Liên tiếp (1, 2, 3, 4)",
+      "paddedSequentialFormat": "Liên tiếp có số 0 (01, 02, 03, 04)",
+      "letterFormat": "Định dạng chữ cái (A1, A2, B1, B2)",
+      "otherFormat": "Khác (Định dạng tùy chỉnh)",
+      "customFormat": "Định dạng tùy chỉnh",
+      "enterCustomFormat": "Vui lòng nhập định dạng tùy chỉnh",
+      "customFormatPlaceholder": "Nhập định dạng tùy chỉnh (ví dụ: {floor}{room:02d}, T{floor}-P{room}, v.v.)",
+      "formatHints": "Gợi ý định dạng",
+      "formatPreview": "Xem trước định dạng:",
+      "customFormatInstructions": "Hướng dẫn định dạng tùy chỉnh",
+      "availableVariables": "Các biến có sẵn:",
+      "floorNumber": "Số tầng",
+      "roomNumber": "Số phòng",
+      "roomNumberWithLeadingZeros": "Số phòng có số 0 đứng trước (01, 02, v.v.)",
+      "letterBasedOnFloor": "Chữ cái dựa theo tầng (A, B, C, v.v.)",
+      "examples": "Ví dụ:",
+      "backToConfiguration": "Quay lại cấu hình",
+      "reviewRoom": "Xem lại phòng",
+      "generateRooms": "Tạo phòng",
+      "createRoom": "Tạo phòng",
+      "createAllRooms": "Tạo tất cả phòng ({{count}})",
+      "roomType": "Loại phòng",
       "form": {
         "roomType": {
           "label": "Loại phòng",
@@ -247,23 +312,88 @@
           "label": "Hình ảnh phòng",
           "uploadText": "Tải lên hình ảnh",
           "uploadHint": "Nhấp hoặc kéo thả hình ảnh để tải lên",
-          "supportedFormats": "Hỗ trợ: JPG, PNG, WEBP (Tối đa: 5MB)",
+          "supportedFormats": "Hỗ trợ: JPG, PNG tối đa 10MB",
           "extra": "Tải lên hình ảnh rõ nét của phòng để thu hút người thuê"
         }
       },
       "validation": {
         "imageRequired": "Vui lòng tải lên hình ảnh phòng",
         "invalidImageType": "Vui lòng tải lên file hình ảnh hợp lệ",
-        "imageSizeLimit": "Kích thước hình ảnh phải nhỏ hơn 5MB"
+        "imageSizeLimit": "Kích thước hình ảnh phải nhỏ hơn 10MB",
+        "fixErrorsFirst": "Vui lòng sửa các lỗi trước khi tạo phòng"
       },
       "noRoomType": {
         "title": "Không tìm thấy loại phòng",
         "content": "Vui lòng thêm loại phòng trước khi tạo phòng. Hãy vào Quản lý loại phòng để thêm loại phòng trước."
       }
     },
+    "editRoom": {
+      "title": "Sửa phòng"
+    },
+    "reviewStep": {
+      "bulkEditControls": "Chỉnh sửa hàng loạt phòng đã chọn",
+      "roomsSelected": "phòng đã chọn",
+      "deleteSelected": "Xóa đã chọn",
+      "noRoomsSelected": "Không có phòng nào được chọn",
+      "selectRoomsToEnable": "Vui lòng chọn ít nhất một phòng để bật tùy chọn chỉnh sửa hàng loạt.",
+      "roomType": "Loại phòng",
+      "description": "Mô tả",
+      "roomImage": "Hình ảnh phòng",
+      "selectRoomsToUpload": "Chọn phòng để tải lên",
+      "clickToUploadImage": "Nhấp để tải lên hình ảnh",
+      "change": "Thay đổi",
+      "remove": "Xóa",
+      "roomDetailsPreview": "Xem trước chi tiết phòng",
+      "deleteRoom": "Xóa phòng",
+      "updatingRoom": "Đang cập nhật phòng...",
+      "floorWith": "Tầng {{floor}} ({{count}} phòng)",
+      "errors": "{{count}} lỗi",
+      "noType": "{{count}} chưa có loại",
+      "noImage": "{{count}} chưa có ảnh",
+      "selectAll": "Chọn tất cả ({{selected}}/{{total}})",
+      "floor": "Tầng",
+      "image": "Hình ảnh",
+      "imageUploaded": "Đã tải ảnh lên",
+      "noImageUploaded": "Chưa tải ảnh lên",
+      "clickToPreview": "Nhấp để xem trước",
+      "confirmDeleteTitle": "Xóa phòng",
+      "confirmDeleteContent": "Bạn có chắc chắn muốn xóa phòng này không?",
+      "confirmBulkDeleteTitle": "Xóa nhiều phòng",
+      "confirmBulkDeleteContent": "Bạn có chắc chắn muốn xóa {{count}} phòng đã chọn không?",
+      "roomDeletedSuccess": "Xóa phòng thành công",
+      "roomsDeletedSuccess": "Đã xóa thành công {{count}} phòng",
+      "selectRoomsToDelete": "Vui lòng chọn phòng cần xóa",
+      "processingRooms": "Đang xử lý phòng...",
+      "noImages": "Chưa tải ảnh nào cho phòng này"
+    },
+    "validationSummary": {
+      "allRoomsReady": "Tất cả phòng đã sẵn sàng!",
+      "allRoomsReadyDescription": "Tất cả phòng đã được cấu hình đúng và sẵn sàng để tạo.",
+      "title": "Tóm tắt xác nhận",
+      "totalRooms": "Tổng số phòng: {{count}}",
+      "roomsWithErrors": "Phòng có lỗi: {{count}}",
+      "roomsWithoutType": "Phòng chưa có loại: {{count}}",
+      "roomsWithoutDescription": "Phòng chưa có mô tả: {{count}}",
+      "roomsWithoutImage": "Phòng chưa có hình ảnh: {{count}}"
+    },
+    "errorSummary": {
+      "duplicateRoomsTitle": "Phát hiện số phòng trùng lặp",
+      "duplicateRoomsContent": "Vui lòng sửa các số phòng trùng lặp sau: {rooms}"
+    },
+    "bulkCreationCard": {
+      "readyToCreate": "Sẵn sàng tạo {{count}} phòng?",
+      "batchDescription": "Tất cả phòng sẽ được tạo cùng một lúc trong một thao tác."
+    },
     "common": {
-      "ok": "Đồng ý",
-      "cancel": "Hủy bỏ"
+      "remove": "Xóa",
+      "save": "Lưu thay đổi",
+      "cancel": "Hủy",
+      "ok": "OK",
+      "selected": "Đã chọn",
+      "select": "Chọn",
+      "delete": "Xóa",
+      "edit": "Chỉnh sửa",
+      "unknown": "Không xác định"
     }
   },
   "roomAdditionFee": {

@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/ThemeContext";
 import RoomAdditionFeeList from "./RoomAdditionFeeList"; // Import the new component
 import "./updateRoom.css"; // Import custom styles if needed
+import DefaulImage from "@/assets/images/blankRoom.jpg";
 
 const { Text } = Typography;
 

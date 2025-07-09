@@ -135,45 +135,166 @@ class RoomController {
     }
   }
 
+
+  // Backend API - Improved addRoom method
   async addRoom(req, res) {
     try {
-      const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
+      const roomData = req.body;
+      const rooms = Array.isArray(roomData) ? roomData : [roomData];
 
-      if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
-        return res.status(400).json({ message: "Missing required parameters" });
+      // Validate  required fields for each room
+      for (const room of rooms) {
+        const { roomNumber, boardingHouseId, description, roomTypeId } = room;
+
+        if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
+          return res.status(400).json({
+            message: "Missing required parameters",
+            missingFields: { roomNumber, boardingHouseId, description, roomTypeId }
+          });
+        }
       }
 
-      const existingRoom = await Room.findOne({
-        roomNumber,
-        boardingHouseId,
+      // Check for duplicate room numbers in the same boarding house
+      const roomNumbers = rooms.map(room => room.roomNumber);
+      const duplicateCheck = await Room.find({
+        boardingHouseId: rooms[0].boardingHouseId,
+        roomNumber: { $in: roomNumbers }
       });
 
-      if (existingRoom) {
-        return res.status(400).json({ message: "Room already exists" });
+      if (duplicateCheck.length > 0) {
+        const existingNumbers = duplicateCheck.map(room => room.roomNumber);
+        return res.status(400).json({
+          message: "Some rooms already exist",
+          duplicateRooms: existingNumbers
+        });
       }
 
-      const room = new Room({
-        roomNumber,
-        boardingHouseId,
-        description,
-        roomTypeId,
+      // Check for duplicates within the current batch
+      const uniqueNumbers = new Set(roomNumbers);
+      if (uniqueNumbers.size !== roomNumbers.length) {
+        const duplicatesInBatch = roomNumbers.filter((item, index) =>
+          roomNumbers.indexOf(item) !== index
+        );
+        return res.status(400).json({
+          message: "Duplicate room numbers in the same request",
+          duplicateRooms: [...new Set(duplicatesInBatch)]
+        });
+      }
+
+      // Create room documents
+      const roomDocs = rooms.map(room => ({
+        roomNumber: room.roomNumber,
+        boardingHouseId: room.boardingHouseId,
+        description: room.description,
+        roomTypeId: room.roomTypeId,
         isAvailable: true,
-      });
+        images: room.images || null
+      }));
 
-      if (req.file) {
-        room.images = {
+      // Handle file uploads for single room
+      if (!isArray && req.file) {
+        roomDocs[0].images = {
           imageUrl: req.file.path,
           publicId: req.file.filename,
         };
       }
 
-      await room.save();
-      res.status(201).json({ message: "Room added successfully" });
+      // Save all rooms
+      const savedRooms = await Room.insertMany(roomDocs);
+
+      // Return appropriate response
+      if (isArray) {
+        res.status(201).json({
+          message: `${savedRooms.length} rooms added successfully`,
+          rooms: savedRooms,
+          count: savedRooms.length
+        });
+      } else {
+        res.status(201).json({
+          message: "Room added successfully",
+          room: savedRooms[0]
+        });
+      }
+
     } catch (error) {
       console.error("Error adding room:", error);
-      res.status(500).json({ message: "Server error", error });
+      res.status(500).json({ message: "Server error", error: error.message });
     }
   }
+
+  // Alternative: Create separate endpoint for bulk add
+  async addRooms(req, res) {
+    try {
+      const { rooms } = req.body;
+
+      if (!Array.isArray(rooms) || rooms.length === 0) {
+        return res.status(400).json({ message: "Invalid rooms data" });
+      }
+
+      // Validate required fields for each room
+      for (const room of rooms) {
+        const { roomNumber, boardingHouseId, description, roomTypeId } = room;
+
+        if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
+          return res.status(400).json({
+            message: "Missing required parameters in one or more rooms",
+            missingFields: { roomNumber, boardingHouseId, description, roomTypeId }
+          });
+        }
+      }
+
+      // Check for duplicate room numbers in the same boarding house
+      const roomNumbers = rooms.map(room => room.roomNumber);
+      const duplicateCheck = await Room.find({
+        boardingHouseId: rooms[0].boardingHouseId,
+        roomNumber: { $in: roomNumbers }
+      });
+
+      if (duplicateCheck.length > 0) {
+        const existingNumbers = duplicateCheck.map(room => room.roomNumber);
+        return res.status(400).json({
+          message: "Some rooms already exist",
+          duplicateRooms: existingNumbers
+        });
+      }
+
+      // Check for duplicates within the current batch
+      const uniqueNumbers = new Set(roomNumbers);
+      if (uniqueNumbers.size !== roomNumbers.length) {
+        const duplicatesInBatch = roomNumbers.filter((item, index) =>
+          roomNumbers.indexOf(item) !== index
+        );
+        return res.status(400).json({
+          message: "Duplicate room numbers in the same request",
+          duplicateRooms: [...new Set(duplicatesInBatch)]
+        });
+      }
+
+      // Create room documents
+      const roomDocs = rooms.map(room => ({
+        roomNumber: room.roomNumber,
+        boardingHouseId: room.boardingHouseId,
+        description: room.description,
+        roomTypeId: room.roomTypeId,
+        isAvailable: true,
+        images: room.images || null
+      }));
+
+      // Save all rooms
+      const savedRooms = await Room.insertMany(roomDocs);
+
+      res.status(201).json({
+        message: `${savedRooms.length} rooms added successfully`,
+        rooms: savedRooms,
+        count: savedRooms.length
+      });
+
+    } catch (error) {
+      console.error("Error adding rooms:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+
   async updateRoom(req, res) {
     try {
       const { roomId } = req.params;
