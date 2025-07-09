@@ -74,7 +74,9 @@
     "tenantManagement": "Quản lý khách thuê",
     "revenueManagement": "Quản lý doanh thu",
     "renewalManagement": "Quản lý gia hạn",
-    "rentPaymentManagement": "Quản lý thanh toán tiền thuê"
+    "rentPaymentManagement": "Quản lý thanh toán tiền thuê",
+        "reviewManagement": "Quản lí đánh giá"
+
   },
 
   "labels": {

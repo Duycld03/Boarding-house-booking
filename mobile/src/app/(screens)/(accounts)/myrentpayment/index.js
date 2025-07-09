@@ -1,25 +1,35 @@
-import { BackHeader } from '@/components/navigation/CustomHeader';
-import { getRentPaymentByUserId } from '@/API/rentPaymentAPI'
-import { Text, Button, Loader, LoadMoreButton, EmptyState } from '@/components/ui'
-import { ScreenContainer } from '@/components/layout'
-import { useThemedClasses } from '@/utils/useTheme'
-import { FontAwesome5 } from '@expo/vector-icons';
+import { BackHeader } from "@/components/navigation/CustomHeader";
+import { getRentPaymentByUserId } from "@/API/rentPaymentAPI";
+import {
+  Text,
+  Button,
+  Loader,
+  LoadMoreButton,
+  EmptyState,
+} from "@/components/ui";
+import { ScreenContainer } from "@/components/layout";
+import { useThemedClasses } from "@/utils/useTheme";
+import { FontAwesome5 } from "@expo/vector-icons";
 
-import { useCurrentUser } from '@/context/userContext'
+import { useCurrentUser } from "@/context/userContext";
 
-import { useTranslation } from 'react-i18next';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { useState, useCallback, useRef } from 'react';
+import { useTranslation } from "react-i18next";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useState, useCallback, useRef } from "react";
 
-import UserPaymentCard from '@/components/screen/myRentPayment/userPaymentCard';
-import { FlatList, View, StyleSheet } from 'react-native';
+import UserPaymentCard from "@/components/screen/myRentPayment/userPaymentCard";
+import { FlatList, View, StyleSheet } from "react-native";
 
 function MyRentPayment() {
-  const { t } = useTranslation('myRentPayment');
+  const { t } = useTranslation("myRentPayment");
   const { themedClasses, isDarkMode } = useThemedClasses();
   const [userPayment, setUserPayment] = useState([]);
   const router = useRouter();
-  const [pagination, setPagination] = useState({ page: 1, limit: 5, totalItems: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 5,
+    totalItems: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
@@ -41,7 +51,7 @@ function MyRentPayment() {
 
       if (isLoadMore) {
         // Nếu là load more, append data mới vào data cũ
-        setUserPayment(prev => [...prev, ...(paymentData.data || [])]);
+        setUserPayment((prev) => [...prev, ...(paymentData.data || [])]);
       } else {
         // Nếu là fetch mới, replace toàn bộ data
         setUserPayment(paymentData.data || []);
@@ -53,7 +63,7 @@ function MyRentPayment() {
         totalItems: paymentData.pagination.totalItems,
       });
     } catch (error) {
-      console.error('Error fetching user payment data:', error);
+      console.error("Error fetching user payment data:", error);
       // Có thể thêm error handling ở đây (toast, alert, etc.)
     } finally {
       setLoading(false);
@@ -66,7 +76,7 @@ function MyRentPayment() {
 
     const newPagination = {
       ...pagination,
-      page: pagination.page + 1
+      page: pagination.page + 1,
     };
     setPagination(newPagination);
 
@@ -74,14 +84,14 @@ function MyRentPayment() {
     try {
       setLoadingMore(true);
       const paymentData = await getRentPaymentByUserId(newPagination);
-      setUserPayment(prev => [...prev, ...(paymentData.data || [])]);
+      setUserPayment((prev) => [...prev, ...(paymentData.data || [])]);
       setPagination({
         page: paymentData.pagination.page,
         limit: paymentData.pagination.limit,
         totalItems: paymentData.pagination.totalItems,
       });
     } catch (error) {
-      console.error('Error loading more payments:', error);
+      console.error("Error loading more payments:", error);
     } finally {
       setLoadingMore(false);
     }
@@ -90,7 +100,7 @@ function MyRentPayment() {
   useFocusEffect(
     useCallback(() => {
       if (!isLogin) {
-        router.push('/login');
+        router.push("/login");
         return;
       }
 
@@ -104,8 +114,6 @@ function MyRentPayment() {
 
   const hasMore = userPayment.length < pagination.totalItems;
 
-
-
   // Render item cho FlatList
   const renderPaymentItem = ({ item, index }) => (
     <UserPaymentCard
@@ -115,15 +123,17 @@ function MyRentPayment() {
       isDarkMode={isDarkMode}
       themedClasses={themedClasses}
       onPressDetails={(payment) => {
-        router.push('/myrentpayment/paymentDetail');
-        // Pass the payment data as params
         router.push({
-          pathname: '/myrentpayment/paymentDetail',
-          params: { paymentData: JSON.stringify(payment) }
+          pathname: "/myrentpayment/paymentDetail",
+          params: { paymentData: JSON.stringify(payment) },
         });
       }}
-
-      onPressPay={() => console.log('Pay clicked')}
+      onPressPay={(payment) => {
+        router.push({
+          pathname: "/myrentpayment/payRent",
+          params: { paymentBillId: payment.paymentBillId._id },
+        });
+      }}
     />
   );
 
@@ -135,7 +145,7 @@ function MyRentPayment() {
 
     return (
       <EmptyState
-        title={t('noPayments')}
+        title={t("noPayments")}
         icon={<FontAwesome5 name="money-bill-wave" size={50} color="#ccc" />}
       />
     );
@@ -148,11 +158,11 @@ function MyRentPayment() {
         <FontAwesome5
           name="chevron-left"
           size={18}
-          color={isDarkMode ? '#fff' : '#333'}
+          color={isDarkMode ? "#fff" : "#333"}
         />
       }
-      onBackPress={() => router.push('/account')}
-      title={t('myRentPayments')}
+      onBackPress={() => router.push("/account")}
+      title={t("myRentPayments")}
     />
   );
 
@@ -167,7 +177,7 @@ function MyRentPayment() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.listContainer,
-          userPayment.length === 0 && styles.emptyContainer
+          userPayment.length === 0 && styles.emptyContainer,
         ]}
         // Pull to refresh (optional)
         refreshing={loading}
@@ -187,7 +197,7 @@ function MyRentPayment() {
             itemsPerPage={5}
             currentCount={userPayment.length}
             totalCount={pagination.totalItems}
-            itemName={t('rentPayments')}
+            itemName={t("rentPayments")}
           />
         </View>
       )}
@@ -205,14 +215,14 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   footerContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: "#f0f0f0",
   },
 });
 

@@ -108,7 +108,7 @@ authRouter.get(
 authRouter.post("/pay-deposit", depositController.payDeposit);
 authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
 authRouter.get(
-  "/deposit-payment-bill/:depositRoomId",
+  "/deposit-payment-bill/:paymentBillId",
   paymentBillController.getPaymentBillForRent
 );
 

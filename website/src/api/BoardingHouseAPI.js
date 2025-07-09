@@ -14,7 +14,11 @@ export const getBoardingHouseDetails = async (boardingHouseId) => {
   return axios.get(`/dashboard/boardinghouse/${boardingHouseId}`);
 };
 export const updateBoardingHouseDetails = (boardingHouseId, updateData) => {
-  return axios.put(`/dashboard/boardinghouse/${boardingHouseId}`, updateData);
+  return axios.put(`/dashboard/boardinghouse/${boardingHouseId}`, updateData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };
 export const filterBoardingHouseTypes = (filterParams) => {
   return axios.get('/dashboard/boardinghousetype/filter', {
@@ -51,7 +55,12 @@ export const getBoardingHouseImages = async (boardingHouseId) => {
   return axios.get(`/dashboard/boardinghouse/${boardingHouseId}/images`);
 };
 export const createBoardingHouse = (data) => {
-  return axios.post('/dashboard/boardinghouse/create', data);
+  return axios.post('/dashboard/boardinghouse/create', data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
 };
 export const uploadFile = (data) => {
   return axios.post('/dashboard/boardinghouse/uploadFile', data, {

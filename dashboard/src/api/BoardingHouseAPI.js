@@ -14,7 +14,11 @@ export const getBoardingHouseDetails = async (boardingHouseId) => {
   return axios.get(`/dashboard/boardinghouse/${boardingHouseId}`);
 };
 export const updateBoardingHouseDetails = (boardingHouseId, updateData) => {
-  return axios.put(`/dashboard/boardinghouse/${boardingHouseId}`, updateData);
+  return axios.put(`/dashboard/boardinghouse/${boardingHouseId}`, updateData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };
 export const filterBoardingHouseTypes = (filterParams) => {
   return axios.get('/dashboard/boardinghousetype/filter', {

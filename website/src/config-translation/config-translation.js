@@ -36,6 +36,8 @@ import en_rentPayment from '@/locales/en/rentPayment.json';
 import vi_rentPayment from '@/locales/vi/rentPayment.json';
 import en_renewalManagement from '@/locales/en/renewalManagement.json';
 import vi_renewalManagement from '@/locales/vi/renewalManagement.json';
+import en_review from '@/locales/en/review.json';
+import vi_review from '@/locales/vi/review.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -58,6 +60,7 @@ i18n.use(initReactI18next).init({
       calculateRent: en_calculateRent,
       rentPayment: en_rentPayment,
       renewalManagement: en_renewalManagement,
+      review: en_review,
     },
     vi: {
       menu: vi_menu,
@@ -78,6 +81,7 @@ i18n.use(initReactI18next).init({
       calculateRent: vi_calculateRent,
       rentPayment: vi_rentPayment,
       renewalManagement: vi_renewalManagement,
+      review: vi_review,
     },
   },
   lng: 'en',
