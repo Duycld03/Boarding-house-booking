@@ -9,6 +9,7 @@ import {
   StarOutlined,
 } from '@ant-design/icons';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 
 const cx = classNames;
 
@@ -36,6 +37,8 @@ const BoardingHouseForm = ({
   uploadOtherImgProps,
 }) => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const lang = i18n.language || 'vi';
 
   return (
     <div className="mx-auto md:w-[100%]">
@@ -428,12 +431,13 @@ const BoardingHouseForm = ({
                 className={darkMode ? 'dark-mode-select' : ''}
               >
                 {provinces.map((province) => (
-                  <Select.Option key={province.code} value={province.name}>
-                    {province.name}
+                  <Select.Option key={province.id} value={province.name[lang]}>
+                    {province.name[lang]}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
+
             <Form.Item label={t('form.labels.district')} required>
               <Select
                 placeholder={t('form.placeholders.selectDistrict')}
@@ -457,12 +461,13 @@ const BoardingHouseForm = ({
                 className={darkMode ? 'dark-mode-select' : ''}
               >
                 {districts.map((district) => (
-                  <Select.Option key={district.code} value={district.name}>
-                    {district.name}
+                  <Select.Option key={district.id} value={district.name[lang]}>
+                    {district.name[lang]}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
+
             <Form.Item label={t('form.labels.ward')} required>
               <Select
                 placeholder={t('form.placeholders.selectWard')}
@@ -482,12 +487,13 @@ const BoardingHouseForm = ({
                 className={darkMode ? 'dark-mode-select' : ''}
               >
                 {wards.map((ward) => (
-                  <Select.Option key={ward.code} value={ward.name}>
-                    {ward.name}
+                  <Select.Option key={ward.id} value={ward.name[lang]}>
+                    {ward.name[lang]}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
+
             <Form.Item label={t('form.labels.detailAddress')}>
               <Input.TextArea
                 name="address.detail"

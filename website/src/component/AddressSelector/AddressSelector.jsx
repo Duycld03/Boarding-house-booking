@@ -21,7 +21,9 @@ const AddressSelector = ({
   setGeoLocation,
   darkMode = false,
 }) => {
-  const { t } = useTranslation('bhManagement'); // namespace theo ví dụ của bạn
+  const { t, i18n } = useTranslation('bhManagement');
+  const lang = i18n.language || 'vi';
+
   const [currentLocation, setCurrentLocation] = useState(
     initialPosition ? [initialPosition.lat, initialPosition.lon] : null
   );
@@ -38,11 +40,9 @@ const AddressSelector = ({
     setCurrentLocation([lat, lng]);
   };
 
-  // Classname helper cho dark mode select và input
   const selectClass = classNames({ 'dark-mode-select': darkMode });
   const textareaClass = classNames({ 'dark-mode-input': darkMode });
 
-  // Style inline cho dark mode, bạn có thể customize thêm
   const darkSelectDropdownStyle = darkMode
     ? { backgroundColor: '#374151', color: '#F9FAFB' }
     : {};
@@ -75,8 +75,8 @@ const AddressSelector = ({
             popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
           >
             {provinces.map((province) => (
-              <Option key={province.code} value={province.name}>
-                {province.name}
+              <Option key={province.id} value={province.name[lang]}>
+                {province.name[lang]}
               </Option>
             ))}
           </Select>
@@ -102,8 +102,8 @@ const AddressSelector = ({
             popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
           >
             {districts.map((district) => (
-              <Option key={district.code} value={district.name}>
-                {district.name}
+              <Option key={district.id} value={district.name[lang]}>
+                {district.name[lang]}
               </Option>
             ))}
           </Select>
@@ -126,8 +126,8 @@ const AddressSelector = ({
             popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
           >
             {wards.map((ward) => (
-              <Option key={ward.code} value={ward.name}>
-                {ward.name}
+              <Option key={ward.id} value={ward.name[lang]}>
+                {ward.name[lang]}
               </Option>
             ))}
           </Select>
@@ -146,12 +146,12 @@ const AddressSelector = ({
           />
         </Form.Item>
       </Form>
-      {/* Nếu bạn có LocationPicker thì thêm ở đây, truyền darkMode nếu hỗ trợ */}
+
+      {/* Location Picker */}
       <LocationPicker
         onChange={onLocationChange}
         geoJson={location?.geojson}
         initialPosition={currentLocation}
-        // darkMode={darkMode}
       />
     </div>
   );

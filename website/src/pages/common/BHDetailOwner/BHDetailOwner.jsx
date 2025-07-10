@@ -57,8 +57,9 @@ const BHDetailOwner = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { t } = useTranslation('bhManagement');
+  const { t, i18n } = useTranslation('bhManagement');
   const { darkMode } = useTheme();
+  const lang = i18n.language || 'vi';
 
   const boardingHouseName = location.state?.name || t('defaultTitle');
 
@@ -120,18 +121,18 @@ const BHDetailOwner = () => {
 
         if (updatedData?.address?.province) {
           const selectedProvince = provincesData.find(
-            (p) => p.name === updatedData.address.province
+            (p) => p.name[lang] === updatedData.address.province
           );
           if (selectedProvince) {
-            const districtsData = await fetchDistricts(selectedProvince.code);
+            const districtsData = await fetchDistricts(selectedProvince.id);
             setDistricts(districtsData);
 
             if (updatedData?.address?.district) {
               const selectedDistrict = districtsData.find(
-                (d) => d.name === updatedData.address.district
+                (d) => d.name[lang] === updatedData.address.district
               );
               if (selectedDistrict) {
-                const wardsData = await fetchWards(selectedDistrict.code);
+                const wardsData = await fetchWards(selectedDistrict.id);
                 setWards(wardsData);
               }
             }

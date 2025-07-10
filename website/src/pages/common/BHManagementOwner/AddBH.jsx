@@ -34,7 +34,7 @@ import './darkModeOverrides.css';
 const cx = classNames;
 
 const AddBHModal = ({ onAddData }) => {
-  const { t } = useTranslation('bhManagement');
+  const { t, i18n } = useTranslation('bhManagement');
   const { darkMode } = useTheme();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -57,6 +57,7 @@ const AddBHModal = ({ onAddData }) => {
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
   const [geoLocation, setGeoLocation] = useState(null);
   const [managers, setManagers] = useState([]); // To store the list of managers
+  const lang = i18n.language || 'vi';
 
   const darkInputStyle = darkMode
     ? {
@@ -75,22 +76,23 @@ const AddBHModal = ({ onAddData }) => {
       try {
         const provincesData = await fetchProvinces();
         setProvinces(provincesData);
+        console.log('Hih', provincesData);
 
         if (formData?.address?.province) {
           const selectedProvince = provincesData.find(
-            (p) => p.name === formData.address.province
+            (p) => p.name[lang] === formData.address.province
           );
           if (selectedProvince) {
-            const districtsData = await fetchDistricts(selectedProvince.code);
+            const districtsData = await fetchDistricts(selectedProvince.id);
             setDistricts(districtsData);
             setWards([]);
 
             if (formData?.address?.district) {
               const selectedDistrict = districtsData.find(
-                (d) => d.name === formData.address.district
+                (d) => d.name[lang] === formData.address.district
               );
               if (selectedDistrict) {
-                const wardsData = await fetchWards(selectedDistrict.code);
+                const wardsData = await fetchWards(selectedDistrict.id);
                 setWards(wardsData);
               }
             }
