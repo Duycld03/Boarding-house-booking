@@ -1,0 +1,42 @@
+{
+  "table": {
+    "tableName": "Yêu cầu gia hạn",
+    "tenantName": "Tên người thuê",
+    "roomNumber": "Số phòng",
+    "boardingHouse": "Nhà trọ",
+    "status": "Trạng thái",
+    "currentEndDate": "Ngày kết thúc hiện tại",
+    "requestedEndDate": "Ngày yêu cầu gia hạn",
+    "action": "Hành động"
+  },
+  "status": {
+    "pending": "Chờ duyệt",
+    "accepted": "Đã chấp nhận",
+    "rejected": "Đã từ chối"
+  },
+  "action": {
+    "accept": "Chấp nhận",
+    "reject": "Từ chối",
+        "cancel": "Hủy"
+
+  },
+  "form": {
+    "rejectReason": "Lý do từ chối",
+    "rejectReasonRequired": "Vui lòng nhập lý do từ chối",
+    "rejectReasonPlaceholder": "Nhập lý do từ chối"
+  },
+  "messages": {
+    "fetchError": "Không thể tải danh sách yêu cầu gia hạn",
+    "rejectSuccess": "Từ chối yêu cầu thành công.",
+    "acceptSuccess": "Chấp nhận yêu cầu gia hạn thành công.",
+    "rejectError": "Đã xảy ra lỗi khi từ chối yêu cầu.",
+    "acceptError": "Đã xảy ra lỗi khi chấp nhận yêu cầu.",
+    "rejectReasonRequired": "Vui lòng nhập lý do từ chối.",
+    "noData": "Không có dữ liệu"
+  },
+  "modal": {
+    "confirmTitle": "Xác nhận chấp nhận",
+    "confirmContent": "Bạn có chắc muốn chấp nhận yêu cầu gia hạn cho phòng {{room}} không?",
+    "rejectTitle": "Từ chối yêu cầu gia hạn"
+  }
+}

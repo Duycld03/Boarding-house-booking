@@ -1,0 +1,38 @@
+{
+  "table": {
+        "tableName": "Renewal Request",
+    "tenantName": "Tenant Name",
+    "roomNumber": "Room Number",
+    "boardingHouse": "Boarding House",
+    "status": "Status",
+    "currentEndDate": "Current End Date",
+    "requestedEndDate": "Requested End Date",
+    "action": "Action"
+  },
+  "status": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "rejected": "Rejected"
+  },
+  "action": {
+    "accept": "Accept",
+    "reject": "Reject",
+    "cancel": "Cancel"
+  },
+  "form": {
+    "rejectReason": "Reason for Cancel",
+    "rejectReasonRequired": "Please enter a reason for rejection",
+    "rejectReasonPlaceholder": "Enter reason for rejection"
+  },
+  "messages": {
+    "rejectSuccess": "Request rejected successfully.",
+    "acceptSuccess": "Accepted renewal request successfully.",
+    "fetchError": "Failed to load renewal requests",
+    "rejectReasonRequired": "Please provide a reason for rejecting."
+  },
+  "modal": {
+    "confirmTitle": "Confirm Acceptance",
+    "confirmContent": "Are you sure you want to accept the renewal request for room {{room}}?",
+    "rejectTitle": "Reject Renewal Request"
+  }
+}
