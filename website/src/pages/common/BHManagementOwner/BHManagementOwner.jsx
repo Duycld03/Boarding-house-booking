@@ -64,7 +64,6 @@ function BHManagementOwner() {
             t('messages.noData')
           ),
       },
-
       {
         title: t('columns.priceRange'),
         dataIndex: 'priceRange',
@@ -135,6 +134,7 @@ function BHManagementOwner() {
     try {
       const res = await getAllBHOwner(filterValue, paginationOptions);
       setBoardingHouses(res.data);
+      console.log(res);
 
       setPagination({
         current: res.pagination.currentPage,

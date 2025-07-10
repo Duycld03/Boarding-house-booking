@@ -1,23 +1,12 @@
-// utils/addressHelper.js
+export default function getLocalizedAddress(address, lang = 'vi') {
+  if (!address) return '';
 
-import { provinceMap, districtMap, wardMap } from './addressMapping';
+  const province =
+    address.province?.[`name_${lang}`] || address.province?.name || '';
+  const district =
+    address.district?.[`name_${lang}`] || address.district?.name || '';
+  const ward = address.ward?.[`name_${lang}`] || address.ward?.name || '';
+  const detail = address.detail || '';
 
-const getLocalizedAddress = (address = {}, lang = 'vi') => {
-  const { province, district, ward, detail } = address;
-
-  const getTranslated = (value, map) => {
-    if (!value) return '';
-    return map[value]?.[lang] || value;
-  };
-
-  const parts = [
-    detail,
-    getTranslated(ward, wardMap),
-    getTranslated(district, districtMap),
-    getTranslated(province, provinceMap),
-  ].filter(Boolean);
-
-  return parts.join(', ');
-};
-
-export default getLocalizedAddress;
+  return [detail, ward, district, province].filter(Boolean).join(', ');
+}
