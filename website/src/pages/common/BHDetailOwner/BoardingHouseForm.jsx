@@ -412,20 +412,30 @@ const BoardingHouseForm = ({
               <Select
                 placeholder={t('form.placeholders.selectProvince')}
                 loading={!provinces.length}
-                value={updatedData?.address?.province || null}
+                value={
+                  updatedData?.address?.province?.[`name_${lang}`] ||
+                  updatedData?.address?.province?.name ||
+                  null
+                }
                 onChange={(value) => {
-                  handleInputChange({
-                    target: { name: 'address.province', value },
-                  });
-                  setUpdatedData((prev) => ({
-                    ...prev,
-                    address: {
-                      ...prev.address,
-                      province: value,
-                      district: null,
-                      ward: null,
-                    },
-                  }));
+                  const selected = provinces.find(
+                    (p) => p.name[lang] === value
+                  );
+                  if (selected) {
+                    setUpdatedData((prev) => ({
+                      ...prev,
+                      address: {
+                        ...prev.address,
+                        province: {
+                          id: selected.id,
+                          name: selected.name.vi,
+                          name_en: selected.name.en,
+                        },
+                        district: null,
+                        ward: null,
+                      },
+                    }));
+                  }
                 }}
                 allowClear
                 className={darkMode ? 'dark-mode-select' : ''}
@@ -442,19 +452,29 @@ const BoardingHouseForm = ({
               <Select
                 placeholder={t('form.placeholders.selectDistrict')}
                 loading={!districts.length && !!updatedData.address?.province}
-                value={updatedData?.address?.district || null}
+                value={
+                  updatedData?.address?.district?.[`name_${lang}`] ||
+                  updatedData?.address?.district?.name ||
+                  null
+                }
                 onChange={(value) => {
-                  handleInputChange({
-                    target: { name: 'address.district', value },
-                  });
-                  setUpdatedData((prev) => ({
-                    ...prev,
-                    address: {
-                      ...prev.address,
-                      district: value,
-                      ward: null,
-                    },
-                  }));
+                  const selected = districts.find(
+                    (d) => d.name[lang] === value
+                  );
+                  if (selected) {
+                    setUpdatedData((prev) => ({
+                      ...prev,
+                      address: {
+                        ...prev.address,
+                        district: {
+                          id: selected.id,
+                          name: selected.name.vi,
+                          name_en: selected.name.en,
+                        },
+                        ward: null,
+                      },
+                    }));
+                  }
                 }}
                 disabled={!updatedData.address?.province}
                 allowClear
@@ -472,15 +492,26 @@ const BoardingHouseForm = ({
               <Select
                 placeholder={t('form.placeholders.selectWard')}
                 loading={!wards.length && !!updatedData?.address?.district}
-                value={updatedData.address?.ward || null}
+                value={
+                  updatedData?.address?.ward?.[`name_${lang}`] ||
+                  updatedData?.address?.ward?.name ||
+                  null
+                }
                 onChange={(value) => {
-                  handleInputChange({
-                    target: { name: 'address.ward', value },
-                  });
-                  setUpdatedData((prev) => ({
-                    ...prev,
-                    address: { ...prev.address, ward: value },
-                  }));
+                  const selected = wards.find((w) => w.name[lang] === value);
+                  if (selected) {
+                    setUpdatedData((prev) => ({
+                      ...prev,
+                      address: {
+                        ...prev.address,
+                        ward: {
+                          id: selected.id,
+                          name: selected.name.vi,
+                          name_en: selected.name.en,
+                        },
+                      },
+                    }));
+                  }
                 }}
                 disabled={!updatedData.address?.district}
                 allowClear

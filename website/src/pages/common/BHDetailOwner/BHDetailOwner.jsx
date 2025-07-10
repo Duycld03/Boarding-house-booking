@@ -119,23 +119,15 @@ const BHDetailOwner = () => {
         const provincesData = await fetchProvinces();
         setProvinces(provincesData);
 
-        if (updatedData?.address?.province) {
-          const selectedProvince = provincesData.find(
-            (p) => p.name[lang] === updatedData.address.province
-          );
-          if (selectedProvince) {
-            const districtsData = await fetchDistricts(selectedProvince.id);
-            setDistricts(districtsData);
+        const provinceId = updatedData?.address?.province?.id;
+        if (provinceId) {
+          const districtsData = await fetchDistricts(provinceId);
+          setDistricts(districtsData);
 
-            if (updatedData?.address?.district) {
-              const selectedDistrict = districtsData.find(
-                (d) => d.name[lang] === updatedData.address.district
-              );
-              if (selectedDistrict) {
-                const wardsData = await fetchWards(selectedDistrict.id);
-                setWards(wardsData);
-              }
-            }
+          const districtId = updatedData?.address?.district?.id;
+          if (districtId) {
+            const wardsData = await fetchWards(districtId);
+            setWards(wardsData);
           }
         }
       } catch (error) {
@@ -144,10 +136,8 @@ const BHDetailOwner = () => {
       }
     };
 
-    if (updatedData?.address?.province) {
-      fetchAddressData();
-    }
-  }, [updatedData?.address?.province, updatedData?.address?.district, t]);
+    fetchAddressData();
+  }, [updatedData?.address?.province?.id, updatedData?.address?.district?.id]);
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -351,9 +341,29 @@ const BHDetailOwner = () => {
       payload.append('priceRange', updatedData.priceRange);
       payload.append('electricityPrice', updatedData.electricityPrice);
       payload.append('waterPrice', updatedData.waterPrice);
-      payload.append('address[province]', updatedData.address.province);
-      payload.append('address[district]', updatedData.address.district);
-      payload.append('address[ward]', updatedData.address.ward);
+      payload.append(
+        'address[province][name]',
+        updatedData.address.province.name
+      );
+      payload.append(
+        'address[province][name_en]',
+        updatedData.address.province.name_en
+      );
+
+      payload.append(
+        'address[district][name]',
+        updatedData.address.district.name
+      );
+      payload.append(
+        'address[district][name_en]',
+        updatedData.address.district.name_en
+      );
+
+      payload.append('address[ward][name]', updatedData.address.ward.name);
+      payload.append(
+        'address[ward][name_en]',
+        updatedData.address.ward.name_en
+      );
       payload.append('address[detail]', updatedData.address.detail);
       payload.append('location[lat]', updatedData.location.lat);
       payload.append('location[lon]', updatedData.location.lon);
