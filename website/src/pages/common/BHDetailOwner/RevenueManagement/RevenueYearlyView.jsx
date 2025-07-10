@@ -58,7 +58,7 @@ const RevenueYearlyView = ({ yearlyData }) => {
       {/* Yearly summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-          <p className="text-sm text-blue-600 font-medium">
+          <p className="text-lg text-blue-600 font-medium">
             Total Annual Revenue
           </p>
           <p className="text-2xl font-bold text-blue-700">
@@ -66,19 +66,19 @@ const RevenueYearlyView = ({ yearlyData }) => {
           </p>
         </div>
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-          <p className="text-sm text-blue-600 font-medium">Average Revenue</p>
+          <p className="text-lg text-blue-600 font-medium">Average Revenue</p>
           <p className="text-2xl font-bold text-blue-700">
             {formatCurrency(summaryData.averageRevenue)}
           </p>
         </div>
         <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-          <p className="text-sm text-purple-600 font-medium">Total Profit</p>
+          <p className="text-lg text-purple-600 font-medium">Total Profit</p>
           <p className="text-2xl font-bold text-purple-700">
             {formatCurrency(summaryData.totalProfit)}
           </p>
         </div>
         <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-          <p className="text-sm text-purple-600 font-medium">Profit Margin</p>
+          <p className="text-lg text-purple-600 font-medium">Profit Margin</p>
           <p className="text-2xl font-bold text-purple-700">
             {summaryData.profitMargin}%
           </p>

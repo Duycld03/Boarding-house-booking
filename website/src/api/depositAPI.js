@@ -49,17 +49,17 @@ export const handleDepositDecision = (
   return axios.put(`/staff/deposit/${depositId}`, payload);
 };
 
-// export const getMaxDeposit = (boardingHouseId) => {
-//   return axios.get(
-//     `owner/boardinghouse/deposit/max-deposit/${boardingHouseId}`
-//   );
-// };
+export const getMaxDeposit = (boardingHouseId) => {
+  return axios.get(
+    `staff/boardinghouse/deposit/max-deposit/${boardingHouseId}`
+  );
+};
 
-// export const getRentTime = (boardingHouseId) => {
-//   return axios.get(
-//     `owner/boardinghouse/deposit/max-rent-time/${boardingHouseId}`
-//   );
-// };
+export const getRentTime = (boardingHouseId) => {
+  return axios.get(
+    `staff/boardinghouse/deposit/max-rent-time/${boardingHouseId}`
+  );
+};
 
 export const payDeposit = (data) => {
   return axios.post('auth/pay-deposit', data);
