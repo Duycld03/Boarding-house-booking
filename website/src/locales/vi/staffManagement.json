@@ -7,6 +7,7 @@
     "fullName": "Họ và tên",
     "email": "Email",
     "role": "Vai trò",
+    "gender": "Giới tính",
     "status": "Trạng thái",
     "createdAt": "Ngày tạo",
     "action": "Thao tác"
@@ -72,6 +73,10 @@
         "other": "Khác"
       }
     },
+     "hireDate": {
+    "required": "Vui lòng chọn ngày tuyển dụng.",
+    "placeholder": "Chọn ngày tuyển dụng"
+  },
     "phoneNumber": {
       "label": "Nhập số điện thoại",
       "placeholder": "Số điện thoại",
@@ -167,5 +172,10 @@
     "update": "Cập nhật",
     "deleteConfirm": "Bạn có chắc chắn muốn xoá nhân viên này không?",
     "delete": "Xoá"
+  },
+    "genders": {
+    "male": "Nam",
+    "female": "Nữ",
+    "other": "Khác"
   }
 }

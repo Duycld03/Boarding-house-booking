@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Avatar } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
-import { getStaff } from '@/api/staffAPI';
+import { addStaff, getStaff } from '@/api/staffAPI';
 import Table from '@/component/Table';
 import { Button, ConfirmModal } from '@/component';
 import DefaultAvatar from '@/assets/images/none_avatar.png';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/themeContext';
 import { toast } from 'react-toastify';
 import convertTimetap from '@/utils/convertTimetap';
+import AddStaffModal from './AddStaffModal';
 
 function StaffManagement() {
   const { t } = useTranslation('staffManagement');
@@ -36,6 +37,8 @@ function StaffManagement() {
     setLoading(true);
     try {
       const res = await getStaff(paginationOptions); // Gửi page + limit
+      console.log(res);
+
       if (res?.success) {
         setStaffList(res.data);
         if (res.pagination) {
@@ -59,6 +62,25 @@ function StaffManagement() {
   useEffect(() => {
     fetchStaff();
   }, [fetchStaff]);
+  const handleAddNewData = useCallback(
+    async (data) => {
+      try {
+        setLoading(true);
+        const res = await addStaff(data);
+        if (res?.success) {
+          toast.success(t('messages.addSuccess'));
+          fetchStaff(); // Gọi lại để cập nhật danh sách
+        } else {
+          toast.error(res.message || t('messages.addFailed'));
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || error.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [t, fetchStaff]
+  );
 
   const handleTableChange = useCallback((pagination) => {
     setPaginationOptions({
@@ -117,11 +139,21 @@ function StaffManagement() {
         key: 'email',
       },
       {
-        title: t('columns.status'),
-        dataIndex: 'status',
-        key: 'status',
-        render: (status) =>
-          status === 'active' ? t('status.active') : t('status.inactive'),
+        title: t('columns.gender'),
+        dataIndex: 'gender',
+        key: 'gender',
+        render: (gender) => {
+          switch (gender) {
+            case 'male':
+              return t('genders.male');
+            case 'female':
+              return t('genders.female');
+            case 'other':
+              return t('genders.other');
+            default:
+              return '-';
+          }
+        },
       },
       {
         title: t('columns.createdAt'),
@@ -163,6 +195,9 @@ function StaffManagement() {
         darkMode ? 'bg-gray-700 text-text-dark' : 'text-text-light'
       }`}
     >
+      <div className="flex justify-between mb-4">
+        <AddStaffModal onAddData={handleAddNewData} />
+      </div>
       <Table
         tableName={t('tableName')}
         columns={columns}

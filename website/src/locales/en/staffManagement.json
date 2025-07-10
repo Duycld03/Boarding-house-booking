@@ -8,6 +8,7 @@
     "email": "Email",
     "role": "Role",
     "status": "Status",
+    "gender": "Gender",
     "createdAt": "Created At",
     "action": "Action"
   },
@@ -56,6 +57,10 @@
       "required": "Full Name is required",
       "invalidFormat": "Full Name cannot contain numbers or special characters"
     },
+     "hireDate": {
+    "required": "Please select the hire date.",
+    "placeholder": "Please select the hire date"
+  },
     "email": {
       "label": "Enter email",
       "placeholder": "Email",
@@ -167,5 +172,10 @@
     "update": "Update",
     "deleteConfirm": "Are you sure you want to delete this staff member?",
     "delete": "Delete"
+  },
+   "genders": {
+    "male": "Male",
+    "female": "Female",
+    "other": "Other"
   }
 }

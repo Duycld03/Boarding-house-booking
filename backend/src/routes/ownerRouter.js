@@ -155,5 +155,8 @@ ownerRouter.post(
   paymentBillController.calculateMonthlyRoomRent
 );
 ownerRouter.get('/staff', managerController.getStaff);
+ownerRouter.post('/addstaff', managerController.addStaff);
+ownerRouter.delete('/staff/:id', managerController.deleteStaff);
+ownerRouter.put('/staff/:id', managerController.updateStaff);
 
 export { ownerRouter };
