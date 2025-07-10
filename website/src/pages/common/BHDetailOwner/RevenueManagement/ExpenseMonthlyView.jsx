@@ -7,24 +7,35 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { Empty } from "antd";
 import ExpenseDetailsCard from "./ExpenseDetailsCard";
 import OtherExpensesTable from "./OtherExpensesTable";
 import { COLORS } from "./index";
 
 const ExpenseMonthlyView = ({
   monthlyExpenses,
-  formatCurrency,
+  formatAmount,
+  currentLanguage,
+  t,
   onEditElectrical,
   onEditWater,
   onAddOtherExpense,
   onEditOtherExpense,
   onDeleteOtherExpense,
   onRefreshChart,
+  darkMode,
 }) => {
   if (!monthlyExpenses) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg">
-        No expense data available for this month.
+      <div className="flex flex-col items-center justify-center h-[300px] text-gray-500">
+        <Empty
+          description={
+            <span>
+              {t("revenue.noData.expense", "No expense data available")}
+            </span>
+          }
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        />
       </div>
     );
   }
@@ -59,12 +70,12 @@ const ExpenseMonthlyView = ({
 
     const expensesData = [
       {
-        name: "Điện",
+        name: t("revenue.expenses.electricity", "Electricity"),
         value: monthlyExpenses?.electricalExpense?.totalAmount || 0,
         color: COLORS.electricity,
       },
       {
-        name: "Nước",
+        name: t("revenue.expenses.water", "Water"),
         value: monthlyExpenses?.waterExpense?.totalAmount || 0,
         color: COLORS.water,
       },
@@ -90,30 +101,45 @@ const ExpenseMonthlyView = ({
       {/* Expense summary cards */}
       <div className="lg:col-span-3">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-red-50 p-4 rounded-lg border border-red-100">
-            <p className="text-sm text-red-600 font-medium">Total Expenses</p>
+          <div className="expense-summary-card bg-red-50 p-4 rounded-lg border border-red-100">
+            <p className="text-lg text-red-600 font-medium">
+              {t("revenue.expenses.totalExpenses", "Total Expenses")}
+            </p>
             <p className="text-2xl font-bold text-red-700">
-              {formatCurrency(calculateTotalExpenses() || 0)}
+              {formatAmount(calculateTotalExpenses() || 0, currentLanguage)}
             </p>
           </div>
-          <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
-            <p className="text-sm text-orange-600 font-medium">Electricity</p>
+          <div className="expense-summary-card bg-orange-50 p-4 rounded-lg border border-orange-100">
+            <p className="text-lg text-orange-600 font-medium">
+              {t("revenue.expenses.electricity", "Electricity")}
+            </p>
             <p className="text-2xl font-bold text-orange-700">
-              {formatCurrency(
-                monthlyExpenses.electricalExpense?.totalAmount || 0
+              {formatAmount(
+                monthlyExpenses.electricalExpense?.totalAmount || 0,
+                currentLanguage
               )}
             </p>
           </div>
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <p className="text-sm text-blue-600 font-medium">Water</p>
+          <div className="expense-summary-card bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <p className="text-lg text-blue-600 font-medium">
+              {t("revenue.expenses.water", "Water")}
+            </p>
             <p className="text-2xl font-bold text-blue-700">
-              {formatCurrency(monthlyExpenses.waterExpense?.totalAmount || 0)}
+              {formatAmount(
+                monthlyExpenses.waterExpense?.totalAmount || 0,
+                currentLanguage
+              )}
             </p>
           </div>
-          <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-            <p className="text-sm text-green-600 font-medium">Other Expenses</p>
+          <div className="expense-summary-card bg-green-50 p-4 rounded-lg border border-green-100">
+            <p className="text-lg text-green-600 font-medium">
+              {t("revenue.expenses.other", "Other Expenses")}
+            </p>
             <p className="text-2xl font-bold text-green-700">
-              {formatCurrency(calculateOtherExpensesTotal() || 0)}
+              {formatAmount(
+                calculateOtherExpensesTotal() || 0,
+                currentLanguage
+              )}
             </p>
           </div>
         </div>
@@ -124,22 +150,31 @@ const ExpenseMonthlyView = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Electricity Details */}
           <ExpenseDetailsCard
-            title="Electricity Details"
+            title={t(
+              "revenue.expenses.electricityDetails",
+              "Electricity Details"
+            )}
             expense={monthlyExpenses.electricalExpense}
             colorClass="orange"
             unit="kWh"
+            t={t}
             onEdit={onEditElectrical}
-            formatCurrency={formatCurrency}
+            formatAmount={formatAmount}
+            currentLanguage={currentLanguage}
+            darkMode={darkMode}
           />
 
           {/* Water Details */}
           <ExpenseDetailsCard
-            title="Water Details"
+            title={t("revenue.expenses.waterDetails", "Water Details")}
             expense={monthlyExpenses.waterExpense}
             colorClass="blue"
             unit="m³"
+            t={t}
             onEdit={onEditWater}
-            formatCurrency={formatCurrency}
+            formatAmount={formatAmount}
+            currentLanguage={currentLanguage}
+            darkMode={darkMode}
           />
         </div>
 
@@ -150,18 +185,21 @@ const ExpenseMonthlyView = ({
           onEdit={onEditOtherExpense}
           onDelete={onDeleteOtherExpense}
           calculateTotal={calculateOtherExpensesTotal}
-          formatCurrency={formatCurrency}
+          formatAmount={formatAmount}
+          currentLanguage={currentLanguage}
+          t={t}
+          darkMode={darkMode}
         />
       </div>
 
       {/* Expense pie chart */}
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+      <div className="pie-chart-container bg-gray-50 p-4 rounded-lg border border-gray-200">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-700">
-            Expense Distribution
+            {t("revenue.expenses.distribution", "Expense Distribution")}
           </h3>
           <button
-            className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-1 px-3 rounded-md text-sm flex items-center"
+            className="refresh-button bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-1 px-3 rounded-md text-lg flex items-center"
             onClick={onRefreshChart}
           >
             <svg
@@ -178,7 +216,7 @@ const ExpenseMonthlyView = ({
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
-            Update Chart
+            {t("revenue.expenses.updateChart", "Update Chart")}
           </button>
         </div>
         <ResponsiveContainer width="100%" height={300}>
@@ -200,8 +238,23 @@ const ExpenseMonthlyView = ({
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => formatCurrency(value)} />
-            <Legend />
+            <Tooltip
+              formatter={(value) => formatAmount(value, currentLanguage)}
+              contentStyle={
+                darkMode
+                  ? { backgroundColor: "#1f1f1f", border: "1px solid #434343" }
+                  : {}
+              }
+              labelStyle={darkMode ? { color: "#d9d9d9" } : {}}
+              itemStyle={darkMode ? { color: "#d9d9d9" } : {}}
+            />
+            <Legend
+              formatter={(value) => (
+                <span style={{ color: darkMode ? "#d9d9d9" : "inherit" }}>
+                  {value}
+                </span>
+              )}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>

@@ -106,7 +106,7 @@ class DepositController {
           },
         })
         .sort({ createdAt: -1 })
-        .skip(skip) // Thêm skip để bỏ qua các item đã load
+        .skip(skip)
         .limit(limit)
         .lean();
 
@@ -536,7 +536,7 @@ class DepositController {
         });
       }
 
-      const { status, priceRange, roomId, rentalTime } = req.query;
+      const { status, boardingHouseId, roomId, rentalTime, startDate, endDate } = req.query;
 
       // 1. Tìm tất cả boarding house mà user là owner hoặc staff
       const boardingHouses = await BoardingHouse.find({
@@ -546,7 +546,14 @@ class DepositController {
       const bhIds = boardingHouses.map((bh) => bh._id.toString());
 
       // 2. Tìm tất cả room thuộc các boarding house này
-      const rooms = await Room.find({ boardingHouseId: { $in: bhIds } }).lean();
+      let roomFilter = { boardingHouseId: { $in: bhIds } };
+
+      // Nếu có boardingHouseId thì chỉ lấy rooms của boarding house đó
+      if (boardingHouseId && boardingHouseId !== '') {
+        roomFilter = { boardingHouseId: boardingHouseId };
+      }
+
+      const rooms = await Room.find(roomFilter).lean();
       const roomMap = new Map(
         rooms.map((room) => [
           room._id.toString(),
@@ -561,36 +568,54 @@ class DepositController {
       // 3. Tạo bộ lọc truy vấn DepositRoom
       let filter = { roomId: { $in: roomIds } };
 
-      if (roomId && roomId !== '' && roomMap.has(roomId)) {
+      // Xử lý filter roomId
+      if (roomId && roomId !== 'all' && roomId !== '') {
         filter.roomId = roomId;
       }
 
-      if (status && status !== '') {
+      // Xử lý filter status
+      if (status && status !== 'all' && status !== '') {
         filter.status = status;
       }
 
-      if (priceRange) {
-        try {
-          let [min, max] =
-            typeof priceRange === 'string'
-              ? priceRange.split(',').map(Number)
-              : [0, 0];
-          if (!isNaN(min) && !isNaN(max)) {
-            filter.amount = { $gte: min, $lte: max };
-          }
-        } catch (e) {}
-      }
-
+      // Xử lý filter rentalTime
       if (rentalTime) {
         try {
-          let [min, max] =
-            typeof rentalTime === 'string'
-              ? rentalTime.split(',').map(Number)
-              : [0, 0];
-          if (!isNaN(min) && !isNaN(max)) {
-            filter.rentalTime = { $gte: min, $lte: max };
+          // Case 1: Nếu rentalTime là array từ query string
+          if (Array.isArray(rentalTime)) {
+            let min = Number(rentalTime[0]);
+            let max = Number(rentalTime[1]);
+            if (!isNaN(min) && !isNaN(max)) {
+              filter.rentalTime = { $gte: min, $lte: max };
+            }
           }
-        } catch (e) {}
+          // Case 2: Nếu rentalTime là string có dạng min,max
+          else if (typeof rentalTime === 'string' && rentalTime.includes(',')) {
+            let [min, max] = rentalTime.split(',').map(Number);
+            if (!isNaN(min) && !isNaN(max)) {
+              filter.rentalTime = { $gte: min, $lte: max };
+            }
+          }
+          // Case 3: Nếu rentalTime là một giá trị đơn
+          else {
+            const value = Number(rentalTime);
+            if (!isNaN(value)) {
+              filter.rentalTime = value;
+            }
+          }
+          console.log('Applied rentalTime filter:', filter.rentalTime);
+        } catch (e) {
+          console.error('Error parsing rentalTime:', e, typeof rentalTime);
+        }
+      }
+
+      // Xử lý filter theo ngày bắt đầu và kết thúc
+      if (startDate && startDate !== '') {
+        filter.startDate = { $gte: new Date(startDate) };
+      }
+
+      if (endDate && endDate !== '') {
+        filter.endDate = { $lte: new Date(endDate) };
       }
 
       // 4. Cấu hình phân trang
@@ -598,10 +623,10 @@ class DepositController {
         defaultPage: 1,
         defaultLimit: 10,
         maxLimit: 100,
-        sortField: 'createdAt',
-        sortOrder: 'desc',
+        sortField: req.query.sortField || 'createdAt',
+        sortOrder: req.query.sortOrder || 'desc',
         filter,
-        populate: [{ path: 'accountId', select: 'fullname' }],
+        populate: [{ path: 'accountId', select: 'fullname email' }],
         includeTotalData: true,
       };
 
@@ -625,13 +650,17 @@ class DepositController {
         return {
           _id: deposit._id,
           name: deposit.accountId?.fullname || 'Unknown',
+          email: deposit.accountId?.email || 'N/A',
+          roomId: deposit.roomId,
           roomNumber: roomInfo.roomNumber || 'N/A',
           boardingHouseName: bhName,
+          boardingHouseId: roomInfo.boardingHouseId,
           amount: deposit.amount,
           status: deposit.status,
-          startDate: moment(deposit.createdAt).format('DD/MM/YYYY'),
-          endDate: moment(deposit.endDate).format('DD/MM/YYYY'),
+          startDate: deposit.startDate ? moment(deposit.startDate).format('DD/MM/YYYY') : 'N/A',
+          endDate: deposit.endDate ? moment(deposit.endDate).format('DD/MM/YYYY') : 'N/A',
           rentalTime: deposit.rentalTime,
+          createdAt: moment(deposit.createdAt).format('DD/MM/YYYY HH:mm:ss')
         };
       });
 
@@ -642,10 +671,12 @@ class DepositController {
         ...paginatedResult,
       });
     } catch (error) {
+      console.error('Error in getDepositsByOwnerOrStaff:', error);
       return res.status(500).json({
         message: 'Server error',
         success: false,
         error: true,
+        details: error.message
       });
     }
   }
@@ -884,7 +915,7 @@ class DepositController {
         .select('rentalTime');
 
       res.status(200).json(maxRentTime?.rentalTime || 0);
-    } catch (error) {}
+    } catch (error) { }
   }
 
   async payDeposit(req, res) {

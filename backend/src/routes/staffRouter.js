@@ -155,6 +155,8 @@ staffRouter.post(
 staffRouter.get('/expense', bhExpenseController.getExpensesByTime);
 staffRouter.put('/expense/:expenseId', bhExpenseController.updateExpense);
 staffRouter.get('/total-expense', bhExpenseController.getTotalExpensesByTime);
+staffRouter.post('/expense', bhExpenseController.addExpense);
+staffRouter.delete('/expense/:expenseId', bhExpenseController.deleteExpense);
 
 //revenue
 staffRouter.get('/revenue', revenueController.getRevenue);
