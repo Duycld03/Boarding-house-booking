@@ -1,0 +1,171 @@
+{
+  "title": "Staff Management",
+  "tableName": "Staff",
+  "columns": {
+    "avatar": "Avatar",
+    "username": "Username",
+    "fullName": "Full Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "createdAt": "Created At",
+    "action": "Action"
+  },
+  "role": {
+    "staff": "Staff",
+    "manager": "Manager",
+    "owner": "Owner"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "buttons": {
+    "delete": "Delete",
+    "update": "Update",
+    "addNew": "Add New Staff",
+    "next": "Next",
+    "back": "Back",
+    "submit": "Submit"
+  },
+  "filters": {
+    "title": "Filter",
+    "gender": "Gender",
+    "role": "Role",
+    "status": "Status",
+    "statusPlaceholder": "Select status",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "clear": "Clear",
+    "statusOptions": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "startDatePlaceholder": "Select start date",
+    "endDatePlaceholder": "Select end date",
+    "errors": {
+      "startDateRequired": "Please select a start date.",
+      "endDateRequired": "Please select an end date.",
+      "invalidDateRange": "Start date cannot be later than end date."
+    }
+  },
+  "forms": {
+    "fullname": {
+      "label": "Enter full name",
+      "placeholder": "Full Name",
+      "required": "Full Name is required",
+      "invalidFormat": "Full Name cannot contain numbers or special characters"
+    },
+    "email": {
+      "label": "Enter email",
+      "placeholder": "Email",
+      "required": "Email is required",
+      "invalidFormat": "Invalid email address"
+    },
+    "gender": {
+      "label": "Select gender",
+      "placeholder": "Select Gender",
+      "required": "Gender is required",
+      "options": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      }
+    },
+    "phoneNumber": {
+      "label": "Enter phone number",
+      "placeholder": "Phone Number",
+      "required": "Phone Number is required",
+      "invalidFormat": "Invalid phone number format"
+    },
+    "username": {
+      "label": "Enter username",
+      "placeholder": "Username",
+      "required": "Username is required"
+    },
+    "password": {
+      "label": "Enter password",
+      "placeholder": "Password",
+      "required": "Password is required",
+      "minLength": "Password must be at least 6 characters"
+    },
+    "confirmPassword": {
+      "label": "Confirm password",
+      "placeholder": "Confirm Password",
+      "required": "Confirm Password is required",
+      "mismatch": "Passwords do not match!"
+    },
+    "role": {
+      "label": "Select role",
+      "placeholder": "Select Role",
+      "required": "Role is required",
+      "options": {
+        "staff": "Staff"
+      }
+    }
+  },
+  "modals": {
+    "createAccount": {
+      "title": "Create Staff"
+    },
+    "confirmDelete": {
+      "title": "Confirm Deletion",
+      "content": "Do you want to delete this staff record?"
+    }
+  },
+  "messages": {
+    "addSuccess": "Add new staff successful",
+    "addFailed": "Add staff failed, no response received.",
+    "updateSuccess": "Update staff successful!",
+    "updateFailed": "Update failed, no response received.",
+    "deleteSuccess": "Delete staff successful",
+    "deleteFailed": "Failed to delete staff. Server response was not successful.",
+    "invalidId": "Invalid ID",
+    "fetchError": "Failed to fetch staff list. Please try again later.",
+    "des": "An error occurred: {{error}}"
+  },
+  "errors": {
+    "form1": "Please correct the errors in form 1.",
+    "form2": "Please correct the errors in form 2."
+  },
+  "updateAccount": {
+    "title": "Update Staff",
+    "avatar": "Avatar",
+    "username": "Username",
+    "usernamePlaceholder": "Username",
+    "password": "Password",
+    "passwordPlaceholder": "Password",
+    "email": "Email",
+    "emailPlaceholder": "Email",
+    "phoneNumber": "Phone Number",
+    "phoneNumberPlaceholder": "Phone Number",
+    "invalidPhoneFormat": "Invalid phone number format",
+    "phoneRequired": "Phone number is required",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Full Name",
+    "fullNameRequired": "Full name is required",
+    "fullNameInvalid": "Full name cannot contain numbers or special characters",
+    "gender": "Gender",
+    "selectGender": "Select Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "role": "Role",
+    "selectRole": "Select Role",
+    "roleUser": "User",
+    "roleOwner": "Owner",
+    "createdAt": "Created At",
+    "creationDate": "Creation Date",
+    "updatedAt": "Updated At",
+    "lastUpdatedDate": "Last Updated Date",
+    "accountBalance": "Account Balance",
+    "status": "Status",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "statusLocked": "Locked",
+    "cancel": "Cancel",
+    "update": "Update",
+    "deleteConfirm": "Are you sure you want to delete this staff member?",
+    "delete": "Delete"
+  }
+}

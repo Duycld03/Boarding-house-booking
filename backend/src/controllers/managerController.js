@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Account } from '../models/account.js';
+import paginate from '../utils/pagination.js';
 
 class ManagerController {
   // Function to get managers associated with a specific Owner (logged-in user)
@@ -44,6 +45,51 @@ class ManagerController {
       return res.status(500).json({
         success: false,
         message: 'Server error.',
+      });
+    }
+  }
+  async getStaff(req, res, next) {
+    try {
+      const account = await Account.findById(req.user.userId);
+
+      if (!account || account.role !== 'owner') {
+        return res.status(403).json({
+          success: false,
+          message: 'You are not authorized to access this resource.',
+        });
+      }
+
+      // Xây dựng bộ lọc và cấu hình phân trang
+      const filter = {
+        role: 'staff',
+        createdBy: req.user.userId,
+      };
+
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'asc',
+        filter,
+        fields:
+          'username fullname email phoneNumber avatarImage accountBalance status createdAt',
+        includeTotalData: true,
+      };
+
+      // Gọi helper paginate
+      const result = await paginate(Account, paginationOptions, req);
+
+      return res.status(200).json({
+        success: true,
+        ...result, // Bao gồm data + pagination
+      });
+    } catch (error) {
+      console.error('Error getting managers:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Server error.',
+        error: error.message,
       });
     }
   }

@@ -1,0 +1,171 @@
+{
+  "title": "Quản lý nhân viên",
+  "tableName": "Nhân viên",
+  "columns": {
+    "avatar": "Ảnh đại diện",
+    "username": "Tên",
+    "fullName": "Họ và tên",
+    "email": "Email",
+    "role": "Vai trò",
+    "status": "Trạng thái",
+    "createdAt": "Ngày tạo",
+    "action": "Thao tác"
+  },
+  "role": {
+    "staff": "Nhân viên",
+    "manager": "Quản lý",
+    "owner": "Chủ trọ"
+  },
+  "status": {
+    "active": "Hoạt động",
+    "inactive": "Ngưng hoạt động"
+  },
+  "buttons": {
+    "delete": "Xoá",
+    "update": "Cập nhật",
+    "addNew": "Thêm nhân viên mới",
+    "next": "Tiếp",
+    "back": "Quay lại",
+    "submit": "Gửi"
+  },
+  "filters": {
+    "title": "Lọc",
+    "gender": "Giới tính",
+    "role": "Vai trò",
+    "status": "Trạng thái",
+    "statusPlaceholder": "Chọn trạng thái",
+    "startDate": "Từ ngày",
+    "endDate": "Đến ngày",
+    "clear": "Xoá bộ lọc",
+    "statusOptions": {
+      "active": "Hoạt động",
+      "inactive": "Ngưng hoạt động"
+    },
+    "startDatePlaceholder": "Chọn ngày bắt đầu",
+    "endDatePlaceholder": "Chọn ngày kết thúc",
+    "errors": {
+      "startDateRequired": "Vui lòng chọn ngày bắt đầu.",
+      "endDateRequired": "Vui lòng chọn ngày kết thúc.",
+      "invalidDateRange": "Ngày bắt đầu không thể lớn hơn ngày kết thúc."
+    }
+  },
+  "forms": {
+    "fullname": {
+      "label": "Nhập họ và tên",
+      "placeholder": "Họ và tên",
+      "required": "Họ và tên là bắt buộc",
+      "invalidFormat": "Họ và tên không được chứa số hoặc ký tự đặc biệt"
+    },
+    "email": {
+      "label": "Nhập email",
+      "placeholder": "Email",
+      "required": "Email là bắt buộc",
+      "invalidFormat": "Địa chỉ email không hợp lệ"
+    },
+    "gender": {
+      "label": "Chọn giới tính",
+      "placeholder": "Chọn giới tính",
+      "required": "Giới tính là bắt buộc",
+      "options": {
+        "male": "Nam",
+        "female": "Nữ",
+        "other": "Khác"
+      }
+    },
+    "phoneNumber": {
+      "label": "Nhập số điện thoại",
+      "placeholder": "Số điện thoại",
+      "required": "Số điện thoại là bắt buộc",
+      "invalidFormat": "Định dạng số điện thoại không hợp lệ"
+    },
+    "username": {
+      "label": "Nhập tên đăng nhập",
+      "placeholder": "Tên đăng nhập",
+      "required": "Tên đăng nhập là bắt buộc"
+    },
+    "password": {
+      "label": "Nhập mật khẩu",
+      "placeholder": "Mật khẩu",
+      "required": "Mật khẩu là bắt buộc",
+      "minLength": "Mật khẩu phải có ít nhất 6 ký tự"
+    },
+    "confirmPassword": {
+      "label": "Xác nhận mật khẩu",
+      "placeholder": "Xác nhận mật khẩu",
+      "required": "Xác nhận mật khẩu là bắt buộc",
+      "mismatch": "Mật khẩu không khớp!"
+    },
+    "role": {
+      "label": "Chọn vai trò",
+      "placeholder": "Chọn vai trò",
+      "required": "Vai trò là bắt buộc",
+      "options": {
+        "staff": "Nhân viên"
+      }
+    }
+  },
+  "modals": {
+    "createAccount": {
+      "title": "Tạo nhân viên"
+    },
+    "confirmDelete": {
+      "title": "Xác nhận xoá",
+      "content": "Bạn có chắc chắn muốn xoá bản ghi nhân viên này không?"
+    }
+  },
+  "messages": {
+    "addSuccess": "Thêm nhân viên thành công",
+    "addFailed": "Thêm nhân viên thất bại, không có phản hồi.",
+    "updateSuccess": "Cập nhật nhân viên thành công!",
+    "updateFailed": "Cập nhật thất bại, không có phản hồi.",
+    "deleteSuccess": "Xoá nhân viên thành công",
+    "deleteFailed": "Xoá nhân viên thất bại. Phản hồi từ máy chủ không thành công.",
+    "invalidId": "ID không hợp lệ",
+    "fetchError": "Không thể tải danh sách nhân viên. Vui lòng thử lại sau.",
+    "des": "Đã xảy ra lỗi: {{error}}"
+  },
+  "errors": {
+    "form1": "Vui lòng sửa các lỗi trong biểu mẫu 1.",
+    "form2": "Vui lòng sửa các lỗi trong biểu mẫu 2."
+  },
+  "updateAccount": {
+    "title": "Cập nhật nhân viên",
+    "avatar": "Ảnh đại diện",
+    "username": "Tên đăng nhập",
+    "usernamePlaceholder": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Mật khẩu",
+    "email": "Email",
+    "emailPlaceholder": "Email",
+    "phoneNumber": "Số điện thoại",
+    "phoneNumberPlaceholder": "Số điện thoại",
+    "invalidPhoneFormat": "Định dạng số điện thoại không hợp lệ",
+    "phoneRequired": "Số điện thoại là bắt buộc",
+    "fullName": "Họ và tên",
+    "fullNamePlaceholder": "Họ và tên",
+    "fullNameRequired": "Họ và tên là bắt buộc",
+    "fullNameInvalid": "Họ và tên không được chứa số hoặc ký tự đặc biệt",
+    "gender": "Giới tính",
+    "selectGender": "Chọn giới tính",
+    "genderMale": "Nam",
+    "genderFemale": "Nữ",
+    "genderOther": "Khác",
+    "role": "Vai trò",
+    "selectRole": "Chọn vai trò",
+    "roleUser": "Người dùng",
+    "roleOwner": "Chủ trọ",
+    "createdAt": "Ngày tạo",
+    "creationDate": "Ngày tạo",
+    "updatedAt": "Ngày cập nhật",
+    "lastUpdatedDate": "Ngày cập nhật cuối",
+    "accountBalance": "Số dư tài khoản",
+    "status": "Trạng thái",
+    "statusActive": "Hoạt động",
+    "statusInactive": "Không hoạt động",
+    "statusLocked": "Đã khoá",
+    "cancel": "Huỷ",
+    "update": "Cập nhật",
+    "deleteConfirm": "Bạn có chắc chắn muốn xoá nhân viên này không?",
+    "delete": "Xoá"
+  }
+}
