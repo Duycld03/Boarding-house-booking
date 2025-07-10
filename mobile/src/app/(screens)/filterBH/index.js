@@ -5,14 +5,14 @@ import { getBhByArea } from '@/API/boardingHouseAPI';
 import formatAmount from '@/utils/formatAmount';
 import { ScreenContainer } from '@/components/layout';
 import VerticalList from '@/components/ui/VerticalList';
-import LoadMoreButton from '@/components/ui/LoadMoreButton';
 import Loader from '@/components/ui/Loader';
 import EmptyState from '@/components/ui/EmptyState';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useThemedClasses } from '@/utils/useTheme';
 import { useTranslation } from 'react-i18next';
-
+import Button from '@/components/ui/Button';
+import LoadMoreButton from '@/components/ui/LoadMoreButton';
 const FilteredResultScreen = () => {
     const { themedClasses, isDarkMode } = useThemedClasses();
     const { name, priceRange, boardingHouseType, rating, province, district, ward } = useLocalSearchParams();
@@ -26,7 +26,6 @@ const FilteredResultScreen = () => {
     const { t } = useTranslation('filter');
     const hasMore = data.length < totalItems;
 
-    // Giả sử frontend đang nhập theo đơn vị đồng (VND), thì convert sang nghìn đồng nếu backend dùng 1000 VND:
     const parsePriceRange = (rangeStr: string) => {
         const [min, max] = (rangeStr || '').split(',').map(Number);
         return {
@@ -34,7 +33,6 @@ const FilteredResultScreen = () => {
             priceMax: Math.ceil((max || 50000000) / 1000),
         };
     };
-
 
     const { priceMin, priceMax } = parsePriceRange(priceRange);
 
@@ -51,20 +49,13 @@ const FilteredResultScreen = () => {
                 ...(priceMax !== undefined && { priceMax }),
                 ...(boardingHouseType && boardingHouseType !== 'null' && { boardingHouseType }),
                 ...(rating && rating !== 'null' && { rating }),
-                ...(province && province !== 'null' && { 'address.province': province }),
-                ...(district && district !== 'null' && { 'address.district': district }),
-                ...(ward && ward !== 'null' && { 'address.ward': ward }),
+                ...(province && province !== 'null' && { province }),
+                ...(district && district !== 'null' && { district }),
+                ...(ward && ward !== 'null' && { ward }),
             };
 
             const res = await getBhByArea(filters);
             const list = Array.isArray(res) ? res : res?.data || res?.results || [];
-
-            // const filteredList = list.filter((bh) => {
-            //     const matchesProvince = province ? bh.address?.province?.toLowerCase().includes(province.toLowerCase()) : true;
-            //     const matchesDistrict = district ? bh.address?.district?.toLowerCase().includes(district.toLowerCase()) : true;
-            //     const matchesWard = ward ? bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) : true;
-            //     return matchesProvince && matchesDistrict && matchesWard;
-            // });
 
             const formatted = list.map((item) => ({
                 id: item._id,
@@ -90,19 +81,20 @@ const FilteredResultScreen = () => {
         }
     }, [page, name, priceMin, priceMax, boardingHouseType, rating, province, district, ward]);
 
-    useEffect(() => {
-    }, [data, totalItems]);
+    useEffect(() => { }, [data, totalItems]);
     useEffect(() => {
         fetchFilteredData();
     }, [page]);
     useEffect(() => {
         setPage(1);
     }, [name, priceRange, boardingHouseType, rating, province, district, ward]);
+
     const handleLoadMore = () => {
         if (hasMore && !loading) {
             setPage((prev) => prev + 1);
         }
     };
+
     return (
         <ScreenContainer withPadding={false}>
             {initialLoading ? (
@@ -119,7 +111,15 @@ const FilteredResultScreen = () => {
                             />
                         }
                     />
-                    <Text style={{ paddingHorizontal: 16, fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>
+                    <Text
+                        style={{
+                            paddingHorizontal: 16,
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            marginBottom: 8,
+                            color: isDarkMode ? '#fff' : '#000',
+                        }}
+                    >
                         {t('totalResults', { count: totalItems })}
                     </Text>
                     {data.length === 0 && !loading ? (

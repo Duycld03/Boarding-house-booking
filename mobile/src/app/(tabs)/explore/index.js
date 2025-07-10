@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
+  Image
 } from "react-native";
 import Slider from '@react-native-community/slider';
-import { Checkbox, Button, RadioButton } from "react-native-paper";
+import { Checkbox, RadioButton } from "react-native-paper";
 import { getAllBoardingHouseTypeUser, getMaxPriceBHUser, getBhByArea } from "@/API/boardingHouseAPI";
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +23,9 @@ import { Picker } from '@react-native-picker/picker';
 import { useCallback } from 'react';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { fetchProvinces, fetchDistricts, fetchWards } from "@/API/apiAddress";
+import { Button } from "@/components/ui";
+import Logo from '../../../assets/images/newLogo.png';
+
 const ExploreFilterScreen = () => {
   const router = useRouter();
   const [nameFilter, setNameFilter] = useState("");
@@ -44,6 +48,7 @@ const ExploreFilterScreen = () => {
   const selectedDistrictName = districts.find(d => d.code === selectedDistrict)?.name || '';
   const selectedWardName = wards.find(w => w.code === selectedWard)?.name || '';
   const styles = getStyles(isDarkMode);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -156,15 +161,44 @@ const ExploreFilterScreen = () => {
     {
       backgroundColor: isDarkMode ? '#1e1e1e' : '#fff',
       color: isDarkMode ? '#fff' : '#000',
+      height: 55
     },
   ];
 
   return (
     <ScreenContainer withPadding={false} className={isDarkMode ? 'bg-black' : 'bg-white'}>
       {/* <BackHeader title={t('filterTitle')} /> */}
-      <ScrollContainer
-        contentContainerStyle={{ padding: 16 }}
-      >
+      <ScrollContainer contentContainerStyle={{ paddingHorizontal: 10 }}>
+        <View
+          className={themedClasses(
+            "mb-6 border-b border-gray-200 pb-4",
+            "mb-6 border-b border-gray-700 pb-4"
+          )}
+        >
+          <View className="flex-row items-center">
+            <View
+              className={themedClasses(
+                "mr-3 p-2 rounded-full bg-gray-100",
+                "mr-3 p-2 rounded-full bg-gray-800"
+              )}
+            >
+              <Image
+                source={Logo}
+                className="w-8 h-8"
+                resizeMode="contain"
+              />
+            </View>
+            <Text
+              className={themedClasses(
+                "text-2xl text-text-light",
+                "text-2xl text-text-dark"
+              )}
+              style={{ fontFamily: "Poppins-Bold" }}
+            >
+              {t("filterTitle")}
+            </Text>
+          </View>
+        </View>
         {/* <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 16 }}>
           {t("name")}
         </Text>
@@ -194,17 +228,30 @@ const ExploreFilterScreen = () => {
             {t("max")}: {currentPrice[1].toLocaleString()}
           </Text>
         </View>
-        <MultiSlider
-          values={currentPrice}
-          min={priceRange.min}
-          max={priceRange.max}
-          step={100000}
-          onValuesChange={(values) => setCurrentPrice(values)}
-          selectedStyle={{ backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb" }}
-          unselectedStyle={{ backgroundColor: isDarkMode ? "#374151" : "#d1d5db" }}
-          markerStyle={{ backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb" }}
-        />
-
+        <View style={{ paddingHorizontal: 56, marginTop: 8 }}>
+          <MultiSlider
+            values={currentPrice}
+            min={priceRange.min}
+            max={priceRange.max}
+            step={100000}
+            onValuesChange={(values) => setCurrentPrice(values)}
+            selectedStyle={{ backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb" }}
+            unselectedStyle={{ backgroundColor: isDarkMode ? "#374151" : "#d1d5db" }}
+            markerStyle={{
+              backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb",
+              height: 20,
+              width: 20,
+            }}
+            containerStyle={{
+              height: 40,
+              alignSelf: 'stretch',
+            }}
+            trackStyle={{
+              height: 6,
+              borderRadius: 3,
+            }}
+          />
+        </View>
         <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 12 }}>
           {t("type")}
         </Text>
@@ -250,6 +297,7 @@ const ExploreFilterScreen = () => {
           selectedValue={selectedProvince}
           onValueChange={handleProvinceChange}
           style={pickerStyle}
+          itemStyle={{ fontSize: 14 }}
         >
           <Picker.Item label={t("selectProvince")} value="" />
           {provinces.map((p) => (
@@ -262,6 +310,7 @@ const ExploreFilterScreen = () => {
           selectedValue={selectedDistrict}
           onValueChange={handleDistrictChange}
           style={pickerStyle}
+          itemStyle={{ fontSize: 14 }}
         >
           <Picker.Item label={t("selectDistrict")} value="" />
           {districts.map((d) => (
@@ -274,6 +323,7 @@ const ExploreFilterScreen = () => {
           selectedValue={selectedWard}
           onValueChange={(value) => setSelectedWard(value)}
           style={pickerStyle}
+          itemStyle={{ fontSize: 14 }}
         >
           <Picker.Item label={t("selectWard")} value="" />
           {wards.map((w) => (
@@ -307,8 +357,10 @@ const getStyles = (isDark: boolean) =>
       backgroundColor: isDark ? '#121212' : '#fff',
     },
     label: {
+      height: 40,
       fontSize: 16,
       marginTop: 16,
+      fontWeight: '600',
       color: isDark ? '#fff' : '#000',
     },
     text: {
