@@ -1,0 +1,20 @@
+{
+    "filterBH": {
+        "filter": "Filter",
+        "boardingHouseName": "Boarding House Name",
+        "enterBoardingHouseName": "Enter boarding house name",
+        "province": "Province",
+        "selectProvince": "Select province",
+        "district": "District",
+        "selectDistrict": "Select district",
+        "ward": "Ward",
+        "selectWard": "Select ward",
+        "priceRange": "Price Range",
+        "minPrice": "Min Price",
+        "maxPrice": "Max Price",
+        "boardingHouseType": "Boarding House Type",
+        "selectBoardingHouseType": "Select boarding house type",
+        "filterButton": "Apply",
+        "deleteButton": "CLear"
+    }
+}

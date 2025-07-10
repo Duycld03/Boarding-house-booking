@@ -1,12 +1,17 @@
-import mongoose from 'mongoose';
-import BoardingHouse from '../models/boardingHouse.js';
-import BoardingHouseType from '../models/boardingHouseType.js';
-import { v2 as cloudinary } from 'cloudinary';
+import mongoose from "mongoose";
+import BoardingHouse from "../models/boardingHouse.js";
+import BoardingHouseType from "../models/boardingHouseType.js";
+import RoomType from "../models/roomType.js";
+import Room from "../models/room.js";
+import { v2 as cloudinary } from "cloudinary";
+import facilities from "../models/facilities.js";
+
 
 // import path from "path";
 import fs from 'fs';
 import multer from 'multer';
 import { Account } from '../models/account.js';
+import Review from '../models/review.js';
 import paginate from '../utils/pagination.js';
 
 class boardingHouseController {
@@ -86,108 +91,129 @@ class boardingHouseController {
 
   async updateBoardingHouseDetails(req, res, next) {
     try {
-      const { id } = req.params; // Boarding house ID
+      const { id } = req.params;
       const updateData = req.body;
+      console.log("mtiennnn", req.files)
+      const boardingHouse = await BoardingHouse.findById(id);
+      if (!boardingHouse) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Boarding house not found." });
+      }
+      // let images = [];
+      // let primaryImageCount = 0;
 
-      // Destructure data for validation
-      const {
-        name,
-        address,
-        images,
-        priceRange,
-        electricityPrice,
-        waterPrice,
-      } = updateData;
+      // // Xử lý primary image mới
+      // if (req.files?.primaryImage?.[0]) {
+      //   images.push({
+      //     imageUrl: req.files.primaryImage[0].path,
+      //     publicId: req.files.primaryImage[0].filename,
+      //     isPrimary: true
+      //   });
+      //   primaryImageCount++;
+      // } else if (req.body.existingPrimaryImage) {
+      //   const existingPrimary = JSON.parse(req.body.existingPrimaryImage);
+      //   images.push({ ...existingPrimary, isPrimary: true });
+      //   primaryImageCount++;
+      // }
 
-      // Validate name
-      if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Name is required and must not contain special characters.',
+      // // Xử lý other images mới
+      // if (req.files?.otherImages?.length) {
+      //   req.files.otherImages.forEach(file => {
+      //     images.push({
+      //       imageUrl: file.path,
+      //       publicId: file.filename,
+      //       isPrimary: false
+      //     });
+      //   });
+      // }
+
+      // // Xử lý other images cũ
+      // if (req.body.existingOtherImages) {
+      //   const existingOthers = JSON.parse(req.body.existingOtherImages);
+      //   existingOthers.forEach(img => {
+      //     images.push({ ...img, isPrimary: false });
+      //   });
+      // }
+
+      // if (primaryImageCount !== 1) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "You must upload exactly one primary image.",
+      //   });
+      // }
+
+      // if (images.length > 15) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "You can't upload more than 15 images.",
+      //   });
+      // }
+
+      // // Xóa ảnh cũ nếu có upload ảnh mới
+      // const boardingHouse = await BoardingHouse.findById(id);
+      // const oldPublicIds = boardingHouse.images.map(img => img.publicId);
+      // const newPublicIds = images.map(img => img.publicId);
+      // const imagesToDelete = oldPublicIds.filter(id => !newPublicIds.includes(id));
+
+      // for (const publicId of imagesToDelete) {
+      //   await cloudinary.uploader.destroy(publicId);
+      // }
+
+      // // Cập nhật thông tin boarding house
+      // updateData.images = images;
+      const images = [];
+      let hasPrimary = false;
+      if (req.body.boardingHouse) {
+        const data = JSON.parse(req.body.boardingHouse);
+
+        for (const img of data) {
+          if (img.isPrimary) hasPrimary = true;
+        }
+
+        if (Array.isArray(data)) {
+          images.push(...data);
+        }
+      }
+      if (req.files) {
+        req.files.forEach((file, index) => {
+          images.push({
+            imageUrl: file.path,
+            publicId: file.filename,
+            isPrimary: !hasPrimary && index === 0,
+          });
         });
+        // Delete old images from Cloudinary
+        for (const oldImage of boardingHouse.images) {
+          await cloudinary.uploader.destroy(oldImage.publicId);
+        }
+
+        updateData.images = images;
       }
 
-      // Check if the name already exists (excluding the current boarding house)
-      const existingBoardingHouse = await BoardingHouse.findOne({
-        name,
-        _id: { $ne: id },
-      });
-      if (existingBoardingHouse) {
-        return res.status(400).json({
-          success: false,
-          message: 'A boarding house with this name already exists.',
-        });
-      }
-
-      // Validate address
-      if (!address || !address.province || !address.district || !address.ward) {
-        return res.status(400).json({
-          success: false,
-          message:
-            'Province, district, and ward are required fields in the address.',
-        });
-      }
-
-      // Validate images
-      const primaryImageCount =
-        images?.filter((img) => img.isPrimary).length || 0;
-      if (primaryImageCount !== 1) {
-        return res.status(400).json({
-          success: false,
-          message: 'You must upload exactly one primary image.',
-        });
-      }
-      if (images?.length > 15) {
-        return res.status(400).json({
-          success: false,
-          message: "You can't upload more than 15 images.",
-        });
-      }
-
-      // Validate price fields
-      if (
-        !priceRange ||
-        priceRange <= 0 ||
-        !electricityPrice ||
-        electricityPrice <= 0 ||
-        !waterPrice ||
-        waterPrice <= 0
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: 'Price fields must be greater than 0.',
-        });
-      }
-
-      // Update the boarding house details
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
         id,
         { $set: updateData },
         { new: true, runValidators: true }
-      )
-        .populate('boardingHouseType', 'name')
-        .populate('ownerId', 'email');
+      ).populate("boardingHouseType", "name codeName").populate("ownerId", "email");
 
-      // Check if the boarding house exists
       if (!updatedBoardingHouse) {
         return res.status(404).json({
           success: false,
-          message: 'Boarding house not found.',
+          message: "Boarding house not found.",
         });
       }
 
-      // Successfully updated
       return res.status(200).json({
         success: true,
-        message: 'Boarding house updated successfully.',
+        message: "Boarding house updated successfully.",
         data: updatedBoardingHouse,
       });
     } catch (error) {
-      console.error('Error updating boarding house details:', error);
+      console.error("Error updating boarding house details:", error);
       return res.status(500).json({
         success: false,
-        message:
-          'Failed to update boarding house details. Please try again later.',
+        message: "Failed to update boarding house details. Please try again later.",
         error: error.message,
       });
     }
@@ -201,6 +227,7 @@ class boardingHouseController {
       const formattedTypes = boardingHouseTypes.map((type) => ({
         value: type._id,
         label: type.name,
+        code: type.codeName,
         roomSize: type.roomSize,
         peopleNumber: type.peopleNumber,
         description: type.description,
@@ -386,7 +413,7 @@ class boardingHouseController {
         address,
         location,
         description,
-        images,
+        // images,
         priceRange,
         electricityPrice,
         waterPrice,
@@ -396,6 +423,26 @@ class boardingHouseController {
         rating = 5,
       } = req.body;
 
+
+      console.log("Request body received:", req.files);
+      const images = [];
+      if (req.files && req.files.length > 0) {
+        console.log(req.files)
+        req.files.forEach((file) => {
+          images.push({
+            imageUrl: file.path,
+            publicId: file.filename,
+            isPrimary: images.length === 0, // First image is primary
+          });
+        });
+      }
+
+      if (images.length === 0) {
+        console.error("No images uploaded.");
+        return res
+          .status(400)
+          .json({ message: "You must upload at least one image." });
+      }
       // Validate owner
       const ownerAccount = await Account.findOne({
         username: ownerUsername,
@@ -567,24 +614,23 @@ class boardingHouseController {
         startDate,
         endDate,
         rating,
+        page = 1,
+        limit = 10,
       } = req.query;
 
+      page = Math.max(parseInt(page), 1);
+      limit = Math.min(Math.max(parseInt(limit), 1), 100);
+
       let filter = {};
-      let result = [];
 
       if (boardingHouseType) {
-        filter.boardingHouseType = new mongoose.Types.ObjectId(
-          boardingHouseType
-        ); // Convert string to ObjectId
+        filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType);
       }
       if (rating) {
-        const ratings = rating.split(',').map(Number); // Split and convert to numbers
-        const validRatings = ratings.filter(
-          (r) => !isNaN(r) && r >= 0 && r <= 5
-        ); // Validate ratings
-
+        const ratings = rating.split(',').map(Number);
+        const validRatings = ratings.filter((r) => !isNaN(r) && r >= 0 && r <= 5);
         if (validRatings.length > 0) {
-          filter.rating = { $in: validRatings }; // Filter for ratings in the provided array
+          filter.rating = { $in: validRatings };
         } else {
           return res.status(400).json({
             success: false,
@@ -596,7 +642,6 @@ class boardingHouseController {
       if (priceRange && priceRange.length === 2) {
         filter.priceRange = { $gte: priceRange[0], $lte: priceRange[1] };
       }
-      // If province is provided, filter by province
       if (startDate && endDate) {
         filter.createdAt = {
           $gte: new Date(startDate),
@@ -604,51 +649,29 @@ class boardingHouseController {
         };
       }
 
-      // Query the boarding houses based on filter
-      const boardingHouses = await BoardingHouse.find(filter)
-        .populate('boardingHouseType')
-        .populate({
-          path: 'ownerId',
-        })
-        .sort({ createdAt: -1 });
+      // Sử dụng paginate
+      const paginatedResult = await paginate(BoardingHouse, { filter, page, limit }, req);
+      paginatedResult.data = await BoardingHouse.populate(paginatedResult.data, [
+        { path: "boardingHouseType", select: "name codeName" },
+        { path: "ownerId" }
+      ]);
+      // // Query the boarding houses based on filter
+      // const boardingHouses = await BoardingHouse.find(filter)
+      //   .populate('boardingHouseType')
+      //   .populate({
+      //     path: 'ownerId',
+      //   })
+      //   .sort({ createdAt: -1 });
 
-      result = boardingHouses;
+      // Lọc bổ sung dựa trên province, district, ward, name (nếu cần thiết)
+      paginatedResult.data = paginatedResult.data.filter(bh => {
+        return (!province || (bh.address?.province && bh.address.province.toLowerCase().includes(province.toLowerCase())))
+          && (!district || (bh.address?.district && bh.address.district.toLowerCase().includes(district.toLowerCase())))
+          && (!ward || (bh.address?.ward && bh.address.ward.toLowerCase().includes(ward.toLowerCase())))
+          && (!name || (bh.name && bh.name.toLowerCase().includes(name.toLowerCase())));
+      });
 
-      if (province) {
-        result = result.filter((bh) => {
-          return (
-            bh.address?.province &&
-            bh.address.province.toLowerCase().includes(province.toLowerCase())
-          );
-        });
-      }
-
-      if (district) {
-        result = result.filter((bh) => {
-          return (
-            bh.address?.district &&
-            bh.address.district.toLowerCase().includes(district.toLowerCase())
-          );
-        });
-      }
-
-      if (ward) {
-        result = result.filter((bh) => {
-          return (
-            bh.address?.ward &&
-            bh.address.ward.toLowerCase().includes(ward.toLowerCase())
-          );
-        });
-      }
-
-      // Handle name search if provided
-      if (name) {
-        result = result.filter((bh) => {
-          return bh.name && bh.name.toLowerCase().includes(name.toLowerCase());
-        });
-      }
-
-      res.status(200).json(result);
+      res.status(200).json(paginatedResult);
     } catch (error) {
       console.error('Error filtering boarding houses:', error);
       res.status(500).json({ message: 'Server Error' });

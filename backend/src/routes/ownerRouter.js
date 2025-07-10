@@ -100,30 +100,6 @@ ownerRouter.get(
   '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
   depositController.getMaxRentTime
 );
-ownerRouter.put(
-  '/acceptdeposit/:depositId',
-  depositController.acceptDepositRoom
-);
-ownerRouter.put(
-  '/rejectdeposit/:depositId',
-  depositController.rejectDepositRoom
-);
-
-
-
-//renewal
-ownerRouter.get(
-  '/renewal/boarding-house/:boardingHouseId',
-  renewalController.getRenewalRequestByBhID
-);
-ownerRouter.put(
-  '/renewal/:requestId',
-  renewalController.acceptExtensionRequest
-);
-ownerRouter.put(
-  '/rejectrenewal/:requestId',
-  renewalController.rejectExtensionRequest
-);
 
 // refund request
 ownerRouter.get(
