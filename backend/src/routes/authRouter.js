@@ -118,6 +118,14 @@ authRouter.post(
   "/refund-requests",
   refundRequestController.createRefundRequest
 );
+authRouter.get(
+  "/refund-request/check-exists/:depositRoomId",
+  refundRequestController.checkRefundRequestExists
+);
+authRouter.get(
+  "/refund-request/my-requests",
+  refundRequestController.getMyRefundRequestsSimple
+);
 
 //renewal
 authRouter.get("/renewal", renewalController.getExtensionRequests);

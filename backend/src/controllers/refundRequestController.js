@@ -130,14 +130,30 @@ class RefundRequestController {
 
   async createRefundRequest(req, res) {
     try {
-      const { depositRoomId, reason, amountRefunded } = req.body;
-      if (!depositRoomId || !reason || !amountRefunded) {
-        return res.status(400).json({ message: "Missing required fields." });
+      const { depositRoomId, reason } = req.body;
+
+      if (!depositRoomId || !reason) {
+        return res.status(400).json({
+          success: false,
+          message: "Missing required fields.",
+        });
       }
 
       const depositRoom = await DepositRoom.findById(depositRoomId);
       if (!depositRoom) {
-        return res.status(404).json({ message: "Deposit room not found." });
+        return res.status(404).json({
+          success: false,
+          message: "Deposit room not found.",
+        });
+      }
+
+      // Check if deposit belongs to the user
+      if (depositRoom.accountId.toString() !== req.user.userId) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "You are not authorized to create refund request for this deposit.",
+        });
       }
 
       const currentDate = new Date();
@@ -148,6 +164,7 @@ class RefundRequestController {
 
       if (daysDiff > 7) {
         return res.status(400).json({
+          success: false,
           message:
             "Refund request can only be created 7 days before the deposit end date.",
         });
@@ -161,6 +178,7 @@ class RefundRequestController {
 
       if (existingRequest) {
         return res.status(400).json({
+          success: false,
           message: "A refund request already exists for this deposit.",
         });
       }
@@ -169,17 +187,84 @@ class RefundRequestController {
         depositRoomId,
         reason,
         status: "pending",
-        amountRefunded,
+        amountRefunded: depositRoom.amount, // Lấy amount từ depositRoom
         accountId: req.user.userId,
       });
 
       return res.status(201).json({
+        success: true,
         message: "Refund request created successfully.",
         refundRequest,
       });
     } catch (error) {
       console.log("Error creating refund request:", error);
-      return res.status(500).json(error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
+
+  async checkRefundRequestExists(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+      const { userId } = req.user;
+
+      const existingRequest = await RefundRequest.findOne({
+        depositRoomId,
+        accountId: userId,
+        status: { $in: ["pending", "approved"] }, // Chỉ check các request chưa bị reject hoặc cancel
+      });
+
+      return res.json({
+        exists: !!existingRequest,
+        refundRequest: existingRequest
+          ? {
+              _id: existingRequest._id,
+              status: existingRequest.status,
+              reason: existingRequest.reason,
+              amountRefunded: existingRequest.amountRefunded,
+              createdAt: existingRequest.createdAt,
+            }
+          : null,
+      });
+    } catch (error) {
+      console.log("Error checking refund request:", error);
+      return res.status(500).json({
+        message: "Error checking refund request",
+        error: error.message,
+      });
+    }
+  }
+
+  async getMyRefundRequestsSimple(req, res) {
+    try {
+      const { userId } = req.user;
+
+      const refundRequests = await RefundRequest.find({
+        accountId: userId,
+        status: { $in: ["pending", "approved"] },
+      }).select("depositRoomId status createdAt");
+
+      // Tạo map để frontend có thể check nhanh
+      const refundRequestMap = {};
+      refundRequests.forEach((request) => {
+        refundRequestMap[request.depositRoomId.toString()] = {
+          status: request.status,
+          createdAt: request.createdAt,
+        };
+      });
+
+      return res.json({
+        refundRequests: refundRequestMap,
+      });
+    } catch (error) {
+      console.log("Error getting refund requests:", error);
+      return res.status(500).json({
+        message: "Error getting refund requests",
+        error: error.message,
+      });
     }
   }
 }

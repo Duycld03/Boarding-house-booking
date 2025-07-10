@@ -61,5 +61,12 @@
   "errorLoadingDeposit": "Lỗi khi tải thông tin đặt cọc",
   "vnpay": "VNPay",
   "momo": "MoMo",
-  "connectionError": "Lỗi kết nối. Vui lòng thử lại."
+  "connectionError": "Lỗi kết nối. Vui lòng thử lại.",
+  "refundRequestAlreadyExists": "Yêu cầu hoàn tiền đã tồn tại cho đặt cọc này",
+  "refundRequested": "Đã Yêu Cầu Hoàn Tiền",
+  "refundStatus": "Trạng thái",
+  "refundStatus.pending": "Chờ duyệt",
+  "refundStatus.approved": "Đã duyệt",
+  "refundStatus.rejected": "Bị từ chối",
+  "refundStatus.canceled": "Đã hủy"
 }

@@ -1,0 +1,25 @@
+{
+  "title": "Refund Request",
+  "refundRequestTitle": "Request Deposit Refund",
+  "refundRequestSubtitle": "Submit your refund request",
+  "importantNote": "Important Note:",
+  "refundPolicy": "Refund requests can only be submitted 7 days before the deposit end date. Processing may take 3-5 business days.",
+  "reason": "Reason for Refund",
+  "selectReason": "Select a reason",
+  "reasonRequired": "Please select a reason for refund",
+  "requestSubmitted": "Refund request submitted successfully",
+  "submitError": "Failed to submit refund request",
+  "submitting": "Submitting...",
+  "submitRequest": "Submit Refund Request",
+  "invalidDepositId": "Invalid deposit ID",
+  "reasons": {
+    "emergencyMove": "Emergency relocation",
+    "roomCondition": "Room condition issues",
+    "ownerIssue": "Issues with property owner",
+    "personalReason": "Personal circumstances",
+    "jobChange": "Job change/transfer",
+    "familyIssue": "Family emergency",
+    "healthIssue": "Health concerns",
+    "other": "Other reasons"
+  }
+}

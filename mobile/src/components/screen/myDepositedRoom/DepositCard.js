@@ -16,7 +16,14 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import formatAmount from "@/utils/formatAmount";
 
-const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
+const DepositCard = ({
+  item,
+  onRefund,
+  onPayDeposit,
+  index,
+  hasExistingRefundRequest = false,
+  refundRequestInfo = null,
+}) => {
   const { isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
   const { t, i18n } = useTranslation("myDepositedRoom"); // Get i18n to access current language
@@ -152,7 +159,7 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
       return (
         <>
           <View className="flex-row justify-between mt-2">
-            {/* Request Refund Button - Show if refund is available */}
+            {/* Request Refund Button - Show if refund is available and no existing request */}
             {shouldShowRefund(item.endDate) && (
               <View className="flex-1 ml-2">
                 <Button
@@ -160,14 +167,52 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
                   variant="secondary"
                   fullWidth={true}
                   size="md"
-                  icon={<Ionicons name="refresh" size={16} color="#fff" />}
+                  disabled={hasExistingRefundRequest} // Disable if request exists
+                  icon={
+                    hasExistingRefundRequest ? (
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={16}
+                        color={
+                          isDarkMode ? "#6b7280" : "#9ca3af"
+                        }
+                      />
+                    ) : (
+                      <Ionicons name="refresh" size={16} color="#fff" />
+                    )
+                  }
                   style={{
                     borderRadius: 12,
-                    backgroundColor: isDarkMode ? "#b91c1c" : "#dc2626",
+                    backgroundColor:
+                      hasExistingRefundRequest
+                        ? isDarkMode
+                          ? "#374151"
+                          : "#e5e7eb"
+                        : isDarkMode
+                        ? "#b91c1c"
+                        : "#dc2626",
+                    opacity: hasExistingRefundRequest ? 0.6 : 1,
                   }}
                 >
-                  {t("requestRefund")}
+                  {hasExistingRefundRequest
+                    ? t("refundRequested")
+                    : t("requestRefund")}
                 </Button>
+
+                {/* Show refund request status if exists */}
+                {hasExistingRefundRequest && refundRequestInfo && (
+                  <View className="mt-2">
+                    <Text
+                      className={themedClasses(
+                        "text-xs text-gray-600 text-center",
+                        "text-xs text-gray-400 text-center"
+                      )}
+                    >
+                      {t("refundStatus")}:{" "}
+                      {t(`refundStatus.${refundRequestInfo.status}`)}
+                    </Text>
+                  </View>
+                )}
               </View>
             )}
           </View>

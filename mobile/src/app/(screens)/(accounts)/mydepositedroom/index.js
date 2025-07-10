@@ -14,6 +14,7 @@ import { useTheme } from "@/context/ThemeProvider";
 import { useThemedClasses } from "@/utils/useTheme";
 import { useTranslation } from "react-i18next";
 import { getMyDepositedRoom } from "@/API/depositAPI";
+import { getMyRefundRequests } from "@/API/refundRequestAPI";
 import { useNotification } from "@/context/NotificationProvider";
 import {
   Ionicons,
@@ -41,6 +42,8 @@ function MyDepositedRoom() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [refundRequestsMap, setRefundRequestsMap] = useState({});
+  const [loadingRefundRequests, setLoadingRefundRequests] = useState(false);
 
   // Pagination state
   const [pagination, setPagination] = useState({
@@ -68,6 +71,20 @@ function MyDepositedRoom() {
       }
     }, [isLogin, router])
   );
+
+  // Fetch refund requests map
+  const fetchRefundRequests = useCallback(async () => {
+    setLoadingRefundRequests(true);
+    try {
+      const response = await getMyRefundRequests();
+      setRefundRequestsMap(response.refundRequests || {});
+    } catch (error) {
+      console.error("Error fetching refund requests:", error);
+      setRefundRequestsMap({});
+    } finally {
+      setLoadingRefundRequests(false);
+    }
+  }, []);
 
   // Fetch data function with proper pagination handling
   const fetchData = useCallback(
@@ -108,6 +125,9 @@ function MyDepositedRoom() {
           } else {
             setDepositData(res.data);
           }
+
+          // Fetch refund requests after getting deposit data
+          await fetchRefundRequests();
         } else {
           showError(res.message || t("errorLoadingDeposits"));
         }
@@ -126,7 +146,7 @@ function MyDepositedRoom() {
         }
       }
     },
-    [paginationOptions, t, showError]
+    [paginationOptions, t, showError, fetchRefundRequests]
   );
 
   // Initial load effect
@@ -157,6 +177,7 @@ function MyDepositedRoom() {
 
     // Clear existing data
     setDepositData([]);
+    setRefundRequestsMap({});
 
     try {
       const res = await getMyDepositedRoom({
@@ -177,6 +198,8 @@ function MyDepositedRoom() {
         });
 
         setDepositData(res.data);
+        // Fetch refund requests after setting data
+        await fetchRefundRequests();
       }
     } catch (error) {
       console.error("Error refreshing data:", error);
@@ -184,7 +207,7 @@ function MyDepositedRoom() {
     } finally {
       setRefreshing(false);
     }
-  }, [showError, t]);
+  }, [showError, t, fetchRefundRequests]);
 
   // Handle load more
   const handleLoadMore = useCallback(() => {
@@ -212,14 +235,20 @@ function MyDepositedRoom() {
   // Handle refund
   const handleRefund = useCallback(
     (deposit) => {
-      // Navigate to refund screen or handle refund logic
-      // router.push({
-      //   pathname: "/refund",
-      //   params: { depositId: deposit._id },
-      // });
-      console.log("Refund clicked for deposit:", deposit);
+      const hasExistingRequest = refundRequestsMap[deposit._id];
+
+      if (hasExistingRequest) {
+        showError(t("refundRequestAlreadyExists"));
+        return;
+      }
+
+      // Navigate to refund screen
+      router.push({
+        pathname: "/mydepositedroom/refundRequest",
+        params: { depositId: deposit._id },
+      });
     },
-    [router]
+    [router, refundRequestsMap, showError, t]
   );
 
   // Handle pay deposit
@@ -242,9 +271,11 @@ function MyDepositedRoom() {
         onRefund={handleRefund}
         onPayDeposit={handlePayDeposit}
         index={index}
+        hasExistingRefundRequest={!!refundRequestsMap[item._id]} // Pass refund request status
+        refundRequestInfo={refundRequestsMap[item._id]} // Pass refund request info
       />
     ),
-    [handleRefund, handlePayDeposit]
+    [handleRefund, handlePayDeposit, refundRequestsMap]
   );
 
   const renderFooter = () => {
