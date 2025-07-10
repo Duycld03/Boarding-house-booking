@@ -545,9 +545,8 @@ function BoardingHouseManagement(onClose) {
       <Table columns={columns} data={boardingHData} loading={loading} />
       <ConfirmModal
         title="Confirm Deletion"
-        content={`Are you sure you want to delete "${
-          selectedRequest?.name || "this boarding house"
-        }"?`}
+        content={`Are you sure you want to delete "${selectedRequest?.name || "this boarding house"
+          }"?`}
         onOk={handleSelectDelete}
         onCancel={() => {
           setIsOpenDeleteModal(false);
@@ -658,15 +657,14 @@ function BoardingHouseManagement(onClose) {
               <div className="flex flex-col gap-4">
                 {/* Check primary Image exists */}
                 {formData.primaryImage ||
-                images?.find((img) => img.isPrimary) ? (
+                  images?.find((img) => img.isPrimary) ? (
                   <div className="relative">
                     <Image
                       src={
                         formData.primaryImage
                           ? URL.createObjectURL(formData.primaryImage)
-                          : `http://localhost:3000${
-                              images.find((img) => img.isPrimary)?.imageUrl
-                            }`
+                          : `http://localhost:3000${images.find((img) => img.isPrimary)?.imageUrl
+                          }`
                       }
                       alt="Primary"
                       className="object-cover border rounded"

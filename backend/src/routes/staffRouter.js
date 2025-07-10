@@ -129,11 +129,7 @@ staffRouter.get(
 );
 staffRouter.put(
   '/renewal/:requestId',
-  renewalController.acceptExtensionRequest
-);
-staffRouter.put(
-  '/rejectrenewal/:requestId',
-  renewalController.rejectExtensionRequest
+  renewalController.handleExtensionRequestAction
 );
 
 // refund request
@@ -227,5 +223,7 @@ staffRouter.get(
   '/room-addition-fee/:roomId',
   roomAdditionFeeController.getRoomAdditionFeesByRoomId
 );
+
+staffRouter.get('/boardinghouse/reviews/:id', ReviewController.getReviewByBhId);
 
 export { staffRouter };

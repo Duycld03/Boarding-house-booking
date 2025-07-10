@@ -26,26 +26,28 @@ import { getBoardingHouseDetail } from "../../../api/ownerUser/boardingHouseAPI"
 import {
   updateBoardingHouseDetailsOwner,
   getManagersForOwner,
-} from "../../../api/BoardingHouseAPI";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import RoomType from "./RoomType/RoomType";
-import RenewalRequest from "./RenewalRequestManagement/RenewalRequest";
-import TenantManagement from "./TenantManagement/TenantManagement";
-import RoomManagement from "./RoomManagement/RoomManagement";
-import RevenueManagement from "./RevenueManagement";
-import RentPaymentManagement from "./RentPaymentManagement";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHotel } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
+} from '../../../api/BoardingHouseAPI';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import RoomType from './RoomType/RoomType';
+import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
+import TenantManagement from './TenantManagement/TenantManagement';
+import RoomManagement from './RoomManagement/RoomManagement';
+import RevenueManagement from './RevenueManagement';
+import RentPaymentManagement from './RentPaymentManagement';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHotel } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
-import { useTranslation } from "react-i18next";
-import { useTheme } from "../../../context/themeContext";
-import "./BHDetailOwner.module.css"; // Import custom CSS for additional dark mode fixes
-import classNames from "classnames";
-import "./darkModeOverrides.css";
-import { useCurrentUser } from "@/context/userContext";
-import userRole from "@/constants/userRole";
-import BoardingHouseForm from "./BoardingHouseForm";
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../../context/themeContext';
+import './BHDetailOwner.module.css'; // Import custom CSS for additional dark mode fixes
+import classNames from 'classnames';
+import './darkModeOverrides.css';
+import { useCurrentUser } from '@/context/userContext';
+import userRole from '@/constants/userRole';
+import BoardingHouseForm from './BoardingHouseForm';
+import ReviewManagement from './ReviewManagement';
+
 
 const { TabPane } = Tabs;
 
@@ -471,6 +473,9 @@ const BHDetailOwner = () => {
           key="rentPaymentManagement"
         >
           <RentPaymentManagement />
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={t('tabs.reviewManagement')} key="reviewManagement">
+          <ReviewManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
       </Tabs>
     </div>

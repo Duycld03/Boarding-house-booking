@@ -43,7 +43,6 @@ const PayRent = () => {
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [depositInfo, setDepositInfo] = useState(null);
-  const [checking, setChecking] = useState(true);
   const [paymentUrl, setPaymentUrl] = useState(null);
   const [webviewVisible, setWebviewVisible] = useState(false);
   const [paymentBill, setPaymentBill] = useState(null);
@@ -90,54 +89,38 @@ const PayRent = () => {
       router.replace("/login");
       return;
     }
-
-    // Only process deposit data if we haven't already
-    if (checking && params.deposit) {
-      try {
-        const depositData = JSON.parse(params.deposit);
-        setDepositInfo(depositData);
-        setChecking(false);
-      } catch (error) {
-        router.back();
-        setChecking(false);
-      }
-    } else if (checking && !params.deposit) {
-      router.back();
-      setChecking(false);
-    }
-  }, [isLogin, params.deposit, router, showError, t, checking]);
+  }, [isLogin, router, showError, t]);
 
   // Fetch payment bill data when deposit info is ready
   useEffect(() => {
     const fetchPaymentBill = async () => {
-      if (depositInfo && !checking) {
-        setLoadingBill(true);
-        setBillError(null);
-        try {
-          const response = await getPaymentBillForRent(depositInfo._id);
-          setPaymentBill(response.paymentBill);
+      setLoadingBill(true);
+      setBillError(null);
+      try {
+        const response = await getPaymentBillForRent(params.paymentBillId);
+        setPaymentBill(response.paymentBill);
+        setDepositInfo(response.depositRoom);
 
-          // If already paid, show message and auto navigate back
-          if (response.isPaid) {
-            showInfo(t("alreadyPaid"));
-            const timer = setTimeout(() => {
-              router.back();
-            }, 2500);
-            setAutoNavigateTimer(timer);
-          }
-        } catch (error) {
-          setBillError(
-            error.response?.data?.message || error.message || t("noBillFound")
-          );
-
-          // Auto navigate back after a delay when no bill is found
+        // If already paid, show message and auto navigate back
+        if (response.isPaid) {
+          showInfo(t("alreadyPaid"));
           const timer = setTimeout(() => {
             router.back();
-          }, 3000);
+          }, 2500);
           setAutoNavigateTimer(timer);
-        } finally {
-          setLoadingBill(false);
         }
+      } catch (error) {
+        setBillError(
+          error.response?.data?.message || error.message || t("noBillFound")
+        );
+
+        // Auto navigate back after a delay when no bill is found
+        const timer = setTimeout(() => {
+          router.back();
+        }, 3000);
+        setAutoNavigateTimer(timer);
+      } finally {
+        setLoadingBill(false);
       }
     };
 
@@ -149,7 +132,7 @@ const PayRent = () => {
         clearTimeout(autoNavigateTimer);
       }
     };
-  }, [depositInfo, router]);
+  }, [router]);
 
   // Handle hardware back button when WebView is open
   useEffect(() => {
@@ -235,17 +218,6 @@ const PayRent = () => {
       showError(t("paymentFailed"));
     }
   };
-
-  if (checking || !depositInfo) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator
-          size="large"
-          color={isDarkMode ? "#3b82f6" : "#2563eb"}
-        />
-      </View>
-    );
-  }
 
   // Show WebView when payment URL is available
   if (webviewVisible && paymentUrl) {
@@ -499,7 +471,7 @@ const PayRent = () => {
                       "text-xl font-bold text-gray-100"
                     )}
                   >
-                    {depositInfo.name}
+                    {depositInfo?.name}
                   </Text>
                   <Text
                     className={themedClasses(
@@ -507,7 +479,7 @@ const PayRent = () => {
                       "text-base text-gray-300"
                     )}
                   >
-                    {t("room")} {depositInfo.roomNumber}
+                    {t("room")} {depositInfo?.roomNumber}
                   </Text>
                 </View>
               </View>
@@ -569,8 +541,8 @@ const PayRent = () => {
                       "font-semibold text-gray-100"
                     )}
                   >
-                    {formatDate(depositInfo.startDate)} -{" "}
-                    {formatDate(depositInfo.endDate)}
+                    {formatDate(depositInfo?.startDate)} -{" "}
+                    {formatDate(depositInfo?.endDate)}
                   </Text>
                 </View>
 
@@ -764,7 +736,7 @@ const PayRent = () => {
                 {/* Room Rent */}
                 <BillItem
                   title={t("roomRent")}
-                  amount={formatCurrency(depositInfo.amount)}
+                  amount={formatCurrency(depositInfo?.amount)}
                   icon={
                     <FontAwesome5
                       name="home"

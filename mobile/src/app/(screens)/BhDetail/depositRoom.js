@@ -50,7 +50,9 @@ export default function DepositRoom() {
   const [selectedRoomId, setSelectedRoomId] = useState("");
   const [rentalTime, setRentalTime] = useState("1");
   const [timeType, setTimeType] = useState("month");
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  );
   const [endDate, setEndDate] = useState(
     calculateEndDate(new Date(), 1, "month")
   );

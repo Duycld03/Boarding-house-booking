@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Select, Input } from "antd";
 import LocationPicker from "../LocationPicker/LocationPicker";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -20,6 +21,7 @@ const AddressSelector = ({
   const [currentLocation, setCurrentLocation] = useState(
     initialPosition ? [initialPosition.lat, initialPosition.lon] : null
   );
+  const { t } = useTranslation("addBoardingHouseAdmin");
 
   useEffect(() => {
     if (initialPosition) return;
@@ -38,9 +40,14 @@ const AddressSelector = ({
     <div className="col-span-2">
       <Form layout="vertical">
         {/* Province Selector */}
-        <Form.Item label="Province" required className="mb-2">
+        <Form.Item
+          label={t("selectProvince")}
+          required
+          className="mb-2"
+          rules={[{ required: true, message: t("validation.selectProvince") }]}
+        >
           <Select
-            placeholder="Select province"
+            placeholder={t("selectProvince")}
             value={formData?.address?.province || undefined}
             onChange={(value) => {
               // Reset district and ward when province changes
@@ -65,9 +72,14 @@ const AddressSelector = ({
         </Form.Item>
 
         {/* District Selector */}
-        <Form.Item label="District" required className="mb-2">
+        <Form.Item
+          label={t("selectDistrict")}
+          required
+          className="mb-2"
+          rules={[{ required: true, message: t("validation.selectDistrict") }]}
+        >
           <Select
-            placeholder="Select district"
+            placeholder={t("selectDistrict")}
             value={formData?.address?.district || undefined}
             onChange={(value) => {
               // Reset ward when district changes
@@ -90,9 +102,14 @@ const AddressSelector = ({
         </Form.Item>
 
         {/* Ward Selector */}
-        <Form.Item label="Ward" required className="mb-2">
+        <Form.Item
+          label={t("selectWard")}
+          required
+          className="mb-2"
+          rules={[{ required: true, message: t("validation.selectWard") }]}
+        >
           <Select
-            placeholder="Select ward"
+            placeholder={t("selectWard")}
             value={formData?.address?.ward || undefined}
             onChange={(value) => {
               onInputChange({
@@ -111,9 +128,13 @@ const AddressSelector = ({
         </Form.Item>
 
         {/* Address Details */}
-        <Form.Item label="Details" required>
+        <Form.Item
+          label={t("enterDetailAddress")}
+          required
+          rules={[{ required: true, message: t("validation.enterDetailAddress") }]}
+        >
           <TextArea
-            placeholder="Input details boarding house address"
+            placeholder={t("enterDetailAddress")}
             value={formData?.address?.detail || ""}
             onChange={(e) => {
               onInputChange(e);

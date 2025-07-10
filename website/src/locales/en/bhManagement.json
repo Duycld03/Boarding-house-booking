@@ -74,7 +74,8 @@
     "tenantManagement": "Tenant Management",
     "revenueManagement": "Revenue Management",
     "renewalManagement": "Renewal Management",
-    "rentPaymentManagement": "Rent Payment Management"
+    "rentPaymentManagement": "Rent Payment Management",
+    "reviewManagement": "Review Management"
   },
 
   "labels": {
