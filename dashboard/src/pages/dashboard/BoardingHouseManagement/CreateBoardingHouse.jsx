@@ -568,7 +568,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     style={{
                       width: "100%",
                       height: "auto",
-                      maxHeight: "300px",
+                      maxHeight: "298px",
                     }}
                     preview={{
                       mask: (
