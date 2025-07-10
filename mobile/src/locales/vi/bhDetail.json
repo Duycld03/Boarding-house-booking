@@ -115,7 +115,9 @@
     "allReviewsLoaded": "Tất cả đánh giá đã được tải",
     "loadMore": "Xem thêm đánh giá",
     "totalReviews": "Tổng đánh giá",
-    "averageRating": "Điểm trung bình"
+    "averageRating": "Điểm trung bình",
+    "noReviewsYet": "Chưa có đánh giá nào",
+    "beFirstToReview": "Hãy là người đầu tiên chia sẻ trải nghiệm của bạn!"
   },
   "roomTypeCard": {
     "month": "tháng",

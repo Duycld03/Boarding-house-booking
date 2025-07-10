@@ -369,6 +369,10 @@ export default function BhDetailScreen() {
 
   // Write Review Handler
   const handleWriteReview = useCallback(() => {
+    if (!isLogin) {
+      router.push("/login");
+      return;
+    }
     if (hasUserReviewed) {
       setShowReviewError(true);
       return;
@@ -378,7 +382,7 @@ export default function BhDetailScreen() {
       pathname: "/BhDetail/addReview",
       params: { boardingHouseId },
     });
-  }, [hasUserReviewed, router, boardingHouseId]);
+  }, [isLogin, hasUserReviewed, router, boardingHouseId]);
 
   // Render Functions - Memoized for better performance
   const LoadingState = useMemo(

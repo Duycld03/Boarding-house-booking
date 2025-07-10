@@ -115,7 +115,9 @@
     "allReviewsLoaded": "All reviews loaded",
     "loadMore": "Load more reviews",
     "totalReviews": "Total reviews",
-    "averageRating": "Average rating"
+    "averageRating": "Average rating",
+    "noReviewsYet": "No reviews yet",
+    "beFirstToReview": "Be the first to share your experience!"
   },
   "roomTypeCard": {
     "month": "month",

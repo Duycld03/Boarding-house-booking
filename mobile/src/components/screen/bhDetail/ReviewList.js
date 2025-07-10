@@ -71,31 +71,34 @@ const CircularProgress = ({ percent, rating, themedClasses }) => {
     );
 };
 
-const EmptyState = ({ themedClasses, t, onWriteReview }) => (
-    <View className={`flex-1 items-center justify-center py-16 ${themedClasses.background}`}>
-        <FontAwesome
-            name="comments-o"
-            size={64}
-            color={themedClasses.textSecondary}
-            style={{ marginBottom: 16 }}
-        />
-        <Text className={`text-lg mb-2 ${themedClasses.text}`}>
-            {t?.("reviewList.noReviewsYet") || "No reviews yet"}
-        </Text>
-        <Text className={`text-sm mb-6 ${themedClasses.textSecondary} text-center px-4`}>
-            {t?.("reviewList.beFirstToReview") || "Be the first to share your experience!"}
-        </Text>
-        <Button
-            onPress={onWriteReview}
-            variant="primary"
-            size="md"
+const EmptyState = ({ themedClasses, t, onWriteReview }) => {
+    const { isDarkMode } = useTheme(); // ✅ Gọi đúng chỗ
 
+    return (
+        <View className={`flex-1 items-center justify-center py-16 ${themedClasses.background}`}>
+            <FontAwesome
+                name="comments-o"
+                size={64}
+                color={isDarkMode ? '#9CA3AF' : '#6B7280'}
+                style={{ marginBottom: 16 }}
+            />
+            <Text className={`text-lg mb-2 ${themedClasses.text}`}>
+                {t?.("reviewList.noReviewsYet") || "No reviews yet"}
+            </Text>
+            <Text className={`text-sm mb-6 ${themedClasses.textSecondary} text-center px-4`}>
+                {t?.("reviewList.beFirstToReview") || "Be the first to share your experience!"}
+            </Text>
+            <Button
+                onPress={onWriteReview}
+                variant="primary"
+                size="md"
+            >
+                {t('writeAReview')}
+            </Button>
+        </View>
+    );
+};
 
-        >
-            {t('writeAReview')}
-        </Button>
-    </View>
-);
 
 const ReviewList = ({
     reviews = [],
@@ -111,6 +114,11 @@ const ReviewList = ({
     pagination,
     bhId
 }) => {
+    const handleWriteReview = () => {
+        if (typeof onWriteReview === 'function') {
+            onWriteReview();
+        }
+    };
     const { isDarkMode } = useTheme();
     const { t } = useTranslation('boardingHouseDetail');
     const { themedClasses } = useThemedClasses();
@@ -410,7 +418,7 @@ const ReviewList = ({
                 <View className="flex-row justify-between items-center mb-7">
                     {canWriteReview && (
                         <Button
-                            onPress={onWriteReview}
+                            onPress={handleWriteReview}
                             variant="primary"
                             size="md"
                         >
