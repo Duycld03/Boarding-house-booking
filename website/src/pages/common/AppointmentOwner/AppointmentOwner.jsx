@@ -165,28 +165,28 @@ const ViewListAppointmentOwner = () => {
                 </Tag>
             )
         },
-        {
-            title: t('columns.actions'),
-            key: "action",
-            render: (_, record) => (
-                <div style={{ display: "flex", gap: "8px" }}>
-                    <Button
-                        title={t('buttons.detail')}
-                        icon={<FileTextOutlined />}
-                        style={{
-                            backgroundColor: "rgb(5, 150, 105)",
-                            color: "white",
-                        }}
-                        className="text-white"
-                        bgColor="rgb(5 150 105)"
-                        size="large"
-                        onClick={() => fetchAppointmentDetail(record._id)}
-                    >
-                        {t('buttons.detail')}
-                    </Button>
-                </div>
-            ),
-        },
+        // {
+        //     title: t('columns.actions'),
+        //     key: "action",
+        //     render: (_, record) => (
+        //         <div style={{ display: "flex", gap: "8px" }}>
+        //             <Button
+        //                 title={t('buttons.detail')}
+        //                 icon={<FileTextOutlined />}
+        //                 style={{
+        //                     backgroundColor: "rgb(5, 150, 105)",
+        //                     color: "white",
+        //                 }}
+        //                 className="text-white"
+        //                 bgColor="rgb(5 150 105)"
+        //                 size="large"
+        //                 onClick={() => fetchAppointmentDetail(record._id)}
+        //             >
+        //                 {t('buttons.detail')}
+        //             </Button>
+        //         </div>
+        //     ),
+        // },
     ];
 
     return (
@@ -207,9 +207,8 @@ const ViewListAppointmentOwner = () => {
                 }}
                 onChange={handleTableChange}
 
-                onRow={(record) => ({
-                    onClick: () => fetchAppointmentDetail(record._id),
-                })}
+                onRowClick={(record) => fetchAppointmentDetail(record._id)}
+
             />
             <Modal
                 title={<span style={{ fontSize: "16px", fontWeight: "bold" }}>{t('modal.title')}</span>}
