@@ -99,7 +99,6 @@ class ManagerController {
     try {
       const { username, password, email, fullname, gender, hireDate } =
         req.body;
-      console.log(req.body);
 
       if (!username || !password || !email || !fullname) {
         return res.status(400).json({

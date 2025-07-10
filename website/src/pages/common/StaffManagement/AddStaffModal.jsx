@@ -151,7 +151,9 @@ const AddStaffModal = ({ onAddData }) => {
               <DatePicker
                 format="YYYY-MM-DD"
                 style={{ width: '100%' }}
+                className={cx('custom-datepicker')}
                 placeholder={t('forms.hireDate.placeholder') || 'Chọn ngày'}
+                renderExtraFooter={() => null}
               />
             </Form.Item>
 
@@ -188,7 +190,13 @@ const AddStaffModal = ({ onAddData }) => {
                 { min: 6, message: t('forms.password.minLength') },
               ]}
             >
-              <Input.Password placeholder={t('forms.password.placeholder')} />
+              <div className="bg-[#111827] border border-gray-600 rounded-md focus-within:border-gray-500">
+                <Input.Password
+                  placeholder={t('forms.password.placeholder')}
+                  bordered={false} // ⛔ tắt mặc định border của AntD
+                  className="bg-transparent text-white focus:outline-none focus:ring-0 shadow-none"
+                />
+              </div>
             </Form.Item>
 
             <Form.Item
@@ -213,9 +221,13 @@ const AddStaffModal = ({ onAddData }) => {
                 }),
               ]}
             >
-              <Input.Password
-                placeholder={t('forms.confirmPassword.placeholder')}
-              />
+              <div className="bg-[#111827] border border-gray-600 rounded-md focus-within:border-gray-500">
+                <Input.Password
+                  placeholder={t('forms.confirmPassword.placeholder')}
+                  bordered={false} // ⛔ tắt mặc định border của AntD
+                  className="bg-transparent text-white focus:outline-none focus:ring-0 shadow-none"
+                />
+              </div>
             </Form.Item>
 
             <div className="flex gap-4 mt-4">

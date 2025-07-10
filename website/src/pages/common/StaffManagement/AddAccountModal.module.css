@@ -247,3 +247,18 @@
 .dark-mode-form .ant-form-item {
   margin-bottom: 24px;
 }
+/* Custom dark mode fix for Input.Password */
+.dark .ant-input-password,
+.dark .ant-input-affix-wrapper {
+  background-color: #1e293b !important;
+  /* màu nền tối */
+  border-color: #334155 !important;
+  /* viền tối hơn */
+  color: #f1f5f9 !important;
+  /* chữ trắng nhẹ */
+}
+
+.dark .ant-input-password input {
+  background-color: transparent !important;
+  color: #f1f5f9 !important;
+}

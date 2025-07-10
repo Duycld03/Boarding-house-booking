@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Avatar } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
-import { addStaff, getStaff } from '@/api/staffAPI';
+import { addStaff, getStaff, deleteStaff, updateStaff } from '@/api/staffAPI';
 import Table from '@/component/Table';
 import { Button, ConfirmModal } from '@/component';
 import DefaultAvatar from '@/assets/images/none_avatar.png';
@@ -11,6 +11,7 @@ import { useTheme } from '@/context/themeContext';
 import { toast } from 'react-toastify';
 import convertTimetap from '@/utils/convertTimetap';
 import AddStaffModal from './AddStaffModal';
+import UpdateStaffModal from './UpdateStaffModal'; // 👈 Thêm mới
 
 function StaffManagement() {
   const { t } = useTranslation('staffManagement');
@@ -18,9 +19,8 @@ function StaffManagement() {
 
   const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedData, setSelectedData] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalItems: 0,
@@ -32,13 +32,11 @@ function StaffManagement() {
     limit: 10,
   });
 
-  // ✅ Fetch staff from API
+  // ✅ Fetch staff list
   const fetchStaff = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getStaff(paginationOptions); // Gửi page + limit
-      console.log(res);
-
+      const res = await getStaff(paginationOptions);
       if (res?.success) {
         setStaffList(res.data);
         if (res.pagination) {
@@ -51,8 +49,7 @@ function StaffManagement() {
       } else {
         toast.error(res.message || 'Failed to load staff');
       }
-    } catch (error) {
-      console.error('Error fetching staff:', error);
+    } catch (err) {
       toast.error('Server error while fetching staff');
     } finally {
       setLoading(false);
@@ -62,32 +59,77 @@ function StaffManagement() {
   useEffect(() => {
     fetchStaff();
   }, [fetchStaff]);
-  const handleAddNewData = useCallback(
-    async (data) => {
-      try {
-        setLoading(true);
-        const res = await addStaff(data);
-        if (res?.success) {
-          toast.success(t('messages.addSuccess'));
-          fetchStaff(); // Gọi lại để cập nhật danh sách
-        } else {
-          toast.error(res.message || t('messages.addFailed'));
-        }
-      } catch (error) {
-        toast.error(error.response?.data?.message || error.message);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [t, fetchStaff]
-  );
 
-  const handleTableChange = useCallback((pagination) => {
+  // ✅ Add
+  const handleAddNewData = async (data) => {
+    try {
+      setLoading(true);
+      const res = await addStaff(data);
+      if (res?.success) {
+        toast.success(t('messages.addSuccess'));
+        fetchStaff();
+      } else {
+        toast.error(res.message || t('messages.addFailed'));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Update
+  const handleUpdate = async (data) => {
+    if (!data || !data._id) return;
+    try {
+      setLoading(true);
+      const res = await updateStaff(data._id, {
+        email: data.email,
+        fullname: data.fullname,
+        gender: data.gender,
+      });
+
+      if (res?.success) {
+        toast.success(t('messages.updateSuccess'));
+        fetchStaff();
+      } else {
+        toast.error(res.message || t('messages.updateFailed'));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message || 'Lỗi server');
+    } finally {
+      setEditTarget(null);
+      setLoading(false);
+    }
+  };
+
+  // ✅ Delete
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      setLoading(true);
+      const res = await deleteStaff(deleteTarget._id);
+      if (res?.success) {
+        toast.success(t('messages.deleteSuccess'));
+        fetchStaff();
+      } else {
+        toast.error(res.message || t('messages.deleteFailed'));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    } finally {
+      setDeleteTarget(null);
+      setLoading(false);
+    }
+  };
+
+  // ✅ Table
+  const handleTableChange = (pagination) => {
     setPaginationOptions({
       page: pagination.current,
       limit: pagination.pageSize,
     });
-  }, []);
+  };
 
   const tablePaginationConfig = useMemo(
     () => ({
@@ -99,15 +141,6 @@ function StaffManagement() {
     }),
     [pagination]
   );
-
-  const handleDelete = () => {
-    if (!selectedData) return;
-    setStaffList((prev) =>
-      prev.filter((staff) => staff._id !== selectedData._id)
-    );
-    setIsOpen(false);
-    setSelectedData(null);
-  };
 
   const columns = useMemo(
     () => [
@@ -169,18 +202,13 @@ function StaffManagement() {
             <Button
               btnDelete
               title={t('buttons.delete')}
-              onClick={() => {
-                setSelectedData(record);
-                setIsOpen(true);
-              }}
+              onClick={() => setDeleteTarget(record)}
             />
             <Button
               btnUpdate
               icon={<FileTextOutlined />}
               title={t('buttons.update')}
-              onClick={() => {
-                // Mở form cập nhật nếu cần
-              }}
+              onClick={() => setEditTarget(record)}
             />
           </div>
         ),
@@ -198,6 +226,7 @@ function StaffManagement() {
       <div className="flex justify-between mb-4">
         <AddStaffModal onAddData={handleAddNewData} />
       </div>
+
       <Table
         tableName={t('tableName')}
         columns={columns}
@@ -208,12 +237,19 @@ function StaffManagement() {
         pagination={tablePaginationConfig}
       />
 
+      <UpdateStaffModal
+        open={!!editTarget}
+        initialData={editTarget}
+        onCancel={() => setEditTarget(null)}
+        onSubmit={handleUpdate}
+      />
+
       <ConfirmModal
         title={t('modals.confirmDelete.title')}
         content={t('modals.confirmDelete.content')}
         onOk={handleDelete}
-        onCancel={() => setIsOpen(false)}
-        isOpen={isOpen}
+        onCancel={() => setDeleteTarget(null)}
+        isOpen={!!deleteTarget}
       />
     </div>
   );
