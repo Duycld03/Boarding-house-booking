@@ -13,6 +13,7 @@ export { default as MyRenewalRequest } from "./MyRenewalRequest";
 export { default as MyRentPayment } from "./MyRentPayment";
 export { default as MyDepositRefundRequest } from "./MyDepositRefundRequest";
 export { default as FavouriteList } from "./FavouriteList";
+export { default as TaskManagement } from "./TaskManagement";
 // Re-export tất cả các components trong thư mục owner
 export { default as BHManagementOwner } from "./BHManagementOwner";
 export { default as BHDetailOwner } from "./BHDetailOwner";

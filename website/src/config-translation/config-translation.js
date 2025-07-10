@@ -38,7 +38,8 @@ import en_renewalManagement from '@/locales/en/renewalManagement.json';
 import vi_renewalManagement from '@/locales/vi/renewalManagement.json';
 import en_review from '@/locales/en/review.json';
 import vi_review from '@/locales/vi/review.json';
-
+import en_task from '@/locales/en/task.json';
+import vi_task from '@/locales/vi/task.json';
 i18n.use(initReactI18next).init({
   resources: {
     en: {
@@ -61,6 +62,7 @@ i18n.use(initReactI18next).init({
       rentPayment: en_rentPayment,
       renewalManagement: en_renewalManagement,
       review: en_review,
+      task: en_task
     },
     vi: {
       menu: vi_menu,
@@ -82,6 +84,7 @@ i18n.use(initReactI18next).init({
       rentPayment: vi_rentPayment,
       renewalManagement: vi_renewalManagement,
       review: vi_review,
+      task: vi_task
     },
   },
   lng: 'en',

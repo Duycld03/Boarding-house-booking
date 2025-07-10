@@ -12,6 +12,8 @@ import {
   refundRequestController,
   renewalController,
   paymentBillController,
+  taskController,
+  accountController
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -153,5 +155,12 @@ ownerRouter.post(
   '/calculate-monthly-bill',
   paymentBillController.calculateMonthlyRoomRent
 );
+
+// task
+ownerRouter.get('/tasks', taskController.getTasks);
+ownerRouter.post('/tasks', taskController.createTask);
+ownerRouter.put('/tasks/:id', taskController.updateTask);
+ownerRouter.delete('/tasks/:id', taskController.deleteTask);
+ownerRouter.get('/staffs', accountController.getStaffAccounts);
 
 export { ownerRouter };

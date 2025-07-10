@@ -152,6 +152,11 @@ const routes = [
     page: CommonPages.DepositManagement,
     layout: ProfileLayout,
   },
+  {
+    path: "/task-management",
+    page: CommonPages.TaskManagement,
+    layout: ProfileLayout,
+  },
 
   // Dashboard routes
   {

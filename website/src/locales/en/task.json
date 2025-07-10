@@ -1,0 +1,70 @@
+{
+    "tableName": "Task List",
+    "columns": {
+        "title": "Title",
+        "responsibleBy": "Assigned To",
+        "priority": "Priority",
+        "status": "Status",
+        "dueDate": "Due Date",
+        "action": "Action"
+    },
+    "priorities": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+    },
+    "statuses": {
+        "inprogress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+    },
+    "form": {
+        "title": "Title",
+        "responsibleBy": "Assigned To",
+        "details": "Details",
+        "priority": "Priority",
+        "status": "Status",
+        "dueDate": "Due Date",
+        "required": "This field is required",
+        "selectStaff": "Select staff",
+        "charactersUsed": "{{count}} / {{max}} characters"
+    },
+    "validation": {
+        "title": "Title is required",
+        "responsibleBy": "Please select a staff member",
+        "priority": "Please select priority",
+        "status": "Please select status",
+        "dueDate": "Please choose due date"
+    },
+    "actions": {
+        "save": "Save",
+        "edit": "Edit",
+        "delete": "Delete",
+        "add": "+ Add Task"
+    },
+    "modal": {
+        "addTitle": "Add Task",
+        "editTitle": "Edit Task",
+        "deleteTitle": "Delete Confirmation",
+        "deleteConfirm": "Are you sure you want to delete this task?"
+    },
+    "messages": {
+        "createSuccess": "Task created successfully",
+        "updateSuccess": "Task updated successfully",
+        "submitFailed": "Failed to submit task",
+        "deleteSuccess": "Task deleted successfully",
+        "deleteFailed": "Failed to delete task",
+        "confirmDeleteTitle": "Delete Confirmation",
+        "confirmDeleteContent": "Are you sure you want to delete this task?",
+        "noData": "No data"
+    },
+    "table": {
+        "title": "Task List",
+        "noData": "No data"
+    },
+    "buttons": {
+        "cancel": "Cancel",
+        "submit": "Submit",
+        "loading": "Saving..."
+    }
+}

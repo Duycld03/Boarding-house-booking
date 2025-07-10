@@ -1,0 +1,70 @@
+{
+    "tableName": "Danh sách công việc",
+    "columns": {
+        "title": "Tiêu đề",
+        "responsibleBy": "Người phụ trách",
+        "priority": "Độ ưu tiên",
+        "status": "Trạng thái",
+        "dueDate": "Hạn chót",
+        "action": "Hành động"
+    },
+    "priorities": {
+        "low": "Thấp",
+        "medium": "Trung bình",
+        "high": "Cao"
+    },
+    "statuses": {
+        "inprogress": "Đang tiến hành",
+        "completed": "Hoàn thành",
+        "cancelled": "Đã hủy"
+    },
+    "form": {
+        "title": "Tiêu đề",
+        "responsibleBy": "Người phụ trách",
+        "details": "Chi tiết",
+        "priority": "Độ ưu tiên",
+        "status": "Trạng thái",
+        "dueDate": "Hạn chót",
+        "required": "Trường này là bắt buộc",
+        "selectStaff": "Chọn nhân viên",
+        "charactersUsed": "{{count}} / {{max}} ký tự"
+    },
+    "validation": {
+        "title": "Vui lòng nhập tiêu đề",
+        "responsibleBy": "Vui lòng chọn người phụ trách",
+        "priority": "Vui lòng chọn độ ưu tiên",
+        "status": "Vui lòng chọn trạng thái",
+        "dueDate": "Vui lòng chọn hạn chót"
+    },
+    "actions": {
+        "save": "Lưu",
+        "edit": "Sửa",
+        "delete": "Xóa",
+        "add": "Thêm công việc"
+    },
+    "modal": {
+        "addTitle": "Thêm công việc",
+        "editTitle": "Cập nhật công việc",
+        "deleteTitle": "Xác nhận xoá",
+        "deleteConfirm": "Bạn có chắc muốn xoá công việc này?"
+    },
+    "messages": {
+        "createSuccess": "Tạo công việc thành công",
+        "updateSuccess": "Cập nhật công việc thành công",
+        "submitFailed": "Lưu công việc thất bại",
+        "deleteSuccess": "Xóa công việc thành công",
+        "deleteFailed": "Xóa công việc thất bại",
+        "confirmDeleteTitle": "Xác nhận xoá",
+        "confirmDeleteContent": "Bạn có chắc muốn xoá công việc này?",
+        "noData": "Không có dữ liệu"
+    },
+    "table": {
+        "title": "Danh sách công việc",
+        "noData": "Không có dữ liệu"
+    },
+    "buttons": {
+        "cancel": "Huỷ",
+        "submit": "Lưu",
+        "loading": "Đang lưu..."
+    }
+}

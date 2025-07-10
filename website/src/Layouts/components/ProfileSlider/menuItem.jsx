@@ -107,6 +107,12 @@ const getMenuItems = () => {
       icon: <DollarCircleOutlined />,
       visible: isOwner,
     },
+    {
+      key: 'task-management',
+      label: <Link to="/task-management">Task Management</Link>,
+      icon: <DollarCircleOutlined />,
+      visible: isOwner || isStaff,
+    },
   ];
   return menuItems.filter((item) => item.visible);
 };
