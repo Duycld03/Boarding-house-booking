@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/themeContext';
 import classNames from 'classnames';
-import Style from './AddAccountModal.module.css';
+import Style from './AddModal.module.css';
 
 const cx = classNames.bind(Style);
 const { Option } = Select;
@@ -111,7 +111,10 @@ const AddStaffModal = ({ onAddData }) => {
               style={{ marginBottom: 0 }}
               rules={[{ required: true, message: t('forms.gender.required') }]}
             >
-              <Select placeholder={t('forms.gender.placeholder')}>
+              <Select
+                className={cx({ 'dark-mode-select': darkMode })}
+                placeholder={t('forms.gender.placeholder')}
+              >
                 <Option value="male">{t('forms.gender.options.male')}</Option>
                 <Option value="female">
                   {t('forms.gender.options.female')}
@@ -140,20 +143,16 @@ const AddStaffModal = ({ onAddData }) => {
               name="hireDate"
               style={{ marginBottom: 0 }}
               rules={[
-                {
-                  required: true,
-                  message:
-                    t('forms.hireDate.required') ||
-                    'Vui lòng chọn ngày tuyển dụng.',
-                },
+                { required: true, message: t('forms.hireDate.required') },
               ]}
             >
               <DatePicker
                 format="YYYY-MM-DD"
                 style={{ width: '100%' }}
-                className={cx('custom-datepicker')}
+                className={cx('custom-datepicker', {
+                  'dark-mode-datepicker': darkMode,
+                })}
                 placeholder={t('forms.hireDate.placeholder') || 'Chọn ngày'}
-                renderExtraFooter={() => null}
               />
             </Form.Item>
 
@@ -182,52 +181,37 @@ const AddStaffModal = ({ onAddData }) => {
             </Form.Item>
 
             <Form.Item
-              label={t('forms.password.label')}
+              label="Nhập mật khẩu"
               name="password"
               style={{ marginBottom: 0 }}
-              rules={[
-                { required: true, message: t('forms.password.required') },
-                { min: 6, message: t('forms.password.minLength') },
-              ]}
+              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
             >
-              <div className="bg-[#111827] border border-gray-600 rounded-md focus-within:border-gray-500">
-                <Input.Password
-                  placeholder={t('forms.password.placeholder')}
-                  bordered={false} // ⛔ tắt mặc định border của AntD
-                  className="bg-transparent text-white focus:outline-none focus:ring-0 shadow-none"
-                />
-              </div>
+              <Input.Password
+                className={cx({ 'dark-mode-input': darkMode })}
+                placeholder="Mật khẩu"
+              />
             </Form.Item>
 
             <Form.Item
-              label={t('forms.confirmPassword.label')}
+              label="Xác nhận mật khẩu"
               name="confirmPassword"
               dependencies={['password']}
-              style={{ marginBottom: 0 }}
               rules={[
-                {
-                  required: true,
-                  message: t('forms.confirmPassword.required'),
-                },
+                { required: true, message: 'Vui lòng xác nhận mật khẩu!' },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (!value || getFieldValue('password') === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(
-                      new Error(t('forms.confirmPassword.mismatch'))
-                    );
+                    return Promise.reject('Mật khẩu không khớp!');
                   },
                 }),
               ]}
             >
-              <div className="bg-[#111827] border border-gray-600 rounded-md focus-within:border-gray-500">
-                <Input.Password
-                  placeholder={t('forms.confirmPassword.placeholder')}
-                  bordered={false} // ⛔ tắt mặc định border của AntD
-                  className="bg-transparent text-white focus:outline-none focus:ring-0 shadow-none"
-                />
-              </div>
+              <Input.Password
+                className={cx({ 'dark-mode-input': darkMode })}
+                placeholder="Xác nhận mật khẩu"
+              />
             </Form.Item>
 
             <div className="flex gap-4 mt-4">

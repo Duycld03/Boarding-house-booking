@@ -4,7 +4,7 @@ import { FileTextOutlined } from '@ant-design/icons';
 import { addStaff, getStaff, deleteStaff, updateStaff } from '@/api/staffAPI';
 import Table from '@/component/Table';
 import { Button, ConfirmModal } from '@/component';
-import DefaultAvatar from '@/assets/images/none_avatar.png';
+import DefaultAvatar from '../../../assets/images/none_avatar.png';
 
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/context/themeContext';
@@ -148,13 +148,22 @@ function StaffManagement() {
         title: t('columns.avatar'),
         dataIndex: 'avatarImage',
         key: 'avatarImage',
-        render: (avatarImage) => (
-          <Avatar
-            src={avatarImage?.url ?? DefaultAvatar}
-            shape="circle"
-            size="large"
-          />
-        ),
+        render: (avatarImage) => {
+          const url = avatarImage?.url;
+
+          const isInvalidOrEmpty =
+            !url ||
+            url ===
+              'https://res.cloudinary.com/dcknewpzx/image/upload/v1716733369/default-avatar.png';
+
+          return (
+            <Avatar
+              src={isInvalidOrEmpty ? DefaultAvatar : url}
+              shape="circle"
+              size="large"
+            />
+          );
+        },
       },
       {
         title: t('columns.username'),

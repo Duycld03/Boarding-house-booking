@@ -12,13 +12,14 @@
 }
 
 /* Form label and content text in dark mode */
-.dark-mode-form .ant-form-item-label > label {
+.dark-mode-form .ant-form-item-label>label {
   color: #ffffff !important;
 }
 
 .dark-mode-form .ant-form-item-explain,
 .dark-mode-form .ant-form-item-extra {
-  color: #e5e7eb !important; /* Brighter error text */
+  color: #e5e7eb !important;
+  /* Brighter error text */
 }
 
 /* Input fields in dark mode */
@@ -57,6 +58,7 @@
   background-color: #1f2937 !important;
   border: 1px solid #4b5563 !important;
 }
+
 .ant-modal.ant-modal-dark .ant-modal-close-x {
   color: #9ca3af !important;
 }
@@ -70,8 +72,7 @@
   color: #ffffff !important;
 }
 
-.ant-select-dropdown
-  .ant-select-item-option-active:not(.ant-select-item-option-selected) {
+.ant-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-selected) {
   background-color: #374151 !important;
 }
 
@@ -93,7 +94,8 @@
 
 /* Make validation error messages more visible */
 .dark-mode-form .ant-form-item-has-error .ant-form-item-explain-error {
-  color: #f87171 !important; /* Brighter red for better visibility */
+  color: #f87171 !important;
+  /* Brighter red for better visibility */
 }
 
 /* Ensure modal footer buttons have good visibility */
@@ -101,11 +103,11 @@
   border-color: #4b5563;
 }
 
-.dark-mode-modal 
+.dark-mode-modal
 
 /* Consistent transition for theme switching */
 .ant-modal-content,
-.ant-form-item-label > label,
+.ant-form-item-label>label,
 .ant-input,
 .ant-select-selector,
 .ant-btn {
@@ -144,8 +146,8 @@
 /* Form inputs */
 .dark-mode-input,
 .dark-mode-input .ant-input {
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
+  background-color: #111827 !important;
+  border-color: #111827 !important;
   color: #f9fafb !important;
 }
 
@@ -162,8 +164,8 @@
 
 /* Password input specific */
 .dark-mode-input.ant-input-affix-wrapper {
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
+  background-color: #111827 !important;
+  border-color: #111827 !important;
 }
 
 .dark-mode-input.ant-input-affix-wrapper:hover {
@@ -177,11 +179,11 @@
 }
 
 .dark-mode-input .ant-input-suffix {
-  color: #9ca3af !important;
+  color: #111827 !important;
 }
 
 .dark-mode-input .ant-input-suffix:hover {
-  color: #f9fafb !important;
+  color: #111827 !important;
 }
 
 /* Select boxes */
@@ -219,8 +221,7 @@
   color: #f9fafb !important;
 }
 
-.dark-mode-dropdown
-  .ant-select-item-option-active:not(.ant-select-item-option-selected) {
+.dark-mode-dropdown .ant-select-item-option-active:not(.ant-select-item-option-selected) {
   background-color: #4b5563 !important;
 }
 
@@ -239,7 +240,7 @@
 }
 
 /* Form labels - making sure they're visible in dark mode */
-.dark-mode-form .ant-form-item-label > label {
+.dark-mode-form .ant-form-item-label>label {
   color: #f9fafb !important;
 }
 
@@ -247,18 +248,25 @@
 .dark-mode-form .ant-form-item {
   margin-bottom: 24px;
 }
-/* Custom dark mode fix for Input.Password */
-.dark .ant-input-password,
-.dark .ant-input-affix-wrapper {
-  background-color: #1e293b !important;
-  /* màu nền tối */
-  border-color: #334155 !important;
-  /* viền tối hơn */
-  color: #f1f5f9 !important;
-  /* chữ trắng nhẹ */
+/* Áp dụng cho cả input thường và password có affix-wrapper */
+.dark-mode-input.ant-input,
+.dark-mode-input.ant-input-affix-wrapper {
+  background-color: #111827 !important;
+  /* nền tối */
+  color: #f9fafb !important;
+  /* chữ sáng */
+  border: 1px solid #4b5563 !important;
+  /* viền */
 }
 
-.dark .ant-input-password input {
-  background-color: transparent !important;
-  color: #f1f5f9 !important;
+/* Placeholder */
+.dark-mode-input.ant-input::placeholder,
+.dark-mode-input input::placeholder {
+background-color: #111827 !important;
+  border-color: #374151 !important;
+  color: white !important;}
+
+/* Icon con mắt trong Input.Password */
+.dark-mode-input .ant-input-suffix {
+  color: #d1d5db !important;
 }
