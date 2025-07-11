@@ -98,6 +98,10 @@ authRouter.get(
   "/deposited-room/:depositRoomId",
   depositController.getDepositRoom
 );
+authRouter.get(
+  "/deposited-room/detail/:depositRoomId",
+  depositController.getDepositRoomDetail
+);
 
 //payment
 authRouter.post("/pay-rent", depositController.payRent);

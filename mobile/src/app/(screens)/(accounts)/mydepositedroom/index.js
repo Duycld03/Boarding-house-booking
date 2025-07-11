@@ -273,6 +273,17 @@ function MyDepositedRoom() {
     [router]
   );
 
+  // Handle navigate to detail
+  const handleDepositPress = useCallback(
+    (deposit) => {
+      router.push({
+        pathname: "/mydepositedroom/detail",
+        params: { depositId: deposit._id },
+      });
+    },
+    [router]
+  );
+
   // Render functions
   const renderDepositItem = useCallback(
     ({ item, index }) => (
@@ -280,12 +291,13 @@ function MyDepositedRoom() {
         item={item}
         onRefund={handleRefund}
         onPayDeposit={handlePayDeposit}
+        onPress={handleDepositPress}
         index={index}
         hasExistingRefundRequest={!!refundRequestsMap[item._id]} // Pass refund request status
         refundRequestInfo={refundRequestsMap[item._id]} // Pass refund request info
       />
     ),
-    [handleRefund, handlePayDeposit, refundRequestsMap]
+    [handleRefund, handlePayDeposit, handleDepositPress, refundRequestsMap]
   );
 
   const renderFooter = () => {

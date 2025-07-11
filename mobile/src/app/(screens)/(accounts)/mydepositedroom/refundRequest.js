@@ -86,7 +86,6 @@ export default function RefundRequest() {
         throw new Error(response.message || t("submitError"));
       }
     } catch (error) {
-      console.error("Error submitting refund request:", error);
       showError(
         error.response?.data?.message || error.message || t("submitError")
       );
