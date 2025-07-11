@@ -1,6 +1,8 @@
 import moment from "moment";
 import RefundRequest from "../models/refundRequest.js";
 import DepositRoom from "../models/depositRoom.js";
+import paginate from "../utils/pagination.js";
+import Room from "../models/room.js";
 
 class RefundRequestController {
   async getRefundRequests(req, res) {
@@ -45,43 +47,258 @@ class RefundRequestController {
 
   async getRefundRequestsForOwner(req, res) {
     try {
-      const refundRequests = await RefundRequest.find().populate({
-        path: "depositRoomId",
-        populate: {
-          path: "roomId",
-          populate: {
-            path: "boardingHouseId",
-            match: { ownerId: req.user.userId },
-            select: "name",
-          },
-        },
+      const { userId } = req.user;
+
+      // Parse pagination parameters - SỬA LẠI PHẦN NÀY
+      const page = parseInt(req.query.page) || 1;
+      const limit = Math.min(parseInt(req.query.limit) || 10, 100); // Đảm bảo lấy đúng limit
+      const skip = (page - 1) * limit;
+      const sortField = req.query.sortField || "createdAt";
+      const sortOrder = req.query.sortOrder || "desc";
+
+      console.log("Backend pagination params:", {
+        page,
+        limit,
+        skip,
+        sortField,
+        sortOrder,
       });
 
-      const filteredRefundRequests = refundRequests.filter(
-        (refundRequest) => refundRequest.depositRoomId?.roomId?.boardingHouseId
+      // Get all refund requests with populate
+      const refundRequests = await RefundRequest.find({})
+        .populate({
+          path: "depositRoomId",
+          populate: {
+            path: "roomId",
+            populate: {
+              path: "boardingHouseId",
+              match: { ownerId: userId },
+            },
+          },
+        })
+        .exec();
+
+      // Filter out null boarding houses
+      const filteredRequests = refundRequests.filter(
+        (request) => request.depositRoomId?.roomId?.boardingHouseId
       );
 
-      const data = filteredRefundRequests.map((refundRequest) => {
-        return {
-          _id: refundRequest._id,
-          roomNumber: refundRequest.depositRoomId.roomId.roomNumber,
-          endDate: moment(refundRequest.depositRoomId.endDate).format(
-            "DD/MM/YYYY"
-          ),
-          amountRefunded: refundRequest.amountRefunded,
-          boardingHouseName:
-            refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || "N/A", // Lấy tên của boardingHouse
-          status: refundRequest.status,
-          reason: refundRequest.reason,
-          createdAt: moment(refundRequest.createdAt).format("DD/MM/YYYY"),
-        };
+      // Sort the filtered requests
+      filteredRequests.sort((a, b) => {
+        let aValue = a[sortField];
+        let bValue = b[sortField];
+
+        // Handle nested fields
+        if (sortField === "roomNumber") {
+          aValue = a.depositRoomId?.roomId?.roomNumber || "";
+          bValue = b.depositRoomId?.roomId?.roomNumber || "";
+        } else if (sortField === "endDate") {
+          aValue = a.depositRoomId?.endDate || new Date(0);
+          bValue = b.depositRoomId?.endDate || new Date(0);
+        } else if (sortField === "boardingHouseName") {
+          aValue = a.depositRoomId?.roomId?.boardingHouseId?.name || "";
+          bValue = b.depositRoomId?.roomId?.boardingHouseId?.name || "";
+        }
+
+        // Convert dates to comparable format
+        if (aValue instanceof Date && bValue instanceof Date) {
+          aValue = aValue.getTime();
+          bValue = bValue.getTime();
+        }
+
+        // Sort logic
+        if (sortOrder === "asc") {
+          return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+        } else {
+          return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+        }
       });
-      return res.json(data);
+
+      // Calculate pagination
+      const totalItems = filteredRequests.length;
+      const totalPages = Math.ceil(totalItems / limit);
+      const paginatedRequests = filteredRequests.slice(skip, skip + limit);
+
+      console.log("Backend pagination result:", {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit, // Đảm bảo trả về đúng limit
+        paginatedItems: paginatedRequests.length,
+      });
+
+      // Format data
+      const formattedRequests = paginatedRequests.map((request) => ({
+        _id: request._id,
+        roomNumber: request.depositRoomId?.roomId?.roomNumber || "N/A",
+        endDate: request.depositRoomId?.endDate
+          ? moment(request.depositRoomId.endDate).format("DD/MM/YYYY")
+          : "N/A",
+        amountRefunded: request.amountRefunded,
+        boardingHouseName:
+          request.depositRoomId?.roomId?.boardingHouseId?.name || "N/A",
+        status: request.status,
+        reason: request.reason,
+        reasonForCancel: request.reasonForCancel,
+        createdAt: moment(request.createdAt).format("DD/MM/YYYY"),
+        depositRoomId: request.depositRoomId?._id,
+        accountId: request.accountId,
+      }));
+
+      // SỬA LẠI RESPONSE - đảm bảo trả về đúng limit
+      return res.status(200).json({
+        success: true,
+        data: formattedRequests,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalItems,
+          limit, // Trả về đúng limit từ request
+        },
+        currentPage: page,
+        totalPages,
+        limit, // Trả về đúng limit từ request
+        totalItems,
+      });
     } catch (error) {
-      console.log("Error getting refund requests:", error);
-      return res.status(500).json(error);
+      console.error("Error getting refund requests for owner:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        error: error.message,
+      });
     }
   }
+
+  // Alternative approach using aggregation for better performance
+  async getRefundRequestsForOwnerOptimized(req, res) {
+    try {
+      const { userId } = req.user;
+
+      // Parse pagination parameters
+      const page = parseInt(req.query.page) || 1;
+      const limit = Math.min(parseInt(req.query.limit) || 10, 100);
+      const skip = (page - 1) * limit;
+      const sortField = req.query.sortField || "createdAt";
+      const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+
+      // Build match conditions
+      const matchConditions = {};
+      if (req.query.status) {
+        matchConditions.status = req.query.status;
+      }
+
+      // Aggregation pipeline to get refund requests for owner
+      const pipeline = [
+        {
+          $lookup: {
+            from: "depositrooms",
+            localField: "depositRoomId",
+            foreignField: "_id",
+            as: "depositRoom",
+          },
+        },
+        {
+          $unwind: "$depositRoom",
+        },
+        {
+          $lookup: {
+            from: "rooms",
+            localField: "depositRoom.roomId",
+            foreignField: "_id",
+            as: "room",
+          },
+        },
+        {
+          $unwind: "$room",
+        },
+        {
+          $lookup: {
+            from: "boardinghouses",
+            localField: "room.boardingHouseId",
+            foreignField: "_id",
+            as: "boardingHouse",
+          },
+        },
+        {
+          $unwind: "$boardingHouse",
+        },
+        {
+          $match: {
+            "boardingHouse.ownerId": userId,
+            ...matchConditions,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            roomNumber: "$room.roomNumber",
+            endDate: "$depositRoom.endDate",
+            amountRefunded: 1,
+            boardingHouseName: "$boardingHouse.name",
+            status: 1,
+            reason: 1,
+            reasonForCancel: 1,
+            createdAt: 1,
+            depositRoomId: "$depositRoom._id",
+            accountId: 1,
+          },
+        },
+        {
+          $sort: { [sortField]: sortOrder },
+        },
+      ];
+
+      // Get total count
+      const totalPipeline = [...pipeline, { $count: "total" }];
+      const totalResult = await RefundRequest.aggregate(totalPipeline);
+      const totalItems = totalResult.length > 0 ? totalResult[0].total : 0;
+
+      // Get paginated data
+      const dataPipeline = [...pipeline, { $skip: skip }, { $limit: limit }];
+      const refundRequests = await RefundRequest.aggregate(dataPipeline);
+
+      // Format the data
+      const formattedRequests = refundRequests.map((refundRequest) => ({
+        _id: refundRequest._id,
+        roomNumber: refundRequest.roomNumber || "N/A",
+        endDate: moment(refundRequest.endDate).format("DD/MM/YYYY"),
+        amountRefunded: refundRequest.amountRefunded,
+        boardingHouseName: refundRequest.boardingHouseName || "N/A",
+        status: refundRequest.status,
+        reason: refundRequest.reason,
+        reasonForCancel: refundRequest.reasonForCancel,
+        createdAt: moment(refundRequest.createdAt).format("DD/MM/YYYY"),
+        depositRoomId: refundRequest.depositRoomId,
+        accountId: refundRequest.accountId,
+      }));
+
+      const totalPages = Math.ceil(totalItems / limit);
+
+      return res.status(200).json({
+        success: true,
+        data: formattedRequests,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalItems,
+          limit,
+        },
+        currentPage: page,
+        totalPages,
+        limit,
+        totalItems,
+      });
+    } catch (error) {
+      console.error("Error getting refund requests for owner:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        error: error.message,
+      });
+    }
+  }
+
   async cancelRefundRequestsForOwner(req, res) {
     const { reasonForCancel } = req.body; // Lý do hủy nhận từ body
     const { refundRequestId } = req.params; // ID yêu cầu hoàn tiền nhận từ params
