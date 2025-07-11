@@ -1,4 +1,4 @@
-// Tạo file: mobile/src/app/(screens)/(accounts)/mydepositedroom/refund.js
+// Tạo file: mobile/src/app/(screens)/(accounts)/mydepositedroom/refundRequest.js
 import React, { useState, useEffect } from "react";
 import ScreenContainer, {
   ScrollContainer,
@@ -9,30 +9,13 @@ import Button from "@/components/ui/Button";
 import { useNotification } from "@/context/NotificationProvider";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import {
-  View,
-  TouchableOpacity,
-  Modal,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
+import { View, TextInput, ActivityIndicator } from "react-native";
 import { useTheme } from "@/context/ThemeProvider";
 import FontAwesome5 from "@expo/vector-icons/build/FontAwesome5";
-import { AntDesign, MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { createRefundRequest } from "@/API/refundRequestAPI";
 import { useCurrentUser } from "@/context/userContext";
 import { LinearGradient } from "expo-linear-gradient";
-
-const reasonOptionsKeys = [
-  "emergencyMove",
-  "roomCondition",
-  "ownerIssue",
-  "personalReason",
-  "jobChange",
-  "familyIssue",
-  "healthIssue",
-  "other",
-];
 
 export default function RefundRequest() {
   const router = useRouter();
@@ -42,9 +25,8 @@ export default function RefundRequest() {
   const { isLogin } = useCurrentUser();
   const { depositId } = useLocalSearchParams();
 
-  const [selectedReason, setSelectedReason] = useState("");
+  const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showReasonPicker, setShowReasonPicker] = useState(false);
   const [loadingDepositInfo, setLoadingDepositInfo] = useState(false);
 
   // Check login status
@@ -64,10 +46,21 @@ export default function RefundRequest() {
   }, [depositId, router, showError, t]);
 
   const validateForm = () => {
-    if (!selectedReason.trim()) {
+    if (!reason.trim()) {
       showError(t("reasonRequired"));
       return false;
     }
+
+    if (reason.trim().length < 10) {
+      showError(t("reasonTooShort"));
+      return false;
+    }
+
+    if (reason.trim().length > 500) {
+      showError(t("reasonTooLong"));
+      return false;
+    }
+
     return true;
   };
 
@@ -81,11 +74,13 @@ export default function RefundRequest() {
     try {
       const response = await createRefundRequest({
         depositRoomId: depositId,
-        reason: selectedReason,
+        reason: reason.trim(),
       });
 
       if (response.success) {
         showSuccess(t("requestSubmitted"));
+
+        // Chỉ cần router.back() thôi, useFocusEffect sẽ tự động refresh
         router.back();
       } else {
         throw new Error(response.message || t("submitError"));
@@ -93,24 +88,12 @@ export default function RefundRequest() {
     } catch (error) {
       console.error("Error submitting refund request:", error);
       showError(
-        error.response?.data?.message ||
-          error.message ||
-          t("submitError")
+        error.response?.data?.message || error.message || t("submitError")
       );
     } finally {
       setLoading(false);
     }
   };
-
-  // Get reason options
-  const getReasonOptions = () => {
-    return reasonOptionsKeys.map((key) => ({
-      value: t(`reasons.${key}`),
-      label: t(`reasons.${key}`),
-    }));
-  };
-
-  const reasonOptions = getReasonOptions();
 
   if (loadingDepositInfo) {
     return (
@@ -141,9 +124,7 @@ export default function RefundRequest() {
         <View className="mb-6">
           <LinearGradient
             colors={
-              isDarkMode
-                ? ["#1f2937", "#111827"]
-                : ["#ffffff", "#f9fafb"]
+              isDarkMode ? ["#1f2937", "#111827"] : ["#ffffff", "#f9fafb"]
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -225,7 +206,7 @@ export default function RefundRequest() {
           </LinearGradient>
         </View>
 
-        {/* Reason Selection */}
+        {/* Reason Input */}
         <View className="mb-6">
           <Text
             className={`text-base font-semibold mb-2 ${
@@ -235,118 +216,71 @@ export default function RefundRequest() {
             {t("reason")} <Text style={{ color: "red" }}>*</Text>
           </Text>
 
-          <TouchableOpacity
-            className={`border rounded-lg p-4 ${
+          <View
+            className={`border rounded-lg ${
               isDarkMode
                 ? "border-gray-600 bg-gray-800"
                 : "border-gray-300 bg-white"
             }`}
-            onPress={() => setShowReasonPicker(true)}
           >
-            <View className="flex-row items-center justify-between">
-              <Text
-                className={`text-base ${
-                  isDarkMode ? "text-gray-200" : "text-black"
-                } ${!selectedReason ? "opacity-60" : ""}`}
-              >
-                {selectedReason || t("selectReason")}
-              </Text>
-              <Ionicons
-                name="chevron-down"
-                size={20}
-                color={isDarkMode ? "#9ca3af" : "#6b7280"}
-              />
-            </View>
-          </TouchableOpacity>
+            <TextInput
+              value={reason}
+              onChangeText={setReason}
+              placeholder={t("enterReason")}
+              placeholderTextColor={isDarkMode ? "#9ca3af" : "#6b7280"}
+              multiline
+              numberOfLines={6}
+              textAlignVertical="top"
+              maxLength={500}
+              className={`p-4 text-base ${
+                isDarkMode ? "text-gray-200" : "text-black"
+              }`}
+              style={{
+                minHeight: 120,
+                fontSize: 16,
+                lineHeight: 24,
+              }}
+            />
+          </View>
 
-          {/* Reason Picker Modal */}
-          <Modal
-            visible={showReasonPicker}
-            transparent
-            animationType="slide"
-            onRequestClose={() => setShowReasonPicker(false)}
-          >
-            <TouchableOpacity
-              className="flex-1 bg-black/50 justify-end"
-              activeOpacity={1}
-              onPress={() => setShowReasonPicker(false)}
+          {/* Character Counter */}
+          <View className="flex-row justify-between items-center mt-2">
+            <Text
+              className={`text-xs ${
+                isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
             >
-              <View
-                className={`rounded-t-3xl max-h-[80%] ${
-                  isDarkMode ? "bg-gray-900" : "bg-white"
-                }`}
-              >
-                <View
-                  className={`flex-row justify-between items-center p-4 border-b ${
-                    isDarkMode ? "border-gray-700" : "border-gray-200"
-                  }`}
-                >
-                  <Text
-                    className={`text-lg font-semibold ${
-                      isDarkMode ? "text-white" : "text-black"
-                    }`}
-                  >
-                    {t("selectReason")}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => setShowReasonPicker(false)}
-                    className="p-1"
-                  >
-                    <AntDesign
-                      name="close"
-                      size={20}
-                      color={isDarkMode ? "#fff" : "#000"}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <ScrollView className="p-4">
-                  {reasonOptions.map((option, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      className={`p-4 border-b ${
-                        isDarkMode ? "border-gray-700" : "border-gray-200"
-                      } ${
-                        selectedReason === option.value
-                          ? isDarkMode
-                            ? "bg-gray-700"
-                            : "bg-gray-100"
-                          : ""
-                      }`}
-                      onPress={() => {
-                        setSelectedReason(option.value);
-                        setShowReasonPicker(false);
-                      }}
-                    >
-                      <Text
-                        className={`text-base ${
-                          selectedReason === option.value
-                            ? "font-semibold"
-                            : ""
-                        } ${isDarkMode ? "text-white" : "text-black"}`}
-                      >
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            </TouchableOpacity>
-          </Modal>
+              {t("reasonHint")}
+            </Text>
+            <Text
+              className={`text-xs ${
+                reason.length > 450
+                  ? "text-orange-500"
+                  : reason.length > 500
+                  ? "text-red-500"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-500"
+              }`}
+            >
+              {reason.length}/500
+            </Text>
+          </View>
         </View>
 
         {/* Submit Button */}
         <Button
           onPress={handleSubmit}
           loading={loading}
-          disabled={loading || !selectedReason}
+          disabled={loading || !reason.trim() || reason.trim().length < 10}
           fullWidth
           className="mb-8"
           style={{
             backgroundColor: isDarkMode ? "#ef4444" : "#dc2626",
             borderRadius: 12,
             paddingVertical: 16,
-            opacity: (!selectedReason || loading) ? 0.6 : 1,
+            opacity:
+              loading || !reason.trim() || reason.trim().length < 10 ? 0.6 : 1,
           }}
         >
           {loading ? t("submitting") : t("submitRequest")}

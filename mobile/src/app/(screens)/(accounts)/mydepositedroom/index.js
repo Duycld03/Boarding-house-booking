@@ -163,6 +163,16 @@ function MyDepositedRoom() {
     }
   }, [paginationOptions.page]); // Don't include fetchData to prevent infinite loop
 
+  // THÊM MỚI: useFocusEffect để refresh refund requests khi screen được focus
+  useFocusEffect(
+    useCallback(() => {
+      // Chỉ refresh refund requests, không fetch lại toàn bộ data
+      if (isLogin && depositData.length > 0) {
+        fetchRefundRequests();
+      }
+    }, [isLogin, depositData.length, fetchRefundRequests])
+  );
+
   // Handle refresh
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

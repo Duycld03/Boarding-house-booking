@@ -5,21 +5,14 @@
   "importantNote": "Lưu ý quan trọng:",
   "refundPolicy": "Yêu cầu hoàn tiền chỉ có thể gửi trước 7 ngày kết thúc thời hạn cọc. Quá trình xử lý có thể mất 3-5 ngày làm việc.",
   "reason": "Lý do hoàn tiền",
-  "selectReason": "Chọn lý do",
-  "reasonRequired": "Vui lòng chọn lý do hoàn tiền",
+  "enterReason": "Vui lòng giải thích chi tiết lý do bạn muốn yêu cầu hoàn tiền...",
+  "reasonHint": "Tối thiểu 10 ký tự",
+  "reasonRequired": "Vui lòng cung cấp lý do hoàn tiền",
+  "reasonTooShort": "Lý do phải có ít nhất 10 ký tự",
+  "reasonTooLong": "Lý do không được vượt quá 500 ký tự",
   "requestSubmitted": "Yêu cầu hoàn tiền đã được gửi thành công",
   "submitError": "Gửi yêu cầu hoàn tiền thất bại",
   "submitting": "Đang gửi...",
   "submitRequest": "Gửi Yêu Cầu Hoàn Tiền",
-  "invalidDepositId": "ID đặt cọc không hợp lệ",
-  "reasons": {
-    "emergencyMove": "Chuyển đi khẩn cấp",
-    "roomCondition": "Vấn đề về tình trạng phòng",
-    "ownerIssue": "Vấn đề với chủ nhà",
-    "personalReason": "Lý do cá nhân",
-    "jobChange": "Thay đổi công việc/chuyển công tác",
-    "familyIssue": "Khẩn cấp gia đình",
-    "healthIssue": "Vấn đề sức khỏe",
-    "other": "Lý do khác"
-  }
+  "invalidDepositId": "ID đặt cọc không hợp lệ"
 }

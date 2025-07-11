@@ -26,7 +26,7 @@ const DepositCard = ({
 }) => {
   const { isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
-  const { t, i18n } = useTranslation("myDepositedRoom"); // Get i18n to access current language
+  const { t, i18n } = useTranslation("myDepositedRoom");
   const slideAnim = React.useRef(new Animated.Value(50)).current;
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
@@ -132,35 +132,24 @@ const DepositCard = ({
     });
   };
 
-  const shouldShowRefund = (endDateStr) => {
-    if (!endDateStr) return false;
+  // Updated shouldShowRefund function - only based on rentalTime
+  const shouldShowRefund = (rentalTime) => {
+    // Convert rentalTime to number if it's a string
+    const rentalTimeNum =
+      typeof rentalTime === "string" ? parseInt(rentalTime) : rentalTime;
 
-    let endDate;
-
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(endDateStr)) {
-      const [day, month, year] = endDateStr.split("/").map(Number);
-      endDate = new Date(year, month - 1, day);
-    } else {
-      endDate = new Date(endDateStr);
-    }
-
-    if (isNaN(endDate.getTime())) return false;
-
-    const currentDate = new Date();
-    const twoMonthsBeforeEnd = new Date(endDate);
-    twoMonthsBeforeEnd.setMonth(twoMonthsBeforeEnd.getMonth() - 2);
-
-    return currentDate <= twoMonthsBeforeEnd;
+    // Show refund button if rental time is >= 2 months
+    return rentalTimeNum >= 2;
   };
 
-  // Add this function to your DepositCard component
+  // Updated renderActionButtons function
   const renderActionButtons = () => {
     if (item.status === "confirmed") {
       return (
         <>
           <View className="flex-row justify-between mt-2">
-            {/* Request Refund Button - Show if refund is available and no existing request */}
-            {shouldShowRefund(item.endDate) && (
+            {/* Request Refund Button - Show based on rental time */}
+            {shouldShowRefund(item.rentalTime) && (
               <View className="flex-1 ml-2">
                 <Button
                   onPress={() => onRefund(item)}
@@ -173,9 +162,7 @@ const DepositCard = ({
                       <Ionicons
                         name="checkmark-circle"
                         size={16}
-                        color={
-                          isDarkMode ? "#6b7280" : "#9ca3af"
-                        }
+                        color={isDarkMode ? "#6b7280" : "#9ca3af"}
                       />
                     ) : (
                       <Ionicons name="refresh" size={16} color="#fff" />
@@ -183,14 +170,13 @@ const DepositCard = ({
                   }
                   style={{
                     borderRadius: 12,
-                    backgroundColor:
-                      hasExistingRefundRequest
-                        ? isDarkMode
-                          ? "#374151"
-                          : "#e5e7eb"
-                        : isDarkMode
-                        ? "#b91c1c"
-                        : "#dc2626",
+                    backgroundColor: hasExistingRefundRequest
+                      ? isDarkMode
+                        ? "#374151"
+                        : "#e5e7eb"
+                      : isDarkMode
+                      ? "#b91c1c"
+                      : "#dc2626",
                     opacity: hasExistingRefundRequest ? 0.6 : 1,
                   }}
                 >
@@ -451,7 +437,7 @@ const DepositCard = ({
                   "font-semibold text-gray-100"
                 )}
               >
-                {item.rentalTime}{" "}
+                {item.rentalTime} {t("months")}
               </Text>
             </View>
           </View>
