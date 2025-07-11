@@ -1,39 +1,23 @@
 import React from 'react';
-import { View, Switch, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Switch, ScrollView } from 'react-native';
 import { useTheme } from '@/context/ThemeProvider';
 import { useThemedClasses } from '@/utils/useTheme';
 import { Ionicons, FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import LanguagePicker from './LanguagePicker';
 import { useTranslation } from 'react-i18next';
-import i18n from '@/config-translation/config-translation';
 import Text from '@/components/ui/Text';
 import { ScreenContainer } from '@/components/layout';
 import Color from '@/constants/styles/color';
 import Font from '@/constants/styles/fonts';
+import Button from '@/components/ui/Button';
 import { useNavigation } from '@react-navigation/native';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 
 export default function Setting() {
   const { isDarkMode, toggleTheme } = useTheme();
   const { themedClasses } = useThemedClasses();
-  const { t, ready } = useTranslation('setting');
+  const { t } = useTranslation('setting');
   const navigation = useNavigation();
-
-  // ✅ Chặn render nếu i18n chưa khởi tạo hoặc namespace 'setting' chưa sẵn sàng
-  if (!i18n.isInitialized || !ready) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: isDarkMode ? '#000' : '#fff',
-        }}
-      >
-        <ActivityIndicator size="large" color={isDarkMode ? '#fff' : '#333'} />
-      </View>
-    );
-  }
 
   const primaryColor = isDarkMode ? '#60a5fa' : '#3b82f6';
 
@@ -74,13 +58,14 @@ export default function Setting() {
         }
         title={t('back')}
       />
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="p-5">
-          {/* Giao diện */}
+
+
+          {/* Giao diện - Appearance */}
           <View className={cardStyle}>
             <View className={cardHeaderStyle}>
               <Text
@@ -145,8 +130,9 @@ export default function Setting() {
           </View>
 
           <View className="h-8" />
+
         </View>
       </ScrollView>
-    </ScreenContainer>
+    </ScreenContainer >
   );
 }

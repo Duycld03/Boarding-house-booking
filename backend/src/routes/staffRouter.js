@@ -14,7 +14,7 @@ import {
   renewalController,
   paymentBillController,
   managerController,
-  roomAdditionFeeController
+  roomAdditionFeeController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -102,14 +102,7 @@ staffRouter.get(
   '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
   depositController.getMaxRentTime
 );
-staffRouter.put(
-  '/acceptdeposit/:depositId',
-  depositController.acceptDepositRoom
-);
-staffRouter.put(
-  '/rejectdeposit/:depositId',
-  depositController.rejectDepositRoom
-);
+staffRouter.put('/deposit/:depositId', depositController.handleDepositDecision);
 
 // room
 staffRouter.get(
@@ -136,11 +129,7 @@ staffRouter.get(
 );
 staffRouter.put(
   '/renewal/:requestId',
-  renewalController.acceptExtensionRequest
-);
-staffRouter.put(
-  '/rejectrenewal/:requestId',
-  renewalController.rejectExtensionRequest
+  renewalController.handleExtensionRequestAction
 );
 
 // refund request
@@ -162,6 +151,8 @@ staffRouter.post(
 staffRouter.get('/expense', bhExpenseController.getExpensesByTime);
 staffRouter.put('/expense/:expenseId', bhExpenseController.updateExpense);
 staffRouter.get('/total-expense', bhExpenseController.getTotalExpensesByTime);
+staffRouter.post('/expense', bhExpenseController.addExpense);
+staffRouter.delete('/expense/:expenseId', bhExpenseController.deleteExpense);
 
 //revenue
 staffRouter.get('/revenue', revenueController.getRevenue);
@@ -196,6 +187,14 @@ staffRouter.post(
   '/calculate-monthly-bill',
   paymentBillController.calculateMonthlyRoomRent
 );
+staffRouter.put(
+  '/payment-bill/:paymentBillId',
+  paymentBillController.updatePaymentBill
+);
+staffRouter.get(
+  '/payment-bill/:paymentBillId',
+  paymentBillController.getPaymentBillById
+);
 
 //manager
 staffRouter.get('/manager-owner', managerController.getManagerOwner);
@@ -208,6 +207,10 @@ staffRouter.post(
 staffRouter.get(
   '/room-addition-fee',
   roomAdditionFeeController.getAllRoomAdditionFees
+);
+staffRouter.get(
+  '/room-addition-fee/calculate-rent/:roomId',
+  roomAdditionFeeController.getRoomAdditionFeeForMonthlyCalculate
 );
 staffRouter.put(
   '/room-addition-fee/:id',
@@ -223,5 +226,6 @@ staffRouter.get(
   roomAdditionFeeController.getRoomAdditionFeesByRoomId
 );
 
+staffRouter.get('/boardinghouse/reviews/:id', ReviewController.getReviewByBhId);
 
 export { staffRouter };

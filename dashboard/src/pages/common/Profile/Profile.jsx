@@ -193,7 +193,7 @@ function Profile() {
                   <Upload
                     name="avatar"
                     listType="picture-circle"
-                    className="avatar-uploader mb-6"
+                    className="avatarUpload avatar-uploader mb-6"
                     showUploadList={false}
                     customRequest={handleUpload}
                     beforeUpload={beforeUpload}

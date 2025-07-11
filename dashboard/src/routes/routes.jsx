@@ -107,6 +107,11 @@ const routes = [
     page: CommonPages.Profile,
     layout: ProfileLayout,
   },
+  {
+    path: `${DASHBOARD_PATH}/bh-management/:boardingHouseId`,
+    page: DashboardPages.BHDetailAdmin,
+    layout: null,
+  },
 ];
 
 export default routes;

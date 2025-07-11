@@ -1,154 +1,146 @@
-// import { useState, useEffect } from "react";
-// import { Select, Slider, DatePicker, Form } from "antd";
-// import ButtonCustom from "@/component/Button";
-// import { useParams } from "react-router-dom";
-// import { getMaxDeposit, getRentTime } from "@/api/depositAPI";
-// import formatAmount from "@/utils/formatAmount";
+import { useState, useEffect } from "react";
+import { Select, Slider, Form } from "antd";
+import ButtonCustom from "@/component/Button";
 
-// const { Option } = Select;
+const { Option } = Select;
 
-// function FilterDeposit({ setFilterValue, listRoom }) {
-//   const [isOpen, setIsOpen] = useState(false);
-//   const [form] = Form.useForm();
-//   const [maxAmount, setMaxAmount] = useState(1000000);
-//   const [currentPrice, setCurrentPrice] = useState({ min: 0, max: 1000000 });
-//   const [maxRentalTime, setMaxRentalTime] = useState(12);
-//   const [rentalTime, setRentalTime] = useState([1, 12]);
+function FilterDeposit({
+  setFilterValue,
+  listRoom,
+  boardingHouses = [], // Thêm prop boardingHouses
+  maxRentalTime = 12,
+  loading = false,
+  t,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [form] = Form.useForm();
+  const [rentalTime, setRentalTime] = useState([1, maxRentalTime]);
 
-//   const { boardingHouseId } = useParams();
+  // Cập nhật giá trị state khi props thay đổi
+  useEffect(() => {
+    setRentalTime([1, maxRentalTime]);
+    form.setFieldsValue({ rentalTime: [1, maxRentalTime] });
+  }, [maxRentalTime]);
 
-//   useEffect(() => {
-//     getMaxDeposit(boardingHouseId).then((max) => {
-//       const maxValue = max || 1000000;
-//       setMaxAmount(maxValue);
-//       setCurrentPrice({ min: 0, max: maxValue });
-//     });
+  const handleFilterClick = () => {
+    setIsOpen(!isOpen);
+  };
 
-//     getRentTime(boardingHouseId).then((maxTime) => {
-//       setMaxRentalTime(maxTime || 12);
-//       setRentalTime([1, maxTime || 12]);
-//     });
-//   }, []);
+  const handleSubmit = (values) => {
+    // Chỉ gửi các filter có giá trị hoặc khác với giá trị mặc định
+    const filters = {};
 
-//   const handleFilterClick = () => {
-//     setIsOpen(!isOpen);
-//   };
+    if (values.status && values.status !== "") {
+      filters.status = values.status;
+    }
 
-//   const handleSubmit = (values) => {
-//     setFilterValue({
-//       status: values.status || "",
-//       priceRange: values.priceRange || [0, maxAmount],
-//       rentalTime: values.rentalTime || [1, maxRentalTime],
-//       roomId: values.roomId || "",
-//     });
-//   };
+    // Chỉ áp dụng rentalTime nếu khác với giá trị mặc định
+    if (
+      values.rentalTime &&
+      (values.rentalTime[0] > 1 || values.rentalTime[1] < maxRentalTime)
+    ) {
+      filters.rentalTime = values.rentalTime;
+    }
 
-//   const handleClear = () => {
-//     form.resetFields();
-//     setFilterValue({
-//       status: "",
-//       priceRange: [0, maxAmount],
-//       rentalTime: [1, maxRentalTime],
-//       endDate: null,
-//       roomId: "",
-//     });
-//     setCurrentPrice({ min: 0, max: maxAmount });
-//     setRentalTime([1, maxRentalTime]);
-//   };
+    // Thay thế roomId bằng boardingHouseId
+    if (values.boardingHouseId && values.boardingHouseId !== "") {
+      filters.boardingHouseId = values.boardingHouseId;
+    }
 
-//   return (
-//     <div className="relative inline-block text-left">
-//       <ButtonCustom
-//         onClick={handleFilterClick}
-//         size="large"
-//         title="Filter"
-//         btnFilter
-//       />
-//       {isOpen && (
-//         <div className="absolute right-0 z-10 mt-2 w-96 rounded-md bg-white ring-1 shadow-lg ring-black/5 p-4">
-//           <Form form={form} onFinish={handleSubmit} layout="vertical">
-//             <Form.Item className="mb-2" label="Status" name="status">
-//               <Select placeholder="Select status" allowClear>
-//                 <Option value="accepted">Accepted</Option>
-//                 <Option value="deleted">Deleted</Option>
-//                 <Option value="pending">Pending</Option>
-//               </Select>
-//             </Form.Item>
+    console.log("Applied filters:", filters);
+    setFilterValue(filters);
+    // Giữ popup mở sau khi submit
+  };
 
-//             <Form.Item label="Price Range" name="priceRange" className="mb-2">
-//               <div className="flex justify-between text-2xl mt-1 mb-2">
-//                 <p className="truncate max-w-[40%]">
-//                   min: {formatAmount(currentPrice.min)}
-//                 </p>
-//                 <p className="truncate max-w-[40%] text-right">
-//                   max: {formatAmount(currentPrice.max)}
-//                 </p>
-//               </div>
-//               <Slider
-//                 range
-//                 min={0}
-//                 max={maxAmount}
-//                 defaultValue={[0, maxAmount]}
-//                 onChange={(value) => {
-//                   setCurrentPrice({ min: value[0], max: value[1] });
-//                   form.setFieldsValue({ priceRange: value });
-//                 }}
-//               />
-//             </Form.Item>
+  const handleClear = () => {
+    form.resetFields();
+    setRentalTime([1, maxRentalTime]);
+    setFilterValue({}); // Gửi filter rỗng để hiển thị tất cả dữ liệu
+    // Giữ popup mở sau khi clear
+  };
 
-//             {/* Rental Time Range (Updated) */}
-//             <Form.Item
-//               className="mb-2"
-//               label="Rental Time Range"
-//               name="rentalTime"
-//             >
-//               <div className="flex justify-between text-2xl mt-1 mb-2">
-//                 <p>min: {rentalTime[0]}</p>
-//                 <p>max: {rentalTime[1]} </p>
-//               </div>
-//               <Slider
-//                 range
-//                 min={1}
-//                 max={maxRentalTime}
-//                 defaultValue={[1, maxRentalTime]}
-//                 onChange={(value) => {
-//                   setRentalTime(value);
-//                   form.setFieldsValue({ rentalTime: value });
-//                 }}
-//               />
-//             </Form.Item>
+  // Hàm để đóng popup
+  const handleClose = () => {
+    setIsOpen(false);
+  };
 
-//             <Form.Item label="Room Number" name="roomId">
-//               <Select placeholder="Select room" allowClear>
-//                 {listRoom?.map((room) => (
-//                   <Option key={room._id} value={room._id}>
-//                     {room.roomNumber}
-//                   </Option>
-//                 ))}
-//               </Select>
-//             </Form.Item>
+  return (
+    <div className="relative inline-block text-left">
+      <ButtonCustom
+        onClick={handleFilterClick}
+        size="large"
+        title="Filter"
+        btnFilter
+        disabled={loading}
+      />
+      {isOpen && (
+        <div className="absolute right-0 z-10 mt-2 w-96 rounded-md bg-white ring-1 shadow-lg ring-black/5 p-4">
+          <Form form={form} onFinish={handleSubmit} layout="vertical">
+            <Form.Item className="mb-2" label="Status" name="status">
+              <Select placeholder="Select status" allowClear>
+                <Option value="accepted">{t(`status.accepted`)}</Option>
+                <Option value="deleted">{t(`status.deleted`)}</Option>
+                <Option value="pending">{t(`status.pending`)}</Option>
+                <Option value="rejected">{t(`status.rejected`)}</Option>
+              </Select>
+            </Form.Item>
 
-//             <Form.Item>
-//               <div className="flex justify-between">
-//                 <ButtonCustom
-//                   btnFilter
-//                   size="large"
-//                   htmlType="submit"
-//                   className="flex-1 w-40"
-//                 />
-//                 <ButtonCustom
-//                   onClick={handleClear}
-//                   className="flex-1 w-40"
-//                   btnDelete
-//                   size="large"
-//                 />
-//               </div>
-//             </Form.Item>
-//           </Form>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
+            <Form.Item
+              className="mb-2"
+              label="Rental Time Range"
+              name="rentalTime"
+            >
+              <div className="flex justify-between text-2xl mt-1 mb-2">
+                <p>min: {rentalTime[0]} </p>
+                <p>max: {rentalTime[1]}</p>
+              </div>
+              <Slider
+                range
+                min={1}
+                max={maxRentalTime}
+                defaultValue={[1, maxRentalTime]}
+                value={rentalTime}
+                onChange={(value) => {
+                  setRentalTime(value);
+                  form.setFieldsValue({ rentalTime: value });
+                }}
+              />
+            </Form.Item>
 
-// export default FilterDeposit;
+            {/* Thay thế Room Number bằng Boarding House */}
+            <Form.Item label="Boarding House" name="boardingHouseId">
+              <Select placeholder="Select boarding house" allowClear>
+                {boardingHouses?.map((bh) => (
+                  <Option key={bh._id} value={bh._id}>
+                    {bh.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item>
+              <div className="flex justify-between">
+                <ButtonCustom
+                  btnFilter
+                  size="large"
+                  htmlType="submit"
+                  className="flex-1 w-40"
+                  title="Apply"
+                />
+                <ButtonCustom
+                  onClick={handleClear}
+                  className="flex-1 w-40"
+                  btnDelete
+                  size="large"
+                  title="Reset"
+                />
+              </div>
+            </Form.Item>
+          </Form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default FilterDeposit;

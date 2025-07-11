@@ -91,37 +91,10 @@ ownerRouter.delete(
 //   depositController.getDepositsByAccount
 // );
 
-ownerRouter.get(
-  '/boardinghouse/deposit/max-deposit/:boardingHouseId',
-  depositController.getMaxDeposit
-);
+
 ownerRouter.get(
   '/boardinghouse/deposit/max-rent-time/:boardingHouseId',
   depositController.getMaxRentTime
-);
-ownerRouter.put(
-  '/acceptdeposit/:depositId',
-  depositController.acceptDepositRoom
-);
-ownerRouter.put(
-  '/rejectdeposit/:depositId',
-  depositController.rejectDepositRoom
-);
-
-
-
-//renewal
-ownerRouter.get(
-  '/renewal/boarding-house/:boardingHouseId',
-  renewalController.getRenewalRequestByBhID
-);
-ownerRouter.put(
-  '/renewal/:requestId',
-  renewalController.acceptExtensionRequest
-);
-ownerRouter.put(
-  '/rejectrenewal/:requestId',
-  renewalController.rejectExtensionRequest
 );
 
 // refund request
@@ -139,10 +112,7 @@ ownerRouter.post(
   depositController.acceptRefundRequestForOwner
 );
 
-//expense
-ownerRouter.get('/expense', bhExpenseController.getExpensesByTime);
-ownerRouter.put('/expense/:expenseId', bhExpenseController.updateExpense);
-ownerRouter.get('/total-expense', bhExpenseController.getTotalExpensesByTime);
+
 
 //revenue
 ownerRouter.get('/revenue', revenueController.getRevenue);

@@ -74,7 +74,8 @@
     "tenantManagement": "Quản lý khách thuê",
     "revenueManagement": "Quản lý doanh thu",
     "renewalManagement": "Quản lý gia hạn",
-    "rentPaymentManagement": "Quản lý thanh toán tiền thuê"
+    "rentPaymentManagement": "Quản lý thanh toán tiền thuê",
+    "reviewManagement": "Quản lí đánh giá"
   },
 
   "labels": {
@@ -458,5 +459,86 @@
         "required": "Tháng/Năm là bắt buộc"
       }
     }
+  },
+  "revenue": {
+    "tabs": {
+      "revenue": "Doanh thu",
+      "expense": "Chi phí"
+    },
+    "filters": {
+      "month": "Tháng",
+      "year": "Năm"
+    },
+    "buttons": {
+      "addNewExpense": "Thêm chi phí mới",
+      "updateExpense": "Cập nhật chi phí",
+      "deleteExpense": "Xóa chi phí",
+      "addExpense": "Thêm chi phí",
+      "cancel": "Hủy",
+      "add": "Thêm",
+      "save": "Lưu"
+    },
+    "confirmDelete": {
+      "title": "Xóa chi phí",
+      "description": "Bạn có chắc chắn muốn xóa chi phí này không? Hành động này không thể hoàn tác.",
+      "okText": "Có, Xóa",
+      "cancelText": "Hủy"
+    },
+    "modal": {
+      "addExpense": "Thêm chi phí mới",
+      "updateExpense": "Cập nhật chi phí"
+    },
+    "expenses": {
+      "electricity": "Chi phí điện",
+      "water": "Chi phí nước",
+      "other": "Chi phí khác",
+      "oldReading": "Chỉ số cũ",
+      "newReading": "Chỉ số mới",
+      "expenseName": "Tên chi phí",
+      "otherExpense": "Chi phí khác",
+      "amount": "Số tiền",
+      "totalExpenses": "Tổng chi phí",
+      "electricityDetails": "Chi tiết tiền điện",
+      "waterDetails": "Chi tiết tiền nước",
+      "previousReading": "Chỉ số cũ",
+      "currentReading": "Chỉ số mới",
+      "consumption": "Tiêu thụ",
+      "totalAmount": "Tổng tiền",
+      "distribution": "Phân bố chi phí",
+      "updateChart": "Cập nhật biểu đồ",
+      "feeName": "Tên phí",
+      "totalOtherExpenses": "Tổng chi phí khác",
+      "noOtherExpenses": "Không có chi phí khác nào"
+    },
+    "noData": {
+      "revenue": "Không có dữ liệu doanh thu",
+      "expense": "Không có dữ liệu chi phí"
+    },
+    "success": {
+      "expenseAdded": "Thêm chi phí thành công",
+      "expenseUpdated": "Cập nhật chi phí thành công",
+      "expenseDeleted": "Xóa chi phí thành công"
+    },
+    "errors": {
+      "noExpenseToDelete": "Không có chi phí để xóa",
+      "deleteExpense": "Không thể xóa chi phí: {{message}}",
+      "addExpense": "Không thể thêm chi phí. {{message}}",
+      "updateExpense": "Không thể cập nhật chi phí. {{message}}",
+      "unknownError": "Lỗi không xác định"
+    }
+  },
+  "months": {
+    "january": "Tháng 1",
+    "february": "Tháng 2",
+    "march": "Tháng 3",
+    "april": "Tháng 4",
+    "may": "Tháng 5",
+    "june": "Tháng 6",
+    "july": "Tháng 7",
+    "august": "Tháng 8",
+    "september": "Tháng 9",
+    "october": "Tháng 10",
+    "november": "Tháng 11",
+    "december": "Tháng 12"
   }
 }

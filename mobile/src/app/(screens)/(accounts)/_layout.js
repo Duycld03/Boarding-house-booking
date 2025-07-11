@@ -47,7 +47,7 @@ const AccountLayout = () => {
           }}
         />
         <Stack.Screen
-          name="mydepositedroom/payRent"
+          name="myrentpayment/payRent"
           options={{
             headerShown: false,
           }}

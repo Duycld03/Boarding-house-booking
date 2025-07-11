@@ -1,7 +1,14 @@
 import axios from "../axios.config";
 
-export const getPaymentBillByBoardingHouseId = (boardingHouseId) => {
-  return axios.get(`/owner/rent-payment/${boardingHouseId}`);
+export const getPaymentBillByBoardingHouseId = (
+  boardingHouseId,
+  paginationOptions = {}
+) => {
+  const params = {
+    ...paginationOptions,
+  };
+
+  return axios.get(`/owner/rent-payment/${boardingHouseId}`, { params });
 };
 
 export const calculateMonthlyBill = (data) => {
