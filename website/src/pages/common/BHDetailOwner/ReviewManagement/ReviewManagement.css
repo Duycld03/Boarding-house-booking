@@ -1,0 +1,44 @@
+.dark-modal .ant-modal-content {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+    border-radius: 16px;
+}
+
+.dark-modal .ant-modal-header {
+    background-color: #1f2937 !important;
+    border-bottom: 1px solid #374151;
+}
+
+.dark-modal .ant-modal-title {
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.dark-modal .ant-modal-close {
+    color: #ffffff !important;
+}
+
+.dark-modal .ant-modal-body {
+    max-height: 80vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #4b5563 #1f2937;
+}
+
+.dark-modal .ant-modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dark-modal .ant-modal-body::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+
+/* Truncate content in table cell */
+.truncate-text {
+    display: inline-block;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
