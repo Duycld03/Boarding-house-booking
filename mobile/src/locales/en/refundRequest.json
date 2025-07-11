@@ -1,0 +1,27 @@
+{
+  "refund": {
+    "pageTitle": "Refund Requests",
+    "emptyTitle": "No Refund Requests",
+    "emptyMessage": "When you request a refund, it will appear here.",
+    "room": "Room",
+    "endDate": "End Date",
+    "amount": "Refund Amount",
+    "reason": "Reason",
+    "noReason": "None",
+    "createdAt": "Created At",
+    "status": {
+      "label": "Status",
+      "pending": "Processing",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+       "canceled": "Canceled"
+    },
+    "loadMore": "Load More",
+    "loadAll": "All Requests Loaded",
+    "loadingMore": "Loading more...",
+    "requests": "requests"
+  },
+  "common": {
+    "errorRefreshing": "Error refreshing data"
+  }
+}
