@@ -10,7 +10,6 @@ import PaymentBill from "../models/paymentBill.js";
 import dotenv from "dotenv";
 import UserPayment from "../models/userPayment.js";
 import BoardingHouse from "../models/boardingHouse.js";
-import { query } from "express";
 import RefundRequest from "../models/refundRequest.js";
 import { Account } from "../models/account.js";
 import paginate from "../utils/pagination.js";
@@ -379,13 +378,13 @@ class DepositController {
 
       await refundRequest.save();
 
-      const redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=success`;
+      const redirectUrl = `http://localhost:5173/refund-request-management?status=success`;
       return res.redirect(redirectUrl);
     }
     //failed
     let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
     if (type == "refund") {
-      redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
+      redirectUrl = `http://localhost:5173/refund-request-management?status=fail`;
     }
     res.redirect(redirectUrl);
   }
@@ -404,6 +403,7 @@ class DepositController {
     const info = orderInfo.split("-");
     const type = info[0];
     try {
+      console.log(resultCode);
       if (resultCode == "7002" || resultCode == "0") {
         if (type == "deposit") {
           const accountId = info[1];
@@ -467,8 +467,8 @@ class DepositController {
           return res.redirect(redirectUrl);
         }
         // refund
-        const accountId = orderInfo[1];
-        const refundRequestId = orderInfo[2];
+        const accountId = info[1];
+        const refundRequestId = info[2];
 
         const refundRequest = await RefundRequest.findOne({
           _id: refundRequestId,
@@ -494,13 +494,13 @@ class DepositController {
 
         await refundRequest.save();
 
-        const redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=success`;
+        const redirectUrl = `http://localhost:5173/refund-request-management?status=success`;
         return res.redirect(redirectUrl);
       }
     } catch (error) {
       let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
       if (type == "refund") {
-        redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
+        redirectUrl = `http://localhost:5173/refund-request-management?status=fail`;
       }
       res.redirect(redirectUrl);
     }

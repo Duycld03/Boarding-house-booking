@@ -56,14 +56,6 @@ class RefundRequestController {
       const sortField = req.query.sortField || "createdAt";
       const sortOrder = req.query.sortOrder || "desc";
 
-      console.log("Backend pagination params:", {
-        page,
-        limit,
-        skip,
-        sortField,
-        sortOrder,
-      });
-
       // Get all refund requests with populate
       const refundRequests = await RefundRequest.find({})
         .populate({
@@ -118,14 +110,6 @@ class RefundRequestController {
       const totalItems = filteredRequests.length;
       const totalPages = Math.ceil(totalItems / limit);
       const paginatedRequests = filteredRequests.slice(skip, skip + limit);
-
-      console.log("Backend pagination result:", {
-        totalItems,
-        totalPages,
-        currentPage: page,
-        limit, // Đảm bảo trả về đúng limit
-        paginatedItems: paginatedRequests.length,
-      });
 
       // Format data
       const formattedRequests = paginatedRequests.map((request) => ({

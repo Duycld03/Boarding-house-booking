@@ -22,7 +22,7 @@ import { useTranslation } from "react-i18next";
 function DepositRefundRequestOwner() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation("depositRefundRequest");
+  const { t, i18n } = useTranslation("depositRefundRequest");
   const currentRequestRef = useRef(null);
 
   // State management
@@ -72,7 +72,11 @@ function DepositRefundRequestOwner() {
         dataIndex: "amountRefunded",
         key: "amountRefunded",
         sorter: true,
-        render: (price) => (price ? formatAmount(price) : "N/A"),
+        render: (price) => (
+          <Tag color="processing">
+            {price ? formatAmount(price, i18n.language) : "N/A"}
+          </Tag>
+        ),
       },
       {
         title: t("status"),
@@ -91,7 +95,7 @@ function DepositRefundRequestOwner() {
           const capitalize =
             status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 
-          return <Tag color={color}>{capitalize}</Tag>;
+          return <Tag color={color}>{t(statusLower)}</Tag>;
         },
       },
       {
