@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { deleteRoom } from "@/api/ownerUser/boardingHouseAPI";
 import UpdateRoomPage from "./UpdateRoom";
 import { useTranslation } from "react-i18next";
+import DefaulImage from "@/assets/images/blankRoom.jpg";
 
 function RoomManagement({ boardingHouseId }) {
   const [rooms, setRooms] = useState([]);
@@ -136,9 +137,9 @@ function RoomManagement({ boardingHouseId }) {
               ? images[0]?.imageUrl
               : images?.imageUrl;
 
-          return imageUrl ? (
+          return (
             <Image
-              src={imageUrl}
+              src={imageUrl || DefaulImage}
               alt={t("roomManagement.table.roomImageAlt")}
               style={{ width: 50, height: 50, objectFit: "cover" }}
               placeholder={
@@ -155,27 +156,11 @@ function RoomManagement({ boardingHouseId }) {
                   Loading...
                 </div>
               }
-              fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+s2HLO4MRbYUK5dQRDaJGFyCKISAYEsQQMomxJAwsEZiEYLU0zZPZ5Lp8T1Tmn6qa6v6e6vOcFn6qv7/T0/6P21K0+/vq5l6/8uvcL37/x89efCa4LL4+1LGVZfJMr9X5f//4z7v0/rGCgvbO5/vv7VQI5YH4wPOCN4MHmAe8GjPK/sZkfdWqCTGWgEuRCaBfKQ5lOGZINUTEJIyRBoSxXIciwb0wORhKpODaELYOVIkdZYCr6Nf//2x4YGrw0E8lKVWcEQCFqNJ3KNAYYfJ5CUyGpxpM5QIHJ6CSGQRJV+pz1AUbmtUjVosFIBcbLWEYF3E4CrVPKEwUE5wOHkzZ7uA5QYDI6FS2kBYFYh3sGOBkOcF6X8Q8oMBmdSudQFJJCUpYCJeRaLDUxI8fI4gxNvgHUhfKEAlPR6dAUgqJDcCoP1t7FLfqFLswOHOkEq3UH6VcQFJqKTkun8gikVZ+vKhQTylMb1n6VD1Rps6Uqel7bAAVGo5PRqazuI5G/Cx6EfYl6DqIyMx0gN6M5ZVl6g8QYx7fBTiCjBCMQmIl8O5QFqJ8UIzOhcNNs2cOCJEEhKST8n+uA58pCAg=="
+              fallback={DefaulImage}
               onError={(e) => {
                 console.error("Image load error:", e);
               }}
             />
-          ) : (
-            <div
-              style={{
-                width: 50,
-                height: 50,
-                backgroundColor: "#f0f0f0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "12px",
-                color: "#999",
-                borderRadius: "4px",
-              }}
-            >
-              {t("roomManagement.table.noImage")}
-            </div>
           );
         },
       },

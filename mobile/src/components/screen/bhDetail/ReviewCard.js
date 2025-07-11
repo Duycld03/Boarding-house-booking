@@ -9,8 +9,13 @@ import { useThemedClasses } from '@/utils/useTheme';
 import ImageGrid from './ImageGrid';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-
+import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
+import { useRouter } from 'expo-router';
+import { useCurrentUser } from '@/context/userContext';
+import { deleteReviewUser } from '@/API/reviewAPI';
+import { useNotification } from "@/context/NotificationProvider";
+import { ConfirmModal } from '@/components/feedback';
+import { getReviewReportsAuth } from '@/API/reportAPI';
 
 // Enable relative time plugin
 dayjs.extend(relativeTime);
@@ -18,12 +23,18 @@ dayjs.extend(relativeTime);
 // Get screen dimensions
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-function ReviewCard({ t, review, onPress, onImagePress, locale = 'en' }) {
+function ReviewCard({ t, review, onPress, onImagePress, locale = 'en', navigation, onDeleted }) {
     const { i18n } = useTranslation();
-
     const { isDarkMode } = useTheme();
     const { themedClasses } = useThemedClasses();
-
+    const router = useRouter();
+    const { user, isLogin } = useCurrentUser();
+    const isMyReview = user && review?.accountId?._id === user._id;
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const [deleteReviewId, setDeleteReviewId] = useState(null);
+    const { showSuccess, showError } = useNotification();
+    const [loading, setLoading] = useState(false);
+    const [showReviewError, setShowReviewError] = useState(false);
     // State for image modal
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -140,7 +151,72 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en' }) {
     };
 
     const Wrapper = onPress ? TouchableOpacity : View;
+    const handleMenuAction = async (action) => {
+        if (action === 'report' && !isLogin) {
+            router.push('/login');
+            return;
+        }
+        switch (action) {
+            case 'update':
+                router.push({
+                    pathname: '/(screens)/BhDetail/updateReview',
+                    params: { reviewId: review._id.toString() },
+                });
+                break;
+            case 'delete':
+                alert('Delete action triggered');
+                break;
+            case 'report':
+                if (!review?._id) {
+                    showError("Review ID is missing or invalid!");
+                    return;
+                }
+                const getReports = await getReviewReportsAuth()
 
+                if (!user?._id || !getReports) return false;
+                if (getReports.some(
+                    (report) =>
+                        // review.accountId === user._id ||
+                        report.reporter?._id === user._id
+                )) {
+                    showError(t("reviewCard.alreadyReported"));
+                    return false;
+                }
+                router.push({
+                    pathname: "/(screens)/BhDetail/report",
+                    params: {
+                        reviewId: review?._id,
+                        // boardingHouseId,
+                    },
+                });
+                break;
+            default:
+                break;
+        }
+    };
+    const handleDeleteReview = async () => {
+        if (!deleteReviewId) return;
+        setLoading(true);
+
+        try {
+            const response = await deleteReviewUser(deleteReviewId);
+            // onDeleted();
+            if (response?.success) {
+                showSuccess(t("reviewCard.deleteSuccess") || "Review deleted successfully!");
+                if (onDeleted) {
+                    onDeleted(); // Callback lại cho component cha
+                }
+            } else {
+                showError(response.message || t('reviewCard.deleteFailed'));
+            }
+        } catch (error) {
+            console.error('Error deleting review:', error);
+            showError(t('reviewCard.deleteFailed'));
+
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <>
             <Wrapper
@@ -159,6 +235,7 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en' }) {
             >
                 {/* Header với avatar và thông tin user */}
                 <View className="flex-row items-start mb-3">
+
                     <Avatar
                         source={review?.accountId?.avatarImage?.url}
                         fallbackText={review?.accountId?.fullname || t('reviewCard.anonymous')}
@@ -172,11 +249,12 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en' }) {
                                 {review?.accountId?.fullname || t('reviewCard.anonymous')}
                             </Text>
 
-                            {review?.createdAt && (
+                            {/* {review?.createdAt && (
                                 <Text className={`text-xs ml-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                     {formatTime(review.createdAt)}
                                 </Text>
-                            )}
+                            )} */}
+
                         </View>
 
                         {/* Rating stars */}
@@ -190,7 +268,71 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en' }) {
                                 </Text>
                             </View>
                         )}
+                        {review?.createdAt && (
+                            <Text className={`text-xs ml-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                {formatTime(review.createdAt)}
+                            </Text>
+                        )}
                     </View>
+                    <Menu>
+                        <MenuTrigger style={{ paddingHorizontal: 10 }}>
+                            <FontAwesome
+                                name="ellipsis-v"
+                                size={20}
+                                color={isDarkMode ? '#9CA3AF' : '#6B7280'}
+                            />
+                        </MenuTrigger>
+
+                        <MenuOptions
+                            customStyles={{
+                                optionsContainer: {
+                                    padding: 10,
+                                    borderRadius: 8,
+                                    backgroundColor: isDarkMode ? '#2D3748' : '#FFFFFF',
+                                    shadowColor: '#000',
+                                    shadowOpacity: 0.1,
+                                    shadowRadius: 6,
+                                    marginTop: 22,
+                                    marginLeft: -10,
+                                    width: 120,
+                                },
+                                optionWrapper: {
+                                    paddingVertical: 8,
+                                    paddingHorizontal: 15,
+                                },
+                                optionText: {
+                                    fontSize: 14,
+                                    color: isDarkMode ? '#E2E8F0' : '#1A202C',
+                                },
+                            }}
+                        >
+                            {isLogin && isMyReview && (
+                                <>
+                                    <MenuOption onSelect={() => handleMenuAction('update')}>
+                                        <Text style={{ color: isDarkMode ? '#FBBF24' : '#1D4ED8', fontWeight: '500' }}>
+                                            {t('reviewCard.update')}
+                                        </Text>
+                                    </MenuOption>
+                                    <MenuOption onSelect={() => {
+                                        setDeleteReviewId(review._id); // Lưu ID
+                                        setIsDeleteModalVisible(true); // Hiển thị modal
+                                    }}>
+                                        <Text style={{ color: 'red', fontWeight: '500' }}>
+                                            {t('reviewCard.delete')}
+                                        </Text>
+                                    </MenuOption>
+                                </>
+                            )}
+
+                            {(!isLogin || (isLogin && !isMyReview)) && (
+                                <MenuOption onSelect={() => handleMenuAction('report')}>
+                                    <Text style={{ color: isDarkMode ? '#FBBF24' : '#1D4ED8', fontWeight: '500' }}>
+                                        {t('reviewCard.report')}
+                                    </Text>
+                                </MenuOption>
+                            )}
+                        </MenuOptions>
+                    </Menu>
                 </View>
 
                 {/* Review content */}
@@ -241,10 +383,20 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en' }) {
                                 </Text>
                             </TouchableOpacity>
                         )}
+
                     </View>
                 )}
             </Wrapper>
-
+            <ConfirmModal
+                visible={isDeleteModalVisible}
+                onClose={() => setIsDeleteModalVisible(false)}
+                onConfirm={handleDeleteReview}
+                title={t('reviewCard.confirmDelete')}
+                message={t('reviewCard.deleteMessage')}
+                confirmText={t('reviewCard.confirm')}
+                cancelText={t('reviewCard.cancel')}
+                dangerMode
+            />
             {/* Image Modal */}
             <Modal
                 visible={modalVisible}
@@ -262,6 +414,7 @@ function ReviewCard({ t, review, onPress, onImagePress, locale = 'en' }) {
                     {/* Close button */}
                     <TouchableOpacity
                         onPress={closeModal}
+                        loading={loading}
                         style={{
                             position: 'absolute',
                             top: 50,

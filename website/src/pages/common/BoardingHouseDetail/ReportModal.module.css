@@ -123,7 +123,6 @@
 :global(.dark) :global(.ant-input),
 :global(.dark) :global(.ant-input-textarea) textarea,
 :global(.dark) :global(.ant-select-selector) {
-  background-color: var(--background-dark, #111827) !important;
   color: var(--text-dark, #f9fafb) !important;
   border-color: #374151 !important;
 }

@@ -1,0 +1,262 @@
+/* Typography component dark mode styles */
+.dark-mode .ant-typography {
+  color: #e5e7eb; /* text color for dark mode */
+}
+
+.dark-mode h1.ant-typography,
+.dark-mode h2.ant-typography,
+.dark-mode h3.ant-typography,
+.dark-mode h4.ant-typography,
+.dark-mode h5.ant-typography {
+  color: #f3f4f6;
+}
+
+.dark-mode .ant-typography-secondary {
+  color: #9ca3af;
+}
+
+.dark-mode .ant-typography-success {
+  color: #10b981;
+}
+
+.dark-mode .ant-typography-warning {
+  color: #f59e0b;
+}
+
+.dark-mode .ant-typography-danger {
+  color: #ef4444;
+}
+
+/* Select component dark mode styles */
+.dark-mode .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+.dark-mode .ant-select-selection-placeholder {
+  color: #9ca3af;
+}
+
+.dark-mode .ant-select-arrow {
+  color: #9ca3af;
+}
+
+.dark-mode
+  .ant-select-focused:not(.ant-select-disabled).ant-select:not(
+    .ant-select-customize-input
+  )
+  .ant-select-selector {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Select dropdown styles */
+.ant-select-dropdown-dark {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48),
+    0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ant-select-dropdown-dark .ant-select-item {
+  color: #e5e7eb;
+}
+
+.ant-select-dropdown-dark
+  .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: #374151;
+}
+
+.ant-select-dropdown-dark
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Button ghost styles in dark mode */
+.dark-mode .ant-btn-ghost {
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+.dark-mode .ant-btn-ghost:hover,
+.dark-mode .ant-btn-ghost:focus {
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Button dashed style in dark mode - Add Floor button */
+.dark-mode .ant-btn-dashed.ant-btn-block {
+  color: #d1d5db; /* text-gray-300 */
+  border-color: #4b5563; /* border-gray-600 */
+  background-color: transparent;
+}
+
+.dark-mode .ant-btn-dashed.ant-btn-block:hover,
+.dark-mode .ant-btn-dashed.ant-btn-block:focus {
+  color: #60a5fa; /* text-blue-400 */
+  border-color: #60a5fa; /* border-blue-400 */
+  background-color: rgba(37, 99, 235, 0.1); /* light blue background */
+}
+
+.dark-mode .ant-btn-dashed.ant-btn-block:active {
+  color: #93c5fd; /* text-blue-300 */
+  border-color: #93c5fd; /* border-blue-300 */
+}
+
+/* Fix for the override classes that Ant Design adds */
+.dark-mode .css-dev-only-do-not-override-1m63z2v.ant-btn-dashed.ant-btn-block {
+  color: #d1d5db; /* text-gray-300 */
+  border-color: #4b5563; /* border-gray-600 */
+}
+
+.dark-mode
+  .css-dev-only-do-not-override-1m63z2v.ant-btn-dashed.ant-btn-block:hover,
+.dark-mode
+  .css-dev-only-do-not-override-1m63z2v.ant-btn-dashed.ant-btn-block:focus {
+  color: #60a5fa; /* text-blue-400 */
+  border-color: #60a5fa; /* border-blue-400 */
+}
+
+/* Button add icon in dark mode */
+.dark-mode .ant-btn-dashed.ant-btn-block .anticon-plus {
+  color: #d1d5db; /* text-gray-300 */
+}
+
+.dark-mode .ant-btn-dashed.ant-btn-block:hover .anticon-plus,
+.dark-mode .ant-btn-dashed.ant-btn-block:focus .anticon-plus {
+  color: #60a5fa; /* text-blue-400 */
+}
+
+/* Input and InputNumber dark mode styles */
+.dark-mode .ant-input,
+.dark-mode .ant-input-affix-wrapper,
+.dark-mode .ant-input-number,
+.dark-mode .ant-input-number-input {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+.dark-mode .ant-input-affix-wrapper .ant-input {
+  background-color: transparent;
+}
+
+.dark-mode .ant-input::placeholder,
+.dark-mode .ant-input-number-input::placeholder {
+  color: #9ca3af;
+}
+
+/* TextArea in dark mode */
+.dark-mode .ant-input-textarea-show-count::after {
+  color: #9ca3af;
+}
+
+/* Alert in dark mode */
+.dark-mode .ant-alert-info {
+  background-color: rgba(30, 58, 138, 0.15);
+  border-color: #1e40af;
+}
+
+.dark-mode .ant-alert-info .ant-alert-message {
+  color: #93c5fd;
+}
+
+.dark-mode .ant-alert-info .ant-alert-description {
+  color: #e5e7eb;
+}
+
+/* Radio buttons in dark mode */
+.dark-mode .ant-radio-button-wrapper {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+.dark-mode .ant-radio-button-wrapper:hover {
+  color: #3b82f6;
+}
+
+.dark-mode
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  color: #fff;
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+/* Card in dark mode */
+.dark-mode .ant-card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark-mode .ant-card-head {
+  border-bottom-color: #374151;
+}
+
+.dark-mode .ant-card-head-title {
+  color: #f3f4f6;
+}
+
+/* Upload in dark mode */
+.dark-mode .ant-upload.ant-upload-select-picture-card {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+.dark-mode .ant-upload-list-picture-card .ant-upload-list-item {
+  border-color: #4b5563;
+}
+
+/* Collapse component in dark mode */
+.dark-mode .ant-collapse {
+  background-color: transparent;
+  border-color: #374151;
+}
+
+.dark-mode .ant-collapse-header {
+  background-color: #1f2937;
+  color: #e5e7eb !important;
+}
+
+.dark-mode .ant-collapse-content {
+  background-color: #1f2937;
+  border-top-color: #374151;
+}
+
+.dark-mode .ant-collapse-content-box {
+  background-color: #1f2937;
+  color: #e5e7eb;
+}
+
+.dark-mode .ant-collapse-arrow {
+  color: #9ca3af;
+}
+
+.dark-mode .ant-collapse-item {
+  border-bottom-color: #374151;
+}
+
+.dark-mode .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  color: #e5e7eb;
+}
+
+/* Fix for nested elements inside collapse */
+.dark-mode .ant-collapse-content-box .ant-row {
+  color: #e5e7eb;
+}
+
+/* Tags inside collapse */
+.dark-mode .ant-collapse-content-box .ant-tag {
+  border-color: transparent;
+}
+
+/* Checkbox inside collapse */
+.dark-mode .ant-collapse-header .ant-checkbox-wrapper {
+  color: #e5e7eb;
+}
+
+.dark-mode .ant-collapse-header .ant-checkbox-wrapper:hover {
+  color: #3b82f6;
+}
