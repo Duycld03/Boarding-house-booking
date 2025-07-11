@@ -156,6 +156,36 @@
     "Nhà trọ kiến trúc xá": "Dormitory"
   },
   "roomManagement": {
+    "form": {
+      "roomType": {
+        "label": "Room Type",
+        "placeholder": "Select Room Type",
+        "required": "Please select a room type!"
+      },
+      "roomNumber": {
+        "label": "Room Number",
+        "placeholder": "Enter Room Number",
+        "required": "Please enter room number!"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter Description",
+        "required": "Please enter description!"
+      },
+      "image": {
+        "label": "Image",
+        "uploadText": "Upload Image",
+        "uploadHint": "Click or drag and drop image to upload",
+        "supportedFormats": "Supported: JPG, PNG up to 10MB",
+        "extra": "Upload clear images of the room to attract tenants"
+      },
+      "uploadImage": "Upload Image",
+      "selectRoomType": "Select Room Type",
+      "enterRoomNumber": "Enter Room Number",
+      "enterDescription": "Enter Description",
+      "clickToUploadImage": "Click to upload image",
+      "imageFileFormat": "Support JPG, PNG, JPEG formats"
+    },
     "updateRoom": {
       "backToRoomManagement": "Back to Room Management",
       "updateRoom": "Update Room",
@@ -212,7 +242,12 @@
     },
     "messages": {
       "deleteFailed": "Delete failed",
-      "updateSuccess": "Room updated successfully"
+      "updateSuccess": "Room updated successfully",
+      "imageUploadSuccess": "Image uploaded successfully",
+      "imageRemoveFailed": "Failed to remove image",
+      "roomTypeChanged": "Room type changed to: {type}",
+      "roomTypeChangeFailed": "Failed to change room type",
+      "descriptionChangeFailed": "Failed to change description"
     },
     "modal": {
       "confirmDelete": {
@@ -222,49 +257,127 @@
     },
     "addRoom": {
       "button": {
-        "addRoom": "Add Room"
+        "addRoom": "Add Room",
+        "bulkAddRoom": "Bulk Add Rooms",
+        "btnCancel": "Cancel"
       },
       "modal": {
         "title": "Add New Room",
-        "okText": "Add Room"
+        "okText": "Add Room",
+        "singleModeTitle": "Add Single Room",
+        "bulkModeTitle": "Custom Floor Configuration",
+        "singleModeReviewTitle": "Add Single Room - Review",
+        "bulkModeReviewTitle": "Bulk Add Rooms - Review"
       },
-      "form": {
-        "roomType": {
-          "label": "Room Type",
-          "placeholder": "Select room type",
-          "required": "Please select room type!"
-        },
-        "roomNumber": {
-          "label": "Room Number",
-          "placeholder": "Enter room number (e.g: A101, B02)",
-          "required": "Please enter room number!"
-        },
-        "description": {
-          "label": "Room Description",
-          "placeholder": "Enter detailed room description, amenities, and features...",
-          "required": "Please enter room description!"
-        },
-        "image": {
-          "label": "Room Image",
-          "uploadText": "Upload Image",
-          "uploadHint": "Click or drag image to upload",
-          "supportedFormats": "Support: JPG, PNG, WEBP (Max: 5MB)",
-          "extra": "Upload a clear photo of the room to attract tenants"
-        }
-      },
-      "validation": {
-        "imageRequired": "Please upload a room image",
-        "invalidImageType": "Please upload a valid image file",
-        "imageSizeLimit": "Image size must be less than 5MB"
-      },
-      "noRoomType": {
-        "title": "No Room Type Found",
-        "content": "Please add room types before creating rooms. Go to Room Type Management to add room types first."
-      }
+      "chooseAddMode": "Choose Add Mode",
+      "singleRoom": "Single Room",
+      "addOneRoomAtATime": "Add one room at a time",
+      "bulkAdd": "Bulk Add",
+      "generateMultipleRooms": "Generate multiple rooms",
+      "roomInformation": "Room Information",
+      "floorConfiguration": "Floor Configuration",
+      "total": "Total",
+      "rooms": "rooms",
+      "floor": "Floor",
+      "floorNumber": "Floor Number",
+      "floorNumberRequired": "Floor number is required",
+      "roomCount": "Room Count",
+      "roomCountRequired": "Room count is required",
+      "prefix": "Prefix (Optional)",
+      "prefixTooltip": "Prefix will be directly added to room number. Example: 'East101'",
+      "prefixPlaceholder": "e.g., East, West",
+      "addFloor": "Add Floor",
+      "numberingFormat": "Numbering Format",
+      "selectNumberingFormat": "Select numbering format",
+      "floorRoomFormat": "Floor-Room (101, 102, 201, 202)",
+      "sequentialFormat": "Sequential (1, 2, 3, 4)",
+      "paddedSequentialFormat": "Padded Sequential (01, 02, 03, 04)",
+      "letterFormat": "Letter Format (A1, A2, B1, B2)",
+      "otherFormat": "Other (Custom Format)",
+      "customFormat": "Custom Format",
+      "enterCustomFormat": "Please enter custom format",
+      "customFormatPlaceholder": "Enter custom format (e.g., {floor}{room:02d}, FL{floor}-R{room}, etc.)",
+      "formatHints": "Format hints",
+      "formatPreview": "Format Preview:",
+      "customFormatInstructions": "Custom Format Instructions",
+      "availableVariables": "Available variables:",
+      "roomNumberWithLeadingZeros": "Room number with leading zeros (01, 02, etc.)",
+      "letterBasedOnFloor": "Letter based on floor (A, B, C, etc.)",
+      "examples": "Examples:",
+      "backToConfiguration": "Back to Configuration",
+      "reviewRoom": "Review Room",
+      "generateRooms": "Generate Rooms",
+      "createRoom": "Create Room",
+      "createAllRooms": "Create All Rooms ({{count}})",
+      "roomType": "Room Type"
+    },
+    "editRoom": {
+      "title": "Edit Room"
+    },
+    "reviewStep": {
+      "bulkEditControls": "Bulk Edit Selected Rooms",
+      "roomsSelected": "room(s) selected",
+      "deleteSelected": "Delete Selected",
+      "noRoomsSelected": "No rooms selected",
+      "selectRoomsToEnable": "Please select at least one room to enable bulk editing options.",
+      "roomType": "Room Type",
+      "description": "Description",
+      "roomImage": "Room Image",
+      "selectRoomsToUpload": "Select rooms to upload",
+      "clickToUploadImage": "Click to upload image",
+      "change": "Change",
+      "remove": "Remove",
+      "roomDetailsPreview": "Room Details Preview",
+      "deleteRoom": "Delete Room",
+      "updatingRoom": "Updating room...",
+      "floorWith": "Floor {{floor}} ({{count}} rooms)",
+      "errors": "{{count}} errors",
+      "noType": "{{count}} no type",
+      "noImage": "{{count}} no image",
+      "selectAll": "Select All {{selected}}/{{total}}",
+      "floor": "Floor",
+      "image": "Image",
+      "imageUploaded": "Image uploaded",
+      "noImageUploaded": "No image uploaded",
+      "clickToPreview": "Click to preview",
+      "confirmDeleteTitle": "Delete Room",
+      "confirmDeleteContent": "Are you sure you want to delete this room?",
+      "confirmBulkDeleteTitle": "Bulk Delete Rooms",
+      "confirmBulkDeleteContent": "Are you sure you want to delete {{count}} selected rooms?",
+      "roomDeletedSuccess": "Room deleted successfully",
+      "roomsDeletedSuccess": "{{count}} rooms deleted successfully",
+      "selectRoomsToDelete": "Please select rooms to delete",
+      "processingRooms": "Processing rooms...",
+      "noImages": "No images uploaded for this room"
+    },
+    "validationSummary": {
+      "allRoomsReady": "All rooms are ready!",
+      "allRoomsReadyDescription": "All rooms have been configured properly and are ready to be created.",
+      "title": "Validation Summary",
+      "totalRooms": "Total rooms: {{count}}",
+      "roomsWithErrors": "Rooms with errors: {{count}}",
+      "roomsWithoutType": "Rooms without type: {{count}}",
+      "roomsWithoutDescription": "Rooms without description: {{count}}",
+      "roomsWithoutImage": "Rooms without image: {{count}}"
+    },
+    "errorSummary": {
+      "duplicateRoomsTitle": "Duplicate Room Numbers Found",
+      "duplicateRoomsContent": "Please fix the following duplicate room numbers: {rooms}"
+    },
+    "bulkCreationCard": {
+      "readyToCreate": "Ready to create {{count}} rooms?",
+      "batchDescription": "All rooms will be created at once as a batch operation."
     },
     "common": {
+      "remove": "Remove",
+      "save": "Save Changes",
+      "cancel": "Cancel",
       "ok": "OK",
-      "cancel": "Cancel"
+      "selected": "Selected",
+      "select": "Select",
+      "delete": "Delete",
+      "edit": "Edit",
+      "unknown": "Unknown"
     }
   },
   "roomAdditionFee": {

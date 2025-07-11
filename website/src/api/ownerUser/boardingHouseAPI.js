@@ -29,7 +29,7 @@ export const getElectricalAndWaterPrice = (boardingHouseId) => {
 }
 
 export const addRoom = async (data) => {
-  return axios.post(`/owner/room/boarding-house`, data, {
+  return axios.post(`/staff/room/boarding-house`, data, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
