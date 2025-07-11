@@ -107,13 +107,17 @@
     "reportReview": "Báo cáo đánh giá này",
     "alreadyReported": "Bạn đã báo cáo đánh giá này. Vui lòng đợi quản trị viên xử lý.",
     "replyToReview": "Trả lời đánh giá này",
-    "alreadyReplied": "Bạn đã trả lời đánh giá này."
+    "alreadyReplied": "Bạn đã trả lời đánh giá này.",
+    "deleteMessage": "Bạn có chắc chắn muốn xóa đánh giá này?",
+    "confirm": "Xóa"
   },
   "reviewList": {
     "allReviewsLoaded": "Tất cả đánh giá đã được tải",
     "loadMore": "Xem thêm đánh giá",
     "totalReviews": "Tổng đánh giá",
-    "averageRating": "Điểm trung bình"
+    "averageRating": "Điểm trung bình",
+    "noReviewsYet": "Chưa có đánh giá nào",
+    "beFirstToReview": "Hãy là người đầu tiên chia sẻ trải nghiệm của bạn!"
   },
   "roomTypeCard": {
     "month": "tháng",
@@ -165,5 +169,10 @@
       "fixErrors": "Vui lòng sửa các lỗi trước khi gửi"
     },
     "submitting": "Đang tạo..."
+  },
+  "review": {
+    "alreadySubmittedTitle": "Thông báo",
+    "alreadySubmittedMessage": "Bạn đã gửi đánh giá cho nhà trọ này rồi.",
+    "confirmButton": "Đóng"
   }
 }

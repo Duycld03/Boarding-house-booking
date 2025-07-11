@@ -49,6 +49,8 @@ import en_payRent from "@/locales/en/payRent.json";
 import vi_payRent from "@/locales/vi/payRent.json";
 import en_payDeposit from "@/locales/en/payDeposit.json";
 import vi_payDeposit from "@/locales/vi/payDeposit.json";
+import en_review from "@/locales/en/review.json";
+import vi_review from "@/locales/vi/review.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -72,6 +74,7 @@ i18n.use(initReactI18next).init({
       depositRoom: en_depositRoom,
       report: en_report,
       boardingHouseGallery: en_boardingHouseGallery,
+      review: en_review,
       myreport: en_myreport,
       myRentPayment: en_myRentPayment,
       myDepositedRoom: en_myDepositedRoom,
@@ -98,6 +101,7 @@ i18n.use(initReactI18next).init({
       depositRoom: vi_depositRoom,
       report: vi_report,
       boardingHouseGallery: vi_boardingHouseGallery,
+      review: vi_review,
       myreport: vi_myreport,
       myRentPayment: vi_myRentPayment,
       myDepositedRoom: vi_myDepositedRoom,

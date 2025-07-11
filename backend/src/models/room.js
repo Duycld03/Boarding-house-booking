@@ -25,7 +25,6 @@ const RoomSchema = new mongoose.Schema(
     images: {
       imageUrl: {
         type: String,
-        required: true,
       },
       publicId: {
         type: String,

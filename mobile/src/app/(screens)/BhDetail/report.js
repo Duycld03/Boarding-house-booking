@@ -129,16 +129,18 @@ export default function Report() {
           type: imageType,
         });
       });
-
       const response = await createReport(formDataObj);
       showSuccess(t("report.success") || "Report submitted successfully");
       router.back();
     } catch (error) {
-      showError(t("report.error") || "Failed to submit report");
-    } finally {
-      setLoading(false);
+      if (error.response?.data?.message) {
+        showError(error.response.data.message);
+        router.back();
+      } else {
+        showError(t("report.error") || "Failed to submit report");
+      }
     }
-  };
+  }
 
   // Get reason options based on whether it's a boarding house or review report
   const getReasonOptions = () => {
@@ -168,26 +170,23 @@ export default function Report() {
         {/* Reason Selection with Modal */}
         <View className="mb-4">
           <Text
-            className={`text-base font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-black"
-            }`}
+            className={`text-base font-semibold mb-2 ${isDarkMode ? "text-white" : "text-black"
+              }`}
           >
             {t("report.reason") || "Reason"}{" "}
             <Text style={{ color: "red" }}>*</Text>
           </Text>
 
           <TouchableOpacity
-            className={`border rounded-lg p-4 ${
-              isDarkMode
-                ? "border-gray-600 bg-gray-800"
-                : "border-gray-300 bg-white"
-            } ${errors.reason ? "border-red-500" : ""}`}
+            className={`border rounded-lg p-4 ${isDarkMode
+              ? "border-gray-600 bg-gray-800"
+              : "border-gray-300 bg-white"
+              } ${errors.reason ? "border-red-500" : ""}`}
             onPress={() => setShowReasonPicker(true)}
           >
             <Text
-              className={`text-base ${
-                isDarkMode ? "text-gray-200" : "text-black"
-              } ${!formData.reason ? "opacity-60" : ""}`}
+              className={`text-base ${isDarkMode ? "text-gray-200" : "text-black"
+                } ${!formData.reason ? "opacity-60" : ""}`}
             >
               {formData.reason
                 ? formData.reason
@@ -213,19 +212,16 @@ export default function Report() {
               onPress={() => setShowReasonPicker(false)}
             >
               <View
-                className={`rounded-t-3xl max-h-[80%] ${
-                  isDarkMode ? "bg-gray-900" : "bg-white"
-                }`}
+                className={`rounded-t-3xl max-h-[80%] ${isDarkMode ? "bg-gray-900" : "bg-white"
+                  }`}
               >
                 <View
-                  className={`flex-row justify-between items-center p-4 border-b ${
-                    isDarkMode ? "border-gray-700" : "border-gray-200"
-                  }`}
+                  className={`flex-row justify-between items-center p-4 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"
+                    }`}
                 >
                   <Text
-                    className={`text-lg font-semibold ${
-                      isDarkMode ? "text-white" : "text-black"
-                    }`}
+                    className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-black"
+                      }`}
                   >
                     {t("report.selectReason") || "Select a reason"}
                   </Text>
@@ -234,9 +230,8 @@ export default function Report() {
                     className="p-1"
                   >
                     <Text
-                      className={`text-xl ${
-                        isDarkMode ? "text-white" : "text-black"
-                      }`}
+                      className={`text-xl ${isDarkMode ? "text-white" : "text-black"
+                        }`}
                     >
                       ✕
                     </Text>
@@ -247,26 +242,23 @@ export default function Report() {
                   {reasonOptions.map((option) => (
                     <TouchableOpacity
                       key={option.value}
-                      className={`p-4 border-b ${
-                        isDarkMode ? "border-gray-700" : "border-gray-200"
-                      } ${
-                        formData.reason === option.value
+                      className={`p-4 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"
+                        } ${formData.reason === option.value
                           ? isDarkMode
                             ? "bg-gray-700"
                             : "bg-gray-100"
                           : ""
-                      }`}
+                        }`}
                       onPress={() => {
                         handleChange("reason", option.value);
                         setShowReasonPicker(false);
                       }}
                     >
                       <Text
-                        className={`text-base ${
-                          formData.reason === option.value
-                            ? "font-semibold"
-                            : ""
-                        } ${isDarkMode ? "text-white" : "text-black"}`}
+                        className={`text-base ${formData.reason === option.value
+                          ? "font-semibold"
+                          : ""
+                          } ${isDarkMode ? "text-white" : "text-black"}`}
                       >
                         {option.label}
                       </Text>
@@ -280,9 +272,8 @@ export default function Report() {
 
         <View className="mb-4">
           <Text
-            className={`text-base font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-black"
-            }`}
+            className={`text-base font-semibold mb-2 ${isDarkMode ? "text-white" : "text-black"
+              }`}
           >
             {t("report.detail") || "Details"}{" "}
             <Text style={{ color: "red" }}>*</Text>
@@ -294,11 +285,10 @@ export default function Report() {
             placeholder={t("report.enterDetail") || "Describe the issue"}
             multiline
             numberOfLines={4}
-            className={`min-h-[100px] text-top border rounded-lg p-3 ${
-              isDarkMode
-                ? "border-gray-600 bg-gray-800 text-gray-200"
-                : "border-gray-300 bg-white text-black"
-            } ${errors.note ? "border-red-500" : ""}`}
+            className={`min-h-[100px] text-top border rounded-lg p-3 ${isDarkMode
+              ? "border-gray-600 bg-gray-800 text-gray-200"
+              : "border-gray-300 bg-white text-black"
+              } ${errors.note ? "border-red-500" : ""}`}
             style={{ textAlignVertical: "top" }}
             error={errors.detail ? errors.detail.message : null}
           />
@@ -310,9 +300,8 @@ export default function Report() {
         </View>
 
         <Text
-          className={`text-base font-semibold mb-2 ${
-            isDarkMode ? "text-white" : "text-black"
-          }`}
+          className={`text-base font-semibold mb-2 ${isDarkMode ? "text-white" : "text-black"
+            }`}
         >
           {t("report.images") || "Images"}{" "}
           <Text style={{ color: "red" }}>*</Text>

@@ -15,6 +15,7 @@
     "detailRequired": "Vui lòng cung cấp chi tiết về vấn đề",
     "uploadLimit": "Tối đa 6 hình ảnh được phép",
     "dragDropText": "Kéo và thả tệp vào đây, hoặc nhấp để chọn",
+    "alreadyReported": "Bạn đã báo cáo đánh giá này rồi",
     "reasons": {
       "boardingHouse": {
         "scamRent": "Lừa đảo hoặc danh sách gian lận",
