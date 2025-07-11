@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
-  Image
+  Image,
+  Animated,
+  Dimensions
 } from "react-native";
 import Slider from '@react-native-community/slider';
 import { Checkbox, RadioButton } from "react-native-paper";
@@ -25,6 +27,8 @@ import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { fetchProvinces, fetchDistricts, fetchWards } from "@/API/apiAddress";
 import { Button } from "@/components/ui";
 import Logo from '../../../assets/images/newLogo.png';
+
+const { width, height } = Dimensions.get('window');
 
 const ExploreFilterScreen = () => {
   const router = useRouter();
@@ -49,6 +53,8 @@ const ExploreFilterScreen = () => {
   const selectedWardName = wards.find(w => w.code === selectedWard)?.name || '';
   const styles = getStyles(isDarkMode);
 
+  // Thêm animated value để theo dõi scroll
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useFocusEffect(
     useCallback(() => {
@@ -67,19 +73,6 @@ const ExploreFilterScreen = () => {
     }, [])
   );
 
-  // const fetchAreas = async () => {
-  //   try {
-  //     const res = await getBhByArea();
-  //     const uniqueProvinces = [...new Set(res.map(bh => bh.address?.province).filter(Boolean))];
-  //     const uniqueDistricts = [...new Set(res.map(bh => bh.address?.district).filter(Boolean))];
-  //     const uniqueWards = [...new Set(res.map(bh => bh.address?.ward).filter(Boolean))];
-  //     setProvinces(uniqueProvinces);
-  //     setDistricts(uniqueDistricts);
-  //     setWards(uniqueWards);
-  //   } catch (err) {
-  //     console.error("Failed to fetch areas:", err);
-  //   }
-  // };
   const fetchData = async () => {
     try {
       const priceRes = await getMaxPriceBHUser();
@@ -122,8 +115,8 @@ const ExploreFilterScreen = () => {
         ward: selectedWardName,
       },
     });
-
   };
+
   const fetchAreas = async () => {
     try {
       const provincesData = await fetchProvinces();
@@ -140,7 +133,7 @@ const ExploreFilterScreen = () => {
     try {
       const districtsData = await fetchDistricts(provinceCode);
       setDistricts(districtsData);
-      setWards([]); // reset wards
+      setWards([]);
     } catch (err) {
       console.error("Failed to fetch districts:", err);
     }
@@ -156,24 +149,82 @@ const ExploreFilterScreen = () => {
       console.error("Failed to fetch wards:", err);
     }
   };
-  const pickerStyle = [
-    styles.input,
-    {
-      backgroundColor: isDarkMode ? '#1e1e1e' : '#fff',
-      color: isDarkMode ? '#fff' : '#000',
-      height: 55
-    },
-  ];
+
+  // Add reset function
+  const handleResetFilters = () => {
+    // Reset all filters to default values
+    setNameFilter("");
+    setSelectedType(null);
+    setRatings([]);
+    setSelectedProvince('');
+    setSelectedDistrict('');
+    setSelectedWard('');
+    setCurrentPrice([0, priceRange.max]);
+    setDistricts([]);
+    setWards([]);
+  };
 
   return (
     <ScreenContainer withPadding={false} className={isDarkMode ? 'bg-black' : 'bg-white'}>
-      {/* <BackHeader title={t('filterTitle')} /> */}
-      <ScrollContainer contentContainerStyle={{ paddingHorizontal: 10 }}>
+      {/* Đặt animated view cho buttons ở đây, ngoài ScrollContainer */}
+      <Animated.View
+        style={[
+          styles.floatingButtonContainer,
+          {
+            backgroundColor: isDarkMode ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.95)',
+            shadowColor: isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.2)',
+            transform: [{
+              translateY: scrollY.interpolate({
+                inputRange: [0, 50],
+                outputRange: [0, 0],
+                extrapolate: 'clamp'
+              })
+            }]
+          }
+        ]}
+      >
+        <View style={styles.buttonRow}>
+          {/* Reset Button */}
+          <Button
+            variant="outline"
+            onPress={handleResetFilters}
+            className="flex-1 mr-2"
+            fullWidth
+            size="lg"
+            iconPosition="left"
+          >
+            {t('resetFilter', 'Reset')}
+          </Button>
+
+          {/* Apply Button */}
+          <Button
+            variant="primary"
+            onPress={handleApplyFilter}
+            className="flex-1 ml-2"
+            fullWidth
+            size="lg"
+            loading={loading}
+            iconPosition="right"
+          >
+            {t('applyFilter', 'Apply')}
+          </Button>
+        </View>
+      </Animated.View>
+
+      <ScrollContainer
+        contentContainerStyle={{ paddingBottom: 90 }} // Add padding to bottom to make space for floating buttons
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
+        {/* Modern Header with Gradient Background */}
         <View
-          className={themedClasses(
+          className={`px-5 mt-3 ${themedClasses(
             "mb-6 border-b border-gray-200 pb-4",
             "mb-6 border-b border-gray-700 pb-4"
-          )}
+          )}`}
         >
           <View className="flex-row items-center">
             <View
@@ -195,155 +246,242 @@ const ExploreFilterScreen = () => {
               )}
               style={{ fontFamily: "Poppins-Bold" }}
             >
-              {t("filterTitle")}
+              {t("filter")}
             </Text>
           </View>
         </View>
-        {/* <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 16 }}>
-          {t("name")}
-        </Text>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: isDarkMode ? "#1e1e1e" : "#fff",
-              color: isDarkMode ? "#fff" : "#000",
-              borderColor: isDarkMode ? "#4b5563" : "#ccc",
-            },
-          ]}
-          placeholder={t("enterName")}
-          placeholderTextColor={isDarkMode ? "#9ca3af" : "#6b7280"}
-          value={nameFilter}
-          onChangeText={setNameFilter}
-        /> */}
 
-        <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600' }}>
-          {t("priceRange")}
-        </Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 14 }}>
-          <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
-            {t("min")}: {currentPrice[0].toLocaleString()}
-          </Text>
-          <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
-            {t("max")}: {currentPrice[1].toLocaleString()}
-          </Text>
+        <View style={styles.contentContainer}>
+
+          {/* Price Range Section */}
+          <View style={[styles.filterSection, { backgroundColor: isDarkMode ? '#1e1e1e' : '#F6F7FB' }]}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: isDarkMode ? '#FFF' : '#223263' }]}>
+                💰 {t("priceRange")}
+              </Text>
+            </View>
+
+            <View style={styles.priceRangeContainer}>
+              <View style={styles.priceDisplayContainer}>
+                <View style={[styles.priceBox, { backgroundColor: isDarkMode ? '#2a2a2a' : '#FFF' }]}>
+                  <Text style={[styles.priceLabel, { color: isDarkMode ? '#9098B1' : '#9098B1' }]}>
+                    {t("min")}
+                  </Text>
+                  <Text style={[styles.priceValue, { color: isDarkMode ? '#40BFFF' : '#40BFFF' }]}>
+                    {currentPrice[0].toLocaleString()} ₫
+                  </Text>
+                </View>
+
+                <View style={styles.priceSeparator}>
+                  <View style={[styles.separatorLine, { backgroundColor: isDarkMode ? '#40BFFF' : '#40BFFF' }]} />
+                </View>
+
+                <View style={[styles.priceBox, { backgroundColor: isDarkMode ? '#2a2a2a' : '#FFF' }]}>
+                  <Text style={[styles.priceLabel, { color: isDarkMode ? '#9098B1' : '#9098B1' }]}>
+                    {t("max")}
+                  </Text>
+                  <Text style={[styles.priceValue, { color: isDarkMode ? '#40BFFF' : '#40BFFF' }]}>
+                    {currentPrice[1].toLocaleString()} ₫
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.sliderContainer}>
+                <MultiSlider
+                  values={currentPrice}
+                  min={priceRange.min}
+                  max={priceRange.max}
+                  step={100000}
+                  onValuesChange={(values) => setCurrentPrice(values)}
+                  selectedStyle={{ backgroundColor: '#40BFFF' }}
+                  unselectedStyle={{ backgroundColor: isDarkMode ? '#374151' : '#EBF0FF' }}
+                  markerStyle={styles.sliderMarker}
+                  containerStyle={styles.sliderContainerStyle}
+                  trackStyle={styles.sliderTrack}
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Type Selection Section */}
+          <View style={[styles.filterSection, { backgroundColor: isDarkMode ? '#1e1e1e' : '#F6F7FB' }]}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: isDarkMode ? '#FFF' : '#223263' }]}>
+                🏠 {t("type")}
+              </Text>
+            </View>
+
+            <View style={styles.typeContainer}>
+              {types.map((type: any) => (
+                <TouchableOpacity
+                  key={type.value}
+                  style={[
+                    styles.typeOption,
+                    {
+                      backgroundColor: selectedType === type.value
+                        ? (isDarkMode ? '#40BFFF20' : '#40BFFF15')
+                        : (isDarkMode ? '#2a2a2a' : '#FFF'),
+                      borderColor: selectedType === type.value ? '#40BFFF' : (isDarkMode ? '#374151' : '#EBF0FF')
+                    }
+                  ]}
+                  onPress={() => setSelectedType(type.value)}
+                >
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioButton,
+                      {
+                        backgroundColor: selectedType === type.value ? '#40BFFF' : 'transparent',
+                        borderColor: selectedType === type.value ? '#40BFFF' : (isDarkMode ? '#9098B1' : '#B9C1D6')
+                      }
+                    ]}>
+                      {selectedType === type.value && (
+                        <View style={styles.radioButtonInner} />
+                      )}
+                    </View>
+                  </View>
+                  <Text style={[
+                    styles.typeLabel,
+                    {
+                      color: selectedType === type.value
+                        ? '#40BFFF'
+                        : (isDarkMode ? '#FFF' : '#223263')
+                    }
+                  ]}>
+                    {type.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Rating Section */}
+          <View style={[styles.filterSection, { backgroundColor: isDarkMode ? '#1e1e1e' : '#F6F7FB' }]}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: isDarkMode ? '#FFF' : '#223263' }]}>
+                ⭐ {t("rating")}
+              </Text>
+            </View>
+
+            <View style={styles.ratingContainer}>
+              {[5, 4, 3, 2, 1].map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  style={[
+                    styles.ratingOption,
+                    {
+                      backgroundColor: ratings.includes(r)
+                        ? (isDarkMode ? '#40BFFF20' : '#40BFFF15')
+                        : (isDarkMode ? '#2a2a2a' : '#FFF'),
+                      borderColor: ratings.includes(r) ? '#40BFFF' : (isDarkMode ? '#374151' : '#EBF0FF')
+                    }
+                  ]}
+                  onPress={() => toggleRating(r)}
+                >
+                  <View style={styles.checkboxContainer}>
+                    <View style={[
+                      styles.checkbox,
+                      {
+                        backgroundColor: ratings.includes(r) ? '#40BFFF' : 'transparent',
+                        borderColor: ratings.includes(r) ? '#40BFFF' : (isDarkMode ? '#9098B1' : '#B9C1D6')
+                      }
+                    ]}>
+                      {ratings.includes(r) && (
+                        <Text style={styles.checkmark}>✓</Text>
+                      )}
+                    </View>
+                  </View>
+                  <View style={styles.starsContainer}>
+                    {[...Array(5)].map((_, index) => (
+                      <Text key={index} style={[
+                        styles.star,
+                        { color: index < r ? '#FFC833' : (isDarkMode ? '#374151' : '#EBF0FF') }
+                      ]}>
+                        ★
+                      </Text>
+                    ))}
+                  </View>
+                  <Text style={[
+                    styles.ratingText,
+                    { color: ratings.includes(r) ? '#40BFFF' : (isDarkMode ? '#9098B1' : '#9098B1') }
+                  ]}>
+                    {r} sao trở lên
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Location Section */}
+          <View style={[styles.filterSection, { backgroundColor: isDarkMode ? '#1e1e1e' : '#F6F7FB' }]}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: isDarkMode ? '#FFF' : '#223263' }]}>
+                📍 Địa điểm
+              </Text>
+            </View>
+
+            <View style={styles.locationContainer}>
+              {/* Province Picker */}
+              <View style={styles.pickerWrapper}>
+                <Text style={[styles.pickerLabel, { color: isDarkMode ? '#9098B1' : '#9098B1' }]}>
+                  {t("province")}
+                </Text>
+                <View style={[styles.pickerContainer, { backgroundColor: isDarkMode ? '#2a2a2a' : '#FFF' }]}>
+                  <Picker
+                    selectedValue={selectedProvince}
+                    onValueChange={handleProvinceChange}
+                    style={[styles.picker, { color: isDarkMode ? '#FFF' : '#223263' }]}
+                  >
+                    <Picker.Item label={t("selectProvince")} value="" />
+                    {provinces.map((p) => (
+                      <Picker.Item key={p.code} label={p.name} value={p.code} />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* District Picker */}
+              <View style={styles.pickerWrapper}>
+                <Text style={[styles.pickerLabel, { color: isDarkMode ? '#9098B1' : '#9098B1' }]}>
+                  {t("district")}
+                </Text>
+                <View style={[styles.pickerContainer, { backgroundColor: isDarkMode ? '#2a2a2a' : '#FFF' }]}>
+                  <Picker
+                    selectedValue={selectedDistrict}
+                    onValueChange={handleDistrictChange}
+                    style={[styles.picker, { color: isDarkMode ? '#FFF' : '#223263' }]}
+                  >
+                    <Picker.Item label={t("selectDistrict")} value="" />
+                    {districts.map((d) => (
+                      <Picker.Item key={d.code} label={d.name} value={d.code} />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* Ward Picker */}
+              <View style={styles.pickerWrapper}>
+                <Text style={[styles.pickerLabel, { color: isDarkMode ? '#9098B1' : '#9098B1' }]}>
+                  {t("ward")}
+                </Text>
+                <View style={[styles.pickerContainer, { backgroundColor: isDarkMode ? '#2a2a2a' : '#FFF' }]}>
+                  <Picker
+                    selectedValue={selectedWard}
+                    onValueChange={(value) => setSelectedWard(value)}
+                    style={[styles.picker, { color: isDarkMode ? '#FFF' : '#223263' }]}
+                  >
+                    <Picker.Item label={t("selectWard")} value="" />
+                    {wards.map((w) => (
+                      <Picker.Item key={w.code} label={w.name} value={w.code} />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Loại bỏ phần button ở đây vì đã đưa vào Animated.View phía trên */}
         </View>
-        <View style={{ paddingHorizontal: 56, marginTop: 8 }}>
-          <MultiSlider
-            values={currentPrice}
-            min={priceRange.min}
-            max={priceRange.max}
-            step={100000}
-            onValuesChange={(values) => setCurrentPrice(values)}
-            selectedStyle={{ backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb" }}
-            unselectedStyle={{ backgroundColor: isDarkMode ? "#374151" : "#d1d5db" }}
-            markerStyle={{
-              backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb",
-              height: 20,
-              width: 20,
-            }}
-            containerStyle={{
-              height: 40,
-              alignSelf: 'stretch',
-            }}
-            trackStyle={{
-              height: 6,
-              borderRadius: 3,
-            }}
-          />
-        </View>
-        <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 12 }}>
-          {t("type")}
-        </Text>
-        {types.map((type: any) => (
-          <TouchableOpacity
-            key={type.value}
-            style={{ flexDirection: "row", alignItems: "center", marginBottom: 8, marginTop: 4 }}
-            onPress={() => setSelectedType(type.value)}
-          >
-            <RadioButton
-              value={type.value}
-              status={selectedType === type.value ? "checked" : "unchecked"}
-              onPress={() => setSelectedType(type.value)}
-              color={isDarkMode ? "#60a5fa" : "#2563eb"}
-            />
-            <Text style={{ color: isDarkMode ? "#fff" : "#000" }}>{type.label}</Text>
-          </TouchableOpacity>
-        ))}
-
-        <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16, fontWeight: '600', marginTop: 16 }}>
-          {t("rating")}
-        </Text>
-        {[1, 2, 3, 4, 5].map((r) => (
-          <TouchableOpacity
-            key={r}
-            style={styles.option}
-            onPress={() => toggleRating(r)}
-          >
-            <Checkbox
-              status={ratings.includes(r) ? "checked" : "unchecked"}
-              color={isDarkMode ? "#60a5fa" : "#2563eb"}
-            />
-            <Text style={{ color: isDarkMode ? "#fff" : "#000" }}>
-              {"⭐".repeat(r)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-
-        <Text style={[styles.label, { color: isDarkMode ? '#fff' : '#000' }]}>
-          {t("province")}
-        </Text>
-        <Picker
-          selectedValue={selectedProvince}
-          onValueChange={handleProvinceChange}
-          style={pickerStyle}
-          itemStyle={{ fontSize: 14 }}
-        >
-          <Picker.Item label={t("selectProvince")} value="" />
-          {provinces.map((p) => (
-            <Picker.Item key={p.code} label={p.name} value={p.code} />
-          ))}
-        </Picker>
-
-        {/* District Picker */}
-        <Picker
-          selectedValue={selectedDistrict}
-          onValueChange={handleDistrictChange}
-          style={pickerStyle}
-          itemStyle={{ fontSize: 14 }}
-        >
-          <Picker.Item label={t("selectDistrict")} value="" />
-          {districts.map((d) => (
-            <Picker.Item key={d.code} label={d.name} value={d.code} />
-          ))}
-        </Picker>
-
-        {/* Ward Picker */}
-        <Picker
-          selectedValue={selectedWard}
-          onValueChange={(value) => setSelectedWard(value)}
-          style={pickerStyle}
-          itemStyle={{ fontSize: 14 }}
-        >
-          <Picker.Item label={t("selectWard")} value="" />
-          {wards.map((w) => (
-            <Picker.Item key={w.code} label={w.name} value={w.code} />
-          ))}
-        </Picker>
-
-        <Button
-          mode="contained"
-          onPress={handleApplyFilter}
-          loading={loading}
-          style={{
-            marginTop: 24,
-            backgroundColor: isDarkMode ? "#60a5fa" : "#2563eb",
-          }}
-        >
-          {t('applyFilter')}
-        </Button>
       </ScrollContainer>
-
     </ScreenContainer>
   );
 }
@@ -352,39 +490,260 @@ export default ExploreFilterScreen;
 
 const getStyles = (isDark: boolean) =>
   StyleSheet.create({
-    container: {
-      padding: 16,
-      backgroundColor: isDark ? '#121212' : '#fff',
+    // Header Styles
+    headerContainer: {
+      paddingTop: 50,
+      paddingBottom: 20,
+      paddingHorizontal: 20,
+      borderBottomLeftRadius: 25,
+      borderBottomRightRadius: 25,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 5,
     },
-    label: {
-      height: 40,
-      fontSize: 16,
-      marginTop: 16,
+    headerContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    logoContainer: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: isDark ? '#2a2a2a' : 'rgba(255,255,255,0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 15,
+    },
+    logoImage: {
+      width: 30,
+      height: 30,
+    },
+    headerTextContainer: {
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: '700',
+      fontFamily: 'Poppins-Bold',
+    },
+    headerSubtitle: {
+      fontSize: 14,
+      opacity: 0.8,
+      marginTop: 2,
+    },
+
+    // Content Styles
+    contentContainer: {
+      paddingTop: 20,
+    },
+    filterSection: {
+      borderRadius: 15,
+      padding: 20,
+      marginBottom: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    sectionHeader: {
+      marginBottom: 15,
+    },
+    sectionTitle: {
+      fontSize: 18,
       fontWeight: '600',
-      color: isDark ? '#fff' : '#000',
+      fontFamily: 'Poppins-SemiBold',
     },
-    text: {
-      color: isDark ? '#ccc' : '#333',
+
+    // Price Range Styles
+    priceRangeContainer: {
+      marginTop: 10,
     },
-    input: {
+    priceDisplayContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    priceBox: {
+      flex: 1,
+      padding: 15,
+      borderRadius: 12,
+      alignItems: 'center',
       borderWidth: 1,
-      borderColor: isDark ? '#555' : '#ccc',
-      backgroundColor: isDark ? '#1e1e1e' : '#fff',
-      color: isDark ? '#fff' : '#000',
-      padding: 8,
-      borderRadius: 8,
-      marginTop: 4,
+      borderColor: isDark ? '#374151' : '#EBF0FF',
     },
-    option: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginVertical: 4,
+    priceLabel: {
+      fontSize: 12,
+      fontWeight: '500',
+      marginBottom: 5,
     },
-    button: {
-      marginTop: 24,
-      backgroundColor: isDark ? '#90caf9' : '#2196f3',
+    priceValue: {
+      fontSize: 16,
+      fontWeight: '700',
     },
-    buttonText: {
-      color: '#fff',
+    priceSeparator: {
+      width: 30,
+      alignItems: 'center',
+    },
+    separatorLine: {
+      width: 20,
+      height: 2,
+      borderRadius: 1,
+    },
+    sliderContainer: {
+      paddingHorizontal: 10,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    sliderMarker: {
+      backgroundColor: '#40BFFF',
+      height: 24,
+      width: 24,
+      borderRadius: 12,
+      borderWidth: 3,
+      borderColor: '#FFF',
+      shadowColor: '#40BFFF',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    sliderContainerStyle: {
+      height: 40,
+    },
+    sliderTrack: {
+      height: 8,
+      borderRadius: 4,
+    },
+
+    // Type Selection Styles
+    typeContainer: {
+      gap: 12,
+    },
+    typeOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 15,
+      borderRadius: 12,
+      borderWidth: 2,
+    },
+    radioContainer: {
+      marginRight: 12,
+    },
+    radioButton: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      borderWidth: 2,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    radioButtonInner: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: '#FFF',
+    },
+    typeLabel: {
+      fontSize: 16,
+      fontWeight: '500',
+      flex: 1,
+    },
+
+    // Rating Styles
+    ratingContainer: {
+      gap: 12,
+    },
+    ratingOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 15,
+      borderRadius: 12,
+      borderWidth: 2,
+    },
+    checkboxContainer: {
+      marginRight: 12,
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderRadius: 4,
+      borderWidth: 2,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    checkmark: {
+      color: '#FFF',
+      fontSize: 12,
+      fontWeight: '700',
+    },
+    starsContainer: {
+      flexDirection: 'row',
+      marginRight: 8,
+    },
+    star: {
+      fontSize: 16,
+      marginRight: 2,
+    },
+    ratingText: {
+      fontSize: 14,
+      fontWeight: '500',
+      flex: 1,
+    },
+
+    // Location Styles
+    locationContainer: {
+      gap: 15,
+    },
+    pickerWrapper: {
+      marginBottom: 5,
+    },
+    pickerLabel: {
+      fontSize: 14,
+      fontWeight: '500',
+      marginBottom: 8,
+    },
+    pickerContainer: {
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: isDark ? '#374151' : '#EBF0FF',
+      overflow: 'hidden',
+    },
+    picker: {
+      height: 50,
+    },
+
+    // Button Styles
+    buttonContainer: {
+      marginVertical: 20,
+      paddingHorizontal: 20,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    buttonIcon: {
+      fontSize: 16,
+    },
+
+    // Thêm styles mới cho floating buttons
+    floatingButtonContainer: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderTopWidth: 1,
+      borderTopColor: isDark ? '#374151' : '#EBF0FF',
+      zIndex: 100,
+      elevation: 5,
+      shadowOffset: { width: 0, height: -3 },
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
     },
   });
