@@ -32,6 +32,7 @@ import ExtraPrices from "@/components/screen/bhDetail/ExtraPrices";
 import { useTheme } from "@/context/ThemeProvider";
 import formatAmount from "@/utils/formatAmount";
 import emitter from "@/utils/FavoriteEvent";
+import { useCurrentUser } from "@/context/userContext";
 
 // API
 import {
@@ -43,6 +44,7 @@ import { useThemedClasses } from "@/utils/useTheme";
 import { addFavorite, getFavorite } from "@/API/favoriteAPI";
 import i18next from "i18next";
 import coverBhType from "@/utils/coverBhType";
+import ConfirmModal from "@/components/feedback/ConfirmModal";
 
 // Constants
 const DEFAULT_BOARDING_HOUSE_ID = "64ab1cd234abcd1234567878";
@@ -57,8 +59,11 @@ export default function BhDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const currentLanguage = i18next.language;
+  const [reviews, setReviews] = useState([]);
 
   const { themedClasses } = useThemedClasses();
+  const { contextLogout, isLogin, user } = useCurrentUser();
+  const [showReviewError, setShowReviewError] = useState(false);
 
   // Refs
   const scrollViewRef = useRef(null);
@@ -204,7 +209,7 @@ export default function BhDetailScreen() {
             hasNext: paginationData.hasNext || false,
             hasPrev: paginationData.hasPrev || false,
           });
-
+          setReviews(response.data);
           return response;
         }
 
@@ -351,14 +356,33 @@ export default function BhDetailScreen() {
       }
     }, SCROLL_TO_ROOM_DELAY);
   }, [ui.roomTypesPosition, ui.isScrollReady]);
+  const hasUserReviewed = useMemo(() => {
+
+
+    if (!user?._id || !reviews?.length) return false;
+    return reviews.some(
+      (review) =>
+        // review.accountId === user._id ||
+        review.accountId?._id === user._id
+    );
+  }, [reviews, user?._id]);
 
   // Write Review Handler
   const handleWriteReview = useCallback(() => {
+    if (!isLogin) {
+      router.push("/login");
+      return;
+    }
+    if (hasUserReviewed) {
+      setShowReviewError(true);
+      return;
+    }
+
     router.push({
-      pathname: "/review/write",
+      pathname: "/BhDetail/addReview",
       params: { boardingHouseId },
     });
-  }, [router, boardingHouseId]);
+  }, [isLogin, hasUserReviewed, router, boardingHouseId]);
 
   // Render Functions - Memoized for better performance
   const LoadingState = useMemo(
@@ -384,9 +408,8 @@ export default function BhDetailScreen() {
               {ui.error}
             </Text>
             <Text
-              className={`text-base underline ${
-                isDarkMode ? "text-blue-400" : "text-blue-700"
-              }`}
+              className={`text-base underline ${isDarkMode ? "text-blue-400" : "text-blue-700"
+                }`}
               onPress={onRefresh}
             >
               {t("retry")}
@@ -451,9 +474,8 @@ export default function BhDetailScreen() {
         {t("address")}:
       </Text>
       <Text
-        className={`text-base ${
-          isDarkMode ? "text-gray-400" : "text-gray-600"
-        }`}
+        className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+          }`}
       >
         {formattedAddress}
       </Text>
@@ -475,9 +497,8 @@ export default function BhDetailScreen() {
             />
           </TouchableOpacity>
           <Text
-            className={`text-base font-semibold ml-2 ${
-              isDarkMode ? "text-gray-200" : "text-gray-800"
-            }`}
+            className={`text-base font-semibold ml-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+              }`}
           >
             {data.boardingHouseDetail?.likes || 0}
           </Text>
@@ -512,9 +533,8 @@ export default function BhDetailScreen() {
       return (
         <View className="mt-4" onLayout={onRoomTypesLayout}>
           <Text
-            className={`text-base ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             {t("noRoomTypesAvailable")}
           </Text>
@@ -570,6 +590,7 @@ export default function BhDetailScreen() {
             console.log("Set review ID:", reviewId);
           }}
           reportedReviews={[]}
+          pagination={pagination}
         />
       </View>
     );
@@ -626,6 +647,17 @@ export default function BhDetailScreen() {
 
         {renderReviewList()}
       </ScrollView>
+      <ConfirmModal
+        visible={showReviewError}
+        onClose={() => setShowReviewError(false)}
+        onConfirm={() => setShowReviewError(false)}
+        title={t("review.alreadySubmittedTitle")}
+        message={t("review.alreadySubmittedMessage")}
+        confirmText={t("review.confirmButton")}
+        cancelText=""
+      />
+
+
     </ScreenContainer>
   );
 }

@@ -49,3 +49,6 @@ export const getReportReviewDetail = (reportId) => {
 export const getOwnReportReviewDetail = (reportId) => {
   return axios.get(`/auth/reports/${reportId}`);
 };
+export const getReviewReportsAuth = () => {
+  return axios.get("/auth/review-reports");
+};

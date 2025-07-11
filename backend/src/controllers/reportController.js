@@ -157,6 +157,7 @@ class reportController {
           subject: `Kết quả xử lý báo cáo: #${relatedReport._id}`,
           html: `
             <p>Kính gửi Anh/Chị ${relatedReport.reporter.fullname},</p>
+
             <p>Cảm ơn bạn đã gửi báo cáo về vấn đề <strong>"${
               relatedReport.reason || 'undefined'
             }"</strong> ${reportSubject} trên nền tảng của chúng tôi.</p>
@@ -164,8 +165,8 @@ class reportController {
             <ul>
                 <li><strong>Trạng thái báo cáo:</strong> ${status}</li>
                 <li><strong>Ngày gửi báo cáo:</strong> ${new Date(
-                  relatedReport.createdAt
-                ).toLocaleDateString()}</li>
+              relatedReport.createdAt
+            ).toLocaleDateString()}</li>
                 <li><strong>Người xử lý:</strong> ${processedByName}</li>
                 <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
                 <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>
@@ -392,7 +393,6 @@ class reportController {
   async createReport(req, res) {
     try {
       const { reason, details, boardingHouseId, reviewId } = req.body;
-
       const reporter = req.user.userId;
       const reportType = reviewId ? 'review' : 'boardingHouse';
 

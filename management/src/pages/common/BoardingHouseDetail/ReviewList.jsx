@@ -19,6 +19,7 @@ const ReviewList = ({
   onLoadMore,
   loading,
   hasMore,
+  pagination
 }) => {
   const [rating, setRating] = useState(0);
   const [ratingCounts, setRatingCounts] = useState({});
@@ -129,12 +130,11 @@ const ReviewList = ({
             rounded-xl shadow-lg hover:shadow-xl
             transform transition-all duration-300 ease-out
             hover:scale-105 active:scale-95
-            ${
-              darkMode
-                ? `bg-gradient-to-r from-blue-600 to-blue-700 
+            ${darkMode
+              ? `bg-gradient-to-r from-blue-600 to-blue-700 
                  hover:from-blue-700 hover:to-blue-800 
                  text-white border-0 shadow-blue-500/25 hover:shadow-blue-500/40`
-                : `bg-gradient-to-r from-blue-500 to-blue-600 
+              : `bg-gradient-to-r from-blue-500 to-blue-600 
                  hover:from-blue-600 hover:to-blue-700 
                  text-white border-0 shadow-blue-500/30 hover:shadow-blue-500/50`
             }
@@ -211,8 +211,8 @@ const ReviewList = ({
             styles={
               darkMode
                 ? {
-                    trail: { stroke: "#1f2937" },
-                  }
+                  trail: { stroke: "#1f2937" },
+                }
                 : {}
             }
           />
@@ -222,9 +222,8 @@ const ReviewList = ({
           {allRatings.map((star) => (
             <div key={star} className="flex mt-3 gap-3 items-center">
               <Text
-                className={`md:w-16 md:text-4xl ${
-                  darkMode ? "text-white" : ""
-                }`}
+                className={`md:w-16 md:text-4xl ${darkMode ? "text-white" : ""
+                  }`}
               >
                 {ratingCounts[star] || 0}
               </Text>
@@ -248,6 +247,7 @@ const ReviewList = ({
               isReported={reportedReviews.includes(review._id)}
               onReviewUpdated={fetchReviews}
               boardingHouse={boardingHouse}
+              onDeleted={fetchAllData}
             />
           )}
           className={darkMode ? "ant-list-dark" : ""}
