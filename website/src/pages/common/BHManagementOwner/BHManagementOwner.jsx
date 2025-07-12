@@ -15,6 +15,7 @@ import { useTheme } from '../../../context/themeContext';
 import { useCurrentUser } from '@/context/userContext';
 import userRole from '@/constants/userRole';
 import i18next from 'i18next';
+import getLocalizedAddress from '../../../utils/addressHelper';
 
 function BHManagementOwner() {
   const currentLanguage = i18next.language;
@@ -56,10 +57,8 @@ function BHManagementOwner() {
         width: 200,
         render: (address) =>
           address ? (
-            <Tooltip
-              title={`${address.detail}, ${address.ward}, ${address.district}, ${address.province}`}
-            >
-              {`${address.detail}, ${address.ward}, ${address.district}`}
+            <Tooltip title={getLocalizedAddress(address, currentLanguage)}>
+              {getLocalizedAddress(address, currentLanguage)}
             </Tooltip>
           ) : (
             t('messages.noData')
@@ -135,6 +134,7 @@ function BHManagementOwner() {
     try {
       const res = await getAllBHOwner(filterValue, paginationOptions);
       setBoardingHouses(res.data);
+      console.log(res);
 
       setPagination({
         current: res.pagination.currentPage,

@@ -94,22 +94,23 @@ const BoardingHouseSchema = new mongoose.Schema(
     },
     address: {
       province: {
-        type: String,
-        required: true,
+        name: { type: String, required: true },
+        name_en: { type: String, required: true },
       },
       district: {
-        type: String,
-        required: true,
+        name: { type: String, required: true },
+        name_en: { type: String, required: true },
       },
       ward: {
-        type: String,
-        required: true,
+        name: { type: String, required: true },
+        name_en: { type: String, required: true },
       },
       detail: {
         type: String,
         default: '',
       },
     },
+
     images: [ImagesSchema],
     location: LocationSchema,
   },

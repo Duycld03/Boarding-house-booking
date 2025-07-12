@@ -8,13 +8,12 @@ import { getAllBHHome } from '@/API/boardingHouseAPI';
 import { useTranslation } from 'react-i18next';
 
 function AllBHScreen() {
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const limit = 6;
-  const { t } = useTranslation('home');
+  const { t, i18n } = useTranslation('home');
 
   const fetchData = async (currentPage = 1) => {
     setLoading(true);
@@ -31,7 +30,10 @@ function AllBHScreen() {
             id: item._id,
             name: item.name,
             price: item.priceRange,
-            detail: item.address?.province,
+            detail:
+              item.address?.province?.[
+                i18n.language === 'en' ? 'name_en' : 'name'
+              ] || '',
             rating: item.rating || 0,
             reviewCount: item.reviewCount || 0,
             img: imgPath,
