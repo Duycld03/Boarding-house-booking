@@ -118,18 +118,16 @@ function DepositRefundRequestOwner() {
           return isPending ? (
             <div className="flex gap-3 items-center">
               <Button
-                title={t("accept")}
-                iconPosition="left"
-                btnAccept
-                size="large"
-                onClick={() => handleAccept(record)}
-              />
-              <Button
                 title={t("reject")}
                 iconPosition="left"
                 btnReject
-                size="large"
                 onClick={() => handleReject(record)}
+              />
+              <Button
+                title={t("accept")}
+                iconPosition="left"
+                btnAccept
+                onClick={() => handleAccept(record)}
               />
             </div>
           ) : null;
