@@ -1,6 +1,6 @@
 {
   "title": "Staff Management",
-  "tableName": "Staff",
+  "tableName": "Staff Management",
   "columns": {
     "avatar": "Avatar",
     "username": "Username",
@@ -160,7 +160,7 @@
     "roleUser": "User",
     "roleOwner": "Owner",
     "createdAt": "Created At",
-    "creationDate": "Creation Date",
+    "creationDate": "Hire Date",
     "updatedAt": "Updated At",
     "lastUpdatedDate": "Last Updated Date",
     "accountBalance": "Account Balance",
