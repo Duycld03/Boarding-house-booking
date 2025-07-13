@@ -8,8 +8,8 @@
     "mini_house": "Mini house",
     "nha_tro_kien_truc_xa": "Nhà trọ kiến trúc xá",
     "nha_tro_cao_cap": "Nhà trọ cao cấp"
-  },  
-   "boardingHouseTypes": {
+  },
+  "boardingHouseTypes": {
     "Nhà trọ truyền thống": "Nhà trọ truyền thống",
     "Mini house": "Căn hộ mini",
     "Nhà trọ kiến trúc xá": "Ký túc xá"
@@ -21,11 +21,32 @@
     "detail": "Địa chỉ chi tiết"
   },
   "addressFormat": "{{detail}}, {{ward}}, {{district}}, {{province}}",
-   "facilities": {
+  "facilities": {
     "swimming_pool": "Hồ bơi",
     "gym": "Phòng tập thể hình",
     "laundry_room": "Phòng giặt đồ",
     "parking_lot": "Bãi đậu xe",
-    "tennis_court": "Sân tennis"
+    "tennis_court": "Sân tennis",
+    "bed": "Giường",
+    "wardrobe": "Tủ quần áo",
+    "closet": "Tủ đựng đồ",
+    "desk": "Bàn học",
+    "chair": "Ghế",
+    "bookshelf": "Kệ sách",
+    "air_conditioner": "Máy lạnh",
+    "heater": "Máy sưởi",
+    "refrigerator": "Tủ lạnh",
+    "induction_cooker": "Bếp từ",
+    "dining_table": "Bàn ăn",
+    "dining_chair": "Ghế ăn",
+    "kitchen_cabinet": "Tủ bếp",
+    "washbasin": "Chậu rửa mặt",
+    "trash_can": "Thùng rác",
+    "tv": "Tivi",
+    "wifi_router": "Bộ phát WiFi",
+    "shoe_rack": "Kệ để giày",
+    "floor_mat": "Thảm lót sàn",
+    "water_heater": "Máy nước nóng",
+    "smoke_detector": "Máy báo khói"
   }
 }
