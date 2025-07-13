@@ -13,8 +13,7 @@
       "label": "Trạng thái",
       "pending": "Đang xử lý",
       "accepted": "Đã chấp nhận",
-      "rejected": "Từ chối",
-             "canceled": "Hủy"
+      "rejected": "Từ chối"
 
     },
     "loadMore": "Tải thêm",

@@ -11,11 +11,9 @@
     "createdAt": "Created At",
     "status": {
       "label": "Status",
-      "pending": "Processing",
+      "pending": "Pending",
       "accepted": "Accepted",
-      "rejected": "Rejected",
-       "canceled": "Canceled"
-    },
+      "rejected": "Rejected"    },
     "loadMore": "Load More",
     "loadAll": "All Requests Loaded",
     "loadingMore": "Loading more...",

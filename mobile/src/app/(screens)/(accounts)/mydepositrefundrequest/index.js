@@ -72,7 +72,6 @@ function MyDepositRefundRequest() {
           hasNextPage: page * limit < totalItems,
         });
       } catch (error) {
-        showError(t('common.errorFetching') || 'Error fetching data');
         router.replace('/login');
       } finally {
         setLoading(false);
@@ -215,6 +214,10 @@ const RefundCard = ({ item, index, t, isDarkMode, currentLanguage }) => {
     color: 'white',
     label: item.status,
   };
+  const truncateText = (text, maxLength = 10) => {
+    if (!text) return '';
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+  };
 
   return (
     <View className="mb-4 px-4">
@@ -243,10 +246,14 @@ const RefundCard = ({ item, index, t, isDarkMode, currentLanguage }) => {
         </View>
 
         {/* Tiêu đề */}
-        <View className="flex-row items-center justify-between mb-2">
-          <Text className="text-lg font-semibold text-gray-800 dark:text-white">
+        <View className="flex-row items-center max-w-[95%]">
+          <Text
+            className="text-lg font-semibold text-gray-800 dark:text-white"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             #{index + 1} {t('refund.room')} {item.roomNumber} -{' '}
-            {item.boardingHouseName}
+            {truncateText(item.boardingHouseName, 15)}
           </Text>
         </View>
 
