@@ -207,7 +207,6 @@ const RefundCard = ({ item, index, t, isDarkMode, currentLanguage }) => {
     pending: { color: '#f59e0b', label: t('refund.status.pending') },
     accepted: { color: '#10b981', label: t('refund.status.accepted') },
     rejected: { color: '#ef4444', label: t('refund.status.rejected') },
-    canceled: { color: '#9ca3af', label: t('refund.status.canceled') },
   };
 
   const status = statusMap[item.status] || {
