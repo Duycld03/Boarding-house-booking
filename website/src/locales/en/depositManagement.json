@@ -32,7 +32,7 @@
     "rejectPlaceholder": "Enter reason for rejection",
     "rejectConfirm": "Reject",
     "deleteTitle": "Delete Deposit",
-    "deleteContent": "Are you sure you want to delete deposit for room {{room}}? This action cannot be undone.",
+    "deleteContent": "Are you sure you want to delete deposit for room {{room}}?",
     "deleteConfirm": "Delete",
     "cancel": "Cancel"
   },

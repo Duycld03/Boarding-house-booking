@@ -987,9 +987,9 @@ class DepositController {
       if (!depositRoom) {
         return res.status(404).json({ message: "Deposit room not found" });
       }
-      if (depositRoom.status.toLowerCase() != "canceled") {
+      if (depositRoom.status.toLowerCase() != "rejected") {
         return res.status(400).json({
-          message: "Only canceled deposits can be deleted",
+          message: "Only rejected deposits can be deleted",
         });
       }
       await DepositRoom.deleteOne({ _id: depositRoomId });

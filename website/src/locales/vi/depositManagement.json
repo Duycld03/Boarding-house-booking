@@ -32,7 +32,7 @@
     "rejectPlaceholder": "Nhập lý do từ chối",
     "rejectConfirm": "Từ Chối",
     "deleteTitle": "Xóa Đặt Cọc",
-    "deleteContent": "Bạn có chắc chắn muốn xóa đặt cọc cho phòng {{room}}? Hành động này không thể hoàn tác.",
+    "deleteContent": "Bạn có chắc chắn muốn xóa đặt cọc cho phòng {{room}}?",
     "deleteConfirm": "Xóa",
     "cancel": "Hủy"
   },
