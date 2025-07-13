@@ -53,25 +53,21 @@ function DepositRefundRequestOwner() {
         title: t("boardingHouseName"),
         dataIndex: "boardingHouseName",
         key: "boardingHouseName",
-        sorter: true,
       },
       {
         title: t("roomNumber"),
         dataIndex: "roomNumber",
         key: "roomNumber",
-        sorter: true,
       },
       {
         title: t("endDate"),
         dataIndex: "endDate",
         key: "endDate",
-        sorter: true,
       },
       {
         title: t("amountRefunded"),
         dataIndex: "amountRefunded",
         key: "amountRefunded",
-        sorter: true,
         render: (price) => (
           <Tag color="processing">
             {price ? formatAmount(price, i18n.language) : "N/A"}
@@ -82,7 +78,6 @@ function DepositRefundRequestOwner() {
         title: t("status"),
         dataIndex: "status",
         key: "status",
-        sorter: true,
         render: (status) => {
           const statusLower = status?.toLowerCase() || "";
           let color;
@@ -108,7 +103,6 @@ function DepositRefundRequestOwner() {
         title: t("createdAt"),
         dataIndex: "createdAt",
         key: "createdAt",
-        sorter: true,
       },
       {
         title: t("actions"),
