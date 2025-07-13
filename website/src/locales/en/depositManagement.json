@@ -1,46 +1,87 @@
 {
-  "tableName": "Deposit Requests",
+  "tableName": "Deposit Management",
+  "noData": "No deposits found",
   "columns": {
-    "name": "Depositor",
+    "name": "Customer Name",
     "boardingHouse": "Boarding House",
     "roomNumber": "Room Number",
-    "amount": "Deposit",
+    "amount": "Deposit Amount",
     "status": "Status",
     "rentalTime": "Rental Time",
     "startDate": "Start Date",
     "endDate": "End Date",
-    "action": "Action"
+    "action": "Actions"
   },
   "status": {
     "pending": "Pending",
     "accepted": "Accepted",
-    "deleted": "Canceled",
+    "confirmed": "Confirmed",
     "rejected": "Rejected",
-    "confirmed": "Confirmed"
-
+    "refunded": "Refunded"
+  },
+  "actions": {
+    "accept": "Accept",
+    "reject": "Reject",
+    "delete": "Delete"
   },
   "modal": {
-    "confirmTitle": "Confirm",
-    "confirmContent": "Are you sure you want to accept the deposit request for room {{room}}?",
+    "confirmTitle": "Accept Deposit",
+    "confirmContent": "Are you sure you want to accept deposit for room {{room}}?",
     "rejectTitle": "Reject Deposit Request",
     "rejectReason": "Reason for Rejection",
     "rejectPlaceholder": "Enter reason for rejection",
     "rejectConfirm": "Reject",
-      "cancel": "Cancel"
-
+    "deleteTitle": "Delete Deposit",
+    "deleteContent": "Are you sure you want to delete deposit for room {{room}}? This action cannot be undone.",
+    "deleteConfirm": "Delete",
+    "cancel": "Cancel"
   },
   "messages": {
-    "fetchError": "Failed to fetch deposit list.",
-    "acceptSuccess": "Request processing results sent successfully.",
-    "acceptError": "An error occurred while accepting the deposit.",
-    "rejectSuccess": "Request processing results sent successfully.",
-    "rejectError": "An error occurred while rejecting the deposit.",
+    "fetchError": "Failed to fetch deposit list",
+    "acceptSuccess": "Request processing results sent successfully",
+    "acceptError": "An error occurred while accepting the deposit",
+    "rejectSuccess": "Request processing results sent successfully",
+    "rejectError": "An error occurred while rejecting the deposit",
+    "deleteSuccess": "Deposit for room {{room}} deleted successfully",
+    "deleteError": "Failed to delete deposit",
     "noRoomSelected": "No room selected!",
     "requireReason": "Please enter a reason for rejection"
   },
-  "noData": "No data available",
-    "time": {
+  "time": {
     "month": "month(s)",
     "year": "year(s)"
+  },
+  "pagination": {
+    "showingRecords": "Showing {{start}} to {{end}} of {{total}} records",
+    "totalRecords": "Total: {{total}} records",
+    "itemsPerPage": "Items per page",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
+  },
+  "filters": {
+    "title": "Filter Deposits",
+    "boardingHouse": "Boarding House",
+    "selectBoardingHouse": "Select boarding house",
+    "room": "Room",
+    "selectRoom": "Select room",
+    "status": "Status",
+    "selectStatus": "Select status",
+    "depositAmount": "Deposit Amount",
+    "rentalTime": "Rental Time (months)",
+    "dateRange": "Date Range",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "clear": "Clear",
+    "apply": "Apply",
+    "reset": "Reset Filters"
+  },
+  "loading": {
+    "loadingData": "Loading deposits...",
+    "processing": "Processing...",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "loadingFilters": "Loading filters..."
   }
 }
