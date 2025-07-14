@@ -21,7 +21,7 @@
   },
   "common": {
     "errorRefreshing": "Error refreshing data"
-  }
+  },
   "title": "Refund Request",
   "refundRequestTitle": "Request Deposit Refund",
   "refundRequestSubtitle": "Submit your refund request",

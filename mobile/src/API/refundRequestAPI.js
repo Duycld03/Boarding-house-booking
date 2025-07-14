@@ -19,14 +19,12 @@ export const getRefundRequests = (paginationOptions = {}) => {
 };
 export const createRefundRequest = (data) => {
   return axios.post('auth/refund-requests', data);
-
+};
 
 export const checkRefundRequestExists = (depositRoomId) => {
   return axios.get(`/auth/refund-request/check-exists/${depositRoomId}`);
 };
 
 export const getMyRefundRequests = () => {
-  return axios.get("/auth/refund-request/my-requests");
+  return axios.get('/auth/refund-request/my-requests');
 };
-
-
