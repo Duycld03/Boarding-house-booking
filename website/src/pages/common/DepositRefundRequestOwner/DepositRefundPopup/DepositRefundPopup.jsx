@@ -189,7 +189,7 @@ function DepositRefundPopup({
       open={visible}
       onCancel={handleCancel}
       footer={null}
-      width={800}
+      width={600}
       destroyOnClose
       centered
     >
@@ -237,30 +237,6 @@ function DepositRefundPopup({
                   </Text>
                 </div>
               </div>
-
-              <div className="p-3 bg-green-50 rounded-lg">
-                <Text type="secondary" className="block font-bold mb-1">
-                  {t("actualRefundAmount") || "Actual Refund Amount"}
-                </Text>
-                <Text
-                  className={`text-xl font-semibold ${
-                    actualRefundAmount > 0 ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {formatAmount(actualRefundAmount, i18n.language)}
-                </Text>
-                {actualRefundAmount <= 0 && (
-                  <Alert
-                    message={
-                      t("noRefundWarning") ||
-                      "No amount will be refunded due to damage costs"
-                    }
-                    type="warning"
-                    className="mt-2"
-                    showIcon
-                  />
-                )}
-              </div>
             </div>
           </Card>
 
@@ -273,7 +249,7 @@ function DepositRefundPopup({
                   type="primary"
                   icon={<PlusOutlined />}
                   onClick={addDamageItem}
-                  size="small"
+                  size="medium"
                 >
                   {t("addDamage") || "Add Damage"}
                 </Button>
@@ -417,11 +393,10 @@ function DepositRefundPopup({
             <Row gutter={[12, 12]} className="mt-4">
               <Col span={12}>
                 <Button
-                  size="large"
+                  size="medium"
                   block
                   onClick={handleCancel}
                   disabled={loading}
-                  className="h-10"
                 >
                   {t("cancel") || "Cancel"}
                 </Button>
@@ -429,12 +404,11 @@ function DepositRefundPopup({
               <Col span={12}>
                 <Button
                   type="primary"
-                  size="large"
+                  size="medium"
                   block
                   htmlType="submit"
                   loading={loading}
                   icon={<CheckCircleOutlined />}
-                  className="h-10"
                   disabled={actualRefundAmount <= 0}
                 >
                   {loading
