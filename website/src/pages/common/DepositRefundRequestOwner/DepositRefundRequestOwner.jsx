@@ -65,9 +65,9 @@ function DepositRefundRequestOwner() {
         key: "endDate",
       },
       {
-        title: t("amountRefunded"),
-        dataIndex: "amountRefunded",
-        key: "amountRefunded",
+        title: t("originalDepositAmount"),
+        dataIndex: "originalDepositAmount",
+        key: "originalDepositAmount",
         render: (price) => (
           <Tag color="processing">
             {price ? formatAmount(price, i18n.language) : "N/A"}
