@@ -19,12 +19,6 @@ class ExpenseController {
       let { expenseId } = req.params;
       let expenseData = req.body;
 
-      // Nếu không có expenseId hoặc expenseId không hợp lệ => Tạo mới
-      if (!expenseId || !mongoose.Types.ObjectId.isValid(expenseId)) {
-        const newExpense = new boardingHouseExpense(expenseData);
-        await newExpense.save();
-        return res.status(201).json({ success: true, data: newExpense });
-      }
 
       // Nếu có expenseId, thực hiện cập nhật
       const updatedExpense = await boardingHouseExpense.findByIdAndUpdate(
@@ -33,11 +27,6 @@ class ExpenseController {
         { new: true, runValidators: true }
       );
 
-      if (!updatedExpense) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Expense không tồn tại" });
-      }
 
       res.status(200).json({ success: true, data: updatedExpense });
     } catch (error) {
@@ -45,6 +34,140 @@ class ExpenseController {
       res
         .status(500)
         .json({ success: false, message: "Lỗi server", error: error.message });
+    }
+  }
+
+  //add new expense for boarding house
+  async addExpense(req, res) {
+    try {
+      const expenseData = req.body;
+      const { boardingHouseId, month, year } = expenseData;
+      const userId = req.user.userId;
+
+
+      // Tạo mới expense
+      const newExpense = new boardingHouseExpense(expenseData);
+      await newExpense.save();
+
+      res.status(201).json({
+        success: true,
+        message: "Expense added successfully",
+        data: newExpense
+      });
+
+    } catch (error) {
+      console.error("Error adding expense:", error);
+
+
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message
+      });
+    }
+  }
+
+  // Thêm phương thức để xóa expense
+  async deleteExpense(req, res) {
+    try {
+      const { expenseId } = req.params;
+      const userId = req.user.userId;
+
+      if (!expenseId || !mongoose.Types.ObjectId.isValid(expenseId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid expense ID"
+        });
+      }
+
+      // Lấy expense để kiểm tra quyền
+      const expense = await boardingHouseExpense.findById(expenseId);
+
+      if (!expense) {
+        return res.status(404).json({
+          success: false,
+          message: "Expense not found"
+        });
+      }
+
+      // Kiểm tra quyền của user với boarding house
+      const boardingHouse = await BoardingHouse.findOne({
+        _id: expense.boardingHouseId,
+        $or: [{ ownerId: userId }, { staffId: userId }]
+      });
+
+      if (!boardingHouse) {
+        return res.status(403).json({
+          success: false,
+          message: "You don't have permission to delete expenses for this boarding house"
+        });
+      }
+
+      // Xóa expense
+      await boardingHouseExpense.findByIdAndDelete(expenseId);
+
+      res.status(200).json({
+        success: true,
+        message: "Expense deleted successfully"
+      });
+
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message
+      });
+    }
+  }
+
+  // Thêm phương thức để lấy expense theo ID
+  async getExpenseById(req, res) {
+    try {
+      const { expenseId } = req.params;
+      const userId = req.user.userId;
+
+      if (!expenseId || !mongoose.Types.ObjectId.isValid(expenseId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid expense ID"
+        });
+      }
+
+      const expense = await boardingHouseExpense.findById(expenseId);
+
+      if (!expense) {
+        return res.status(404).json({
+          success: false,
+          message: "Expense not found"
+        });
+      }
+
+      // Kiểm tra quyền của user với boarding house
+      const boardingHouse = await BoardingHouse.findOne({
+        _id: expense.boardingHouseId,
+        $or: [{ ownerId: userId }, { staffId: userId }]
+      });
+
+      if (!boardingHouse) {
+        return res.status(403).json({
+          success: false,
+          message: "You don't have permission to view expenses for this boarding house"
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: expense
+      });
+
+    } catch (error) {
+      console.error("Error fetching expense:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message
+      });
     }
   }
 

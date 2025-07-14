@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import {
   Form,
   Input,
@@ -9,20 +9,20 @@ import {
   Image,
   Button,
   Tabs,
-} from 'antd';
+} from "antd";
 import {
   PlusOutlined,
   HeartFilled,
   StarFilled,
   StarOutlined,
-} from '@ant-design/icons';
-import { getAllBoardingHouseTypesOwner } from '../../../api/BoardingHouseAPI';
+} from "@ant-design/icons";
+import { getAllBoardingHouseTypesOwner } from "../../../api/BoardingHouseAPI";
 import {
   fetchProvinces,
   fetchDistricts,
   fetchWards,
-} from '../../../api/apiAddress';
-import { getBoardingHouseDetail } from '../../../api/ownerUser/boardingHouseAPI';
+} from "../../../api/apiAddress";
+import { getBoardingHouseDetail } from "../../../api/ownerUser/boardingHouseAPI";
 import {
   updateBoardingHouseDetailsOwner,
   getManagersForOwner,
@@ -48,6 +48,7 @@ import userRole from '@/constants/userRole';
 import BoardingHouseForm from './BoardingHouseForm';
 import ReviewManagement from './ReviewManagement';
 
+
 const { TabPane } = Tabs;
 
 const cx = classNames;
@@ -57,10 +58,12 @@ const BHDetailOwner = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { t } = useTranslation('bhManagement');
-  const { darkMode } = useTheme();
+  const { t, i18n } = useTranslation('bhManagement');
 
-  const boardingHouseName = location.state?.name || t('defaultTitle');
+  const { darkMode } = useTheme();
+  const lang = i18n.language || 'vi';
+
+  const boardingHouseName = location.state?.name || t("defaultTitle");
 
   const [updatedData, setUpdatedData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -77,8 +80,8 @@ const BHDetailOwner = () => {
 
   const fetchBoardingHouseDetails = async () => {
     if (!boardingHouseId) {
-      toast.error(t('errors.noId'));
-      navigate('/bh-management-owner');
+      toast.error(t("errors.noId"));
+      navigate("/bh-management-owner");
       return;
     }
     try {
@@ -88,8 +91,8 @@ const BHDetailOwner = () => {
       setUpdatedData({ ...response, primaryImage, otherImages });
       setCurrentLocation([response?.location?.lat, response?.location?.lon]);
     } catch (error) {
-      console.error('Failed to fetch boarding house data:', error);
-      toast.error(t('errors.fetchFailed'));
+      console.error("Failed to fetch boarding house data:", error);
+      toast.error(t("errors.fetchFailed"));
     }
   };
 
@@ -105,10 +108,10 @@ const BHDetailOwner = () => {
   }, [geoLocation]);
   useEffect(() => {
     if (darkMode) {
-      document.body.classList.add('dark-mode');
-      console.log('Added dark-mode class to body');
+      document.body.classList.add("dark-mode");
+      console.log("Added dark-mode class to body");
     } else {
-      document.body.classList.remove('dark-mode');
+      document.body.classList.remove("dark-mode");
     }
   }, [darkMode]);
 
@@ -118,35 +121,25 @@ const BHDetailOwner = () => {
         const provincesData = await fetchProvinces();
         setProvinces(provincesData);
 
-        if (updatedData?.address?.province) {
-          const selectedProvince = provincesData.find(
-            (p) => p.name === updatedData.address.province
-          );
-          if (selectedProvince) {
-            const districtsData = await fetchDistricts(selectedProvince.code);
-            setDistricts(districtsData);
+        const provinceId = updatedData?.address?.province?.id;
+        if (provinceId) {
+          const districtsData = await fetchDistricts(provinceId);
+          setDistricts(districtsData);
 
-            if (updatedData?.address?.district) {
-              const selectedDistrict = districtsData.find(
-                (d) => d.name === updatedData.address.district
-              );
-              if (selectedDistrict) {
-                const wardsData = await fetchWards(selectedDistrict.code);
-                setWards(wardsData);
-              }
-            }
+          const districtId = updatedData?.address?.district?.id;
+          if (districtId) {
+            const wardsData = await fetchWards(districtId);
+            setWards(wardsData);
           }
         }
       } catch (error) {
-        console.error('Error fetching address data:', error);
-        toast.error(t('errors.fetchAddressFailed'));
+        console.error("Error fetching address data:", error);
+        toast.error(t("errors.fetchAddressFailed"));
       }
     };
 
-    if (updatedData?.address?.province) {
-      fetchAddressData();
-    }
-  }, [updatedData?.address?.province, updatedData?.address?.district, t]);
+    fetchAddressData();
+  }, [updatedData?.address?.province?.id, updatedData?.address?.district?.id]);
 
   useEffect(() => {
     const fetchTypes = async () => {
@@ -154,8 +147,8 @@ const BHDetailOwner = () => {
         const response = await getAllBoardingHouseTypesOwner();
         setBoardingHouseTypes(response.data || []);
       } catch (error) {
-        console.error('Failed to fetch boarding house types:', error);
-        toast.error(t('errors.fetchBoardingHouseTypes'));
+        console.error("Failed to fetch boarding house types:", error);
+        toast.error(t("errors.fetchBoardingHouseTypes"));
       }
     };
 
@@ -178,7 +171,7 @@ const BHDetailOwner = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const keys = name.split('.');
+    const keys = name.split(".");
 
     if (keys.length === 2) {
       setUpdatedData((prev) => ({
@@ -206,7 +199,7 @@ const BHDetailOwner = () => {
     }
 
     if ((updatedData.otherImages?.length || 0) >= 15) {
-      toast.error(t('errors.maxOtherImages'));
+      toast.error(t("errors.maxOtherImages"));
       return;
     }
 
@@ -226,7 +219,7 @@ const BHDetailOwner = () => {
       ...prev,
       otherImages: prev.otherImages.filter((_, i) => i !== index),
     }));
-    toast.success(t('messages.imageRemoved'));
+    toast.success(t("messages.imageRemoved"));
   };
 
   const handleSelectedTypesChange = (event) => {
@@ -243,14 +236,14 @@ const BHDetailOwner = () => {
       return false;
     },
     multiple: true,
-    accept: 'image/*',
+    accept: "image/*",
   };
   const uploadProps = {
     beforeUpload: (file) => {
       handleFileChange({ target: { files: [file] } }, true);
       return false;
     },
-    accept: 'image/*',
+    accept: "image/*",
     maxCount: 1,
     showUploadList: false,
   };
@@ -258,19 +251,17 @@ const BHDetailOwner = () => {
   const getLocation = async () => {
     try {
       const res = await axios.get(
-        'https://nominatim.openstreetmap.org/search',
+        "https://nominatim.openstreetmap.org/search",
         {
           params: {
-            format: 'json',
+            format: "json",
             q: `${updatedData.address.ward}, ${updatedData.address.district}, ${updatedData.address.province}`,
             polygon_geojson: 1,
           },
         }
       );
       setGeoLocation(res.data[0]);
-    } catch (error) {
-      console.log('Error getting location:', error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -284,57 +275,57 @@ const BHDetailOwner = () => {
       setLoading(true);
 
       if (!updatedData.boardingHouseType) {
-        toast.error(t('validation.selectBoardingHouseType'));
+        toast.error(t("validation.selectBoardingHouseType"));
         setLoading(false);
         return;
       }
       if (!updatedData.name) {
-        toast.error(t('validation.enterName'));
+        toast.error(t("validation.enterName"));
         setLoading(false);
         return;
       }
       if (!updatedData.address.province) {
-        toast.error(t('validation.selectProvince'));
+        toast.error(t("validation.selectProvince"));
         setLoading(false);
         return;
       }
       if (!updatedData.address.district) {
-        toast.error(t('validation.selectDistrict'));
+        toast.error(t("validation.selectDistrict"));
         setLoading(false);
         return;
       }
       if (!updatedData.address.ward) {
-        toast.error(t('validation.selectWard'));
+        toast.error(t("validation.selectWard"));
         setLoading(false);
         return;
       }
       if (!updatedData.address.detail) {
-        toast.error(t('validation.enterDetailAddress'));
+        toast.error(t("validation.enterDetailAddress"));
         setLoading(false);
         return;
       }
       if (!updatedData.priceRange) {
-        toast.error(t('validation.enterPriceRange'));
+        toast.error(t("validation.enterPriceRange"));
         setLoading(false);
         return;
       }
       if (!updatedData.electricityPrice) {
-        toast.error(t('validation.enterElectricityPrice'));
+        toast.error(t("validation.enterElectricityPrice"));
         setLoading(false);
         return;
       }
       if (!updatedData.waterPrice) {
-        toast.error(t('validation.enterWaterPrice'));
+        toast.error(t("validation.enterWaterPrice"));
         setLoading(false);
         return;
       }
       if (!updatedData.primaryImage) {
-        toast.error(t('validation.uploadPrimaryImage'));
+        toast.error(t("validation.uploadPrimaryImage"));
         setLoading(false);
         return;
       }
       if (updatedData.otherImages.length > 15) {
-        toast.error(t('errors.maxOtherImages'));
+        toast.error(t("errors.maxOtherImages"));
         setLoading(false);
         return;
       }
@@ -342,7 +333,7 @@ const BHDetailOwner = () => {
       const payload = new FormData();
 
       payload.append(
-        'boardingHouseType',
+        "boardingHouseType",
         updatedData.boardingHouseType?._id || updatedData.boardingHouseType
       );
       payload.append('name', updatedData.name);
@@ -350,32 +341,53 @@ const BHDetailOwner = () => {
       payload.append('priceRange', updatedData.priceRange);
       payload.append('electricityPrice', updatedData.electricityPrice);
       payload.append('waterPrice', updatedData.waterPrice);
-      payload.append('address[province]', updatedData.address.province);
-      payload.append('address[district]', updatedData.address.district);
-      payload.append('address[ward]', updatedData.address.ward);
+      payload.append(
+        'address[province][name]',
+        updatedData.address.province.name
+      );
+      payload.append(
+        'address[province][name_en]',
+        updatedData.address.province.name_en
+      );
+
+      payload.append(
+        'address[district][name]',
+        updatedData.address.district.name
+      );
+      payload.append(
+        'address[district][name_en]',
+        updatedData.address.district.name_en
+      );
+
+      payload.append('address[ward][name]', updatedData.address.ward.name);
+      payload.append(
+        'address[ward][name_en]',
+        updatedData.address.ward.name_en
+      );
       payload.append('address[detail]', updatedData.address.detail);
       payload.append('location[lat]', updatedData.location.lat);
       payload.append('location[lon]', updatedData.location.lon);
       payload.append('staffId', updatedData.staffId);
 
+
       const oldImg = [];
 
       if (updatedData.primaryImage instanceof File) {
-        payload.append('boardingHouse', updatedData.primaryImage);
+        payload.append("boardingHouse", updatedData.primaryImage);
       } else {
         oldImg.push(updatedData.primaryImage);
       }
 
       (updatedData.otherImages || []).forEach((file) => {
         if (file instanceof File) {
-          payload.append('boardingHouse', file);
+          payload.append("boardingHouse", file);
         } else {
           oldImg.push(file);
         }
       });
 
       if (oldImg.length > 0) {
-        payload.append('boardingHouse', JSON.stringify(oldImg));
+        payload.append("boardingHouse", JSON.stringify(oldImg));
       }
 
       const response = await updateBoardingHouseDetailsOwner(
@@ -384,18 +396,18 @@ const BHDetailOwner = () => {
       );
 
       if (response?.success) {
-        toast.success(t('messages.updateSuccess'));
-        navigate('/bh-management-owner');
+        toast.success(t("messages.updateSuccess"));
+        navigate("/bh-management-owner");
       } else {
-        toast.error(response.message || t('messages.updateFailed'));
+        toast.error(response.message || t("messages.updateFailed"));
       }
     } catch (error) {
-      console.error('Error updating boarding house details:', error);
+      console.error("Error updating boarding house details:", error);
 
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          t('messages.updateFailed')
+          t("messages.updateFailed")
       );
     } finally {
       setLoading(false);
@@ -407,20 +419,20 @@ const BHDetailOwner = () => {
   return (
     <div
       className={`mx-auto w-full back rounded-xl p-4 ${
-        darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'
+        darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
       }`}
     >
       <h1 className="text-5xl flex items-center gap-2">
         <FontAwesomeIcon
           icon={faHotel}
-          className={`text-6xl ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
-        />{' '}
-        {boardingHouseName || t('defaultTitle')}
+          className={`text-6xl ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+        />{" "}
+        {boardingHouseName || t("defaultTitle")}
       </h1>
       <Tabs defaultActiveKey="boardingHouseDetail">
         {/* Tab: Boarding House Detail */}
         <Tabs.TabPane
-          tab={t('tabs.boardingHouseDetail')}
+          tab={t("tabs.boardingHouseDetail")}
           key="boardingHouseDetail"
         >
           <BoardingHouseForm
@@ -449,28 +461,28 @@ const BHDetailOwner = () => {
         </Tabs.TabPane>
 
         {/* Other Tabs */}
-        <Tabs.TabPane tab={t('tabs.roomType')} key="roomType">
+        <Tabs.TabPane tab={t("tabs.roomType")} key="roomType">
           <RoomType />
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab={t('tabs.room')} key="room">
+        <Tabs.TabPane tab={t("tabs.room")} key="room">
           <RoomManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab={t('tabs.tenantManagement')} key="tenantManagement">
+        <Tabs.TabPane tab={t("tabs.tenantManagement")} key="tenantManagement">
           <TenantManagement />
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab={t('tabs.revenueManagement')} key="revenueManagement">
+        <Tabs.TabPane tab={t("tabs.revenueManagement")} key="revenueManagement">
           <RevenueManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab={t('tabs.renewalManagement')} key="renewalManagement">
+        <Tabs.TabPane tab={t("tabs.renewalManagement")} key="renewalManagement">
           <RenewalRequest boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
 
         <Tabs.TabPane
-          tab={t('tabs.rentPaymentManagement')}
+          tab={t("tabs.rentPaymentManagement")}
           key="rentPaymentManagement"
         >
           <RentPaymentManagement />

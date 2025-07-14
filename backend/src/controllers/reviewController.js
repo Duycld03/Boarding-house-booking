@@ -168,6 +168,7 @@ class ReviewController {
       );
 
       return res.status(200).json({
+        success: true,
         message: 'Review deleted successfully',
         newRating: averageRating, // Trả về rating mới sau khi xóa review
       });
@@ -180,63 +181,76 @@ class ReviewController {
   async updateReview(req, res) {
     try {
       const { reviewId } = req.params;
-      const { content, rating, images, boardingHouseId } = req.body;
-      const accountId = req.user.userId;
+      const accountId = req.user?.userId;
+
+
+      const { content, rating, boardingHouseId } = req.body;
 
       if (!accountId) {
-        return res
-          .status(401)
-          .json({ success: false, message: 'Account ID not found.' });
+        if (req.files.images) {
+          await Promise.all(req.files.images.map(
+            file => cloudinary.uploader.destroy(file.filename)
+          ));
+        }
+        return res.status(401).json(
+          { success: false, message: 'Account ID not found.' }
+        );
       }
 
       const review = await Review.findOne({ _id: reviewId, accountId });
       if (!review) {
-        return res
-          .status(403)
-          .json({ message: 'You are not authorized to update this review' });
-      }
-
-      // Check nếu rating hợp lệ (1-5)
-      if (rating !== undefined && (rating < 1 || rating > 5)) {
-        return res
-          .status(400)
-          .json({ message: 'Rating must be between 1 and 5.' });
-      }
-
-      // Cập nhật review trước để rating mới được tính chính xác
-      review.content = content !== undefined ? content : review.content;
-      review.rating = rating !== undefined ? rating : review.rating;
-      review.images = images !== undefined ? images : review.images; // Cho phép xóa ảnh bằng cách gửi array rỗng
-      await review.save();
-
-      // 🔥 Truy vấn lại danh sách review sau khi cập nhật
-      const reviews = await Review.find({
-        boardingHouseId: review.boardingHouseId,
-        parentId: null, // Chỉ lấy review gốc
-        deleted: false,
-      });
-
-      if (reviews.length > 0) {
-        const totalRating = reviews.reduce((sum, rev) => sum + rev.rating, 0);
-        const averageRating = (totalRating / reviews.length).toFixed(1);
-
-        // 🔥 Cập nhật BoardingHouse nhưng không cập nhật `updatedAt`
-        await BoardingHouse.findByIdAndUpdate(
-          review.boardingHouseId,
-          { rating: averageRating },
-          { new: true, timestamps: false } // 🔥 Ngăn Mongoose cập nhật `updatedAt`
+        if (req.files.images) {
+          await Promise.all(req.files.images.map(
+            file => cloudinary.uploader.destroy(file.filename)
+          ));
+        }
+        return res.status(403).json(
+          { success: false, message: 'Unauthorized' }
         );
       }
 
-      return res
-        .status(200)
-        .json({ message: 'Review updated successfully', review });
+      review.content = content || review.content;
+      review.rating = rating || review.rating;
+
+      if (req.files.images && req.files.images.length > 0) {
+        if (review.images && review.images.length > 0) {
+          await Promise.all(review.images.map(
+            oldImg => cloudinary.uploader.destroy(oldImg.publicId)
+          ));
+        }
+
+        review.images = req.files.images.map(file => ({
+          imageUrl: file.path,
+          publicId: file.filename
+        }));
+      }
+
+      await review.save();
+
+      const reviews = await Review.find(
+        { boardingHouseId: review.boardingHouseId, parentId: null, deleted: false }
+      );
+
+      if (reviews.length > 0) {
+        const avgRating = (reviews.reduce((sum, rev) => sum + rev.rating, 0) / reviews.length).toFixed(1);
+        await BoardingHouse.findByIdAndUpdate(
+          review.boardingHouseId, { rating: avgRating }, { new: true, timestamps: false }
+        );
+      }
+
+      return res.status(200).json(
+        { success: true, message: 'Review updated successfully', review }
+      );
     } catch (error) {
-      console.error('Error updating review:', error);
-      return res.status(500).json({ message: 'Server Error' });
+      console.error('Error:', error);
+      if (req.files.images) {
+        await Promise.all(req.files.images.map(file => cloudinary.uploader.destroy(file.filename)));
+      }
+      return res.status(500).json(
+        { success: false, message: 'Server Error', error: error.message }
+      );
     }
   }
-
   async getReviewsUser(req, res) {
     try {
       // 🔥 Lấy toàn bộ review gốc (không có parentId)
@@ -321,6 +335,11 @@ class ReviewController {
       });
 
       if (existingReview) {
+        if (req.files && req.files.length > 0) {
+          for (const file of req.files) {
+            cloudinary.uploader.destroy(file.filename);
+          }
+        }
         return res.status(400).json({
           success: false,
           message: 'You have already reviewed this boarding house.',
@@ -334,14 +353,21 @@ class ReviewController {
         });
       }
 
+
+
       // Tạo review mới
       const newReview = new Review({
         accountId,
         boardingHouseId,
         content,
         rating,
-        images,
       });
+      if (req.files && req.files.length > 0) {
+        newReview.images = req.files.map((file) => ({
+          imageUrl: file.path,
+          publicId: file.filename,
+        }));
+      }
 
       await newReview.save();
 
@@ -533,7 +559,7 @@ class ReviewController {
         })
         .sort({ createdAt: 1 });
 
-      return res.status(200).json({ ...review.toObject(), replies });
+      return res.status(200).json({ success: true, data: { review, replies } });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }

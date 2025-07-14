@@ -109,8 +109,8 @@ const AppointmentCard = ({ item, onCancel }) => {
         }
     };
 
-    const statusStyle = statusStyles[item.status.toLowerCase()];
-    const StatusIcon = statusStyle.iconLibrary;
+    const statusStyle = statusStyles[item?.status?.toLowerCase()];
+    const StatusIcon = statusStyle?.iconLibrary;
 
     return (
         <View
@@ -260,7 +260,7 @@ const AppointmentCard = ({ item, onCancel }) => {
                 )}
 
                 {/* Action Button */}
-                {item.status !== 'canceled' && item.status !== 'completed' && (
+                {item.status === 'pending' && (
                     <>
                         <Button
                             onPress={() => onCancel(item)}

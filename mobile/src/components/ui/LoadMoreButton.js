@@ -35,14 +35,14 @@ const LoadMoreButton = ({
 }) => {
   const { isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
   // Default translations với fallback
   const defaultTranslations = {
-    allLoaded: `All ${itemName} loaded`,
-    loadingMore: `Loading more ${itemName}...`,
-    loadMore: `Load more ${itemName}`,
-    progressText: `${currentCount} of ${totalCount} ${itemName} loaded`,
+    allLoaded: t('loaderComponent.allLoaded', { itemName }),
+    loadingMore: t('loaderComponent.loadingMore', { itemName }),
+    loadMore: t('loaderComponent.loadMore', { itemName }),
+    progressText: t('loaderComponent.progressText', { currentCount, totalCount, itemName }),
     ...translations,
   };
 
@@ -75,13 +75,11 @@ const LoadMoreButton = ({
       <TouchableOpacity
         onPress={onLoadMore}
         disabled={isLoading}
-        className={`flex-row items-center justify-center py-4 px-6 rounded-lg border-2 border-dashed ${
-          isLoading
-            ? `${themedClasses.border} opacity-50`
-            : `border-blue-300 ${
-                isDarkMode ? 'border-blue-600' : 'border-blue-300'
-              }`
-        }`}
+        className={`flex-row items-center justify-center py-4 px-6 rounded-lg border-2 border-dashed ${isLoading
+          ? `${themedClasses.border} opacity-50`
+          : `border-blue-300 ${isDarkMode ? 'border-blue-600' : 'border-blue-300'
+          }`
+          }`}
         style={{
           backgroundColor: isDarkMode
             ? 'rgba(59, 130, 246, 0.1)'
@@ -94,28 +92,24 @@ const LoadMoreButton = ({
             {/* Loading animation */}
             <View className="flex-row items-center mr-3">
               <View
-                className={`w-2 h-2 rounded-full mr-1 ${
-                  isDarkMode ? 'bg-blue-400' : 'bg-blue-500'
-                }`}
+                className={`w-2 h-2 rounded-full mr-1 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-500'
+                  }`}
                 style={{ opacity: 0.4 }}
               />
               <View
-                className={`w-2 h-2 rounded-full mr-1 ${
-                  isDarkMode ? 'bg-blue-400' : 'bg-blue-500'
-                }`}
+                className={`w-2 h-2 rounded-full mr-1 ${isDarkMode ? 'bg-blue-400' : 'bg-blue-500'
+                  }`}
                 style={{ opacity: 0.6 }}
               />
               <View
-                className={`w-2 h-2 rounded-full ${
-                  isDarkMode ? 'bg-blue-400' : 'bg-blue-500'
-                }`}
+                className={`w-2 h-2 rounded-full ${isDarkMode ? 'bg-blue-400' : 'bg-blue-500'
+                  }`}
                 style={{ opacity: 0.8 }}
               />
             </View>
             <Text
-              className={`font-medium ${
-                isDarkMode ? 'text-blue-400' : 'text-blue-600'
-              }`}
+              className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                }`}
               style={customStyles.loadingText}
             >
               {defaultTranslations.loadingMore}
@@ -130,11 +124,12 @@ const LoadMoreButton = ({
               style={{ marginRight: 8 }}
             />
             <Text
-              className={`font-medium ${
-                isDarkMode ? 'text-blue-400' : 'text-blue-600'
-              }`}
+              className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                }`}
               style={customStyles.buttonText}
             >
+
+
               {defaultTranslations.loadMore ||
                 `Load ${itemsToLoad} more ${itemName}`}
             </Text>
@@ -155,17 +150,15 @@ const LoadMoreButton = ({
             {defaultTranslations.progressText}
           </Text>
           <View
-            className={`w-full h-1 rounded-full ${
-              isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
-            }`}
+            className={`w-full h-1 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+              }`}
             style={customStyles.progressTrack}
           >
             <View
               className="h-1 rounded-full bg-blue-500"
               style={{
-                width: `${
-                  totalCount > 0 ? (currentCount / totalCount) * 100 : 0
-                }%`,
+                width: `${totalCount > 0 ? (currentCount / totalCount) * 100 : 0
+                  }%`,
                 ...customStyles.progressBar,
               }}
             />
