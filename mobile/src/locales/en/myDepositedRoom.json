@@ -61,5 +61,12 @@
   "errorLoadingDeposit": "Error loading deposit information",
   "vnpay": "VNPay",
   "momo": "MoMo",
-  "connectionError": "Connection error. Please try again."
+  "connectionError": "Connection error. Please try again.",
+  "refundRequestAlreadyExists": "Refund request already exists for this deposit",
+  "refundRequested": "Refund Requested",
+  "refundStatus": "Status",
+  "refundStatus.pending": "Pending",
+  "refundStatus.approved": "Approved",
+  "refundStatus.rejected": "Rejected",
+  "refundStatus.canceled": "Canceled"
 }

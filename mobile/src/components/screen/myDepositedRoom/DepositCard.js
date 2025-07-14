@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Animated } from "react-native";
+import { View, Animated, TouchableOpacity } from "react-native";
 import { Text } from "@/components/ui";
 import Button from "@/components/ui/Button";
 import { useTheme } from "@/context/ThemeProvider";
@@ -16,10 +16,18 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import formatAmount from "@/utils/formatAmount";
 
-const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
+const DepositCard = ({
+  item,
+  onRefund,
+  onPayDeposit,
+  index,
+  hasExistingRefundRequest = false,
+  refundRequestInfo = null,
+  onPress,
+}) => {
   const { isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
-  const { t, i18n } = useTranslation("myDepositedRoom"); // Get i18n to access current language
+  const { t, i18n } = useTranslation("myDepositedRoom");
   const slideAnim = React.useRef(new Animated.Value(50)).current;
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
 
@@ -125,49 +133,73 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
     });
   };
 
-  const shouldShowRefund = (endDateStr) => {
-    if (!endDateStr) return false;
+  // Updated shouldShowRefund function - only based on rentalTime
+  const shouldShowRefund = (rentalTime) => {
+    // Convert rentalTime to number if it's a string
+    const rentalTimeNum =
+      typeof rentalTime === "string" ? parseInt(rentalTime) : rentalTime;
 
-    let endDate;
-
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(endDateStr)) {
-      const [day, month, year] = endDateStr.split("/").map(Number);
-      endDate = new Date(year, month - 1, day);
-    } else {
-      endDate = new Date(endDateStr);
-    }
-
-    if (isNaN(endDate.getTime())) return false;
-
-    const currentDate = new Date();
-    const twoMonthsBeforeEnd = new Date(endDate);
-    twoMonthsBeforeEnd.setMonth(twoMonthsBeforeEnd.getMonth() - 2);
-
-    return currentDate <= twoMonthsBeforeEnd;
+    // Show refund button if rental time is >= 2 months
+    return rentalTimeNum >= 2;
   };
 
-  // Add this function to your DepositCard component
+  // Updated renderActionButtons function
   const renderActionButtons = () => {
     if (item.status === "confirmed") {
       return (
         <>
           <View className="flex-row justify-between mt-2">
-            {/* Request Refund Button - Show if refund is available */}
-            {shouldShowRefund(item.endDate) && (
+            {/* Request Refund Button - Show based on rental time */}
+            {shouldShowRefund(item.rentalTime) && (
               <View className="flex-1 ml-2">
                 <Button
                   onPress={() => onRefund(item)}
                   variant="secondary"
                   fullWidth={true}
                   size="md"
-                  icon={<Ionicons name="refresh" size={16} color="#fff" />}
+                  disabled={hasExistingRefundRequest} // Disable if request exists
+                  icon={
+                    hasExistingRefundRequest ? (
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={16}
+                        color={isDarkMode ? "#6b7280" : "#9ca3af"}
+                      />
+                    ) : (
+                      <Ionicons name="refresh" size={16} color="#fff" />
+                    )
+                  }
                   style={{
                     borderRadius: 12,
-                    backgroundColor: isDarkMode ? "#b91c1c" : "#dc2626",
+                    backgroundColor: hasExistingRefundRequest
+                      ? isDarkMode
+                        ? "#374151"
+                        : "#e5e7eb"
+                      : isDarkMode
+                      ? "#b91c1c"
+                      : "#dc2626",
+                    opacity: hasExistingRefundRequest ? 0.6 : 1,
                   }}
                 >
-                  {t("requestRefund")}
+                  {hasExistingRefundRequest
+                    ? t("refundRequested")
+                    : t("requestRefund")}
                 </Button>
+
+                {/* Show refund request status if exists */}
+                {hasExistingRefundRequest && refundRequestInfo && (
+                  <View className="mt-2">
+                    <Text
+                      className={themedClasses(
+                        "text-xs text-gray-600 text-center",
+                        "text-xs text-gray-400 text-center"
+                      )}
+                    >
+                      {t("refundStatus")}:{" "}
+                      {t(`refundStatus.${refundRequestInfo.status}`)}
+                    </Text>
+                  </View>
+                )}
               </View>
             )}
           </View>
@@ -206,237 +238,239 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
         marginVertical: 8,
       }}
     >
-      <LinearGradient
-        colors={isDarkMode ? ["#1f2937", "#111827"] : ["#ffffff", "#f9fafb"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        className="rounded-2xl p-0.5"
-        style={{
-          shadowColor: isDarkMode ? "#000" : "#5c93bb",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: isDarkMode ? 0.3 : 0.15,
-          shadowRadius: 12,
-          elevation: 8,
-          borderRadius: 16,
-        }}
-      >
-        <View
-          className={themedClasses(
-            "bg-white rounded-2xl p-5",
-            "bg-gray-800 rounded-2xl p-5"
-          )}
-          style={{ borderRadius: 16 }}
+      <TouchableOpacity onPress={() => onPress?.(item)} activeOpacity={0.8}>
+        <LinearGradient
+          colors={isDarkMode ? ["#1f2937", "#111827"] : ["#ffffff", "#f9fafb"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          className="rounded-2xl p-0.5"
+          style={{
+            shadowColor: isDarkMode ? "#000" : "#5c93bb",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: isDarkMode ? 0.3 : 0.15,
+            shadowRadius: 12,
+            elevation: 8,
+            borderRadius: 16,
+          }}
         >
-          {/* Status Badge - Top Right */}
           <View
-            style={{
-              position: "absolute",
-              top: 12,
-              right: 12,
-              backgroundColor: `${getStatusColor(item.status)}15`,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: `${getStatusColor(item.status)}30`,
-              flexDirection: "row",
-              alignItems: "center",
-              zIndex: 10,
-              overflow: "hidden",
-            }}
+            className={themedClasses(
+              "bg-white rounded-2xl p-5",
+              "bg-gray-800 rounded-2xl p-5"
+            )}
+            style={{ borderRadius: 16 }}
           >
-            {getStatusIcon(item.status)}
-            <Text
+            {/* Status Badge - Top Right */}
+            <View
               style={{
-                color: getStatusColor(item.status),
-                fontWeight: "600",
-                fontSize: 12,
-                marginLeft: 4,
+                position: "absolute",
+                top: 12,
+                right: 12,
+                backgroundColor: `${getStatusColor(item.status)}15`,
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: `${getStatusColor(item.status)}30`,
+                flexDirection: "row",
+                alignItems: "center",
+                zIndex: 10,
+                overflow: "hidden",
               }}
             >
-              {t(`status.${item.status}`)}
-            </Text>
-          </View>
-
-          {/* Property & Room Info */}
-          <View className="mb-4 pr-28">
-            <View className="flex-row items-center mb-1">
-              <MaterialIcons
-                name="home-work"
-                size={18}
-                color={isDarkMode ? "#9ca3af" : "#4b5563"}
-                style={{ marginRight: 6 }}
-              />
+              {getStatusIcon(item.status)}
               <Text
-                className={themedClasses(
-                  "text-lg font-bold text-gray-900",
-                  "text-lg font-bold text-gray-100"
-                )}
+                style={{
+                  color: getStatusColor(item.status),
+                  fontWeight: "600",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
               >
-                {item.name}
+                {t(`status.${item.status}`)}
               </Text>
             </View>
 
-            <View className="flex-row items-center">
-              <FontAwesome5
-                name="door-open"
-                size={14}
-                color={isDarkMode ? "#9ca3af" : "#4b5563"}
-                style={{ marginRight: 8, marginLeft: 2 }}
-              />
-              <Text
-                className={themedClasses(
-                  "text-base font-medium text-gray-700",
-                  "text-base font-medium text-gray-300"
-                )}
-              >
-                {t("room")} {item.roomNumber}
-              </Text>
-            </View>
-          </View>
-
-          {/* Divider with gradient */}
-          <LinearGradient
-            colors={
-              isDarkMode
-                ? [
-                    "rgba(75, 85, 99, 0)",
-                    "rgba(75, 85, 99, 0.5)",
-                    "rgba(75, 85, 99, 0)",
-                  ]
-                : [
-                    "rgba(229, 231, 235, 0)",
-                    "rgba(229, 231, 235, 0.8)",
-                    "rgba(229, 231, 235, 0)",
-                  ]
-            }
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="h-[1px] my-3"
-          />
-
-          {/* Deposit Details */}
-          <View className="space-y-3 mb-4">
-            {/* Amount - Now using formatAmount */}
-            <View className="flex-row justify-between items-center">
-              <View className="flex-row items-center">
-                <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
-                  }`}
-                  style={{ borderRadius: 9999 }}
-                >
-                  <FontAwesome
-                    name="money"
-                    size={14}
-                    color={isDarkMode ? "#60a5fa" : "#3b82f6"}
-                  />
-                </View>
+            {/* Property & Room Info */}
+            <View className="mb-4 pr-28">
+              <View className="flex-row items-center mb-1">
+                <MaterialIcons
+                  name="home-work"
+                  size={18}
+                  color={isDarkMode ? "#9ca3af" : "#4b5563"}
+                  style={{ marginRight: 6 }}
+                />
                 <Text
-                  className={themedClasses("text-gray-700", "text-gray-300")}
+                  className={themedClasses(
+                    "text-lg font-bold text-gray-900",
+                    "text-lg font-bold text-gray-100"
+                  )}
                 >
-                  {t("depositAmount")}
+                  {item.name}
                 </Text>
               </View>
-              <Text
-                className={themedClasses(
-                  "font-bold text-gray-800",
-                  "font-bold text-gray-100"
-                )}
-              >
-                {formatCurrency(item.amount)}
-              </Text>
-            </View>
 
-            {/* Rental Period */}
-            <View className="flex-row justify-between items-center">
               <View className="flex-row items-center">
-                <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-green-900/30" : "bg-green-100"
-                  }`}
-                  style={{ borderRadius: 9999 }}
-                >
-                  <MaterialCommunityIcons
-                    name="calendar-range"
-                    size={14}
-                    color={isDarkMode ? "#4ade80" : "#22c55e"}
-                  />
-                </View>
+                <FontAwesome5
+                  name="door-open"
+                  size={14}
+                  color={isDarkMode ? "#9ca3af" : "#4b5563"}
+                  style={{ marginRight: 8, marginLeft: 2 }}
+                />
                 <Text
-                  className={themedClasses("text-gray-700", "text-gray-300")}
+                  className={themedClasses(
+                    "text-base font-medium text-gray-700",
+                    "text-base font-medium text-gray-300"
+                  )}
                 >
-                  {t("rentalPeriod")}
+                  {t("room")} {item.roomNumber}
                 </Text>
               </View>
-              <Text
-                className={themedClasses(
-                  "font-semibold text-gray-800",
-                  "font-semibold text-gray-100"
-                )}
-              >
-                {formatDate(item.startDate)} - {formatDate(item.endDate)}
-              </Text>
             </View>
 
-            {/* Rental Time */}
-            <View className="flex-row justify-between items-center">
-              <View className="flex-row items-center">
-                <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-purple-900/30" : "bg-purple-100"
-                  }`}
-                  style={{ borderRadius: 9999 }}
-                >
-                  <MaterialIcons
-                    name="timer"
-                    size={14}
-                    color={isDarkMode ? "#c084fc" : "#a855f7"}
-                  />
+            {/* Divider with gradient */}
+            <LinearGradient
+              colors={
+                isDarkMode
+                  ? [
+                      "rgba(75, 85, 99, 0)",
+                      "rgba(75, 85, 99, 0.5)",
+                      "rgba(75, 85, 99, 0)",
+                    ]
+                  : [
+                      "rgba(229, 231, 235, 0)",
+                      "rgba(229, 231, 235, 0.8)",
+                      "rgba(229, 231, 235, 0)",
+                    ]
+              }
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              className="h-[1px] my-3"
+            />
+
+            {/* Deposit Details */}
+            <View className="space-y-3 mb-4">
+              {/* Amount - Now using formatAmount */}
+              <View className="flex-row justify-between items-center">
+                <View className="flex-row items-center">
+                  <View
+                    className={`p-2 rounded-full mr-3 ${
+                      isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
+                    }`}
+                    style={{ borderRadius: 9999 }}
+                  >
+                    <FontAwesome
+                      name="money"
+                      size={14}
+                      color={isDarkMode ? "#60a5fa" : "#3b82f6"}
+                    />
+                  </View>
+                  <Text
+                    className={themedClasses("text-gray-700", "text-gray-300")}
+                  >
+                    {t("depositAmount")}
+                  </Text>
                 </View>
                 <Text
-                  className={themedClasses("text-gray-700", "text-gray-300")}
+                  className={themedClasses(
+                    "font-bold text-gray-800",
+                    "font-bold text-gray-100"
+                  )}
                 >
-                  {t("rentalTime")}
+                  {formatCurrency(item.amount)}
                 </Text>
               </View>
-              <Text
-                className={themedClasses(
-                  "font-semibold text-gray-800",
-                  "font-semibold text-gray-100"
-                )}
-              >
-                {item.rentalTime}{" "}
-              </Text>
+
+              {/* Rental Period */}
+              <View className="flex-row justify-between items-center">
+                <View className="flex-row items-center">
+                  <View
+                    className={`p-2 rounded-full mr-3 ${
+                      isDarkMode ? "bg-green-900/30" : "bg-green-100"
+                    }`}
+                    style={{ borderRadius: 9999 }}
+                  >
+                    <MaterialCommunityIcons
+                      name="calendar-range"
+                      size={14}
+                      color={isDarkMode ? "#4ade80" : "#22c55e"}
+                    />
+                  </View>
+                  <Text
+                    className={themedClasses("text-gray-700", "text-gray-300")}
+                  >
+                    {t("rentalPeriod")}
+                  </Text>
+                </View>
+                <Text
+                  className={themedClasses(
+                    "font-semibold text-gray-800",
+                    "font-semibold text-gray-100"
+                  )}
+                >
+                  {formatDate(item.startDate)} - {formatDate(item.endDate)}
+                </Text>
+              </View>
+
+              {/* Rental Time */}
+              <View className="flex-row justify-between items-center">
+                <View className="flex-row items-center">
+                  <View
+                    className={`p-2 rounded-full mr-3 ${
+                      isDarkMode ? "bg-purple-900/30" : "bg-purple-100"
+                    }`}
+                    style={{ borderRadius: 9999 }}
+                  >
+                    <MaterialIcons
+                      name="timer"
+                      size={14}
+                      color={isDarkMode ? "#c084fc" : "#a855f7"}
+                    />
+                  </View>
+                  <Text
+                    className={themedClasses("text-gray-700", "text-gray-300")}
+                  >
+                    {t("rentalTime")}
+                  </Text>
+                </View>
+                <Text
+                  className={themedClasses(
+                    "font-semibold text-gray-800",
+                    "font-semibold text-gray-100"
+                  )}
+                >
+                  {item.rentalTime} {t("months")}
+                </Text>
+              </View>
             </View>
+
+            {/* Actions Buttons */}
+            {(item.status === "confirmed" || item.status === "accepted") && (
+              <>
+                <LinearGradient
+                  colors={
+                    isDarkMode
+                      ? [
+                          "rgba(75, 85, 99, 0)",
+                          "rgba(75, 85, 99, 0.5)",
+                          "rgba(75, 85, 99, 0)",
+                        ]
+                      : [
+                          "rgba(229, 231, 235, 0)",
+                          "rgba(229, 231, 235, 0.8)",
+                          "rgba(229, 231, 235, 0)",
+                        ]
+                  }
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  className="h-[1px] my-3"
+                />
+                {renderActionButtons()}
+              </>
+            )}
           </View>
-
-          {/* Actions Buttons */}
-          {(item.status === "confirmed" || item.status === "accepted") && (
-            <>
-              <LinearGradient
-                colors={
-                  isDarkMode
-                    ? [
-                        "rgba(75, 85, 99, 0)",
-                        "rgba(75, 85, 99, 0.5)",
-                        "rgba(75, 85, 99, 0)",
-                      ]
-                    : [
-                        "rgba(229, 231, 235, 0)",
-                        "rgba(229, 231, 235, 0.8)",
-                        "rgba(229, 231, 235, 0)",
-                      ]
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                className="h-[1px] my-3"
-              />
-              {renderActionButtons()}
-            </>
-          )}
-        </View>
-      </LinearGradient>
+        </LinearGradient>
+      </TouchableOpacity>
     </Animated.View>
   );
 };

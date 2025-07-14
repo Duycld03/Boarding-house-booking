@@ -61,3 +61,7 @@ export const payDeposit = (data) => {
 export const rejectDepositRoom = (depositId, reasonForCancel) => {
   return axios.put(`owner/rejectdeposit/${depositId}`, { reasonForCancel });
 };
+
+export const getDepositRoomDetail = (depositId) => {
+  return axios.get(`auth/deposited-room/detail/${depositId}`);
+};
