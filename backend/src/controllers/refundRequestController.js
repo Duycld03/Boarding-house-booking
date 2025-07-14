@@ -29,7 +29,7 @@ class RefundRequestController {
           endDate: moment(refundRequest.depositRoomId.endDate).format(
             "DD/MM/YYYY"
           ),
-          amountRefunded: refundRequest.amountRefunded,
+          originalDepositAmount: refundRequest.originalDepositAmount,
           status: refundRequest.status,
           reason: refundRequest.reason,
           boardingHouseName:
@@ -118,7 +118,7 @@ class RefundRequestController {
         endDate: request.depositRoomId?.endDate
           ? moment(request.depositRoomId.endDate).format("DD/MM/YYYY")
           : "N/A",
-        amountRefunded: request.amountRefunded,
+        originalDepositAmount: request.originalDepositAmount,
         boardingHouseName:
           request.depositRoomId?.roomId?.boardingHouseId?.name || "N/A",
         status: request.status,
@@ -313,7 +313,7 @@ class RefundRequestController {
       }
 
       // Cập nhật trạng thái và lý do hủy, các trường khác giữ nguyên
-      refundRequest.status = "canceled";
+      refundRequest.status = "rejected";
       refundRequest.reasonForCancel = reasonForCancel || ""; // Lưu lý do hủy (có thể là chuỗi rỗng nếu không có lý do)
 
       // Lưu thay đổi vào database
@@ -373,7 +373,7 @@ class RefundRequestController {
 
       const existingRequest = await RefundRequest.findOne({
         depositRoomId,
-        accountId: req.user.userId,
+        userId: req.user.userId,
         status: { $ne: "rejected" },
       });
 
@@ -388,8 +388,8 @@ class RefundRequestController {
         depositRoomId,
         reason,
         status: "pending",
-        amountRefunded: depositRoom.amount, // Lấy amount từ depositRoom
-        accountId: req.user.userId,
+        originalDepositAmount: depositRoom.amount,
+        userId: req.user.userId,
       });
 
       return res.status(201).json({
@@ -415,7 +415,7 @@ class RefundRequestController {
       const existingRequest = await RefundRequest.findOne({
         depositRoomId,
         accountId: userId,
-        status: { $in: ["pending", "approved"] }, // Chỉ check các request chưa bị reject hoặc cancel
+        status: { $in: ["pending", "accepted"] }, // Chỉ check các request chưa bị reject hoặc cancel
       });
 
       return res.json({
@@ -425,7 +425,7 @@ class RefundRequestController {
               _id: existingRequest._id,
               status: existingRequest.status,
               reason: existingRequest.reason,
-              amountRefunded: existingRequest.amountRefunded,
+              amountRefunded: existingRequest.originalDepositAmount,
               createdAt: existingRequest.createdAt,
             }
           : null,
@@ -445,7 +445,7 @@ class RefundRequestController {
 
       const refundRequests = await RefundRequest.find({
         accountId: userId,
-        status: { $in: ["pending", "approved"] },
+        status: { $in: ["pending", "accepted"] },
       }).select("depositRoomId status createdAt");
 
       // Tạo map để frontend có thể check nhanh
