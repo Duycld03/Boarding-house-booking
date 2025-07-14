@@ -1,7 +1,11 @@
 {
   "loaderComponent": {
     "loading": "Loading...",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "allLoaded": "All items loaded",
+    "loadingMore": "Loading more {{itemName}}...",
+    "loadMore": "Load more {{itemName}}...",
+    "progressText": "{{currentCount}} of {{totalCount}} items loaded"
   },
   "accommodation_types": {
     "nha_tro_truyen_thong": "Traditional Boarding House",

@@ -17,15 +17,13 @@ import { getMyDepositedRoom } from "@/API/depositAPI";
 import { useNotification } from "@/context/NotificationProvider";
 import {
   Ionicons,
-  MaterialIcons,
-  FontAwesome,
   FontAwesome5,
   MaterialCommunityIcons,
-  AntDesign,
 } from "@expo/vector-icons";
 import { useCurrentUser } from "@/context/userContext";
 import { useFocusEffect, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { getRenewalRequests } from "@/API/renewalRequestAPI";
 import DepositCard from "@/components/screen/myDepositedRoom/DepositCard";
 
 function MyDepositedRoom() {
@@ -34,13 +32,16 @@ function MyDepositedRoom() {
   const { t } = useTranslation("myDepositedRoom");
   const { isLogin } = useCurrentUser();
   const router = useRouter();
-  const { showSuccess, showError } = useNotification();
+  const { showError } = useNotification();
 
   // State management
   const [depositData, setDepositData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [pendingRenewalRequests, setPendingRenewalRequests] = useState({});
+
+
 
   // Pagination state
   const [pagination, setPagination] = useState({
@@ -68,6 +69,27 @@ function MyDepositedRoom() {
       }
     }, [isLogin, router])
   );
+
+  // Fetch pending renewal requests
+  const fetchPendingRenewalRequests = useCallback(async () => {
+    try {
+      const res = await getRenewalRequests({
+        limit: 100,
+      });
+      if (res) {
+        const pendingRequestMap = {};
+        res.data.forEach(request => {
+          // Map depositRoomId to true for pending requests
+          if (request.status === "pending") {
+            pendingRequestMap[request.depositRoomId?._id] = true;
+          }
+        });
+        setPendingRenewalRequests(pendingRequestMap);
+      }
+    } catch (error) {
+      console.error("Error fetching renewal requests:", error);
+    }
+  }, []);
 
   // Fetch data function with proper pagination handling
   const fetchData = useCallback(
@@ -108,6 +130,9 @@ function MyDepositedRoom() {
           } else {
             setDepositData(res.data);
           }
+
+          // Fetch pending renewal requests after getting deposit data
+          await fetchPendingRenewalRequests();
         } else {
           showError(res.message || t("errorLoadingDeposits"));
         }
@@ -115,8 +140,8 @@ function MyDepositedRoom() {
         console.error("Error fetching deposit data:", error);
         showError(
           error.response?.data?.message ||
-            error.message ||
-            t("errorLoadingDeposits")
+          error.message ||
+          t("errorLoadingDeposits")
         );
       } finally {
         if (isLoadMore) {
@@ -126,7 +151,7 @@ function MyDepositedRoom() {
         }
       }
     },
-    [paginationOptions, t, showError]
+    [paginationOptions, t, showError, fetchPendingRenewalRequests]
   );
 
   // Initial load effect
@@ -134,14 +159,14 @@ function MyDepositedRoom() {
     if (isLogin && paginationOptions.page === 1) {
       fetchData();
     }
-  }, [isLogin]); // Don't include fetchData to prevent infinite loop
+  }, [isLogin]);
 
   // Load more effect
   useEffect(() => {
     if (paginationOptions.page > 1) {
       fetchData(true);
     }
-  }, [paginationOptions.page]); // Don't include fetchData to prevent infinite loop
+  }, [paginationOptions.page]);
 
   // Handle refresh
   const onRefresh = useCallback(async () => {
@@ -177,6 +202,9 @@ function MyDepositedRoom() {
         });
 
         setDepositData(res.data);
+
+        // Refresh pending renewal requests
+        await fetchPendingRenewalRequests();
       }
     } catch (error) {
       console.error("Error refreshing data:", error);
@@ -184,7 +212,7 @@ function MyDepositedRoom() {
     } finally {
       setRefreshing(false);
     }
-  }, [showError, t]);
+  }, [showError, t, fetchPendingRenewalRequests]);
 
   // Handle load more
   const handleLoadMore = useCallback(() => {
@@ -199,9 +227,6 @@ function MyDepositedRoom() {
     pagination.hasNextPage,
     loadingMore,
     loading,
-    paginationOptions.page,
-    depositData.length,
-    pagination.totalItems,
   ]);
 
   // Calculate if we should show load more button
@@ -213,11 +238,10 @@ function MyDepositedRoom() {
   const handleRefund = useCallback(
     (deposit) => {
       // Navigate to refund screen or handle refund logic
-      // router.push({
-      //   pathname: "/refund",
-      //   params: { depositId: deposit._id },
-      // });
-      console.log("Refund clicked for deposit:", deposit);
+      router.push({
+        pathname: "/mydepositedroom/refund",
+        params: { depositId: deposit._id },
+      });
     },
     [router]
   );
@@ -234,6 +258,18 @@ function MyDepositedRoom() {
     [router]
   );
 
+  // Handle create renew deposit
+  const handleCreateRenewDeposit = useCallback(
+    (item) => {
+      // Navigate to create renew request screen with deposit data
+      router.push({
+        pathname: "/mydepositedroom/createRenewalRequest",
+        params: { deposit: JSON.stringify(item) },
+      });
+    },
+    [router]
+  );
+
   // Render functions
   const renderDepositItem = useCallback(
     ({ item, index }) => (
@@ -241,10 +277,12 @@ function MyDepositedRoom() {
         item={item}
         onRefund={handleRefund}
         onPayDeposit={handlePayDeposit}
+        onCreateRenewDeposit={handleCreateRenewDeposit}
         index={index}
+        isCreateRenewDeposit={Boolean(pendingRenewalRequests[item._id])}
       />
     ),
-    [handleRefund, handlePayDeposit]
+    [handleRefund, handlePayDeposit, handleCreateRenewDeposit, pendingRenewalRequests]
   );
 
   const renderFooter = () => {
@@ -352,9 +390,8 @@ function MyDepositedRoom() {
           allLoaded: t("allDepositsLoaded") || "All deposits loaded",
           loadingMore: t("loadingMoreDeposits") || "Loading more deposits...",
           loadMore: t("loadMoreDeposits") || "Load more deposits",
-          progressText: `${depositData.length} ${t("of")} ${
-            pagination.totalItems
-          } ${t("depositsLoaded")}`,
+          progressText: `${depositData.length} ${t("of")} ${pagination.totalItems
+            } ${t("depositsLoaded")}`,
         }}
         showProgress={true}
         customStyles={{

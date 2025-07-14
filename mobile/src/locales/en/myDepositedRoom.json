@@ -16,6 +16,7 @@
   "loadingMoreDeposits": "Loading more deposits...",
   "loadMoreDeposits": "Load more deposits",
   "depositsLoaded": "deposits loaded",
+  "renewDeposit": "Renew Deposit",
   "of": "of",
   "room": "Room",
   "status": {
@@ -61,5 +62,24 @@
   "errorLoadingDeposit": "Error loading deposit information",
   "vnpay": "VNPay",
   "momo": "MoMo",
-  "connectionError": "Connection error. Please try again."
+  "connectionError": "Connection error. Please try again.",
+  "createRenewalRequest": {
+    "title": "Request Lease Renewal",
+    "loading": "Loading...",
+    "roomInformation": "Room Information",
+    "roomNumber": "Room",
+    "currentEndDate": "Current Lease End Date",
+    "renewalDuration": "Renewal Duration",
+    "enterDuration": "Enter duration",
+    "months": "Months",
+    "years": "Years",
+    "requestedEndDate": "New End Date",
+    "tenantNote": "Your Note (Optional)",
+    "enterNote": "Explain why you need an extension...",
+    "submitRequest": "Submit Request",
+    "successMessage": "Renewal request submitted successfully",
+    "errorMessage": "Failed to create renewal request",
+    "endDateMustBeLater": "Requested end date must be after current end date",
+    "durationRequired": "Please enter a valid duration"
+  }
 }

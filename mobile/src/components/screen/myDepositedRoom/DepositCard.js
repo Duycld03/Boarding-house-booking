@@ -16,12 +16,20 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import formatAmount from "@/utils/formatAmount";
 
-const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
+const DepositCard = ({
+  item,
+  onRefund,
+  onPayDeposit,
+  onCreateRenewDeposit, // Thêm prop này
+  index,
+  isCreateRenewDeposit, // Thêm prop này
+}) => {
   const { isDarkMode } = useTheme();
   const { themedClasses } = useThemedClasses();
   const { t, i18n } = useTranslation("myDepositedRoom"); // Get i18n to access current language
   const slideAnim = React.useRef(new Animated.Value(50)).current;
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
+
 
   // Animation effect
   React.useEffect(() => {
@@ -154,7 +162,7 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
           <View className="flex-row justify-between mt-2">
             {/* Request Refund Button - Show if refund is available */}
             {shouldShowRefund(item.endDate) && (
-              <View className="flex-1 ml-2">
+              <View className="flex-1">
                 <Button
                   onPress={() => onRefund(item)}
                   variant="secondary"
@@ -176,19 +184,49 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
     } else if (item.status === "accepted") {
       return (
         <View className="mt-2">
-          <Button
-            onPress={() => onPayDeposit(item)}
-            variant="primary"
-            fullWidth={true}
-            size="md"
-            icon={<FontAwesome name="dollar" size={14} color="#fff" />}
-            style={{
-              borderRadius: 12,
-              backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb",
-            }}
-          >
-            {t("payDeposit")}
-          </Button>
+          <View className="flex-row justify-between gap-2">
+            {/* Pay Deposit Button */}
+            <View className="flex-1">
+              <Button
+                onPress={() => onPayDeposit(item)}
+                variant="primary"
+                fullWidth={true}
+                size="md"
+                icon={<FontAwesome name="dollar" size={14} color="#fff" />}
+                style={{
+                  borderRadius: 12,
+                  backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb",
+                }}
+              >
+                {t("payDeposit")}
+              </Button>
+            </View>
+
+            {/* Create Renew Deposit Button */}
+            {!isCreateRenewDeposit && (
+              <View className="flex-1">
+                <Button
+                  onPress={() => onCreateRenewDeposit(item)}
+                  variant="secondary"
+                  fullWidth={true}
+                  size="md"
+                  icon={
+                    <MaterialCommunityIcons
+                      name="calendar-refresh"
+                      size={16}
+                      color="#fff"
+                    />
+                  }
+                  style={{
+                    borderRadius: 12,
+                    backgroundColor: isDarkMode ? "#047857" : "#059669", // Green color for renewal
+                  }}
+                >
+                  {t("renewDeposit")}
+                </Button>
+              </View>
+            )}
+          </View>
         </View>
       );
     }
@@ -300,15 +338,15 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
             colors={
               isDarkMode
                 ? [
-                    "rgba(75, 85, 99, 0)",
-                    "rgba(75, 85, 99, 0.5)",
-                    "rgba(75, 85, 99, 0)",
-                  ]
+                  "rgba(75, 85, 99, 0)",
+                  "rgba(75, 85, 99, 0.5)",
+                  "rgba(75, 85, 99, 0)",
+                ]
                 : [
-                    "rgba(229, 231, 235, 0)",
-                    "rgba(229, 231, 235, 0.8)",
-                    "rgba(229, 231, 235, 0)",
-                  ]
+                  "rgba(229, 231, 235, 0)",
+                  "rgba(229, 231, 235, 0.8)",
+                  "rgba(229, 231, 235, 0)",
+                ]
             }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -321,9 +359,8 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center">
                 <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
-                  }`}
+                  className={`p-2 rounded-full mr-3 ${isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
+                    }`}
                   style={{ borderRadius: 9999 }}
                 >
                   <FontAwesome
@@ -352,9 +389,8 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center">
                 <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-green-900/30" : "bg-green-100"
-                  }`}
+                  className={`p-2 rounded-full mr-3 ${isDarkMode ? "bg-green-900/30" : "bg-green-100"
+                    }`}
                   style={{ borderRadius: 9999 }}
                 >
                   <MaterialCommunityIcons
@@ -383,9 +419,8 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center">
                 <View
-                  className={`p-2 rounded-full mr-3 ${
-                    isDarkMode ? "bg-purple-900/30" : "bg-purple-100"
-                  }`}
+                  className={`p-2 rounded-full mr-3 ${isDarkMode ? "bg-purple-900/30" : "bg-purple-100"
+                    }`}
                   style={{ borderRadius: 9999 }}
                 >
                   <MaterialIcons
@@ -418,15 +453,15 @@ const DepositCard = ({ item, onRefund, onPayDeposit, index }) => {
                 colors={
                   isDarkMode
                     ? [
-                        "rgba(75, 85, 99, 0)",
-                        "rgba(75, 85, 99, 0.5)",
-                        "rgba(75, 85, 99, 0)",
-                      ]
+                      "rgba(75, 85, 99, 0)",
+                      "rgba(75, 85, 99, 0.5)",
+                      "rgba(75, 85, 99, 0)",
+                    ]
                     : [
-                        "rgba(229, 231, 235, 0)",
-                        "rgba(229, 231, 235, 0.8)",
-                        "rgba(229, 231, 235, 0)",
-                      ]
+                      "rgba(229, 231, 235, 0)",
+                      "rgba(229, 231, 235, 0.8)",
+                      "rgba(229, 231, 235, 0)",
+                    ]
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
