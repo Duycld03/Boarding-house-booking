@@ -6,21 +6,59 @@ import paginate from '../utils/pagination.js';
 
 class renewalController {
   async getExtensionRequests(req, res) {
-    const accountId = req.user.userId;
     try {
-      const extensionRequests = await ExtensionRequest.find({ accountId })
-        .populate({
-          path: 'roomId',
-          select: 'roomNumber boardingHouseId',
-          populate: {
-            path: 'boardingHouseId',
-          },
-        })
-        .sort({ createdAt: -1 });
+      const accountId = req.user.userId;
 
-      res.json(extensionRequests);
+      // Tạo filter để lọc theo accountId của user hiện tại
+      const filter = {
+        accountId: accountId
+      };
+
+      // Cấu hình paginate options
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 5,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter,
+        allowSearchFields: ['status'],
+        fields: '',
+        populate: [
+          {
+            path: 'roomId',
+            select: 'roomNumber boardingHouseId',
+            populate: {
+              path: 'boardingHouseId',
+              select: 'name address images',
+            },
+          },
+          {
+            path: 'depositRoomId',
+            select: 'amount startDate endDate status',
+          }
+        ],
+        includeTotalData: true,
+      };
+
+      // Gọi hàm paginate
+      const result = await paginate(ExtensionRequest, paginationOptions, req);
+
+
+
+      // Trả về kết quả có phân trang
+      return res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Error getting extension requests:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   }
 

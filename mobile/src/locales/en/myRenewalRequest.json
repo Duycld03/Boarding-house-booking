@@ -1,0 +1,19 @@
+{
+  "myRenewalRequests": "My Renewal Requests",
+  "noRenewalRequests": "No Renewal Requests",
+  "noRenewalRequestsDescription": "You don't have any renewal requests yet",
+  "renewalRequests": "renewal requests",
+  "viewDetails": "View Details",
+  "room": "Room",
+  "previousEndDate": "Current End Date",
+  "requestedExtensionDate": "New Extension Date",
+  "tenantNote": "Your Note",
+  "ownerNote": "Owner's Response",
+  "approvedMessage": "Renewal request has been approved",
+  "rejectedMessage": "Renewal request has been rejected",
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
+}

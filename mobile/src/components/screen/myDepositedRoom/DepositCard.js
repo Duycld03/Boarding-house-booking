@@ -20,7 +20,9 @@ const DepositCard = ({
   item,
   onRefund,
   onPayDeposit,
+  onCreateRenewDeposit, // Thêm prop này
   index,
+  isCreateRenewDeposit, // Thêm prop này
   hasExistingRefundRequest = false,
   refundRequestInfo = null,
   onPress,
@@ -208,19 +210,49 @@ const DepositCard = ({
     } else if (item.status === "accepted") {
       return (
         <View className="mt-2">
-          <Button
-            onPress={() => onPayDeposit(item)}
-            variant="primary"
-            fullWidth={true}
-            size="md"
-            icon={<FontAwesome name="dollar" size={14} color="#fff" />}
-            style={{
-              borderRadius: 12,
-              backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb",
-            }}
-          >
-            {t("payDeposit")}
-          </Button>
+          <View className="flex-row justify-between gap-2">
+            {/* Pay Deposit Button */}
+            <View className="flex-1">
+              <Button
+                onPress={() => onPayDeposit(item)}
+                variant="primary"
+                fullWidth={true}
+                size="md"
+                icon={<FontAwesome name="dollar" size={14} color="#fff" />}
+                style={{
+                  borderRadius: 12,
+                  backgroundColor: isDarkMode ? "#1d4ed8" : "#2563eb",
+                }}
+              >
+                {t("payDeposit")}
+              </Button>
+            </View>
+
+            {/* Create Renew Deposit Button */}
+            {!isCreateRenewDeposit && (
+              <View className="flex-1">
+                <Button
+                  onPress={() => onCreateRenewDeposit(item)}
+                  variant="secondary"
+                  fullWidth={true}
+                  size="md"
+                  icon={
+                    <MaterialCommunityIcons
+                      name="calendar-refresh"
+                      size={16}
+                      color="#fff"
+                    />
+                  }
+                  style={{
+                    borderRadius: 12,
+                    backgroundColor: isDarkMode ? "#047857" : "#059669", // Green color for renewal
+                  }}
+                >
+                  {t("renewDeposit")}
+                </Button>
+              </View>
+            )}
+          </View>
         </View>
       );
     }
