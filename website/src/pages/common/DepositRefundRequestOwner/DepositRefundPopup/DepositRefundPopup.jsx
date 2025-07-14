@@ -10,14 +10,23 @@ import {
   Col,
   Button,
   Spin,
+  Input,
+  InputNumber,
+  Space,
+  Divider,
+  Alert,
+  Popconfirm,
 } from "antd";
 import {
   WalletOutlined,
   CreditCardOutlined,
   DollarOutlined,
   CheckCircleOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 
@@ -31,21 +40,118 @@ function DepositRefundPopup({
 }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [damageAssessment, setDamageAssessment] = useState([]);
   const { t, i18n } = useTranslation("depositRefundRequest");
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (visible) {
+      form.resetFields();
+      setDamageAssessment([]);
+    }
+  }, [visible, form]);
+
+  // Calculate total damage amount
+  const totalDamageAmount = damageAssessment.reduce(
+    (total, item) => total + (item.estimatedCost || 0),
+    0
+  );
+
+  // Calculate actual refund amount
+  const originalDepositAmount = depositRefundData?.originalDepositAmount || 0;
+  const actualRefundAmount = Math.max(
+    0,
+    originalDepositAmount - totalDamageAmount
+  );
 
   const handleCancel = () => {
     setVisible(false);
     form.resetFields();
+    setDamageAssessment([]);
+  };
+
+  // Add new damage assessment item
+  const addDamageItem = () => {
+    setDamageAssessment([
+      ...damageAssessment,
+      {
+        id: Date.now(),
+        damageName: "",
+        estimatedCost: 0,
+      },
+    ]);
+  };
+
+  // Remove damage assessment item
+  const removeDamageItem = (id) => {
+    setDamageAssessment(damageAssessment.filter((item) => item.id !== id));
+  };
+
+  // Update damage assessment item
+  const updateDamageItem = (id, field, value) => {
+    setDamageAssessment(
+      damageAssessment.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  // Validate damage assessment
+  const validateDamageAssessment = () => {
+    if (damageAssessment.length === 0) {
+      return true; // No damage assessment is valid
+    }
+
+    for (const item of damageAssessment) {
+      if (!item.damageName || item.damageName.trim() === "") {
+        toast.error(t("damageNameRequired") || "Damage name is required");
+        return false;
+      }
+      if (item.estimatedCost === null || item.estimatedCost < 0) {
+        toast.error(
+          t("validCostRequired") || "Valid estimated cost is required"
+        );
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const onFinish = async (values) => {
+    // Validate damage assessment
+    if (!validateDamageAssessment()) {
+      return;
+    }
+
+    // Check if refund amount is positive
+    if (actualRefundAmount <= 0) {
+      toast.error(
+        t("noRefundAmount") ||
+          "No amount to refund. Total damage amount equals or exceeds deposit amount."
+      );
+      return;
+    }
+
     setLoading(true);
     try {
+      // Prepare damage assessment data (remove id field)
+      const damageAssessmentData = damageAssessment.map(({ id, ...item }) => ({
+        damageName: item.damageName.trim(),
+        estimatedCost: item.estimatedCost || 0,
+      }));
+
+      const requestData = {
+        ...values,
+        damageAssessment: damageAssessmentData,
+      };
+
       const response = await acceptRefundRequestForOwner(
         depositRefundData._id,
-        values
+        requestData
       );
-      console.log(response);
+
+      console.log("Response:", response);
 
       if (response.payUrl) {
         window.location.href = response.payUrl;
@@ -73,9 +179,9 @@ function DepositRefundPopup({
   return (
     <Modal
       title={
-        <div className="flex items-center space-x-4">
-          <DollarOutlined className="text-green-500 text-5xl" />
-          <span className="text-4xl font-bold">
+        <div className="flex items-center space-x-2">
+          <DollarOutlined className="text-green-500" />
+          <span className="font-bold">
             {t("depositRefundTitle") || "Deposit Refund Payment"}
           </span>
         </div>
@@ -83,54 +189,182 @@ function DepositRefundPopup({
       open={visible}
       onCancel={handleCancel}
       footer={null}
-      width={600}
+      width={800}
       destroyOnClose
       centered
     >
       <Spin spinning={loading}>
-        <div className="space-y-8">
+        <div className="space-y-4">
           {/* Refund Information */}
           <Card className="border-0 bg-gray-50">
             <div className="text-center">
-              <Text type="secondary" className="block mb-6 text-3xl font-bold">
+              <Text type="secondary" className="block mb-3 font-bold">
                 {t("refundInformation") || "Refund Information"}
               </Text>
 
-              <div className="space-y-6 mb-8">
+              <div className="space-y-2 mb-3">
                 <div className="flex justify-between items-center">
-                  <Text className="text-3xl font-semibold">
+                  <Text className="font-semibold">
                     {t("roomNumber") || "Room"}:
                   </Text>
-                  <Text strong className="text-2xl">
-                    {depositRefundData?.roomNumber || "N/A"}
-                  </Text>
+                  <Text strong>{depositRefundData?.roomNumber || "N/A"}</Text>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <Text className="text-2xl font-semibold">
+                  <Text className="font-semibold">
                     {t("boardingHouseName") || "Boarding House"}:
                   </Text>
-                  <Text strong className="text-2xl">
+                  <Text strong>
                     {depositRefundData?.boardingHouseName || "N/A"}
                   </Text>
                 </div>
+
+                <div className="flex justify-between items-center">
+                  <Text className="font-semibold">
+                    {t("originalDepositAmount") || "Original Deposit"}:
+                  </Text>
+                  <Text strong className="text-blue-600">
+                    {formatAmount(originalDepositAmount, i18n.language)}
+                  </Text>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <Text className="font-semibold">
+                    {t("totalDamageAmount") || "Total Damage"}:
+                  </Text>
+                  <Text strong className="text-red-600">
+                    {formatAmount(totalDamageAmount, i18n.language)}
+                  </Text>
+                </div>
               </div>
 
-              <div className="p-6 bg-green-50 rounded-lg">
+              <div className="p-3 bg-green-50 rounded-lg">
+                <Text type="secondary" className="block font-bold mb-1">
+                  {t("actualRefundAmount") || "Actual Refund Amount"}
+                </Text>
                 <Text
-                  type="secondary"
-                  className="block text-2xl font-bold mb-5"
+                  className={`text-xl font-semibold ${
+                    actualRefundAmount > 0 ? "text-green-600" : "text-red-600"
+                  }`}
                 >
-                  {t("amountRefunded") || "Amount to Refund"}
+                  {formatAmount(actualRefundAmount, i18n.language)}
                 </Text>
-                <Text className="text-green-600 text-5xl font-semibold">
-                  {formatAmount(
-                    depositRefundData?.amountRefunded || 0,
-                    i18n.language
-                  )}
-                </Text>
+                {actualRefundAmount <= 0 && (
+                  <Alert
+                    message={
+                      t("noRefundWarning") ||
+                      "No amount will be refunded due to damage costs"
+                    }
+                    type="warning"
+                    className="mt-2"
+                    showIcon
+                  />
+                )}
               </div>
             </div>
+          </Card>
+
+          {/* Damage Assessment Section */}
+          <Card
+            title={
+              <div className="flex items-center justify-between">
+                <span>{t("damageAssessment") || "Damage Assessment"}</span>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={addDamageItem}
+                  size="small"
+                >
+                  {t("addDamage") || "Add Damage"}
+                </Button>
+              </div>
+            }
+          >
+            {damageAssessment.length === 0 ? (
+              <div className="text-center py-4">
+                <Text type="secondary">
+                  {t("noDamageAssessment") ||
+                    "No damage assessment added. Click 'Add Damage' to add items."}
+                </Text>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {damageAssessment.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="border rounded-lg p-3 bg-gray-50"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <Text strong>
+                        {t("damageItem") || "Damage Item"} #{index + 1}
+                      </Text>
+                      <Popconfirm
+                        title={
+                          t("confirmRemove") ||
+                          "Are you sure you want to remove this item?"
+                        }
+                        onConfirm={() => removeDamageItem(item.id)}
+                        okText={t("yes") || "Yes"}
+                        cancelText={t("no") || "No"}
+                      >
+                        <Button
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined />}
+                          size="small"
+                        />
+                      </Popconfirm>
+                    </div>
+
+                    <Row gutter={[12, 12]}>
+                      <Col span={14}>
+                        <div>
+                          <Text strong className="block mb-1">
+                            {t("damageName") || "Damage Name"}
+                          </Text>
+                          <Input
+                            placeholder={
+                              t("enterDamageName") || "Enter damage name"
+                            }
+                            value={item.damageName}
+                            onChange={(e) =>
+                              updateDamageItem(
+                                item.id,
+                                "damageName",
+                                e.target.value
+                              )
+                            }
+                            maxLength={100}
+                          />
+                        </div>
+                      </Col>
+                      <Col span={10}>
+                        <div>
+                          <Text strong className="block mb-1">
+                            {t("estimatedCost") || "Estimated Cost"}
+                          </Text>
+                          <InputNumber
+                            placeholder={t("enterCost") || "Enter cost"}
+                            value={item.estimatedCost}
+                            onChange={(value) =>
+                              updateDamageItem(item.id, "estimatedCost", value)
+                            }
+                            min={0}
+                            max={10000000}
+                            formatter={(value) =>
+                              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                            }
+                            parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                            style={{ width: "100%" }}
+                            addonAfter="VND"
+                          />
+                        </div>
+                      </Col>
+                    </Row>
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
 
           {/* Payment Form */}
@@ -142,7 +376,7 @@ function DepositRefundPopup({
           >
             <Form.Item
               label={
-                <span className="text-2xl font-bold">
+                <span className="font-bold">
                   {t("selectPaymentMethod") || "Select Payment Method"}
                 </span>
               }
@@ -157,14 +391,12 @@ function DepositRefundPopup({
               ]}
             >
               <Radio.Group className="w-full">
-                <Row gutter={[20, 20]}>
+                <Row gutter={[12, 12]}>
                   <Col span={12}>
                     <Radio value="vnpay" className="w-full">
                       <div className="flex items-center justify-center p-2 border-2 rounded-lg hover:bg-blue-50 transition-colors">
-                        <CreditCardOutlined className="text-blue-500 text-5xl mr-4" />
-                        <Text strong className="text-2xl">
-                          VNPay
-                        </Text>
+                        <CreditCardOutlined className="text-blue-500 text-xl mr-2" />
+                        <Text strong>VNPay</Text>
                       </div>
                     </Radio>
                   </Col>
@@ -172,10 +404,8 @@ function DepositRefundPopup({
                   <Col span={12}>
                     <Radio value="momo" className="w-full">
                       <div className="flex items-center justify-center p-2 border-2 rounded-lg hover:bg-pink-50 transition-colors">
-                        <WalletOutlined className="text-pink-500 text-5xl mr-4" />
-                        <Text strong className="text-2xl">
-                          MoMo
-                        </Text>
+                        <WalletOutlined className="text-pink-500 text-xl mr-2" />
+                        <Text strong>MoMo</Text>
                       </div>
                     </Radio>
                   </Col>
@@ -184,14 +414,14 @@ function DepositRefundPopup({
             </Form.Item>
 
             {/* Action Buttons */}
-            <Row gutter={[20, 20]} className="mt-10">
+            <Row gutter={[12, 12]} className="mt-4">
               <Col span={12}>
                 <Button
                   size="large"
                   block
                   onClick={handleCancel}
                   disabled={loading}
-                  className="h-16 text-2xl font-bold"
+                  className="h-10"
                 >
                   {t("cancel") || "Cancel"}
                 </Button>
@@ -204,7 +434,8 @@ function DepositRefundPopup({
                   htmlType="submit"
                   loading={loading}
                   icon={<CheckCircleOutlined />}
-                  className="h-16 text-2xl font-bold"
+                  className="h-10"
+                  disabled={actualRefundAmount <= 0}
                 >
                   {loading
                     ? t("processing") || "Processing..."

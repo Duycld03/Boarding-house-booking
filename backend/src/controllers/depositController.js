@@ -356,7 +356,7 @@ class DepositController {
 
       const refundRequest = await RefundRequest.findOne({
         _id: refundRequestId,
-        accountId,
+        userId: accountId,
         status: { $regex: /^pending$/i },
       }).populate("depositRoomId");
 
@@ -403,7 +403,6 @@ class DepositController {
     const info = orderInfo.split("-");
     const type = info[0];
     try {
-      console.log(resultCode);
       if (resultCode == "7002" || resultCode == "0") {
         if (type == "deposit") {
           const accountId = info[1];
@@ -472,7 +471,7 @@ class DepositController {
 
         const refundRequest = await RefundRequest.findOne({
           _id: refundRequestId,
-          accountId,
+          userId: accountId,
           status: { $regex: /^pending$/i },
         }).populate("depositRoomId");
 
@@ -1031,7 +1030,7 @@ class DepositController {
   async acceptRefundRequestForOwner(req, res) {
     try {
       const { refundRequestId } = req.params;
-      const { paymentMethod } = req.body;
+      const { paymentMethod, damageAssessment = [] } = req.body;
       const existRefundRequest = await RefundRequest.findOne({
         _id: refundRequestId,
         status: { $regex: /^pending$/i },
@@ -1040,14 +1039,18 @@ class DepositController {
       if (!existRefundRequest) {
         return res.status(400).json({ message: "Refund request not found" });
       }
+      existRefundRequest.damageAssessment = damageAssessment;
+      existRefundRequest.processedBy = req.user.userId;
+      existRefundRequest.processedByRole = req.user.role;
+      await existRefundRequest.save();
 
-      const { amountRefunded, accountId } = existRefundRequest;
-      const orderInfo = `refund-${accountId}-${refundRequestId}`;
+      const { actualRefundAmount, userId } = existRefundRequest;
+      const orderInfo = `refund-${userId}-${refundRequestId}`;
 
       if (paymentMethod === "vnpay") {
-        createVNPayUrl(req, res, amountRefunded, orderInfo);
+        createVNPayUrl(req, res, actualRefundAmount, orderInfo);
       } else if (paymentMethod === "momo") {
-        createMomoUrl(req, res, amountRefunded, orderInfo);
+        createMomoUrl(req, res, actualRefundAmount, orderInfo);
       }
     } catch (error) {
       res.status(500).json({ message: "Server error", error });

@@ -35,7 +35,7 @@ const refundRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected", "paid"],
+      enum: ["pending", "accepted", "rejected"],
       default: "pending",
     },
     reason: {
@@ -78,6 +78,8 @@ refundRequestSchema.pre("save", function (next) {
       (total, damage) => total + (damage.estimatedCost || 0),
       0
     );
+  } else {
+    this.totalDamageAmount = 0;
   }
   next();
 });
