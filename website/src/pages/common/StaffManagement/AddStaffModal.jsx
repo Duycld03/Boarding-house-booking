@@ -75,9 +75,14 @@ const AddStaffModal = ({ onAddData }) => {
         onCancel={handleCancel}
         footer={null}
         destroyOnClose
+        className={darkMode ? 'dark-mode-modal' : ''}
       >
         {step === 1 && (
-          <Form form={form1} layout="vertical">
+          <Form
+            form={form1}
+            layout="vertical"
+            className={darkMode ? 'dark-mode-form' : ''}
+          >
             <Form.Item
               label={t('forms.fullname.label')}
               name="fullname"
@@ -90,7 +95,10 @@ const AddStaffModal = ({ onAddData }) => {
                 },
               ]}
             >
-              <Input placeholder={t('forms.fullname.placeholder')} />
+              <Input
+                placeholder={t('forms.fullname.placeholder')}
+                className={darkMode ? 'dark-mode-input' : ''}
+              />
             </Form.Item>
 
             <Form.Item
@@ -102,7 +110,10 @@ const AddStaffModal = ({ onAddData }) => {
                 { type: 'email', message: t('forms.email.invalidFormat') },
               ]}
             >
-              <Input placeholder={t('forms.email.placeholder')} />
+              <Input
+                placeholder={t('forms.email.placeholder')}
+                className={darkMode ? 'dark-mode-input' : ''}
+              />
             </Form.Item>
 
             <Form.Item
@@ -112,7 +123,7 @@ const AddStaffModal = ({ onAddData }) => {
               rules={[{ required: true, message: t('forms.gender.required') }]}
             >
               <Select
-                className={cx({ 'dark-mode-select': darkMode })}
+                className={darkMode ? 'dark-mode-select' : ''}
                 placeholder={t('forms.gender.placeholder')}
               >
                 <Option value="male">{t('forms.gender.options.male')}</Option>
@@ -135,7 +146,10 @@ const AddStaffModal = ({ onAddData }) => {
                 },
               ]}
             >
-              <Input placeholder={t('forms.phoneNumber.placeholder')} />
+              <Input
+                placeholder={t('forms.phoneNumber.placeholder')}
+                className={darkMode ? 'dark-mode-input' : ''}
+              />
             </Form.Item>
 
             <Form.Item
@@ -149,9 +163,7 @@ const AddStaffModal = ({ onAddData }) => {
               <DatePicker
                 format="YYYY-MM-DD"
                 style={{ width: '100%' }}
-                className={cx('custom-datepicker', {
-                  'dark-mode-datepicker': darkMode,
-                })}
+                className={darkMode ? 'dark-mode-datepicker' : ''}
                 placeholder={t('forms.hireDate.placeholder') || 'Chọn ngày'}
               />
             </Form.Item>
@@ -168,7 +180,11 @@ const AddStaffModal = ({ onAddData }) => {
         )}
 
         {step === 2 && (
-          <Form form={form2} layout="vertical">
+          <Form
+            form={form2}
+            layout="vertical"
+            className={darkMode ? 'dark-mode-form' : ''}
+          >
             <Form.Item
               label={t('forms.username.label')}
               name="username"
@@ -177,7 +193,10 @@ const AddStaffModal = ({ onAddData }) => {
                 { required: true, message: t('forms.username.required') },
               ]}
             >
-              <Input placeholder={t('forms.username.placeholder')} />
+              <Input
+                placeholder={t('forms.username.placeholder')}
+                className={darkMode ? 'dark-mode-input' : ''}
+              />
             </Form.Item>
 
             <Form.Item
@@ -187,7 +206,7 @@ const AddStaffModal = ({ onAddData }) => {
               rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
             >
               <Input.Password
-                className={cx({ 'dark-mode-input': darkMode })}
+                className={darkMode ? 'dark-mode-input' : ''}
                 placeholder="Mật khẩu"
               />
             </Form.Item>
@@ -195,6 +214,7 @@ const AddStaffModal = ({ onAddData }) => {
             <Form.Item
               label="Xác nhận mật khẩu"
               name="confirmPassword"
+              style={{ marginBottom: 0 }}
               dependencies={['password']}
               rules={[
                 { required: true, message: 'Vui lòng xác nhận mật khẩu!' },
@@ -209,7 +229,7 @@ const AddStaffModal = ({ onAddData }) => {
               ]}
             >
               <Input.Password
-                className={cx({ 'dark-mode-input': darkMode })}
+                className={darkMode ? 'dark-mode-input' : ''}
                 placeholder="Xác nhận mật khẩu"
               />
             </Form.Item>

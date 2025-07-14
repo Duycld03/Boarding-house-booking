@@ -1,25 +1,22 @@
-/* AddAccountModal.css */
-
 /* Improved text visibility in dark mode */
-.dark-mode-modal .ant-modal-title,
-.dark-mode-modal .ant-modal-close {
+.dark-modal .ant-modal-title,
+.dark-modal .ant-modal-close {
   color: #ffffff !important;
 }
 
-.dark-mode-modal .ant-modal-close:hover {
+.dark-modal .ant-modal-close:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: #ffffff !important;
 }
 
 /* Form label and content text in dark mode */
-.dark-mode-form .ant-form-item-label>label {
+.dark-form .ant-form-item-label>label {
   color: #ffffff !important;
 }
 
-.dark-mode-form .ant-form-item-explain,
-.dark-mode-form .ant-form-item-extra {
+.dark-form .ant-form-item-explain,
+.dark-form .ant-form-item-extra {
   color: #e5e7eb !important;
-  /* Brighter error text */
 }
 
 /* Input fields in dark mode */
@@ -93,17 +90,14 @@
 }
 
 /* Make validation error messages more visible */
-.dark-mode-form .ant-form-item-has-error .ant-form-item-explain-error {
+.dark-form .ant-form-item-has-error .ant-form-item-explain-error {
   color: #f87171 !important;
-  /* Brighter red for better visibility */
 }
 
 /* Ensure modal footer buttons have good visibility */
-.dark-mode-modal .ant-btn {
+.dark-modal .ant-btn {
   border-color: #4b5563;
 }
-
-.dark-mode-modal
 
 /* Consistent transition for theme switching */
 .ant-modal-content,
@@ -114,159 +108,188 @@
   transition: all 0.3s ease;
 }
 
-/* Dark mode styles for the AddAccountModal */
-
 /* Base dark mode styles for the modal */
-.dark-mode-modal .ant-modal-content {
+.dark-modal .ant-modal-content {
   background-color: #1f2937;
   color: #ffffff;
 }
 
-.dark-mode-modal .ant-modal-header {
+.dark-modal .ant-modal-header {
   background-color: #1f2937;
   border-bottom: 1px solid #374151;
 }
 
-.dark-mode-modal .ant-modal-title {
+.dark-modal .ant-modal-title {
   color: #ffffff;
 }
 
-.dark-mode-modal .ant-modal-close {
+.dark-modal .ant-modal-close {
   color: #ffffff;
 }
 
-.dark-mode-modal .ant-modal-close:hover {
+.dark-modal .ant-modal-close:hover {
   color: #f3f4f6;
 }
 
-.dark-mode-modal .ant-modal-close-x {
+.dark-modal .ant-modal-close-x {
   color: #ffffff !important;
 }
 
 /* Form inputs */
-.dark-mode-input,
-.dark-mode-input .ant-input {
+.dark-input,
+.dark-input .ant-input {
   background-color: #111827 !important;
   border-color: #111827 !important;
   color: #f9fafb !important;
 }
 
-.dark-mode-input:hover,
-.dark-mode-input .ant-input:hover {
+.dark-input:hover,
+.dark-input .ant-input:hover {
   border-color: #60a5fa !important;
 }
 
-.dark-mode-input:focus,
-.dark-mode-input .ant-input:focus {
+.dark-input:focus,
+.dark-input .ant-input:focus {
   border-color: #3b82f6 !important;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
 }
 
-/* Password input specific */
-.dark-mode-input.ant-input-affix-wrapper {
+.dark-input.ant-input-affix-wrapper {
   background-color: #111827 !important;
   border-color: #111827 !important;
 }
 
-.dark-mode-input.ant-input-affix-wrapper:hover {
+.dark-input.ant-input-affix-wrapper:hover {
   border-color: #60a5fa !important;
 }
 
-.dark-mode-input.ant-input-affix-wrapper:focus,
-.dark-mode-input.ant-input-affix-wrapper-focused {
+.dark-input.ant-input-affix-wrapper:focus,
+.dark-input.ant-input-affix-wrapper-focused {
   border-color: #3b82f6 !important;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
 }
 
-.dark-mode-input .ant-input-suffix {
+.dark-input .ant-input-suffix {
   color: #111827 !important;
 }
 
-.dark-mode-input .ant-input-suffix:hover {
+.dark-input .ant-input-suffix:hover {
   color: #111827 !important;
 }
 
 /* Select boxes */
-.dark-mode-select .ant-select-selector {
+.dark-select .ant-select-selector {
   background-color: #374151 !important;
   border-color: #4b5563 !important;
   color: #f9fafb !important;
 }
 
-.dark-mode-select .ant-select-selection-placeholder {
+.dark-select .ant-select-selection-placeholder {
   color: #9ca3af !important;
 }
 
-.dark-mode-select .ant-select-arrow {
+.dark-select .ant-select-arrow {
   color: #9ca3af !important;
 }
 
-.dark-mode-select:hover .ant-select-selector {
+.dark-select:hover .ant-select-selector {
   border-color: #60a5fa !important;
 }
 
-.dark-mode-select.ant-select-focused .ant-select-selector {
+.dark-select.ant-select-focused .ant-select-selector {
   border-color: #3b82f6 !important;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
 }
 
 /* Dropdown lists */
-.dark-mode-dropdown .ant-select-dropdown {
+.dark-dropdown .ant-select-dropdown {
   background-color: #374151 !important;
   box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48),
     0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
-.dark-mode-dropdown .ant-select-item {
+.dark-dropdown .ant-select-item {
   color: #f9fafb !important;
 }
 
-.dark-mode-dropdown .ant-select-item-option-active:not(.ant-select-item-option-selected) {
+.dark-dropdown .ant-select-item-option-active:not(.ant-select-item-option-selected) {
   background-color: #4b5563 !important;
 }
 
-.dark-mode-dropdown .ant-select-item-option-selected {
+.dark-dropdown .ant-select-item-option-selected {
   background-color: #2563eb !important;
   color: #ffffff !important;
 }
 
-.dark-mode-dropdown .ant-select-item-option:hover {
+.dark-dropdown .ant-select-item-option:hover {
   background-color: #4b5563 !important;
 }
 
 /* Form validation messages */
-.dark-mode-form .ant-form-item-explain-error {
+.dark-form .ant-form-item-explain-error {
   color: #ef4444 !important;
 }
 
 /* Form labels - making sure they're visible in dark mode */
-.dark-mode-form .ant-form-item-label>label {
+.dark-form .ant-form-item-label>label {
   color: #f9fafb !important;
 }
 
 /* Form item margin for better spacing */
-.dark-mode-form .ant-form-item {
+.dark-form .ant-form-item {
   margin-bottom: 24px;
 }
-/* Áp dụng cho cả input thường và password có affix-wrapper */
-.dark-mode-input.ant-input,
-.dark-mode-input.ant-input-affix-wrapper {
+
+/* Placeholder fixes */
+.dark-input.ant-input::placeholder,
+.dark-input input::placeholder {
   background-color: #111827 !important;
-  /* nền tối */
-  color: #f9fafb !important;
-  /* chữ sáng */
-  border: 1px solid #4b5563 !important;
-  /* viền */
+  border-color: #374151 !important;
+  color: white !important;
 }
 
-/* Placeholder */
-.dark-mode-input.ant-input::placeholder,
-.dark-mode-input input::placeholder {
-background-color: #111827 !important;
-  border-color: #374151 !important;
-  color: white !important;}
+/* Datepicker */
+.dark-datepicker .ant-picker-input>input {
+  color: white !important;
+}
 
-/* Icon con mắt trong Input.Password */
-.dark-mode-input .ant-input-suffix {
-  color: #d1d5db !important;
+.dark-datepicker .ant-picker-input>input::placeholder {
+  color: #9ca3af !important;
+}
+
+.dark-datepicker {
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+}
+.dark .ant-pagination,
+.dark .ant-pagination-total-text,
+.dark .ant-pagination-item a,
+.dark .ant-pagination-item-active a,
+.dark .ant-pagination-options {
+  color: #f9fafb !important;
+}
+
+.dark .ant-pagination-item-active {
+  border-color: #3b82f6 !important;
+  background-color: #3b82f6 !important;
+}
+
+.dark .ant-pagination-options .ant-select-selector {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+.dark .ant-pagination-options .ant-select-arrow {
+  color: #f9fafb !important;
+}
+.dark .ant-pagination,
+.dark .ant-pagination-total-text,
+.dark .ant-pagination-item a,
+.dark .ant-pagination-item-active a,
+.dark .ant-pagination-options {
+  color: #f9fafb !important;
+}
+.dark .ant-table-pagination.ant-pagination {
+  color: #f9fafb !important;
 }

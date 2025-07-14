@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import convertTimetap from '@/utils/convertTimetap';
 import AddStaffModal from './AddStaffModal';
 import UpdateStaffModal from './UpdateStaffModal'; // 👈 Thêm mới
+import Style from './AddModal.module.css';
 
 function StaffManagement() {
   const { t } = useTranslation('staffManagement');
@@ -31,6 +32,14 @@ function StaffManagement() {
     page: 1,
     limit: 10,
   });
+  useEffect(() => {
+    const html = document.documentElement;
+    if (darkMode) {
+      html.classList.add('dark');
+    } else {
+      html.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   // ✅ Fetch staff list
   const fetchStaff = useCallback(async () => {
@@ -131,16 +140,12 @@ function StaffManagement() {
     });
   };
 
-  const tablePaginationConfig = useMemo(
-    () => ({
-      current: pagination.currentPage,
-      pageSize: pagination.limit,
-      total: pagination.totalItems,
-      showSizeChanger: true,
-      pageSizeOptions: ['10', '20', '50', '100'],
-    }),
-    [pagination]
-  );
+  const tablePaginationConfig = {
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
+  };
 
   const columns = useMemo(
     () => [
@@ -228,9 +233,9 @@ function StaffManagement() {
 
   return (
     <div
-      className={`txt ${
-        darkMode ? 'bg-gray-700 text-text-dark' : 'text-text-light'
-      }`}
+      className={
+        darkMode ? 'dark bg-gray-700 text-text-dark' : 'text-text-light'
+      }
     >
       <div className="flex justify-between mb-4">
         <AddStaffModal onAddData={handleAddNewData} />
@@ -241,6 +246,7 @@ function StaffManagement() {
         columns={columns}
         data={staffList}
         loading={loading}
+        className={darkMode ? 'dark' : ''}
         noDataText={t('messages.noData')}
         onChange={handleTableChange}
         pagination={tablePaginationConfig}
