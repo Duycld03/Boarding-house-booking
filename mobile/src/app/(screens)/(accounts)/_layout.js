@@ -64,6 +64,18 @@ const AccountLayout = () => {
             headerShown: false,
           }}
         />
+       <Stack.Screen
+          name="mydepositedroom/refundRequest"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="mydepositedroom/detail"
+          options={{
+            headerShown: false,
+          }}
+        />
         <Stack.Screen
           name="myrenewalrequest/index"
           options={{

@@ -1,40 +1,91 @@
 import mongoose from "mongoose";
 import Revenue from "../models/revenue.js";
 import BoardingHouse from "../models/boardingHouse.js";
+import PaymentBill from "../models/paymentBill.js";
 
 class RevenueController {
-  async getRevenue(req, res) {
+  async getRevenuePerBoardingHouse(req, res) {
     try {
       const { boardingHouseId, month, year } = req.query;
 
       if (!boardingHouseId || !month || !year) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
-      const revenue = await Revenue.findOne({
-        boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId),
+
+      // Đầu tiên, lấy tất cả các hóa đơn trong tháng/năm cụ thể và đã thanh toán
+      const allPaidBills = await PaymentBill.find({
         month: parseInt(month),
         year: parseInt(year),
-      }).populate("transactions");
+        status: "paid",
+      }).populate({
+        path: "roomId",
+        select: "boardingHouseId roomNumber floor",
+      });
 
-      if (!revenue) {
-        return res.status(404).json({ message: "Revenue not found" });
-      }
+      // Lọc các hóa đơn thuộc về boarding house cụ thể
+      const paidPaymentBills = allPaidBills.filter(
+        (bill) =>
+          bill.roomId &&
+          bill.roomId.boardingHouseId &&
+          bill.roomId.boardingHouseId.toString() === boardingHouseId
+      );
 
-      const totalRevenue = revenue.transactions.reduce((sum, transaction) => {
-        if (transaction.status === "paid") {
-          return sum + (transaction.paymentAmount || 0);
-        }
-        return sum;
+
+      // Calculate total revenue from payment bills
+      const totalRevenue = paidPaymentBills.reduce((sum, bill) => {
+        return sum + (bill.paymentAmount || 0);
       }, 0);
 
-      if (revenue.totalRevenue !== totalRevenue) {
-        revenue.totalRevenue = totalRevenue;
-        await revenue.save();
-      }
+      // Group transactions by categories if needed
+      const roomRentTotal = paidPaymentBills.reduce((sum, bill) => {
+        return sum + (bill.roomRent || 0);
+      }, 0);
 
-      res.status(200).json(revenue);
+      const electricityTotal = paidPaymentBills.reduce((sum, bill) => {
+        return sum + (bill.electricalBill?.totalAmount || 0);
+      }, 0);
+
+      const waterTotal = paidPaymentBills.reduce((sum, bill) => {
+        return sum + (bill.waterBill?.totalAmount || 0);
+      }, 0);
+
+      // Không thấy internet trong schema, nên bỏ qua
+      const internetTotal = 0;
+
+      const servicesTotal = paidPaymentBills.reduce((sum, bill) => {
+        return (
+          sum +
+          (bill.additionalFee?.reduce(
+            (s, fee) => s + (fee.feeAmount || 0),
+            0
+          ) || 0)
+        );
+      }, 0);
+
+      // Construct response object with revenue data
+      const revenueData = {
+        boardingHouseId,
+        month: parseInt(month),
+        year: parseInt(year),
+        totalRevenue,
+        transactionCount: paidPaymentBills.length,
+        transactions: paidPaymentBills,
+        summary: {
+          roomRentTotal,
+          electricityTotal,
+          waterTotal,
+          internetTotal,
+          servicesTotal,
+        },
+      };
+
+      res.status(200).json(revenueData);
     } catch (error) {
-      res.status(500).json({ message: "Server error", error: error.message });
+      console.error("Error in getRevenuePerBoardingHouse:", error);
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
     }
   }
 

@@ -5,7 +5,7 @@ import {
   addExpense,
   deleteExpense,
 } from "@/api/boardingHouseExpenseAPI";
-import { Modal, Empty, Popconfirm } from "antd";
+import { Modal, Empty } from "antd"; // Đã xóa Popconfirm
 import { DeleteOutlined } from "@ant-design/icons";
 import RevenueMonthlyView from "./RevenueMonthlyView";
 import ExpenseMonthlyView from "./ExpenseMonthlyView";
@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import "./RevenueManagement.css"; // Import custom styles
 import { useTheme } from "@/context/ThemeContext";
+import { ConfirmModal } from "@/component";
 
 // Colors for the charts
 export const COLORS = {
@@ -43,6 +44,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
   const [isAddNewExpense, setIsAddNewExpense] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
   const { t } = useTranslation("bhManagement");
   const currentLanguage = i18next.language;
@@ -94,6 +96,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
         response.transactions.length > 0
       ) {
         setMonthlyData(response);
+        console.log("Monthly data fetched successfully:", response);
       } else {
         // Handle case with no data
         setMonthlyData(null);
@@ -223,8 +226,6 @@ const RevenueManagement = ({ boardingHouseId }) => {
     };
   };
 
-  const summaryData = calculateYearlySummary();
-
   const handleEditElectrical = () => {
     handleUpdateExpense();
   };
@@ -283,6 +284,12 @@ const RevenueManagement = ({ boardingHouseId }) => {
       return;
     }
 
+    // Mở confirm dialog thay vì xóa trực tiếp
+    setIsConfirmDeleteOpen(true);
+  };
+
+  // Thêm hàm thực hiện xóa sau khi xác nhận
+  const handleConfirmDelete = async () => {
     setIsDeleting(true);
     try {
       await deleteExpense(monthlyExpenses._id);
@@ -326,6 +333,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
       );
     } finally {
       setIsDeleting(false);
+      setIsConfirmDeleteOpen(false); // Đóng dialog sau khi hoàn tất
     }
   };
 
@@ -443,9 +451,9 @@ const RevenueManagement = ({ boardingHouseId }) => {
 
       <div className="min-h-[300px]">
         {/* Revenue/Expense toggle - Luôn hiển thị ngay cả khi không có dữ liệu */}
-        <div className="tabs-container flex mb-6 bg-gray-100 rounded-lg p-1 w-full md:w-64">
+        <div className="tabs-container flex mb-6 bg-gray-100 rounded-lg p-1 w-full md:max-w-md">
           <button
-            className={`tab-button py-2 px-4 rounded-lg font-medium flex-1 ${
+            className={`tab-button py-2 px-3 rounded-lg font-medium flex-1 whitespace-nowrap text-xl  ${
               !expenseView ? "active bg-white shadow-sm" : "text-gray-600"
             }`}
             onClick={() => setExpenseView(false)}
@@ -453,7 +461,7 @@ const RevenueManagement = ({ boardingHouseId }) => {
             {t("revenue.tabs.revenue", "Revenue")}
           </button>
           <button
-            className={`tab-button py-2 px-4 rounded-lg font-medium flex-1 ${
+            className={`tab-button py-2 px-3 rounded-lg font-medium flex-1 whitespace-nowrap text-xl  ${
               expenseView ? "active bg-white shadow-sm" : "text-gray-600"
             }`}
             onClick={() => setExpenseView(true)}
@@ -481,27 +489,16 @@ const RevenueManagement = ({ boardingHouseId }) => {
                 {t("revenue.buttons.updateExpense", "Update Expense")}
               </button>
             )}
-            {/* Thêm nút Delete với Popconfirm */}
+            {/* Thay thế Popconfirm bằng button bình thường để mở ConfirmModal */}
             {showDeleteButton && (
-              <Popconfirm
-                title={t("revenue.confirmDelete.title", "Delete Expense")}
-                description={t(
-                  "revenue.confirmDelete.description",
-                  "Are you sure you want to delete this expense record? This action cannot be undone."
-                )}
-                onConfirm={handleDeleteExpense}
-                okText={t("revenue.confirmDelete.okText", "Yes, Delete")}
-                cancelText={t("revenue.confirmDelete.cancelText", "Cancel")}
-                okButtonProps={{ danger: true, loading: isDeleting }}
+              <button
+                onClick={handleDeleteExpense}
+                className="py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center"
+                disabled={isDeleting}
               >
-                <button
-                  className="py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center"
-                  disabled={isDeleting}
-                >
-                  <DeleteOutlined className="mr-1" />{" "}
-                  {t("revenue.buttons.deleteExpense", "Delete Expense")}
-                </button>
-              </Popconfirm>
+                <DeleteOutlined className="mr-1" />{" "}
+                {t("revenue.buttons.deleteExpense", "Delete Expense")}
+              </button>
             )}
           </div>
         )}
@@ -583,6 +580,19 @@ const RevenueManagement = ({ boardingHouseId }) => {
           darkMode={darkMode}
         />
       </Modal>
+
+      {/* Thêm ConfirmModal */}
+      <ConfirmModal
+        title={t("revenue.confirmDelete.title", "Delete Expense")}
+        content={t(
+          "revenue.confirmDelete.description",
+          "Are you sure you want to delete this expense record? This action cannot be undone."
+        )}
+        onOk={handleConfirmDelete}
+        onCancel={() => setIsConfirmDeleteOpen(false)}
+        isOpen={isConfirmDeleteOpen}
+        confirmLoading={isDeleting}
+      />
     </div>
   );
 };

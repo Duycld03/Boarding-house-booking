@@ -1,10 +1,10 @@
+import formatAmount from "@/utils/formatAmount";
 import { Empty } from "antd";
 import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 
 const RevenueMonthlyView = ({
   monthlyData,
-  formatAmount,
   monthlyExpenses,
   currentLanguage,
   t,
@@ -78,7 +78,7 @@ const RevenueMonthlyView = ({
             {formatAmount(monthlyData?.totalRevenue, currentLanguage)}
           </p>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+        <div className="bg-purple-50 dark:bg-purple-100 p-4 rounded-lg border border-purple-100 dark:border-purple-200">
           <p className="text-lg text-purple-600 font-medium">Net Profit</p>
           <p className="text-2xl font-bold text-purple-700">
             {formatAmount(netProfit, currentLanguage)}
@@ -99,8 +99,8 @@ const RevenueMonthlyView = ({
       </div>
 
       {/* Pie chart */}
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <h3 className="text-lg font-semibold mb-2 text-gray-700">
+      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">
           Expense Allocation
         </h3>
         <ResponsiveContainer width="100%" height={250}>

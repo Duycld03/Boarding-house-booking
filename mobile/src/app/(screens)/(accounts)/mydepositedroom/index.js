@@ -14,6 +14,7 @@ import { useTheme } from "@/context/ThemeProvider";
 import { useThemedClasses } from "@/utils/useTheme";
 import { useTranslation } from "react-i18next";
 import { getMyDepositedRoom } from "@/API/depositAPI";
+import { getMyRefundRequests } from "@/API/refundRequestAPI";
 import { useNotification } from "@/context/NotificationProvider";
 import {
   Ionicons,
@@ -40,8 +41,8 @@ function MyDepositedRoom() {
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [pendingRenewalRequests, setPendingRenewalRequests] = useState({});
-
-
+  const [refundRequestsMap, setRefundRequestsMap] = useState({});
+  const [loadingRefundRequests, setLoadingRefundRequests] = useState(false);
 
   // Pagination state
   const [pagination, setPagination] = useState({
@@ -88,6 +89,18 @@ function MyDepositedRoom() {
       }
     } catch (error) {
       console.error("Error fetching renewal requests:", error);
+
+  // Fetch refund requests map
+  const fetchRefundRequests = useCallback(async () => {
+    setLoadingRefundRequests(true);
+    try {
+      const response = await getMyRefundRequests();
+      setRefundRequestsMap(response.refundRequests || {});
+    } catch (error) {
+      console.error("Error fetching refund requests:", error);
+      setRefundRequestsMap({});
+    } finally {
+      setLoadingRefundRequests(false);
     }
   }, []);
 
@@ -130,9 +143,10 @@ function MyDepositedRoom() {
           } else {
             setDepositData(res.data);
           }
-
           // Fetch pending renewal requests after getting deposit data
           await fetchPendingRenewalRequests();
+          // Fetch refund requests after getting deposit data
+          await fetchRefundRequests();
         } else {
           showError(res.message || t("errorLoadingDeposits"));
         }
@@ -151,7 +165,7 @@ function MyDepositedRoom() {
         }
       }
     },
-    [paginationOptions, t, showError, fetchPendingRenewalRequests]
+    [paginationOptions, t, showError, fetchPendingRenewalRequests, fetchRefundRequests]
   );
 
   // Initial load effect
@@ -168,6 +182,16 @@ function MyDepositedRoom() {
     }
   }, [paginationOptions.page]);
 
+  // THÊM MỚI: useFocusEffect để refresh refund requests khi screen được focus
+  useFocusEffect(
+    useCallback(() => {
+      // Chỉ refresh refund requests, không fetch lại toàn bộ data
+      if (isLogin && depositData.length > 0) {
+        fetchRefundRequests();
+      }
+    }, [isLogin, depositData.length, fetchRefundRequests])
+  );
+
   // Handle refresh
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -182,6 +206,7 @@ function MyDepositedRoom() {
 
     // Clear existing data
     setDepositData([]);
+    setRefundRequestsMap({});
 
     try {
       const res = await getMyDepositedRoom({
@@ -202,9 +227,11 @@ function MyDepositedRoom() {
         });
 
         setDepositData(res.data);
-
         // Refresh pending renewal requests
         await fetchPendingRenewalRequests();
+        // Fetch refund requests after setting data
+        await fetchRefundRequests();
+
       }
     } catch (error) {
       console.error("Error refreshing data:", error);
@@ -212,7 +239,8 @@ function MyDepositedRoom() {
     } finally {
       setRefreshing(false);
     }
-  }, [showError, t, fetchPendingRenewalRequests]);
+  }, [showError, t, fetchPendingRenewalRequests, fetchRefundRequests]);
+
 
   // Handle load more
   const handleLoadMore = useCallback(() => {
@@ -234,17 +262,24 @@ function MyDepositedRoom() {
     return depositData.length < pagination.totalItems && pagination.hasNextPage;
   }, [depositData.length, pagination.totalItems, pagination.hasNextPage]);
 
-  // Handle refund
-  const handleRefund = useCallback(
-    (deposit) => {
-      // Navigate to refund screen or handle refund logic
-      router.push({
-        pathname: "/mydepositedroom/refund",
-        params: { depositId: deposit._id },
-      });
-    },
-    [router]
-  );
+// Handle refund
+const handleRefund = useCallback(
+  (deposit) => {
+    // Check if there's already an existing refund request
+    const hasExistingRequest = refundRequestsMap[deposit._id];
+    if (hasExistingRequest) {
+      showError(t("refundRequestAlreadyExists"));
+      return;
+    }
+    
+    // Navigate to refund screen
+    router.push({
+      pathname: "/mydepositedroom/refundRequest", // Using the more specific path from feature branch
+      params: { depositId: deposit._id },
+    });
+  },
+  [router, refundRequestsMap, showError, t]
+);
 
   // Handle pay deposit
   const handlePayDeposit = useCallback(
@@ -265,25 +300,45 @@ function MyDepositedRoom() {
       router.push({
         pathname: "/mydepositedroom/createRenewalRequest",
         params: { deposit: JSON.stringify(item) },
+           });
+    },
+    [router]
+        
+  // Handle navigate to detail
+  const handleDepositPress = useCallback(
+    (deposit) => {
+      router.push({
+        pathname: "/mydepositedroom/detail",
+        params: { depositId: deposit._id },
       });
     },
     [router]
   );
 
-  // Render functions
-  const renderDepositItem = useCallback(
-    ({ item, index }) => (
-      <DepositCard
-        item={item}
-        onRefund={handleRefund}
-        onPayDeposit={handlePayDeposit}
-        onCreateRenewDeposit={handleCreateRenewDeposit}
-        index={index}
-        isCreateRenewDeposit={Boolean(pendingRenewalRequests[item._id])}
-      />
-    ),
-    [handleRefund, handlePayDeposit, handleCreateRenewDeposit, pendingRenewalRequests]
-  );
+// Render functions
+const renderDepositItem = useCallback(
+  ({ item, index }) => (
+    <DepositCard
+      item={item}
+      onRefund={handleRefund}
+      onPayDeposit={handlePayDeposit}
+      onCreateRenewDeposit={handleCreateRenewDeposit}
+      onPress={handleDepositPress}
+      index={index}
+      isCreateRenewDeposit={Boolean(pendingRenewalRequests[item._id])}
+      hasExistingRefundRequest={!!refundRequestsMap[item._id]} // Pass refund request status
+      refundRequestInfo={refundRequestsMap[item._id]} // Pass refund request info
+    />
+  ),
+  [
+    handleRefund, 
+    handlePayDeposit, 
+    handleCreateRenewDeposit, 
+    handleDepositPress, 
+    pendingRenewalRequests,
+    refundRequestsMap
+  ]
+);
 
   const renderFooter = () => {
     if (!loading || depositData.length > 0) return null;

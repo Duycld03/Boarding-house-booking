@@ -193,9 +193,9 @@ const ExpenseMonthlyView = ({
       </div>
 
       {/* Expense pie chart */}
-      <div className="pie-chart-container bg-gray-50 p-4 rounded-lg border border-gray-200">
+      <div className="pie-chart-container bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-700">
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
             {t("revenue.expenses.distribution", "Expense Distribution")}
           </h3>
           <button

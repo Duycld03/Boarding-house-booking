@@ -81,5 +81,12 @@
     "errorMessage": "Không thể tạo yêu cầu gia hạn",
     "endDateMustBeLater": "Ngày kết thúc mới phải sau ngày kết thúc hiện tại",
     "durationRequired": "Vui lòng nhập thời gian hợp lệ"
-  }
+  },
+  "refundRequestAlreadyExists": "Yêu cầu hoàn tiền đã tồn tại cho đặt cọc này",
+  "refundRequested": "Đã Yêu Cầu Hoàn Tiền",
+  "refundStatus": "Trạng thái",
+  "refundStatus.pending": "Chờ duyệt",
+  "refundStatus.approved": "Đã duyệt",
+  "refundStatus.rejected": "Bị từ chối",
+  "refundStatus.canceled": "Đã hủy"
 }
