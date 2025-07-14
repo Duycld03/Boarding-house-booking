@@ -10,7 +10,6 @@ import PaymentBill from "../models/paymentBill.js";
 import dotenv from "dotenv";
 import UserPayment from "../models/userPayment.js";
 import BoardingHouse from "../models/boardingHouse.js";
-import { query } from "express";
 import RefundRequest from "../models/refundRequest.js";
 import { Account } from "../models/account.js";
 import paginate from "../utils/pagination.js";
@@ -197,6 +196,79 @@ class DepositController {
     }
   }
 
+  async getDepositRoomDetail(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+      const { userId } = req.user;
+
+      // Verify that the deposit belongs to the user
+      const deposit = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: userId,
+      })
+        .populate({
+          path: "roomId",
+          select: "roomNumber images",
+          populate: [
+            {
+              path: "boardingHouseId",
+              select: "name",
+              populate: { path: "boardingHouseType", select: "name" },
+            },
+            {
+              path: "rentBy",
+              select: "fullname avatarImage",
+            },
+            {
+              path: "roomTypeId",
+              select: "price roomSize",
+            },
+          ],
+        })
+        .lean();
+
+      if (!deposit) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Deposit room not found or you do not have permission to view it",
+        });
+      }
+
+      // Format the response data
+      const formattedData = {
+        _id: deposit._id,
+        boardingHouseName: deposit.roomId.boardingHouseId.name,
+        boardingHouseType:
+          deposit.roomId.boardingHouseId.boardingHouseType.name,
+        roomNumber: deposit.roomId.roomNumber,
+        images: deposit.roomId.images,
+        price: deposit.roomId.roomTypeId.price,
+        roomSize: deposit.roomId.roomTypeId.roomSize,
+        rentBy: deposit.roomId.rentBy,
+        amount: deposit.amount,
+        status: deposit.status,
+        rentalTime: deposit.rentalTime,
+        startDate: deposit.startDate,
+        endDate: deposit.endDate,
+        createdAt: deposit.createdAt,
+        reasonForCancel: deposit.reasonForCancel,
+      };
+
+      res.status(200).json({
+        success: true,
+        data: formattedData,
+      });
+    } catch (error) {
+      console.error("Error getting deposit room detail:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message,
+      });
+    }
+  }
+
   async vnpayReturn(req, res) {
     let vnp_Params = req.query;
 
@@ -284,7 +356,7 @@ class DepositController {
 
       const refundRequest = await RefundRequest.findOne({
         _id: refundRequestId,
-        accountId,
+        userId: accountId,
         status: { $regex: /^pending$/i },
       }).populate("depositRoomId");
 
@@ -306,13 +378,13 @@ class DepositController {
 
       await refundRequest.save();
 
-      const redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=success`;
+      const redirectUrl = `http://localhost:5173/refund-request-management?status=success`;
       return res.redirect(redirectUrl);
     }
     //failed
     let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
     if (type == "refund") {
-      redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
+      redirectUrl = `http://localhost:5173/refund-request-management?status=fail`;
     }
     res.redirect(redirectUrl);
   }
@@ -394,12 +466,12 @@ class DepositController {
           return res.redirect(redirectUrl);
         }
         // refund
-        const accountId = orderInfo[1];
-        const refundRequestId = orderInfo[2];
+        const accountId = info[1];
+        const refundRequestId = info[2];
 
         const refundRequest = await RefundRequest.findOne({
           _id: refundRequestId,
-          accountId,
+          userId: accountId,
           status: { $regex: /^pending$/i },
         }).populate("depositRoomId");
 
@@ -421,13 +493,13 @@ class DepositController {
 
         await refundRequest.save();
 
-        const redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=success`;
+        const redirectUrl = `http://localhost:5173/refund-request-management?status=success`;
         return res.redirect(redirectUrl);
       }
     } catch (error) {
       let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
       if (type == "refund") {
-        redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
+        redirectUrl = `http://localhost:5173/refund-request-management?status=fail`;
       }
       res.redirect(redirectUrl);
     }
@@ -954,11 +1026,10 @@ class DepositController {
       res.status(500).json({ message: "Server error", error });
     }
   }
-
-  async acceptRefundRequestForOwner(req, res) {
+    async acceptRefundRequestForOwner(req, res) {
     try {
       const { refundRequestId } = req.params;
-      const { paymentMethod } = req.body;
+      const { paymentMethod, damageAssessment = [] } = req.body;
       const existRefundRequest = await RefundRequest.findOne({
         _id: refundRequestId,
         status: { $regex: /^pending$/i },
@@ -967,20 +1038,25 @@ class DepositController {
       if (!existRefundRequest) {
         return res.status(400).json({ message: "Refund request not found" });
       }
+      existRefundRequest.damageAssessment = damageAssessment;
+      existRefundRequest.processedBy = req.user.userId;
+      existRefundRequest.processedByRole = req.user.role;
+      await existRefundRequest.save();
 
-      const { amountRefunded, accountId } = existRefundRequest;
-      const orderInfo = `refund-${accountId}-${refundRequestId}`;
+      const { actualRefundAmount, userId } = existRefundRequest;
+      const orderInfo = `refund-${userId}-${refundRequestId}`;
 
       if (paymentMethod === "vnpay") {
-        createVNPayUrl(req, res, amountRefunded, orderInfo);
+        createVNPayUrl(req, res, actualRefundAmount, orderInfo);
       } else if (paymentMethod === "momo") {
-        createMomoUrl(req, res, amountRefunded, orderInfo);
+        createMomoUrl(req, res, actualRefundAmount, orderInfo);
       }
     } catch (error) {
       res.status(500).json({ message: "Server error", error });
     }
   }
-  async deleteDepositRoom(req, res) {
+  
+    async deleteDepositRoom(req, res) {
     try {
       const { depositRoomId } = req.params;
       const depositRoom = await DepositRoom.findById(depositRoomId);

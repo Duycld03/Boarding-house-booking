@@ -145,19 +145,16 @@ const RentPaymentManagement = () => {
         title: t("roomNumber"),
         dataIndex: "roomNumber",
         key: "roomNumber",
-        sorter: true,
       },
       {
         title: t("monthlyRent"),
         dataIndex: "rentMonth",
         key: "rentMonth",
-        sorter: true,
       },
       {
         title: t("status"),
         dataIndex: "status",
         key: "status",
-        sorter: true,
         render: (status) => {
           const statusLower = status?.toLowerCase() || "";
           let color;
@@ -173,14 +170,12 @@ const RentPaymentManagement = () => {
         title: t("additionalFee"),
         dataIndex: "additionalFee",
         key: "additionalFee",
-        sorter: true,
         render: (price) => (price ? formatPrice(price) : formatPrice(0)),
       },
       {
         title: t("electricalBill"),
         dataIndex: "electricalBill",
         key: "electricalBill",
-        sorter: true,
         render: (price) => {
           if (price && typeof price === "object" && price.totalAmount) {
             return formatPrice(price.totalAmount);
@@ -194,7 +189,6 @@ const RentPaymentManagement = () => {
         title: t("waterBill"),
         dataIndex: "waterBill",
         key: "waterBill",
-        sorter: true,
         render: (price) => {
           if (price && typeof price === "object" && price.totalAmount) {
             return formatPrice(price.totalAmount);
@@ -208,7 +202,6 @@ const RentPaymentManagement = () => {
         title: t("paymentAmount"),
         dataIndex: "paymentAmount",
         key: "paymentAmount",
-        sorter: true,
         render: (price) => (price ? formatPrice(price) : t("notApplicable")),
       },
       {

@@ -10,16 +10,23 @@ import Text from '@/components/ui/Text';
 import { ScreenContainer } from '@/components/layout';
 import Color from '@/constants/styles/color';
 import Font from '@/constants/styles/fonts';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { BackHeader } from '@/components/navigation/CustomHeader';
 
 export default function Setting() {
   const { isDarkMode, toggleTheme } = useTheme();
   const { themedClasses } = useThemedClasses();
   const { t, ready } = useTranslation('setting');
-  const navigation = useNavigation();
+  const router = useRouter();
 
-  // ✅ Chặn render nếu i18n chưa khởi tạo hoặc namespace 'setting' chưa sẵn sàng
+  const handleBackPress = () => {
+    try {
+      router.back();
+    } catch (error) {
+      console.log('Navigation not ready yet');
+    }
+  };
+
   if (!i18n.isInitialized || !ready) {
     return (
       <View
@@ -73,6 +80,7 @@ export default function Setting() {
           />
         }
         title={t('back')}
+        onBackPress={handleBackPress}
       />
 
       <ScrollView
