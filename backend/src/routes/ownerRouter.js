@@ -115,7 +115,6 @@ ownerRouter.post(
 
 
 //revenue
-ownerRouter.get('/revenue', revenueController.getRevenue);
 ownerRouter.get('/revenue/years', revenueController.getAvailableYears);
 ownerRouter.get('/revenue/year', revenueController.getRevenueByYear);
 
