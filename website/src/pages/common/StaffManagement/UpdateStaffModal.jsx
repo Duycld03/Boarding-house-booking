@@ -4,6 +4,7 @@ import { Button as CustomButton } from '@/component';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useTheme } from '@/context/themeContext';
+import './UpdateStaffModal.css'; // 👈 import CSS riêng cho dark mode
 
 const { Option } = Select;
 
@@ -32,12 +33,6 @@ const UpdateStaffModal = ({ open, onCancel, onSubmit, initialData }) => {
     toast.error(t('errors.form1'));
   };
 
-  const selectStyle = {
-    backgroundColor: darkMode ? '#1f2937' : '#fff',
-    color: darkMode ? '#fff' : '#000',
-    borderColor: darkMode ? '#4b5563' : '#d9d9d9',
-  };
-
   return (
     <ConfigProvider>
       <Modal
@@ -46,44 +41,52 @@ const UpdateStaffModal = ({ open, onCancel, onSubmit, initialData }) => {
         footer={null}
         destroyOnClose
         title={t('updateAccount.title')}
+        className={darkMode ? 'dark-modal' : ''}
       >
         <Form
           form={form}
           layout="vertical"
           onFinish={handleFinish}
           onFinishFailed={handleError}
+          className={darkMode ? 'dark-form' : ''}
         >
           <Form.Item
             label={t('forms.fullname.label')}
-            name="fullname"
             style={{ marginBottom: 0 }}
+            name="fullname"
             rules={[{ required: true, message: t('forms.fullname.required') }]}
           >
-            <Input placeholder={t('forms.fullname.placeholder')} />
+            <Input
+              placeholder={t('forms.fullname.placeholder')}
+              className={darkMode ? 'dark-input' : ''}
+            />
           </Form.Item>
 
           <Form.Item
             label={t('forms.email.label')}
-            name="email"
             style={{ marginBottom: 0 }}
+            name="email"
             rules={[
               { required: true, message: t('forms.email.required') },
               { type: 'email', message: t('forms.email.invalidFormat') },
             ]}
           >
-            <Input placeholder={t('forms.email.placeholder')} />
+            <Input
+              placeholder={t('forms.email.placeholder')}
+              className={darkMode ? 'dark-input' : ''}
+            />
           </Form.Item>
 
           <Form.Item
             label={t('forms.gender.label')}
-            name="gender"
             style={{ marginBottom: 0 }}
+            name="gender"
             rules={[{ required: true, message: t('forms.gender.required') }]}
           >
             <Select
               placeholder={t('forms.gender.placeholder')}
-              style={selectStyle}
-              dropdownStyle={selectStyle}
+              className={darkMode ? 'dark-select' : ''}
+              dropdownClassName={darkMode ? 'dark-dropdown' : ''}
             >
               <Option value="male">{t('forms.gender.options.male')}</Option>
               <Option value="female">{t('forms.gender.options.female')}</Option>
