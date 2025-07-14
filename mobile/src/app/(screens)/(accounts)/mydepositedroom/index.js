@@ -89,6 +89,8 @@ function MyDepositedRoom() {
       }
     } catch (error) {
       console.error("Error fetching renewal requests:", error);
+    }
+  }, []);
 
   // Fetch refund requests map
   const fetchRefundRequests = useCallback(async () => {
@@ -173,14 +175,14 @@ function MyDepositedRoom() {
     if (isLogin && paginationOptions.page === 1) {
       fetchData();
     }
-  }, [isLogin]);
+  }, [isLogin, fetchData]);
 
   // Load more effect
   useEffect(() => {
     if (paginationOptions.page > 1) {
       fetchData(true);
     }
-  }, [paginationOptions.page]);
+  }, [paginationOptions.page, fetchData]);
 
   // THÊM MỚI: useFocusEffect để refresh refund requests khi screen được focus
   useFocusEffect(
@@ -231,7 +233,6 @@ function MyDepositedRoom() {
         await fetchPendingRenewalRequests();
         // Fetch refund requests after setting data
         await fetchRefundRequests();
-
       }
     } catch (error) {
       console.error("Error refreshing data:", error);
@@ -240,7 +241,6 @@ function MyDepositedRoom() {
       setRefreshing(false);
     }
   }, [showError, t, fetchPendingRenewalRequests, fetchRefundRequests]);
-
 
   // Handle load more
   const handleLoadMore = useCallback(() => {
@@ -262,24 +262,24 @@ function MyDepositedRoom() {
     return depositData.length < pagination.totalItems && pagination.hasNextPage;
   }, [depositData.length, pagination.totalItems, pagination.hasNextPage]);
 
-// Handle refund
-const handleRefund = useCallback(
-  (deposit) => {
-    // Check if there's already an existing refund request
-    const hasExistingRequest = refundRequestsMap[deposit._id];
-    if (hasExistingRequest) {
-      showError(t("refundRequestAlreadyExists"));
-      return;
-    }
-    
-    // Navigate to refund screen
-    router.push({
-      pathname: "/mydepositedroom/refundRequest", // Using the more specific path from feature branch
-      params: { depositId: deposit._id },
-    });
-  },
-  [router, refundRequestsMap, showError, t]
-);
+  // Handle refund
+  const handleRefund = useCallback(
+    (deposit) => {
+      // Check if there's already an existing refund request
+      const hasExistingRequest = refundRequestsMap[deposit._id];
+      if (hasExistingRequest) {
+        showError(t("refundRequestAlreadyExists"));
+        return;
+      }
+
+      // Navigate to refund screen
+      router.push({
+        pathname: "/mydepositedroom/refundRequest", // Using the more specific path from feature branch
+        params: { depositId: deposit._id },
+      });
+    },
+    [router, refundRequestsMap, showError, t]
+  );
 
   // Handle pay deposit
   const handlePayDeposit = useCallback(
@@ -300,10 +300,11 @@ const handleRefund = useCallback(
       router.push({
         pathname: "/mydepositedroom/createRenewalRequest",
         params: { deposit: JSON.stringify(item) },
-           });
+      });
     },
     [router]
-        
+  );
+
   // Handle navigate to detail
   const handleDepositPress = useCallback(
     (deposit) => {
@@ -315,30 +316,30 @@ const handleRefund = useCallback(
     [router]
   );
 
-// Render functions
-const renderDepositItem = useCallback(
-  ({ item, index }) => (
-    <DepositCard
-      item={item}
-      onRefund={handleRefund}
-      onPayDeposit={handlePayDeposit}
-      onCreateRenewDeposit={handleCreateRenewDeposit}
-      onPress={handleDepositPress}
-      index={index}
-      isCreateRenewDeposit={Boolean(pendingRenewalRequests[item._id])}
-      hasExistingRefundRequest={!!refundRequestsMap[item._id]} // Pass refund request status
-      refundRequestInfo={refundRequestsMap[item._id]} // Pass refund request info
-    />
-  ),
-  [
-    handleRefund, 
-    handlePayDeposit, 
-    handleCreateRenewDeposit, 
-    handleDepositPress, 
-    pendingRenewalRequests,
-    refundRequestsMap
-  ]
-);
+  // Render functions
+  const renderDepositItem = useCallback(
+    ({ item, index }) => (
+      <DepositCard
+        item={item}
+        onRefund={handleRefund}
+        onPayDeposit={handlePayDeposit}
+        onCreateRenewDeposit={handleCreateRenewDeposit}
+        onPress={handleDepositPress}
+        index={index}
+        isCreateRenewDeposit={Boolean(pendingRenewalRequests[item._id])}
+        hasExistingRefundRequest={!!refundRequestsMap[item._id]} // Pass refund request status
+        refundRequestInfo={refundRequestsMap[item._id]} // Pass refund request info
+      />
+    ),
+    [
+      handleRefund,
+      handlePayDeposit,
+      handleCreateRenewDeposit,
+      handleDepositPress,
+      pendingRenewalRequests,
+      refundRequestsMap
+    ]
+  );
 
   const renderFooter = () => {
     if (!loading || depositData.length > 0) return null;
