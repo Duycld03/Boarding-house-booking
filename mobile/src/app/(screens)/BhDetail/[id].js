@@ -4,57 +4,58 @@ import React, {
   useCallback,
   useRef,
   useMemo,
-} from "react";
-import { View, Alert, ScrollView, TouchableOpacity } from "react-native";
-import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
-import { useTranslation } from "react-i18next";
-import { AntDesign } from "@expo/vector-icons";
+} from 'react';
+import { View, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import { AntDesign } from '@expo/vector-icons';
+import getLocalizedAddress from '@/utils/addressHelper';
 
 // Components
-import { ScreenContainer } from "@/components/layout";
+import { ScreenContainer } from '@/components/layout';
 import {
   Text,
   BoardingHouseGallery,
   Loader,
   Line,
   Button,
-} from "@/components/ui";
-import { BackHeader } from "@/components/navigation/CustomHeader";
+} from '@/components/ui';
+import { BackHeader } from '@/components/navigation/CustomHeader';
 import {
   OwnerInfo,
   Description,
   RoomTypeCard,
   ReviewList,
-} from "@/components/screen/bhDetail";
-import ExtraPrices from "@/components/screen/bhDetail/ExtraPrices";
+} from '@/components/screen/bhDetail';
+import ExtraPrices from '@/components/screen/bhDetail/ExtraPrices';
 
 // Context & Utils
-import { useTheme } from "@/context/ThemeProvider";
-import formatAmount from "@/utils/formatAmount";
-import emitter from "@/utils/FavoriteEvent";
-import { useCurrentUser } from "@/context/userContext";
+import { useTheme } from '@/context/ThemeProvider';
+import formatAmount from '@/utils/formatAmount';
+import emitter from '@/utils/FavoriteEvent';
+import { useCurrentUser } from '@/context/userContext';
 
 // API
 import {
   getBoardingHouseDetail,
   getReviewByBhId,
   getRoomTypeByBhId,
-} from "@/API/ownerUser/boardingHouse";
-import { useThemedClasses } from "@/utils/useTheme";
-import { addFavorite, getFavorite } from "@/API/favoriteAPI";
-import i18next from "i18next";
-import coverBhType from "@/utils/coverBhType";
-import ConfirmModal from "@/components/feedback/ConfirmModal";
+} from '@/API/ownerUser/boardingHouse';
+import { useThemedClasses } from '@/utils/useTheme';
+import { addFavorite, getFavorite } from '@/API/favoriteAPI';
+import i18next from 'i18next';
+import coverBhType from '@/utils/coverBhType';
+import ConfirmModal from '@/components/feedback/ConfirmModal';
 
 // Constants
-const DEFAULT_BOARDING_HOUSE_ID = "64ab1cd234abcd1234567878";
+const DEFAULT_BOARDING_HOUSE_ID = '64ab1cd234abcd1234567878';
 const SCROLL_OFFSET = 80;
 const SCROLL_READY_DELAY = 500;
 const SCROLL_TO_ROOM_DELAY = 300;
 
 export default function BhDetailScreen() {
   // Hooks
-  const { t } = useTranslation("boardingHouseDetail");
+  const { t } = useTranslation('boardingHouseDetail');
   const { isDarkMode } = useTheme();
   const router = useRouter();
   const { id } = useLocalSearchParams();
@@ -99,16 +100,16 @@ export default function BhDetailScreen() {
 
   // Memoized computed values
   const formattedAddress = useMemo(() => {
-    if (!data.boardingHouseDetail?.address) return t("addressNotAvailable");
-    const { detail, ward, district, province } =
-      data.boardingHouseDetail.address;
-    return `${detail}, ${ward}, ${district}, ${province}`;
-  }, [data.boardingHouseDetail?.address, t]);
+    return getLocalizedAddress(
+      data.boardingHouseDetail?.address,
+      i18next.language
+    );
+  }, [data.boardingHouseDetail?.address, i18next.language]);
 
   const priceRangeText = useMemo(
     () =>
       `${formatAmount(data.boardingHouseDetail?.priceRange)}/${t(
-        "roomTypeCard.month"
+        'roomTypeCard.month'
       )}`,
     [data.boardingHouseDetail?.priceRange, t]
   );
@@ -141,9 +142,9 @@ export default function BhDetailScreen() {
       }
     };
 
-    emitter.on("favoriteChanged", handler);
+    emitter.on('favoriteChanged', handler);
     return () => {
-      emitter.off("favoriteChanged", handler);
+      emitter.off('favoriteChanged', handler);
     };
   }, [boardingHouseId]);
 
@@ -165,12 +166,12 @@ export default function BhDetailScreen() {
         },
       }));
 
-      emitter.emit("favoriteChanged", {
+      emitter.emit('favoriteChanged', {
         id: String(boardingHouseId),
         isFavorite,
       });
     } catch (error) {
-      router.push("/login");
+      router.push('/login');
     }
   };
 
@@ -215,7 +216,7 @@ export default function BhDetailScreen() {
 
         return { data: [], pagination: {} };
       } catch (error) {
-        console.error("❌ Error fetching reviews:", error);
+        console.error('❌ Error fetching reviews:', error);
         throw error;
       }
     },
@@ -246,7 +247,7 @@ export default function BhDetailScreen() {
     if (!boardingHouseId) {
       setUi((prev) => ({
         ...prev,
-        error: t("boardingHouseIdRequired"),
+        error: t('boardingHouseIdRequired'),
         loading: false,
       }));
       return;
@@ -280,8 +281,8 @@ export default function BhDetailScreen() {
       // Gọi riêng check favorite
       await checkFavoriteStatus();
     } catch (error) {
-      console.error("❌ Error fetching data:", error);
-      setUi((prev) => ({ ...prev, error: t("failedToLoadData") }));
+      console.error('❌ Error fetching data:', error);
+      setUi((prev) => ({ ...prev, error: t('failedToLoadData') }));
     } finally {
       setUi((prev) => ({ ...prev, loading: false }));
 
@@ -311,7 +312,7 @@ export default function BhDetailScreen() {
     try {
       await fetchAllData();
     } catch (error) {
-      console.error("❌ Error refreshing data:", error);
+      console.error('❌ Error refreshing data:', error);
     } finally {
       setUi((prev) => ({ ...prev, refreshing: false }));
     }
@@ -321,7 +322,7 @@ export default function BhDetailScreen() {
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.push("/(tabs)/home");
+      router.push('/(tabs)/home');
     }
   }, [router]);
 
@@ -357,8 +358,6 @@ export default function BhDetailScreen() {
     }, SCROLL_TO_ROOM_DELAY);
   }, [ui.roomTypesPosition, ui.isScrollReady]);
   const hasUserReviewed = useMemo(() => {
-
-
     if (!user?._id || !reviews?.length) return false;
     return reviews.some(
       (review) =>
@@ -370,7 +369,7 @@ export default function BhDetailScreen() {
   // Write Review Handler
   const handleWriteReview = useCallback(() => {
     if (!isLogin) {
-      router.push("/login");
+      router.push('/login');
       return;
     }
     if (hasUserReviewed) {
@@ -379,7 +378,7 @@ export default function BhDetailScreen() {
     }
 
     router.push({
-      pathname: "/BhDetail/addReview",
+      pathname: '/BhDetail/addReview',
       params: { boardingHouseId },
     });
   }, [isLogin, hasUserReviewed, router, boardingHouseId]);
@@ -388,10 +387,10 @@ export default function BhDetailScreen() {
   const LoadingState = useMemo(
     () => (
       <ScreenContainer withPadding={false}>
-        <BackHeader animationType="slide" title={t("boardingHouseDetail")} />
+        <BackHeader animationType="slide" title={t('boardingHouseDetail')} />
         <Loader
-          text={t("loadingBoardingHouseDetails")}
-          color={isDarkMode ? "#3B82F6" : "#1D4ED8"}
+          text={t('loadingBoardingHouseDetails')}
+          color={isDarkMode ? '#3B82F6' : '#1D4ED8'}
         />
       </ScreenContainer>
     ),
@@ -401,18 +400,19 @@ export default function BhDetailScreen() {
   const ErrorState = useMemo(
     () => (
       <ScreenContainer withPadding={true}>
-        <BackHeader animationType="slide" title={t("boardingHouseDetail")} />
+        <BackHeader animationType="slide" title={t('boardingHouseDetail')} />
         <View className="flex-1 justify-center items-center px-4">
           <View className="items-center">
             <Text className="text-red-500 text-center text-lg font-medium mb-6">
               {ui.error}
             </Text>
             <Text
-              className={`text-base underline ${isDarkMode ? "text-blue-400" : "text-blue-700"
-                }`}
+              className={`text-base underline ${
+                isDarkMode ? 'text-blue-400' : 'text-blue-700'
+              }`}
               onPress={onRefresh}
             >
-              {t("retry")}
+              {t('retry')}
             </Text>
           </View>
         </View>
@@ -423,7 +423,7 @@ export default function BhDetailScreen() {
 
   const renderBoardingHouseName = () => (
     <Text className="mt-2" variant="h2" weight="bold">
-      {data.boardingHouseDetail?.name || t("boardingHouseTypeUnknown")}
+      {data.boardingHouseDetail?.name || t('boardingHouseTypeUnknown')}
     </Text>
   );
 
@@ -433,12 +433,12 @@ export default function BhDetailScreen() {
         className="bg-blue-400 rounded-lg px-2 py-1 self-start"
         variant="subtitle"
         weight="bold"
-        style={{ color: "#fff" }}
+        style={{ color: '#fff' }}
       >
         {coverBhType(
           data.boardingHouseDetail?.boardingHouseType?.codeName,
           currentLanguage
-        ) || t("boardingHouseTypeUnknown")}
+        ) || t('boardingHouseTypeUnknown')}
       </Text>
     </View>
   );
@@ -446,13 +446,13 @@ export default function BhDetailScreen() {
   const renderPriceRange = () => (
     <View className="mt-4">
       <Text variant="subtitle" weight="bold">
-        {t("priceRange")}:
+        {t('priceRange')}:
       </Text>
       <View className="flex-row justify-between items-center mt-1">
         <Text
           weight="bold"
           variant="h3"
-          style={{ color: isDarkMode ? "white" : "rgb(249 115 22)" }}
+          style={{ color: isDarkMode ? 'white' : 'rgb(249 115 22)' }}
           className="flex-1"
         >
           {priceRangeText}
@@ -460,9 +460,9 @@ export default function BhDetailScreen() {
         <Button
           onPress={scrollToRoomTypes}
           disabled={!ui.isScrollReady}
-          style={{ backgroundColor: "rgb(249 115 22)" }}
+          style={{ backgroundColor: 'rgb(249 115 22)' }}
         >
-          {t("selectRoom")}
+          {t('selectRoom')}
         </Button>
       </View>
     </View>
@@ -471,11 +471,12 @@ export default function BhDetailScreen() {
   const renderAddress = () => (
     <View className="mt-4">
       <Text variant="subtitle" weight="bold">
-        {t("address")}:
+        {t('address')}:
       </Text>
       <Text
-        className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
-          }`}
+        className={`text-base ${
+          isDarkMode ? 'text-gray-400' : 'text-gray-600'
+        }`}
       >
         {formattedAddress}
       </Text>
@@ -486,19 +487,20 @@ export default function BhDetailScreen() {
     <View className="mt-4 flex-row justify-between">
       <View className="flex-1 mr-2">
         <Text variant="subtitle" weight="bold">
-          {t("likeCount")}:
+          {t('likeCount')}:
         </Text>
         <View className="flex-row items-center">
           <TouchableOpacity onPress={handleFavoriteClick}>
             <AntDesign
-              name={isFavorite ? "heart" : "hearto"}
+              name={isFavorite ? 'heart' : 'hearto'}
               size={20}
-              color={isFavorite ? "red" : isDarkMode ? "#fff" : "#444"}
+              color={isFavorite ? 'red' : isDarkMode ? '#fff' : '#444'}
             />
           </TouchableOpacity>
           <Text
-            className={`text-base font-semibold ml-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
-              }`}
+            className={`text-base font-semibold ml-2 ${
+              isDarkMode ? 'text-gray-200' : 'text-gray-800'
+            }`}
           >
             {data.boardingHouseDetail?.likes || 0}
           </Text>
@@ -510,7 +512,7 @@ export default function BhDetailScreen() {
   const renderOwnerInfo = () => (
     <View className="mt-4">
       <Text variant="subtitle" weight="bold">
-        {t("ownerInfo.title")}:
+        {t('ownerInfo.title')}:
       </Text>
       <OwnerInfo ownerData={data.boardingHouseDetail?.ownerId} />
     </View>
@@ -533,10 +535,11 @@ export default function BhDetailScreen() {
       return (
         <View className="mt-4" onLayout={onRoomTypesLayout}>
           <Text
-            className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+            className={`text-base ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            }`}
           >
-            {t("noRoomTypesAvailable")}
+            {t('noRoomTypesAvailable')}
           </Text>
         </View>
       );
@@ -545,7 +548,7 @@ export default function BhDetailScreen() {
     return (
       <View className="mt-4" onLayout={onRoomTypesLayout}>
         <Text variant="subtitle" weight="bold">
-          {t("availableRoomTypes")}
+          {t('availableRoomTypes')}
         </Text>
         {data.roomType.map((roomData, index) => (
           <RoomTypeCard
@@ -553,7 +556,7 @@ export default function BhDetailScreen() {
             roomData={roomData}
             onDeposit={(roomData) => {
               router.push({
-                pathname: "/(screens)/BhDetail/depositRoom",
+                pathname: '/(screens)/BhDetail/depositRoom',
                 params: {
                   roomData: JSON.stringify(roomData),
                 },
@@ -570,7 +573,7 @@ export default function BhDetailScreen() {
     return (
       <View className="mt-4">
         <Text variant="subtitle" weight="bold">
-          {t("ratingAndReview")}{" "}
+          {t('ratingAndReview')}{' '}
           {pagination.totalItems > 0 && `(${pagination.totalItems})`}
         </Text>
         <ReviewList
@@ -584,10 +587,10 @@ export default function BhDetailScreen() {
           pagination={pagination}
           setPagination={setPagination}
           onReport={(reviewId) => {
-            console.log("Report review:", reviewId);
+            console.log('Report review:', reviewId);
           }}
           setReviewId={(reviewId) => {
-            console.log("Set review ID:", reviewId);
+            console.log('Set review ID:', reviewId);
           }}
           reportedReviews={[]}
           pagination={pagination}
@@ -608,15 +611,15 @@ export default function BhDetailScreen() {
   return (
     <ScreenContainer withPadding={false} className="pb-16">
       <BackHeader
-        title={data.boardingHouseDetail?.name || t("boardingHouseDetail")}
+        title={data.boardingHouseDetail?.name || t('boardingHouseDetail')}
         onBackPress={handleBackPress}
       />
 
       {ui.refreshing && (
         <Loader
           overlay={true}
-          text={t("refreshingData")}
-          color={isDarkMode ? "#3B82F6" : "#1D4ED8"}
+          text={t('refreshingData')}
+          color={isDarkMode ? '#3B82F6' : '#1D4ED8'}
         />
       )}
 
@@ -651,13 +654,11 @@ export default function BhDetailScreen() {
         visible={showReviewError}
         onClose={() => setShowReviewError(false)}
         onConfirm={() => setShowReviewError(false)}
-        title={t("review.alreadySubmittedTitle")}
-        message={t("review.alreadySubmittedMessage")}
-        confirmText={t("review.confirmButton")}
+        title={t('review.alreadySubmittedTitle')}
+        message={t('review.alreadySubmittedMessage')}
+        confirmText={t('review.confirmButton')}
         cancelText=""
       />
-
-
     </ScreenContainer>
   );
 }

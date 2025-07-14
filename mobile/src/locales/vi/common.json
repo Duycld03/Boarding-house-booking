@@ -1,7 +1,11 @@
 {
   "loaderComponent": {
     "loading": "Đang tải...",
-    "processing": "Đang xử lý..."
+    "processing": "Đang xử lý...",
+    "allLoaded": "Tất cả mục đã được tải",
+    "loadingMore": "Đang tải thêm {{itemName}}...",
+    "loadMore": "Tải thêm {{itemName}}...",
+    "progressText": "{{currentCount}} trong tổng số {{totalCount}} mục đã được tải"
   },
   "accommodation_types": {
     "nha_tro_truyen_thong": "Nhà trọ truyền thống",

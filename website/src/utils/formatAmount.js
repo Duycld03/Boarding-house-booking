@@ -27,11 +27,11 @@ const formatAmount = (amount, language = 'en', options = {}) => {
 
   if (isVietnamese) {
     finalAmount = amount;
-    currencySymbol = '₫';
+    currencySymbol = ' ₫';
     locale = 'vi-VN';
   } else {
     finalAmount = amount / customRate;
-    currencySymbol = '$';
+    currencySymbol = ' $';
     locale = 'en-US';
   }
 
@@ -51,24 +51,38 @@ const formatAmount = (amount, language = 'en', options = {}) => {
   let formattedNumber = '';
   let suffix = '';
 
-  if (finalAmount >= 1e9) {
-    formattedNumber = (finalAmount / 1e9).toFixed(1);
-    suffix = 'B';
-  } else if (finalAmount >= 1e6) {
-    formattedNumber = (finalAmount / 1e6).toFixed(1);
-    suffix = 'M';
-  } else if (finalAmount >= 1e3) {
-    formattedNumber = (finalAmount / 1e3).toFixed(1);
-    suffix = 'K';
+  // Lưu trữ dấu của số ban đầu
+  const absAmount = Math.abs(finalAmount);
+  const isNegative = finalAmount < 0;
+
+  // Định nghĩa các hậu tố theo ngôn ngữ
+  const suffixes = isVietnamese
+    ? { thousand: 'K', million: 'Tr', billion: 'Tỷ' }
+    : { thousand: 'K', million: 'M', billion: 'B' };
+
+  if (absAmount >= 1e9) {
+    formattedNumber = (absAmount / 1e9).toFixed(1);
+    suffix = suffixes.billion;
+  } else if (absAmount >= 1e6) {
+    formattedNumber = (absAmount / 1e6).toFixed(1);
+    suffix = suffixes.million;
+  } else if (absAmount >= 1e3) {
+    formattedNumber = (absAmount / 1e3).toFixed(1);
+    suffix = suffixes.thousand;
   } else {
     if (isVietnamese) {
-      formattedNumber = Math.round(finalAmount).toString();
+      formattedNumber = Math.round(absAmount).toString();
     } else {
-      formattedNumber = finalAmount.toFixed(2);
+      formattedNumber = absAmount.toFixed(2);
     }
   }
 
   formattedNumber = formattedNumber.replace(/\.0$/, '');
+
+  // Thêm dấu âm trước số nếu cần
+  if (isNegative) {
+    formattedNumber = '-' + formattedNumber;
+  }
 
   if (showCurrency) {
     return isVietnamese

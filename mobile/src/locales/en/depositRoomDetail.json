@@ -1,0 +1,37 @@
+// Cập nhật mobile/src/locales/en/depositRoomDetail.json
+{
+  "depositDetail": "Deposit Detail",
+  "loading": "Loading",
+  "notFound": "Not Found",
+  "depositNotFoundMessage": "The deposit room information could not be found.",
+  "noImagesAvailable": "No images available",
+  "room": "Room",
+  "depositAmount": "Deposit Amount",
+  "rentalTime": "Rental Time",
+  "months": "months",
+  "rentalPeriod": "Rental Period",
+  "to": "to",
+  "roomSize": "Room Size",
+  "monthlyPrice": "Monthly Price",
+  "refundRequestInfo": "Refund Request Information",
+  "refundStatusLabel": "Status",
+  "reason": "Reason",
+  "roommates": "Roommates",
+  "payDeposit": "Pay Deposit",
+  "requestRefund": "Request Refund",
+  "refundRequestAlreadyExists": "A refund request already exists for this deposit",
+  "invalidDepositId": "Invalid deposit ID",
+  "fetchError": "Failed to fetch deposit details",
+  "status": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "refunded": "Refunded"
+  },
+  "refundStatus": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
+}
