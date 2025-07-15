@@ -252,7 +252,7 @@ const RefundCard = ({ item, index, t, isDarkMode, currentLanguage }) => {
             ellipsizeMode="tail"
           >
             #{index + 1} {t('refund.room')} {item.roomNumber} -{' '}
-            {truncateText(item.boardingHouseName, 15)}
+            {truncateText(item.boardingHouseName, 8)}
           </Text>
         </View>
 
