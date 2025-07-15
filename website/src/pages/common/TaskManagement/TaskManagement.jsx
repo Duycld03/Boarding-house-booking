@@ -12,7 +12,7 @@ import { useCurrentUser } from '@/context/userContext';
 import userRole from '@/constants/userRole';
 import { getStaffAccounts } from '../../../api/accountAPI';
 import { useTranslation } from 'react-i18next';
-
+import { Tooltip } from "antd";
 function TaskManagement() {
     const { hasRole } = useCurrentUser();
     const { t } = useTranslation('task');
@@ -35,7 +35,31 @@ function TaskManagement() {
                 title: t('columns.title'),
                 dataIndex: 'title',
                 key: 'title',
+                width: 200,
+                render: (title) =>
+                    title ? (
+                        <Tooltip title={title}>
+                            {title.length > 50 ? `${title.slice(0, 50)}...` : title}
+                        </Tooltip>
+                    ) : (
+                        t('messages.noData')
+                    ),
             },
+            {
+                title: t('columns.detail'),
+                dataIndex: 'details',
+                key: 'details',
+                width: 200,
+                render: (details) =>
+                    details ? (
+                        <Tooltip title={details}>
+                            {details.length > 50 ? `${details.slice(0, 50)}...` : details}
+                        </Tooltip>
+                    ) : (
+                        t('messages.noData')
+                    ),
+            },
+
             {
                 title: t('columns.responsibleBy'),
                 dataIndex: 'responsibleBy',
@@ -73,7 +97,6 @@ function TaskManagement() {
                 render: (_, record) => (
                     <div className="flex gap-2">
                         <Button
-                            size="large"
                             title={t('actions.edit')}
                             icon={<EditOutlined />}
                             onClick={() => {
@@ -86,7 +109,6 @@ function TaskManagement() {
 
                         {isOwner && (
                             <Button
-                                size="large"
                                 icon={<DeleteOutlined />}
                                 btnDelete
                                 title={t('actions.delete')}

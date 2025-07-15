@@ -6,7 +6,8 @@
         "priority": "Độ ưu tiên",
         "status": "Trạng thái",
         "dueDate": "Hạn chót",
-        "action": "Hành động"
+        "action": "Hành động",
+        "detail": "Chi tiết"
     },
     "priorities": {
         "low": "Thấp",
@@ -38,7 +39,7 @@
     },
     "actions": {
         "save": "Lưu",
-        "edit": "Sửa",
+        "edit": "Cập nhật",
         "delete": "Xóa",
         "add": "Thêm công việc"
     },

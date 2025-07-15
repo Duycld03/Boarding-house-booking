@@ -84,32 +84,45 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
                 initialValues={{ status: 'In Progress', priority: 'Medium' }}
             >
                 <Form.Item
-                    label={t('form.title')}
+                    label={
+                        <span style={{ color: darkMode ? '#ffffff' : '#000000' }}>
+                            {t('form.title')}
+                        </span>
+                    }
                     name="title"
                     rules={[{ required: true, message: t('validation.title') }]}
+                    style={formItemStyle}
                 >
-                    <Input
+                    <Input.TextArea
                         disabled={isStaff && task}
                         maxLength={100}
-                        showCount
-                        className={darkMode ? 'dark-mode-input' : ''}
-                        style={
-                            darkMode
-                                ? {
-                                    backgroundColor: '#1e293b',
-                                    color: '#f9fafb',
-                                    borderColor: '#4b5563',
-                                }
-                                : {}
-                        }
+                        rows={2}
+                        showCount={{
+                            formatter: ({ count, maxLength }) => (
+                                <span
+                                    style={{
+                                        color: darkMode ? '#D1D5DB' : 'rgba(0,0,0,0.45)',
+                                    }}
+                                >
+                                    {t('form.charactersUsed', { count, max: maxLength })}
+                                </span>
+                            ),
+                        }}
+                        style={{
+                            backgroundColor: darkMode ? '#1e293b' : undefined,
+                            color: darkMode ? '#f9fafb' : undefined,
+                            borderColor: darkMode ? '#4b5563' : undefined,
+                        }}
                     />
                 </Form.Item>
+
 
                 {isOwner && (
                     <Form.Item
                         label={t('form.responsibleBy')}
                         name="responsibleBy"
                         rules={[{ required: true, message: t('validation.responsibleBy') }]}
+                        style={formItemStyle}
                     >
                         <Select disabled={isStaff && task} placeholder={t('form.selectStaff')}>
                             {staffList.map((staff) => (
@@ -120,8 +133,6 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
                         </Select>
                     </Form.Item>
                 )}
-
-
 
                 <Form.Item label={t('form.details')} name="details" style={formItemStyle}>
                     <Input.TextArea
@@ -151,11 +162,11 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
                     />
                 </Form.Item>
 
-
                 <Form.Item
                     label={t('form.priority')}
                     name="priority"
                     rules={[{ required: true, message: t('validation.priority') }]}
+                    style={formItemStyle}
                 >
                     <Select disabled={isStaff && task}>
                         <Option value="Low">{t('priorities.low')}</Option>
@@ -164,22 +175,27 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
                     </Select>
                 </Form.Item>
 
-                <Form.Item
-                    label={t('form.status')}
-                    name="status"
-                    rules={[{ required: true, message: t('validation.status') }]}
-                >
-                    <Select disabled={isStaff && !task}>
-                        <Option value="In Progress">{t('statuses.inprogress')}</Option>
-                        <Option value="Completed">{t('statuses.completed')}</Option>
-                        <Option value="Cancelled">{t('statuses.cancelled')}</Option>
-                    </Select>
-                </Form.Item>
+                {/* Chỉ render trường status khi cập nhật (update) */}
+                {task && (
+                    <Form.Item
+                        label={t('form.status')}
+                        name="status"
+                        rules={[{ required: true, message: t('validation.status') }]}
+                        style={formItemStyle}
+                    >
+                        <Select disabled={isStaff && !task}>
+                            <Option value="In Progress">{t('statuses.inprogress')}</Option>
+                            <Option value="Completed">{t('statuses.completed')}</Option>
+                            <Option value="Cancelled">{t('statuses.cancelled')}</Option>
+                        </Select>
+                    </Form.Item>
+                )}
 
                 <Form.Item
                     label={t('form.dueDate')}
                     name="dueDate"
                     rules={[{ required: true, message: t('validation.dueDate') }]}
+                    style={formItemStyle}
                 >
                     <DatePicker
                         disabled={isStaff && task}
@@ -188,7 +204,6 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
                         disabledDate={(current) => current && current < dayjs().startOf('day')}
                     />
                 </Form.Item>
-
             </Form>
             <div className="flex justify-end mt-4">
                 <Button
@@ -213,8 +228,8 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
                     {t('buttons.submit')}
                 </Button>
             </div>
-
         </Modal>
+
     );
 }
 
