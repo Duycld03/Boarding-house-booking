@@ -15,7 +15,7 @@ function HighRatingBHScreen() {
   const { themedClasses } = useThemedClasses();
   const { theme } = useTheme();
   const router = useRouter();
-  const { t } = useTranslation('home');
+  const { t, i18n } = useTranslation('home');
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,10 @@ function HighRatingBHScreen() {
             id: item._id,
             name: item.name,
             price: item.priceRange,
-            detail: item.address?.province,
+            detail:
+              item.address?.province?.[
+                i18n.language === 'en' ? 'name_en' : 'name'
+              ] || '',
             rating: item.rating || 0,
             reviewCount: item.reviewCount || 0,
             img: imgPath,

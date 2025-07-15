@@ -265,20 +265,18 @@ const ReviewCard = ({
               <div className="flex items-center">
                 <FontAwesomeIcon
                   icon={faReply}
-                  className={`text-xl ${
-                    hasReply ? "text-blue-500" : "text-gray-500"
-                  }`}
+                  className={`text-xl ${hasReply ? "text-blue-500" : "text-gray-500"
+                    }`}
                 />
                 <span
-                  className={`ml-2 ${
-                    hasReply
+                  className={`ml-2 ${hasReply
                       ? darkMode
                         ? "text-gray-400 opacity-50"
                         : "text-gray-400 opacity-50"
                       : darkMode
-                      ? "text-gray-200"
-                      : "text-black"
-                  }`}
+                        ? "text-gray-200"
+                        : "text-black"
+                    }`}
                 >
                   {hasReply ? t("reviewCard.replied") : t("reviewCard.reply")}
                 </span>
@@ -327,9 +325,8 @@ const ReviewCard = ({
         }
       />
       <p
-        className={`mt-2 ${
-          darkMode ? "text-gray-300" : "text-gray-600"
-        } text-justify 
+        className={`mt-2 ${darkMode ? "text-gray-300" : "text-gray-600"
+          } text-justify 
         ${isExpanded ? "max-h-[300px] overflow-auto" : "overflow-hidden"} 
         break-words leading-relaxed`}
       >
@@ -410,12 +407,12 @@ const ReviewCard = ({
         styles={
           darkMode
             ? {
-                mask: { backgroundColor: "rgba(0, 0, 0, 0.65)" },
-                content: {
-                  backgroundColor: "#1f2937",
-                  color: "#fff",
-                },
-              }
+              mask: { backgroundColor: "rgba(0, 0, 0, 0.65)" },
+              content: {
+                backgroundColor: "#1f2937",
+                color: "#fff",
+              },
+            }
             : {}
         }
       >
@@ -505,11 +502,11 @@ const ReviewCard = ({
               {newFiles.length +
                 newImages.filter((img) => !img.isDeleted).length <
                 MAX_IMAGES && (
-                <div>
-                  <PlusOutlined />
-                  <div style={{ marginTop: 8 }}>{t("reviewCard.upload")}</div>
-                </div>
-              )}
+                  <div>
+                    <PlusOutlined />
+                    <div style={{ marginTop: 8 }}>{t("reviewCard.upload")}</div>
+                  </div>
+                )}
             </Upload>
           </div>
         </div>

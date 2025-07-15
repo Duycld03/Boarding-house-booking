@@ -49,6 +49,14 @@ import en_payRent from "@/locales/en/payRent.json";
 import vi_payRent from "@/locales/vi/payRent.json";
 import en_payDeposit from "@/locales/en/payDeposit.json";
 import vi_payDeposit from "@/locales/vi/payDeposit.json";
+import en_review from "@/locales/en/review.json";
+import vi_review from "@/locales/vi/review.json";
+import vi_RenewalRequest from "@/locales/vi/myRenewalRequest.json";
+import en_RenewalRequest from "@/locales/en/myRenewalRequest.json";
+import en_refundRequest from "@/locales/en/refundRequest.json";
+import vi_refundRequest from "@/locales/vi/refundRequest.json";
+import en_depositRoomDetail from "@/locales/en/depositRoomDetail.json";
+import vi_depositRoomDetail from "@/locales/vi/depositRoomDetail.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -72,11 +80,16 @@ i18n.use(initReactI18next).init({
       depositRoom: en_depositRoom,
       report: en_report,
       boardingHouseGallery: en_boardingHouseGallery,
+      review: en_review,
       myreport: en_myreport,
       myRentPayment: en_myRentPayment,
       myDepositedRoom: en_myDepositedRoom,
       payRent: en_payRent,
       payDeposit: en_payDeposit,
+      myRenewalRequest: en_RenewalRequest,
+      refundRequest: en_refundRequest,
+      depositRoomDetail: en_depositRoomDetail,
+
     },
     vi: {
       setting: vi_setting,
@@ -98,11 +111,15 @@ i18n.use(initReactI18next).init({
       depositRoom: vi_depositRoom,
       report: vi_report,
       boardingHouseGallery: vi_boardingHouseGallery,
+      review: vi_review,
       myreport: vi_myreport,
       myRentPayment: vi_myRentPayment,
       myDepositedRoom: vi_myDepositedRoom,
       payRent: vi_payRent,
       payDeposit: vi_payDeposit,
+      myRenewalRequest: vi_RenewalRequest,
+      refundRequest: vi_refundRequest,
+      depositRoomDetail: vi_depositRoomDetail,
     },
   },
   lng: "en",

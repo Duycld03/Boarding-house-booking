@@ -107,13 +107,17 @@
     "reportReview": "Report this review",
     "alreadyReported": "You have reported this review. Please wait for admin to process.",
     "replyToReview": "Reply to this review",
-    "alreadyReplied": "You have replied to this review."
+    "alreadyReplied": "You have replied to this review.",
+    "deleteMessage": "Are you sure you want to delete this review? This action cannot be undone.",
+    "confirm": "Delete"
   },
   "reviewList": {
     "allReviewsLoaded": "All reviews loaded",
     "loadMore": "Load more reviews",
     "totalReviews": "Total reviews",
-    "averageRating": "Average rating"
+    "averageRating": "Average rating",
+    "noReviewsYet": "No reviews yet",
+    "beFirstToReview": "Be the first to share your experience!"
   },
   "roomTypeCard": {
     "month": "month",
@@ -165,5 +169,10 @@
       "fixErrors": "Please fix the errors before submitting"
     },
     "submitting": "Creating..."
+  },
+  "review": {
+    "alreadySubmittedTitle": "Notice",
+    "alreadySubmittedMessage": "You have already reviewed this boarding house.",
+    "confirmButton": "Close"
   }
 }

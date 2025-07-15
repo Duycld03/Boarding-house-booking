@@ -6,15 +6,14 @@
     "rating": "Rating",
     "createdAt": "Created Date",
     "reviewer": "Reviewer",
-    "action": "Action"
+    "action": "Action",
+    "reply":"Owner reply"
   },
   "buttons": {
     "delete": "Delete",
     "detail": "Detail",
     "submit": "Apply",
-    "cancel": "Cancel",
-    "owner": "Owner reply"
-
+    "cancel": "Cancel"
   },
   "modals": {
     "confirmDelete": {

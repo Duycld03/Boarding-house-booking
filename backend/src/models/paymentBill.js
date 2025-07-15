@@ -48,10 +48,10 @@ const paymentBillSchema = new mongoose.Schema(
     electricalBill: BillSchema,
     waterBill: BillSchema,
     month: {
-      type: String,
+      type: Number,
     },
     year: {
-      type: String,
+      type: Number,
     },
   },
   {

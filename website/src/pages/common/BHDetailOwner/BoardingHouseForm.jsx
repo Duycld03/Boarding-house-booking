@@ -9,6 +9,7 @@ import {
   StarOutlined,
 } from '@ant-design/icons';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 
 const cx = classNames;
 
@@ -36,6 +37,8 @@ const BoardingHouseForm = ({
   uploadOtherImgProps,
 }) => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const lang = i18n.language || 'vi';
 
   return (
     <div className="mx-auto md:w-[100%]">
@@ -409,85 +412,119 @@ const BoardingHouseForm = ({
               <Select
                 placeholder={t('form.placeholders.selectProvince')}
                 loading={!provinces.length}
-                value={updatedData?.address?.province || null}
+                value={
+                  updatedData?.address?.province?.[`name_${lang}`] ||
+                  updatedData?.address?.province?.name ||
+                  null
+                }
                 onChange={(value) => {
-                  handleInputChange({
-                    target: { name: 'address.province', value },
-                  });
-                  setUpdatedData((prev) => ({
-                    ...prev,
-                    address: {
-                      ...prev.address,
-                      province: value,
-                      district: null,
-                      ward: null,
-                    },
-                  }));
+                  const selected = provinces.find(
+                    (p) => p.name[lang] === value
+                  );
+                  if (selected) {
+                    setUpdatedData((prev) => ({
+                      ...prev,
+                      address: {
+                        ...prev.address,
+                        province: {
+                          id: selected.id,
+                          name: selected.name.vi,
+                          name_en: selected.name.en,
+                        },
+                        district: null,
+                        ward: null,
+                      },
+                    }));
+                  }
                 }}
                 allowClear
                 className={darkMode ? 'dark-mode-select' : ''}
               >
                 {provinces.map((province) => (
-                  <Select.Option key={province.code} value={province.name}>
-                    {province.name}
+                  <Select.Option key={province.id} value={province.name[lang]}>
+                    {province.name[lang]}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
+
             <Form.Item label={t('form.labels.district')} required>
               <Select
                 placeholder={t('form.placeholders.selectDistrict')}
                 loading={!districts.length && !!updatedData.address?.province}
-                value={updatedData?.address?.district || null}
+                value={
+                  updatedData?.address?.district?.[`name_${lang}`] ||
+                  updatedData?.address?.district?.name ||
+                  null
+                }
                 onChange={(value) => {
-                  handleInputChange({
-                    target: { name: 'address.district', value },
-                  });
-                  setUpdatedData((prev) => ({
-                    ...prev,
-                    address: {
-                      ...prev.address,
-                      district: value,
-                      ward: null,
-                    },
-                  }));
+                  const selected = districts.find(
+                    (d) => d.name[lang] === value
+                  );
+                  if (selected) {
+                    setUpdatedData((prev) => ({
+                      ...prev,
+                      address: {
+                        ...prev.address,
+                        district: {
+                          id: selected.id,
+                          name: selected.name.vi,
+                          name_en: selected.name.en,
+                        },
+                        ward: null,
+                      },
+                    }));
+                  }
                 }}
                 disabled={!updatedData.address?.province}
                 allowClear
                 className={darkMode ? 'dark-mode-select' : ''}
               >
                 {districts.map((district) => (
-                  <Select.Option key={district.code} value={district.name}>
-                    {district.name}
+                  <Select.Option key={district.id} value={district.name[lang]}>
+                    {district.name[lang]}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
+
             <Form.Item label={t('form.labels.ward')} required>
               <Select
                 placeholder={t('form.placeholders.selectWard')}
                 loading={!wards.length && !!updatedData?.address?.district}
-                value={updatedData.address?.ward || null}
+                value={
+                  updatedData?.address?.ward?.[`name_${lang}`] ||
+                  updatedData?.address?.ward?.name ||
+                  null
+                }
                 onChange={(value) => {
-                  handleInputChange({
-                    target: { name: 'address.ward', value },
-                  });
-                  setUpdatedData((prev) => ({
-                    ...prev,
-                    address: { ...prev.address, ward: value },
-                  }));
+                  const selected = wards.find((w) => w.name[lang] === value);
+                  if (selected) {
+                    setUpdatedData((prev) => ({
+                      ...prev,
+                      address: {
+                        ...prev.address,
+                        ward: {
+                          id: selected.id,
+                          name: selected.name.vi,
+                          name_en: selected.name.en,
+                        },
+                      },
+                    }));
+                  }
                 }}
                 disabled={!updatedData.address?.district}
                 allowClear
                 className={darkMode ? 'dark-mode-select' : ''}
               >
                 {wards.map((ward) => (
-                  <Select.Option key={ward.code} value={ward.name}>
-                    {ward.name}
+                  <Select.Option key={ward.id} value={ward.name[lang]}>
+                    {ward.name[lang]}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
+
             <Form.Item label={t('form.labels.detailAddress')}>
               <Input.TextArea
                 name="address.detail"

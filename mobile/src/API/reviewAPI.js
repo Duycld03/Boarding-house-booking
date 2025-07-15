@@ -13,15 +13,20 @@ export const filterReviews = (filterValue) => {
     params: filterValue,
   });
 };
-
 export const updateReview = (reviewId, updatedData) => {
-  return axios.put(`/auth/reviews/${reviewId}`, updatedData);
+  return axios.put(`/auth/reviews/${reviewId}`, updatedData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 };
 export const getReviewsUser = () => {
   return axios.get('/auth/reviews');
 };
-export const addReview = (reviewData) => {
-  return axios.post('/auth/reviews', reviewData);
+export const addReview = (data) => {
+  return axios.post('/auth/reviews', data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 export const updateReviewImage = async (imageFile) => {
   const formData = new FormData();
@@ -64,4 +69,7 @@ export const softDeleteReplyReview = (replyId) => {
   return axios.delete('/owner/review/reply', {
     data: { replyId }, // ✅ Đặt `replyId` vào `data`
   });
+};
+export const getReviewDetailUser = (reviewId) => {
+  return axios.get(`/auth/review/${reviewId}`);
 };
