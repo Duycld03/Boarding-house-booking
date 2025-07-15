@@ -19,5 +19,7 @@
     "district": "District",
     "selectDistrict": "Select district",
     "ward": "Ward",
-    "selectWard": "Select ward"
+    "selectWard": "Select ward",
+    "address": "Address",
+    "ratingAbove": "{{rating}} stars and up"
 }

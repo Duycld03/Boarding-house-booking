@@ -18,5 +18,7 @@
     "district": "Quận/Huyện",
     "selectDistrict": "Chọn quận",
     "ward": "Phường/Xã",
-    "selectWard": "Chọn phường"
+    "selectWard": "Chọn phường",
+    "address": "Địa chỉ",
+    "ratingAbove": "{{rating}} sao trở lên"
 }

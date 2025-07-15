@@ -28,7 +28,6 @@ import { fetchProvinces, fetchDistricts, fetchWards } from "@/API/apiAddress";
 import { Button } from "@/components/ui";
 import Logo from '../../../assets/images/newLogo.png';
 
-const { width, height } = Dimensions.get('window');
 
 const ExploreFilterScreen = () => {
   const router = useRouter();
@@ -38,20 +37,37 @@ const ExploreFilterScreen = () => {
   const [types, setTypes] = useState([]);
   const [selectedType, setSelectedType] = useState(null);
   const [ratings, setRatings] = useState([]);
-  const { t } = useTranslation('filter');
+  const { t, i18n } = useTranslation('filter');
   const [loading, setLoading] = useState(false);
   const { themedClasses, isDarkMode } = useThemedClasses();
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const lang = i18n.language || 'vi';
+  const getTranslatedName = useCallback((item) => {
+    if (!item) return '';
+    const name = item.name;
+    if (typeof name === 'object') {
+      return lang === 'en' ? name.en || name.vi : name.vi || name.en;
+    }
+    return String(name);
+  }, [lang]);
+
+
 
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
-  const selectedProvinceName = provinces.find(p => p.code === selectedProvince)?.name || '';
-  const selectedDistrictName = districts.find(d => d.code === selectedDistrict)?.name || '';
-  const selectedWardName = wards.find(w => w.code === selectedWard)?.name || '';
+  const selectedProvinceName = getTranslatedName(
+    provinces.find(p => String(p.code) === String(selectedProvince))
+  );
+  const selectedDistrictName = districts.find(d => d.code === selectedDistrict) ? getTranslatedName(districts.find(d => d.code === selectedDistrict)) : '';
+  const selectedWardName = wards.find(w => w.code === selectedWard) ? getTranslatedName(wards.find(w => w.code === selectedWard)) : '';
   const styles = getStyles(isDarkMode);
+  const formatAmount = (value, lang = 'vi') => {
+    if (!value && value !== 0) return lang === 'en' ? '0 ₫' : '0 ₫';
+    return value.toLocaleString(lang === 'en' ? 'en-US' : 'vi-VN') + ' ₫';
+  };
 
   // Thêm animated value để theo dõi scroll
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -98,7 +114,7 @@ const ExploreFilterScreen = () => {
 
   const handleApplyFilter = async () => {
     const filters = {
-      name: nameFilter || null,
+      // name: nameFilter || null,
       priceRange: `${currentPrice[0]},${currentPrice[1]}`,
       boardingHouseType: selectedType || null,
       rating: ratings.length > 0 ? ratings.join(",") : null,
@@ -110,29 +126,52 @@ const ExploreFilterScreen = () => {
         priceRange: `${currentPrice[0]},${currentPrice[1]}`,
         boardingHouseType: selectedType || "",
         rating: ratings.join(","),
-        province: selectedProvinceName,
-        district: selectedDistrictName,
-        ward: selectedWardName,
+        provinceCode: selectedProvince || "",
+        districtCode: selectedDistrict || "",
+        wardCode: selectedWard || "",
       },
     });
   };
 
   const fetchAreas = async () => {
     try {
-      const provincesData = await fetchProvinces();
-      setProvinces(provincesData);
-    } catch (err) {
-      console.error("Failed to fetch provinces:", err);
+      const res = await fetchProvinces();
+      const mapped = res.map(p => ({
+        code: String(p.code || p.id),
+        name_en: p.name_en || '',
+        name_vi: p.name || '',
+        name: p.name || '',
+      }));
+      setProvinces(mapped);
+    } catch (error) {
+      const fallback = provincesData.map(p => ({
+        code: String(p.id),
+        name_en: p.name.en,
+        name_vi: p.name.vi,
+        name: p.name,
+      }));
+
+      setProvinces(fallback);
     }
   };
 
+
+
   const handleProvinceChange = async (provinceCode) => {
+    const stringCode = String(provinceCode);
     setSelectedProvince(provinceCode);
     setSelectedDistrict('');
     setSelectedWard('');
     try {
-      const districtsData = await fetchDistricts(provinceCode);
-      setDistricts(districtsData);
+      const districtsData = await fetchDistricts(stringCode);
+      const mapped = districtsData.map(d => ({
+        ...d,
+        code: d.code || d.id,
+        name_en: d.name_en || '',
+        name_vi: d.name || '',
+        name: d.name || '',
+      }));
+      setDistricts(mapped);
       setWards([]);
     } catch (err) {
       console.error("Failed to fetch districts:", err);
@@ -144,7 +183,14 @@ const ExploreFilterScreen = () => {
     setSelectedWard('');
     try {
       const wardsData = await fetchWards(districtCode);
-      setWards(wardsData);
+      const mapped = wardsData.map(w => ({
+        ...w,
+        code: w.code || w.id,
+        name_en: w.name_en || '',
+        name_vi: w.name || '',
+        name: w.name || '',
+      }));
+      setWards(mapped);
     } catch (err) {
       console.error("Failed to fetch wards:", err);
     }
@@ -152,7 +198,6 @@ const ExploreFilterScreen = () => {
 
   // Add reset function
   const handleResetFilters = () => {
-    // Reset all filters to default values
     setNameFilter("");
     setSelectedType(null);
     setRatings([]);
@@ -246,7 +291,7 @@ const ExploreFilterScreen = () => {
               )}
               style={{ fontFamily: "Poppins-Bold" }}
             >
-              {t("filter")}
+              {t("filterTitle")}
             </Text>
           </View>
         </View>
@@ -268,8 +313,9 @@ const ExploreFilterScreen = () => {
                     {t("min")}
                   </Text>
                   <Text style={[styles.priceValue, { color: isDarkMode ? '#40BFFF' : '#40BFFF' }]}>
-                    {currentPrice[0].toLocaleString()} ₫
+                    {formatAmount(currentPrice[0], lang)}
                   </Text>
+
                 </View>
 
                 <View style={styles.priceSeparator}>
@@ -281,8 +327,9 @@ const ExploreFilterScreen = () => {
                     {t("max")}
                   </Text>
                   <Text style={[styles.priceValue, { color: isDarkMode ? '#40BFFF' : '#40BFFF' }]}>
-                    {currentPrice[1].toLocaleString()} ₫
+                    {formatAmount(currentPrice[1], lang)}
                   </Text>
+
                 </View>
               </View>
 
@@ -404,7 +451,7 @@ const ExploreFilterScreen = () => {
                     styles.ratingText,
                     { color: ratings.includes(r) ? '#40BFFF' : (isDarkMode ? '#9098B1' : '#9098B1') }
                   ]}>
-                    {r} sao trở lên
+                    {t('ratingAbove', { rating: r })}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -415,7 +462,7 @@ const ExploreFilterScreen = () => {
           <View style={[styles.filterSection, { backgroundColor: isDarkMode ? '#1e1e1e' : '#F6F7FB' }]}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionTitle, { color: isDarkMode ? '#FFF' : '#223263' }]}>
-                📍 Địa điểm
+                📍{t("address")}
               </Text>
             </View>
 
@@ -428,14 +475,22 @@ const ExploreFilterScreen = () => {
                 <View style={[styles.pickerContainer, { backgroundColor: isDarkMode ? '#2a2a2a' : '#FFF' }]}>
                   <Picker
                     selectedValue={selectedProvince}
-                    onValueChange={handleProvinceChange}
+                    onValueChange={(value) => {
+                      setSelectedProvince(String(value));
+                      handleProvinceChange(String(value));
+                    }}
                     style={[styles.picker, { color: isDarkMode ? '#FFF' : '#223263' }]}
                   >
                     <Picker.Item label={t("selectProvince")} value="" />
                     {provinces.map((p) => (
-                      <Picker.Item key={p.code} label={p.name} value={p.code} />
+                      <Picker.Item
+                        key={p.code}
+                        label={getTranslatedName(p)}
+                        value={p.code}
+                      />
                     ))}
                   </Picker>
+
                 </View>
               </View>
 
@@ -452,7 +507,11 @@ const ExploreFilterScreen = () => {
                   >
                     <Picker.Item label={t("selectDistrict")} value="" />
                     {districts.map((d) => (
-                      <Picker.Item key={d.code} label={d.name} value={d.code} />
+                      <Picker.Item
+                        key={d.code}
+                        label={getTranslatedName(d)}
+                        value={d.code}
+                      />
                     ))}
                   </Picker>
                 </View>
@@ -471,18 +530,22 @@ const ExploreFilterScreen = () => {
                   >
                     <Picker.Item label={t("selectWard")} value="" />
                     {wards.map((w) => (
-                      <Picker.Item key={w.code} label={w.name} value={w.code} />
+                      <Picker.Item
+                        key={w.code}
+                        label={getTranslatedName(w)}
+                        value={w.code}
+                      />
                     ))}
                   </Picker>
                 </View>
               </View>
             </View>
           </View>
-
-          {/* Loại bỏ phần button ở đây vì đã đưa vào Animated.View phía trên */}
         </View>
+
+        {/* Loại bỏ phần button ở đây vì đã đưa vào Animated.View phía trên */}
       </ScrollContainer>
-    </ScreenContainer>
+    </ScreenContainer >
   );
 }
 
