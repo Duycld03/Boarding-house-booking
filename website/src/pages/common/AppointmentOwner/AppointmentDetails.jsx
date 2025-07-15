@@ -11,16 +11,14 @@ import { Input } from 'antd';
 
 const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
     const { Title, Text } = Typography;
-    const { t } = useTranslation('appointment');
+    const { t, i18n } = useTranslation('appointment');
     const { darkMode } = useTheme();
 
     if (!appointment || Object.keys(appointment).length === 0) {
         return <Text style={{ color: darkMode ? '#fff' : undefined }}>{t('loading')}</Text>;
     }
 
-    useEffect(() => {
-        console.log("appointment passed to child component:", appointment);
-    }, [appointment]);
+
 
     const {
         tenant,
@@ -53,7 +51,7 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
 
         try {
             await acceptAppointment(appointment._id);
-            toast("Appointment accepted successfully!");
+            toast.success("Appointment accepted successfully!");
             onAcceptSuccess();
         } catch (err) {
             const error = err.response?.data;
@@ -62,13 +60,13 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
                 if (confirm) {
                     try {
                         await acceptAppointment(appointment._id, true);
-                        toast("Appointment accepted with overlap!");
+                        toast.success("Appointment accepted with overlap!");
                     } catch (confirmErr) {
-                        toast(confirmErr.response?.data?.message || "Failed to accept appointment after confirmation.");
+                        toast.error(confirmErr.response?.data?.message || "Failed to accept appointment after confirmation.");
                     }
                 }
             } else {
-                toast(error?.message || "Something went wrong.");
+                toast.error(error?.message || "Something went wrong.");
             }
         }
     };
@@ -124,7 +122,9 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
         });
     };
 
-
+    useEffect(() => {
+        console.log("appointment passed to child component:", appointment);
+    }, [appointment]);
     const labelStyle = { color: darkMode ? '#ddd' : undefined };
     const textStyle = { color: darkMode ? '#fff' : undefined };
 
@@ -164,7 +164,11 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
                     </Text>
                 </Form.Item>
                 <Form.Item label={<span style={labelStyle}>{t('fields.note')}</span>}>
-                    <Text style={textStyle}>{userNote || t('fields.noNote')}</Text>
+                    <Text style={textStyle}>
+                        {!userNote || userNote.trim().toLowerCase() === 'no note'
+                            ? t('fields.noNote')
+                            : userNote}
+                    </Text>
                 </Form.Item>
                 <Form.Item label={<span style={labelStyle}>{t('fields.status')}</span>}>
                     {getStatusTag(status)}
@@ -180,24 +184,27 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
                 )}
             </Form>
 
-            <div className="flex gap-3 items-center justify-between mt-8">
-                <Button
-                    title={t('buttons.accept')}
-                    size="large"
-                    btnAccept
-                    className="text-white"
-                    bgColor="rgb(5 150 105)"
-                    onClick={handleAccept}
-                />
-                <Button
-                    title={t('buttons.reject')}
-                    iconPosition="left"
-                    btnReject
-                    size="large"
-                    style={{ backgroundColor: 'red', color: 'white' }}
-                    onClick={handleReject}
-                />
-            </div>
+            {status === "pending" && (
+                <div className="flex gap-3 items-center justify-between mt-8">
+                    <Button
+                        title={t('buttons.accept')}
+                        size="large"
+                        btnAccept
+                        className="text-white"
+                        bgColor="rgb(5 150 105)"
+                        onClick={handleAccept}
+                    />
+                    <Button
+                        title={t('buttons.reject')}
+                        iconPosition="left"
+                        btnReject
+                        size="large"
+                        style={{ backgroundColor: 'red', color: 'white' }}
+                        onClick={handleReject}
+                    />
+                </div>
+            )}
+
         </Card>
     );
 };
