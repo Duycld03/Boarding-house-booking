@@ -34,6 +34,12 @@ import en_calculateRent from "@/locales/en/calculateRent.json";
 import vi_calculateRent from "@/locales/vi/calculateRent.json";
 import en_rentPayment from "@/locales/en/rentPayment.json";
 import vi_rentPayment from "@/locales/vi/rentPayment.json";
+import en_renewalManagement from "@/locales/en/renewalManagement.json";
+import vi_renewalManagement from "@/locales/vi/renewalManagement.json";
+import en_review from "@/locales/en/review.json";
+import vi_review from "@/locales/vi/review.json";
+import en_depositRefundRequest from "@/locales/en/depositRefundRequest.json";
+import vi_depositRefundRequest from "@/locales/vi/depositRefundRequest.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -55,6 +61,9 @@ i18n.use(initReactI18next).init({
       depositManagement: en_depositManagement,
       calculateRent: en_calculateRent,
       rentPayment: en_rentPayment,
+      renewalManagement: en_renewalManagement,
+      review: en_review,
+      depositRefundRequest: en_depositRefundRequest,
     },
     vi: {
       menu: vi_menu,
@@ -74,6 +83,9 @@ i18n.use(initReactI18next).init({
       depositManagement: vi_depositManagement,
       calculateRent: vi_calculateRent,
       rentPayment: vi_rentPayment,
+      renewalManagement: vi_renewalManagement,
+      review: vi_review,
+      depositRefundRequest: vi_depositRefundRequest,
     },
   },
   lng: "en",

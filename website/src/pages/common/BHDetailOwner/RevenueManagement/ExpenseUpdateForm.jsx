@@ -1,72 +1,86 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Form,
   Input,
-  Button,
-  Space,
-  Divider,
-  Card,
   InputNumber,
-  Typography,
+  Button,
+  Divider,
   Row,
   Col,
+  Space,
 } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
-const { Title } = Typography;
+// Giá cố định cho điện và nước
+const ELECTRICITY_PRICE = 3000; // VND/kWh
+const WATER_PRICE = 15000; // VND/m³
 
 const ExpenseUpdateForm = ({
   expenseData,
   onCancel,
   onSubmit,
   isLoading = false,
+  isAddNew = false,
+  t,
+  currentLanguage,
 }) => {
   const [form] = Form.useForm();
 
-  React.useEffect(() => {
+  useEffect(() => {
     form.setFieldsValue({
-      id: expenseData?.id,
-      electricalExpense: expenseData.electricalExpense || {
+      electricalExpense: expenseData?.electricalExpense || {
         oldNumber: 0,
         newNumber: 0,
         quantityConsumed: 0,
         totalAmount: 0,
       },
-      waterExpense: expenseData.waterExpense || {
+      waterExpense: expenseData?.waterExpense || {
         oldNumber: 0,
         newNumber: 0,
         quantityConsumed: 0,
         totalAmount: 0,
       },
-      otherExpenses: expenseData.otherExpenses?.length
-        ? expenseData.otherExpenses
-        : [{ feeName: "", feeAmount: 0 }],
+      otherExpenses: expenseData?.otherExpenses || [
+        { feeName: "", feeAmount: 0 },
+      ],
     });
   }, [expenseData, form]);
 
-  const ELECTRICITY_PRICE = 3000;
-  const WATER_PRICE = 15000;
-
-  const calculateQuantity = (field, price) => {
+  // Tính toán số lượng tiêu thụ và tổng tiền
+  const calculateQuantity = (fieldType, price) => {
     const values = form.getFieldsValue();
-    const oldNumber = values[field]?.oldNumber || 0;
-    const newNumber = values[field]?.newNumber || 0;
-    const quantityConsumed = Math.max(0, newNumber - oldNumber);
-    const totalAmount = quantityConsumed * price;
+    const expense = values[fieldType];
 
-    form.setFieldsValue({
-      [field]: {
-        oldNumber,
-        newNumber,
-        quantityConsumed,
-        totalAmount,
-      },
-    });
+    if (
+      expense &&
+      expense.oldNumber !== undefined &&
+      expense.newNumber !== undefined
+    ) {
+      const oldNumber = Number(expense.oldNumber);
+      const newNumber = Number(expense.newNumber);
+
+      if (!isNaN(oldNumber) && !isNaN(newNumber) && newNumber >= oldNumber) {
+        const quantityConsumed = newNumber - oldNumber;
+        const totalAmount = quantityConsumed * price;
+
+        // Cập nhật form
+        const updatedExpense = {
+          ...expense,
+          quantityConsumed,
+          totalAmount,
+        };
+
+        form.setFieldsValue({
+          [fieldType]: updatedExpense,
+        });
+      }
+    }
   };
 
   const handleFinish = (values) => {
+    // Filter out empty other expenses
     const filteredOtherExpenses = values.otherExpenses.filter(
-      (expense) => expense.feeName.trim() && expense.feeAmount > 0
+      (expense) => expense.feeName?.trim() && expense.feeAmount !== undefined
     );
 
     const formattedValues = {
@@ -82,188 +96,227 @@ const ExpenseUpdateForm = ({
       otherExpenses: filteredOtherExpenses,
     };
     onSubmit(formattedValues);
-    form.resetFields();
-    onCancel();
   };
 
   return (
-    <Card bordered={false}>
-      <Title level={4}>Update Expense</Title>
+    <Form form={form} layout="vertical" onFinish={handleFinish}>
+      <Divider>
+        {t
+          ? t("revenue.expenses.electricity", "Electricity Expense")
+          : "Electricity Expense"}
+      </Divider>
+      <Row gutter={16}>
+        {["oldNumber", "newNumber"].map((field, index) => (
+          <Col span={12} key={field}>
+            <Form.Item
+              name={["electricalExpense", field]}
+              label={
+                index === 0
+                  ? t
+                    ? t("revenue.expenses.oldReading", "Old Reading")
+                    : "Old Reading"
+                  : t
+                  ? t("revenue.expenses.newReading", "New Reading")
+                  : "New Reading"
+              }
+            >
+              <InputNumber
+                min={0}
+                formatter={(value) =>
+                  value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                }
+                parser={(value) => value?.replace(/\./g, "").replace(",", ".")}
+                style={{ width: "100%" }}
+                onChange={() =>
+                  calculateQuantity("electricalExpense", ELECTRICITY_PRICE)
+                }
+              />
+            </Form.Item>
+          </Col>
+        ))}
+      </Row>
+      <Row gutter={16}>
+        {["quantityConsumed", "totalAmount"].map((field, index) => (
+          <Col span={12} key={field}>
+            <Form.Item
+              name={["electricalExpense", field]}
+              label={
+                index === 0
+                  ? t
+                    ? t("revenue.expenses.consumption", "Consumption")
+                    : "Consumption"
+                  : t
+                  ? t("revenue.expenses.totalAmount", "Total Amount (VND)")
+                  : "Total Amount (VND)"
+              }
+            >
+              <InputNumber
+                min={0}
+                formatter={(value) =>
+                  value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                }
+                parser={(value) => value?.replace(/\./g, "").replace(",", ".")}
+                style={{ width: "100%" }}
+                disabled={field === "quantityConsumed"}
+              />
+            </Form.Item>
+          </Col>
+        ))}
+      </Row>
+
       <Divider />
 
-      <Form form={form} layout="vertical" onFinish={handleFinish}>
-        <Title level={5}>Electricity Expense</Title>
-        <Row gutter={16}>
-          {["oldNumber", "newNumber"].map((field, index) => (
-            <Col span={12} key={field}>
-              <Form.Item
-                name={["electricalExpense", field]}
-                label={index === 0 ? "Old Reading" : "New Reading"}
-              >
-                <InputNumber
-                  min={0}
-                  formatter={(value) =>
-                    value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                  }
-                  parser={(value) =>
-                    value?.replace(/\./g, "").replace(",", ".")
-                  }
-                  style={{ width: "100%" }}
-                  onChange={() =>
-                    calculateQuantity("electricalExpense", ELECTRICITY_PRICE)
-                  }
-                />
-              </Form.Item>
-            </Col>
-          ))}
-        </Row>
-        <Row gutter={16}>
-          {["quantityConsumed", "totalAmount"].map((field, index) => (
-            <Col span={12} key={field}>
-              <Form.Item
-                name={["electricalExpense", field]}
-                label={index === 0 ? "Consumption" : "Total Amount (VND)"}
-              >
-                <InputNumber
-                  min={0}
-                  formatter={(value) =>
-                    value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                  }
-                  parser={(value) =>
-                    value?.replace(/\./g, "").replace(",", ".")
-                  }
-                  style={{ width: "100%" }}
-                  disabled={field === "quantityConsumed"}
-                />
-              </Form.Item>
-            </Col>
-          ))}
-        </Row>
+      <Divider>
+        {t ? t("revenue.expenses.water", "Water Expense") : "Water Expense"}
+      </Divider>
+      <Row gutter={16}>
+        {["oldNumber", "newNumber"].map((field, index) => (
+          <Col span={12} key={field}>
+            <Form.Item
+              name={["waterExpense", field]}
+              label={
+                index === 0
+                  ? t
+                    ? t("revenue.expenses.oldReading", "Old Reading")
+                    : "Old Reading"
+                  : t
+                  ? t("revenue.expenses.newReading", "New Reading")
+                  : "New Reading"
+              }
+            >
+              <InputNumber
+                min={0}
+                style={{ width: "100%" }}
+                formatter={(value) =>
+                  value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                }
+                parser={(value) => value?.replace(/\./g, "").replace(",", ".")}
+                onChange={() => calculateQuantity("waterExpense", WATER_PRICE)}
+              />
+            </Form.Item>
+          </Col>
+        ))}
+      </Row>
+      <Row gutter={16}>
+        {["quantityConsumed", "totalAmount"].map((field, index) => (
+          <Col span={12} key={field}>
+            <Form.Item
+              name={["waterExpense", field]}
+              label={
+                index === 0
+                  ? t
+                    ? t("revenue.expenses.consumption", "Consumption")
+                    : "Consumption"
+                  : t
+                  ? t("revenue.expenses.totalAmount", "Total Amount (VND)")
+                  : "Total Amount (VND)"
+              }
+            >
+              <InputNumber
+                min={0}
+                formatter={(value) =>
+                  value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                }
+                parser={(value) => value?.replace(/\./g, "").replace(",", ".")}
+                style={{ width: "100%" }}
+                disabled={field === "quantityConsumed"}
+              />
+            </Form.Item>
+          </Col>
+        ))}
+      </Row>
 
-        <Divider />
+      <Divider>
+        {t ? t("revenue.expenses.other", "Other Expenses") : "Other Expenses"}
+      </Divider>
 
-        <Title level={5}>Water Expense</Title>
-        <Row gutter={16}>
-          {["oldNumber", "newNumber"].map((field, index) => (
-            <Col span={12} key={field}>
-              <Form.Item
-                name={["waterExpense", field]}
-                label={index === 0 ? "Old Reading" : "New Reading"}
-              >
-                <InputNumber
-                  min={0}
-                  style={{ width: "100%" }}
-                  formatter={(value) =>
-                    value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                  }
-                  parser={(value) =>
-                    value?.replace(/\./g, "").replace(",", ".")
-                  }
-                  onChange={() =>
-                    calculateQuantity("waterExpense", WATER_PRICE)
-                  }
-                />
-              </Form.Item>
-            </Col>
-          ))}
-        </Row>
-        <Row gutter={16}>
-          {["quantityConsumed", "totalAmount"].map((field, index) => (
-            <Col span={12} key={field}>
-              <Form.Item
-                name={["waterExpense", field]}
-                label={index === 0 ? "Consumption" : "Total Amount (VND)"}
-              >
-                <InputNumber
-                  min={0}
-                  formatter={(value) =>
-                    value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                  }
-                  parser={(value) =>
-                    value?.replace(/\./g, "").replace(",", ".")
-                  }
-                  style={{ width: "100%" }}
-                  disabled={field === "quantityConsumed"}
-                />
-              </Form.Item>
-            </Col>
-          ))}
-        </Row>
-
-        <Divider>Other Expenses</Divider>
-
-        <Form.List name="otherExpenses">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name, ...restField }) => (
-                <Row key={key} gutter={16} align="middle" className="mb-5">
-                  <Col span={14}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, "feeName"]}
-                      style={{ marginBottom: 0 }}
-                    >
-                      <Input placeholder="Expense Name" />
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, "feeAmount"]}
-                      style={{ marginBottom: 0 }}
-                    >
-                      <InputNumber
-                        min={0}
-                        formatter={(value) =>
-                          value
-                            ?.toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                        }
-                        parser={(value) =>
-                          value?.replace(/\./g, "").replace(",", ".")
-                        }
-                        placeholder="Amount"
-                        style={{ width: "100%" }}
-                        addonAfter="VND"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={2}>
-                    <Button
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() => remove(name)}
-                      style={{
-                        height: "32px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+      <Form.List name="otherExpenses">
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map(({ key, name, ...restField }) => (
+              <Row key={key} gutter={16} align="middle" className="mb-5">
+                <Col span={14}>
+                  <Form.Item
+                    {...restField}
+                    name={[name, "feeName"]}
+                    style={{ marginBottom: 0 }}
+                  >
+                    <Input
+                      placeholder={
+                        t
+                          ? t("revenue.expenses.expenseName", "Expense Name")
+                          : "Expense Name"
+                      }
                     />
-                  </Col>
-                </Row>
-              ))}
-              <Button
-                type="dashed"
-                onClick={() => add()}
-                block
-                icon={<PlusOutlined />}
-              >
-                Add Expense
-              </Button>
-            </>
-          )}
-        </Form.List>
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    {...restField}
+                    name={[name, "feeAmount"]}
+                    style={{ marginBottom: 0 }}
+                  >
+                    <InputNumber
+                      min={0}
+                      formatter={(value) =>
+                        value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                      }
+                      parser={(value) =>
+                        value?.replace(/\./g, "").replace(",", ".")
+                      }
+                      placeholder={
+                        t ? t("revenue.expenses.amount", "Amount") : "Amount"
+                      }
+                      style={{ width: "100%" }}
+                      addonAfter="VND"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={2}>
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => remove(name)}
+                    style={{
+                      height: "32px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  />
+                </Col>
+              </Row>
+            ))}
+            <Button
+              type="dashed"
+              onClick={() => add()}
+              block
+              icon={<PlusOutlined />}
+            >
+              {t
+                ? t("revenue.buttons.addExpense", "Add Expense")
+                : "Add Expense"}
+            </Button>
+          </>
+        )}
+      </Form.List>
 
-        <Divider />
-        <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-          <Button onClick={onCancel}>Cancel</Button>
-          <Button type="primary" htmlType="submit" loading={isLoading}>
-            Save
-          </Button>
-        </Space>
-      </Form>
-    </Card>
+      <Divider />
+      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+        <Button onClick={onCancel}>
+          {t ? t("revenue.buttons.cancel", "Cancel") : "Cancel"}
+        </Button>
+        <Button type="primary" htmlType="submit" loading={isLoading}>
+          {isAddNew
+            ? t
+              ? t("revenue.buttons.add", "Add")
+              : "Add"
+            : t
+            ? t("revenue.buttons.save", "Save")
+            : "Save"}
+        </Button>
+      </Space>
+    </Form>
   );
 };
 

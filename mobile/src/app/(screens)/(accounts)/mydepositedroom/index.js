@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   View,
   RefreshControl,
@@ -14,18 +14,17 @@ import { useTheme } from "@/context/ThemeProvider";
 import { useThemedClasses } from "@/utils/useTheme";
 import { useTranslation } from "react-i18next";
 import { getMyDepositedRoom } from "@/API/depositAPI";
+import { getMyRefundRequests } from "@/API/refundRequestAPI";
 import { useNotification } from "@/context/NotificationProvider";
 import {
   Ionicons,
-  MaterialIcons,
-  FontAwesome,
   FontAwesome5,
   MaterialCommunityIcons,
-  AntDesign,
 } from "@expo/vector-icons";
 import { useCurrentUser } from "@/context/userContext";
 import { useFocusEffect, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { getRenewalRequests } from "@/API/renewalRequestAPI";
 import DepositCard from "@/components/screen/myDepositedRoom/DepositCard";
 
 function MyDepositedRoom() {
@@ -34,19 +33,25 @@ function MyDepositedRoom() {
   const { t } = useTranslation("myDepositedRoom");
   const { isLogin } = useCurrentUser();
   const router = useRouter();
+  const { showError } = useNotification();
 
-  const { showSuccess, showError } = useNotification();
-
+  // State management
   const [depositData, setDepositData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [pendingRenewalRequests, setPendingRenewalRequests] = useState({});
+  const [refundRequestsMap, setRefundRequestsMap] = useState({});
+  const [loadingRefundRequests, setLoadingRefundRequests] = useState(false);
 
+  // Pagination state
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
     limit: 5,
+    hasNextPage: false,
+    hasPrevPage: false,
   });
 
   const [paginationOptions, setPaginationOptions] = useState({
@@ -66,7 +71,42 @@ function MyDepositedRoom() {
     }, [isLogin, router])
   );
 
-  // Update the fetchData function to properly handle pagination
+  // Fetch pending renewal requests
+  const fetchPendingRenewalRequests = useCallback(async () => {
+    try {
+      const res = await getRenewalRequests({
+        limit: 100,
+      });
+      if (res) {
+        const pendingRequestMap = {};
+        res.data.forEach(request => {
+          // Map depositRoomId to true for pending requests
+          if (request.status === "pending") {
+            pendingRequestMap[request.depositRoomId?._id] = true;
+          }
+        });
+        setPendingRenewalRequests(pendingRequestMap);
+      }
+    } catch (error) {
+      console.error("Error fetching renewal requests:", error);
+    }
+  }, []);
+
+  // Fetch refund requests map
+  const fetchRefundRequests = useCallback(async () => {
+    setLoadingRefundRequests(true);
+    try {
+      const response = await getMyRefundRequests();
+      setRefundRequestsMap(response.refundRequests || {});
+    } catch (error) {
+      console.error("Error fetching refund requests:", error);
+      setRefundRequestsMap({});
+    } finally {
+      setLoadingRefundRequests(false);
+    }
+  }, []);
+
+  // Fetch data function with proper pagination handling
   const fetchData = useCallback(
     async (isLoadMore = false) => {
       if (isLoadMore) {
@@ -76,12 +116,10 @@ function MyDepositedRoom() {
       }
 
       try {
-        const res = await getMyDepositedRoom({
-          page: paginationOptions.page,
-          limit: paginationOptions.limit,
-        });
+        const res = await getMyDepositedRoom(paginationOptions);
 
         if (res.success) {
+          // Update pagination state
           setPagination({
             currentPage: res.pagination.currentPage,
             totalPages: res.pagination.totalPages,
@@ -91,15 +129,36 @@ function MyDepositedRoom() {
             hasPrevPage: res.pagination.hasPrevPage,
           });
 
-          // If loading more, append new data; otherwise, replace existing data
+          // Handle data based on load more or initial load
           if (isLoadMore) {
-            setDepositData((prev) => [...prev, ...res.data]);
+            setDepositData((prev) => {
+              // Create a Set of existing IDs to prevent duplicates
+              const existingIds = new Set(prev.map((item) => item._id));
+
+              // Filter out any items that already exist
+              const newUniqueItems = res.data.filter(
+                (item) => !existingIds.has(item._id)
+              );
+
+              return [...prev, ...newUniqueItems];
+            });
           } else {
             setDepositData(res.data);
           }
+          // Fetch pending renewal requests after getting deposit data
+          await fetchPendingRenewalRequests();
+          // Fetch refund requests after getting deposit data
+          await fetchRefundRequests();
         } else {
+          showError(res.message || t("errorLoadingDeposits"));
         }
       } catch (error) {
+        console.error("Error fetching deposit data:", error);
+        showError(
+          error.response?.data?.message ||
+          error.message ||
+          t("errorLoadingDeposits")
+        );
       } finally {
         if (isLoadMore) {
           setLoadingMore(false);
@@ -108,46 +167,121 @@ function MyDepositedRoom() {
         }
       }
     },
-    [paginationOptions, t, showError]
+    [paginationOptions, t, showError, fetchPendingRenewalRequests, fetchRefundRequests]
   );
 
+  // Initial load effect
   useEffect(() => {
-    if (isLogin) {
+    if (isLogin && paginationOptions.page === 1) {
       fetchData();
     }
-  }, [fetchData, isLogin]);
+  }, [isLogin, fetchData]);
 
+  // Load more effect
+  useEffect(() => {
+    if (paginationOptions.page > 1) {
+      fetchData(true);
+    }
+  }, [paginationOptions.page, fetchData]);
+
+  // THÊM MỚI: useFocusEffect để refresh refund requests khi screen được focus
+  useFocusEffect(
+    useCallback(() => {
+      // Chỉ refresh refund requests, không fetch lại toàn bộ data
+      if (isLogin && depositData.length > 0) {
+        fetchRefundRequests();
+      }
+    }, [isLogin, depositData.length, fetchRefundRequests])
+  );
+
+  // Handle refresh
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setPaginationOptions((prev) => ({
-      ...prev,
+
+    // Reset pagination to page 1
+    setPaginationOptions({
       page: 1,
       limit: 5,
-    }));
-    await fetchData();
-    setRefreshing(false);
-  }, [fetchData]);
+      sortField: "createdAt",
+      sortOrder: "desc",
+    });
 
-  // Action handlers
-  const handlePayRent = useCallback(
-    (deposit) => {
-      // Navigate to PayRent screen with deposit data
-      router.push({
-        pathname: "/mydepositedroom/payRent",
-        params: { deposit: JSON.stringify(deposit) },
+    // Clear existing data
+    setDepositData([]);
+    setRefundRequestsMap({});
+
+    try {
+      const res = await getMyDepositedRoom({
+        page: 1,
+        limit: 5,
+        sortField: "createdAt",
+        sortOrder: "desc",
       });
-    },
-    [router]
-  );
 
+      if (res.success) {
+        setPagination({
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
+          totalItems: res.pagination.totalItems,
+          limit: res.pagination.limit,
+          hasNextPage: res.pagination.hasNextPage,
+          hasPrevPage: res.pagination.hasPrevPage,
+        });
+
+        setDepositData(res.data);
+        // Refresh pending renewal requests
+        await fetchPendingRenewalRequests();
+        // Fetch refund requests after setting data
+        await fetchRefundRequests();
+      }
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      showError(t("errorLoadingDeposits"));
+    } finally {
+      setRefreshing(false);
+    }
+  }, [showError, t, fetchPendingRenewalRequests, fetchRefundRequests]);
+
+  // Handle load more
+  const handleLoadMore = useCallback(() => {
+    // Check if we can load more
+    if (pagination.hasNextPage && !loadingMore && !loading) {
+      setPaginationOptions((prev) => ({
+        ...prev,
+        page: prev.page + 1, // Increment page to get next 5 items
+      }));
+    }
+  }, [
+    pagination.hasNextPage,
+    loadingMore,
+    loading,
+  ]);
+
+  // Calculate if we should show load more button
+  const hasMoreDeposits = useMemo(() => {
+    return depositData.length < pagination.totalItems && pagination.hasNextPage;
+  }, [depositData.length, pagination.totalItems, pagination.hasNextPage]);
+
+  // Handle refund
   const handleRefund = useCallback(
     (deposit) => {
-      showSuccess(t("refundRequestSent"));
+      // Check if there's already an existing refund request
+      const hasExistingRequest = refundRequestsMap[deposit._id];
+      if (hasExistingRequest) {
+        showError(t("refundRequestAlreadyExists"));
+        return;
+      }
+
+      // Navigate to refund screen
+      router.push({
+        pathname: "/mydepositedroom/refundRequest", // Using the more specific path from feature branch
+        params: { depositId: deposit._id },
+      });
     },
-    [t, showSuccess]
+    [router, refundRequestsMap, showError, t]
   );
 
-  // Add to your MyDepositedRoom screen
+  // Handle pay deposit
   const handlePayDeposit = useCallback(
     (item) => {
       // Navigate to pay deposit screen with deposit data
@@ -159,30 +293,52 @@ function MyDepositedRoom() {
     [router]
   );
 
-  // Update the handleLoadMore function
-  const handleLoadMore = useCallback(() => {
-    if (pagination.hasNextPage && !loadingMore) {
-      setPaginationOptions((prev) => ({
-        ...prev,
-        page: prev.page + 1, // Increment page instead of limit
-      }));
-      fetchData(true);
-    }
-  }, [pagination.hasNextPage, loadingMore, fetchData]);
+  // Handle create renew deposit
+  const handleCreateRenewDeposit = useCallback(
+    (item) => {
+      // Navigate to create renew request screen with deposit data
+      router.push({
+        pathname: "/mydepositedroom/createRenewalRequest",
+        params: { deposit: JSON.stringify(item) },
+      });
+    },
+    [router]
+  );
 
-  const hasMoreDeposits = depositData.length < pagination.totalItems;
+  // Handle navigate to detail
+  const handleDepositPress = useCallback(
+    (deposit) => {
+      router.push({
+        pathname: "/mydepositedroom/detail",
+        params: { depositId: deposit._id },
+      });
+    },
+    [router]
+  );
 
+  // Render functions
   const renderDepositItem = useCallback(
     ({ item, index }) => (
       <DepositCard
         item={item}
-        onPayRent={handlePayRent}
         onRefund={handleRefund}
-        onPayDeposit={handlePayDeposit} // Add this prop
+        onPayDeposit={handlePayDeposit}
+        onCreateRenewDeposit={handleCreateRenewDeposit}
+        onPress={handleDepositPress}
         index={index}
+        isCreateRenewDeposit={Boolean(pendingRenewalRequests[item._id])}
+        hasExistingRefundRequest={!!refundRequestsMap[item._id]} // Pass refund request status
+        refundRequestInfo={refundRequestsMap[item._id]} // Pass refund request info
       />
     ),
-    [handlePayRent, handleRefund, handlePayDeposit]
+    [
+      handleRefund,
+      handlePayDeposit,
+      handleCreateRenewDeposit,
+      handleDepositPress,
+      pendingRenewalRequests,
+      refundRequestsMap
+    ]
   );
 
   const renderFooter = () => {
@@ -195,8 +351,8 @@ function MyDepositedRoom() {
             "bg-gray-800/95 backdrop-blur-sm border-gray-700/50 shadow-2xl shadow-black/30"
           )}
           style={{
-            borderRadius: 24, // Explicitly set borderRadius to match rounded-3xl
-            overflow: "hidden", // Ensure content doesn't overflow rounded corners
+            borderRadius: 24,
+            overflow: "hidden",
           }}
         >
           <View className="flex-row items-center justify-center">
@@ -229,14 +385,13 @@ function MyDepositedRoom() {
           "bg-gray-800/95 backdrop-blur-sm border-gray-700/50 shadow-2xl shadow-black/40"
         )}`}
         style={{
-          opacity: 1, // Instead of using Animated.FadeInDown
-          transform: [{ translateY: 0 }], // Instead of using Animated.FadeInDown
-          borderRadius: 24, // Explicitly set borderRadius to match rounded-3xl
-          overflow: "hidden", // Ensure content doesn't overflow rounded corners
+          opacity: 1,
+          transform: [{ translateY: 0 }],
+          borderRadius: 24,
+          overflow: "hidden",
         }}
       >
         <View className="items-center">
-          {/* Enhanced empty state with animation */}
           <View className="relative mb-8">
             <LinearGradient
               colors={
@@ -245,7 +400,12 @@ function MyDepositedRoom() {
                   : ["rgba(139, 92, 246, 0.2)", "rgba(99, 102, 241, 0.05)"]
               }
               className="absolute -inset-5 rounded-full opacity-80 blur-xl"
-              style={{ borderRadius: 9999 }} // Ensure the gradient blob is properly rounded
+              style={{ borderRadius: 9999 }}
+            />
+            <MaterialCommunityIcons
+              name="home-search"
+              size={80}
+              color={isDarkMode ? "#8B5CF6" : "#6366F1"}
             />
           </View>
 
@@ -270,7 +430,6 @@ function MyDepositedRoom() {
     </View>
   );
 
-  // Enhanced LoadMoreButton
   const renderLoadMoreButton = () => {
     if (depositData.length === 0 || loading) return null;
 
@@ -287,23 +446,21 @@ function MyDepositedRoom() {
           allLoaded: t("allDepositsLoaded") || "All deposits loaded",
           loadingMore: t("loadingMoreDeposits") || "Loading more deposits...",
           loadMore: t("loadMoreDeposits") || "Load more deposits",
-          progressText: `${depositData.length} ${t("of")} ${
-            pagination.totalItems
-          } ${t("depositsLoaded")}`,
+          progressText: `${depositData.length} ${t("of")} ${pagination.totalItems
+            } ${t("depositsLoaded")}`,
         }}
         showProgress={true}
         customStyles={{
           container: { paddingHorizontal: 0, marginBottom: 24 },
           button: {
             marginHorizontal: 16,
-            borderRadius: 12, // Ensure consistent border radius on load more button
+            borderRadius: 12,
           },
         }}
       />
     );
   };
 
-  // Enhanced Header
   const renderHeader = () => (
     <View className="px-4 py-2 mb-2">
       <View className="flex-row items-center justify-between">
@@ -348,7 +505,7 @@ function MyDepositedRoom() {
       <FlatList
         data={depositData}
         renderItem={renderDepositItem}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item, index) => item._id || `deposit-${index}`}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -367,6 +524,12 @@ function MyDepositedRoom() {
           paddingBottom: 32,
           flexGrow: 1,
         }}
+        // Performance optimizations
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={50}
+        initialNumToRender={5}
+        windowSize={10}
       />
 
       {renderLoadMoreButton()}

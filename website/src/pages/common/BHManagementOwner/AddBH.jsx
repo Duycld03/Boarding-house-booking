@@ -34,7 +34,7 @@ import './darkModeOverrides.css';
 const cx = classNames;
 
 const AddBHModal = ({ onAddData }) => {
-  const { t } = useTranslation('bhManagement');
+  const { t, i18n } = useTranslation('bhManagement');
   const { darkMode } = useTheme();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -57,6 +57,7 @@ const AddBHModal = ({ onAddData }) => {
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
   const [geoLocation, setGeoLocation] = useState(null);
   const [managers, setManagers] = useState([]); // To store the list of managers
+  const lang = i18n.language || 'vi';
 
   const darkInputStyle = darkMode
     ? {
@@ -76,21 +77,21 @@ const AddBHModal = ({ onAddData }) => {
         const provincesData = await fetchProvinces();
         setProvinces(provincesData);
 
-        if (formData?.address?.province) {
+        if (formData?.address?.province?.name) {
           const selectedProvince = provincesData.find(
-            (p) => p.name === formData.address.province
+            (p) => p.name.vi === formData.address.province.name
           );
           if (selectedProvince) {
-            const districtsData = await fetchDistricts(selectedProvince.code);
+            const districtsData = await fetchDistricts(selectedProvince.id);
             setDistricts(districtsData);
             setWards([]);
 
-            if (formData?.address?.district) {
+            if (formData?.address?.district?.name) {
               const selectedDistrict = districtsData.find(
-                (d) => d.name === formData.address.district
+                (d) => d.name.vi === formData.address.district.name
               );
               if (selectedDistrict) {
-                const wardsData = await fetchWards(selectedDistrict.code);
+                const wardsData = await fetchWards(selectedDistrict.id);
                 setWards(wardsData);
               }
             }
@@ -101,7 +102,7 @@ const AddBHModal = ({ onAddData }) => {
       }
     };
     fetchData();
-  }, [formData?.address?.province, formData?.address?.district]);
+  }, [formData?.address?.province?.name, formData?.address?.district?.name]);
 
   // Fetch boarding house types
   useEffect(() => {
@@ -333,9 +334,21 @@ const AddBHModal = ({ onAddData }) => {
       payload.append('priceRange', formData.priceRange);
       payload.append('electricityPrice', formData.electricityPrice);
       payload.append('waterPrice', formData.waterPrice);
-      payload.append('address[province]', formData.address.province);
-      payload.append('address[district]', formData.address.district);
-      payload.append('address[ward]', formData.address.ward);
+      payload.append('address[province][name]', formData.address.province.name);
+      payload.append(
+        'address[province][name_en]',
+        formData.address.province.name_en
+      );
+
+      payload.append('address[district][name]', formData.address.district.name);
+      payload.append(
+        'address[district][name_en]',
+        formData.address.district.name_en
+      );
+
+      payload.append('address[ward][name]', formData.address.ward.name);
+      payload.append('address[ward][name_en]', formData.address.ward.name_en);
+
       payload.append('address[detail]', formData.address.detail);
       payload.append('location[lat]', geoLocation.lat);
       payload.append('location[lon]', geoLocation.lon);
@@ -593,7 +606,7 @@ const AddBHModal = ({ onAddData }) => {
               formData={formData}
               location={geoLocation}
               setGeoLocation={setGeoLocation}
-              darkMode={darkMode} // nếu AddressSelector hỗ trợ dark mode
+              darkMode={darkMode}
             />
 
             <h2

@@ -1,11 +1,13 @@
+import formatAmount from "@/utils/formatAmount";
 import { Empty } from "antd";
 import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 
 const RevenueMonthlyView = ({
   monthlyData,
-  formatCurrency,
   monthlyExpenses,
+  currentLanguage,
+  t,
 }) => {
   const COLORS = {
     profit: "#10B981", // green-500
@@ -71,34 +73,34 @@ const RevenueMonthlyView = ({
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-          <p className="text-sm text-blue-600 font-medium">Total Revenue</p>
+          <p className="text-lg text-blue-600 font-medium">Total Revenue</p>
           <p className="text-2xl font-bold text-blue-700">
-            {formatCurrency(monthlyData.totalRevenue)}
+            {formatAmount(monthlyData?.totalRevenue, currentLanguage)}
           </p>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-          <p className="text-sm text-purple-600 font-medium">Net Profit</p>
+        <div className="bg-purple-50 dark:bg-purple-100 p-4 rounded-lg border border-purple-100 dark:border-purple-200">
+          <p className="text-lg text-purple-600 font-medium">Net Profit</p>
           <p className="text-2xl font-bold text-purple-700">
-            {formatCurrency(netProfit)}
+            {formatAmount(netProfit, currentLanguage)}
           </p>
         </div>
         <div className="bg-red-50 p-4 rounded-lg border border-red-100">
-          <p className="text-sm text-red-600 font-medium">Utility Expenses</p>
+          <p className="text-lg text-red-600 font-medium">Utility Expenses</p>
           <p className="text-2xl font-bold text-red-700">
-            {formatCurrency(totalUtilityExpenses)}
+            {formatAmount(totalUtilityExpenses, currentLanguage)}
           </p>
         </div>
         <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-          <p className="text-sm text-green-600 font-medium">Other Expenses</p>
+          <p className="text-lg text-green-600 font-medium">Other Expenses</p>
           <p className="text-2xl font-bold text-green-700">
-            {formatCurrency(totalOtherExpenses)}
+            {formatAmount(totalOtherExpenses, currentLanguage)}
           </p>
         </div>
       </div>
 
       {/* Pie chart */}
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <h3 className="text-lg font-semibold mb-2 text-gray-700">
+      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">
           Expense Allocation
         </h3>
         <ResponsiveContainer width="100%" height={250}>
@@ -120,7 +122,9 @@ const RevenueMonthlyView = ({
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => formatCurrency(value)} />
+            <Tooltip
+              formatter={(value) => formatAmount(value, currentLanguage)}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>

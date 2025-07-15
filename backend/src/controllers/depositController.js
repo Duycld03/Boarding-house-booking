@@ -10,7 +10,6 @@ import PaymentBill from "../models/paymentBill.js";
 import dotenv from "dotenv";
 import UserPayment from "../models/userPayment.js";
 import BoardingHouse from "../models/boardingHouse.js";
-import { query } from "express";
 import RefundRequest from "../models/refundRequest.js";
 import { Account } from "../models/account.js";
 import paginate from "../utils/pagination.js";
@@ -70,7 +69,7 @@ class DepositController {
         return res.status(403).json({ message: "User not found" });
       }
 
-      // Get pagination parameters from query
+      // Sử dụng page và limit thay vì chỉ limit
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 5;
       const skip = (page - 1) * limit;
@@ -91,13 +90,12 @@ class DepositController {
             totalItems: 0,
             limit,
             hasNextPage: false,
-            hasPrevPage: false,
           },
           data: [],
         });
       }
 
-      // Get deposits list with pagination
+      // Get deposits list with proper pagination
       const depositList = await DepositRoom.find(filter)
         .populate({
           path: "roomId",
@@ -127,10 +125,9 @@ class DepositController {
         };
       });
 
-      // Calculate pagination
+      // Calculate pagination info
       const totalPages = Math.ceil(totalItems / limit);
       const hasNextPage = page < totalPages;
-      const hasPrevPage = page > 1;
 
       const pagination = {
         currentPage: page,
@@ -138,7 +135,8 @@ class DepositController {
         totalItems,
         limit,
         hasNextPage,
-        hasPrevPage,
+        hasPrevPage: page > 1,
+        currentCount: depositList.length,
       };
 
       return res.status(200).json({
@@ -195,6 +193,79 @@ class DepositController {
       });
     } catch (error) {
       res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+  async getDepositRoomDetail(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+      const { userId } = req.user;
+
+      // Verify that the deposit belongs to the user
+      const deposit = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: userId,
+      })
+        .populate({
+          path: "roomId",
+          select: "roomNumber images",
+          populate: [
+            {
+              path: "boardingHouseId",
+              select: "name",
+              populate: { path: "boardingHouseType", select: "name" },
+            },
+            {
+              path: "rentBy",
+              select: "fullname avatarImage",
+            },
+            {
+              path: "roomTypeId",
+              select: "price roomSize",
+            },
+          ],
+        })
+        .lean();
+
+      if (!deposit) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Deposit room not found or you do not have permission to view it",
+        });
+      }
+
+      // Format the response data
+      const formattedData = {
+        _id: deposit._id,
+        boardingHouseName: deposit.roomId.boardingHouseId.name,
+        boardingHouseType:
+          deposit.roomId.boardingHouseId.boardingHouseType.name,
+        roomNumber: deposit.roomId.roomNumber,
+        images: deposit.roomId.images,
+        price: deposit.roomId.roomTypeId.price,
+        roomSize: deposit.roomId.roomTypeId.roomSize,
+        rentBy: deposit.roomId.rentBy,
+        amount: deposit.amount,
+        status: deposit.status,
+        rentalTime: deposit.rentalTime,
+        startDate: deposit.startDate,
+        endDate: deposit.endDate,
+        createdAt: deposit.createdAt,
+        reasonForCancel: deposit.reasonForCancel,
+      };
+
+      res.status(200).json({
+        success: true,
+        data: formattedData,
+      });
+    } catch (error) {
+      console.error("Error getting deposit room detail:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message,
+      });
     }
   }
 
@@ -285,7 +356,7 @@ class DepositController {
 
       const refundRequest = await RefundRequest.findOne({
         _id: refundRequestId,
-        accountId,
+        userId: accountId,
         status: { $regex: /^pending$/i },
       }).populate("depositRoomId");
 
@@ -307,13 +378,13 @@ class DepositController {
 
       await refundRequest.save();
 
-      const redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=success`;
+      const redirectUrl = `http://localhost:5173/refund-request-management?status=success`;
       return res.redirect(redirectUrl);
     }
     //failed
     let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
     if (type == "refund") {
-      redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
+      redirectUrl = `http://localhost:5173/refund-request-management?status=fail`;
     }
     res.redirect(redirectUrl);
   }
@@ -395,12 +466,12 @@ class DepositController {
           return res.redirect(redirectUrl);
         }
         // refund
-        const accountId = orderInfo[1];
-        const refundRequestId = orderInfo[2];
+        const accountId = info[1];
+        const refundRequestId = info[2];
 
         const refundRequest = await RefundRequest.findOne({
           _id: refundRequestId,
-          accountId,
+          userId: accountId,
           status: { $regex: /^pending$/i },
         }).populate("depositRoomId");
 
@@ -422,13 +493,13 @@ class DepositController {
 
         await refundRequest.save();
 
-        const redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=success`;
+        const redirectUrl = `http://localhost:5173/refund-request-management?status=success`;
         return res.redirect(redirectUrl);
       }
     } catch (error) {
       let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
       if (type == "refund") {
-        redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
+        redirectUrl = `http://localhost:5173/refund-request-management?status=fail`;
       }
       res.redirect(redirectUrl);
     }
@@ -537,7 +608,14 @@ class DepositController {
         });
       }
 
-      const { status, priceRange, roomId, rentalTime } = req.query;
+      const {
+        status,
+        boardingHouseId,
+        roomId,
+        rentalTime,
+        startDate,
+        endDate,
+      } = req.query;
 
       // 1. Tìm tất cả boarding house mà user là owner hoặc staff
       const boardingHouses = await BoardingHouse.find({
@@ -547,7 +625,14 @@ class DepositController {
       const bhIds = boardingHouses.map((bh) => bh._id.toString());
 
       // 2. Tìm tất cả room thuộc các boarding house này
-      const rooms = await Room.find({ boardingHouseId: { $in: bhIds } }).lean();
+      let roomFilter = { boardingHouseId: { $in: bhIds } };
+
+      // Nếu có boardingHouseId thì chỉ lấy rooms của boarding house đó
+      if (boardingHouseId && boardingHouseId !== "") {
+        roomFilter = { boardingHouseId: boardingHouseId };
+      }
+
+      const rooms = await Room.find(roomFilter).lean();
       const roomMap = new Map(
         rooms.map((room) => [
           room._id.toString(),
@@ -562,36 +647,54 @@ class DepositController {
       // 3. Tạo bộ lọc truy vấn DepositRoom
       let filter = { roomId: { $in: roomIds } };
 
-      if (roomId && roomId !== "" && roomMap.has(roomId)) {
+      // Xử lý filter roomId
+      if (roomId && roomId !== "all" && roomId !== "") {
         filter.roomId = roomId;
       }
 
-      if (status && status !== "") {
+      // Xử lý filter status
+      if (status && status !== "all" && status !== "") {
         filter.status = status;
       }
 
-      if (priceRange) {
-        try {
-          let [min, max] =
-            typeof priceRange === "string"
-              ? priceRange.split(",").map(Number)
-              : [0, 0];
-          if (!isNaN(min) && !isNaN(max)) {
-            filter.amount = { $gte: min, $lte: max };
-          }
-        } catch (e) {}
-      }
-
+      // Xử lý filter rentalTime
       if (rentalTime) {
         try {
-          let [min, max] =
-            typeof rentalTime === "string"
-              ? rentalTime.split(",").map(Number)
-              : [0, 0];
-          if (!isNaN(min) && !isNaN(max)) {
-            filter.rentalTime = { $gte: min, $lte: max };
+          // Case 1: Nếu rentalTime là array từ query string
+          if (Array.isArray(rentalTime)) {
+            let min = Number(rentalTime[0]);
+            let max = Number(rentalTime[1]);
+            if (!isNaN(min) && !isNaN(max)) {
+              filter.rentalTime = { $gte: min, $lte: max };
+            }
           }
-        } catch (e) {}
+          // Case 2: Nếu rentalTime là string có dạng min,max
+          else if (typeof rentalTime === "string" && rentalTime.includes(",")) {
+            let [min, max] = rentalTime.split(",").map(Number);
+            if (!isNaN(min) && !isNaN(max)) {
+              filter.rentalTime = { $gte: min, $lte: max };
+            }
+          }
+          // Case 3: Nếu rentalTime là một giá trị đơn
+          else {
+            const value = Number(rentalTime);
+            if (!isNaN(value)) {
+              filter.rentalTime = value;
+            }
+          }
+          console.log("Applied rentalTime filter:", filter.rentalTime);
+        } catch (e) {
+          console.error("Error parsing rentalTime:", e, typeof rentalTime);
+        }
+      }
+
+      // Xử lý filter theo ngày bắt đầu và kết thúc
+      if (startDate && startDate !== "") {
+        filter.startDate = { $gte: new Date(startDate) };
+      }
+
+      if (endDate && endDate !== "") {
+        filter.endDate = { $lte: new Date(endDate) };
       }
 
       // 4. Cấu hình phân trang
@@ -599,10 +702,10 @@ class DepositController {
         defaultPage: 1,
         defaultLimit: 10,
         maxLimit: 100,
-        sortField: "createdAt",
-        sortOrder: "desc",
+        sortField: req.query.sortField || "createdAt",
+        sortOrder: req.query.sortOrder || "desc",
         filter,
-        populate: [{ path: "accountId", select: "fullname" }],
+        populate: [{ path: "accountId", select: "fullname email" }],
         includeTotalData: true,
       };
 
@@ -626,13 +729,21 @@ class DepositController {
         return {
           _id: deposit._id,
           name: deposit.accountId?.fullname || "Unknown",
+          email: deposit.accountId?.email || "N/A",
+          roomId: deposit.roomId,
           roomNumber: roomInfo.roomNumber || "N/A",
           boardingHouseName: bhName,
+          boardingHouseId: roomInfo.boardingHouseId,
           amount: deposit.amount,
           status: deposit.status,
-          startDate: moment(deposit.createdAt).format("DD/MM/YYYY"),
-          endDate: moment(deposit.endDate).format("DD/MM/YYYY"),
+          startDate: deposit.startDate
+            ? moment(deposit.startDate).format("DD/MM/YYYY")
+            : "N/A",
+          endDate: deposit.endDate
+            ? moment(deposit.endDate).format("DD/MM/YYYY")
+            : "N/A",
           rentalTime: deposit.rentalTime,
+          createdAt: moment(deposit.createdAt).format("DD/MM/YYYY HH:mm:ss"),
         };
       });
 
@@ -643,17 +754,24 @@ class DepositController {
         ...paginatedResult,
       });
     } catch (error) {
+      console.error("Error in getDepositsByOwnerOrStaff:", error);
       return res.status(500).json({
         message: "Server error",
         success: false,
         error: true,
+        details: error.message,
       });
     }
   }
 
-  async acceptDepositRoom(req, res) {
+  async handleDepositDecision(req, res) {
     try {
       const { depositId } = req.params;
+      const { action, reasonForCancel } = req.body;
+
+      if (!["accept", "reject"].includes(action)) {
+        return res.status(400).json({ error: "Invalid action type." });
+      }
 
       const deposit = await DepositRoom.findById(depositId)
         .populate({ path: "accountId", select: "fullname email" })
@@ -685,7 +803,7 @@ class DepositController {
       const boardingHouseTypeCode =
         boardingHouse?.boardingHouseType?.codeName || "";
 
-      // Tạo transporter gửi email
+      // Cấu hình email
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -703,7 +821,44 @@ class DepositController {
         });
       };
 
-      // Xử lý nếu là ký túc xá
+      // Trường hợp từ chối
+      if (action === "reject") {
+        if (!reasonForCancel) {
+          return res
+            .status(400)
+            .json({ error: "Reason for rejection is required." });
+        }
+
+        deposit.status = "rejected";
+        deposit.reasonForCancel = reasonForCancel;
+        await deposit.save();
+
+        await sendEmail(
+          deposit.accountId.email,
+          "Đặt cọc phòng trọ đã bị từ chối ❌",
+          `
+        <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
+        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã bị <span style="color:red;"><strong>từ chối</strong></span>.</p>
+        <ul>
+          <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
+          <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
+          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format("DD/MM/YYYY")}</li>
+          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format("DD/MM/YYYY")}</li>
+          <li><strong>Lý do từ chối:</strong> ${reasonForCancel}</li>
+        </ul>
+        <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại.</p>
+        <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
+      `
+        );
+
+        return res.status(200).json({
+          message: "Đã từ chối khoản đặt cọc và gửi email thành công.",
+          status: "rejected",
+          depositId: deposit._id,
+        });
+      }
+
+      // Trường hợp chấp nhận
       if (boardingHouseTypeCode === "nha_tro_kien_truc_xa") {
         const currentAcceptedCount = await DepositRoom.countDocuments({
           roomId: deposit.roomId._id,
@@ -716,7 +871,6 @@ class DepositController {
         );
 
         if (currentAcceptedCount >= limit) {
-          // Từ chối vì quá giới hạn
           deposit.status = "rejected";
           deposit.rejectReason = "Phòng ký túc xá đã đủ số lượng người.";
           await deposit.save();
@@ -742,7 +896,7 @@ class DepositController {
         }
       }
 
-      // Nếu không quá giới hạn → chấp nhận
+      // Chấp nhận đơn
       deposit.status = "accepted";
       await deposit.save();
 
@@ -763,7 +917,7 @@ class DepositController {
     `
       );
 
-      // Nếu là mini_house hoặc nhà trọ truyền thống → từ chối đơn pending khác
+      // Xử lý từ chối đơn khác nếu là nhà truyền thống hoặc mini house
       if (
         ["mini_house", "nha_tro_truyen_thong"].includes(boardingHouseTypeCode)
       ) {
@@ -799,10 +953,9 @@ class DepositController {
         depositId: deposit._id,
       });
     } catch (error) {
-      return res.status(500).json({
-        error: "Đã có lỗi xảy ra",
-        detail: error.message,
-      });
+      return res
+        .status(500)
+        .json({ error: "Đã có lỗi xảy ra", detail: error.message });
     }
   }
 
@@ -873,88 +1026,11 @@ class DepositController {
       res.status(500).json({ message: "Server error", error });
     }
   }
-  async rejectDepositRoom(req, res) {
-    try {
-      const { depositId } = req.params;
-      const { reasonForCancel } = req.body; // Lấy lý do hủy từ request body
 
-      if (!reasonForCancel) {
-        return res
-          .status(400)
-          .json({ error: "Reason for rejection is required" });
-      }
-
-      // Lấy thông tin khoản đặt cọc, bao gồm cả boardingHouseName
-      const deposit = await DepositRoom.findById(depositId)
-        .populate({ path: "accountId", select: "fullname email" })
-        .populate({
-          path: "roomId",
-          select: "roomNumber boardingHouseId", // Lấy boardingHouseId từ roomId
-          populate: {
-            path: "boardingHouseId", // Populate boardingHouseId trong roomId
-            select: "name", // Lấy trường name của boardingHouse
-          },
-        });
-
-      if (!deposit) {
-        return res.status(404).json({ error: "Không tìm thấy khoản đặt cọc" });
-      }
-
-      // Lấy tên nhà trọ từ boardingHouseId đã populate
-      const boardingHouseName = deposit.roomId.boardingHouseId
-        ? deposit.roomId.boardingHouseId.name
-        : "Không có tên nhà trọ";
-
-      // Cập nhật status thành 'rejected' và thêm lý do hủy
-      deposit.status = "rejected";
-      deposit.reasonForCancel = reasonForCancel; // Thêm lý do hủy vào đối tượng deposit
-      await deposit.save();
-
-      // Config mail server (nhớ đổi tài khoản của bạn)
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: "todohongy@gmail.com", // Thay bằng email của bạn
-          pass: "ersq syrb ihov ilvx", // Thay bằng App Password
-        },
-      });
-
-      const mailOptions = {
-        from: "support@example.com",
-        to: deposit.accountId.email,
-        subject: "Đặt cọc phòng trọ đã bị từ chối ❌",
-        html: `
-        <p>Xin chào <strong>${deposit.accountId.fullname}</strong>,</p>
-        <p>Khoản đặt cọc của bạn cho phòng <strong>${deposit.roomId.roomNumber}</strong> tại nhà trọ <strong>${boardingHouseName}</strong> đã bị <span style="color:red;"><strong>từ chối</strong></span>.</p>
-        <ul>
-          <li><strong>Số tiền đặt cọc:</strong> ${deposit.amount.toLocaleString()} VND</li>
-          <li><strong>Thời gian thuê:</strong> ${deposit.rentalTime} tháng</li>
-          <li><strong>Ngày bắt đầu:</strong> ${moment(deposit.startDate).format("DD/MM/YYYY")}</li>
-          <li><strong>Ngày kết thúc:</strong> ${moment(deposit.endDate).format("DD/MM/YYYY")}</li>
-          <li><strong>Lý do từ chối:</strong> ${reasonForCancel}</li>
-        </ul>
-        <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại.</p>
-        <p>Trân trọng,<br>Đội ngũ hỗ trợ XYZ</p>
-      `,
-      };
-
-      // Gửi mail
-      await transporter.sendMail(mailOptions);
-
-      return res.status(200).json({
-        message: "Đã từ chối khoản đặt cọc và gửi email thành công.",
-        depositId: deposit._id,
-      });
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ error: "Đã có lỗi xảy ra", detail: error.message });
-    }
-  }
   async acceptRefundRequestForOwner(req, res) {
     try {
       const { refundRequestId } = req.params;
-      const { paymentMethod } = req.body;
+      const { paymentMethod, damageAssessment = [] } = req.body;
       const existRefundRequest = await RefundRequest.findOne({
         _id: refundRequestId,
         status: { $regex: /^pending$/i },
@@ -963,14 +1039,18 @@ class DepositController {
       if (!existRefundRequest) {
         return res.status(400).json({ message: "Refund request not found" });
       }
+      existRefundRequest.damageAssessment = damageAssessment;
+      existRefundRequest.processedBy = req.user.userId;
+      existRefundRequest.processedByRole = req.user.role;
+      await existRefundRequest.save();
 
-      const { amountRefunded, accountId } = existRefundRequest;
-      const orderInfo = `refund-${accountId}-${refundRequestId}`;
+      const { actualRefundAmount, userId } = existRefundRequest;
+      const orderInfo = `refund-${userId}-${refundRequestId}`;
 
       if (paymentMethod === "vnpay") {
-        createVNPayUrl(req, res, amountRefunded, orderInfo);
+        createVNPayUrl(req, res, actualRefundAmount, orderInfo);
       } else if (paymentMethod === "momo") {
-        createMomoUrl(req, res, amountRefunded, orderInfo);
+        createMomoUrl(req, res, actualRefundAmount, orderInfo);
       }
     } catch (error) {
       res.status(500).json({ message: "Server error", error });

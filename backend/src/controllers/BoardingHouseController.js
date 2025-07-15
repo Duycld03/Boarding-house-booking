@@ -1,11 +1,10 @@
-import mongoose from "mongoose";
-import BoardingHouse from "../models/boardingHouse.js";
-import BoardingHouseType from "../models/boardingHouseType.js";
-import RoomType from "../models/roomType.js";
-import Room from "../models/room.js";
-import { v2 as cloudinary } from "cloudinary";
-import facilities from "../models/facilities.js";
-
+import mongoose from 'mongoose';
+import BoardingHouse from '../models/boardingHouse.js';
+import BoardingHouseType from '../models/boardingHouseType.js';
+import RoomType from '../models/roomType.js';
+import Room from '../models/room.js';
+import { v2 as cloudinary } from 'cloudinary';
+import facilities from '../models/facilities.js';
 
 // import path from "path";
 import fs from 'fs';
@@ -93,12 +92,11 @@ class boardingHouseController {
     try {
       const { id } = req.params;
       const updateData = req.body;
-      // console.log("mtiennnn", req.files)
       const boardingHouse = await BoardingHouse.findById(id);
       if (!boardingHouse) {
         return res
           .status(404)
-          .json({ success: false, message: "Boarding house not found." });
+          .json({ success: false, message: 'Boarding house not found.' });
       }
       const images = [];
       let hasPrimary = false;
@@ -133,25 +131,28 @@ class boardingHouseController {
         id,
         { $set: updateData },
         { new: true, runValidators: true }
-      ).populate("boardingHouseType", "name codeName").populate("ownerId", "email");
+      )
+        .populate('boardingHouseType', 'name codeName')
+        .populate('ownerId', 'email');
 
       if (!updatedBoardingHouse) {
         return res.status(404).json({
           success: false,
-          message: "Boarding house not found.",
+          message: 'Boarding house not found.',
         });
       }
 
       return res.status(200).json({
         success: true,
-        message: "Boarding house updated successfully.",
+        message: 'Boarding house updated successfully.',
         data: updatedBoardingHouse,
       });
     } catch (error) {
-      console.error("Error updating boarding house details:", error);
+      console.error('Error updating boarding house details:', error);
       return res.status(500).json({
         success: false,
-        message: "Failed to update boarding house details. Please try again later.",
+        message:
+          'Failed to update boarding house details. Please try again later.',
         error: error.message,
       });
     }
@@ -360,12 +361,9 @@ class boardingHouseController {
         rating = 5,
       } = req.body;
 
-
-      console.log("Request body received:", req.body);
-
       const images = [];
       if (req.files && req.files.length > 0) {
-        console.log(req.files)
+        console.log(req.files);
         req.files.forEach((file) => {
           images.push({
             imageUrl: file.path,
@@ -376,10 +374,10 @@ class boardingHouseController {
       }
 
       if (images.length === 0) {
-        console.error("No images uploaded.");
+        console.error('No images uploaded.');
         return res
           .status(400)
-          .json({ message: "You must upload at least one image." });
+          .json({ message: 'You must upload at least one image.' });
       }
       // Validate owner
       const ownerAccount = await Account.findOne({
@@ -562,11 +560,15 @@ class boardingHouseController {
       let filter = {};
 
       if (boardingHouseType) {
-        filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType);
+        filter.boardingHouseType = new mongoose.Types.ObjectId(
+          boardingHouseType
+        );
       }
       if (rating) {
         const ratings = rating.split(',').map(Number);
-        const validRatings = ratings.filter((r) => !isNaN(r) && r >= 0 && r <= 5);
+        const validRatings = ratings.filter(
+          (r) => !isNaN(r) && r >= 0 && r <= 5
+        );
         if (validRatings.length > 0) {
           filter.rating = { $in: validRatings };
         } else {
@@ -588,11 +590,18 @@ class boardingHouseController {
       }
 
       // Sử dụng paginate
-      const paginatedResult = await paginate(BoardingHouse, { filter, page, limit }, req);
-      paginatedResult.data = await BoardingHouse.populate(paginatedResult.data, [
-        { path: "boardingHouseType", select: "name codeName" },
-        { path: "ownerId" }
-      ]);
+      const paginatedResult = await paginate(
+        BoardingHouse,
+        { filter, page, limit },
+        req
+      );
+      paginatedResult.data = await BoardingHouse.populate(
+        paginatedResult.data,
+        [
+          { path: 'boardingHouseType', select: 'name codeName' },
+          { path: 'ownerId' },
+        ]
+      );
       // // Query the boarding houses based on filter
       // const boardingHouses = await BoardingHouse.find(filter)
       //   .populate('boardingHouseType')
@@ -602,11 +611,24 @@ class boardingHouseController {
       //   .sort({ createdAt: -1 });
 
       // Lọc bổ sung dựa trên province, district, ward, name (nếu cần thiết)
-      paginatedResult.data = paginatedResult.data.filter(bh => {
-        return (!province || (bh.address?.province && bh.address.province.toLowerCase().includes(province.toLowerCase())))
-          && (!district || (bh.address?.district && bh.address.district.toLowerCase().includes(district.toLowerCase())))
-          && (!ward || (bh.address?.ward && bh.address.ward.toLowerCase().includes(ward.toLowerCase())))
-          && (!name || (bh.name && bh.name.toLowerCase().includes(name.toLowerCase())));
+      paginatedResult.data = paginatedResult.data.filter((bh) => {
+        return (
+          (!province ||
+            (bh.address?.province &&
+              bh.address.province
+                .toLowerCase()
+                .includes(province.toLowerCase()))) &&
+          (!district ||
+            (bh.address?.district &&
+              bh.address.district
+                .toLowerCase()
+                .includes(district.toLowerCase()))) &&
+          (!ward ||
+            (bh.address?.ward &&
+              bh.address.ward.toLowerCase().includes(ward.toLowerCase()))) &&
+          (!name ||
+            (bh.name && bh.name.toLowerCase().includes(name.toLowerCase())))
+        );
       });
 
       res.status(200).json(paginatedResult);
@@ -952,13 +974,22 @@ class boardingHouseController {
         });
       }
 
-      if (!address || !address.province || !address.district || !address.ward) {
-        console.error('Invalid address:', address);
+      if (
+        !address ||
+        !address.province?.name ||
+        !address.province?.name_en ||
+        !address.district?.name ||
+        !address.district?.name_en ||
+        !address.ward?.name ||
+        !address.ward?.name_en
+      ) {
+        console.error('Invalid address structure:', address);
         return res.status(400).json({
           message:
-            'Province, district, and ward are required fields in the address.',
+            'Province, district, and ward must include both name and name_en.',
         });
       }
+
       let validManagerId = staffId;
       if (staffId === '') {
         validManagerId = null;

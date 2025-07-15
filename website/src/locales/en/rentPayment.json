@@ -37,5 +37,6 @@
   "newNumber": "New number",
   "roomPrice": "Room Price",
   "totalAmount": "Total Amount",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "tableName": "Payment Bill"
 }

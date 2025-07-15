@@ -37,21 +37,29 @@ export const getDepositsByOwnerOrStaff = (
   return axios.get(`staff/bh/deposit-list`, { params });
 };
 
-export const acceptDepositRoom = (depositId) => {
-  return axios.put(`staff/acceptdeposit/${depositId}`);
+export const handleDepositDecision = (
+  depositId,
+  action,
+  reasonForCancel = ''
+) => {
+  const payload = { action };
+  if (action === 'reject') {
+    payload.reasonForCancel = reasonForCancel;
+  }
+  return axios.put(`/staff/deposit/${depositId}`, payload);
 };
 
-// export const getMaxDeposit = (boardingHouseId) => {
-//   return axios.get(
-//     `owner/boardinghouse/deposit/max-deposit/${boardingHouseId}`
-//   );
-// };
+export const getMaxDeposit = (boardingHouseId) => {
+  return axios.get(
+    `staff/boardinghouse/deposit/max-deposit/${boardingHouseId}`
+  );
+};
 
-// export const getRentTime = (boardingHouseId) => {
-//   return axios.get(
-//     `owner/boardinghouse/deposit/max-rent-time/${boardingHouseId}`
-//   );
-// };
+export const getRentTime = (boardingHouseId) => {
+  return axios.get(
+    `staff/boardinghouse/deposit/max-rent-time/${boardingHouseId}`
+  );
+};
 
 export const payDeposit = (data) => {
   return axios.post('auth/pay-deposit', data);
