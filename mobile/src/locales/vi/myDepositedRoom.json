@@ -16,6 +16,7 @@
   "loadingMoreDeposits": "Đang tải thêm đặt cọc...",
   "loadMoreDeposits": "Tải thêm đặt cọc",
   "depositsLoaded": "đặt cọc đã tải",
+  "renewDeposit": "Gia Hạn Đặt Cọc",
   "of": "trong số",
   "room": "Phòng",
   "status": {
@@ -61,5 +62,31 @@
   "errorLoadingDeposit": "Lỗi khi tải thông tin đặt cọc",
   "vnpay": "VNPay",
   "momo": "MoMo",
-  "connectionError": "Lỗi kết nối. Vui lòng thử lại."
+  "connectionError": "Lỗi kết nối. Vui lòng thử lại.",
+  "createRenewalRequest": {
+    "title": "Yêu Cầu Gia Hạn Hợp Đồng",
+    "loading": "Đang tải...",
+    "roomInformation": "Thông Tin Phòng",
+    "roomNumber": "Phòng",
+    "currentEndDate": "Ngày Kết Thúc Hợp Đồng Hiện Tại",
+    "renewalDuration": "Thời Gian Gia Hạn",
+    "enterDuration": "Nhập thời gian",
+    "months": "Tháng",
+    "years": "Năm",
+    "requestedEndDate": "Ngày Kết Thúc Mới",
+    "tenantNote": "Ghi Chú (Tùy chọn)",
+    "enterNote": "Giải thích lý do bạn cần gia hạn...",
+    "submitRequest": "Gửi Yêu Cầu",
+    "successMessage": "Đã gửi yêu cầu gia hạn thành công",
+    "errorMessage": "Không thể tạo yêu cầu gia hạn",
+    "endDateMustBeLater": "Ngày kết thúc mới phải sau ngày kết thúc hiện tại",
+    "durationRequired": "Vui lòng nhập thời gian hợp lệ"
+  },
+  "refundRequestAlreadyExists": "Yêu cầu hoàn tiền đã tồn tại cho đặt cọc này",
+  "refundRequested": "Đã Yêu Cầu Hoàn Tiền",
+  "refundStatus": "Trạng thái",
+  "refundStatus.pending": "Chờ duyệt",
+  "refundStatus.approved": "Đã duyệt",
+  "refundStatus.rejected": "Bị từ chối",
+  "refundStatus.canceled": "Đã hủy"
 }

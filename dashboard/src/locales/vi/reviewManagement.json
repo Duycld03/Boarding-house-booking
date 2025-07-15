@@ -6,7 +6,9 @@
     "rating": "Đánh giá",
     "createdAt": "Ngày tạo",
     "reviewer": "Người đánh giá",
-    "action": "Hành động"
+    "action": "Hành động",
+    "reply":"Chủ trả lời"
+
   },
   "buttons": {
     "delete": "Xóa",

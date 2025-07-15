@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -56,10 +56,13 @@ export const ThemeProvider = ({ children }) => {
     };
 
     const toggleTheme = () => {
-        const newTheme = !isDarkMode;
-        setIsDarkMode(newTheme);
-        setThemeSource('user');
-        saveTheme(newTheme ? 'dark' : 'light', 'user');
+        // Wrap state updates in requestAnimationFrame để tránh update liên tiếp
+        requestAnimationFrame(() => {
+            const newTheme = !isDarkMode;
+            setIsDarkMode(newTheme);
+            setThemeSource('user');
+            saveTheme(newTheme ? 'dark' : 'light', 'user');
+        });
     };
 
     const setDarkMode = () => {
@@ -81,17 +84,18 @@ export const ThemeProvider = ({ children }) => {
         saveTheme(systemIsDark ? 'dark' : 'light', 'system');
     };
 
+    // Use useMemo to memoize the context value
+    const contextValue = useMemo(() => ({
+        isDarkMode,
+        toggleTheme,
+        setDarkMode,
+        setLightMode,
+        useSystemTheme,
+        themeSource,
+    }), [isDarkMode, themeSource]);
+
     return (
-        <ThemeContext.Provider
-            value={{
-                isDarkMode,
-                toggleTheme,
-                setDarkMode,
-                setLightMode,
-                useSystemTheme,
-                themeSource,
-            }}
-        >
+        <ThemeContext.Provider value={contextValue}>
             <StatusBar style={isDarkMode ? 'light' : 'dark'} />
             {children}
         </ThemeContext.Provider>

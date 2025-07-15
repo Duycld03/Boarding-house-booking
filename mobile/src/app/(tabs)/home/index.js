@@ -1,11 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-} from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,11 +20,10 @@ import { useTranslation } from 'react-i18next';
 import Loader from '@/components/ui/Loader';
 import { getUser } from '@/API/authAPI';
 
-
 function Home() {
   const { isDarkMode } = useThemedClasses();
   const router = useRouter();
-  const { t } = useTranslation('home');
+  const { t, i18n } = useTranslation('home');
   const [data, setData] = useState({
     all: [],
     newest: [],
@@ -58,7 +51,10 @@ function Home() {
               id: item._id,
               name: item.name,
               price: item.priceRange,
-              detail: item.address?.province,
+              detail:
+                item.address?.province?.[
+                  i18n.language === 'en' ? 'name_en' : 'name'
+                ] || '',
               rating: item.rating || 0,
               reviewCount: item.reviewCount || 0,
               updatedAt: item.updatedAt || 0,

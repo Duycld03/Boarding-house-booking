@@ -40,6 +40,8 @@ import en_review from '@/locales/en/review.json';
 import vi_review from '@/locales/vi/review.json';
 import en_appointment from "@/locales/en/appointment.json";
 import vi_appointment from "@/locales/vi/appointment.json";
+import en_depositRefundRequest from "@/locales/en/depositRefundRequest.json";
+import vi_depositRefundRequest from "@/locales/vi/depositRefundRequest.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -64,6 +66,7 @@ i18n.use(initReactI18next).init({
       appointment: en_appointment,
       renewalManagement: en_renewalManagement,
       review: en_review,
+      depositRefundRequest: en_depositRefundRequest,
     },
     vi: {
       menu: vi_menu,
@@ -86,12 +89,13 @@ i18n.use(initReactI18next).init({
       appointment: vi_appointment,
       renewalManagement: vi_renewalManagement,
       review: vi_review,
+      depositRefundRequest: vi_depositRefundRequest,
     },
   },
-  lng: 'en',
-  fallbackLng: 'en',
-  ns: ['menu', 'sidebar', 'home', 'changePassword', 'aboutUs'],
-  defaultNS: 'menu',
+  lng: "en",
+  fallbackLng: "en",
+  ns: ["menu", "sidebar", "home", "changePassword", "aboutUs"],
+  defaultNS: "menu",
   interpolation: {
     escapeValue: false,
   },
