@@ -89,7 +89,6 @@ const ReportCard = ({ report, index }) => {
           style={styles.detailButton}
           labelStyle={{ color: '#fff' }}
           buttonColor={isDarkMode ? '#2563eb' : '#3b82f6'}
-          contentStyle={{ paddingVertical: 6 }}
         >
           {t('myReport.detail')}
         </Button>
