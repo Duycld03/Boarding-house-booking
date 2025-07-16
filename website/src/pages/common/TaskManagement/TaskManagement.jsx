@@ -13,6 +13,9 @@ import userRole from '@/constants/userRole';
 import { getStaffAccounts } from '../../../api/accountAPI';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from "antd";
+import FilterTask from './FilterTask';
+import ButtonCustom from "../../../component/Button";
+
 function TaskManagement() {
     const { hasRole } = useCurrentUser();
     const { t } = useTranslation('task');
@@ -25,10 +28,12 @@ function TaskManagement() {
     const [selectedTask, setSelectedTask] = useState(null);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const [filterValue, setFilterValue] = useState({});
+    const [filterValue, setFilterValue] = useState();
     const [staffList, setStaffList] = useState([]);
-
+    useEffect(() => {
+    }, [filterValue]);
     const columns = useMemo(
         () => [
             {
@@ -141,7 +146,7 @@ function TaskManagement() {
         try {
             const res = isOwner
                 ? await getOwnerTasks(filterValue)
-                : await getStaffTasks();
+                : await getStaffTasks(filterValue);
             setTasks(res.data || []);
         } catch (error) {
             toast.error(t('messages.fetchFailed'));
@@ -182,8 +187,8 @@ function TaskManagement() {
                 staffList={staffList}
             />
 
-            {isOwner && (
-                <div className="mb-4">
+            <div className={`flex mb-4 relative ${isOwner ? 'justify-between' : 'justify-end'}`}>
+                {isOwner && (
                     <Button
                         size="large"
                         title={t('actions.add')}
@@ -191,8 +196,30 @@ function TaskManagement() {
                         bgColor="rgb(59 130 246)"
                         className="text-white"
                     />
-                </div>
-            )}
+                )}
+
+                <ButtonCustom
+                    onClick={() => setIsFilterOpen((prev) => !prev)}
+                    size="large"
+                    title={t("actions.filter")}
+                    btnFilter
+                />
+
+                {isFilterOpen && (
+                    <div
+                        className={`absolute right-0 top-12 z-10 w-[500px] rounded-2xl ring-1 ring-black/5 shadow-lg ${document.documentElement.classList.contains("dark") ? "bg-gray-800 text-gray-100" : "bg-white text-gray-800"
+                            }`}
+                    >
+                        <FilterTask
+                            setFilterValue={(value) => {
+                                setFilterValue(value);
+                                setIsFilterOpen(false);
+                            }}
+                            onClose={() => setIsFilterOpen(false)}
+                        />
+                    </div>
+                )}
+            </div>
             <Table
                 tableName={t('table.title')}
                 columns={columns}

@@ -41,7 +41,10 @@
         "save": "Save",
         "edit": "Update",
         "delete": "Delete",
-        "add": "+ Add Task"
+        "add": "+ Add Task",
+        "filter": "Filter",
+        "reset": "Reset",
+        "close": "Close"
     },
     "modal": {
         "addTitle": "Add Task",
@@ -67,5 +70,14 @@
         "cancel": "Cancel",
         "submit": "Submit",
         "loading": "Saving..."
+    },
+    "filters": {
+        "responsibleBy": "Assigned To",
+        "selectResponsible": "Select responsible person",
+        "unassigned": "Unassigned",
+        "priority": "Priority",
+        "selectPriority": "Select priority",
+        "status": "Status",
+        "selectStatus": "Select status"
     }
 }

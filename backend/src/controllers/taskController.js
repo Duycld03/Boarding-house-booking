@@ -4,40 +4,32 @@ import { Account } from "../models/account.js";
 class TaskController {
     async getTasks(req, res) {
         try {
-            const { priority, status } = req.query;
+            const { responsibleBy, priority, status } = req.query;
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
 
             let filter = {};
 
-            if (req.user.role === 'staff') {
+            if (req.user.role === "staff") {
                 filter.responsibleBy = req.user.userId;
             } else {
-                if (req.query.responsibleBy) {
-                    filter.responsibleBy = req.query.responsibleBy;
+                if (responsibleBy === "null") {
+                    filter.responsibleBy = { $exists: false };
+                } else if (responsibleBy) {
+                    filter.responsibleBy = responsibleBy;
                 }
             }
 
-            if (priority) filter.priority = priority;
-            if (status) filter.status = status;
-
-            const totalTasks = await Task.countDocuments(filter);
-
-            if (totalTasks === 0) {
-                return res.status(200).json({
-                    message: "No tasks found",
-                    pagination: {
-                        currentPage: page,
-                        totalPages: 0,
-                        totalItems: 0,
-                        hasNextPage: false,
-                        hasPrevPage: false,
-                    },
-                    data: [],
-                });
+            if (priority) {
+                filter.priority = priority;
             }
 
+            if (status) {
+                filter.status = status;
+            }
+
+            const totalTasks = await Task.countDocuments(filter);
             const tasks = await Task.find(filter)
                 .populate("responsibleBy", "fullname email")
                 .sort({ createdAt: -1 })
@@ -59,9 +51,14 @@ class TaskController {
             });
         } catch (error) {
             console.error("Error in getTasks:", error);
-            return res.status(500).json({ success: false, message: error.message });
+            return res.status(500).json({
+                success: false,
+                message: "Lỗi khi lấy danh sách task.",
+                error: error.message,
+            });
         }
     }
+
     async createTask(req, res) {
         try {
             const { title, responsibleBy, details, priority, dueDate, createdBy } = req.body;
