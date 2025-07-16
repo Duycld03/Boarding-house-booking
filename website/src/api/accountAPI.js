@@ -44,3 +44,6 @@ export const updateAvatar = (data) => {
     },
   });
 };
+export const getStaffAccounts = () => {
+  return axios.get("/owner/staffs");
+};

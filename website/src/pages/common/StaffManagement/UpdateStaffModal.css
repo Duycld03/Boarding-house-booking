@@ -1,0 +1,64 @@
+/* Input dark mode */
+.dark-input {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+.dark-input::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Select dark mode */
+.dark-select .ant-select-selector {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+.dark-select .ant-select-selection-placeholder {
+    color: #9ca3af !important;
+}
+
+.dark-select .ant-select-arrow {
+    color: #e5e7eb !important;
+}
+
+.dark-dropdown {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+    border: 1px solid #4b5563 !important;
+}
+
+.dark-dropdown .ant-select-item-option-selected {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+.dark-dropdown .ant-select-item-option-active:not(.ant-select-item-option-selected) {
+    background-color: #374151 !important;
+}
+
+/* Modal styles */
+.dark-modal .ant-modal-content {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+}
+
+.dark-modal .ant-modal-header {
+    background-color: #1f2937 !important;
+    border-bottom: 1px solid #374151 !important;
+}
+
+.dark-modal .ant-modal-title,
+.dark-modal .ant-modal-close {
+    color: #ffffff !important;
+}
+
+.dark-form .ant-form-item-label>label {
+    color: #ffffff !important;
+}
+
+.dark-form .ant-form-item-explain-error {
+    color: #f87171 !important;
+}

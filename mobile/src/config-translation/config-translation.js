@@ -1,3 +1,4 @@
+
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import "intl-pluralrules";
@@ -86,8 +87,8 @@ i18n.use(initReactI18next).init({
       myDepositedRoom: en_myDepositedRoom,
       payRent: en_payRent,
       payDeposit: en_payDeposit,
-      myRenewalRequest: en_RenewalRequest,
       refundRequest: en_refundRequest,
+      myRenewalRequest: en_RenewalRequest,
       depositRoomDetail: en_depositRoomDetail,
 
     },
@@ -122,10 +123,10 @@ i18n.use(initReactI18next).init({
       depositRoomDetail: vi_depositRoomDetail,
     },
   },
-  lng: "en",
-  fallbackLng: "en",
-  ns: ["setting", "account"],
-  defaultNS: "setting",
+  lng: 'en',
+  fallbackLng: 'en',
+  ns: ['setting', 'account'],
+  defaultNS: 'setting',
   interpolation: {
     escapeValue: false,
   },

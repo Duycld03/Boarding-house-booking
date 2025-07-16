@@ -15,14 +15,16 @@ import {
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import formatAmount from "@/utils/formatAmount";
+import { NotificationModal } from '@/components/feedback'
+import { useNotification } from "@/context/NotificationProvider";
 
 const DepositCard = ({
   item,
   onRefund,
   onPayDeposit,
-  onCreateRenewDeposit, // Thêm prop này
+  onCreateRenewDeposit,
   index,
-  isCreateRenewDeposit, // Thêm prop này
+  isCreateRenewDeposit,
   hasExistingRefundRequest = false,
   refundRequestInfo = null,
   onPress,
@@ -32,6 +34,7 @@ const DepositCard = ({
   const { t, i18n } = useTranslation("myDepositedRoom");
   const slideAnim = React.useRef(new Animated.Value(50)).current;
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const { showError } = useNotification();
 
   // Animation effect
   React.useEffect(() => {
@@ -149,63 +152,96 @@ const DepositCard = ({
   const renderActionButtons = () => {
     if (item.status === "confirmed") {
       return (
-        <>
-          <View className="flex-row justify-between mt-2">
-            {/* Request Refund Button - Show based on rental time */}
-            {shouldShowRefund(item.rentalTime) && (
-              <View className="flex-1 ml-2">
-                <Button
-                  onPress={() => onRefund(item)}
-                  variant="secondary"
-                  fullWidth={true}
-                  size="md"
-                  disabled={hasExistingRefundRequest} // Disable if request exists
-                  icon={
-                    hasExistingRefundRequest ? (
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={16}
-                        color={isDarkMode ? "#6b7280" : "#9ca3af"}
-                      />
-                    ) : (
-                      <Ionicons name="refresh" size={16} color="#fff" />
-                    )
-                  }
-                  style={{
-                    borderRadius: 12,
-                    backgroundColor: hasExistingRefundRequest
-                      ? isDarkMode
-                        ? "#374151"
-                        : "#e5e7eb"
-                      : isDarkMode
+        <View className="flex-row justify-between items-start mt-2">
+          {/* Create Renew Deposit Button - Đặt bên trái */}
+
+          <View className="flex-1 mr-2">
+            <Button
+              onPress={() => isCreateRenewDeposit === true ? showError(currentLanguage === 'vi' ? "Đã có yêu cầu gia hạn khác cho đặt cọc này" : "Another renewal request exists for this deposit") : onCreateRenewDeposit(item)}
+              variant="secondary"
+              fullWidth={true}
+              size="md"
+              icon={
+                <MaterialCommunityIcons
+                  name="calendar-refresh"
+                  size={16}
+                  color="#fff"
+                />
+              }
+              style={{
+                borderRadius: 12,
+                backgroundColor: isDarkMode ? "#047857" : "#059669", // Green color for renewal
+              }}
+            >
+              {t("renewDeposit")}
+            </Button>
+          </View>
+
+
+          {/* Request Refund Button - Đặt bên phải */}
+          {shouldShowRefund(item.rentalTime) && (
+            <View className="flex-1 ml-2">
+              <Button
+                onPress={() => onRefund(item)}
+                variant="secondary"
+                fullWidth={true}
+                size="md"
+                disabled={hasExistingRefundRequest}
+                icon={
+                  hasExistingRefundRequest ? (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={16}
+                      color={isDarkMode ? "#6b7280" : "#9ca3af"}
+                    />
+                  ) : (
+                    <Ionicons name="refresh" size={16} color="#fff" />
+                  )
+                }
+                style={{
+                  borderRadius: 12,
+                  backgroundColor: hasExistingRefundRequest
+                    ? isDarkMode
+                      ? "#374151"
+                      : "#e5e7eb"
+                    : isDarkMode
                       ? "#b91c1c"
                       : "#dc2626",
-                    opacity: hasExistingRefundRequest ? 0.6 : 1,
+                  opacity: hasExistingRefundRequest ? 0.6 : 1,
+                }}
+              >
+                <Text
+                  style={{
+                    color: hasExistingRefundRequest
+                      ? isDarkMode
+                        ? "#9ca3af"
+                        : "#6b7280"
+                      : "#fff",
+                    fontWeight: "600",
                   }}
                 >
-                  {hasExistingRefundRequest
-                    ? t("refundRequested")
-                    : t("requestRefund")}
-                </Button>
 
-                {/* Show refund request status if exists */}
-                {hasExistingRefundRequest && refundRequestInfo && (
-                  <View className="mt-2">
-                    <Text
-                      className={themedClasses(
-                        "text-xs text-gray-600 text-center",
-                        "text-xs text-gray-400 text-center"
-                      )}
-                    >
-                      {t("refundStatus")}:{" "}
-                      {t(`refundStatus.${refundRequestInfo.status}`)}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            )}
-          </View>
-        </>
+                  {t("requestRefund")}
+                </Text>
+              </Button>
+
+              {/* Show refund request status if exists */}
+              {hasExistingRefundRequest && refundRequestInfo && (
+                <View className="mt-2">
+                  <Text
+                    className={themedClasses(
+                      "text-xs text-gray-600 text-center",
+                      "text-xs text-gray-400 text-center"
+                    )}
+                  >
+                    {t("refundStatus")}:{" "}
+                    {t(`refundStatus.${refundRequestInfo.status}`)}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
       );
     } else if (item.status === "accepted") {
       return (
@@ -227,31 +263,6 @@ const DepositCard = ({
                 {t("payDeposit")}
               </Button>
             </View>
-
-            {/* Create Renew Deposit Button */}
-            {!isCreateRenewDeposit && (
-              <View className="flex-1">
-                <Button
-                  onPress={() => onCreateRenewDeposit(item)}
-                  variant="secondary"
-                  fullWidth={true}
-                  size="md"
-                  icon={
-                    <MaterialCommunityIcons
-                      name="calendar-refresh"
-                      size={16}
-                      color="#fff"
-                    />
-                  }
-                  style={{
-                    borderRadius: 12,
-                    backgroundColor: isDarkMode ? "#047857" : "#059669", // Green color for renewal
-                  }}
-                >
-                  {t("renewDeposit")}
-                </Button>
-              </View>
-            )}
           </View>
         </View>
       );
@@ -259,7 +270,6 @@ const DepositCard = ({
 
     return null;
   };
-
   // Card rendering with Button component
   return (
     <Animated.View
@@ -365,30 +375,29 @@ const DepositCard = ({
               colors={
                 isDarkMode
                   ? [
-                      "rgba(75, 85, 99, 0)",
-                      "rgba(75, 85, 99, 0.5)",
-                      "rgba(75, 85, 99, 0)",
-                    ]
+                    "rgba(75, 85, 99, 0)",
+                    "rgba(75, 85, 99, 0.5)",
+                    "rgba(75, 85, 99, 0)",
+                  ]
                   : [
-                      "rgba(229, 231, 235, 0)",
-                      "rgba(229, 231, 235, 0.8)",
-                      "rgba(229, 231, 235, 0)",
-                    ]
+                    "rgba(229, 231, 235, 0)",
+                    "rgba(229, 231, 235, 0.8)",
+                    "rgba(229, 231, 235, 0)",
+                  ]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               className="h-[1px] my-3"
             />
 
-            {/* Deposit Details */}
+            {/* Deposit Details - Đã xóa phần Rental Time */}
             <View className="space-y-3 mb-4">
               {/* Amount - Now using formatAmount */}
               <View className="flex-row justify-between items-center">
                 <View className="flex-row items-center">
                   <View
-                    className={`p-2 rounded-full mr-3 ${
-                      isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
-                    }`}
+                    className={`p-2 rounded-full mr-3 ${isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
+                      }`}
                     style={{ borderRadius: 9999 }}
                   >
                     <FontAwesome
@@ -417,9 +426,8 @@ const DepositCard = ({
               <View className="flex-row justify-between items-center">
                 <View className="flex-row items-center">
                   <View
-                    className={`p-2 rounded-full mr-3 ${
-                      isDarkMode ? "bg-green-900/30" : "bg-green-100"
-                    }`}
+                    className={`p-2 rounded-full mr-3 ${isDarkMode ? "bg-green-900/30" : "bg-green-100"
+                      }`}
                     style={{ borderRadius: 9999 }}
                   >
                     <MaterialCommunityIcons
@@ -443,37 +451,6 @@ const DepositCard = ({
                   {formatDate(item.startDate)} - {formatDate(item.endDate)}
                 </Text>
               </View>
-
-              {/* Rental Time */}
-              <View className="flex-row justify-between items-center">
-                <View className="flex-row items-center">
-                  <View
-                    className={`p-2 rounded-full mr-3 ${
-                      isDarkMode ? "bg-purple-900/30" : "bg-purple-100"
-                    }`}
-                    style={{ borderRadius: 9999 }}
-                  >
-                    <MaterialIcons
-                      name="timer"
-                      size={14}
-                      color={isDarkMode ? "#c084fc" : "#a855f7"}
-                    />
-                  </View>
-                  <Text
-                    className={themedClasses("text-gray-700", "text-gray-300")}
-                  >
-                    {t("rentalTime")}
-                  </Text>
-                </View>
-                <Text
-                  className={themedClasses(
-                    "font-semibold text-gray-800",
-                    "font-semibold text-gray-100"
-                  )}
-                >
-                  {item.rentalTime} {t("months")}
-                </Text>
-              </View>
             </View>
 
             {/* Actions Buttons */}
@@ -483,15 +460,15 @@ const DepositCard = ({
                   colors={
                     isDarkMode
                       ? [
-                          "rgba(75, 85, 99, 0)",
-                          "rgba(75, 85, 99, 0.5)",
-                          "rgba(75, 85, 99, 0)",
-                        ]
+                        "rgba(75, 85, 99, 0)",
+                        "rgba(75, 85, 99, 0.5)",
+                        "rgba(75, 85, 99, 0)",
+                      ]
                       : [
-                          "rgba(229, 231, 235, 0)",
-                          "rgba(229, 231, 235, 0.8)",
-                          "rgba(229, 231, 235, 0)",
-                        ]
+                        "rgba(229, 231, 235, 0)",
+                        "rgba(229, 231, 235, 0.8)",
+                        "rgba(229, 231, 235, 0)",
+                      ]
                   }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
