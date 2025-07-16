@@ -12,6 +12,7 @@ import {
   refundRequestController,
   renewalController,
   paymentBillController,
+  managerController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -146,5 +147,9 @@ ownerRouter.post(
   '/calculate-monthly-bill',
   paymentBillController.calculateMonthlyRoomRent
 );
+ownerRouter.get('/staff', managerController.getStaff);
+ownerRouter.post('/addstaff', managerController.addStaff);
+ownerRouter.delete('/staff/:id', managerController.deleteStaff);
+ownerRouter.put('/staff/:id', managerController.updateStaff);
 
 export { ownerRouter };
