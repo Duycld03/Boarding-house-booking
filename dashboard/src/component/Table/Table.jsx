@@ -178,8 +178,8 @@ const TableCustom = ({
 
   const numberedData = useMemo(() => {
     if (!data || data.length === 0) return [];
-    console.log("mtienneeeeeeeeeeeeee")
-    console.log(data)
+    // console.log("mtienneeeeeeeeeeeeee")
+    // console.log(data)
     return data.map((item, index) => {
       const pageSize = paginationConfig.pageSize || 10;
       const currentPage = paginationConfig.current || 1;

@@ -126,6 +126,14 @@ class boardingHouseController {
 
         updateData.images = images;
       }
+      if (!updateData.address?.province?.name || !updateData.address?.province?.name_en ||
+        !updateData.address?.district?.name || !updateData.address?.district?.name_en ||
+        !updateData.address?.ward?.name || !updateData.address?.ward?.name_en) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required address fields.',
+        });
+      }
 
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
         id,

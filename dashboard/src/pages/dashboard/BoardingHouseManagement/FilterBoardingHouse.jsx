@@ -100,10 +100,15 @@ function FilterBoardingHouse({ setFilterValue }) {
   const handleProvinceChange = async (province) => {
     setFilters((prev) => ({
       ...prev,
-      province: province?.name,
+      province: {
+        id: province.id,
+        name: province.name,
+        name_en: province.name_en,
+      },
       district: null,
       ward: null,
     }));
+
     form.setFieldsValue({ district: null, ward: null });
 
     if (province) {
@@ -271,9 +276,10 @@ function FilterBoardingHouse({ setFilterValue }) {
                 >
                   {provinces?.map((province) => (
                     <Option key={province.id} value={province.id}>
-                      {province.name}
+                      {currentLanguage === "vi" ? province.name : province.name_en}
                     </Option>
                   ))}
+
                 </Select>
               </Form.Item>
 
@@ -291,9 +297,10 @@ function FilterBoardingHouse({ setFilterValue }) {
                 >
                   {districts?.map((district) => (
                     <Option key={district.id} value={district.id}>
-                      {district.name}
+                      {currentLanguage === "vi" ? district.name : district.name_en}
                     </Option>
                   ))}
+
                 </Select>
               </Form.Item>
 
@@ -311,9 +318,10 @@ function FilterBoardingHouse({ setFilterValue }) {
                 >
                   {wards?.map((ward) => (
                     <Option key={ward.id} value={ward.id}>
-                      {ward.name}
+                      {currentLanguage === "vi" ? ward.name : ward.name_en}
                     </Option>
                   ))}
+
                 </Select>
               </Form.Item>
 

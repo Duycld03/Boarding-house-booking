@@ -163,7 +163,6 @@ const BHDetailAdmin = () => {
         const fetchTypes = async () => {
             try {
                 const response = await getAllBoardingHouseTypes();
-                console.log("dmtien:", response)
 
                 setBoardingHouseTypes(
                     response.data.map((type) => ({
@@ -183,24 +182,21 @@ const BHDetailAdmin = () => {
     }, []);
 
     // Update form data on input change
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        const keys = name.split("."); // Split by dot notation for nested fields (e.g., "address.detail")
-
-        if (keys.length === 2) {
-            // Handle nested fields (e.g., "address.detail")
-            setUpdatedData((prev) => ({
-                ...prev,
-                [keys[0]]: { ...prev[keys[0]], [keys[1]]: value },
-            }));
-        } else {
-            // Handle top-level fields
-            setUpdatedData((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
+    const handleInputChange = ({ target }) => {
+        const { name, value } = target;
+        setUpdatedData((prev) => {
+            const newData = { ...prev };
+            const keys = name.split(".");
+            if (keys.length === 2) {
+                newData[keys[0]][keys[1]] = value;
+            } else if (keys.length === 1) {
+                newData[keys[0]] = value;
+            }
+            return newData;
+        });
     };
+
+
 
     const handleFileChange = (e, isPrimary = false) => {
         const file = e.target.files[0];
@@ -353,13 +349,32 @@ const BHDetailAdmin = () => {
             payload.append("priceRange", updatedData.priceRange);
             payload.append("electricityPrice", updatedData.electricityPrice);
             payload.append("waterPrice", updatedData.waterPrice);
-            payload.append("address[province]", updatedData.address.province);
-            payload.append("address[district]", updatedData.address.district);
-            payload.append("address[ward]", updatedData.address.ward);
+            payload.append(
+                'address[province][name]',
+                updatedData.address.province.name
+            );
+            payload.append(
+                'address[province][name_en]',
+                updatedData.address.province.name_en
+            );
+
+            payload.append(
+                'address[district][name]',
+                updatedData.address.district.name
+            );
+            payload.append(
+                'address[district][name_en]',
+                updatedData.address.district.name_en
+            );
+
+            payload.append('address[ward][name]', updatedData.address.ward.name);
+            payload.append(
+                'address[ward][name_en]',
+                updatedData.address.ward.name_en
+            );
             payload.append("address[detail]", updatedData.address.detail);
             payload.append("location[lat]", updatedData.location.lat);
             payload.append("location[lon]", updatedData.location.lon);
-            console.log("quá tr mệt: ", updatedData.boardingHouseType)
             // Append primary image (new or existing)
             const oldImg = [];
 
@@ -707,76 +722,101 @@ const BHDetailAdmin = () => {
                                 <h2 className="text-3xl font-bold mb-4 mt-10">{t("boardingHouseDetailsAdmin.address")}</h2>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div className="flex flex-col h-full">
-                                        <Form.Item label={t("boardingHouseDetailsAdmin.selectProvince")} required
-                                            rules={[
-                                                { required: true, message: "Province is required" },
-                                            ]} className="mb-4">
+                                        {/* Province */}
+                                        <Form.Item
+                                            label={t("boardingHouseDetailsAdmin.selectProvince")}
+                                            required
+                                            rules={[{ required: true, message: t("boardingHouseDetailsAdmin.validation.selectProvince") }]}
+                                            className="mb-4"
+                                        >
                                             <Select
                                                 placeholder={t("boardingHouseDetailsAdmin.selectProvince")}
-                                                value={updatedData?.address?.province || null}
-                                                onChange={(value) => {
-                                                    handleInputChange({
-                                                        target: { name: "address.province", value },
-                                                    });
-                                                    setUpdatedData((prev) => ({
-                                                        ...prev,
-                                                        address: {
-                                                            ...prev.address,
-                                                            province: value,
-                                                            district: null,
-                                                            ward: null,
-                                                        },
-                                                    }));
+                                                value={updatedData?.address?.province?.id || null}
+                                                onChange={(id) => {
+                                                    const selected = provinces.find((p) => p.id === id);
+                                                    if (selected) {
+                                                        const fullProvince = {
+                                                            id: selected.id,
+                                                            name: selected.name,
+                                                            name_en: selected.name_en,
+                                                        };
+
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "address.province",
+                                                                value: fullProvince,
+                                                            },
+                                                        });
+
+                                                        setUpdatedData((prev) => ({
+                                                            ...prev,
+                                                            address: {
+                                                                ...prev.address,
+                                                                province: fullProvince,
+                                                                district: null,
+                                                                ward: null,
+                                                            },
+                                                        }));
+
+                                                        fetchDistricts(selected.id).then(setDistricts);
+                                                    }
                                                 }}
+
                                                 allowClear
                                             >
                                                 {provinces.map((province) => (
-                                                    <Select.Option
-                                                        key={province.code}
-                                                        value={province.name}
-                                                    >
-                                                        {province.name}
-                                                    </Select.Option>
+                                                    <Option key={province.id} value={province.id}>
+                                                        {currentLanguage === "vi" ? province.name : province.name_en}
+                                                    </Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
+
                                         {/* District */}
                                         <Form.Item
                                             label={t("boardingHouseDetailsAdmin.selectDistrict")}
                                             required
-                                            rules={[
-                                                { required: true, message: "District is required" },
-                                            ]}
+                                            rules={[{ required: true, message: t("boardingHouseDetailsAdmin.validation.selectDistrict") }]}
                                         >
                                             <Select
-                                                placeholder="Select District"
-                                                loading={
-                                                    !districts.length && updatedData?.address?.province
-                                                }
-                                                value={updatedData?.address?.district || null}
-                                                onChange={(value) => {
-                                                    handleInputChange({
-                                                        target: { name: "address.district", value },
-                                                    });
-                                                    setUpdatedData((prev) => ({
-                                                        ...prev,
-                                                        address: {
-                                                            ...prev.address,
-                                                            district: value,
-                                                            ward: null,
-                                                        },
-                                                    }));
+                                                placeholder={t("boardingHouseDetailsAdmin.selectDistrict")}
+                                                value={updatedData?.address?.district?.id || null}
+                                                onChange={(id) => {
+                                                    const selected = districts.find((d) => d.id === id);
+                                                    if (selected) {
+                                                        const fullDistrict = {
+                                                            id: selected.id,
+                                                            name: selected.name,
+                                                            name_en: selected.name_en,
+                                                        };
+
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "address.district",
+                                                                value: fullDistrict,
+                                                            },
+                                                        });
+
+                                                        setUpdatedData((prev) => ({
+                                                            ...prev,
+                                                            address: {
+                                                                ...prev.address,
+                                                                district: fullDistrict,
+                                                                ward: null,
+                                                            },
+                                                        }));
+
+                                                        fetchWards(selected.id).then(setWards);
+                                                    }
                                                 }}
+
                                                 disabled={!updatedData?.address?.province}
                                                 allowClear
                                             >
                                                 {districts.map((district) => (
-                                                    <Select.Option
-                                                        key={district.code}
-                                                        value={district.name}
-                                                    >
-                                                        {district.name}
-                                                    </Select.Option>
+                                                    <Option key={district.id} value={district.id}>
+                                                        {currentLanguage === "vi" ? district.name : district.name_en}
+                                                    </Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
@@ -784,35 +824,49 @@ const BHDetailAdmin = () => {
                                         {/* Ward */}
                                         <Form.Item
                                             label={t("boardingHouseDetailsAdmin.selectWard")}
-
                                             required
-                                            rules={[{ required: true, message: "Ward is required" }]}
+                                            rules={[{ required: true, message: t("boardingHouseDetailsAdmin.validation.selectWard") }]}
                                         >
                                             <Select
-                                                placeholder="Select Ward"
-                                                loading={
-                                                    !wards.length && updatedData?.address?.district
-                                                }
-                                                value={updatedData?.address?.ward || null}
-                                                onChange={(value) => {
-                                                    handleInputChange({
-                                                        target: { name: "address.ward", value },
-                                                    });
-                                                    setUpdatedData((prev) => ({
-                                                        ...prev,
-                                                        address: { ...prev.address, ward: value },
-                                                    }));
+                                                placeholder={t("boardingHouseDetailsAdmin.selectWard")}
+                                                value={updatedData?.address?.ward?.id || null}
+                                                onChange={(id) => {
+                                                    const selected = wards.find((w) => w.id === id);
+                                                    if (selected) {
+                                                        const fullWard = {
+                                                            id: selected.id,
+                                                            name: selected.name,
+                                                            name_en: selected.name_en,
+                                                        };
+
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "address.ward",
+                                                                value: fullWard,
+                                                            },
+                                                        });
+
+                                                        setUpdatedData((prev) => ({
+                                                            ...prev,
+                                                            address: {
+                                                                ...prev.address,
+                                                                ward: fullWard,
+                                                            },
+                                                        }));
+                                                    }
                                                 }}
+
                                                 disabled={!updatedData?.address?.district}
                                                 allowClear
                                             >
                                                 {wards.map((ward) => (
-                                                    <Select.Option key={ward.code} value={ward.name}>
-                                                        {ward.name}
-                                                    </Select.Option>
+                                                    <Option key={ward.id} value={ward.id}>
+                                                        {currentLanguage === "vi" ? ward.name : ward.name_en}
+                                                    </Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
+
 
                                         {/* Detail Address */}
                                         <Form.Item label={t("boardingHouseDetailsAdmin.detail")}

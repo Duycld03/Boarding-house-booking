@@ -42,9 +42,7 @@ const BoardingHouseCard = ({
     event.stopPropagation(); // Ngăn chặn click vào card
 
     try {
-      console.log("Calling API with id:", id);
       const response = await addFavorite(id); // Gọi API
-      console.log("API Response:", response);
 
       if (response && typeof response.isFavorite !== "undefined") {
         setIsFavorite(response.isFavorite); // Cập nhật trạng thái

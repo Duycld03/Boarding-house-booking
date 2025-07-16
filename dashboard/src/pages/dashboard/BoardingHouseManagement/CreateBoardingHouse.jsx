@@ -54,6 +54,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
   const { t } = useTranslation("addBoardingHouseAdmin");
   const currentLanguage = i18n.language;
   const cx = classNames;
+  const lang = i18n.language || 'vi';
 
   const uploadOtherImgProps = {
     beforeUpload: (file) => {
@@ -87,7 +88,6 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
         const provincesData = await fetchProvinces();
         setProvinces(provincesData);
 
-        // Nếu đã chọn tỉnh, fetch districts
         if (formData?.address?.province) {
           const selectedProvince = provincesData.find(
             (p) => p.name === formData.address.province
@@ -314,6 +314,66 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
       setLoading(false);
     }
   };
+  const handleProvinceChange = async (provinceId) => {
+    const selectedProvince = provinces.find((p) => p.id === provinceId);
+    if (selectedProvince) {
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          province: {
+            id: selectedProvince.id,
+            name: selectedProvince.name,
+            name_en: selectedProvince.name_en,
+          },
+          district: "",
+          ward: "",
+        },
+      }));
+      const districtsData = await fetchDistricts(provinceId);
+      setDistricts(districtsData);
+      setWards([]);
+    }
+  };
+
+  const handleDistrictChange = async (districtId) => {
+    const selectedDistrict = districts.find((d) => d.id === districtId);
+    if (selectedDistrict) {
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          district: {
+            id: selectedDistrict.id,
+            name: selectedDistrict.name,
+            name_en: selectedDistrict.name_en,
+          },
+          ward: "",
+        },
+      }));
+      const wardsData = await fetchWards(districtId);
+      setWards(wardsData);
+    }
+  };
+
+  const handleWardChange = (wardId) => {
+    const selectedWard = wards.find((w) => w.id === wardId);
+    if (selectedWard) {
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          ward: {
+            id: selectedWard.id,
+            name: selectedWard.name,
+            name_en: selectedWard.name_en,
+          },
+        },
+      }));
+    }
+  };
+
+
   const themeConfig = {
     algorithm: darkMode
       ? ConfigProvider.darkAlgorithm
@@ -506,14 +566,14 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             provinces={provinces}
             districts={districts}
             wards={wards}
-            onProvinceChange={handleInputChange}
-            onDistrictChange={handleInputChange}
+            onProvinceChange={handleProvinceChange}
+            onDistrictChange={handleDistrictChange}
+            onWardChange={handleWardChange}
             onInputChange={handleInputChange}
             formData={formData}
-            location={geoLocation}
-            initialPosition={formData?.location}
-            setGeoLocation={setGeoLocation}
           />
+
+
 
           {/* Hình ảnh */}
           <h2

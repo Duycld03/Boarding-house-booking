@@ -36,6 +36,8 @@ import BHDetailAdmin from "./BHDetailsAdmin";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../context/themeContext";
 import { Tooltip } from 'antd';
+import i18next from 'i18next';
+import getLocalizedAddress from '../../../utils/addressHelper';
 
 function BoardingHouseManagement(onClose) {
   const [boardingHData, setBoardingHData] = useState([]);
@@ -74,6 +76,7 @@ function BoardingHouseManagement(onClose) {
   const [pageSize, setPageSize] = useState(10); // Number of items per page
   const [totalItems, setTotalItems] = useState(0); // Total number of items
   const { darkMode } = useTheme();
+  const currentLanguage = i18next.language;
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -97,7 +100,6 @@ function BoardingHouseManagement(onClose) {
     setLoading(true);
     try {
       const response = await getAllBoardingHDB();
-      console.log("API Response:", response);
       setBoardingHData(response || []);
     } catch (error) {
       console.error("Failed to fetch boarding houses:", error);
@@ -225,7 +227,7 @@ function BoardingHouseManagement(onClose) {
         // Nếu đã chọn tỉnh, fetch districts
         if (formData?.address?.province) {
           const selectedProvince = provincesData.find(
-            (p) => p.name === formData.address.province
+            (p) => p.name === formData.address.province.name
           );
           if (selectedProvince) {
             const districtsData = await fetchDistricts(selectedProvince.id);
@@ -234,7 +236,7 @@ function BoardingHouseManagement(onClose) {
             // Nếu đã chọn quận, fetch wards
             if (formData?.address?.district) {
               const selectedDistrict = districtsData.find(
-                (d) => d.name === formData.address.district
+                (d) => d.name === formData.address.district.name
               );
               if (selectedDistrict) {
                 const wardsData = await fetchWards(selectedDistrict.id);
@@ -274,21 +276,37 @@ function BoardingHouseManagement(onClose) {
   }, [formData?.address?.ward]);
 
   // Xử lý thay đổi input
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleInputChange = ({ target: { name, value } }) => {
     const keys = name.split(".");
+
     if (keys.length === 2) {
-      setFormData((prev) => ({
+      setUpdatedData((prev) => ({
         ...prev,
-        [keys[0]]: { ...prev[keys[0]], [keys[1]]: value },
+        [keys[0]]: {
+          ...prev[keys[0]],
+          [keys[1]]: value,
+        },
+      }));
+    } else if (keys.length === 3) {
+      setUpdatedData((prev) => ({
+        ...prev,
+        [keys[0]]: {
+          ...prev[keys[0]],
+          [keys[1]]: {
+            ...prev[keys[0]]?.[keys[1]],
+            [keys[2]]: value,
+          },
+        },
       }));
     } else {
-      setFormData((prev) => ({
+      setUpdatedData((prev) => ({
         ...prev,
         [name]: value,
       }));
     }
   };
+
+
 
   const handleSelectedTypesChange = (event) => {
     const { name, value } = event.target;
@@ -351,7 +369,24 @@ function BoardingHouseManagement(onClose) {
         ownerUsername: formData.owner,
         boardingHouseType: formData.boardingHouseType,
         name: formData.name,
-        address: formData.address,
+        address: {
+          province: {
+            id: formData.address.province.id,
+            name: formData.address.province.name,
+            name_en: formData.address.province.name_en
+          },
+          district: {
+            id: formData.address.district.id,
+            name: formData.address.district.name,
+            name_en: formData.address.district.name_en
+          },
+          ward: {
+            id: formData.address.ward.id,
+            name: formData.address.ward.name,
+            name_en: formData.address.ward.name_en
+          },
+          detail: formData.address.detail
+        },
         description: formData.description,
         // images: imagesData,
         priceRange: formData.priceRange,
@@ -509,10 +544,8 @@ function BoardingHouseManagement(onClose) {
       width: 200,
       render: (text) =>
         text ? (
-          <Tooltip
-            title={`${text.detail}, ${text.ward}, ${text.district}, ${text.province}`}
-          >
-            {`${text.detail}, ${text.ward}, ${text.district}, ${text.province}`}
+          <Tooltip title={getLocalizedAddress(text, currentLanguage)}>
+            {getLocalizedAddress(text, currentLanguage)}
           </Tooltip>
         ) : (
           t('messages.noData')
