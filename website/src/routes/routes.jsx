@@ -153,6 +153,11 @@ const routes = [
     layout: ProfileLayout,
   },
   {
+    path: "/task-management",
+    page: CommonPages.TaskManagement,
+     layout: ProfileLayout,
+  },
+  {
     path: '/staff-list',
     page: CommonPages.StaffManagement,
     layout: ProfileLayout,

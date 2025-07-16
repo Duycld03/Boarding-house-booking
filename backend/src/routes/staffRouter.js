@@ -15,6 +15,7 @@ import {
   paymentBillController,
   managerController,
   roomAdditionFeeController,
+  taskController
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -228,4 +229,7 @@ staffRouter.get(
 
 staffRouter.get('/boardinghouse/reviews/:id', ReviewController.getReviewByBhId);
 
+//task
+staffRouter.get('/tasks', taskController.getTasks);
+staffRouter.put('/tasks/:id', taskController.updateTask);
 export { staffRouter };
