@@ -373,7 +373,11 @@ const DepositRoom = () => {
               />
             </div>
           );
-        } else if (record.status === "rejected") {
+        } else if (
+          record.status === "rejected" ||
+          record.status === "confirmed" ||
+          record.status === "accepted"
+        ) {
           return (
             <div className="flex gap-3 items-center">
               <Button

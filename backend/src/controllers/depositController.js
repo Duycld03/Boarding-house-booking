@@ -1026,7 +1026,7 @@ class DepositController {
       res.status(500).json({ message: "Server error", error });
     }
   }
-    async acceptRefundRequestForOwner(req, res) {
+  async acceptRefundRequestForOwner(req, res) {
     try {
       const { refundRequestId } = req.params;
       const { paymentMethod, damageAssessment = [] } = req.body;
@@ -1055,19 +1055,33 @@ class DepositController {
       res.status(500).json({ message: "Server error", error });
     }
   }
-  
-    async deleteDepositRoom(req, res) {
+
+  async deleteDepositRoom(req, res) {
     try {
       const { depositRoomId } = req.params;
-      const depositRoom = await DepositRoom.findById(depositRoomId);
+      const depositRoom =
+        await DepositRoom.findById(depositRoomId).populate("roomId");
       if (!depositRoom) {
         return res.status(404).json({ message: "Deposit room not found" });
       }
-      if (depositRoom.status.toLowerCase() != "rejected") {
+
+      if (
+        depositRoom.status
+          .toLowerCase()
+          .includes(["rejected", "accepted", "confirmed"])
+      ) {
         return res.status(400).json({
           message: "Only rejected deposits can be deleted",
         });
       }
+
+      if (depositRoom.status.toLowerCase() === "confirmed") {
+        depositRoom.roomId.rentBy = depositRoom.roomId.rentBy.filter(
+          (id) => id.toString() !== depositRoom.accountId.toString()
+        );
+        await depositRoom.roomId.save();
+      }
+
       await DepositRoom.deleteOne({ _id: depositRoomId });
       res.status(200).json({ message: "Deposit room deleted successfully" });
     } catch (error) {
