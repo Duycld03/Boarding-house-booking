@@ -42,6 +42,9 @@ import en_depositRefundRequest from "@/locales/en/depositRefundRequest.json";
 import vi_depositRefundRequest from "@/locales/vi/depositRefundRequest.json";
 import en_task from '@/locales/en/task.json';
 import vi_task from '@/locales/vi/task.json';
+import en_staffManagement from '@/locales/en/staffManagement.json';
+import vi_staffManagement from '@/locales/vi/staffManagement.json';
+import { StaffManagement } from '@/pages/common';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -66,6 +69,7 @@ i18n.use(initReactI18next).init({
       renewalManagement: en_renewalManagement,
       review: en_review,
       task: en_task,
+      staffManagement: en_staffManagement,
       depositRefundRequest: en_depositRefundRequest,
     },
     vi: {
@@ -89,6 +93,7 @@ i18n.use(initReactI18next).init({
       renewalManagement: vi_renewalManagement,
       review: vi_review,
       task: vi_task,
+      staffManagement: vi_staffManagement,
       depositRefundRequest: vi_depositRefundRequest,
     },
   },

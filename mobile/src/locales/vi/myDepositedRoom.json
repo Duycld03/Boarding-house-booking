@@ -6,7 +6,7 @@
   "fetchError": "Lỗi khi tải dữ liệu đặt cọc",
   "noDeposits": "Không Tìm Thấy Đặt Cọc",
   "noDepositsSubtext": "Bạn chưa đặt cọc phòng nào. Duyệt các phòng có sẵn và đặt cọc để xem chúng ở đây.",
-  "requestRefund": "Yêu Cầu Hoàn Tiền",
+  "requestRefund": "Hoàn Tiền",
   "refundRequestSent": "Yêu cầu hoàn tiền đã được gửi",
   "payRent": "Thanh Toán Tiền Thuê",
   "payDeposit": "Thanh Toán Đặt Cọc",
@@ -78,7 +78,7 @@
     "enterNote": "Giải thích lý do bạn cần gia hạn...",
     "submitRequest": "Gửi Yêu Cầu",
     "successMessage": "Đã gửi yêu cầu gia hạn thành công",
-    "errorMessage": "Không thể tạo yêu cầu gia hạn",
+    "errorMessage": "Không thể tạo yêu cầu gia hạn vì đã có yêu cầu gia hạn khác cho đặt cọc này",
     "endDateMustBeLater": "Ngày kết thúc mới phải sau ngày kết thúc hiện tại",
     "durationRequired": "Vui lòng nhập thời gian hợp lệ"
   },
