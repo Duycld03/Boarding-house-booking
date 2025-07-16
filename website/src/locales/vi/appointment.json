@@ -28,7 +28,7 @@
     "status": {
         "pending": "Đang chờ",
         "accepted": "Đã chấp nhận",
-        "cancelled": "Đã hủy",
+        "canceled": "Đã hủy",
         "rejected": "Đã từ chối",
         "unknown": "Không xác định"
     },

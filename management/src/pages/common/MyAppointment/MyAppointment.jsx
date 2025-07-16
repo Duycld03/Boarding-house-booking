@@ -44,7 +44,7 @@ function MyAppointment() {
   const statusColors = {
     pending: "blue",
     accepted: "orange",
-    canceled: "red",
+    rejected: "red",
     completed: "green",
   };
 
@@ -91,7 +91,7 @@ function MyAppointment() {
       title: "Action",
       key: "action",
       render: (_, record) =>
-        record.status !== "canceled" && record.status !== "completed" ? (
+        record.status !== "rejected" && record.status !== "completed" ? (
           <Button
             btnCancel
             title={"Cancel"}
@@ -154,12 +154,12 @@ function MyAppointment() {
       setLoading(true);
 
       const res = await updateAppointmentStatus(selectedData._id, {
-        status: "canceled",
+        status: "rejected",
       });
 
       if (res) {
         fetchData();
-        toast.success("Appointment has been canceled");
+        toast.success("Appointment has been rejected");
       } else {
         toast.error(
           res?.message || "Failed to cancel appointment. Please try again."

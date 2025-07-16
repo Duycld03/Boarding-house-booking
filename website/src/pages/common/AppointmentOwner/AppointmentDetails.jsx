@@ -36,8 +36,7 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
             case "pending":
                 return <Tag color="orange">{t('status.pending')}</Tag>;
             case "rejected":
-            case "cancelled":
-                return <Tag color="red">{t('status.cancelled')}</Tag>;
+                return <Tag color="red">{t('status.rejected')}</Tag>;
             default:
                 return <Tag>{t('status.unknown')}</Tag>;
         }

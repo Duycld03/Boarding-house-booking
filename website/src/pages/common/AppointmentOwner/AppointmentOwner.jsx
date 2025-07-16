@@ -157,7 +157,7 @@ const ViewListAppointmentOwner = () => {
                         ? "orange"
                         : status === "accepted"
                             ? "green"
-                            : status === "cancelled"
+                            : status === "rejected"
                                 ? "red"
                                 : "default"
                 }>

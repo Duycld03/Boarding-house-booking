@@ -110,7 +110,7 @@ class AppointmentController {
 
             const { status } = req.body;
 
-            const validStatuses = ["pending", "confirmed", "cancelled", "completed"];
+            const validStatuses = ["pending", "confirmed", "rejected", "completed"];
             if (!validStatuses.includes(status)) {
                 return res.status(400).json({ message: "Invalid status value" });
             }
@@ -427,7 +427,7 @@ class AppointmentController {
                 await Appointment.updateMany(
                     { _id: { $in: rejectIds } },
                     {
-                        status: "cancelled",
+                        status: "rejected",
                         reasonForCancel: "This time slot has already been booked by another tenant.",
                     }
                 );
@@ -464,10 +464,10 @@ class AppointmentController {
             }
 
             if (request.status !== "pending") {
-                return res.status(400).json({ message: "Only pending requests can be canceled" });
+                return res.status(400).json({ message: "Only pending requests can be rejected" });
             }
 
-            request.status = "cancelled";
+            request.status = "rejected";
             request.reasonForCancel = reason || "Rejected by owner";
             await request.save();
 

@@ -28,7 +28,7 @@
     "status": {
         "pending": "Pending",
         "accepted": "Accepted",
-        "cancelled": "Cancelled",
+        "canceled": "Canceled",
         "rejected": "Rejected",
         "unknown": "Unknown"
     },
