@@ -204,9 +204,26 @@ function MyDepositRefundRequest() {
 
 const RefundCard = ({ item, index, t, isDarkMode, currentLanguage }) => {
   const statusMap = {
-    pending: { color: '#f59e0b', label: t('refund.status.pending') },
-    accepted: { color: '#10b981', label: t('refund.status.accepted') },
-    rejected: { color: '#ef4444', label: t('refund.status.rejected') },
+    pending: {
+      color: isDarkMode ? '#fbbf24' : '#d97706',
+      bg: isDarkMode ? '#fbbf2420' : '#facc1520',
+      label: t('refund.status.pending'),
+    },
+    accepted: {
+      color: isDarkMode ? '#4ade80' : '#16a34a',
+      bg: isDarkMode ? '#4ade8020' : '#86efac20',
+      label: t('refund.status.accepted'),
+    },
+    rejected: {
+      color: isDarkMode ? '#f87171' : '#dc2626',
+      bg: isDarkMode ? '#f8717120' : '#fca5a520',
+      label: t('refund.status.rejected'),
+    },
+    paid: {
+      color: isDarkMode ? '#60a5fa' : '#2563eb',
+      bg: isDarkMode ? '#60a5fa20' : '#93c5fd20',
+      label: t('refund.status.paid'),
+    },
   };
 
   const status = statusMap[item.status] || {
@@ -236,10 +253,26 @@ const RefundCard = ({ item, index, t, isDarkMode, currentLanguage }) => {
       >
         {/* Tag trạng thái góc phải */}
         <View
-          className="absolute top-2 right-2 px-2 py-1 rounded-full"
-          style={{ backgroundColor: status.color }}
+          className="absolute top-2 right-2 px-2 py-1 rounded-full flex-row items-center"
+          style={{
+            backgroundColor: status.bg,
+            alignSelf: 'flex-start',
+          }}
         >
-          <Text className="text-[10px] font-semibold text-white">
+          <MaterialCommunityIcons
+            name="information-outline"
+            size={14}
+            color={status.color}
+            style={{ marginRight: 4 }}
+          />
+          <Text
+            style={{
+              color: status.color,
+              fontWeight: '650',
+              fontSize: 12,
+              textTransform: 'capitalize',
+            }}
+          >
             {status.label}
           </Text>
         </View>
