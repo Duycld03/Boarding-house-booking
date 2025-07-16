@@ -316,5 +316,16 @@ class accountController {
       res.status(500).json({ message: "Server Error" });
     }
   }
+  async getStaffAccounts(req, res) {
+    try {
+      const staffs = await Account.find({ role: 'staff', deleted: { $ne: true } })
+        .select('_id fullname email avatarImage');
+
+      res.status(200).json(staffs);
+    } catch (error) {
+      console.error('Error fetching staff accounts:', error);
+      res.status(500).json({ message: 'Lỗi server', error: error.message });
+    }
+  }
 }
 export default new accountController();

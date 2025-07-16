@@ -1,4 +1,31 @@
 {
+  "refund": {
+    "pageTitle": "Yêu cầu hoàn tiền",
+    "emptyTitle": "Chưa có yêu cầu hoàn tiền",
+    "emptyMessage": "Khi bạn yêu cầu hoàn tiền, chúng sẽ hiển thị tại đây.",
+    "room": "Phòng",
+    "endDate": "Ngày kết thúc",
+    "amount": "Số tiền hoàn",
+    "reason": "Lý do",
+    "noReason": "Không có",
+    "createdAt": "Ngày tạo",
+    "status": {
+      "label": "Trạng thái",
+      "pending": "Đang xử lý",
+      "accepted": "Đã chấp nhận",
+      "rejected": "Từ chối",
+       "paid": "Đã hoàn tiền"
+
+    },
+    "loadMore": "Tải thêm",
+    "loadAll": "Đã tải tất cả yêu cầu",
+    "loadingMore": "Đang tải thêm...",
+    "requests": "yêu cầu"
+  },
+  "common": {
+    "errorRefreshing": "Lỗi khi tải lại dữ liệu"
+  },
+
   "title": "Yêu Cầu Hoàn Tiền",
   "refundRequestTitle": "Yêu Cầu Hoàn Tiền Cọc",
   "refundRequestSubtitle": "Gửi yêu cầu hoàn tiền",

@@ -12,7 +12,10 @@ import {
   refundRequestController,
   renewalController,
   paymentBillController,
-  appointmentController
+  appointmentController,
+  taskController,
+  accountController,
+  managerController,
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -165,4 +168,16 @@ ownerRouter.post(
   "/appointments/reject/:appointmentId",
   appointmentController.rejectViewingRequest
 );
+ownerRouter.get('/staff', managerController.getStaff);
+ownerRouter.post('/addstaff', managerController.addStaff);
+ownerRouter.delete('/staff/:id', managerController.deleteStaff);
+ownerRouter.put('/staff/:id', managerController.updateStaff);
+
+// task
+ownerRouter.get('/tasks', taskController.getTasks);
+ownerRouter.post('/tasks', taskController.createTask);
+ownerRouter.put('/tasks/:id', taskController.updateTask);
+ownerRouter.delete('/tasks/:id', taskController.deleteTask);
+ownerRouter.get('/staffs', accountController.getStaffAccounts);
+
 export { ownerRouter };
