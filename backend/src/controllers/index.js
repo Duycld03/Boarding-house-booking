@@ -20,6 +20,7 @@ import refundRequestController from './refundRequestController.js'; // Fixed typ
 import paymentBillController from './paymentBillController.js';
 import managerController from './managerController.js';
 import roomAdditionFeeController from './roomAdditionFeeController.js';
+import taskController from './taskController.js';
 
 export {
   authController,
@@ -43,5 +44,6 @@ export {
   refundRequestController,
   paymentBillController,
   managerController,
-  roomAdditionFeeController
+  roomAdditionFeeController,
+  taskController
 };

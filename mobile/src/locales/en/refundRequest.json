@@ -1,4 +1,28 @@
 {
+  "refund": {
+    "pageTitle": "Refund Requests",
+    "emptyTitle": "No Refund Requests",
+    "emptyMessage": "When you request a refund, it will appear here.",
+    "room": "Room",
+    "endDate": "End Date",
+    "amount": "Refund Amount",
+    "reason": "Reason",
+    "noReason": "None",
+    "createdAt": "Created At",
+    "status": {
+      "label": "Status",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+     "paid": "Paid"    },
+    "loadMore": "Load More",
+    "loadAll": "All Requests Loaded",
+    "loadingMore": "Loading more...",
+    "requests": "requests"
+  },
+  "common": {
+    "errorRefreshing": "Error refreshing data"
+  },
   "title": "Refund Request",
   "refundRequestTitle": "Request Deposit Refund",
   "refundRequestSubtitle": "Submit your refund request",

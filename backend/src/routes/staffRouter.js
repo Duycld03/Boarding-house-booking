@@ -15,8 +15,9 @@ import {
   paymentBillController,
   managerController,
   roomAdditionFeeController,
-} from "../controllers/index.js";
-import { upload } from "../config/cloudinary.config.js";
+  taskController
+} from '../controllers/index.js';
+import { upload } from '../config/cloudinary.config.js';
 
 const staffRouter = Router();
 
@@ -232,4 +233,7 @@ staffRouter.get(
 
 staffRouter.get("/boardinghouse/reviews/:id", ReviewController.getReviewByBhId);
 
+//task
+staffRouter.get('/tasks', taskController.getTasks);
+staffRouter.put('/tasks/:id', taskController.updateTask);
 export { staffRouter };

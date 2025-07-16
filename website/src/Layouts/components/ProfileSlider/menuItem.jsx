@@ -62,6 +62,12 @@ const getMenuItems = () => {
       visible: isOwner || isStaff, // Chỉ Owner
     },
     {
+      key: 'staff-list',
+      label: <Link to="/staff-list">Staff Management</Link>,
+      icon: <ContainerOutlined />,
+      visible: isOwner, // Chỉ Owner
+    },
+    {
       key: 'my-owner-report',
       label: <Link to="/my-report-management">My report management</Link>,
       icon: <SnippetsOutlined />,
@@ -106,6 +112,12 @@ const getMenuItems = () => {
       label: <Link to="/revenue-management-owner">Revenue Management</Link>,
       icon: <DollarCircleOutlined />,
       visible: isOwner,
+    },
+    {
+      key: 'task-management',
+      label: <Link to="/task-management">Task Management</Link>,
+      icon: <DollarCircleOutlined />,
+      visible: isOwner || isStaff,
     },
   ];
   return menuItems.filter((item) => item.visible);
