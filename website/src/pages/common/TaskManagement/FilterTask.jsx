@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Select, Button, ConfigProvider, Form } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { getStaffAccounts } from '../../../api/accountAPI';
+import { getStaff } from '../../../api/staffAPI';
 import { useCurrentUser } from '@/context/userContext';
 import userRole from '@/constants/userRole';
 import { useTheme } from '@/context/themeContext';
@@ -18,13 +18,14 @@ const FilterTask = ({ setFilterValue, onClose }) => {
     const [selectedStaff, setSelectedStaff] = useState(undefined);
     const [selectedPriority, setSelectedPriority] = useState(undefined);
     const [selectedStatus, setSelectedStatus] = useState(undefined);
+    const [open, setOpen] = useState(false);
 
     const [form] = Form.useForm();
 
     useEffect(() => {
         if (isOwner) {
-            getStaffAccounts()
-                .then((res) => setStaffList(res))
+            getStaff()
+                .then((res) => setStaffList(res.data || []))
                 .catch(() => { });
         }
     }, [isOwner]);
@@ -37,6 +38,11 @@ const FilterTask = ({ setFilterValue, onClose }) => {
         if (selectedPriority) filters.priority = selectedPriority;
         if (selectedStatus) filters.status = selectedStatus;
         setFilterValue(filters);
+        form.resetFields();
+        setSelectedStaff(undefined);
+        setSelectedPriority(undefined);
+        setSelectedStatus(undefined);
+        setOpen(false);
     };
 
     const handleResetFilters = () => {
@@ -45,6 +51,7 @@ const FilterTask = ({ setFilterValue, onClose }) => {
         setSelectedPriority(undefined);
         setSelectedStatus(undefined);
         setFilterValue(undefined);
+        setOpen(false);
     };
 
     const themeConfig = {
@@ -94,76 +101,93 @@ const FilterTask = ({ setFilterValue, onClose }) => {
 
     return (
         <ConfigProvider theme={themeConfig}>
-            <div
-                className={`absolute right-0 z-10 mt-4 w-96 origin-top-right rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden rounded-2xl ${darkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-800"
-                    }`}
-            >                <Form form={form} layout="vertical" className="py-4 px-6"
-            >
-                    {isOwner && (
-                        <Form.Item label={t('filters.responsibleBy')} name="responsibleBy">
-                            <Select
-                                allowClear
-                                showSearch
-                                value={selectedStaff}
-                                onChange={setSelectedStaff}
-                                placeholder={t('filters.selectResponsible')}
-                                optionFilterProp="label"
-                                options={staffList.map((staff) => ({
-                                    label: staff.fullname,
-                                    value: staff._id,
-                                }))}
-                            />
-                        </Form.Item>
-                    )}
+            <div className="relative inline-block text-left">
+                <ButtonCustom
+                    title={t("actions.filter")}
+                    btnFilter
+                    size="large"
+                    className="ml-auto"
+                    onClick={() => setOpen((prev) => !prev)}
+                />
 
-                    <Form.Item label={t('filters.priority')} name="priority">
-                        <Select
-                            allowClear
-                            value={selectedPriority}
-                            onChange={setSelectedPriority}
-                            placeholder={t('filters.selectPriority')}
-                            options={[
-                                { label: t('priorities.high'), value: 'High' },
-                                { label: t('priorities.medium'), value: 'Medium' },
-                                { label: t('priorities.low'), value: 'Low' },
-                            ]}
-                        />
-                    </Form.Item>
-
-                    <Form.Item label={t('filters.status')} name="status">
-                        <Select
-                            allowClear
-                            value={selectedStatus}
-                            onChange={setSelectedStatus}
-                            placeholder={t('filters.selectStatus')}
-                            options={[
-                                { label: t('statuses.inprogress'), value: 'In Progress' },
-                                { label: t('statuses.completed'), value: 'Completed' },
-                                { label: t('statuses.cancelled'), value: 'Cancelled' },
-                            ]}
-                        />
-                    </Form.Item>
-
-                    <div className="flex justify-evenly mt-4">
-                        <ButtonCustom
-                            btnFilter
-                            size="large"
-                            htmlType="submit"
-                            className="w-40"
-                            onClick={handleApplyFilter}
-                            title={t("actions.filter")}
-
+                {open && (
+                    <div
+                        className={`absolute right-0 z-10 mt-2 w-96 origin-top-right rounded-md ring-1 shadow-lg ring-black/5 focus:outline-hidden rounded-2xl ${darkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-800"
+                            }`}
+                    >
+                        <Form
+                            form={form}
+                            layout="vertical"
+                            className="py-4 px-6"
+                            onFinish={handleApplyFilter}
                         >
-                        </ButtonCustom>
-                        <ButtonCustom
-                            btnDelete
-                            size="large"
-                            className="w-40"
-                            onClick={handleResetFilters}
-                            title={t("actions.reset")}>
-                        </ButtonCustom>
+                            {isOwner && (
+                                <Form.Item label={t('filters.responsibleBy')} name="responsibleBy">
+                                    <Select
+                                        allowClear
+                                        showSearch
+                                        value={selectedStaff}
+                                        onChange={setSelectedStaff}
+                                        placeholder={t('filters.selectResponsible')}
+                                        optionFilterProp="label"
+                                        options={staffList.map((staff) => ({
+                                            label: staff.fullname,
+                                            value: staff._id,
+                                        }))}
+                                    />
+                                </Form.Item>
+                            )}
+
+                            <Form.Item label={t('filters.priority')} name="priority">
+                                <Select
+                                    allowClear
+                                    value={selectedPriority}
+                                    onChange={setSelectedPriority}
+                                    placeholder={t('filters.selectPriority')}
+                                    options={[
+                                        { label: t('priorities.high'), value: 'High' },
+                                        { label: t('priorities.medium'), value: 'Medium' },
+                                        { label: t('priorities.low'), value: 'Low' },
+                                    ]}
+                                />
+                            </Form.Item>
+
+                            <Form.Item label={t('filters.status')} name="status">
+                                <Select
+                                    allowClear
+                                    value={selectedStatus}
+                                    onChange={setSelectedStatus}
+                                    placeholder={t('filters.selectStatus')}
+                                    options={[
+                                        { label: t('statuses.inprogress'), value: 'In Progress' },
+                                        { label: t('statuses.completed'), value: 'Completed' },
+                                        { label: t('statuses.cancelled'), value: 'Cancelled' },
+                                    ]}
+                                />
+                            </Form.Item>
+
+                            <div className="flex justify-evenly mt-4">
+                                <ButtonCustom
+                                    btnFilter
+                                    size="large"
+                                    htmlType="submit"
+                                    className="w-40"
+                                    title={t("actions.filter")}
+
+                                >
+                                </ButtonCustom>
+                                <ButtonCustom
+                                    btnDelete
+                                    size="large"
+                                    className="w-40"
+                                    onClick={handleResetFilters}
+                                    title={t("actions.reset")}>
+                                </ButtonCustom>
+
+                            </div>
+                        </Form>
                     </div>
-                </Form>
+                )}
             </div>
         </ConfigProvider>
     );

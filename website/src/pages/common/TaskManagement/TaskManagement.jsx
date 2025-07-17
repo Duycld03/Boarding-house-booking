@@ -10,7 +10,7 @@ import {
 import TaskModal from './TaskModal';
 import { useCurrentUser } from '@/context/userContext';
 import userRole from '@/constants/userRole';
-import { getStaffAccounts } from '../../../api/accountAPI';
+import { getStaff } from '../../../api/staffAPI';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from "antd";
 import FilterTask from './FilterTask';
@@ -29,6 +29,7 @@ function TaskManagement() {
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [loadingStaffList, setLoadingStaffList] = useState(false);
 
     const [filterValue, setFilterValue] = useState();
     const [staffList, setStaffList] = useState([]);
@@ -55,15 +56,16 @@ function TaskManagement() {
                 dataIndex: 'details',
                 key: 'details',
                 width: 200,
-                render: (details) =>
-                    details ? (
+                render: (details) => {
+                    if (!details) return null;
+                    return (
                         <Tooltip title={details}>
                             {details.length > 50 ? `${details.slice(0, 50)}...` : details}
                         </Tooltip>
-                    ) : (
-                        t('messages.noData')
-                    ),
-            },
+                    );
+                },
+            }
+            ,
 
             {
                 title: t('columns.responsibleBy'),
@@ -131,9 +133,9 @@ function TaskManagement() {
     );
     useEffect(() => {
         if (isOwner) {
-            getStaffAccounts()
-                .then((data) => {
-                    setStaffList(data || []);
+            getStaff()
+                .then((res) => {
+                    setStaffList(res.data || []);
                 })
                 .catch((err) => {
                     toast.error(t('messages.fetchFailed'));
@@ -173,6 +175,8 @@ function TaskManagement() {
             setIsOpenDeleteModal(false);
         }
     };
+    useEffect(() => {
+    }, [staffList]);
 
     return (
         <div>
@@ -198,27 +202,8 @@ function TaskManagement() {
                     />
                 )}
 
-                <ButtonCustom
-                    onClick={() => setIsFilterOpen((prev) => !prev)}
-                    size="large"
-                    title={t("actions.filter")}
-                    btnFilter
-                />
+                <FilterTask setFilterValue={setFilterValue} />
 
-                {isFilterOpen && (
-                    <div
-                        className={`absolute right-0 top-12 z-10 w-[500px] rounded-2xl ring-1 ring-black/5 shadow-lg ${document.documentElement.classList.contains("dark") ? "bg-gray-800 text-gray-100" : "bg-white text-gray-800"
-                            }`}
-                    >
-                        <FilterTask
-                            setFilterValue={(value) => {
-                                setFilterValue(value);
-                                setIsFilterOpen(false);
-                            }}
-                            onClose={() => setIsFilterOpen(false)}
-                        />
-                    </div>
-                )}
             </div>
             <Table
                 tableName={t('table.title')}
