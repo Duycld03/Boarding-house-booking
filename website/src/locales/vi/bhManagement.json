@@ -655,6 +655,18 @@
       "addExpense": "Không thể thêm chi phí. {{message}}",
       "updateExpense": "Không thể cập nhật chi phí. {{message}}",
       "unknownError": "Lỗi không xác định"
+    },
+    "summary": {
+      "totalRevenue": "Tổng doanh thu",
+      "netProfit": "Lợi nhuận ròng",
+      "utilityExpenses": "Chi phí tiện ích",
+      "otherExpenses": "Chi phí khác"
+    },
+    "chart": {
+      "netProfit": "Lợi nhuận ròng",
+      "utilityExpenses": "Chi phí tiện ích",
+      "otherExpenses": "Chi phí khác",
+      "expenseAllocation": "Phân bổ chi phí"
     }
   },
   "months": {
