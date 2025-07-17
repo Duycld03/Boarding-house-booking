@@ -20,12 +20,20 @@ import {
   UserOutlined,
   BulbOutlined,
   BulbFilled,
+  HomeOutlined,
+  FileTextOutlined,
+  FileDoneOutlined,
 } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCreditCard,
+  faClipboardList,
+  faCalendarCheck,
+  faTools,
+} from "@fortawesome/free-solid-svg-icons";
 import { getUser } from "../../../api/authAPI";
 import { useCurrentUser } from "../../../context/userContext";
-import adminMenu from "../Slider/menuItem";
 import userRole from "../../../constants/userRole";
-import getMenuItems from "../ProfileSlider/menuItem";
 import { useTheme } from "../../../context/themeContext";
 import LanguageSwitcher from "../../../component/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
@@ -41,7 +49,7 @@ const CustomHeader = () => {
   const navigate = useNavigate();
   const { contextLogout, hasRole } = useCurrentUser();
   const { darkMode, toggleDarkMode } = useTheme();
-  const { t } = useTranslation();
+  const { t } = useTranslation("common"); // Chỉ sử dụng namespace common
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -77,7 +85,64 @@ const CustomHeader = () => {
     },
   ];
 
-  // Removed dark mode toggle from dropdown menu
+  // Admin menu items with translation support - moved from menuItem.jsx
+  const dashBoard = "/dashboard";
+  const adminMenuItems = [
+    {
+      key: "account-management",
+      label: (
+        <Link to={dashBoard + "/account-management"}>
+          {t("menu.accountManagement")}
+        </Link>
+      ),
+      icon: <UserOutlined />,
+    },
+    {
+      key: "Report-management",
+      label: t("menu.reportManagement"),
+      icon: <FileDoneOutlined />,
+      children: [
+        {
+          key: "report-review-management",
+          label: (
+            <Link to={dashBoard + "/report-review-management"}>
+              {t("menu.reportReview")}
+            </Link>
+          ),
+          icon: <FileTextOutlined />,
+        },
+        {
+          key: "report-boarding-house-management",
+          label: (
+            <Link to={dashBoard + "/report-boarding-house-management"}>
+              {t("menu.reportBoardingHouse")}
+            </Link>
+          ),
+          icon: <FontAwesomeIcon icon={faClipboardList} />,
+        },
+      ],
+    },
+    {
+      key: "boarding-house-management",
+      label: (
+        <Link to={dashBoard + "/boarding-house-management"}>
+          {t("menu.boardingHouseManagement")}
+        </Link>
+      ),
+      icon: <HomeOutlined />,
+    },
+    {
+      key: "list-boarding-house-reviews",
+      label: (
+        <Link to={dashBoard + "/list-boarding-house-reviews"}>
+          {t("menu.reviewManagement")}
+        </Link>
+      ),
+      icon: <FontAwesomeIcon icon={faCalendarCheck} />,
+    },
+  ];
+
+  // User menu items
   const userMenuItems = [
     {
       key: "profile",
@@ -88,7 +153,7 @@ const CustomHeader = () => {
     {
       key: "change-password",
       icon: <LockOutlined />,
-      label: t("change-password"),
+      label: t("changePassword"),
       onClick: () => navigate("/change-password"),
     },
     {
@@ -99,7 +164,7 @@ const CustomHeader = () => {
     },
   ];
 
-  // Theme toggle button component with improved visibility
+  // Theme toggle button component
   const ThemeToggleButton = () => (
     <Button
       shape="circle"
@@ -117,7 +182,7 @@ const CustomHeader = () => {
           ? "bg-gray-700 text-yellow-400 hover:bg-gray-600 hover:text-yellow-300 border-gray-600"
           : "bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 border-blue-200"
       }`}
-      title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      title={darkMode ? t("switchToLightMode") : t("switchToDarkMode")}
     />
   );
 
@@ -145,29 +210,9 @@ const CustomHeader = () => {
           MOTELLEASE TECH
         </p>
       </Link>
-      {/* Main Menu (Desktop) */}
-      {/* <Menu
-        className="hidden lg:block"
-        theme={darkMode ? "dark" : "light"}
-        mode="horizontal"
-        defaultSelectedKeys={["home"]}
-        items={menuItems.map(({ key, label, onClick }) => ({
-          key,
-          label: <span onClick={onClick}>{label}</span>,
-        }))}
-        style={{
-          backgroundColor: darkMode ? "#1f2937" : "#fff",
-          borderBottom: "none",
-          flex: 1,
-          minWidth: 0,
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          marginLeft: 330,
-        }}
-      /> */}
+
       {/* User Section */}
       <div className="hidden lg:flex items-center gap-4">
-        {/* Added prominent theme toggle button */}
         <ThemeToggleButton />
         <LanguageSwitcher />
 
@@ -225,9 +270,9 @@ const CustomHeader = () => {
           </Dropdown>
         )}
       </div>
+
       {/* Mobile Menu Toggle */}
       <div className="lg:hidden flex items-center space-x-2">
-        {/* Always visible theme toggle button */}
         <ThemeToggleButton />
         <Button
           shape="circle"
@@ -246,6 +291,7 @@ const CustomHeader = () => {
           }
         />
       </div>
+
       {/* Drawer (Mobile Menu) */}
       <Drawer
         title={
@@ -275,14 +321,14 @@ const CustomHeader = () => {
                   type="primary"
                   onClick={() => navigate("/login")}
                 >
-                  Login
+                  {t("auth.login-btn")}
                 </Button>
                 <Button
                   size="large"
                   className="btn-register dark:bg-gray-900 dark:text-white dark:border-white mr-2"
                   onClick={() => navigate("/register")}
                 >
-                  Register
+                  {t("auth.register-btn")}
                 </Button>
               </Space>
               <div className="flex items-center">
@@ -308,11 +354,33 @@ const CustomHeader = () => {
         <Menu
           mode="vertical"
           theme={darkMode ? "dark" : "light"}
-          items={(hasRole(userRole.admin) ? adminMenu : menuItems).map(
-            ({ key, label, onClick }) => ({
-              key,
-              label: <span onClick={onClick}>{label}</span>,
-            })
+          items={(hasRole(userRole.admin) ? adminMenuItems : menuItems).map(
+            (item) => {
+              // Xử lý các item có children (submenu)
+              if (item.children) {
+                return {
+                  key: item.key,
+                  label: item.label,
+                  icon: item.icon,
+                  children: item.children.map((child) => ({
+                    key: child.key,
+                    label: child.label,
+                    icon: child.icon,
+                  })),
+                };
+              }
+              // Xử lý item thông thường
+              return {
+                key: item.key,
+                label:
+                  typeof item.label === "string" ? (
+                    <span onClick={item.onClick}>{item.label}</span>
+                  ) : (
+                    item.label
+                  ),
+                icon: item.icon,
+              };
+            }
           )}
           style={{
             border: "none",
@@ -323,25 +391,6 @@ const CustomHeader = () => {
 
         {isLoggedIn && (
           <>
-            {!hasRole(userRole.admin) && (
-              <>
-                <Divider className={darkMode ? "bg-gray-600" : "bg-gray-400"} />
-                <Menu
-                  mode="vertical"
-                  theme={darkMode ? "dark" : "light"}
-                  items={getMenuItems()
-                    .filter((item) => item.key !== "profile")
-                    .map(({ key, label, onClick }) => ({
-                      key,
-                      label: <span onClick={onClick}>{label}</span>,
-                    }))}
-                  style={{
-                    border: "none",
-                    backgroundColor: darkMode ? "#1f2937" : "#fff",
-                  }}
-                />
-              </>
-            )}
             <Divider className={darkMode ? "bg-gray-600" : "bg-gray-400"} />
             <Menu
               mode="vertical"

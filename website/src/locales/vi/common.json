@@ -48,5 +48,14 @@
     "floor_mat": "Thảm lót sàn",
     "water_heater": "Máy nước nóng",
     "smoke_detector": "Máy báo khói"
+  },
+  "profile": "Hồ sơ",
+  "changePassword": "Đổi mật khẩu",
+  "logout": "Đăng xuất",
+  "switchToLightMode": "Chuyển sang chế độ sáng",
+  "switchToDarkMode": "Chuyển sang chế độ tối",
+  "auth": {
+    "login-btn": "Đăng nhập",
+    "register-btn": "Đăng ký"
   }
 }

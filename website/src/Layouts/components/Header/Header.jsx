@@ -13,7 +13,6 @@ import classNames from "classnames/bind";
 import Styles from "./Header.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../assets/images/newLogo.png";
-import UserAvatar from "../../../assets/images/none_avatar.png";
 import {
   LockOutlined,
   LogoutOutlined,
@@ -21,12 +20,30 @@ import {
   UserOutlined,
   BulbOutlined,
   BulbFilled,
+  HomeOutlined,
+  FileTextOutlined,
+  FileDoneOutlined,
+  ScheduleOutlined,
+  HomeFilled,
+  SnippetsOutlined,
+  ContainerOutlined,
+  HeartOutlined,
+  EyeOutlined,
+  RollbackOutlined,
+  DollarCircleOutlined,
 } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCreditCard,
+  faClipboardList,
+  faCalendarCheck,
+  faTools,
+  faMoneyBill,
+} from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
 import { getUser } from "../../../api/authAPI";
 import { useCurrentUser } from "../../../context/userContext";
-import adminMenu from "../Slider/menuItem";
 import userRole from "../../../constants/userRole";
-import getMenuItems from "../ProfileSlider/menuItem";
 import { useTheme } from "../../../context/themeContext";
 import LanguageSwitcher from "../../../component/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
@@ -42,7 +59,7 @@ const CustomHeader = () => {
   const navigate = useNavigate();
   const { contextLogout, hasRole } = useCurrentUser();
   const { darkMode, toggleDarkMode } = useTheme();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["common", "profile"]); // Sử dụng namespace common và profile
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -64,43 +81,171 @@ const CustomHeader = () => {
     navigate("/");
   };
 
-  const menuItems = [
-    { key: "home", label: t("home"), onClick: () => navigate("/") },
-    {
-      key: "about",
-      label: t("about"),
-      onClick: () => navigate("/about-us"),
-    },
-    {
-      key: "contact",
-      label: t("contact"),
-      onClick: () => navigate("/contact"),
-    },
-  ];
-
-  // Removed dark mode toggle from dropdown menu
+  // User menu items
   const userMenuItems = [
     {
       key: "profile",
       icon: <UserOutlined />,
-      label: t("profile"),
+      label: t("common:profile"),
       onClick: () => navigate("/profile"),
     },
     {
       key: "change-password",
       icon: <LockOutlined />,
-      label: t("change-password"),
+      label: t("common:changePassword"),
       onClick: () => navigate("/change-password"),
     },
     {
       key: "logout",
       icon: <LogoutOutlined />,
-      label: t("logout"),
+      label: t("common:logout"),
       onClick: logout,
     },
   ];
 
-  // Theme toggle button component with improved visibility
+  // Profile menu items từ menuItem.jsx với đa ngôn ngữ
+  const getProfileMenuItems = () => {
+    const isOwner = hasRole(userRole.owner);
+    const isUser = hasRole(userRole.user);
+    const isStaff = hasRole(userRole.staff);
+
+    const profileMenuItems = [
+      {
+        key: "profile",
+        label: <Link to="/profile">{t("profile:menu.profile")}</Link>,
+        icon: <UserOutlined />,
+        visible: true, // Ai cũng có quyền xem
+      },
+      {
+        key: "appointment-management",
+        label: (
+          <Link to="/my-appointment">{t("profile:menu.myAppointment")}</Link>
+        ),
+        icon: <ScheduleOutlined />,
+        visible: isUser, // Chỉ User
+      },
+      {
+        key: "favourite-list",
+        label: (
+          <Link to="/favourite-list">{t("profile:menu.myFavourite")}</Link>
+        ),
+        icon: <HeartOutlined />,
+        visible: isUser, // Chỉ User
+      },
+      {
+        key: "watch-later",
+        label: <Link to="/watch-later">{t("profile:menu.watchLater")}</Link>,
+        icon: <EyeOutlined />,
+        visible: isUser, // Chỉ User
+      },
+      {
+        key: "bh-management-owner",
+        label: (
+          <Link to="/bh-management-owner">
+            {t("profile:menu.boardingHouseManagement")}
+          </Link>
+        ),
+        icon: <HomeFilled />,
+        visible: isOwner || isStaff, // Chỉ Owner và Staff
+      },
+      {
+        key: "deposit-list",
+        label: (
+          <Link to="/deposit-list">{t("profile:menu.depositManagement")}</Link>
+        ),
+        icon: <ContainerOutlined />,
+        visible: isOwner || isStaff, // Chỉ Owner và Staff
+      },
+      {
+        key: "staff-list",
+        label: (
+          <Link to="/staff-list">{t("profile:menu.staffManagement")}</Link>
+        ),
+        icon: <ContainerOutlined />,
+        visible: isOwner, // Chỉ Owner
+      },
+      {
+        key: "my-owner-report",
+        label: (
+          <Link to="/my-report-management">
+            {t("profile:menu.myReportManagement")}
+          </Link>
+        ),
+        icon: <SnippetsOutlined />,
+        visible: isUser,
+      },
+      {
+        key: "my-deposited-room",
+        label: (
+          <Link to="/my-deposited-room">
+            {t("profile:menu.myDepositedRoom")}
+          </Link>
+        ),
+        icon: <ContainerOutlined />,
+        visible: isUser,
+      },
+      {
+        key: "my-renewal-request",
+        label: (
+          <Link to="/my-renewal-request">
+            {t("profile:menu.myRenewalRequest")}
+          </Link>
+        ),
+        icon: <FontAwesomeIcon icon={faEnvelope} />,
+        visible: isUser,
+      },
+      {
+        key: "my-rent-room",
+        label: (
+          <Link to="/my-rent-payment">{t("profile:menu.myRentPayment")}</Link>
+        ),
+        icon: <FontAwesomeIcon icon={faMoneyBill} />,
+        visible: isUser,
+      },
+      {
+        key: "my-deposit-refund-request",
+        label: (
+          <Link to="/my-deposit-refund-request">
+            {t("profile:menu.myDepositRefundRequest")}
+          </Link>
+        ),
+        icon: <RollbackOutlined />,
+        visible: isUser,
+      },
+      {
+        key: "refund-request-management",
+        label: (
+          <Link to="/refund-request-management">
+            {t("profile:menu.depositRefundManagement")}
+          </Link>
+        ),
+        icon: <RollbackOutlined />,
+        visible: isOwner,
+      },
+      {
+        key: "revenue-management-owner",
+        label: (
+          <Link to="/revenue-management-owner">
+            {t("profile:menu.revenueManagement")}
+          </Link>
+        ),
+        icon: <DollarCircleOutlined />,
+        visible: isOwner,
+      },
+      {
+        key: "task-management",
+        label: (
+          <Link to="/task-management">{t("profile:menu.taskManagement")}</Link>
+        ),
+        icon: <DollarCircleOutlined />,
+        visible: isOwner || isStaff,
+      },
+    ];
+
+    return profileMenuItems.filter((item) => item.visible);
+  };
+
+  // Theme toggle button component
   const ThemeToggleButton = () => (
     <Button
       shape="circle"
@@ -118,7 +263,9 @@ const CustomHeader = () => {
           ? "bg-gray-700 text-yellow-400 hover:bg-gray-600 hover:text-yellow-300 border-gray-600"
           : "bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 border-blue-200"
       }`}
-      title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      title={
+        darkMode ? t("common:switchToLightMode") : t("common:switchToDarkMode")
+      }
     />
   );
 
@@ -146,29 +293,9 @@ const CustomHeader = () => {
           MOTELLEASE TECH
         </p>
       </Link>
-      {/* Main Menu (Desktop) */}
-      {/* <Menu
-        className="hidden lg:block"
-        theme={darkMode ? "dark" : "light"}
-        mode="horizontal"
-        defaultSelectedKeys={["home"]}
-        items={menuItems.map(({ key, label, onClick }) => ({
-          key,
-          label: <span onClick={onClick}>{label}</span>,
-        }))}
-        style={{
-          backgroundColor: darkMode ? "#1f2937" : "#fff",
-          borderBottom: "none",
-          flex: 1,
-          minWidth: 0,
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          marginLeft: 330,
-        }}
-      /> */}
+
       {/* User Section */}
       <div className="hidden lg:flex items-center gap-4">
-        {/* Added prominent theme toggle button */}
         <ThemeToggleButton />
         <LanguageSwitcher />
 
@@ -179,14 +306,14 @@ const CustomHeader = () => {
               type="primary"
               onClick={() => navigate("/login")}
             >
-              {t("auth.login-btn")}
+              {t("common:auth.login-btn")}
             </Button>
             <Button
               size="large"
               className={cx("btn-register")}
               onClick={() => navigate("/register")}
             >
-              {t("auth.register-btn")}
+              {t("common:auth.register-btn")}
             </Button>
           </Space>
         ) : (
@@ -226,9 +353,9 @@ const CustomHeader = () => {
           </Dropdown>
         )}
       </div>
+
       {/* Mobile Menu Toggle */}
       <div className="lg:hidden flex items-center space-x-2">
-        {/* Always visible theme toggle button */}
         <ThemeToggleButton />
         <Button
           shape="circle"
@@ -247,6 +374,7 @@ const CustomHeader = () => {
           }
         />
       </div>
+
       {/* Drawer (Mobile Menu) */}
       <Drawer
         title={
@@ -276,14 +404,14 @@ const CustomHeader = () => {
                   type="primary"
                   onClick={() => navigate("/login")}
                 >
-                  Login
+                  {t("common:auth.login-btn")}
                 </Button>
                 <Button
                   size="large"
                   className="btn-register dark:bg-gray-900 dark:text-white dark:border-white mr-2"
                   onClick={() => navigate("/register")}
                 >
-                  Register
+                  {t("common:auth.register-btn")}
                 </Button>
               </Space>
               <div className="flex items-center">
@@ -306,35 +434,19 @@ const CustomHeader = () => {
           borderBottom: darkMode ? "1px solid #4b5563" : "1px solid #f0f0f0",
         }}
       >
-        <Menu
-          mode="vertical"
-          theme={darkMode ? "dark" : "light"}
-          items={(hasRole(userRole.admin) ? adminMenu : menuItems).map(
-            ({ key, label, onClick }) => ({
-              key,
-              label: <span onClick={onClick}>{label}</span>,
-            })
-          )}
-          style={{
-            border: "none",
-            marginBottom: 20,
-            backgroundColor: darkMode ? "#1f2937" : "#fff",
-          }}
-        />
-
         {isLoggedIn && (
           <>
             {!hasRole(userRole.admin) && (
               <>
-                <Divider className={darkMode ? "bg-gray-600" : "bg-gray-400"} />
                 <Menu
                   mode="vertical"
                   theme={darkMode ? "dark" : "light"}
-                  items={getMenuItems()
+                  items={getProfileMenuItems()
                     .filter((item) => item.key !== "profile")
-                    .map(({ key, label, onClick }) => ({
+                    .map(({ key, label, icon }) => ({
                       key,
-                      label: <span onClick={onClick}>{label}</span>,
+                      label,
+                      icon,
                     }))}
                   style={{
                     border: "none",

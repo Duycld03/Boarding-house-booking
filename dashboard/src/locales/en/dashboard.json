@@ -1,0 +1,13 @@
+{
+  "menu": {
+    "accountManagement": "Account Management",
+    "reportManagement": "Report Management",
+    "reportReview": "Report Review",
+    "reportBoardingHouse": "Report Boarding House",
+    "boardingHouseManagement": "Boarding House Management",
+    "reviewManagement": "Review Management",
+    "facilitiesManagement": "Facilities Management",
+    "boardingHouseTypeManagement": "Boarding House Type Management",
+    "withdrawalRequests": "Withdrawal Requests"
+  }
+}
