@@ -1,0 +1,52 @@
+{
+  "title": "Revenue Management",
+  "tabs": {
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "filters": {
+    "month": "Month",
+    "year": "Year"
+  },
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "monthlyView": {
+    "title": "Monthly Revenue Report",
+    "totalRevenue": "Total Revenue",
+    "netProfit": "Net Profit",
+    "utilityExpenses": "Utility Expenses",
+    "otherExpenses": "Other Expenses",
+    "expenseAllocation": "Expense Allocation",
+    "noData": "No revenue data available for this month."
+  },
+  "yearlyView": {
+    "title": "Yearly Revenue Report",
+    "totalAnnualRevenue": "Total Annual Revenue",
+    "averageRevenue": "Average Revenue",
+    "totalProfit": "Total Profit",
+    "profitMargin": "Profit Margin",
+    "monthlyRevenue": "Monthly Revenue",
+    "monthlyExpenses": "Monthly Expenses",
+    "electricityWater": "Electricity & Water",
+    "otherCosts": "Other Costs",
+    "revenue": "Revenue",
+    "profit": "Profit"
+  },
+  "common": {
+    "loading": "Loading...",
+    "noData": "No data available",
+    "error": "Error loading data"
+  }
+}
