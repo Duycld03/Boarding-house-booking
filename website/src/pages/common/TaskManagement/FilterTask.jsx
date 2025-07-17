@@ -38,11 +38,7 @@ const FilterTask = ({ setFilterValue, onClose }) => {
         if (selectedPriority) filters.priority = selectedPriority;
         if (selectedStatus) filters.status = selectedStatus;
         setFilterValue(filters);
-        form.resetFields();
-        setSelectedStaff(undefined);
-        setSelectedPriority(undefined);
-        setSelectedStatus(undefined);
-        setOpen(false);
+        setOpen(true);
     };
 
     const handleResetFilters = () => {
@@ -60,45 +56,57 @@ const FilterTask = ({ setFilterValue, onClose }) => {
             : ConfigProvider.defaultAlgorithm,
         token: darkMode
             ? {
-                colorText: '#ffffff',
-                colorTextSecondary: '#e5e7eb',
-                colorBgContainer: '#1f2937',
-                colorBorder: '#4b5563',
-                colorPrimary: '#3b82f6',
-                colorBgElevated: '#374151',
-                colorFillSecondary: '#374151',
-                colorTextPlaceholder: '#9CA3AF',
-                colorBorderSecondary: '#4B5563',
-                controlItemBgActive: '#3b82f6',
-                controlItemBgHover: '#4B5563',
+                colorText: "#ffffff", // Văn bản sáng
+                colorTextSecondary: "#e5e7eb", // Văn bản phụ nhạt hơn
+                colorBgContainer: "#1f2937", // Nền tối
+                colorBorder: "#4b5563", // Viền rõ hơn
+                colorPrimary: "#3b82f6", // Màu chính (xanh lam)
+
+                // Thiết lập màu sắc cho Input
+                colorBgElevated: "#374151", // Nền cho các thành phần thả xuống
+                colorFillSecondary: "#374151", // Nền cho các ô input
+                colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
+                colorBorderSecondary: "#4B5563", // Viền phụ
+                controlItemBgActive: "#3b82f6", // Nền khi được chọn
+                controlItemBgHover: "#4B5563", // Nền khi hover
             }
             : {
-                colorText: '#000',
-                colorTextSecondary: '#4b5563',
-                colorBgContainer: '#ffffff',
-                colorBorder: '#d9d9d9',
-                colorPrimary: '#3b82f6',
-                colorBgElevated: '#f5f5f5',
-                colorFillSecondary: '#f5f5f5',
-                colorTextPlaceholder: '#9CA3AF',
-                colorBorderSecondary: '#d9d9d9',
-                controlItemBgActive: '#e5e7eb',
-                controlItemBgHover: '#f0f0f0',
+                colorText: "#000", // Văn bản tối
+                colorTextSecondary: "#4b5563", // Văn bản phụ
+                colorBgContainer: "#ffffff", // Nền sáng
+                colorBorder: "#d9d9d9", // Viền nhạt
+                colorPrimary: "#3b82f6", // Màu chính (xanh lam)
+
+                // Thiết lập màu sắc cho Input
+                colorBgElevated: "#f5f5f5", // Nền cho các thành phần thả xuống
+                colorFillSecondary: "#f5f5f5", // Nền cho các ô input
+                colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
+                colorBorderSecondary: "#d9d9d9", // Viền phụ
+                controlItemBgActive: "#e5e7eb", // Nền khi được chọn
+                controlItemBgHover: "#f0f0f0", // Nền khi hover
             },
         components: {
+            // Cấu hình cho Select
             Select: {
-                selectorBg: darkMode ? '#374151' : '#f5f5f5',
-                colorText: darkMode ? '#F9FAFB' : '#000',
-                colorBorder: darkMode ? '#4B5563' : '#d9d9d9',
-                optionSelectedBg: darkMode ? '#2563eb' : '#e5e7eb',
-                optionHoverBg: darkMode ? '#4B5563' : '#f0f0f0',
+                selectorBg: darkMode ? "#374151" : "#FFFFFF", // Nền của Select
+                colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Select
+                colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
+                optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb", // Nền khi được chọn
+                optionHoverBg: darkMode ? "#4B5563" : "#FFFFFF", // Nền khi hover
             },
+            // Cấu hình cho Input
+            Input: {
+                colorBgContainer: darkMode ? "#374151" : "#FFFFFF", // Nền Input
+                colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Input
+                colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
+                colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563", // Placeholder
+            },
+            // Cấu hình cho Form
             Form: {
-                labelColor: darkMode ? '#F9FAFB' : '#000',
+                labelColor: darkMode ? "#F9FAFB" : "#000", // Màu nhãn Form
             },
         },
     };
-
     return (
         <ConfigProvider theme={themeConfig}>
             <div className="relative inline-block text-left">
