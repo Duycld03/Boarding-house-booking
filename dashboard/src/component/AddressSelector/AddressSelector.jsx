@@ -130,6 +130,7 @@ const AddressSelector = ({
                 onDistrictChange?.(selected.id);
               }
             }}
+            disabled={!formData?.address?.province}
 
           >
             {districts.map((district) => (

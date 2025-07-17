@@ -412,15 +412,15 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
     components: {
       // Cấu hình cho Select
       Select: {
-        selectorBg: darkMode ? "#374151" : "#f5f5f5", // Nền của Select
+        selectorBg: darkMode ? "#374151" : "#FFFFFF", // Nền của Select
         colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Select
         colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
         optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb", // Nền khi được chọn
-        optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0", // Nền khi hover
+        optionHoverBg: darkMode ? "#4B5563" : "#FFFFFF", // Nền khi hover
       },
       // Cấu hình cho Input
       Input: {
-        colorBgContainer: darkMode ? "#374151" : "#f5f5f5", // Nền Input
+        colorBgContainer: darkMode ? "#374151" : "#FFFFFF", // Nền Input
         colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Input
         colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
         colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563", // Placeholder
