@@ -6,6 +6,7 @@ import {
   handleDepositDecision,
   getMaxDeposit,
   getRentTime,
+  deleteDepositRoom,
 } from "@/api/depositAPI";
 
 import { getAllBHOwner } from "../../../api/BoardingHouseAPI";
@@ -32,8 +33,12 @@ const DepositRoom = () => {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [reasonForCancel, setReasonForCancel] = useState("");
   const [rejectLoading, setRejectLoading] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const [listRoom, setListRoom] = useState([]);
-  const [boardingHouses, setBoardingHouses] = useState([]); // Thêm state cho boardingHouses
+  const [boardingHouses, setBoardingHouses] = useState([]);
   const [filterValue, setFilterValue] = useState({});
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -42,7 +47,6 @@ const DepositRoom = () => {
     limit: 10,
   });
 
-  // Thêm state cho giá trị max
   const [maxDepositAmount, setMaxDepositAmount] = useState();
   const [maxRentalTime, setMaxRentalTime] = useState(12);
   const [filterLoading, setFilterLoading] = useState(false);
@@ -226,6 +230,36 @@ const DepositRoom = () => {
     setReasonForCancel("");
   };
 
+  const handleDelete = (record) => {
+    setSelectedRoom(record);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedRoom) return toast.error(t("messages.noRoomSelected"));
+    setDeleteLoading(true);
+    try {
+      await deleteDepositRoom(selectedRoom._id);
+      toast.success(
+        t("messages.deleteSuccess", { room: selectedRoom.roomNumber })
+      );
+      setIsDeleteModalOpen(false);
+      setSelectedRoom(null);
+      fetchDepositedRooms();
+    } catch (error) {
+      console.error("Error deleting deposit:", error);
+      toast.error(t("messages.deleteError"));
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // Thêm hàm handleCancelDeleteModal
+  const handleCancelDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedRoom(null);
+  };
+
   const handleCancelModal = () => {
     setIsModalVisible(false);
     setSelectedRoom(null);
@@ -273,7 +307,6 @@ const DepositRoom = () => {
           <Tag color="default">N/A</Tag>
         ),
     },
-
     {
       title: t("columns.status"),
       dataIndex: "status",
@@ -284,10 +317,14 @@ const DepositRoom = () => {
             status === "pending"
               ? "orange"
               : status === "accepted"
+              ? "blue"
+              : status === "confirmed"
               ? "green"
-              : status === "deleted"
-              ? "volcano"
-              : "red"
+              : status === "rejected"
+              ? "red"
+              : status === "refunded"
+              ? "purple"
+              : "default"
           }
         >
           {t(`status.${status}`)}
@@ -312,25 +349,53 @@ const DepositRoom = () => {
     },
     {
       title: t("columns.action"),
-      render: (record) =>
-        record.status === "pending" && (
-          <div className="flex gap-3 items-center">
-            <Button
-              title={t("modal.rejectConfirm")}
-              iconPosition="left"
-              btnReject
-              style={{ backgroundColor: "red", color: "white", border: "none" }}
-              onClick={() => handleReject(record)}
-            />
-            <Button
-              title={t("modal.confirmTitle")}
-              btnAccept
-              className="text-white"
-              bgColor="rgb(5 150 105)"
-              onClick={() => handleAccept(record)}
-            />
-          </div>
-        ),
+      render: (record) => {
+        if (record.status === "pending") {
+          return (
+            <div className="flex gap-3 items-center">
+              <Button
+                title={t("actions.reject")}
+                iconPosition="left"
+                btnReject
+                style={{
+                  backgroundColor: "red",
+                  color: "white",
+                  border: "none",
+                }}
+                onClick={() => handleReject(record)}
+              />
+              <Button
+                title={t("actions.accept")}
+                btnAccept
+                className="text-white"
+                bgColor="rgb(5 150 105)"
+                onClick={() => handleAccept(record)}
+              />
+            </div>
+          );
+        } else if (
+          record.status === "rejected" ||
+          record.status === "confirmed" ||
+          record.status === "accepted"
+        ) {
+          return (
+            <div className="flex gap-3 items-center">
+              <Button
+                title={t("actions.delete")}
+                iconPosition="left"
+                btnDelete
+                style={{
+                  backgroundColor: "#dc2626",
+                  color: "white",
+                  border: "none",
+                }}
+                onClick={() => handleDelete(record)}
+              />
+            </div>
+          );
+        }
+        return null;
+      },
     },
   ];
 
@@ -341,7 +406,7 @@ const DepositRoom = () => {
           <FilterDeposit
             setFilterValue={setFilterValue}
             listRoom={listRoom}
-            boardingHouses={boardingHouses} // Truyền danh sách boarding houses
+            boardingHouses={boardingHouses}
             maxRentalTime={maxRentalTime}
             loading={filterLoading}
             t={t}
@@ -359,6 +424,7 @@ const DepositRoom = () => {
         noDataText={t("noData")}
       />
 
+      {/* Accept Modal */}
       <ConfirmModal
         title={t("modal.confirmTitle")}
         content={t("modal.confirmContent", {
@@ -370,6 +436,7 @@ const DepositRoom = () => {
         confirmLoading={confirmLoading}
       />
 
+      {/* Reject Modal */}
       <Modal
         title={t("modal.rejectTitle")}
         visible={isRejectModalOpen}
@@ -400,6 +467,21 @@ const DepositRoom = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* Delete Modal */}
+      <ConfirmModal
+        title={t("modal.deleteTitle")}
+        content={t("modal.deleteContent", {
+          room: selectedRoom?.roomNumber || "",
+        })}
+        onOk={handleConfirmDelete}
+        onCancel={handleCancelDeleteModal}
+        isOpen={isDeleteModalOpen}
+        confirmLoading={deleteLoading}
+        okText={t("modal.deleteConfirm")}
+        cancelText={t("modal.cancel")}
+        okButtonProps={{ danger: true }}
+      />
     </div>
   );
 };
