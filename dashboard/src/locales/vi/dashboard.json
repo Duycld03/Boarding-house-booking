@@ -1,0 +1,13 @@
+{
+  "menu": {
+    "accountManagement": "Quản lý tài khoản",
+    "reportManagement": "Quản lý báo cáo",
+    "reportReview": "Báo cáo đánh giá",
+    "reportBoardingHouse": "Báo cáo nhà trọ",
+    "boardingHouseManagement": "Quản lý nhà trọ",
+    "reviewManagement": "Quản lý đánh giá",
+    "facilitiesManagement": "Quản lý tiện ích",
+    "boardingHouseTypeManagement": "Quản lý loại nhà trọ",
+    "withdrawalRequests": "Yêu cầu rút tiền"
+  }
+}

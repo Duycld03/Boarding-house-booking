@@ -69,6 +69,7 @@ class AppointmentController {
                         status: appointment?.status,
                         note: appointment?.note,
                         roomId: appointment?.roomId?._id,
+                        reasonForCancel: appointment?.reasonForCancel || null
                     };
                 })
             );

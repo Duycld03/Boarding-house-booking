@@ -4,7 +4,6 @@ import { View, TouchableOpacity } from "react-native";
 import { MaterialIcons, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import convertTimetap from "@/utils/convertTimetap";
-import Color from "@/constants/styles/color";
 
 // Status colors mapping
 const statusColors = {
@@ -13,7 +12,7 @@ const statusColors = {
         text: "text-yellow-600 dark:text-yellow-400",
         border: "border-yellow-200 dark:border-yellow-800"
     },
-    approved: {
+    accepted: {
         bg: "bg-green-100 dark:bg-green-900/30",
         text: "text-green-600 dark:text-green-400",
         border: "border-green-200 dark:border-green-800"
@@ -27,7 +26,7 @@ const statusColors = {
 //Color status text
 const statusTextColor = {
     pending: '#F59E0B',
-    approved: '#10B981',
+    accepted: '#10B981',
     rejected: '#EF4444'
 };
 
@@ -46,7 +45,7 @@ function RenewalCard({
     const requestedEndDate = convertTimetap(renewal?.requestedEndDate);
     const status = renewal?.status?.toLowerCase() || "pending";
     const tenantNote = renewal?.tenantNote || "No notes";
-    const ownerNote = renewal?.ownerNote || "No response yet";
+    const ownerNote = renewal?.reasonForCancel || "No response yet";
 
     // Get status styles
     const getStatusStyles = (status) => {
@@ -176,7 +175,7 @@ function RenewalCard({
                         <Text
                             className={themedClasses("text-gray-700", "text-gray-300")}
                         >
-                            {t("tenantNote")}
+                            {t("tenantNote")} {": "}
                         </Text>
                     </View>
                     <Text
@@ -207,7 +206,7 @@ function RenewalCard({
                             <Text
                                 className={themedClasses("text-gray-700", "text-gray-300")}
                             >
-                                {t("ownerNote")}
+                                {t("ownerNote")} {": "}
                             </Text>
                         </View>
                         <Text

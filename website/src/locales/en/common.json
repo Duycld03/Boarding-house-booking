@@ -49,5 +49,14 @@
     "floor_mat": "Floor mat",
     "water_heater": "Water Heater",
     "smoke_detector": "Smoke Detector"
+  },
+  "profile": "Profile",
+  "changePassword": "Change Password",
+  "logout": "Logout",
+  "switchToLightMode": "Switch to Light Mode",
+  "switchToDarkMode": "Switch to Dark Mode",
+  "auth": {
+    "login-btn": "Login",
+    "register-btn": "Register"
   }
 }
