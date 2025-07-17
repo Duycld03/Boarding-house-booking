@@ -16,7 +16,7 @@ class RevenueController {
       const allPaidBills = await PaymentBill.find({
         month: parseInt(month),
         year: parseInt(year),
-        status: "paid",
+        status: { $regex: /^paid$/i },
       }).populate({
         path: "roomId",
         select: "boardingHouseId roomNumber floor",
@@ -134,21 +134,36 @@ class RevenueController {
   async getTotalRevenue(req, res) {
     try {
       const { month, year } = req.query;
-      const ownerId = req.user.userId;
+      const role = req.user.role;
+      const userId = req.user.userId;
 
       if (!month || !year) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
-      // Tìm tất cả boarding houses của owner
-      const boardingHouses = await BoardingHouse.find({ ownerId }).select(
-        "_id"
-      );
+      let boardingHouses = [];
+
+      // Logic dựa trên role
+      if (role === "owner") {
+        // Nếu là owner, lấy tất cả boarding houses của owner
+        boardingHouses = await BoardingHouse.find({ ownerId: userId }).select(
+          "_id"
+        );
+      } else if (role === "staff") {
+        // Nếu là staff, lấy boarding houses mà staff được assign
+        boardingHouses = await BoardingHouse.find({ staffId: userId }).select(
+          "_id"
+        );
+      } else {
+        return res.status(403).json({ message: "Unauthorized role" });
+      }
 
       if (!boardingHouses.length) {
-        return res
-          .status(404)
-          .json({ message: "No boarding houses found for this owner" });
+        const message =
+          role === "owner"
+            ? "No boarding houses found for this owner"
+            : "No boarding houses assigned to this staff";
+        return res.status(404).json({ message });
       }
 
       const boardingHouseIds = boardingHouses.map((house) => house._id);
@@ -157,7 +172,7 @@ class RevenueController {
       const allPaidBills = await PaymentBill.find({
         month: parseInt(month),
         year: parseInt(year),
-        status: "paid",
+        status: { $regex: /^paid$/i },
       }).populate({
         path: "roomId",
         select: "boardingHouseId roomNumber floor",
@@ -292,24 +307,39 @@ class RevenueController {
   // }
   async getTotalAvailableYears(req, res) {
     try {
-      const ownerId = req.user.userId;
+      const role = req.user.role; // staff, owner
+      const userId = req.user.userId;
 
-      // Lấy danh sách boarding houses của owner
-      const boardingHouses = await BoardingHouse.find({ ownerId }).select(
-        "_id"
-      );
+      let boardingHouses = [];
+
+      // Logic dựa trên role
+      if (role === "owner") {
+        // Nếu là owner, lấy tất cả boarding houses của owner
+        boardingHouses = await BoardingHouse.find({ ownerId: userId }).select(
+          "_id"
+        );
+      } else if (role === "staff") {
+        // Nếu là staff, lấy boarding houses mà staff được assign
+        boardingHouses = await BoardingHouse.find({ staffId: userId }).select(
+          "_id"
+        );
+      } else {
+        return res.status(403).json({ message: "Unauthorized role" });
+      }
 
       if (!boardingHouses.length) {
-        return res
-          .status(404)
-          .json({ message: "No boarding houses found for this owner" });
+        const message =
+          role === "owner"
+            ? "No boarding houses found for this owner"
+            : "No boarding houses assigned to this staff";
+        return res.status(404).json({ message });
       }
 
       const boardingHouseIds = boardingHouses.map((house) => house._id);
 
       // Lấy tất cả payment bills của owner
       const allBills = await PaymentBill.find({
-        status: "paid",
+        status: { $regex: /^paid$/i },
       }).populate({
         path: "roomId",
         select: "boardingHouseId",
@@ -342,21 +372,36 @@ class RevenueController {
   async getTotalRevenueByYear(req, res) {
     try {
       const { year } = req.query;
-      const ownerId = req.user.userId;
+      const role = req.user.role; // staff, owner
+      const userId = req.user.userId;
 
       if (!year) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
-      // Lấy danh sách boarding houses của owner
-      const boardingHouses = await BoardingHouse.find({ ownerId }).select(
-        "_id"
-      );
+      let boardingHouses = [];
+
+      // Logic dựa trên role
+      if (role === "owner") {
+        // Nếu là owner, lấy tất cả boarding houses của owner
+        boardingHouses = await BoardingHouse.find({ ownerId: userId }).select(
+          "_id"
+        );
+      } else if (role === "staff") {
+        // Nếu là staff, lấy boarding houses mà staff được assign
+        boardingHouses = await BoardingHouse.find({ staffId: userId }).select(
+          "_id"
+        );
+      } else {
+        return res.status(403).json({ message: "Unauthorized role" });
+      }
 
       if (!boardingHouses.length) {
-        return res
-          .status(404)
-          .json({ message: "No boarding houses found for this owner" });
+        const message =
+          role === "owner"
+            ? "No boarding houses found for this owner"
+            : "No boarding houses assigned to this staff";
+        return res.status(404).json({ message });
       }
 
       const boardingHouseIds = boardingHouses.map((house) => house._id);
@@ -364,7 +409,7 @@ class RevenueController {
       // Lấy tất cả payment bills của năm cụ thể
       const allBills = await PaymentBill.find({
         year: parseInt(year),
-        status: "paid",
+        status: { $regex: /^paid$/i },
       }).populate({
         path: "roomId",
         select: "boardingHouseId roomNumber floor",

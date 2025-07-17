@@ -162,8 +162,10 @@ const RevenueMonthlyView = ({ monthlyData, formatter, monthlyExpenses, t }) => {
                 fontSize={12}
               />
               <YAxis />
-              <Tooltip formatter={(value) => formatter.formatPrice(value)} />
-              <Legend />
+              <Tooltip
+                formatter={(value) => [formatter.formatPrice(value)]}
+                labelFormatter={(label) => label}
+              />
               <Bar dataKey="value" fill="#38bdf8" />
             </BarChart>
           </ResponsiveContainer>
