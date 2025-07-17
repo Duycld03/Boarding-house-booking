@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const RevenueYearlyView = ({ yearlyData, t, formatter }) => {
+const RevenueYearlyView = ({ yearlyData, t, formatter, darkMode }) => {
   const COLORS = {
     revenue: "#38bdf8",
     electricity: "#f43f5e",
@@ -46,41 +46,101 @@ const RevenueYearlyView = ({ yearlyData, t, formatter }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-6 text-gray-800">
+      <h2
+        className={`text-xl font-semibold mb-6 ${
+          darkMode ? "text-gray-100" : "text-gray-800"
+        }`}
+      >
         {t("yearlyView.title")}
       </h2>
 
       {/* Yearly summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-          <p className="text-sm text-blue-600 font-medium">
+        <div
+          className={`${
+            darkMode
+              ? "bg-blue-900/50 border-blue-800"
+              : "bg-blue-50 border-blue-100"
+          } p-4 rounded-lg border`}
+        >
+          <p
+            className={`text-sm ${
+              darkMode ? "text-blue-300" : "text-blue-600"
+            } font-medium`}
+          >
             {t("yearlyView.totalAnnualRevenue")}
           </p>
-          <p className="text-2xl font-bold text-blue-700">
+          <p
+            className={`text-2xl font-bold ${
+              darkMode ? "text-blue-200" : "text-blue-700"
+            }`}
+          >
             {formatter.formatPrice(summaryData.totalRevenue)}
           </p>
         </div>
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-          <p className="text-sm text-blue-600 font-medium">
+        <div
+          className={`${
+            darkMode
+              ? "bg-blue-900/50 border-blue-800"
+              : "bg-blue-50 border-blue-100"
+          } p-4 rounded-lg border`}
+        >
+          <p
+            className={`text-sm ${
+              darkMode ? "text-blue-300" : "text-blue-600"
+            } font-medium`}
+          >
             {t("yearlyView.averageRevenue")}
           </p>
-          <p className="text-2xl font-bold text-blue-700">
+          <p
+            className={`text-2xl font-bold ${
+              darkMode ? "text-blue-200" : "text-blue-700"
+            }`}
+          >
             {formatter.formatPrice(summaryData.averageRevenue)}
           </p>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-          <p className="text-sm text-purple-600 font-medium">
+        <div
+          className={`${
+            darkMode
+              ? "bg-purple-900/50 border-purple-800"
+              : "bg-purple-50 border-purple-100"
+          } p-4 rounded-lg border`}
+        >
+          <p
+            className={`text-sm ${
+              darkMode ? "text-purple-300" : "text-purple-600"
+            } font-medium`}
+          >
             {t("yearlyView.totalProfit")}
           </p>
-          <p className="text-2xl font-bold text-purple-700">
+          <p
+            className={`text-2xl font-bold ${
+              darkMode ? "text-purple-200" : "text-purple-700"
+            }`}
+          >
             {formatter.formatPrice(summaryData.totalProfit)}
           </p>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-          <p className="text-sm text-purple-600 font-medium">
+        <div
+          className={`${
+            darkMode
+              ? "bg-purple-900/50 border-purple-800"
+              : "bg-purple-50 border-purple-100"
+          } p-4 rounded-lg border`}
+        >
+          <p
+            className={`text-sm ${
+              darkMode ? "text-purple-300" : "text-purple-600"
+            } font-medium`}
+          >
             {t("yearlyView.profitMargin")}
           </p>
-          <p className="text-2xl font-bold text-purple-700">
+          <p
+            className={`text-2xl font-bold ${
+              darkMode ? "text-purple-200" : "text-purple-700"
+            }`}
+          >
             {summaryData.profitMargin}%
           </p>
         </div>
@@ -89,8 +149,18 @@ const RevenueYearlyView = ({ yearlyData, t, formatter }) => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar chart */}
-        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+        <div
+          className={`${
+            darkMode
+              ? "bg-gray-800 border-gray-700"
+              : "bg-gray-50 border-gray-200"
+          } p-4 rounded-lg border`}
+        >
+          <h3
+            className={`text-lg font-semibold mb-4 ${
+              darkMode ? "text-gray-200" : "text-gray-700"
+            }`}
+          >
             {t("yearlyView.monthlyRevenue")}
           </h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -118,8 +188,18 @@ const RevenueYearlyView = ({ yearlyData, t, formatter }) => {
         </div>
 
         {/* Line chart */}
-        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">
+        <div
+          className={`${
+            darkMode
+              ? "bg-gray-800 border-gray-700"
+              : "bg-gray-50 border-gray-200"
+          } p-4 rounded-lg border`}
+        >
+          <h3
+            className={`text-lg font-semibold mb-4 ${
+              darkMode ? "text-gray-200" : "text-gray-700"
+            }`}
+          >
             {t("yearlyView.monthlyExpenses")}
           </h3>
           <ResponsiveContainer width="100%" height={300}>

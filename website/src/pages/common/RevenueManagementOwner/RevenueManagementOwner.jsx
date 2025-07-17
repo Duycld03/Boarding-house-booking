@@ -10,6 +10,7 @@ import {
   getTotalRevenueByYear,
 } from "@/api/revenueAPI";
 import { getTotalExpenseByTime } from "@/api/boardingHouseExpenseAPI";
+import { useTheme } from "@/context/themeContext";
 
 // Colors for the charts
 export const COLORS = {
@@ -22,6 +23,7 @@ export const COLORS = {
 
 const RevenueManagementOwner = () => {
   const { t, i18n } = useTranslation("revenueManagement");
+  const { darkMode } = useTheme();
 
   // Get current month and year for default values
   const currentDate = new Date();
@@ -192,14 +194,34 @@ const RevenueManagementOwner = () => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">{t("title")}</h1>
+    <div
+      className={`${
+        darkMode ? "bg-gray-800" : "bg-white"
+      } rounded-lg shadow-md p-6`}
+    >
+      <h1
+        className={`text-2xl font-bold ${
+          darkMode ? "text-gray-100" : "text-gray-800"
+        } mb-6`}
+      >
+        {t("title")}
+      </h1>
 
       {/* Tabs */}
-      <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
+      <div
+        className={`flex mb-6 ${
+          darkMode ? "bg-gray-700" : "bg-gray-100"
+        } rounded-lg p-1`}
+      >
         <button
           className={`py-2 px-4 rounded-lg font-medium ${
-            activeTab === "monthly" ? "bg-white shadow-sm" : "text-gray-600"
+            activeTab === "monthly"
+              ? `${
+                  darkMode
+                    ? "bg-gray-600 text-white shadow-sm"
+                    : "bg-white shadow-sm"
+                }`
+              : `${darkMode ? "text-gray-300" : "text-gray-600"}`
           }`}
           onClick={() => setActiveTab("monthly")}
         >
@@ -207,7 +229,13 @@ const RevenueManagementOwner = () => {
         </button>
         <button
           className={`py-2 px-4 rounded-lg font-medium ${
-            activeTab === "yearly" ? "bg-white shadow-sm" : "text-gray-600"
+            activeTab === "yearly"
+              ? `${
+                  darkMode
+                    ? "bg-gray-600 text-white shadow-sm"
+                    : "bg-white shadow-sm"
+                }`
+              : `${darkMode ? "text-gray-300" : "text-gray-600"}`
           }`}
           onClick={() => setActiveTab("yearly")}
         >
@@ -219,11 +247,19 @@ const RevenueManagementOwner = () => {
       <div className="flex mb-6 gap-4">
         {activeTab === "monthly" && (
           <div className="w-1/2">
-            <label className="block text-lg font-medium text-gray-700 mb-1">
+            <label
+              className={`block text-lg font-medium ${
+                darkMode ? "text-gray-200" : "text-gray-700"
+              } mb-1`}
+            >
               {t("filters.month")}
             </label>
             <select
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className={`w-full p-2 border ${
+                darkMode
+                  ? "border-gray-600 bg-gray-700 text-white"
+                  : "border-gray-300 bg-white"
+              } rounded-lg focus:ring-blue-500 focus:border-blue-500`}
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
             >
@@ -236,11 +272,19 @@ const RevenueManagementOwner = () => {
           </div>
         )}
         <div className={activeTab === "monthly" ? "w-1/2" : "w-1/3"}>
-          <label className="block text-lg font-medium text-gray-700 mb-1">
+          <label
+            className={`block text-lg font-medium ${
+              darkMode ? "text-gray-200" : "text-gray-700"
+            } mb-1`}
+          >
             {t("filters.year")}
           </label>
           <select
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            className={`w-full p-2 border ${
+              darkMode
+                ? "border-gray-600 bg-gray-700 text-white"
+                : "border-gray-300 bg-white"
+            } rounded-lg focus:ring-blue-500 focus:border-blue-500`}
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
           >
@@ -256,7 +300,11 @@ const RevenueManagementOwner = () => {
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          <span className="ml-3 text-gray-600">{t("common.loading")}</span>
+          <span
+            className={`ml-3 ${darkMode ? "text-gray-300" : "text-gray-600"}`}
+          >
+            {t("common.loading")}
+          </span>
         </div>
       ) : (
         <>
@@ -266,6 +314,7 @@ const RevenueManagementOwner = () => {
               formatter={formatter}
               monthlyExpenses={monthlyExpenses}
               t={t}
+              darkMode={darkMode}
             />
           ) : (
             <RevenueYearlyView
@@ -274,6 +323,7 @@ const RevenueManagementOwner = () => {
               selectedYear={selectedYear}
               formatter={formatter}
               t={t}
+              darkMode={darkMode}
             />
           )}
         </>
