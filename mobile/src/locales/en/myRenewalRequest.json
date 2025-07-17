@@ -13,7 +13,7 @@
   "rejectedMessage": "Renewal request has been rejected",
   "status": {
     "pending": "Pending",
-    "approved": "Approved",
+    "accepted": "Accepted",
     "rejected": "Rejected"
   }
 }

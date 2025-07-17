@@ -10,37 +10,26 @@ import {
   Divider,
 } from "antd";
 import classNames from "classnames/bind";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCreditCard,
-  faClipboardList,
-  faCalendarCheck,
-  faTools,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import {
-  UserOutlined,
-  HomeOutlined,
-  FileTextOutlined,
-  FileDoneOutlined,
-} from "@ant-design/icons";
 import Styles from "./Header.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../../assets/images/newLogo.png";
-import UserAvatar from "../../../assets/images/none_avatar.png";
 import {
   LockOutlined,
   LogoutOutlined,
   MenuOutlined,
+  UserOutlined,
   BulbOutlined,
   BulbFilled,
 } from "@ant-design/icons";
 import { getUser } from "../../../api/authAPI";
 import { useCurrentUser } from "../../../context/userContext";
+import adminMenu from "../Slider/menuItem";
 import userRole from "../../../constants/userRole";
+import getMenuItems from "../ProfileSlider/menuItem";
 import { useTheme } from "../../../context/themeContext";
 import LanguageSwitcher from "../../../component/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import DefaultAvatar from "../../../assets/images/none_avatar.png";
 
 const cx = classNames.bind(Styles);
 const { Header } = Layout;
@@ -48,7 +37,7 @@ const { Header } = Layout;
 const CustomHeader = () => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [avatar, setAvatar] = useState(UserAvatar);
+  const [avatar, setAvatar] = useState(null);
   const navigate = useNavigate();
   const { contextLogout, hasRole } = useCurrentUser();
   const { darkMode, toggleDarkMode } = useTheme();
@@ -58,7 +47,7 @@ const CustomHeader = () => {
     const fetchUser = async () => {
       try {
         const res = await getUser();
-        setAvatar(res?.avatarImage?.url || UserAvatar);
+        setAvatar(res?.avatarImage?.url || null);
         setIsLoggedIn(true);
       } catch {
         setIsLoggedIn(false);
@@ -74,6 +63,21 @@ const CustomHeader = () => {
     navigate("/");
   };
 
+  const menuItems = [
+    { key: "home", label: t("home"), onClick: () => navigate("/") },
+    {
+      key: "about",
+      label: t("about"),
+      onClick: () => navigate("/about-us"),
+    },
+    {
+      key: "contact",
+      label: t("contact"),
+      onClick: () => navigate("/contact"),
+    },
+  ];
+
+  // Removed dark mode toggle from dropdown menu
   const userMenuItems = [
     {
       key: "profile",
@@ -95,6 +99,7 @@ const CustomHeader = () => {
     },
   ];
 
+  // Theme toggle button component with improved visibility
   const ThemeToggleButton = () => (
     <Button
       shape="circle"
@@ -116,90 +121,6 @@ const CustomHeader = () => {
     />
   );
 
-  const dashBoard = "/dashboard";
-
-  const menuItems = [
-    {
-      key: "account-management",
-      label: (
-        <Link to={dashBoard + "/account-management"}>
-          {t("account-management")}
-        </Link>
-      ),
-      icon: <FontAwesomeIcon icon={faUser} />,
-    },
-    {
-      key: "report-management",
-      label: t("report-management"),
-      icon: <FileDoneOutlined />,
-      children: [
-        {
-          key: "report-review-management",
-          label: (
-            <Link to={dashBoard + "/report-review-management"}>
-              {t("report-review-management")}
-            </Link>
-          ),
-          icon: <FileTextOutlined />,
-        },
-        {
-          key: "report-boarding-house-management",
-          label: (
-            <Link to={dashBoard + "/report-boarding-house-management"}>
-              {t("report-boarding-house-management")}
-            </Link>
-          ),
-          icon: <FontAwesomeIcon icon={faClipboardList} />,
-        },
-      ],
-    },
-    {
-      key: "boarding-house-management",
-      label: (
-        <Link to={dashBoard + "/boarding-house-management"}>
-          {t("boarding-house-management")}
-        </Link>
-      ),
-      icon: <HomeOutlined />,
-    },
-    // {
-    //   key: "boarding-house-type-management",
-    //   label: (
-    //     <Link to={dashBoard + "/boarding-house-type-management"}>
-    //       {t("boarding-house-type-management")}
-    //     </Link>
-    //   ),
-    //   icon: <HomeOutlined />,
-    // },
-    // {
-    //   key: "withdrawal-requests-management",
-    //   label: (
-    //     <Link to={dashBoard + "/withdrawal-requests-management"}>
-    //       {t("withdrawal-requests-management")}
-    //     </Link>
-    //   ),
-    //   icon: <FontAwesomeIcon icon={faCreditCard} />,
-    // },
-    {
-      key: "list-boarding-house-reviews",
-      label: (
-        <Link to={dashBoard + "/list-boarding-house-reviews"}>
-          {t("list-boarding-house-reviews")}
-        </Link>
-      ),
-      icon: <FontAwesomeIcon icon={faCalendarCheck} />,
-    },
-    // {
-    //   key: "facilities-management",
-    //   label: (
-    //     <Link to={dashBoard + "/facilities-management"}>
-    //       {t("facilities-management")}
-    //     </Link>
-    //   ),
-    //   icon: <FontAwesomeIcon icon={faTools} />,
-    // },
-  ];
-
   return (
     <Header
       className={cx(
@@ -211,7 +132,11 @@ const CustomHeader = () => {
         to={hasRole(userRole.admin) ? "/dashboard/account-management" : "/"}
         className="flex items-center"
       >
-        <img src={Icon} alt="Logo" className="h-32 w-36 cursor-pointer" />
+        <img
+          src={Icon}
+          alt="Logo"
+          className="flex-shrink-0 h-32 w-36 cursor-pointer"
+        />
         <p
           className={cx(
             "logo-txt font-body text-3xl font-extrabold ml-2 dark:text-white text-gray-800"
@@ -220,11 +145,32 @@ const CustomHeader = () => {
           MOTELLEASE TECH
         </p>
       </Link>
-
-      {/* User Section (Desktop) */}
+      {/* Main Menu (Desktop) */}
+      {/* <Menu
+        className="hidden lg:block"
+        theme={darkMode ? "dark" : "light"}
+        mode="horizontal"
+        defaultSelectedKeys={["home"]}
+        items={menuItems.map(({ key, label, onClick }) => ({
+          key,
+          label: <span onClick={onClick}>{label}</span>,
+        }))}
+        style={{
+          backgroundColor: darkMode ? "#1f2937" : "#fff",
+          borderBottom: "none",
+          flex: 1,
+          minWidth: 0,
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          marginLeft: 330,
+        }}
+      /> */}
+      {/* User Section */}
       <div className="hidden lg:flex items-center gap-4">
+        {/* Added prominent theme toggle button */}
         <ThemeToggleButton />
         <LanguageSwitcher />
+
         {!isLoggedIn ? (
           <Space size={10}>
             <Button
@@ -232,19 +178,14 @@ const CustomHeader = () => {
               type="primary"
               onClick={() => navigate("/login")}
             >
-              Login
+              {t("auth.login-btn")}
             </Button>
             <Button
               size="large"
-              className={cx(
-                "btn-register",
-                darkMode
-                  ? "border-white text-white hover:text-white hover:border-blue-400"
-                  : ""
-              )}
+              className={cx("btn-register")}
               onClick={() => navigate("/register")}
             >
-              Register
+              {t("auth.register-btn")}
             </Button>
           </Space>
         ) : (
@@ -272,13 +213,21 @@ const CustomHeader = () => {
             arrow
             trigger={["click"]}
           >
-            <Avatar src={avatar} size={60} className="cursor-pointer mr-5" />
+            <Avatar
+              src={avatar}
+              size={60}
+              className="cursor-pointer mr-5"
+              onError={() => {
+                setAvatar(DefaultAvatar);
+                return false;
+              }}
+            />
           </Dropdown>
         )}
       </div>
-
       {/* Mobile Menu Toggle */}
       <div className="lg:hidden flex items-center space-x-2">
+        {/* Always visible theme toggle button */}
         <ThemeToggleButton />
         <Button
           shape="circle"
@@ -297,14 +246,21 @@ const CustomHeader = () => {
           }
         />
       </div>
-
-      {/* Drawer (Mobile) */}
+      {/* Drawer (Mobile Menu) */}
       <Drawer
         title={
           isLoggedIn ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Avatar src={avatar || UserAvatar} size={60} className="mr-3" />
+                <Avatar
+                  src={avatar}
+                  size={60}
+                  className="mr-3"
+                  onError={() => {
+                    setAvatar(DefaultAvatar);
+                    return false;
+                  }}
+                />
                 <span className={cx("user-name")}>User Name</span>
               </div>
               <div className="flex items-center space-x-2">
@@ -349,21 +305,15 @@ const CustomHeader = () => {
           borderBottom: darkMode ? "1px solid #4b5563" : "1px solid #f0f0f0",
         }}
       >
-        {/* Menu for admin only */}
         <Menu
           mode="vertical"
           theme={darkMode ? "dark" : "light"}
-          items={menuItems.map(({ key, label, icon, onClick }) => ({
-            key,
-            label: (
-              <span onClick={onClick} className="flex items-center gap-1">
-                <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-2">
-                  {icon}
-                </span>
-                <span>{label}</span>
-              </span>
-            ),
-          }))}
+          items={(hasRole(userRole.admin) ? adminMenu : menuItems).map(
+            ({ key, label, onClick }) => ({
+              key,
+              label: <span onClick={onClick}>{label}</span>,
+            })
+          )}
           style={{
             border: "none",
             marginBottom: 20,
@@ -373,6 +323,25 @@ const CustomHeader = () => {
 
         {isLoggedIn && (
           <>
+            {!hasRole(userRole.admin) && (
+              <>
+                <Divider className={darkMode ? "bg-gray-600" : "bg-gray-400"} />
+                <Menu
+                  mode="vertical"
+                  theme={darkMode ? "dark" : "light"}
+                  items={getMenuItems()
+                    .filter((item) => item.key !== "profile")
+                    .map(({ key, label, onClick }) => ({
+                      key,
+                      label: <span onClick={onClick}>{label}</span>,
+                    }))}
+                  style={{
+                    border: "none",
+                    backgroundColor: darkMode ? "#1f2937" : "#fff",
+                  }}
+                />
+              </>
+            )}
             <Divider className={darkMode ? "bg-gray-600" : "bg-gray-400"} />
             <Menu
               mode="vertical"

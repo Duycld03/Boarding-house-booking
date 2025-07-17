@@ -28,6 +28,42 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../context/themeContext";
 
 /**
+ * SafeAvatar Component
+ * Handles image loading failures and provides a fallback
+ * Uses the same approach as in Header.jsx
+ */
+const SafeAvatar = ({
+  src,
+  size = "large",
+  shape = "circle",
+  className = "",
+  ...props
+}) => {
+  // Trạng thái local để quản lý URL hiện tại
+  const [avatarSrc, setAvatarSrc] = useState(src?.url || src);
+
+  // Xử lý khi URL thay đổi
+  useEffect(() => {
+    setAvatarSrc(src?.url || src);
+  }, [src]);
+
+  return (
+    <Avatar
+      src={avatarSrc}
+      shape={shape}
+      size={size}
+      className={className}
+      onError={() => {
+        // Khi gặp lỗi tải ảnh, set lại state để hiển thị default avatar
+        setAvatarSrc(DefaultAvatar);
+        return false; // Trả về false để ngăn vòng lặp vô hạn
+      }}
+      {...props}
+    />
+  );
+};
+
+/**
  * AccountManagement Component
  * Manages the display and operations for user accounts
  */
@@ -159,11 +195,7 @@ function AccountManagement() {
         dataIndex: "avatarImage",
         key: "avatarImage",
         render: (avatarImage) => (
-          <Avatar
-            src={avatarImage?.url ?? DefaultAvatar}
-            shape="circle"
-            size="large"
-          />
+          <SafeAvatar src={avatarImage} shape="circle" size="large" />
         ),
       },
       {

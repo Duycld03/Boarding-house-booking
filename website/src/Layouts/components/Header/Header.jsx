@@ -8,7 +8,6 @@ import {
   Space,
   Drawer,
   Divider,
-  Switch,
 } from "antd";
 import classNames from "classnames/bind";
 import Styles from "./Header.module.css";
@@ -31,6 +30,7 @@ import getMenuItems from "../ProfileSlider/menuItem";
 import { useTheme } from "../../../context/themeContext";
 import LanguageSwitcher from "../../../component/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import DefaultAvatar from "../../../assets/images/none_avatar.png";
 
 const cx = classNames.bind(Styles);
 const { Header } = Layout;
@@ -38,17 +38,17 @@ const { Header } = Layout;
 const CustomHeader = () => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [avatar, setAvatar] = useState(UserAvatar);
+  const [avatar, setAvatar] = useState(null);
   const navigate = useNavigate();
   const { contextLogout, hasRole } = useCurrentUser();
-  const { darkMode, toggleDarkMode } = useTheme(); // Use theme context
+  const { darkMode, toggleDarkMode } = useTheme();
   const { t } = useTranslation();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await getUser();
-        setAvatar(res?.avatarImage?.url || UserAvatar);
+        setAvatar(res?.avatarImage?.url || null);
         setIsLoggedIn(true);
       } catch {
         setIsLoggedIn(false);
@@ -214,7 +214,15 @@ const CustomHeader = () => {
             arrow
             trigger={["click"]}
           >
-            <Avatar src={avatar} size={60} className="cursor-pointer mr-5" />
+            <Avatar
+              src={avatar}
+              size={60}
+              className="cursor-pointer mr-5"
+              onError={() => {
+                setAvatar(DefaultAvatar);
+                return false;
+              }}
+            />
           </Dropdown>
         )}
       </div>
@@ -245,7 +253,15 @@ const CustomHeader = () => {
           isLoggedIn ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Avatar src={avatar || UserAvatar} size={60} className="mr-3" />
+                <Avatar
+                  src={avatar}
+                  size={60}
+                  className="mr-3"
+                  onError={() => {
+                    setAvatar(DefaultAvatar);
+                    return false;
+                  }}
+                />
                 <span className={cx("user-name")}>User Name</span>
               </div>
               <div className="flex items-center space-x-2">
