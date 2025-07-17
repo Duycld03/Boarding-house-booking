@@ -139,7 +139,7 @@ class reportController {
         service: 'gmail',
         auth: {
           user: 'todohongy@gmail.com', // Thay bằng email của bạn
-          pass: 'ersq syrb ihov ilvx', // Thay bằng App Password
+          pass: 'onbg hyaz wxcd vmgw', // Thay bằng App Password
         },
       });
 
@@ -165,8 +165,8 @@ class reportController {
             <ul>
                 <li><strong>Trạng thái báo cáo:</strong> ${status}</li>
                 <li><strong>Ngày gửi báo cáo:</strong> ${new Date(
-              relatedReport.createdAt
-            ).toLocaleDateString()}</li>
+                  relatedReport.createdAt
+                ).toLocaleDateString()}</li>
                 <li><strong>Người xử lý:</strong> ${processedByName}</li>
                 <li><strong>Ngày xử lý:</strong> ${new Date().toLocaleDateString()}</li>
                 <li><strong>Kết quả xử lý:</strong> ${detailReport}</li>

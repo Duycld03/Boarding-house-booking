@@ -29,6 +29,7 @@ const AppointmentCard = ({ item, onCancel }) => {
     const { themedClasses } = useThemedClasses();
     const { t } = useTranslation('myAppointment');
 
+
     const currentLanguage = i18next.language;
 
     const statusStyles = {
@@ -52,7 +53,7 @@ const AppointmentCard = ({ item, onCancel }) => {
             iconColor: 'orange',
             borderColor: isDarkMode ? 'border-blue-500/30' : 'border-blue-200'
         },
-        canceled: {
+        rejected: {
             bg: isDarkMode
                 ? 'bg-gradient-to-r from-red-500 via-red-600 to-pink-500'
                 : 'bg-gradient-to-r from-red-400 via-red-500 to-pink-400',
@@ -257,6 +258,36 @@ const AppointmentCard = ({ item, onCancel }) => {
                             </Text>
                         </View>
                     </>
+                )}
+
+                {/* Reason for Cancellation - New Section */}
+                {item.status === 'rejected' && item.reasonForCancel && (
+                    <View className={`p-4 rounded-xl ${themedClasses(
+                        'bg-red-50 border border-red-100',
+                        'bg-red-900/20 border-red-800/50'
+                    )}`}>
+                        <View className="flex-row items-center mb-2">
+                            <View className={`rounded-lg mr-3 ${themedClasses(
+                                'bg-red-100 p-2',
+                                'bg-red-800/30'
+                            )}`}>
+                                <MaterialIcons
+                                    name="cancel"
+                                    size={18}
+                                    color={isDarkMode ? '#FCA5A5' : '#EF4444'}
+                                />
+                            </View>
+                            <Text className={`text-sm font-semibold ${themedClasses('text-red-700', 'text-red-300')}`}>
+                                {t('reasonForCancel')}
+                            </Text>
+                        </View>
+                        <Text
+                            className={`leading-5 ${themedClasses('text-gray-800', 'text-gray-200')}`}
+                            numberOfLines={4}
+                        >
+                            {item.reasonForCancel}
+                        </Text>
+                    </View>
                 )}
 
                 {/* Action Button */}

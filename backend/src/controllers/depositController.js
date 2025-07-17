@@ -197,6 +197,79 @@ class DepositController {
     }
   }
 
+  async getDepositRoomDetail(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+      const { userId } = req.user;
+
+      // Verify that the deposit belongs to the user
+      const deposit = await DepositRoom.findOne({
+        _id: depositRoomId,
+        accountId: userId,
+      })
+        .populate({
+          path: 'roomId',
+          select: 'roomNumber images',
+          populate: [
+            {
+              path: 'boardingHouseId',
+              select: 'name',
+              populate: { path: 'boardingHouseType', select: 'name' },
+            },
+            {
+              path: 'rentBy',
+              select: 'fullname avatarImage',
+            },
+            {
+              path: 'roomTypeId',
+              select: 'price roomSize',
+            },
+          ],
+        })
+        .lean();
+
+      if (!deposit) {
+        return res.status(404).json({
+          success: false,
+          message:
+            'Deposit room not found or you do not have permission to view it',
+        });
+      }
+
+      // Format the response data
+      const formattedData = {
+        _id: deposit._id,
+        boardingHouseName: deposit.roomId.boardingHouseId.name,
+        boardingHouseType:
+          deposit.roomId.boardingHouseId.boardingHouseType.name,
+        roomNumber: deposit.roomId.roomNumber,
+        images: deposit.roomId.images,
+        price: deposit.roomId.roomTypeId.price,
+        roomSize: deposit.roomId.roomTypeId.roomSize,
+        rentBy: deposit.roomId.rentBy,
+        amount: deposit.amount,
+        status: deposit.status,
+        rentalTime: deposit.rentalTime,
+        startDate: deposit.startDate,
+        endDate: deposit.endDate,
+        createdAt: deposit.createdAt,
+        reasonForCancel: deposit.reasonForCancel,
+      };
+
+      res.status(200).json({
+        success: true,
+        data: formattedData,
+      });
+    } catch (error) {
+      console.error('Error getting deposit room detail:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message,
+      });
+    }
+  }
+
   async vnpayReturn(req, res) {
     let vnp_Params = req.query;
 
@@ -312,7 +385,7 @@ class DepositController {
     //failed
     let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
     if (type == 'refund') {
-      redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
+      redirectUrl = `http://localhost:5173/refund-request-management?status=fail`;
     }
     res.redirect(redirectUrl);
   }
@@ -427,7 +500,7 @@ class DepositController {
     } catch (error) {
       let redirectUrl = `${process.env.NGROK_URL}/my-deposited-room?status=fail`;
       if (type == 'refund') {
-        redirectUrl = `${process.env.NGROK_URL}/refund-request-management?status=fail`;
+        redirectUrl = `http://localhost:5173/refund-request-management?status=fail`;
       }
       res.redirect(redirectUrl);
     }
@@ -657,10 +730,14 @@ class DepositController {
           boardingHouseId: roomInfo.boardingHouseId,
           amount: deposit.amount,
           status: deposit.status,
-          startDate: deposit.startDate ? moment(deposit.startDate).format('DD/MM/YYYY') : 'N/A',
-          endDate: deposit.endDate ? moment(deposit.endDate).format('DD/MM/YYYY') : 'N/A',
+          startDate: deposit.startDate
+            ? moment(deposit.startDate).format('DD/MM/YYYY')
+            : 'N/A',
+          endDate: deposit.endDate
+            ? moment(deposit.endDate).format('DD/MM/YYYY')
+            : 'N/A',
           rentalTime: deposit.rentalTime,
-          createdAt: moment(deposit.createdAt).format('DD/MM/YYYY HH:mm:ss')
+          createdAt: moment(deposit.createdAt).format('DD/MM/YYYY HH:mm:ss'),
         };
       });
 
@@ -725,7 +802,7 @@ class DepositController {
         service: 'gmail',
         auth: {
           user: 'todohongy@gmail.com',
-          pass: 'ersq syrb ihov ilvx',
+          pass: 'onbg hyaz wxcd vmgw',
         },
       });
 
@@ -943,7 +1020,6 @@ class DepositController {
       res.status(500).json({ message: 'Server error', error });
     }
   }
-
   async acceptRefundRequestForOwner(req, res) {
     try {
       const { refundRequestId } = req.params;
@@ -961,12 +1037,45 @@ class DepositController {
       const orderInfo = `refund-${accountId}-${refundRequestId}`;
 
       if (paymentMethod === 'vnpay') {
-        createVNPayUrl(req, res, amountRefunded, orderInfo);
+        createVNPayUrl(req, res, actualRefundAmount, orderInfo);
       } else if (paymentMethod === 'momo') {
-        createMomoUrl(req, res, amountRefunded, orderInfo);
+        createMomoUrl(req, res, actualRefundAmount, orderInfo);
       }
     } catch (error) {
       res.status(500).json({ message: 'Server error', error });
+    }
+  }
+
+  async deleteDepositRoom(req, res) {
+    try {
+      const { depositRoomId } = req.params;
+      const depositRoom =
+        await DepositRoom.findById(depositRoomId).populate("roomId");
+      if (!depositRoom) {
+        return res.status(404).json({ message: "Deposit room not found" });
+      }
+
+      if (
+        depositRoom.status
+          .toLowerCase()
+          .includes(["rejected", "accepted", "confirmed"])
+      ) {
+        return res.status(400).json({
+          message: "Only rejected deposits can be deleted",
+        });
+      }
+
+      if (depositRoom.status.toLowerCase() === "confirmed") {
+        depositRoom.roomId.rentBy = depositRoom.roomId.rentBy.filter(
+          (id) => id.toString() !== depositRoom.accountId.toString()
+        );
+        await depositRoom.roomId.save();
+      }
+
+      await DepositRoom.deleteOne({ _id: depositRoomId });
+      res.status(200).json({ message: "Deposit room deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error });
     }
   }
 }

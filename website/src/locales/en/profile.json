@@ -1,48 +1,65 @@
 {
-    "title": "Personal Profile",
-    "description": "Account Infomation",
-    "avatar": {
-        "label": "Avatar",
-        "upload": "Upload",
-        "change": "Change Avatar"
-    },
-    "username": {
-        "label": "Username",
-        "placeholder": "Enter your username..."
-    },
-    "fullName": {
-        "label": "Full Name",
-        "placeholder": "Enter full name...",
-        "required": "Full name is required!",
-        "minLength": "Full name must be at least 2 characters!",
-        "invalidFormat": "No numbers or special characters allowed!"
-    },
-    "email": {
-        "label": "Email",
-        "placeholder": "Enter email...",
-        "required": "Please enter a valid email address!"
-    },
-    "phone": {
-        "label": "Phone Number",
-        "placeholder": "Enter phone number...",
-        "required": "Phone number is required!",
-        "invalidFormat": "Must be 10 digits!"
-    },
-    "gender": {
-        "label": "Gender",
-        "options": {
-            "male": "Male",
-            "female": "Female",
-            "other": "Other"
-        }
-    },
-    "accountBalance": {
-        "label": "Account Balance"
-    },
-    "actions": {
-        "save": "Save Changes",
-        "saving": "Saving...",
-        "success": "Profile updated successfully!",
-        "error": "Failed to update profile, please try again."
+  "title": "Personal Profile",
+  "description": "Account Infomation",
+  "avatar": {
+    "label": "Avatar",
+    "upload": "Upload",
+    "change": "Change Avatar"
+  },
+  "username": {
+    "label": "Username",
+    "placeholder": "Enter your username..."
+  },
+  "fullName": {
+    "label": "Full Name",
+    "placeholder": "Enter full name...",
+    "required": "Full name is required!",
+    "minLength": "Full name must be at least 2 characters!",
+    "invalidFormat": "No numbers or special characters allowed!"
+  },
+  "email": {
+    "label": "Email",
+    "placeholder": "Enter email...",
+    "required": "Please enter a valid email address!"
+  },
+  "phone": {
+    "label": "Phone Number",
+    "placeholder": "Enter phone number...",
+    "required": "Phone number is required!",
+    "invalidFormat": "Must be 10 digits!"
+  },
+  "gender": {
+    "label": "Gender",
+    "options": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
     }
+  },
+  "accountBalance": {
+    "label": "Account Balance"
+  },
+  "actions": {
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "success": "Profile updated successfully!",
+    "error": "Failed to update profile, please try again."
+  },
+  "menu": {
+    "profile": "Profile",
+    "myAppointment": "My Appointments",
+    "myFavourite": "My Favorites",
+    "watchLater": "Watch Later",
+    "boardingHouseManagement": "Boarding House Management",
+    "depositManagement": "Deposit Management",
+    "staffManagement": "Staff Management",
+    "myReportManagement": "My Report Management",
+    "myDepositedRoom": "My Deposited Rooms",
+    "myRenewalRequest": "My Renewal Requests",
+    "myRentPayment": "My Rent Payments",
+    "myDepositRefundRequest": "My Deposit Refund Requests",
+    "depositRefundManagement": "Deposit Refund Management",
+    "revenueManagement": "Revenue Management",
+    "taskManagement": "Task Management"
+  }
 }

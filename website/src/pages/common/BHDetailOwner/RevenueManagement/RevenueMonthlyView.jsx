@@ -8,6 +8,7 @@ const RevenueMonthlyView = ({
   monthlyExpenses,
   currentLanguage,
   t,
+  darkMode,
 }) => {
   const COLORS = {
     profit: "#10B981", // green-500
@@ -20,21 +21,21 @@ const RevenueMonthlyView = ({
     !monthlyData.transactions ||
     monthlyData.transactions.length === 0
   ) {
-    return <Empty description="No revenue data available for this month." />;
+    return <Empty description={t("revenue.noData.revenue")} />;
   }
 
   // Calculate total utility expenses
   const totalUtilityExpenses = monthlyExpenses
     ? (monthlyExpenses.electricalExpense?.totalAmount || 0) +
-      (monthlyExpenses.waterExpense?.totalAmount || 0)
+    (monthlyExpenses.waterExpense?.totalAmount || 0)
     : 0;
 
   // Calculate other expenses
   const totalOtherExpenses = monthlyExpenses
     ? monthlyExpenses.otherExpenses?.reduce(
-        (total, expense) => total + (expense.feeAmount || 0),
-        0
-      )
+      (total, expense) => total + (expense.feeAmount || 0),
+      0
+    )
     : 0;
 
   // Calculate paid transactions and total paid amount
@@ -52,17 +53,17 @@ const RevenueMonthlyView = ({
   // Prepare data for the pie chart
   const pieData = [
     {
-      name: "Net Profit",
+      name: t("revenue.chart.netProfit"),
       value: netProfit,
       color: COLORS.profit,
     },
     {
-      name: "Utility Expenses",
+      name: t("revenue.chart.utilityExpenses"),
       value: totalUtilityExpenses,
       color: COLORS.utilityExpenses,
     },
     {
-      name: "Other Expenses",
+      name: t("revenue.chart.otherExpenses"),
       value: totalOtherExpenses,
       color: COLORS.otherExpenses,
     },
@@ -73,25 +74,33 @@ const RevenueMonthlyView = ({
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-          <p className="text-lg text-blue-600 font-medium">Total Revenue</p>
+          <p className="text-lg text-blue-600 font-medium">
+            {t("revenue.summary.totalRevenue")}
+          </p>
           <p className="text-2xl font-bold text-blue-700">
             {formatAmount(monthlyData?.totalRevenue, currentLanguage)}
           </p>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-          <p className="text-lg text-purple-600 font-medium">Net Profit</p>
+        <div className="bg-purple-50 dark:bg-purple-100 p-4 rounded-lg border border-purple-100 dark:border-purple-200">
+          <p className="text-lg text-purple-600 font-medium">
+            {t("revenue.summary.netProfit")}
+          </p>
           <p className="text-2xl font-bold text-purple-700">
             {formatAmount(netProfit, currentLanguage)}
           </p>
         </div>
         <div className="bg-red-50 p-4 rounded-lg border border-red-100">
-          <p className="text-lg text-red-600 font-medium">Utility Expenses</p>
+          <p className="text-lg text-red-600 font-medium">
+            {t("revenue.summary.utilityExpenses")}
+          </p>
           <p className="text-2xl font-bold text-red-700">
             {formatAmount(totalUtilityExpenses, currentLanguage)}
           </p>
         </div>
         <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-          <p className="text-lg text-green-600 font-medium">Other Expenses</p>
+          <p className="text-lg text-green-600 font-medium">
+            {t("revenue.summary.otherExpenses")}
+          </p>
           <p className="text-2xl font-bold text-green-700">
             {formatAmount(totalOtherExpenses, currentLanguage)}
           </p>
@@ -99,9 +108,9 @@ const RevenueMonthlyView = ({
       </div>
 
       {/* Pie chart */}
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-        <h3 className="text-lg font-semibold mb-2 text-gray-700">
-          Expense Allocation
+      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">
+          {t("revenue.chart.expenseAllocation")}
         </h3>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>

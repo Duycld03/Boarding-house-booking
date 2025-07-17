@@ -21,11 +21,41 @@
     "detail": "Detail"
   },
   "addressFormat": "Detail address: {{detail}} {{ward}} {{district}} {{province}}",
-   "facilities": {
+  "facilities": {
     "swimming_pool": "Swimming Pool",
     "gym": "Gym",
     "laundry_room": "Laundry Room",
     "parking_lot": "Parking Lot",
-    "tennis_court": "Tennis Court"
+    "tennis_court": "Tennis Court",
+    "bed": "Bed",
+    "wardrobe": "Wardrobe",
+    "closet": "Cabinet",
+    "desk": "Study desk",
+    "chair": "Chair",
+    "bookshelf": "Bookshelf",
+    "air_conditioner": "Air conditioner",
+    "heater": "Heater",
+    "refrigerator": "Refrigerator",
+    "induction_cooker": "Induction cooker",
+    "dining_table": "Dining table",
+    "dining_chair": "Dining chair",
+    "kitchen_cabinet": "Kitchen cabinet",
+    "washbasin": "Washbasin",
+    "trash_can": "Trash can",
+    "tv": "TV",
+    "wifi_router": "WiFi transmitter",
+    "shoe_rack": "Shoe rack",
+    "floor_mat": "Floor mat",
+    "water_heater": "Water Heater",
+    "smoke_detector": "Smoke Detector"
+  },
+  "profile": "Profile",
+  "changePassword": "Change Password",
+  "logout": "Logout",
+  "switchToLightMode": "Switch to Light Mode",
+  "switchToDarkMode": "Switch to Dark Mode",
+  "auth": {
+    "login-btn": "Login",
+    "register-btn": "Register"
   }
 }

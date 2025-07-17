@@ -155,44 +155,14 @@ const routes = [
 
   // Dashboard routes
   {
-    path: `${DASHBOARD_PATH}/boarding-house-management`,
-    page: DashboardPages.BoardingHouseManagement,
-    layout: null,
+    path: "/task-management",
+    page: CommonPages.TaskManagement,
+    layout: ProfileLayout,
   },
   {
-    path: `${DASHBOARD_PATH}/account-management`,
-    page: DashboardPages.AccountManagement,
-    layout: null,
-  },
-  {
-    path: `${DASHBOARD_PATH}/report-boarding-house-management`,
-    page: DashboardPages.ReportBoardingHouse,
-    layout: null,
-  },
-  {
-    path: `${DASHBOARD_PATH}/report-review-management`,
-    page: DashboardPages.ReportReviewManagement,
-    layout: null,
-  },
-  {
-    path: `${DASHBOARD_PATH}/withdrawal-requests-management`,
-    page: DashboardPages.WithdrawalRequestManagement,
-    layout: null,
-  },
-  {
-    path: `${DASHBOARD_PATH}/list-boarding-house-reviews`,
-    page: DashboardPages.ReviewManagement,
-    layout: null,
-  },
-  {
-    path: `${DASHBOARD_PATH}/boarding-house-type-management`,
-    page: DashboardPages.BoardingHouseTypeManagement,
-    layout: null,
-  },
-  {
-    path: `${DASHBOARD_PATH}/facilities-management`,
-    page: DashboardPages.FacilitiesManagement,
-    layout: null,
+    path: "/staff-list",
+    page: CommonPages.StaffManagement,
+    layout: ProfileLayout,
   },
 ];
 

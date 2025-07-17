@@ -1,11 +1,11 @@
-import axios from './axios.config';
+import axios from "./axios.config";
 
 export const depositRoom = (data) => {
-  return axios.post('auth/deposit', data);
+  return axios.post("auth/deposit", data);
 };
 
 export const getMyDepositedRoom = () => {
-  return axios.get('auth/deposited-room');
+  return axios.get("auth/deposited-room");
 };
 
 export const getDepositRoom = (depositRoomId) => {
@@ -13,7 +13,7 @@ export const getDepositRoom = (depositRoomId) => {
 };
 
 export const payRent = (data) => {
-  return axios.post('auth/pay-rent', data);
+  return axios.post("auth/pay-rent", data);
 };
 
 export const checkPayRentStatus = (depositRoomId) => {
@@ -40,10 +40,10 @@ export const getDepositsByOwnerOrStaff = (
 export const handleDepositDecision = (
   depositId,
   action,
-  reasonForCancel = ''
+  reasonForCancel = ""
 ) => {
   const payload = { action };
-  if (action === 'reject') {
+  if (action === "reject") {
     payload.reasonForCancel = reasonForCancel;
   }
   return axios.put(`/staff/deposit/${depositId}`, payload);
@@ -62,8 +62,12 @@ export const getRentTime = (boardingHouseId) => {
 };
 
 export const payDeposit = (data) => {
-  return axios.post('auth/pay-deposit', data);
+  return axios.post("auth/pay-deposit", data);
 };
 export const rejectDepositRoom = (depositId, reasonForCancel) => {
   return axios.put(`staff/rejectdeposit/${depositId}`, { reasonForCancel });
+};
+
+export const deleteDepositRoom = async (depositId) => {
+  return axios.delete(`staff/deposit-room/${depositId}`);
 };

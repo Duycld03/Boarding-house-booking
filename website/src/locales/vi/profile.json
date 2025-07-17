@@ -1,48 +1,65 @@
 {
-    "title": "Hồ Sơ Cá Nhân",
-    "description": "Thông tin cá nhân",
-    "avatar": {
-        "label": "Ảnh đại diện",
-        "upload": "Tải lên",
-        "change": "Thay đổi ảnh đại diện"
-    },
-    "username": {
-        "label": "Tên người dùng",
-        "placeholder": "Nhập tên người dùng..."
-    },
-    "fullName": {
-        "label": "Họ và tên",
-        "placeholder": "Nhập họ và tên...",
-        "required": "Vui lòng nhập họ và tên!",
-        "minLength": "Họ và tên phải có ít nhất 2 ký tự!",
-        "invalidFormat": "Không được chứa số hoặc ký tự đặc biệt!"
-    },
-    "email": {
-        "label": "Email",
-        "placeholder": "Nhập email...",
-        "required": "Vui lòng nhập một địa chỉ email hợp lệ!"
-    },
-    "phone": {
-        "label": "Số điện thoại",
-        "placeholder": "Nhập số điện thoại...",
-        "required": "Vui lòng nhập số điện thoại!",
-        "invalidFormat": "Phải gồm 10 chữ số!"
-    },
-    "gender": {
-        "label": "Giới tính",
-        "options": {
-            "male": "Nam",
-            "female": "Nữ",
-            "other": "Khác"
-        }
-    },
-    "accountBalance": {
-        "label": "Số dư tài khoản"
-    },
-    "actions": {
-        "save": "Lưu thay đổi",
-        "saving": "Đang lưu...",
-        "success": "Cập nhật thông tin thành công!",
-        "error": "Cập nhật thông tin thất bại, vui lòng thử lại."
+  "title": "Hồ Sơ Cá Nhân",
+  "description": "Thông tin cá nhân",
+  "avatar": {
+    "label": "Ảnh đại diện",
+    "upload": "Tải lên",
+    "change": "Thay đổi ảnh đại diện"
+  },
+  "username": {
+    "label": "Tên người dùng",
+    "placeholder": "Nhập tên người dùng..."
+  },
+  "fullName": {
+    "label": "Họ và tên",
+    "placeholder": "Nhập họ và tên...",
+    "required": "Vui lòng nhập họ và tên!",
+    "minLength": "Họ và tên phải có ít nhất 2 ký tự!",
+    "invalidFormat": "Không được chứa số hoặc ký tự đặc biệt!"
+  },
+  "email": {
+    "label": "Email",
+    "placeholder": "Nhập email...",
+    "required": "Vui lòng nhập một địa chỉ email hợp lệ!"
+  },
+  "phone": {
+    "label": "Số điện thoại",
+    "placeholder": "Nhập số điện thoại...",
+    "required": "Vui lòng nhập số điện thoại!",
+    "invalidFormat": "Phải gồm 10 chữ số!"
+  },
+  "gender": {
+    "label": "Giới tính",
+    "options": {
+      "male": "Nam",
+      "female": "Nữ",
+      "other": "Khác"
     }
+  },
+  "accountBalance": {
+    "label": "Số dư tài khoản"
+  },
+  "actions": {
+    "save": "Lưu thay đổi",
+    "saving": "Đang lưu...",
+    "success": "Cập nhật thông tin thành công!",
+    "error": "Cập nhật thông tin thất bại, vui lòng thử lại."
+  },
+  "menu": {
+    "profile": "Hồ sơ",
+    "myAppointment": "Lịch hẹn của tôi",
+    "myFavourite": "Yêu thích",
+    "watchLater": "Xem sau",
+    "boardingHouseManagement": "Quản lý nhà trọ",
+    "depositManagement": "Quản lý đặt cọc",
+    "staffManagement": "Quản lý nhân viên",
+    "myReportManagement": "Quản lý báo cáo",
+    "myDepositedRoom": "Phòng đã đặt cọc",
+    "myRenewalRequest": "Yêu cầu gia hạn",
+    "myRentPayment": "Thanh toán tiền thuê",
+    "myDepositRefundRequest": "Yêu cầu hoàn tiền cọc",
+    "depositRefundManagement": "Quản lý hoàn tiền cọc",
+    "revenueManagement": "Quản lý doanh thu",
+    "taskManagement": "Quản lý công việc"
+  }
 }

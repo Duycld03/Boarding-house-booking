@@ -525,6 +525,18 @@
       "addExpense": "Cannot add expense. {{message}}",
       "updateExpense": "Cannot update expense. {{message}}",
       "unknownError": "Unknown error"
+    },
+    "summary": {
+      "totalRevenue": "Total Revenue",
+      "netProfit": "Net Profit",
+      "utilityExpenses": "Utility Expenses",
+      "otherExpenses": "Other Expenses"
+    },
+    "chart": {
+      "netProfit": "Net Profit",
+      "utilityExpenses": "Utility Expenses",
+      "otherExpenses": "Other Expenses",
+      "expenseAllocation": "Expense Allocation"
     }
   },
   "months": {
