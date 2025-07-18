@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Form, Select, Input } from "antd";
 import LocationPicker from "../LocationPicker/LocationPicker";
 import { useTranslation } from "react-i18next";
+import classNames from 'classnames';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -17,11 +18,13 @@ const AddressSelector = ({
   location,
   initialPosition,
   setGeoLocation,
+  darkMode = false,
 }) => {
   const [currentLocation, setCurrentLocation] = useState(
     initialPosition ? [initialPosition.lat, initialPosition.lon] : null
   );
-  const { t } = useTranslation("addBoardingHouseAdmin");
+  const { t, i18n } = useTranslation("addBoardingHouseAdmin");
+  const lang = i18n.language || 'vi';
 
   useEffect(() => {
     if (initialPosition) return;
@@ -36,6 +39,16 @@ const AddressSelector = ({
     });
     setCurrentLocation([lat, lng]);
   };
+
+  const selectClass = classNames({ 'dark-mode-select': darkMode });
+  const textareaClass = classNames({ 'dark-mode-input': darkMode });
+
+  const darkSelectDropdownStyle = darkMode
+    ? { backgroundColor: '#374151', color: '#F9FAFB' }
+    : {};
+  const darkInputStyle = darkMode
+    ? { borderColor: '#4B5563', color: '#F9FAFB' }
+    : {};
   return (
     <div className="col-span-2">
       <Form layout="vertical">
@@ -47,25 +60,38 @@ const AddressSelector = ({
           rules={[{ required: true, message: t("validation.selectProvince") }]}
         >
           <Select
-            placeholder={t("selectProvince")}
-            value={formData?.address?.province || undefined}
+            placeholder={t("validation.selectProvince")}
+            value={
+              lang === 'en'
+                ? formData?.address?.province?.name_en
+                : formData?.address?.province?.name
+            }
             onChange={(value) => {
-              // Reset district and ward when province changes
-              onProvinceChange({
-                target: { name: "address.province", value },
-              });
-              onInputChange({
-                target: { name: "address.district", value: "" },
-              });
-              onInputChange({
-                target: { name: "address.ward", value: "" },
-              });
+              const selected = provinces.find(
+                (p) => (lang === 'en' ? p.name_en : p.name) === value
+              );
+              if (selected) {
+                onInputChange({
+                  target: {
+                    name: 'address.province',
+                    value: {
+                      name: selected.name,
+                      name_en: selected.name_en,
+                      id: selected.id,
+                    },
+                  },
+                });
+                onInputChange({ target: { name: 'address.district', value: null } });
+                onInputChange({ target: { name: 'address.ward', value: null } });
+
+                onProvinceChange?.(selected.id);
+              }
             }}
-            allowClear
+
           >
             {provinces.map((province) => (
-              <Option key={province.code} value={province.name}>
-                {province.name}
+              <Option key={province.id} value={lang === 'en' ? province.name_en : province.name}>
+                {lang === 'en' ? province.name_en : province.name}
               </Option>
             ))}
           </Select>
@@ -79,23 +105,40 @@ const AddressSelector = ({
           rules={[{ required: true, message: t("validation.selectDistrict") }]}
         >
           <Select
-            placeholder={t("selectDistrict")}
-            value={formData?.address?.district || undefined}
+            placeholder={t("validation.selectDistrict")}
+            value={
+              lang === 'en'
+                ? formData?.address?.district?.name_en
+                : formData?.address?.district?.name
+            }
             onChange={(value) => {
-              // Reset ward when district changes
-              onDistrictChange({
-                target: { name: "address.district", value },
-              });
-              onInputChange({
-                target: { name: "address.ward", value: "" },
-              });
+              const selected = districts.find(
+                (d) => (lang === 'en' ? d.name_en : d.name) === value
+              );
+              if (selected) {
+                onInputChange({
+                  target: {
+                    name: 'address.district',
+                    value: {
+                      name: selected.name,
+                      name_en: selected.name_en,
+                      id: selected.id,
+                    },
+                  },
+                });
+                onInputChange({ target: { name: 'address.ward', value: null } });
+                onDistrictChange?.(selected.id);
+              }
             }}
             disabled={!formData?.address?.province}
-            allowClear
+
           >
             {districts.map((district) => (
-              <Option key={district.code} value={district.name}>
-                {district.name}
+              <Option
+                key={district.id}
+                value={lang === 'en' ? district.name_en : district.name}
+              >
+                {lang === 'en' ? district.name_en : district.name}
               </Option>
             ))}
           </Select>
@@ -109,21 +152,44 @@ const AddressSelector = ({
           rules={[{ required: true, message: t("validation.selectWard") }]}
         >
           <Select
-            placeholder={t("selectWard")}
-            value={formData?.address?.ward || undefined}
+            placeholder={t("validation.selectWard")}
+            value={
+              lang === 'en'
+                ? formData?.address?.ward?.name_en
+                : formData?.address?.ward?.name
+            }
             onChange={(value) => {
-              onInputChange({
-                target: { name: "address.ward", value },
-              });
+              const selected = wards.find(
+                (w) => (lang === 'en' ? w.name_en : w.name) === value
+              );
+              if (selected) {
+                onInputChange({
+                  target: {
+                    name: 'address.ward',
+                    value: {
+                      name: selected.name,
+                      name_en: selected.name_en,
+                      id: selected.id,
+                    },
+                  },
+                });
+              }
             }}
             disabled={!formData?.address?.district}
             allowClear
+            className={selectClass}
+            dropdownStyle={darkSelectDropdownStyle}
+            popupClassName={darkMode ? 'dark-mode-select-dropdown' : ''}
           >
             {wards.map((ward) => (
-              <Option key={ward.code} value={ward.name}>
-                {ward.name}
+              <Option
+                key={ward.id}
+                value={lang === 'en' ? ward.name_en : ward.name}
+              >
+                {lang === 'en' ? ward.name_en : ward.name}
               </Option>
             ))}
+
           </Select>
         </Form.Item>
 

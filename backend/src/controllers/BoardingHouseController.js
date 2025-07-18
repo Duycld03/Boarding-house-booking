@@ -92,75 +92,12 @@ class boardingHouseController {
     try {
       const { id } = req.params;
       const updateData = req.body;
-      console.log('mtiennnn', req.files);
       const boardingHouse = await BoardingHouse.findById(id);
       if (!boardingHouse) {
         return res
           .status(404)
           .json({ success: false, message: 'Boarding house not found.' });
       }
-      // let images = [];
-      // let primaryImageCount = 0;
-
-      // // Xử lý primary image mới
-      // if (req.files?.primaryImage?.[0]) {
-      //   images.push({
-      //     imageUrl: req.files.primaryImage[0].path,
-      //     publicId: req.files.primaryImage[0].filename,
-      //     isPrimary: true
-      //   });
-      //   primaryImageCount++;
-      // } else if (req.body.existingPrimaryImage) {
-      //   const existingPrimary = JSON.parse(req.body.existingPrimaryImage);
-      //   images.push({ ...existingPrimary, isPrimary: true });
-      //   primaryImageCount++;
-      // }
-
-      // // Xử lý other images mới
-      // if (req.files?.otherImages?.length) {
-      //   req.files.otherImages.forEach(file => {
-      //     images.push({
-      //       imageUrl: file.path,
-      //       publicId: file.filename,
-      //       isPrimary: false
-      //     });
-      //   });
-      // }
-
-      // // Xử lý other images cũ
-      // if (req.body.existingOtherImages) {
-      //   const existingOthers = JSON.parse(req.body.existingOtherImages);
-      //   existingOthers.forEach(img => {
-      //     images.push({ ...img, isPrimary: false });
-      //   });
-      // }
-
-      // if (primaryImageCount !== 1) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: "You must upload exactly one primary image.",
-      //   });
-      // }
-
-      // if (images.length > 15) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: "You can't upload more than 15 images.",
-      //   });
-      // }
-
-      // // Xóa ảnh cũ nếu có upload ảnh mới
-      // const boardingHouse = await BoardingHouse.findById(id);
-      // const oldPublicIds = boardingHouse.images.map(img => img.publicId);
-      // const newPublicIds = images.map(img => img.publicId);
-      // const imagesToDelete = oldPublicIds.filter(id => !newPublicIds.includes(id));
-
-      // for (const publicId of imagesToDelete) {
-      //   await cloudinary.uploader.destroy(publicId);
-      // }
-
-      // // Cập nhật thông tin boarding house
-      // updateData.images = images;
       const images = [];
       let hasPrimary = false;
       if (req.body.boardingHouse) {
@@ -188,6 +125,14 @@ class boardingHouseController {
         }
 
         updateData.images = images;
+      }
+      if (!updateData.address?.province?.name || !updateData.address?.province?.name_en ||
+        !updateData.address?.district?.name || !updateData.address?.district?.name_en ||
+        !updateData.address?.ward?.name || !updateData.address?.ward?.name_en) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required address fields.',
+        });
       }
 
       const updatedBoardingHouse = await BoardingHouse.findByIdAndUpdate(
@@ -415,7 +360,6 @@ class boardingHouseController {
         address,
         location,
         description,
-        // images,
         priceRange,
         electricityPrice,
         waterPrice,
@@ -425,7 +369,6 @@ class boardingHouseController {
         rating = 5,
       } = req.body;
 
-      console.log('Request body received:', req.files);
       const images = [];
       if (req.files && req.files.length > 0) {
         console.log(req.files);
@@ -494,19 +437,19 @@ class boardingHouseController {
       }
 
       // Validate images
-      const primaryImageCount = images.filter((img) => img.isPrimary).length;
-      if (primaryImageCount !== 1) {
-        console.error('Invalid primary images count:', primaryImageCount);
-        return res
-          .status(400)
-          .json({ message: 'You must upload exactly one primary image.' });
-      }
-      if (images.length > 15) {
-        console.error('Too many images:', images.length);
-        return res.status(400).json({
-          message: "You can't upload more than 15 images for other image.",
-        });
-      }
+      // const primaryImageCount = images.filter((img) => img.isPrimary).length;
+      // if (primaryImageCount !== 1) {
+      //   console.error('Invalid primary images count:', primaryImageCount);
+      //   return res
+      //     .status(400)
+      //     .json({ message: 'You must upload exactly one primary image.' });
+      // }
+      // if (images.length > 15) {
+      //   console.error('Too many images:', images.length);
+      //   return res.status(400).json({
+      //     message: "You can't upload more than 15 images for other image.",
+      //   });
+      // }
 
       // Validate price fields
       if (priceRange <= 0 || electricityPrice <= 0 || waterPrice <= 0) {
