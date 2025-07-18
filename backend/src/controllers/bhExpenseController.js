@@ -7,7 +7,11 @@ class ExpenseController {
     const { boardingHouseId, month, year } = req.query;
 
     try {
-      const data = await boardingHouseExpense.find({ boardingHouseId, month, year });
+      const data = await boardingHouseExpense.find({
+        boardingHouseId,
+        month,
+        year,
+      });
       res.status(200).json({ success: true, data: data });
     } catch (error) {
       res.status(500).json({ success: false, message: "Lỗi server", error });
@@ -19,14 +23,12 @@ class ExpenseController {
       let { expenseId } = req.params;
       let expenseData = req.body;
 
-
       // Nếu có expenseId, thực hiện cập nhật
       const updatedExpense = await boardingHouseExpense.findByIdAndUpdate(
         expenseId,
         expenseData,
         { new: true, runValidators: true }
       );
-
 
       res.status(200).json({ success: true, data: updatedExpense });
     } catch (error) {
@@ -44,7 +46,6 @@ class ExpenseController {
       const { boardingHouseId, month, year } = expenseData;
       const userId = req.user.userId;
 
-
       // Tạo mới expense
       const newExpense = new boardingHouseExpense(expenseData);
       await newExpense.save();
@@ -52,17 +53,15 @@ class ExpenseController {
       res.status(201).json({
         success: true,
         message: "Expense added successfully",
-        data: newExpense
+        data: newExpense,
       });
-
     } catch (error) {
       console.error("Error adding expense:", error);
-
 
       res.status(500).json({
         success: false,
         message: "Server error",
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -76,7 +75,7 @@ class ExpenseController {
       if (!expenseId || !mongoose.Types.ObjectId.isValid(expenseId)) {
         return res.status(400).json({
           success: false,
-          message: "Invalid expense ID"
+          message: "Invalid expense ID",
         });
       }
 
@@ -86,20 +85,21 @@ class ExpenseController {
       if (!expense) {
         return res.status(404).json({
           success: false,
-          message: "Expense not found"
+          message: "Expense not found",
         });
       }
 
       // Kiểm tra quyền của user với boarding house
       const boardingHouse = await BoardingHouse.findOne({
         _id: expense.boardingHouseId,
-        $or: [{ ownerId: userId }, { staffId: userId }]
+        $or: [{ ownerId: userId }, { staffId: userId }],
       });
 
       if (!boardingHouse) {
         return res.status(403).json({
           success: false,
-          message: "You don't have permission to delete expenses for this boarding house"
+          message:
+            "You don't have permission to delete expenses for this boarding house",
         });
       }
 
@@ -108,15 +108,14 @@ class ExpenseController {
 
       res.status(200).json({
         success: true,
-        message: "Expense deleted successfully"
+        message: "Expense deleted successfully",
       });
-
     } catch (error) {
       console.error("Error deleting expense:", error);
       res.status(500).json({
         success: false,
         message: "Server error",
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -130,7 +129,7 @@ class ExpenseController {
       if (!expenseId || !mongoose.Types.ObjectId.isValid(expenseId)) {
         return res.status(400).json({
           success: false,
-          message: "Invalid expense ID"
+          message: "Invalid expense ID",
         });
       }
 
@@ -139,34 +138,34 @@ class ExpenseController {
       if (!expense) {
         return res.status(404).json({
           success: false,
-          message: "Expense not found"
+          message: "Expense not found",
         });
       }
 
       // Kiểm tra quyền của user với boarding house
       const boardingHouse = await BoardingHouse.findOne({
         _id: expense.boardingHouseId,
-        $or: [{ ownerId: userId }, { staffId: userId }]
+        $or: [{ ownerId: userId }, { staffId: userId }],
       });
 
       if (!boardingHouse) {
         return res.status(403).json({
           success: false,
-          message: "You don't have permission to view expenses for this boarding house"
+          message:
+            "You don't have permission to view expenses for this boarding house",
         });
       }
 
       res.status(200).json({
         success: true,
-        data: expense
+        data: expense,
       });
-
     } catch (error) {
       console.error("Error fetching expense:", error);
       res.status(500).json({
         success: false,
         message: "Server error",
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -174,21 +173,36 @@ class ExpenseController {
   async getTotalExpensesByTime(req, res) {
     try {
       const { month, year } = req.query;
-      const ownerId = req.user.userId;
+      const userId = req.user.userId;
+      const role = req.user.role;
 
       if (!month || !year) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
-      // Tìm tất cả boarding houses của owner
-      const boardingHouses = await BoardingHouse.find({ ownerId }).select(
-        "_id"
-      );
+      let boardingHouses = [];
+
+      // Logic dựa trên role
+      if (role === "owner") {
+        // Nếu là owner, lấy tất cả boarding houses của owner
+        boardingHouses = await BoardingHouse.find({ ownerId: userId }).select(
+          "_id"
+        );
+      } else if (role === "staff") {
+        // Nếu là staff, lấy boarding houses mà staff được assign
+        boardingHouses = await BoardingHouse.find({ staffId: userId }).select(
+          "_id"
+        );
+      } else {
+        return res.status(403).json({ message: "Unauthorized role" });
+      }
 
       if (!boardingHouses.length) {
-        return res
-          .status(404)
-          .json({ message: "No boarding houses found for this owner" });
+        const message =
+          role === "owner"
+            ? "No boarding houses found for this owner"
+            : "No boarding houses assigned to this staff";
+        return res.status(404).json({ message });
       }
 
       const boardingHouseIds = boardingHouses.map((house) => house._id);

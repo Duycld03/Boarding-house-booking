@@ -80,7 +80,7 @@ class RoomController {
       const paidRooms = await PaymentBill.find({
         month: lastMonth.toString(),
         year: lastYear.toString(),
-        status: { $regex: "paid", $options: "i" },
+        status: { $regex: /^paid$/i },
       }).distinct("roomId");
 
       // Lọc danh sách phòng chưa thanh toán theo boardingHouseId
@@ -135,7 +135,6 @@ class RoomController {
     }
   }
 
-
   // Backend API - Improved addRoom method
   async addRoom(req, res) {
     try {
@@ -149,60 +148,60 @@ class RoomController {
         if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
           return res.status(400).json({
             message: "Missing required parameters",
-            missingFields: { roomNumber, boardingHouseId, description, roomTypeId }
+            missingFields: {
+              roomNumber,
+              boardingHouseId,
+              description,
+              roomTypeId,
+            },
           });
         }
       }
 
       // Check for duplicate room numbers in the same boarding house
-      const roomNumbers = rooms.map(room => room.roomNumber);
+      const roomNumbers = rooms.map((room) => room.roomNumber);
       const duplicateCheck = await Room.find({
         boardingHouseId: rooms[0].boardingHouseId,
-        roomNumber: { $in: roomNumbers }
+        roomNumber: { $in: roomNumbers },
       });
 
       if (duplicateCheck.length > 0) {
-        const existingNumbers = duplicateCheck.map(room => room.roomNumber);
+        const existingNumbers = duplicateCheck.map((room) => room.roomNumber);
         return res.status(400).json({
           message: "Some rooms already exist",
-          duplicateRooms: existingNumbers
+          duplicateRooms: existingNumbers,
         });
       }
 
       // Check for duplicates within the current batch
       const uniqueNumbers = new Set(roomNumbers);
       if (uniqueNumbers.size !== roomNumbers.length) {
-        const duplicatesInBatch = roomNumbers.filter((item, index) =>
-          roomNumbers.indexOf(item) !== index
+        const duplicatesInBatch = roomNumbers.filter(
+          (item, index) => roomNumbers.indexOf(item) !== index
         );
         return res.status(400).json({
           message: "Duplicate room numbers in the same request",
-          duplicateRooms: [...new Set(duplicatesInBatch)]
+          duplicateRooms: [...new Set(duplicatesInBatch)],
         });
       }
 
       // Create room documents
-      const roomDocs = rooms.map(room => ({
+      const roomDocs = rooms.map((room) => ({
         roomNumber: room.roomNumber,
         boardingHouseId: room.boardingHouseId,
         description: room.description,
         roomTypeId: room.roomTypeId,
         isAvailable: true,
-        images: room.images || null
+        images: room.images || null,
       }));
-
-
 
       // Save all rooms
       const savedRooms = await Room.insertMany(roomDocs);
 
-
       res.status(201).json({
         message: "Room added successfully",
-        room: savedRooms[0]
+        room: savedRooms[0],
       });
-
-
     } catch (error) {
       console.error("Error adding room:", error);
       res.status(500).json({ message: "Server error", error: error.message });
@@ -225,46 +224,51 @@ class RoomController {
         if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
           return res.status(400).json({
             message: "Missing required parameters in one or more rooms",
-            missingFields: { roomNumber, boardingHouseId, description, roomTypeId }
+            missingFields: {
+              roomNumber,
+              boardingHouseId,
+              description,
+              roomTypeId,
+            },
           });
         }
       }
 
       // Check for duplicate room numbers in the same boarding house
-      const roomNumbers = rooms.map(room => room.roomNumber);
+      const roomNumbers = rooms.map((room) => room.roomNumber);
       const duplicateCheck = await Room.find({
         boardingHouseId: rooms[0].boardingHouseId,
-        roomNumber: { $in: roomNumbers }
+        roomNumber: { $in: roomNumbers },
       });
 
       if (duplicateCheck.length > 0) {
-        const existingNumbers = duplicateCheck.map(room => room.roomNumber);
+        const existingNumbers = duplicateCheck.map((room) => room.roomNumber);
         return res.status(400).json({
           message: "Some rooms already exist",
-          duplicateRooms: existingNumbers
+          duplicateRooms: existingNumbers,
         });
       }
 
       // Check for duplicates within the current batch
       const uniqueNumbers = new Set(roomNumbers);
       if (uniqueNumbers.size !== roomNumbers.length) {
-        const duplicatesInBatch = roomNumbers.filter((item, index) =>
-          roomNumbers.indexOf(item) !== index
+        const duplicatesInBatch = roomNumbers.filter(
+          (item, index) => roomNumbers.indexOf(item) !== index
         );
         return res.status(400).json({
           message: "Duplicate room numbers in the same request",
-          duplicateRooms: [...new Set(duplicatesInBatch)]
+          duplicateRooms: [...new Set(duplicatesInBatch)],
         });
       }
 
       // Create room documents
-      const roomDocs = rooms.map(room => ({
+      const roomDocs = rooms.map((room) => ({
         roomNumber: room.roomNumber,
         boardingHouseId: room.boardingHouseId,
         description: room.description,
         roomTypeId: room.roomTypeId,
         isAvailable: true,
-        images: room.images || null
+        images: room.images || null,
       }));
 
       // Save all rooms
@@ -273,9 +277,8 @@ class RoomController {
       res.status(201).json({
         message: `${savedRooms.length} rooms added successfully`,
         rooms: savedRooms,
-        count: savedRooms.length
+        count: savedRooms.length,
       });
-
     } catch (error) {
       console.error("Error adding rooms:", error);
       res.status(500).json({ message: "Server error", error: error.message });
