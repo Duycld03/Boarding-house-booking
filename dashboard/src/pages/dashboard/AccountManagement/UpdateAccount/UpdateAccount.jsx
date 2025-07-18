@@ -8,16 +8,19 @@ import {
   Tag,
   Avatar,
   ConfigProvider,
+  Spin,
 } from "antd";
 import { Button } from "../../../../component";
 import { toast } from "react-toastify";
 import moment from "moment";
 import formatAmount from "../../../../utils/formatAmount";
-import DefaultAccount from "../../../../assets/images/none_avatar.png";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
 import Styles from "./UpdateAccount.module.css";
 import classNames from "classnames";
+import DefaultAvatar from "../../../../assets/images/none_avatar.png";
+import { useImageValidation } from "../../../../hooks/useImageValidation";
+import { LoadingOutlined } from "@ant-design/icons";
 
 const cx = classNames.bind(Styles);
 
@@ -26,6 +29,7 @@ const { Option } = Select;
 const UpdateAccountModal = ({ accountData, onUpdate }) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [avatarSource, setAvatarSource] = useState(null);
 
   // Using the theme context for dark mode
   const { darkMode } = useTheme();
@@ -33,9 +37,18 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
   // Using react-i18next for translations
   const { t } = useTranslation("accountManagement");
 
+  // Sử dụng hook useImageValidation để kiểm tra và xử lý avatar
+  const { src: validAvatarUrl, isLoading: avatarLoading } = useImageValidation(
+    avatarSource,
+    DefaultAvatar
+  );
+
   useEffect(() => {
     if (accountData) {
       setIsModalVisible(true);
+      // Cập nhật nguồn avatar
+      setAvatarSource(accountData?.avatarImage?.url || null);
+
       form.setFieldsValue({
         username: accountData?.username,
         password: accountData?.password,
@@ -256,6 +269,33 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
     }
   );
 
+  // Avatar wrapper style với khả năng hiển thị trạng thái loading
+  const AvatarWithLoading = () => (
+    <div className="relative">
+      <Avatar
+        src={validAvatarUrl}
+        alt={t("updateAccount.avatar")}
+        size="large"
+        className={cx("w-40", "h-40", avatarLoading ? "opacity-70" : "")}
+      />
+      {avatarLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Spin
+            indicator={
+              <LoadingOutlined
+                style={{
+                  fontSize: 24,
+                  color: darkMode ? "#60A5FA" : "#3b82f6",
+                }}
+                spin
+              />
+            }
+          />
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <ConfigProvider theme={themeConfig}>
       <Modal
@@ -273,13 +313,7 @@ const UpdateAccountModal = ({ accountData, onUpdate }) => {
       >
         <div className={darkMode ? "dark-mode-form" : ""}>
           <div className={avatarBorderClass}>
-            <Avatar
-              src={accountData?.avatarImage?.url ?? DefaultAccount}
-              alt={t("updateAccount.avatar")}
-              size="large"
-              shape="circle"
-              className={cx("w-40", "h-40")}
-            />
+            <AvatarWithLoading />
           </div>
 
           <Form form={form} layout="vertical" name="update_account">

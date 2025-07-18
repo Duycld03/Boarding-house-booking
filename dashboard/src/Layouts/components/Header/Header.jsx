@@ -38,6 +38,7 @@ import { useTheme } from "../../../context/themeContext";
 import LanguageSwitcher from "../../../component/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import DefaultAvatar from "../../../assets/images/none_avatar.png";
+import { useImageValidation } from "../../../hooks/useImageValidation";
 
 const cx = classNames.bind(Styles);
 const { Header } = Layout;
@@ -45,20 +46,30 @@ const { Header } = Layout;
 const CustomHeader = () => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [avatar, setAvatar] = useState(null);
+  const [avatarSource, setAvatarSource] = useState(null);
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
   const { contextLogout, hasRole } = useCurrentUser();
   const { darkMode, toggleDarkMode } = useTheme();
-  const { t } = useTranslation("common"); // Chỉ sử dụng namespace common
+  const { t } = useTranslation("common");
+
+  // Sử dụng hook useImageValidation để quản lý avatar
+  const { src: validAvatarUrl, isLoading: avatarLoading } = useImageValidation(
+    avatarSource,
+    DefaultAvatar
+  );
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await getUser();
-        setAvatar(res?.avatarImage?.url || null);
+        // Chỉ cập nhật nguồn hình ảnh, useImageValidation sẽ xử lý việc kiểm tra và fallback
+        setAvatarSource(res?.avatarImage?.url || null);
+        setUsername(res?.username || "");
         setIsLoggedIn(true);
       } catch {
         setIsLoggedIn(false);
+        setAvatarSource(null);
       }
     };
     fetchUser();
@@ -85,7 +96,7 @@ const CustomHeader = () => {
     },
   ];
 
-  // Admin menu items with translation support - moved from menuItem.jsx
+  // Admin menu items with translation support
   const dashBoard = "/dashboard";
   const adminMenuItems = [
     {
@@ -186,6 +197,22 @@ const CustomHeader = () => {
     />
   );
 
+  // Tùy chỉnh hiển thị Avatar với trạng thái loading
+  const UserAvatar = ({ size = 60, className = "" }) => (
+    <div className="relative">
+      <Avatar
+        src={validAvatarUrl}
+        size={size}
+        className={`${className} ${avatarLoading ? "opacity-70" : ""}`}
+      />
+      {avatarLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 rounded-full">
+          <span className="animate-ping absolute h-3 w-3 rounded-full bg-blue-400 opacity-75"></span>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <Header
       className={cx(
@@ -258,15 +285,9 @@ const CustomHeader = () => {
             arrow
             trigger={["click"]}
           >
-            <Avatar
-              src={avatar}
-              size={60}
-              className="cursor-pointer mr-5"
-              onError={() => {
-                setAvatar(DefaultAvatar);
-                return false;
-              }}
-            />
+            <div className="cursor-pointer mr-5">
+              <UserAvatar size={60} />
+            </div>
           </Dropdown>
         )}
       </div>
@@ -298,16 +319,10 @@ const CustomHeader = () => {
           isLoggedIn ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Avatar
-                  src={avatar}
-                  size={60}
-                  className="mr-3"
-                  onError={() => {
-                    setAvatar(DefaultAvatar);
-                    return false;
-                  }}
-                />
-                <span className={cx("user-name")}>User Name</span>
+                <UserAvatar size={60} className="mr-3" />
+                <span className={cx("user-name")}>
+                  {username || t("general.user")}
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 <LanguageSwitcher />

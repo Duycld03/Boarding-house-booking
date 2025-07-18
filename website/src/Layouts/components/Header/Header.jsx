@@ -48,6 +48,7 @@ import { useTheme } from "../../../context/themeContext";
 import LanguageSwitcher from "../../../component/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import DefaultAvatar from "../../../assets/images/none_avatar.png";
+import { useImageValidation } from "../../../hooks/useImageValidation";
 
 const cx = classNames.bind(Styles);
 const { Header } = Layout;
@@ -55,24 +56,33 @@ const { Header } = Layout;
 const CustomHeader = () => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [avatar, setAvatar] = useState(null);
+  const [avatarSource, setAvatarSource] = useState(null);
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
   const { contextLogout, hasRole } = useCurrentUser();
   const { darkMode, toggleDarkMode } = useTheme();
-  const { t } = useTranslation(["common", "profile"]); // Sử dụng namespace common và profile
+  const { t } = useTranslation(["common", "profile"]);
+
+  // Sử dụng hook useImageValidation để quản lý avatar
+  const { src: validAvatarUrl, isLoading: avatarLoading } = useImageValidation(
+    avatarSource,
+    DefaultAvatar
+  );
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await getUser();
-        setAvatar(res?.avatarImage?.url || null);
+        setAvatarSource(res?.avatarImage?.url || null);
+        setUsername(res?.username || t("common:general.user"));
         setIsLoggedIn(true);
       } catch {
         setIsLoggedIn(false);
+        setAvatarSource(null);
       }
     };
     fetchUser();
-  }, []);
+  }, [t]);
 
   const logout = () => {
     localStorage.removeItem("access_token");
@@ -102,6 +112,24 @@ const CustomHeader = () => {
       onClick: logout,
     },
   ];
+
+  // Tạo component UserAvatar cho việc hiển thị avatar với trạng thái loading
+  const UserAvatar = ({ size = 60, className = "" }) => (
+    <div className="relative">
+      <Avatar
+        src={validAvatarUrl}
+        size={size}
+        className={`${className} ${
+          avatarLoading ? "opacity-70" : ""
+        } cursor-pointer`}
+      />
+      {avatarLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 rounded-full">
+          <span className="animate-ping absolute h-3 w-3 rounded-full bg-blue-400 opacity-75"></span>
+        </div>
+      )}
+    </div>
+  );
 
   // Profile menu items từ menuItem.jsx với đa ngôn ngữ
   const getProfileMenuItems = () => {
@@ -341,15 +369,9 @@ const CustomHeader = () => {
             arrow
             trigger={["click"]}
           >
-            <Avatar
-              src={avatar}
-              size={60}
-              className="cursor-pointer mr-5"
-              onError={() => {
-                setAvatar(DefaultAvatar);
-                return false;
-              }}
-            />
+            <div className="mr-5">
+              <UserAvatar size={60} />
+            </div>
           </Dropdown>
         )}
       </div>
@@ -381,16 +403,8 @@ const CustomHeader = () => {
           isLoggedIn ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Avatar
-                  src={avatar}
-                  size={60}
-                  className="mr-3"
-                  onError={() => {
-                    setAvatar(DefaultAvatar);
-                    return false;
-                  }}
-                />
-                <span className={cx("user-name")}>User Name</span>
+                <UserAvatar size={60} className="mr-3" />
+                <span className={cx("user-name")}>{username}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <LanguageSwitcher />
