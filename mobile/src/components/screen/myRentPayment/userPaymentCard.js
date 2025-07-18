@@ -82,14 +82,14 @@ function UserPaymentCard({
                   status === "overdue"
                     ? "#F97316"
                     : status === "paid"
-                    ? "#10B981"
-                    : status === "pending"
-                    ? "#F59E0B"
-                    : status === "cancelled"
-                    ? "#6B7280"
-                    : status === "failed"
-                    ? "#EF4444"
-                    : "#6B7280",
+                      ? "#10B981"
+                      : status === "pending"
+                        ? "#F59E0B"
+                        : status === "cancelled"
+                          ? "#6B7280"
+                          : status === "failed"
+                            ? "#EF4444"
+                            : "#6B7280",
               }}
               className="capitalize"
             >
@@ -103,7 +103,7 @@ function UserPaymentCard({
       {/* Payment Details Section */}
       <View className="p-4">
         {/* Amount */}
-        <View View className="flex-row justify-between items-center mb-3">
+        <View className="flex-row justify-between items-center mb-3">
           <Text
             variant="label"
             weight="medium"
@@ -121,7 +121,7 @@ function UserPaymentCard({
         </View>
 
         {/* Payment Method */}
-        <View View className="flex-row justify-between items-center mb-3">
+        <View className="flex-row justify-between items-center mb-3">
           <Text variant="label" weight="medium">
             {t("paymentCard.paymentMethodTitle")}
           </Text>
@@ -133,7 +133,7 @@ function UserPaymentCard({
         </View>
 
         {/* Month's Rent */}
-        <View View className="flex-row justify-between items-center mb-4">
+        <View className="flex-row justify-between items-center mb-4">
           <Text variant="label" weight="medium" className={`capitalize`}>
             {t("paymentCard.monthRent")}
           </Text>
@@ -142,30 +142,53 @@ function UserPaymentCard({
           </Text>
         </View>
 
-        {/* Action Buttons */}
-        <View
-          className={`flex-row gap-3 ${
-            status === "pending" ? "space-x-3" : ""
-          }`}
-        >
-          {status === "pending" && (
+        {/* Action Buttons - Fixed width cứng cho 2 button */}
+        <View className="flex-row gap-6 justify-center w-full">
+          {status === "pending" ? (
+            <>
+              {/* Pay Now Button - width cứng 45% */}
+              <Button
+                onPress={() => onPressPay(payment)}
+                style={{
+                  backgroundColor: "#F97316",
+                  width: "45%",
+                  minHeight: 44,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Text variant="body" style={{ color: "white" }} className="text-center">
+                  {t("paymentCard.payNow")}
+                </Text>
+              </Button>
+
+              {/* View Details Button - width cứng 45% */}
+              <Button
+                onPress={() => onPressDetails(payment)}
+                style={{
+                  width: "45%",
+                  minHeight: 44,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Text variant="body" style={{ color: "white" }} className="text-center">
+                  {t("paymentCard.viewDetails")}
+                </Text>
+              </Button>
+            </>
+          ) : (
+            // Nếu không phải pending, chỉ hiển thị View Details Button với 100% width
             <Button
-              onPress={() => onPressPay(payment)}
-              style={{ backgroundColor: "#F97316" }}
+              className="flex-1"
+              size="lg"
+              onPress={() => onPressDetails(payment)}
             >
-              <Text style={{ color: "white" }}>{t("paymentCard.payNow")}</Text>
+              <Text variant="body" style={{ color: "white" }} className="text-center">
+                {t("paymentCard.viewDetails")}
+              </Text>
             </Button>
           )}
-
-          <Button
-            className="flex-1"
-            size="lg"
-            onPress={() => onPressDetails(payment)}
-          >
-            <Text variant="body" style={{ color: "white" }}>
-              {t("paymentCard.viewDetails")}
-            </Text>
-          </Button>
         </View>
       </View>
 

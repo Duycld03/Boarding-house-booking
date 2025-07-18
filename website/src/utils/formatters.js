@@ -3,24 +3,26 @@
  */
 
 /**
- * Format a number as Vietnamese currency (VND)
+ * Format a number as currency with multi-language support
  * @param {number} value - The number to format
  * @param {Object} options - Formatting options
  * @param {string} options.currency - Currency code (default: 'VND')
+ * @param {string} options.locale - Locale for formatting (default: 'vi-VN')
  * @param {number} options.maximumFractionDigits - Maximum number of decimal places (default: 0)
  * @returns {string} Formatted currency string
  */
 export const formatCurrency = (value, options = {}) => {
-    const {
-        currency = 'VND',
-        maximumFractionDigits = 0
-    } = options;
+  const {
+    currency = "VND",
+    locale = "vi-VN",
+    maximumFractionDigits = 0,
+  } = options;
 
-    return new Intl.NumberFormat("vi-VN", {
-        style: "currency",
-        currency,
-        maximumFractionDigits
-    }).format(value || 0);
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits,
+  }).format(value || 0);
 };
 
 /**
@@ -30,31 +32,33 @@ export const formatCurrency = (value, options = {}) => {
  * @returns {string} Formatted percentage string with % symbol
  */
 export const formatPercentage = (value, decimalPlaces = 1) => {
-    return `${value.toFixed(decimalPlaces)}%`;
+  return `${value.toFixed(decimalPlaces)}%`;
 };
 
 /**
- * Format a large number with abbreviated suffixes (K, M, B)
+ * Format a number with thousands separators based on locale
  * @param {number} value - The number to format
- * @returns {string} Formatted number with appropriate suffix
- */
-export const formatCompactNumber = (value) => {
-    if (value < 1000) return value.toString();
-
-    const formatter = new Intl.NumberFormat('vi-VN', {
-        notation: 'compact',
-        compactDisplay: 'short',
-        maximumFractionDigits: 1
-    });
-
-    return formatter.format(value);
-};
-
-/**
- * Format a number with thousands separators
- * @param {number} value - The number to format
+ * @param {string} locale - The locale for formatting (default: 'vi-VN')
  * @returns {string} Formatted number with thousand separators
  */
-export const formatNumber = (value) => {
-    return new Intl.NumberFormat('vi-VN').format(value || 0);
+export const formatNumber = (value, locale = "vi-VN") => {
+  return new Intl.NumberFormat(locale).format(value || 0);
+};
+
+/**
+ * Format a large number with abbreviated suffixes (K, M, B) based on locale
+ * @param {number} value - The number to format
+ * @param {string} locale - The locale for formatting (default: 'vi-VN')
+ * @returns {string} Formatted number with appropriate suffix
+ */
+export const formatCompactNumber = (value, locale = "vi-VN") => {
+  if (value < 1000) return value.toString();
+
+  const formatter = new Intl.NumberFormat(locale, {
+    notation: "compact",
+    compactDisplay: "short",
+    maximumFractionDigits: 1,
+  });
+
+  return formatter.format(value);
 };

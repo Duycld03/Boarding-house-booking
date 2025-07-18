@@ -22,12 +22,13 @@
   "status": {
     "pending": "Pending",
     "accepted": "Accepted",
-    "canceled": "Canceled",
+    "rejected": "Rejected",
     "completed": "Completed"
   },
   "allAppointmentsLoaded": "All appointments loaded",
   "loadingMoreAppointments": "Loading more appointments...",
   "loadMoreAppointments": "Load more appointments",
   "of": "of",
-  "appointmentsLoaded": "appointments loaded"
+  "appointmentsLoaded": "appointments loaded",
+  "reasonForCancel": "Reason for Cancellation"
 }

@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Divider, Table as AntTable, Button, Select, Grid, theme } from 'antd';
-import PropTypes from 'prop-types';
-import { useTheme } from '../../context/themeContext';
-import { createStyles } from 'antd-style';
-import classNames from 'classnames';
-import { t } from 'i18next';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Divider, Table as AntTable, Button, Select, Grid, theme } from "antd";
+import PropTypes from "prop-types";
+import { useTheme } from "../../context/themeContext";
+import { createStyles } from "antd-style";
+import classNames from "classnames";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
@@ -114,7 +114,7 @@ const getTableStyles = (isDarkMode) => `
       border-color: #3b82f6;
     }
   `
-      : ''
+      : ""
   }
 `;
 
@@ -137,13 +137,13 @@ const TableCustom = ({
   pagination = {},
   onChange = () => {},
   tableName,
-  noDataText = 'No data available',
+  noDataText = "No data available",
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [dynamicSelect, setDynamicSelect] = useState(null);
   const { darkMode } = useTheme();
-  const { t } = useTranslation('menu');
+  const { t } = useTranslation("menu");
 
   // Memoize pagination config to avoid unnecessary re-renders
   const paginationConfig = useMemo(
@@ -153,20 +153,20 @@ const TableCustom = ({
       showTotal: (total, range) => (
         <span
           style={{
-            color: darkMode ? '#ddd' : '#333',
-            userSelect: 'none',
-            fontWeight: '500',
+            color: darkMode ? "#ddd" : "#333",
+            userSelect: "none",
+            fontWeight: "500",
           }}
         >
           {`${range[0]}-${range[1]} ${t(
-            'table-component.pagination.of'
+            "table-component.pagination.of"
           )} ${total} ${tableName}`}
         </span>
       ),
       ...pagination,
       classNames: classNames(
-        'ant-pagination',
-        darkMode ? 'ant-pagination-dark' : ''
+        "ant-pagination",
+        darkMode ? "ant-pagination-dark" : ""
       ),
     }),
     [pagination]
@@ -180,11 +180,12 @@ const TableCustom = ({
   const numberedData = useMemo(() => {
     if (!data || data.length === 0) return [];
 
-    return data.map((item, index) => {
-      const pageSize = paginationConfig.pageSize || 10;
-      const currentPage = paginationConfig.current || 1;
-      const startNumber = (currentPage - 1) * pageSize + 1;
+    const pageSize = paginationConfig.pageSize || 10;
+    const currentPage = paginationConfig.current || 1;
 
+    const startNumber = (currentPage - 1) * pageSize + 1;
+
+    return data.map((item, index) => {
       return {
         ...item,
         number: startNumber + index,
@@ -198,9 +199,9 @@ const TableCustom = ({
 
     return [
       {
-        title: 'No.',
-        dataIndex: 'number',
-        key: 'number',
+        title: "No.",
+        dataIndex: "number",
+        key: "number",
         width: 60,
         render: (_, record) => <span>{record.number}</span>,
       },
@@ -221,7 +222,7 @@ const TableCustom = ({
 
   // Callback for processing data
   const handleProcessData = useCallback(() => {
-    if (onProcessData && typeof onProcessData === 'function') {
+    if (onProcessData && typeof onProcessData === "function") {
       onProcessData({
         formValues: { dynamicSelect },
         selectedRows: selectedRows,
@@ -250,7 +251,7 @@ const TableCustom = ({
   // Callback for row click handling
   const handleRowClick = useCallback(
     (record) => {
-      if (onRowClick && typeof onRowClick === 'function') {
+      if (onRowClick && typeof onRowClick === "function") {
         onRowClick(record);
       }
     },
@@ -263,7 +264,7 @@ const TableCustom = ({
 
       {checkbox && (
         <>
-          <Divider className={darkMode ? 'border-gray-700' : ''} />
+          <Divider className={darkMode ? "border-gray-700" : ""} />
           <div className={styles.formContainer}>
             <label className={styles.formLabel}>Select Option:</label>
             <Select
@@ -272,7 +273,7 @@ const TableCustom = ({
               value={dynamicSelect}
               onChange={handleSelectChange}
               style={
-                darkMode ? { backgroundColor: '#2d3748', color: '#f9fafb' } : {}
+                darkMode ? { backgroundColor: "#2d3748", color: "#f9fafb" } : {}
               }
             >
               {selectOptions.map((option) => (
@@ -286,7 +287,7 @@ const TableCustom = ({
               onClick={handleProcessData}
               disabled={isSubmitDisabled}
               className={`${styles.formButton} ${
-                darkMode ? 'table-action-button' : ''
+                darkMode ? "table-action-button" : ""
               }`}
             >
               Submit
@@ -303,11 +304,11 @@ const TableCustom = ({
               ...paginationConfig,
             }}
             scroll={{
-              x: 'max-content',
+              x: "max-content",
               y: scrollY,
             }}
             className={`text-xs sm:text-sm md:text-base ${
-              darkMode ? 'ant-table-dark' : ''
+              darkMode ? "ant-table-dark" : ""
             } custom-table`}
             rowKey="_id"
             rowSelection={checkbox ? rowSelection : null}

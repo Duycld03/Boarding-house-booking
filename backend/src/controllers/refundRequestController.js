@@ -1,47 +1,65 @@
-import moment from "moment";
-import RefundRequest from "../models/refundRequest.js";
-import DepositRoom from "../models/depositRoom.js";
-import paginate from "../utils/pagination.js";
-import Room from "../models/room.js";
+import moment from 'moment';
+import RefundRequest from '../models/refundRequest.js';
+import DepositRoom from '../models/depositRoom.js';
+import paginate from '../utils/pagination.js';
+import Room from '../models/room.js';
 
 class RefundRequestController {
   async getRefundRequests(req, res) {
     try {
-      const refundRequests = await RefundRequest.find({
+      const filter = {
         userId: req.user.userId,
-      })
-        .populate({
-          path: "depositRoomId",
-          populate: {
-            path: "roomId",
+      };
+
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 5,
+        maxLimit: 50,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter,
+        populate: [
+          {
+            path: 'depositRoomId',
             populate: {
-              path: "boardingHouseId", // Populate boardingHouseId để lấy thông tin tên
-              select: "name", // Chỉ lấy trường 'name' của boardingHouse
+              path: 'roomId',
+              populate: {
+                path: 'boardingHouseId',
+                select: 'name',
+              },
             },
           },
-        })
-        .sort({ createdAt: -1 });
+        ],
+        includeTotalData: true,
+      };
 
-      const data = refundRequests.map((refundRequest) => {
-        return {
-          _id: refundRequest._id,
-          roomNumber: refundRequest.depositRoomId.roomId.roomNumber,
-          endDate: moment(refundRequest.depositRoomId.endDate).format(
-            "DD/MM/YYYY"
-          ),
-          originalDepositAmount: refundRequest.originalDepositAmount,
-          status: refundRequest.status,
-          reason: refundRequest.reason,
-          boardingHouseName:
-            refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || "N/A", // Thêm tên boardingHouse vào
-          createdAt: moment(refundRequest.createdAt).format("DD/MM/YYYY"),
-        };
+      const result = await paginate(RefundRequest, paginationOptions, req);
+
+      const data = result.data.map((refundRequest) => ({
+        _id: refundRequest._id,
+        roomNumber: refundRequest.depositRoomId?.roomId?.roomNumber || 'N/A',
+        endDate: moment(refundRequest.depositRoomId?.endDate).format(
+          'DD/MM/YYYY'
+        ),
+        amountRefunded: refundRequest.originalDepositAmount,
+        status: refundRequest.status,
+        reason: refundRequest.reason,
+        boardingHouseName:
+          refundRequest.depositRoomId?.roomId?.boardingHouseId?.name || 'N/A',
+        createdAt: moment(refundRequest.createdAt).format('DD/MM/YYYY'),
+      }));
+
+      return res.status(200).json({
+        data,
+        pagination: result.pagination, // ✅ CHỈ cần dòng này là đúng format
       });
-
-      return res.json(data);
     } catch (error) {
-      console.log("Error getting refund requests:", error);
-      return res.status(500).json(error);
+      console.error('Error getting refund requests:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Server Error',
+        error: error.message,
+      });
     }
   }
 
@@ -53,17 +71,17 @@ class RefundRequestController {
       const page = parseInt(req.query.page) || 1;
       const limit = Math.min(parseInt(req.query.limit) || 10, 100); // Đảm bảo lấy đúng limit
       const skip = (page - 1) * limit;
-      const sortField = req.query.sortField || "createdAt";
-      const sortOrder = req.query.sortOrder || "desc";
+      const sortField = req.query.sortField || 'createdAt';
+      const sortOrder = req.query.sortOrder || 'desc';
 
       // Get all refund requests with populate
       const refundRequests = await RefundRequest.find({})
         .populate({
-          path: "depositRoomId",
+          path: 'depositRoomId',
           populate: {
-            path: "roomId",
+            path: 'roomId',
             populate: {
-              path: "boardingHouseId",
+              path: 'boardingHouseId',
               match: { ownerId: userId },
             },
           },
@@ -81,15 +99,15 @@ class RefundRequestController {
         let bValue = b[sortField];
 
         // Handle nested fields
-        if (sortField === "roomNumber") {
-          aValue = a.depositRoomId?.roomId?.roomNumber || "";
-          bValue = b.depositRoomId?.roomId?.roomNumber || "";
-        } else if (sortField === "endDate") {
+        if (sortField === 'roomNumber') {
+          aValue = a.depositRoomId?.roomId?.roomNumber || '';
+          bValue = b.depositRoomId?.roomId?.roomNumber || '';
+        } else if (sortField === 'endDate') {
           aValue = a.depositRoomId?.endDate || new Date(0);
           bValue = b.depositRoomId?.endDate || new Date(0);
-        } else if (sortField === "boardingHouseName") {
-          aValue = a.depositRoomId?.roomId?.boardingHouseId?.name || "";
-          bValue = b.depositRoomId?.roomId?.boardingHouseId?.name || "";
+        } else if (sortField === 'boardingHouseName') {
+          aValue = a.depositRoomId?.roomId?.boardingHouseId?.name || '';
+          bValue = b.depositRoomId?.roomId?.boardingHouseId?.name || '';
         }
 
         // Convert dates to comparable format
@@ -99,7 +117,7 @@ class RefundRequestController {
         }
 
         // Sort logic
-        if (sortOrder === "asc") {
+        if (sortOrder === 'asc') {
           return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
         } else {
           return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
@@ -114,17 +132,17 @@ class RefundRequestController {
       // Format data
       const formattedRequests = paginatedRequests.map((request) => ({
         _id: request._id,
-        roomNumber: request.depositRoomId?.roomId?.roomNumber || "N/A",
+        roomNumber: request.depositRoomId?.roomId?.roomNumber || 'N/A',
         endDate: request.depositRoomId?.endDate
-          ? moment(request.depositRoomId.endDate).format("DD/MM/YYYY")
-          : "N/A",
+          ? moment(request.depositRoomId.endDate).format('DD/MM/YYYY')
+          : 'N/A',
         originalDepositAmount: request.originalDepositAmount,
         boardingHouseName:
-          request.depositRoomId?.roomId?.boardingHouseId?.name || "N/A",
+          request.depositRoomId?.roomId?.boardingHouseId?.name || 'N/A',
         status: request.status,
         reason: request.reason,
         reasonForCancel: request.reasonForCancel,
-        createdAt: moment(request.createdAt).format("DD/MM/YYYY"),
+        createdAt: moment(request.createdAt).format('DD/MM/YYYY'),
         depositRoomId: request.depositRoomId?._id,
         userId: request.userId,
       }));
@@ -145,10 +163,10 @@ class RefundRequestController {
         totalItems,
       });
     } catch (error) {
-      console.error("Error getting refund requests for owner:", error);
+      console.error('Error getting refund requests for owner:', error);
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: 'Internal Server Error',
         error: error.message,
       });
     }
@@ -163,11 +181,11 @@ class RefundRequestController {
       const refundRequest = await RefundRequest.findById(
         refundRequestId
       ).populate({
-        path: "depositRoomId",
+        path: 'depositRoomId',
         populate: {
-          path: "roomId",
+          path: 'roomId',
           populate: {
-            path: "boardingHouseId",
+            path: 'boardingHouseId',
             match: { ownerId: req.user.userId }, // Kiểm tra xem chủ sở hữu có phải là người yêu cầu không
           },
         },
@@ -179,22 +197,22 @@ class RefundRequestController {
         !refundRequest.depositRoomId?.roomId?.boardingHouseId
       ) {
         return res.status(404).json({
-          message: "Refund request not found or you are not the owner.",
+          message: 'Refund request not found or you are not the owner.',
         });
       }
 
       // Cập nhật trạng thái và lý do hủy, các trường khác giữ nguyên
-      refundRequest.status = "rejected";
-      refundRequest.reasonForCancel = reasonForCancel || ""; // Lưu lý do hủy (có thể là chuỗi rỗng nếu không có lý do)
+      refundRequest.status = 'rejected';
+      refundRequest.reasonForCancel = reasonForCancel || ''; // Lưu lý do hủy (có thể là chuỗi rỗng nếu không có lý do)
 
       // Lưu thay đổi vào database
       await refundRequest.save();
 
-      return res.json({ message: "Refund request canceled successfully." });
+      return res.json({ message: 'Refund request canceled successfully.' });
     } catch (error) {
-      console.log("Error canceling refund request:", error);
+      console.log('Error canceling refund request:', error);
       return res.status(500).json({
-        message: "An error occurred while canceling the refund request.",
+        message: 'An error occurred while canceling the refund request.',
         error,
       });
     }
@@ -207,7 +225,7 @@ class RefundRequestController {
       if (!depositRoomId || !reason) {
         return res.status(400).json({
           success: false,
-          message: "Missing required fields.",
+          message: 'Missing required fields.',
         });
       }
 
@@ -215,7 +233,7 @@ class RefundRequestController {
       if (!depositRoom) {
         return res.status(404).json({
           success: false,
-          message: "Deposit room not found.",
+          message: 'Deposit room not found.',
         });
       }
 
@@ -224,7 +242,7 @@ class RefundRequestController {
         return res.status(403).json({
           success: false,
           message:
-            "You are not authorized to create refund request for this deposit.",
+            'You are not authorized to create refund request for this deposit.',
         });
       }
 
@@ -238,41 +256,41 @@ class RefundRequestController {
         return res.status(400).json({
           success: false,
           message:
-            "Refund request can only be created 7 days before the deposit end date.",
+            'Refund request can only be created 7 days before the deposit end date.',
         });
       }
 
       const existingRequest = await RefundRequest.findOne({
         depositRoomId,
         userId: req.user.userId,
-        status: { $ne: "rejected" },
+        status: { $ne: 'rejected' },
       });
 
       if (existingRequest) {
         return res.status(400).json({
           success: false,
-          message: "A refund request already exists for this deposit.",
+          message: 'A refund request already exists for this deposit.',
         });
       }
 
       const refundRequest = await RefundRequest.create({
         depositRoomId,
         reason,
-        status: "pending",
+        status: 'pending',
         originalDepositAmount: depositRoom.amount,
         userId: req.user.userId,
       });
 
       return res.status(201).json({
         success: true,
-        message: "Refund request created successfully.",
+        message: 'Refund request created successfully.',
         refundRequest,
       });
     } catch (error) {
-      console.log("Error creating refund request:", error);
+      console.log('Error creating refund request:', error);
       return res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: 'Internal server error',
         error: error.message,
       });
     }
@@ -286,7 +304,7 @@ class RefundRequestController {
       const existingRequest = await RefundRequest.findOne({
         depositRoomId,
         userId: userId,
-        status: { $in: ["pending", "accepted"] }, // Chỉ check các request chưa bị reject hoặc cancel
+        status: { $in: ['pending', 'accepted'] }, // Chỉ check các request chưa bị reject hoặc cancel
       });
 
       return res.json({
@@ -302,9 +320,9 @@ class RefundRequestController {
           : null,
       });
     } catch (error) {
-      console.log("Error checking refund request:", error);
+      console.log('Error checking refund request:', error);
       return res.status(500).json({
-        message: "Error checking refund request",
+        message: 'Error checking refund request',
         error: error.message,
       });
     }
@@ -316,8 +334,8 @@ class RefundRequestController {
 
       const refundRequests = await RefundRequest.find({
         userId,
-        status: { $in: ["pending", "accepted"] },
-      }).select("depositRoomId status createdAt");
+        status: { $in: ['pending', 'accepted'] },
+      }).select('depositRoomId status createdAt');
 
       // Tạo map để frontend có thể check nhanh
       const refundRequestMap = {};
@@ -332,9 +350,9 @@ class RefundRequestController {
         refundRequests: refundRequestMap,
       });
     } catch (error) {
-      console.log("Error getting refund requests:", error);
+      console.log('Error getting refund requests:', error);
       return res.status(500).json({
-        message: "Error getting refund requests",
+        message: 'Error getting refund requests',
         error: error.message,
       });
     }

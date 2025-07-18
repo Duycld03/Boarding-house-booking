@@ -22,12 +22,13 @@
   "status": {
     "pending": "Chờ Xác Nhận",
     "accepted": "Đã Chấp Nhận",
-    "canceled": "Đã Hủy",
+    "rejected": "Đã Từ Chối",
     "completed": "Hoàn Thành"
   },
   "allAppointmentsLoaded": "Đã tải tất cả lịch hẹn",
   "loadingMoreAppointments": "Đang tải thêm lịch hẹn...",
   "loadMoreAppointments": "Tải thêm lịch hẹn",
   "of": "trên",
-  "appointmentsLoaded": "lịch hẹn đã được tải"
+  "appointmentsLoaded": "lịch hẹn đã được tải",
+  "reasonForCancel": "Lý do hủy"
 }
