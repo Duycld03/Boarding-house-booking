@@ -5,13 +5,10 @@ import bcrypt from 'bcrypt';
 import { Staff } from '../models/account.js';
 
 class ManagerController {
-  // Function to get managers associated with a specific Owner (logged-in user)
   async getManagerOwner(req, res, next) {
     try {
-      // Get the logged-in user's account (the owner)
       const account = await Account.findById(req.user.userId);
 
-      // If the account is not found or not an owner
       if (!account || account.role !== 'owner') {
         return res.status(403).json({
           success: false,
@@ -19,25 +16,36 @@ class ManagerController {
         });
       }
 
-      // Retrieve managers associated with this owner's userId
-      const managers = await Account.find({
+      const filter = {
         role: 'staff',
         createdBy: req.user.userId,
-      })
+      };
+
+      let managers = await Account.find(filter)
         .select(
-          'username fullname email phoneNumber avatarImage accountBalance status'
-        ) // Optional: specify fields to return
+          'username fullname email phoneNumber avatarImage accountBalance status deleted'
+        )
         .exec();
 
-      // If no managers are found
-      if (managers.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: 'No managers found for this owner.',
-        });
+      const currentStaffId = req.query.currentStaffId;
+
+      if (
+        currentStaffId &&
+        !managers.find((m) => m._id.toString() === currentStaffId)
+      ) {
+        const currentStaff = await Account.findOne({
+          _id: currentStaffId,
+          role: 'staff',
+          createdBy: req.user.userId,
+        }).select(
+          'username fullname email phoneNumber avatarImage accountBalance status deleted'
+        );
+
+        if (currentStaff) {
+          managers.push(currentStaff); // 👈 thêm staff đã bị xóa nếu đang được chọn
+        }
       }
 
-      // Return the list of managers for the given owner
       return res.status(200).json({
         success: true,
         data: managers,
@@ -50,6 +58,7 @@ class ManagerController {
       });
     }
   }
+
   async getStaff(req, res, next) {
     try {
       const account = await Account.findById(req.user.userId);
@@ -65,6 +74,7 @@ class ManagerController {
       const filter = {
         role: 'staff',
         createdBy: req.user.userId,
+        deleted: false,
       };
 
       const paginationOptions = {
@@ -169,16 +179,19 @@ class ManagerController {
 
       const staff = await Account.findById(staffId);
       if (!staff || staff.role !== 'staff') {
-        return res
-          .status(404)
-          .json({ success: false, message: 'Staff not found' });
+        return res.status(404).json({
+          success: false,
+          message: 'Staff not found',
+        });
       }
 
-      await Account.findByIdAndDelete(staffId);
+      // Xóa mềm: đánh dấu deleted là true
+      staff.deleted = true;
+      await staff.save();
 
       return res.status(200).json({
         success: true,
-        message: 'Staff deleted successfully',
+        message: 'Staff soft deleted successfully',
       });
     } catch (error) {
       console.error('Error deleting staff:', error);
