@@ -20,13 +20,14 @@ import {
   MailOutlined,
 } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import UserAvatar from "../../../assets/images/none_avatar.png";
 import { getUser } from "../../../api/authAPI";
 import { updateAccountFromProfile } from "../../../api/accountAPI";
 import ChangeEmailModal from "./ChangeEmailModal";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { updateAvatar } from "../../../api/accountAPI";
+import DefaultAvatar from "../../../assets/images/none_avatar.png";
+import { useImageValidation } from "../../../hooks/useImageValidation";
 
 const { Title, Text } = Typography;
 
@@ -53,13 +54,20 @@ function Profile() {
   const [formEmail] = Form.useForm();
   const [profileLoading, setProfileLoading] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState(UserAvatar);
+  const [imageSource, setImageSource] = useState(null);
   const [username, setUsername] = useState("");
   const [isOwner, setIsOwner] = useState(false);
   const [accountBalance, setAccountBalance] = useState(0);
   const [email, setEmail] = useState("");
   const { darkMode } = useTheme();
   const { t } = useTranslation("profile");
+
+  // Sử dụng hook useImageValidation để quản lý avatar
+  const {
+    src: validImageUrl,
+    isValid,
+    isLoading: imageLoading,
+  } = useImageValidation(imageSource, DefaultAvatar);
 
   const [changeEmailModalVisible, setChangeEmailModalVisible] = useState(false);
 
@@ -71,7 +79,7 @@ function Profile() {
     if (info.file.status === "done") {
       getBase64(info.file.originFileObj, (url) => {
         setLoading(false);
-        setImageUrl(url);
+        setImageSource(url);
       });
     }
   };
@@ -111,7 +119,8 @@ function Profile() {
       const res = await getUser();
       setAccountBalance(res.accountBalance);
 
-      setImageUrl(res?.avatarImage?.url ?? UserAvatar);
+      // Chỉ cập nhật nguồn hình ảnh, useImageValidation sẽ xử lý việc kiểm tra và fallback
+      setImageSource(res?.avatarImage?.url || null);
 
       setUsername(res.username);
       setEmail(res.email);
@@ -121,6 +130,7 @@ function Profile() {
       setProfileLoading(false);
     } catch (error) {
       setProfileLoading(false);
+      setImageSource(null); // Để hook useImageValidation sử dụng fallback
       toast.error(t("actions.error"));
     }
   };
@@ -145,14 +155,14 @@ function Profile() {
 
     try {
       const res = await updateAvatar(formData);
-
-      // setImageUrl(response.url);
-      toast.success("Upload avatar successfully!");
+      toast.success(t("avatar.uploadSuccess"));
+      // Cập nhật ảnh đại diện sau khi tải lên thành công
+      getUserProfile();
       onSuccess();
-      setLoading(false);
     } catch (error) {
-      toast.error("Upload avatar failed!");
+      toast.error(t("avatar.uploadError"));
       onError(error);
+    } finally {
       setLoading(false);
     }
   };
@@ -170,7 +180,6 @@ function Profile() {
     border: darkMode ? "1px solid #333" : "1px solid #eaeaea",
     transition: "all 0.3s ease",
   };
-  console.log("Translated title:", t("title"));
 
   return (
     <div
@@ -200,12 +209,14 @@ function Profile() {
                     onChange={handleAvatarChange}
                     style={{ width: 135 }}
                   >
-                    {imageUrl ? (
+                    {validImageUrl ? (
                       <div className="relative aspect-square w-70 rounded-full overflow-hidden">
                         <img
-                          src={imageUrl}
+                          src={validImageUrl}
                           alt="avatar"
-                          className="w-full h-full object-cover"
+                          className={`w-full h-full object-cover ${
+                            imageLoading ? "opacity-50" : ""
+                          }`}
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                           <EditOutlined className="text-white text-4xl" />

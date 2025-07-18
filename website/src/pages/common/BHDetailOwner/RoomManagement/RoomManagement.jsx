@@ -59,10 +59,10 @@ function RoomManagement({ boardingHouseId }) {
         }
 
         setPagination({
-          currentPage: res.currentPage,
-          totalPages: res.totalPages,
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
           totalItems: res.pagination.totalItems,
-          limit: res.limit,
+          limit: res.pagination.limit,
         });
       } else {
         toast.error(t("roomManagement.messages.fetchFailed"));
