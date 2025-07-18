@@ -60,10 +60,10 @@ const AddBHModal = ({ onAddData }) => {
 
   const darkInputStyle = darkMode
     ? {
-        backgroundColor: '#374151',
-        color: '#fff',
-        borderColor: '#4b5563',
-      }
+      backgroundColor: '#374151',
+      color: '#fff',
+      borderColor: '#4b5563',
+    }
     : {};
   const darkModeSelectClass = cx({
     'dark-mode-select': darkMode,
@@ -368,8 +368,8 @@ const AddBHModal = ({ onAddData }) => {
       console.error('Error submitting boarding house:', error);
       toast.error(
         error.response?.data?.message ||
-          error.message ||
-          t('errors.failedToSubmitForm')
+        error.message ||
+        t('errors.failedToSubmitForm')
       );
     } finally {
       setLoading(false);
@@ -380,19 +380,19 @@ const AddBHModal = ({ onAddData }) => {
   // Dark mode modal styles
   const modalStyles = darkMode
     ? {
-        mask: { backgroundColor: 'rgba(0, 0, 0, 0.6)' },
-        content: {
-          backgroundColor: '#1f2937',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-        },
-        header: {
-          backgroundColor: '#1f2937',
-          color: '#fff',
-          borderBottom: '1px solid #374151',
-        },
-        body: { backgroundColor: '#1f2937', color: '#fff' },
-        footer: { backgroundColor: '#1f2937', borderTop: '1px solid #374151' },
-      }
+      mask: { backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+      content: {
+        backgroundColor: '#1f2937',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      },
+      header: {
+        backgroundColor: '#1f2937',
+        color: '#fff',
+        borderBottom: '1px solid #374151',
+      },
+      body: { backgroundColor: '#1f2937', color: '#fff' },
+      footer: { backgroundColor: '#1f2937', borderTop: '1px solid #374151' },
+    }
     : {};
 
   // Form item style
@@ -414,11 +414,11 @@ const AddBHModal = ({ onAddData }) => {
           : ConfigProvider.defaultAlgorithm,
         token: darkMode
           ? {
-              colorBgContainer: '#1f2937',
-              colorText: '#F9FAFB',
-              colorBorder: '#4B5563',
-              colorPrimary: '#3b82f6',
-            }
+            colorBgContainer: '#1f2937',
+            colorText: '#F9FAFB',
+            colorBorder: '#4B5563',
+            colorPrimary: '#3b82f6',
+          }
           : {},
       }}
     >
@@ -542,10 +542,10 @@ const AddBHModal = ({ onAddData }) => {
                 style={
                   darkMode
                     ? {
-                        // backgroundColor: '#374151',
-                        borderColor: '#4B5563',
-                        color: '#F9FAFB',
-                      }
+                      // backgroundColor: '#374151',
+                      borderColor: '#4B5563',
+                      color: '#F9FAFB',
+                    }
                     : {}
                 }
               />
@@ -566,10 +566,10 @@ const AddBHModal = ({ onAddData }) => {
                 style={
                   darkMode
                     ? {
-                        // backgroundColor: '#374151',
-                        borderColor: '#4B5563',
-                        color: '#F9FAFB',
-                      }
+                      // backgroundColor: '#374151',
+                      borderColor: '#4B5563',
+                      color: '#F9FAFB',
+                    }
                     : {}
                 }
               />
@@ -759,10 +759,10 @@ const AddBHModal = ({ onAddData }) => {
                 style={
                   darkMode
                     ? {
-                        backgroundColor: '#374151',
-                        borderColor: '#4B5563',
-                        color: '#F9FAFB',
-                      }
+                      backgroundColor: '#374151',
+                      borderColor: '#4B5563',
+                      color: '#F9FAFB',
+                    }
                     : {}
                 }
                 min={0}
@@ -797,10 +797,10 @@ const AddBHModal = ({ onAddData }) => {
                 style={
                   darkMode
                     ? {
-                        backgroundColor: '#374151',
-                        borderColor: '#4B5563',
-                        color: '#F9FAFB',
-                      }
+                      backgroundColor: '#374151',
+                      borderColor: '#4B5563',
+                      color: '#F9FAFB',
+                    }
                     : {}
                 }
                 min={0}
@@ -833,10 +833,10 @@ const AddBHModal = ({ onAddData }) => {
                 style={
                   darkMode
                     ? {
-                        backgroundColor: '#374151',
-                        borderColor: '#4B5563',
-                        color: '#F9FAFB',
-                      }
+                      backgroundColor: '#374151',
+                      borderColor: '#4B5563',
+                      color: '#F9FAFB',
+                    }
                     : {}
                 }
                 min={0}

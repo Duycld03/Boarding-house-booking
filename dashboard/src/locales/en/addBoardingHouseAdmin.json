@@ -28,7 +28,9 @@
         "submit": "Submit",
         "fieldRequired": "This field is required.",
         "maxOtherImages": "You can't upload more than 15 other images.",
-        "imageRemoved": "Image removed successfully."
+        "imageRemoved": "Image removed successfully.",
+        "preview": "Preview",
+        "otherImagesLabel": "Other Images"
     },
     "errors": {
         "noId": "Boarding house ID not found.",
@@ -50,7 +52,9 @@
         "enterWaterPrice": "Please enter water price.",
         "markLocationOnMap": "Please mark the location on the map.",
         "failedToAdd": "Failed to add boarding house.",
-        "failedToSubmitForm": "Failed to submit the form."
+        "failedToSubmitForm": "Failed to submit the form.",
+        "fetchBoardingHouseTypesFailed": "Failed to fetch boarding house types.",
+        "createFailed": "Failed to create boarding house."
     },
     "messages": {
         "imageRemoved": "Temporary image removed.",

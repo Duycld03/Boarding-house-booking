@@ -100,15 +100,20 @@ function FilterBoardingHouse({ setFilterValue }) {
   const handleProvinceChange = async (province) => {
     setFilters((prev) => ({
       ...prev,
-      province: province?.name,
+      province: {
+        id: province.id,
+        name: province.name,
+        name_en: province.name_en,
+      },
       district: null,
       ward: null,
     }));
+
     form.setFieldsValue({ district: null, ward: null });
 
     if (province) {
       setLoadingStates((prev) => ({ ...prev, districts: true }));
-      const districtsData = await fetchDistricts(province?.code);
+      const districtsData = await fetchDistricts(province?.id);
       setDistricts(districtsData);
       setWards([]);
       setLoadingStates((prev) => ({ ...prev, districts: false }));
@@ -127,7 +132,7 @@ function FilterBoardingHouse({ setFilterValue }) {
     form.setFieldsValue({ ward: null });
     if (district) {
       setLoadingStates((prev) => ({ ...prev, wards: true }));
-      const wardsData = await fetchWards(district?.code);
+      const wardsData = await fetchWards(district?.id);
       setWards(wardsData);
       setLoadingStates((prev) => ({ ...prev, wards: false }));
     } else {
@@ -210,15 +215,15 @@ function FilterBoardingHouse({ setFilterValue }) {
     components: {
       // Cấu hình cho Select
       Select: {
-        selectorBg: darkMode ? "#374151" : "#f5f5f5", // Nền của Select
+        selectorBg: darkMode ? "#374151" : "#FFFFFF", // Nền của Select
         colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Select
         colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
         optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb", // Nền khi được chọn
-        optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0", // Nền khi hover
+        optionHoverBg: darkMode ? "#4B5563" : "#FFFFFF", // Nền khi hover
       },
       // Cấu hình cho Input
       Input: {
-        colorBgContainer: darkMode ? "#374151" : "#f5f5f5", // Nền Input
+        colorBgContainer: darkMode ? "#374151" : "#FFFFFF", // Nền Input
         colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Input
         colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
         colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563", // Placeholder
@@ -260,9 +265,9 @@ function FilterBoardingHouse({ setFilterValue }) {
               <Form.Item label={t("filterBH.province")} name="province" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectProvince")}
-                  onChange={(code) => {
+                  onChange={(id) => {
                     const selectedProvince = provinces?.find(
-                      (province) => province.code === code
+                      (province) => province.id === id
                     );
                     handleProvinceChange(selectedProvince);
                   }}
@@ -270,19 +275,20 @@ function FilterBoardingHouse({ setFilterValue }) {
                   loading={loadingStates.provinces}
                 >
                   {provinces?.map((province) => (
-                    <Option key={province.code} value={province.code}>
-                      {province.name}
+                    <Option key={province.id} value={province.id}>
+                      {currentLanguage === "vi" ? province.name : province.name_en}
                     </Option>
                   ))}
+
                 </Select>
               </Form.Item>
 
               <Form.Item label={t("filterBH.district")} name="district" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectDistrict")}
-                  onChange={(code) => {
+                  onChange={(id) => {
                     const selectedDistrict = districts?.find(
-                      (district) => district.code === code
+                      (district) => district.id === id
                     );
                     handleDistrictChange(selectedDistrict);
                   }}
@@ -290,19 +296,20 @@ function FilterBoardingHouse({ setFilterValue }) {
                   loading={loadingStates.districts}
                 >
                   {districts?.map((district) => (
-                    <Option key={district.code} value={district.code}>
-                      {district.name}
+                    <Option key={district.id} value={district.id}>
+                      {currentLanguage === "vi" ? district.name : district.name_en}
                     </Option>
                   ))}
+
                 </Select>
               </Form.Item>
 
               <Form.Item label={t("filterBH.ward")} name="ward" className="mb-2">
                 <Select
                   placeholder={t("filterBH.selectWard")}
-                  onChange={(code) => {
+                  onChange={(id) => {
                     const selectedWard = wards?.find(
-                      (ward) => ward.code === code
+                      (ward) => ward.id === id
                     );
                     setFilters((prev) => ({ ...prev, ward: selectedWard?.name }));
                   }}
@@ -310,10 +317,11 @@ function FilterBoardingHouse({ setFilterValue }) {
                   loading={loadingStates.wards}
                 >
                   {wards?.map((ward) => (
-                    <Option key={ward.code} value={ward.code}>
-                      {ward.name}
+                    <Option key={ward.id} value={ward.id}>
+                      {currentLanguage === "vi" ? ward.name : ward.name_en}
                     </Option>
                   ))}
+
                 </Select>
               </Form.Item>
 

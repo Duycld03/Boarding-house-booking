@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import Table from '@/component/Table';
-import { Button, ConfirmModal } from '@/component';
-import { Avatar } from 'antd';
-import DefaultRoomImage from '@/assets/images/none_avatar.png';
-import { getRoomTypeByBhId, softDeleteRoomType } from '@/api/roomTypeAPI';
-import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
-import formatAmount from '@/utils/formatAmount';
-import AddRoomTypeModal from './AddRoomType';
-import UpdateRoomTypeModal from './UpdateRoomTypeModal';
-import { useTranslation } from 'react-i18next';
-import i18next from 'i18next';
-import coverFacility from '@/utils/coverFacility';
-import { Tooltip } from 'antd'; // nếu chưa import
+import React, { useEffect, useState } from "react";
+import Table from "@/component/Table";
+import { Button, ConfirmModal } from "@/component";
+import { Avatar } from "antd";
+import DefaultRoomImage from "@/assets/images/none_avatar.png";
+import { getRoomTypeByBhId, softDeleteRoomType } from "@/api/roomTypeAPI";
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
+import formatAmount from "@/utils/formatAmount";
+import AddRoomTypeModal from "./AddRoomType";
+import UpdateRoomTypeModal from "./UpdateRoomTypeModal";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
+import coverFacility from "@/utils/coverFacility";
+import { Tooltip } from "antd"; // nếu chưa import
 
 const RoomType = () => {
-  const { t } = useTranslation('roomType');
+  const { t } = useTranslation("roomType");
   const { boardingHouseId } = useParams();
   const [roomData, setRoomData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ const RoomType = () => {
 
   const fetchRoomTypes = async () => {
     if (!boardingHouseId) {
-      toast.error('Boarding House ID is missing!');
+      toast.error("Boarding House ID is missing!");
       return;
     }
     setLoading(true);
@@ -52,11 +52,11 @@ const RoomType = () => {
           limit: res.pagination.limit,
         });
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
     } catch (error) {
       console.error(error);
-      toast.error(t('toast.error'));
+      toast.error(t("toast.error"));
       setRoomData([]);
     } finally {
       setLoading(false);
@@ -90,16 +90,16 @@ const RoomType = () => {
     setLoading(true);
     try {
       if (!currentRecord?._id) {
-        toast.error('Invalid ID');
+        toast.error("Invalid ID");
         return;
       }
 
       const response = await softDeleteRoomType(currentRecord._id);
 
       if (
-        response?.message === 'Room Type deleted successfully (soft delete).'
+        response?.message === "Room Type deleted successfully (soft delete)."
       ) {
-        toast.success(t('toast.deleteSuccess'));
+        toast.success(t("toast.deleteSuccess"));
         setRoomData((prev) =>
           prev.filter((room) => room._id !== currentRecord._id)
         );
@@ -112,7 +112,7 @@ const RoomType = () => {
         setCurrentRecord(null);
       }
     } catch (error) {
-      console.error('❌ Delete Room Type Error:', error);
+      console.error("❌ Delete Room Type Error:", error);
       toast.error(
         `Failed to delete Room Type: ${
           error.response?.data?.message || error.message
@@ -140,9 +140,9 @@ const RoomType = () => {
 
   const columns = [
     {
-      title: t('form.image.label') || 'Image',
-      dataIndex: 'image',
-      key: 'image',
+      title: t("form.image.label") || "Image",
+      dataIndex: "image",
+      key: "image",
       render: (image) => (
         <Avatar
           src={image?.imageUrl || DefaultRoomImage}
@@ -152,23 +152,23 @@ const RoomType = () => {
       ),
     },
     {
-      title: t('form.typeName.label'),
-      dataIndex: 'typeName',
-      key: 'typeName',
+      title: t("form.typeName.label"),
+      dataIndex: "typeName",
+      key: "typeName",
     },
     {
-      title: t('form.facilities.label'),
-      dataIndex: 'facilities',
-      key: 'facilities',
+      title: t("form.facilities.label"),
+      dataIndex: "facilities",
+      key: "facilities",
       render: (facilities) => {
         if (!facilities || facilities.length === 0)
-          return t('form.facilities.placeholder');
+          return t("form.facilities.placeholder");
 
         const translated = facilities.map((f) =>
           coverFacility(f.codeName || f.name, currentLanguage)
         );
 
-        const fullText = translated.join(', ');
+        const fullText = translated.join(", ");
         const shortText =
           fullText.length > 30 ? `${fullText.slice(0, 30)}...` : fullText;
 
@@ -180,38 +180,38 @@ const RoomType = () => {
       },
     },
     {
-      title: t('form.roomSize.label'),
-      dataIndex: 'roomSize',
-      key: 'roomSize',
+      title: t("form.roomSize.label"),
+      dataIndex: "roomSize",
+      key: "roomSize",
     },
     {
-      title: t('form.price.label'),
-      dataIndex: 'price',
-      key: 'price',
+      title: t("form.price.label"),
+      dataIndex: "price",
+      key: "price",
       render: (price) =>
-        price ? `${formatAmount(price, currentLanguage)}` : 'N/A',
+        price ? `${formatAmount(price, currentLanguage)}` : "N/A",
     },
     {
-      title: t('form.peopleNumber.label'),
-      dataIndex: 'peopleNumber',
-      key: 'peopleNumber',
+      title: t("form.peopleNumber.label"),
+      dataIndex: "peopleNumber",
+      key: "peopleNumber",
     },
     {
-      title: t('button.action'),
-      key: 'action',
+      title: t("button.action"),
+      key: "action",
       render: (_, record) => (
         <div className="flex gap-3">
           <Button
             size="large"
-            title={t('button.update')}
+            title={t("button.update")}
             btnUpdate
-            className={'text-white'}
+            className={"text-white"}
             onClick={() => handleOpenUpdateModal(record)}
           />
           <Button
             size="large"
             btnDelete
-            title={t('button.delete')}
+            title={t("button.delete")}
             onClick={() => handleSelectDelete(record)}
           />
         </div>
@@ -229,13 +229,13 @@ const RoomType = () => {
       </div>
 
       <Table
-        tableName={t('tableName')}
+        tableName={t("tableName")}
         columns={columns}
         data={roomData}
         loading={loading}
         pagination={tablePaginationConfig}
         onChange={handleTableChange}
-        noDataText={t('messages.noData')}
+        noDataText={t("messages.noData")}
       />
 
       <UpdateRoomTypeModal
@@ -246,8 +246,8 @@ const RoomType = () => {
       />
 
       <ConfirmModal
-        title={t('modal.confirmDeleteTitle')}
-        content={t('modal.confirmDeleteContent')}
+        title={t("modal.confirmDeleteTitle")}
+        content={t("modal.confirmDeleteContent")}
         onOk={handleDelete}
         onCancel={() => setIsDeleteModalVisible(false)}
         isOpen={isDeleteModalVisible}

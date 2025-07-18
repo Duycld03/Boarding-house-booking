@@ -38,6 +38,16 @@ import en_renewalManagement from '@/locales/en/renewalManagement.json';
 import vi_renewalManagement from '@/locales/vi/renewalManagement.json';
 import en_review from '@/locales/en/review.json';
 import vi_review from '@/locales/vi/review.json';
+import en_depositRefundRequest from "@/locales/en/depositRefundRequest.json";
+import vi_depositRefundRequest from "@/locales/vi/depositRefundRequest.json";
+import en_task from "@/locales/en/task.json";
+import vi_task from "@/locales/vi/task.json";
+import en_staffManagement from "@/locales/en/staffManagement.json";
+import vi_staffManagement from "@/locales/vi/staffManagement.json";
+import en_revenueManagement from "@/locales/en/revenueManagement.json";
+import vi_revenueManagement from "@/locales/vi/revenueManagement.json";
+import { StaffManagement } from "@/pages/common";
+
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -61,6 +71,10 @@ i18n.use(initReactI18next).init({
       rentPayment: en_rentPayment,
       renewalManagement: en_renewalManagement,
       review: en_review,
+      task: en_task,
+      staffManagement: en_staffManagement,
+      revenueManagement: en_revenueManagement,
+      depositRefundRequest: en_depositRefundRequest,
     },
     vi: {
       menu: vi_menu,
@@ -82,6 +96,10 @@ i18n.use(initReactI18next).init({
       rentPayment: vi_rentPayment,
       renewalManagement: vi_renewalManagement,
       review: vi_review,
+      task: vi_task,
+      staffManagement: vi_staffManagement,
+      revenueManagement: vi_revenueManagement,
+      depositRefundRequest: vi_depositRefundRequest,
     },
   },
   lng: 'en',

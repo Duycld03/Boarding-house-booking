@@ -1,7 +1,5 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
-import { Avatar, Pagination } from "antd";
 import { FileTextOutlined } from "@ant-design/icons";
-import axios from "axios";
 import { toast } from "react-toastify";
 
 // Components
@@ -10,6 +8,7 @@ import { Button, ConfirmModal } from "../../../component";
 import FilterAccount from "./FilterAccount";
 import AddAccountModal from "./AddAccount";
 import UpdateAccountModal from "./UpdateAccount/UpdateAccount";
+import SafeAvatar from "../../../component/SafeAvatar"; // Import SafeAvatar mới
 
 // API and utils
 import {
@@ -26,42 +25,6 @@ import DefaultAvatar from "../../../assets/images/none_avatar.png";
 // Translations and theme
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../../context/themeContext";
-
-/**
- * SafeAvatar Component
- * Handles image loading failures and provides a fallback
- * Uses the same approach as in Header.jsx
- */
-const SafeAvatar = ({
-  src,
-  size = "large",
-  shape = "circle",
-  className = "",
-  ...props
-}) => {
-  // Trạng thái local để quản lý URL hiện tại
-  const [avatarSrc, setAvatarSrc] = useState(src?.url || src);
-
-  // Xử lý khi URL thay đổi
-  useEffect(() => {
-    setAvatarSrc(src?.url || src);
-  }, [src]);
-
-  return (
-    <Avatar
-      src={avatarSrc}
-      shape={shape}
-      size={size}
-      className={className}
-      onError={() => {
-        // Khi gặp lỗi tải ảnh, set lại state để hiển thị default avatar
-        setAvatarSrc(DefaultAvatar);
-        return false; // Trả về false để ngăn vòng lặp vô hạn
-      }}
-      {...props}
-    />
-  );
-};
 
 /**
  * AccountManagement Component
@@ -135,6 +98,23 @@ function AccountManagement() {
     [t]
   );
 
+  /**
+   * Handle avatar loading error
+   * @param {Object} record - Account record
+   */
+  const handleAvatarError = useCallback((record) => {
+    console.warn(`Avatar load failed for user: ${record.username}`);
+    // Có thể thêm logic khác như ghi log, thông báo, etc.
+  }, []);
+
+  /**
+   * Handle avatar loading success
+   * @param {Object} record - Account record
+   */
+  const handleAvatarLoad = useCallback((record) => {
+    // Có thể thêm logic khác như ghi log, analytics, etc.
+  }, []);
+
   const filterAccountData = useCallback(async () => {
     try {
       const res = await filterAccount(filterValue, paginationOptions);
@@ -142,10 +122,10 @@ function AccountManagement() {
       if (res) {
         setAccountData(res.data);
         setPagination({
-          currentPage: res.currentPage,
-          totalPages: res.totalPages,
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
           totalItems: res.pagination.totalItems,
-          limit: res.limit,
+          limit: res.pagination.limit,
         });
       } else {
         toast.error(t("messages.fetchFailed"));
@@ -194,8 +174,15 @@ function AccountManagement() {
         title: t("columns.avatar"),
         dataIndex: "avatarImage",
         key: "avatarImage",
-        render: (avatarImage) => (
-          <SafeAvatar src={avatarImage} shape="circle" size="large" />
+        render: (avatarImage, record) => (
+          <SafeAvatar
+            src={avatarImage}
+            shape="circle"
+            size="large"
+            fallback={DefaultAvatar}
+            onError={() => handleAvatarError(record)}
+            onLoad={() => handleAvatarLoad(record)}
+          />
         ),
       },
       {
@@ -230,7 +217,6 @@ function AccountManagement() {
         dataIndex: "createdAt",
         key: "createdAt",
         render: (createdAt) => convertTimetap(createdAt),
-
         defaultSortOrder: "descend",
       },
       {
@@ -253,10 +239,9 @@ function AccountManagement() {
         ),
       },
     ],
-    [t, translateRole, translateStatus]
+    [t, translateRole, translateStatus, handleAvatarError, handleAvatarLoad]
   );
 
-  // Memoized pagination configuration for Table component
   const tablePaginationConfig = useMemo(
     () => ({
       current: pagination.currentPage,
@@ -264,7 +249,7 @@ function AccountManagement() {
       total: pagination.totalItems,
       showSizeChanger: true,
     }),
-    [pagination, t, darkMode]
+    [pagination]
   );
 
   /**

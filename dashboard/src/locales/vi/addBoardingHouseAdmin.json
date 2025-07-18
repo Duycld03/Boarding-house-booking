@@ -28,7 +28,9 @@
         "imageRemoved": "Đã xóa hình ảnh thành công.",
         "enterPriceRent": "Nhập giá thuê",
         "enterElectricityPrice": "Nhập giá điện",
-        "enterWaterPrice": "Nhập giá nước"
+        "enterWaterPrice": "Nhập giá nước",
+        "preview": "Xem trước",
+        "otherImagesLabel": "Các ảnh khác"
     },
     "errors": {
         "noId": "Không tìm thấy ID nhà trọ.",
@@ -50,7 +52,9 @@
         "enterWaterPrice": "Vui lòng nhập giá nước.",
         "markLocationOnMap": "Vui lòng đánh dấu vị trí trên bản đồ.",
         "failedToAdd": "Thêm nhà trọ thất bại.",
-        "failedToSubmitForm": "Gửi biểu mẫu thất bại."
+        "failedToSubmitForm": "Gửi biểu mẫu thất bại.",
+        "fetchBoardingHouseTypesFailed": "Không thể tải loại nhà trọ.",
+        "createFailed": "Tạo nhà trọ thất bại."
     },
     "messages": {
         "imageRemoved": "Ảnh tạm thời đã được xóa.",

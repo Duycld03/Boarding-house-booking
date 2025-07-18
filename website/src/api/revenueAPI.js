@@ -19,17 +19,17 @@ export const getRevenueByTime = async ({ boardingHouseId, month, year }) => {
 };
 
 export const getTotalRevenueByYear = async (year) => {
-  return axios.get("/owner/total-revenue/year", {
+  return axios.get("/staff/total-revenue/year", {
     params: { year },
   });
 };
 
 export const getTotalAvailableYears = async () => {
-  return axios.get("/owner/total-revenue/years");
+  return axios.get("/staff/total-revenue/years");
 };
 
 export const getTotalRevenueByTime = async ({ month, year }) => {
-  return axios.get("/owner/total-revenue", {
+  return axios.get("/staff/total-revenue", {
     params: { month, year },
   });
 };

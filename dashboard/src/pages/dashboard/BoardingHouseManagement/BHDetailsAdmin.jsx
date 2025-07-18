@@ -124,6 +124,8 @@ const BHDetailAdmin = () => {
         const fetchAddressData = async () => {
             try {
                 const provincesData = await fetchProvinces();
+                console.log("mt", provincesData);
+
                 setProvinces(provincesData);
 
                 if (updatedData?.address?.province) {
@@ -131,7 +133,7 @@ const BHDetailAdmin = () => {
                         (p) => p.name === updatedData.address.province
                     );
                     if (selectedProvince) {
-                        const districtsData = await fetchDistricts(selectedProvince.code);
+                        const districtsData = await fetchDistricts(selectedProvince.id);
                         setDistricts(districtsData);
 
                         if (updatedData?.address?.district) {
@@ -139,7 +141,7 @@ const BHDetailAdmin = () => {
                                 (d) => d.name === updatedData.address.district
                             );
                             if (selectedDistrict) {
-                                const wardsData = await fetchWards(selectedDistrict.code);
+                                const wardsData = await fetchWards(selectedDistrict.id);
                                 setWards(wardsData);
                             }
                         }
@@ -161,7 +163,6 @@ const BHDetailAdmin = () => {
         const fetchTypes = async () => {
             try {
                 const response = await getAllBoardingHouseTypes();
-                console.log("dmtien:", response)
 
                 setBoardingHouseTypes(
                     response.data.map((type) => ({
@@ -181,24 +182,21 @@ const BHDetailAdmin = () => {
     }, []);
 
     // Update form data on input change
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        const keys = name.split("."); // Split by dot notation for nested fields (e.g., "address.detail")
-
-        if (keys.length === 2) {
-            // Handle nested fields (e.g., "address.detail")
-            setUpdatedData((prev) => ({
-                ...prev,
-                [keys[0]]: { ...prev[keys[0]], [keys[1]]: value },
-            }));
-        } else {
-            // Handle top-level fields
-            setUpdatedData((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
+    const handleInputChange = ({ target }) => {
+        const { name, value } = target;
+        setUpdatedData((prev) => {
+            const newData = { ...prev };
+            const keys = name.split(".");
+            if (keys.length === 2) {
+                newData[keys[0]][keys[1]] = value;
+            } else if (keys.length === 1) {
+                newData[keys[0]] = value;
+            }
+            return newData;
+        });
     };
+
+
 
     const handleFileChange = (e, isPrimary = false) => {
         const file = e.target.files[0];
@@ -351,13 +349,32 @@ const BHDetailAdmin = () => {
             payload.append("priceRange", updatedData.priceRange);
             payload.append("electricityPrice", updatedData.electricityPrice);
             payload.append("waterPrice", updatedData.waterPrice);
-            payload.append("address[province]", updatedData.address.province);
-            payload.append("address[district]", updatedData.address.district);
-            payload.append("address[ward]", updatedData.address.ward);
+            payload.append(
+                'address[province][name]',
+                updatedData.address.province.name
+            );
+            payload.append(
+                'address[province][name_en]',
+                updatedData.address.province.name_en
+            );
+
+            payload.append(
+                'address[district][name]',
+                updatedData.address.district.name
+            );
+            payload.append(
+                'address[district][name_en]',
+                updatedData.address.district.name_en
+            );
+
+            payload.append('address[ward][name]', updatedData.address.ward.name);
+            payload.append(
+                'address[ward][name_en]',
+                updatedData.address.ward.name_en
+            );
             payload.append("address[detail]", updatedData.address.detail);
             payload.append("location[lat]", updatedData.location.lat);
             payload.append("location[lon]", updatedData.location.lon);
-            console.log("quá tr mệt: ", updatedData.boardingHouseType)
             // Append primary image (new or existing)
             const oldImg = [];
 
@@ -413,41 +430,54 @@ const BHDetailAdmin = () => {
             : ConfigProvider.defaultAlgorithm,
         token: darkMode
             ? {
-                colorText: "#F9FAFB",
-                colorTextSecondary: "#e5e7eb",
-                colorBgContainer: "#374151",
-                colorBorder: "#4B5563",
-                colorTextPlaceholder: "#9CA3AF",
-                colorPrimary: "#3b82f6",
-                controlItemBgActive: "#3b82f6",
-                controlItemBgHover: "#4B5563",
-                colorBgElevated: "#374151"
+                colorText: "#ffffff", // Văn bản sáng
+                colorTextSecondary: "#e5e7eb", // Văn bản phụ nhạt hơn
+                colorBgContainer: "#1f2937", // Nền tối
+                colorBorder: "#4b5563", // Viền rõ hơn
+                colorPrimary: "#3b82f6", // Màu chính (xanh lam)
+
+                // Thiết lập màu sắc cho Input
+                colorBgElevated: "#374151", // Nền cho các thành phần thả xuống
+                colorFillSecondary: "#374151", // Nền cho các ô input
+                colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
+                colorBorderSecondary: "#4B5563", // Viền phụ
+                controlItemBgActive: "#3b82f6", // Nền khi được chọn
+                controlItemBgHover: "#4B5563", // Nền khi hover
             }
             : {
-                colorText: "#000000",
-                colorTextSecondary: "#4B5563",
-                colorBgContainer: "#f5f5f5",
-                colorBorder: "#d9d9d9",
-                colorTextPlaceholder: "#9CA3AF",
-                colorPrimary: "#3b82f6",
-                controlItemBgActive: "#e5e7eb",
-                controlItemBgHover: "#f0f0f0",
-                colorBgElevated: "#ffffff"
+                colorText: "#000", // Văn bản tối
+                colorTextSecondary: "#4b5563", // Văn bản phụ
+                colorBgContainer: "#ffffff", // Nền sáng
+                colorBorder: "#d9d9d9", // Viền nhạt
+                colorPrimary: "#3b82f6", // Màu chính (xanh lam)
+
+                // Thiết lập màu sắc cho Input
+                colorBgElevated: "#f5f5f5", // Nền cho các thành phần thả xuống
+                colorFillSecondary: "#f5f5f5", // Nền cho các ô input
+                colorTextPlaceholder: "#9CA3AF", // Văn bản placeholder
+                colorBorderSecondary: "#d9d9d9", // Viền phụ
+                controlItemBgActive: "#e5e7eb", // Nền khi được chọn
+                controlItemBgHover: "#f0f0f0", // Nền khi hover
             },
         components: {
+            // Cấu hình cho Select
             Select: {
-                selectorBg: darkMode ? "#374151" : "#f5f5f5",
-                colorText: darkMode ? "#F9FAFB" : "#000",
-                colorBorder: darkMode ? "#4B5563" : "#d9d9d9",
-                optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb",
-                optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0",
-                colorBgElevated: darkMode ? "#374151" : "#ffffff",
+                selectorBg: darkMode ? "#374151" : "#FFFFFF", // Nền của Select
+                colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Select
+                colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
+                optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb", // Nền khi được chọn
+                optionHoverBg: darkMode ? "#4B5563" : "#FFFFFF", // Nền khi hover
             },
+            // Cấu hình cho Input
             Input: {
-                colorBgContainer: darkMode ? "#374151" : "#f5f5f5",
-                colorText: darkMode ? "#F9FAFB" : "#000",
-                colorBorder: darkMode ? "#4B5563" : "#d9d9d9",
-                colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563",
+                colorBgContainer: darkMode ? "#374151" : "#FFFFFF", // Nền Input
+                colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Input
+                colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
+                colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563", // Placeholder
+            },
+            // Cấu hình cho Form
+            Form: {
+                labelColor: darkMode ? "#F9FAFB" : "#000", // Màu nhãn Form
             },
         },
     };
@@ -705,76 +735,101 @@ const BHDetailAdmin = () => {
                                 <h2 className="text-3xl font-bold mb-4 mt-10">{t("boardingHouseDetailsAdmin.address")}</h2>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div className="flex flex-col h-full">
-                                        <Form.Item label={t("boardingHouseDetailsAdmin.selectProvince")} required
-                                            rules={[
-                                                { required: true, message: "Province is required" },
-                                            ]} className="mb-4">
+                                        {/* Province */}
+                                        <Form.Item
+                                            label={t("boardingHouseDetailsAdmin.selectProvince")}
+                                            required
+                                            rules={[{ required: true, message: t("boardingHouseDetailsAdmin.validation.selectProvince") }]}
+                                            className="mb-4"
+                                        >
                                             <Select
                                                 placeholder={t("boardingHouseDetailsAdmin.selectProvince")}
-                                                value={updatedData?.address?.province || null}
-                                                onChange={(value) => {
-                                                    handleInputChange({
-                                                        target: { name: "address.province", value },
-                                                    });
-                                                    setUpdatedData((prev) => ({
-                                                        ...prev,
-                                                        address: {
-                                                            ...prev.address,
-                                                            province: value,
-                                                            district: null,
-                                                            ward: null,
-                                                        },
-                                                    }));
+                                                value={updatedData?.address?.province?.id || null}
+                                                onChange={(id) => {
+                                                    const selected = provinces.find((p) => p.id === id);
+                                                    if (selected) {
+                                                        const fullProvince = {
+                                                            id: selected.id,
+                                                            name: selected.name,
+                                                            name_en: selected.name_en,
+                                                        };
+
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "address.province",
+                                                                value: fullProvince,
+                                                            },
+                                                        });
+
+                                                        setUpdatedData((prev) => ({
+                                                            ...prev,
+                                                            address: {
+                                                                ...prev.address,
+                                                                province: fullProvince,
+                                                                district: null,
+                                                                ward: null,
+                                                            },
+                                                        }));
+
+                                                        fetchDistricts(selected.id).then(setDistricts);
+                                                    }
                                                 }}
+
                                                 allowClear
                                             >
                                                 {provinces.map((province) => (
-                                                    <Select.Option
-                                                        key={province.code}
-                                                        value={province.name}
-                                                    >
-                                                        {province.name}
-                                                    </Select.Option>
+                                                    <Option key={province.id} value={province.id}>
+                                                        {currentLanguage === "vi" ? province.name : province.name_en}
+                                                    </Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
+
                                         {/* District */}
                                         <Form.Item
                                             label={t("boardingHouseDetailsAdmin.selectDistrict")}
                                             required
-                                            rules={[
-                                                { required: true, message: "District is required" },
-                                            ]}
+                                            rules={[{ required: true, message: t("boardingHouseDetailsAdmin.validation.selectDistrict") }]}
                                         >
                                             <Select
-                                                placeholder="Select District"
-                                                loading={
-                                                    !districts.length && updatedData?.address?.province
-                                                }
-                                                value={updatedData?.address?.district || null}
-                                                onChange={(value) => {
-                                                    handleInputChange({
-                                                        target: { name: "address.district", value },
-                                                    });
-                                                    setUpdatedData((prev) => ({
-                                                        ...prev,
-                                                        address: {
-                                                            ...prev.address,
-                                                            district: value,
-                                                            ward: null,
-                                                        },
-                                                    }));
+                                                placeholder={t("boardingHouseDetailsAdmin.selectDistrict")}
+                                                value={updatedData?.address?.district?.id || null}
+                                                onChange={(id) => {
+                                                    const selected = districts.find((d) => d.id === id);
+                                                    if (selected) {
+                                                        const fullDistrict = {
+                                                            id: selected.id,
+                                                            name: selected.name,
+                                                            name_en: selected.name_en,
+                                                        };
+
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "address.district",
+                                                                value: fullDistrict,
+                                                            },
+                                                        });
+
+                                                        setUpdatedData((prev) => ({
+                                                            ...prev,
+                                                            address: {
+                                                                ...prev.address,
+                                                                district: fullDistrict,
+                                                                ward: null,
+                                                            },
+                                                        }));
+
+                                                        fetchWards(selected.id).then(setWards);
+                                                    }
                                                 }}
+
                                                 disabled={!updatedData?.address?.province}
                                                 allowClear
                                             >
                                                 {districts.map((district) => (
-                                                    <Select.Option
-                                                        key={district.code}
-                                                        value={district.name}
-                                                    >
-                                                        {district.name}
-                                                    </Select.Option>
+                                                    <Option key={district.id} value={district.id}>
+                                                        {currentLanguage === "vi" ? district.name : district.name_en}
+                                                    </Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
@@ -782,35 +837,49 @@ const BHDetailAdmin = () => {
                                         {/* Ward */}
                                         <Form.Item
                                             label={t("boardingHouseDetailsAdmin.selectWard")}
-
                                             required
-                                            rules={[{ required: true, message: "Ward is required" }]}
+                                            rules={[{ required: true, message: t("boardingHouseDetailsAdmin.validation.selectWard") }]}
                                         >
                                             <Select
-                                                placeholder="Select Ward"
-                                                loading={
-                                                    !wards.length && updatedData?.address?.district
-                                                }
-                                                value={updatedData?.address?.ward || null}
-                                                onChange={(value) => {
-                                                    handleInputChange({
-                                                        target: { name: "address.ward", value },
-                                                    });
-                                                    setUpdatedData((prev) => ({
-                                                        ...prev,
-                                                        address: { ...prev.address, ward: value },
-                                                    }));
+                                                placeholder={t("boardingHouseDetailsAdmin.selectWard")}
+                                                value={updatedData?.address?.ward?.id || null}
+                                                onChange={(id) => {
+                                                    const selected = wards.find((w) => w.id === id);
+                                                    if (selected) {
+                                                        const fullWard = {
+                                                            id: selected.id,
+                                                            name: selected.name,
+                                                            name_en: selected.name_en,
+                                                        };
+
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "address.ward",
+                                                                value: fullWard,
+                                                            },
+                                                        });
+
+                                                        setUpdatedData((prev) => ({
+                                                            ...prev,
+                                                            address: {
+                                                                ...prev.address,
+                                                                ward: fullWard,
+                                                            },
+                                                        }));
+                                                    }
                                                 }}
+
                                                 disabled={!updatedData?.address?.district}
                                                 allowClear
                                             >
                                                 {wards.map((ward) => (
-                                                    <Select.Option key={ward.code} value={ward.name}>
-                                                        {ward.name}
-                                                    </Select.Option>
+                                                    <Option key={ward.id} value={ward.id}>
+                                                        {currentLanguage === "vi" ? ward.name : ward.name_en}
+                                                    </Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
+
 
                                         {/* Detail Address */}
                                         <Form.Item label={t("boardingHouseDetailsAdmin.detail")}
@@ -824,11 +893,7 @@ const BHDetailAdmin = () => {
                                                 value={updatedData?.address?.detail || ""}
                                                 onChange={handleInputChange}
                                                 rows={4}
-                                                style={{
-                                                    backgroundColor: darkMode ? "#374151" : "#f5f5f5",
-                                                    color: darkMode ? "#F9FAFB" : "#000",
-                                                    borderColor: darkMode ? "#4B5563" : "#d9d9d9",
-                                                }}
+
                                             />
                                         </Form.Item>
                                     </div>

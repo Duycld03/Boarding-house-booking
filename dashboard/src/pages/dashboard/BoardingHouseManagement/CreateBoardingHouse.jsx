@@ -19,6 +19,8 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/themeContext";
 import coverBhType from "@/utils/coverBhType";
 import i18n from "i18next";
+import classNames from 'classnames';
+
 function AddBoardingHouseForm({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     owner: "",
@@ -51,6 +53,8 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
   const { darkMode } = useTheme();
   const { t } = useTranslation("addBoardingHouseAdmin");
   const currentLanguage = i18n.language;
+  const cx = classNames;
+  const lang = i18n.language || 'vi';
 
   const uploadOtherImgProps = {
     beforeUpload: (file) => {
@@ -84,13 +88,12 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
         const provincesData = await fetchProvinces();
         setProvinces(provincesData);
 
-        // Nếu đã chọn tỉnh, fetch districts
         if (formData?.address?.province) {
           const selectedProvince = provincesData.find(
             (p) => p.name === formData.address.province
           );
           if (selectedProvince) {
-            const districtsData = await fetchDistricts(selectedProvince.code);
+            const districtsData = await fetchDistricts(selectedProvince.id);
             setDistricts(districtsData);
             setWards([]);
             // Nếu đã chọn quận, fetch wards
@@ -99,7 +102,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                 (d) => d.name === formData.address.district
               );
               if (selectedDistrict) {
-                const wardsData = await fetchWards(selectedDistrict.code);
+                const wardsData = await fetchWards(selectedDistrict.id);
                 setWards(wardsData);
               }
             }
@@ -132,7 +135,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
       setBoardingHouseTypes(response.data || []);
     } catch (error) {
       console.error("Failed to fetch boarding house types:", error);
-      toast.error("Failed to fetch boarding house types.");
+      toast.error(t("errors.fetchBoardingHouseTypesFailed"));
     }
   };
 
@@ -300,14 +303,77 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
       onClose(); // Close the form
     } catch (error) {
       console.error("Failed to create boarding house:", error);
+      // toast.error(
+      //   error.response?.data?.message || "Failed to create boarding house."
+      // );
       toast.error(
-        error.response?.data?.message || "Failed to create boarding house."
+        t("errors.createFailed")
       );
     } finally {
       setGeoLocation(null); // Reset location
       setLoading(false);
     }
   };
+  const handleProvinceChange = async (provinceId) => {
+    const selectedProvince = provinces.find((p) => p.id === provinceId);
+    if (selectedProvince) {
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          province: {
+            id: selectedProvince.id,
+            name: selectedProvince.name,
+            name_en: selectedProvince.name_en,
+          },
+          district: "",
+          ward: "",
+        },
+      }));
+      const districtsData = await fetchDistricts(provinceId);
+      setDistricts(districtsData);
+      setWards([]);
+    }
+  };
+
+  const handleDistrictChange = async (districtId) => {
+    const selectedDistrict = districts.find((d) => d.id === districtId);
+    if (selectedDistrict) {
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          district: {
+            id: selectedDistrict.id,
+            name: selectedDistrict.name,
+            name_en: selectedDistrict.name_en,
+          },
+          ward: "",
+        },
+      }));
+      const wardsData = await fetchWards(districtId);
+      setWards(wardsData);
+    }
+  };
+
+  const handleWardChange = (wardId) => {
+    const selectedWard = wards.find((w) => w.id === wardId);
+    if (selectedWard) {
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          ward: {
+            id: selectedWard.id,
+            name: selectedWard.name,
+            name_en: selectedWard.name_en,
+          },
+        },
+      }));
+    }
+  };
+
+
   const themeConfig = {
     algorithm: darkMode
       ? ConfigProvider.darkAlgorithm
@@ -346,15 +412,15 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
     components: {
       // Cấu hình cho Select
       Select: {
-        selectorBg: darkMode ? "#374151" : "#f5f5f5", // Nền của Select
+        selectorBg: darkMode ? "#374151" : "#FFFFFF", // Nền của Select
         colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Select
         colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
         optionSelectedBg: darkMode ? "#2563eb" : "#e5e7eb", // Nền khi được chọn
-        optionHoverBg: darkMode ? "#4B5563" : "#f0f0f0", // Nền khi hover
+        optionHoverBg: darkMode ? "#4B5563" : "#FFFFFF", // Nền khi hover
       },
       // Cấu hình cho Input
       Input: {
-        colorBgContainer: darkMode ? "#374151" : "#f5f5f5", // Nền Input
+        colorBgContainer: darkMode ? "#374151" : "#FFFFFF", // Nền Input
         colorText: darkMode ? "#F9FAFB" : "#000", // Văn bản trong Input
         colorBorder: darkMode ? "#4B5563" : "#d9d9d9", // Viền
         colorTextPlaceholder: darkMode ? "#9CA3AF" : "#4B5563", // Placeholder
@@ -500,14 +566,14 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             provinces={provinces}
             districts={districts}
             wards={wards}
-            onProvinceChange={handleInputChange}
-            onDistrictChange={handleInputChange}
+            onProvinceChange={handleProvinceChange}
+            onDistrictChange={handleDistrictChange}
+            onWardChange={handleWardChange}
             onInputChange={handleInputChange}
             formData={formData}
-            location={geoLocation}
-            initialPosition={formData?.location}
-            setGeoLocation={setGeoLocation}
           />
+
+
 
           {/* Hình ảnh */}
           <h2
@@ -526,15 +592,17 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                   className="custom-upload w-full max-w-lg"
                 >
                   <div
-                    className={`flex flex-col items-center justify-center border ${darkMode
-                      ? "border-gray-600 hover:bg-gray-700"
-                      : "border-gray-300 hover:bg-gray-50"
-                      } rounded-lg p-6 transition`}
+                    className={cx(
+                      'flex flex-col items-center justify-center border border-dashed rounded-lg p-6 transition',
+                      {
+                        'border-gray-300 hover:border-blue-500 hover:bg-gray-50 text-gray-500':
+                          !darkMode,
+                        'border-gray-600 hover:border-blue-600 hover:bg-gray-700 text-white':
+                          darkMode,
+                      }
+                    )}
                   >
-                    <PlusOutlined
-                      className={`text-2xl ${darkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
-                    />
+                    <PlusOutlined className="text-2xl" />
                     <p
                       className={`mt-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-500"
                         }`}
@@ -560,14 +628,14 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     style={{
                       width: "100%",
                       height: "auto",
-                      maxHeight: "300px",
+                      maxHeight: "298px",
                     }}
                     preview={{
                       mask: (
                         <span
                           className={`text-white bg-opacity-50 bg-black p-1`}
                         >
-                          Preview
+                          {t("addBoardingHouseAdmin.preview")}
                         </span>
                       ),
                     }}
@@ -584,7 +652,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
             </div>
           </Form.Item>
           {/* Other Images */}
-          <Form.Item label={<span>Other Images</span>} className="mb-4">
+          <Form.Item label={<span>{t("otherImagesLabel")}</span>} className="mb-4">
             <div className="mt-4 flex flex-wrap gap-4">
               {formData.otherImages.map((file, index) => (
                 <div key={index} className="relative">
@@ -596,7 +664,7 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                     width={100}
                     height={100}
                     preview={{
-                      mask: <span>Preview</span>,
+                      mask: <span>{t("addBoardingHouseAdmin.preview")}</span>,
                     }}
                   />
                   {/* Nút delete */}
@@ -620,10 +688,10 @@ function AddBoardingHouseForm({ onClose, onSuccess }) {
                 <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
                   <PlusOutlined className="text-2xl text-gray-400" />
                   <p className="text-gray-500 mt-2 text-sm font-medium">
-                    Add Images
+                    {t("addBoardingHouseAdmin.addOtherImages")}
                   </p>
                   <p className="text-gray-400 text-xs">
-                    Drag-drop or click here to choose a file
+                    {t("addBoardingHouseAdmin.dragDrop")}
                   </p>
                 </div>
               </Upload>

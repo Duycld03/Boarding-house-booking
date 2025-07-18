@@ -1,0 +1,52 @@
+{
+  "title": "Quản lý Doanh thu",
+  "tabs": {
+    "monthly": "Tháng",
+    "yearly": "Năm"
+  },
+  "filters": {
+    "month": "Tháng",
+    "year": "Năm"
+  },
+  "months": {
+    "january": "Tháng 1",
+    "february": "Tháng 2",
+    "march": "Tháng 3",
+    "april": "Tháng 4",
+    "may": "Tháng 5",
+    "june": "Tháng 6",
+    "july": "Tháng 7",
+    "august": "Tháng 8",
+    "september": "Tháng 9",
+    "october": "Tháng 10",
+    "november": "Tháng 11",
+    "december": "Tháng 12"
+  },
+  "monthlyView": {
+    "title": "Báo cáo Doanh thu Tháng",
+    "totalRevenue": "Tổng Doanh thu",
+    "netProfit": "Lợi nhuận Ròng",
+    "utilityExpenses": "Chi phí Tiện ích",
+    "otherExpenses": "Chi phí Khác",
+    "expenseAllocation": "Phân bổ Chi phí",
+    "noData": "Không có dữ liệu doanh thu cho tháng này."
+  },
+  "yearlyView": {
+    "title": "Báo cáo Doanh thu Năm",
+    "totalAnnualRevenue": "Tổng Doanh thu Năm",
+    "averageRevenue": "Doanh thu Trung bình",
+    "totalProfit": "Tổng Lợi nhuận",
+    "profitMargin": "Tỷ lệ Lợi nhuận",
+    "monthlyRevenue": "Doanh thu Tháng",
+    "monthlyExpenses": "Chi phí Tháng",
+    "electricityWater": "Điện & Nước",
+    "otherCosts": "Chi phí Khác",
+    "revenue": "Doanh thu",
+    "profit": "Lợi nhuận"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "noData": "Không có dữ liệu",
+    "error": "Lỗi khi tải dữ liệu"
+  }
+}

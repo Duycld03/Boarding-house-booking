@@ -43,8 +43,13 @@ function ReviewManagement() {
     setIsOpenDetailModal(true);
     try {
       const res = await getReviewDetail(record._id);
-      if (res) {
-        setSelectedDetail(res);
+      if (res?.data?.review) {
+        // 👉 Gộp replies vào review để truyền xuống DetailModal
+        const reviewWithReplies = {
+          ...res.data.review,
+          replies: res.data.replies || [],
+        };
+        setSelectedDetail(reviewWithReplies);
       } else {
         toast.error(t("messages.detailFetchError"));
       }
@@ -137,7 +142,6 @@ function ReviewManagement() {
         throw new Error("Invalid response format");
       }
     } catch (error) {
-      console.error("❌ API error:", error);
       toast.error(t("messages.filterFetchError"));
       setData([]);
     } finally {
@@ -157,6 +161,7 @@ function ReviewManagement() {
   const handleDelete = async () => {
     try {
       const response = await deleteReview(selectedReview?._id);
+
       if (response) {
         setIsOpenDeleteModal(false);
         filterReview();
