@@ -62,43 +62,46 @@ class RoomController {
     }
   }
 
-  async getUnpaidRoomsByBoardingHouse(req, res) {
+  async getRoomsEligibleForBill(req, res) {
     try {
       const { boardingHouseId } = req.params;
-
-      if (!boardingHouseId) {
-        return res.status(400).json({ message: "boardingHouseId là bắt buộc" });
-      }
-
-      // Lấy thời gian tháng trước
       const now = new Date();
       const lastMonth = now.getMonth() === 0 ? 12 : now.getMonth();
       const lastYear =
         now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
 
-      // Lấy danh sách roomId đã thanh toán trong tháng trước thuộc boardingHouseId
+      if (!boardingHouseId) {
+        return res.status(400).json({ message: "boardingHouseId là bắt buộc" });
+      }
+
       const paidRooms = await PaymentBill.find({
-        month: lastMonth.toString(),
-        year: lastYear.toString(),
+        month: lastMonth,
+        year: lastYear,
         status: { $regex: /^paid$/i },
       }).distinct("roomId");
 
-      // Lọc danh sách phòng chưa thanh toán theo boardingHouseId
-      const unpaidRooms = await Room.find({
-        _id: { $nin: paidRooms },
+      const validDeposits = await DepositRoom.find({
+        status: { $regex: /^confirmed$/i },
+        startDate: { $lte: now },
+        endDate: { $gte: now },
+      }).select("roomId");
+
+      const validRoomIds = validDeposits.map((d) => d.roomId.toString());
+
+      const eligibleRooms = await Room.find({
+        _id: { $in: validRoomIds, $nin: paidRooms },
         boardingHouseId: boardingHouseId,
       })
         .populate("roomTypeId")
         .sort({ roomNumber: 1 });
 
-      //   const roomNumbers = unpaidRooms.map((room) => room.roomNumber);
-
-      return res.status(200).json(unpaidRooms);
+      return res.status(200).json(eligibleRooms);
     } catch (error) {
-      console.error("Error fetching unpaid rooms:", error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Lỗi server", error });
+      console.error(
+        "Lỗi khi lấy danh sách phòng đủ điều kiện tạo bill:",
+        error
+      );
+      return res.status(500).json({ message: "Server error", error });
     }
   }
 
