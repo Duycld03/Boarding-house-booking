@@ -19,11 +19,6 @@ const CalculateRent = ({
   const { darkMode } = useTheme();
   const [form] = Form.useForm();
   const [additionalFees, setAdditionalFees] = useState([]);
-  const [electricalBill, setElectricalBill] = useState({
-    oldNumber: 0,
-    newNumber: 0,
-  });
-  const [waterBill, setWaterBill] = useState({ oldNumber: 0, newNumber: 0 });
   const [availableRooms, setAvailableRooms] = useState([]);
   const [selectRoom, setSelectRoom] = useState(null);
   const [roomPrice, setRoomPrice] = useState(0);
@@ -36,13 +31,11 @@ const CalculateRent = ({
   const [previousYear, setPreviousYear] = useState(null);
 
   // Use the useFormatAmount hook to get language-aware formatting functions
-  const { formatPrice, formatNumber } = useFormatAmount(i18n.language);
+  const { formatPrice } = useFormatAmount(i18n.language);
 
   const onClose = () => {
     setVisible(false);
     setAdditionalFees([]);
-    setElectricalBill({ oldNumber: 0, newNumber: 0 });
-    setWaterBill({ oldNumber: 0, newNumber: 0 });
     setSelectRoom(null);
     form.resetFields();
   };
@@ -50,32 +43,25 @@ const CalculateRent = ({
   const onOk = async () => {
     const values = form.getFieldsValue();
 
-    if (
-      values.roomNumber === undefined ||
-      electricalBill.newNumber === undefined ||
-      waterBill.newNumber === undefined ||
-      electricalBill.oldNumber === undefined ||
-      waterBill.oldNumber === undefined
-    ) {
+    if (values.roomNumber === undefined) {
       toast.error(t("fillAllFields"));
       return;
     }
 
-    if (
-      electricalBill.oldNumber < 0 ||
-      electricalBill.newNumber < 0 ||
-      waterBill.oldNumber < 0 ||
-      waterBill.newNumber < 0
-    ) {
-      toast.error(t("noNegativeNumbers"));
+    // Check if room has current utility readings
+    const selectedRoom = availableRooms.find((room) => room._id === selectRoom);
+    if (!selectedRoom) {
+      toast.error(t("roomNotFound"));
       return;
     }
 
     if (
-      electricalBill.newNumber < electricalBill.oldNumber ||
-      waterBill.newNumber < waterBill.oldNumber
+      selectedRoom.currentElectricityReading === undefined ||
+      selectedRoom.currentElectricityReading === null ||
+      selectedRoom.currentWaterReading === undefined ||
+      selectedRoom.currentWaterReading === null
     ) {
-      toast.error(t("newGreaterThanOld"));
+      toast.error(t("pleaseUpdateUtilityReadings"));
       return;
     }
 
@@ -88,20 +74,6 @@ const CalculateRent = ({
     const payload = {
       roomId: selectRoom,
       paymentAmount: totalAmount,
-      electricalBill: {
-        oldNumber: electricalBill.oldNumber,
-        newNumber: electricalBill.newNumber,
-        quantityConsumed: electricalBill.newNumber - electricalBill.oldNumber,
-        totalAmount: calculateElectricalPrice(),
-        price: electricalBillPrice,
-      },
-      waterBill: {
-        oldNumber: waterBill.oldNumber,
-        newNumber: waterBill.newNumber,
-        quantityConsumed: waterBill.newNumber - waterBill.oldNumber,
-        totalAmount: calculateWaterPrice(),
-        price: waterBillPrice,
-      },
       additionalFee: formattedFees,
     };
 
@@ -150,15 +122,29 @@ const CalculateRent = ({
     }
   };
 
-  const calculateElectricalPrice = () =>
-    Math.max(
-      (electricalBill.newNumber - electricalBill.oldNumber) *
-        electricalBillPrice,
-      0
-    );
+  const calculateElectricalPrice = () => {
+    const selectedRoom = availableRooms.find((room) => room._id === selectRoom);
+    if (!selectedRoom) return 0;
 
-  const calculateWaterPrice = () =>
-    Math.max((waterBill.newNumber - waterBill.oldNumber) * waterBillPrice, 0);
+    const consumption = Math.max(
+      0,
+      (selectedRoom.currentElectricityReading || 0) -
+        (selectedRoom.previousElectricityReading || 0)
+    );
+    return consumption * electricalBillPrice;
+  };
+
+  const calculateWaterPrice = () => {
+    const selectedRoom = availableRooms.find((room) => room._id === selectRoom);
+    if (!selectedRoom) return 0;
+
+    const consumption = Math.max(
+      0,
+      (selectedRoom.currentWaterReading || 0) -
+        (selectedRoom.previousWaterReading || 0)
+    );
+    return consumption * waterBillPrice;
+  };
 
   const calculateTotalAmount = () => {
     const additionalFeesTotal = additionalFees.reduce((sum, fee) => {
@@ -179,11 +165,11 @@ const CalculateRent = ({
     setTotalAmount(total);
   }, [
     roomPrice,
-    electricalBill,
-    waterBill,
+    selectRoom,
     electricalBillPrice,
     waterBillPrice,
     additionalFees,
+    availableRooms,
   ]);
 
   const fetchAvailableRooms = async () => {
@@ -220,22 +206,14 @@ const CalculateRent = ({
       );
 
       if (selectedRoom) {
-        // Set room price and readings
-        setRoomPrice(selectedRoom?.roomTypeId?.price);
-        setElectricalBill({
-          oldNumber: selectedRoom.previousElectricityReading,
-          newNumber: 0,
-        });
-        setWaterBill({
-          oldNumber: selectedRoom.previousWaterReading,
-          newNumber: 0,
-        });
+        // Set room price from room type
+        setRoomPrice(selectedRoom?.roomTypeId?.price || 0);
 
         // Fetch additional fees for this room
         fetchAdditionalFees(selectRoom);
       }
     }
-  }, [selectRoom]);
+  }, [selectRoom, availableRooms]);
 
   const handleRoomChange = (value) => {
     setSelectRoom(value);
@@ -345,127 +323,146 @@ const CalculateRent = ({
         existingStyle.remove();
       }
 
-      if (visible && darkMode) {
-        // Create style element for dark mode styles
+      if (visible) {
+        // Create style element for both dark and light mode styles
         const style = document.createElement("style");
         style.id = "calculate-rent-styles";
-        style.innerHTML = `
-          .ant-modal-content {
-            background-color: #1f2937 !important;
-            border-color: #374151 !important;
-          }
-          
-          .ant-modal-header {
-            background-color: #1f2937 !important;
-            border-bottom-color: #374151 !important;
-          }
-          
-          .ant-modal-title {
-            color: #f9fafb !important;
-          }
-          
-          .ant-modal-close {
-            color: #f9fafb !important;
-          }
-          
-          .ant-modal-close:hover {
-            color: #e5e7eb !important;
-            background-color: #374151 !important;
-          }
-          
-          .ant-modal-body {
-            background-color: #1f2937 !important;
-          }
-          
-          .ant-form-item-label > label {
-            color: #f9fafb !important;
-          }
-          
-          .ant-select-selector {
-            background-color: #374151 !important;
-            color: #f9fafb !important;
-            border-color: #4b5563 !important;
-          }
-          
-          .ant-select-selection-placeholder {
-            color: #9ca3af !important;
-          }
-          
-          .ant-select-arrow {
-            color: #f9fafb !important;
-          }
-          
-          .ant-input {
-            background-color: #374151 !important;
-            color: #f9fafb !important;
-            border-color: #4b5563 !important;
-          }
-          
-          .ant-input:hover {
-            border-color: #3b82f6 !important;
-          }
-          
-          .ant-input:focus {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-          }
-          
-          .ant-input-group-addon {
-            background-color: #4b5563 !important;
-            color: #f9fafb !important;
-            border-color: #4b5563 !important;
-          }
-          
-          .ant-table {
-            background-color: #1f2937 !important;
-          }
-          
-          .ant-table-thead > tr > th {
-            background-color: #374151 !important;
-            color: #f9fafb !important;
-            border-color: #4b5563 !important;
-          }
-          
-          .ant-table-tbody > tr > td {
-            background-color: #1f2937 !important;
-            color: #f9fafb !important;
-            border-color: #4b5563 !important;
-          }
-          
-          .ant-table-tbody > tr:hover > td {
-            background-color: #374151 !important;
-          }
-          
-          .ant-empty-description {
-            color: #9ca3af !important;
-          }
-          
-          .ant-btn-default {
-            background-color: #374151 !important;
-            border-color: #4b5563 !important;
-            color: #f9fafb !important;
-          }
-          
-          .ant-btn-default:hover {
-            background-color: #4b5563 !important;
-            border-color: #6b7280 !important;
-            color: #f9fafb !important;
-          }
-          
-          .ant-btn-primary {
-            background-color: #3b82f6 !important;
-            border-color: #3b82f6 !important;
-          }
-          
-          .ant-btn-primary:hover {
-            background-color: #2563eb !important;
-            border-color: #2563eb !important;
-          }
-          
-          .ant-spin-dot-item {
-            background-color: #3b82f6 !important;
-          }
-        `;
+
+        if (darkMode) {
+          style.innerHTML = `
+            .ant-modal-content {
+              background-color: #1f2937 !important;
+              border-color: #374151 !important;
+              max-height: 90vh !important;
+            }
+            
+            .ant-modal-body {
+              background-color: #1f2937 !important;
+              max-height: 70vh !important;
+              overflow-y: auto !important;
+              padding: 16px !important;
+            }
+            
+            .ant-modal-header {
+              background-color: #1f2937 !important;
+              border-bottom-color: #374151 !important;
+            }
+            
+            .ant-modal-title {
+              color: #f9fafb !important;
+            }
+            
+            .ant-modal-close {
+              color: #f9fafb !important;
+            }
+            
+            .ant-modal-close:hover {
+              color: #e5e7eb !important;
+              background-color: #374151 !important;
+            }
+            
+            .ant-form-item-label > label {
+              color: #f9fafb !important;
+            }
+            
+            .ant-select-selector {
+              background-color: #374151 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .ant-select-selection-placeholder {
+              color: #9ca3af !important;
+            }
+            
+            .ant-select-arrow {
+              color: #f9fafb !important;
+            }
+            
+            .ant-input {
+              background-color: #374151 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .ant-input:hover {
+              border-color: #3b82f6 !important;
+            }
+            
+            .ant-input:focus {
+              border-color: #3b82f6 !important;
+              box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+            }
+            
+            .ant-input-group-addon {
+              background-color: #4b5563 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .ant-table {
+              background-color: #1f2937 !important;
+            }
+            
+            .ant-table-thead > tr > th {
+              background-color: #374151 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .ant-table-tbody > tr > td {
+              background-color: #1f2937 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .ant-table-tbody > tr:hover > td {
+              background-color: #374151 !important;
+            }
+            
+            .ant-empty-description {
+              color: #9ca3af !important;
+            }
+            
+            .ant-btn-default {
+              background-color: #374151 !important;
+              border-color: #4b5563 !important;
+              color: #f9fafb !important;
+            }
+            
+            .ant-btn-default:hover {
+              background-color: #4b5563 !important;
+              border-color: #6b7280 !important;
+              color: #f9fafb !important;
+            }
+            
+            .ant-btn-primary {
+              background-color: #3b82f6 !important;
+              border-color: #3b82f6 !important;
+            }
+            
+            .ant-btn-primary:hover {
+              background-color: #2563eb !important;
+              border-color: #2563eb !important;
+            }
+            
+            .ant-spin-dot-item {
+              background-color: #3b82f6 !important;
+            }
+          `;
+        } else {
+          // Light mode styles - chỉ cần kiểm soát scroll
+          style.innerHTML = `
+            .ant-modal-content {
+              max-height: 90vh !important;
+            }
+            
+            .ant-modal-body {
+              max-height: 70vh !important;
+              overflow-y: auto !important;
+            }
+          `;
+        }
         document.head.appendChild(style);
       }
     };
@@ -497,7 +494,16 @@ const CalculateRent = ({
       confirmLoading={loading}
       destroyOnClose
       width={700}
-      bodyStyle={styles.modalBodyStyle}
+      centered
+      style={{
+        maxHeight: "90vh",
+      }}
+      bodyStyle={{
+        ...styles.modalBodyStyle,
+        maxHeight: "70vh",
+        overflowY: "auto",
+        padding: "16px",
+      }}
       headerStyle={styles.modalHeaderStyle}
       className={darkMode ? "dark-calculate-rent-modal" : ""}
       okButtonProps={{
@@ -534,120 +540,182 @@ const CalculateRent = ({
           </Select>
         </Form.Item>
 
+        {/* Utility Readings Information */}
+        {selectRoom && (
+          <div
+            style={{
+              marginBottom: "16px",
+              padding: "12px",
+              backgroundColor: darkMode ? "#1e40af" : "#dbeafe",
+              borderRadius: "6px",
+              fontSize: "13px",
+              color: darkMode ? "#bfdbfe" : "#1e40af",
+            }}
+          >
+            <strong>ℹ️ {t("utilityReadingsNote")}</strong>
+            <br />
+            {t("utilityReadingsDescription")}
+          </div>
+        )}
+
         <Form.Item label={t("electricalBill")}>
-          <Input.Group compact>
-            <Input
-              style={{
-                width: "48%",
-                marginRight: "4%",
-                ...styles.inputStyle,
-              }}
-              placeholder={t("oldNumber")}
-              type="number"
-              value={electricalBill.oldNumber}
-              onChange={(e) =>
-                setElectricalBill({
-                  ...electricalBill,
-                  oldNumber: Number(e.target.value),
-                })
-              }
-              addonBefore={
-                <span
-                  style={
-                    darkMode
-                      ? { color: "#f9fafb", backgroundColor: "#4b5563" }
-                      : {}
-                  }
-                >
-                  {t("old")}
-                </span>
-              }
-            />
-            <Input
-              style={{
-                width: "48%",
-                ...styles.inputStyle,
-              }}
-              placeholder={t("newNumber")}
-              type="number"
-              value={electricalBill.newNumber}
-              onChange={(e) =>
-                setElectricalBill({
-                  ...electricalBill,
-                  newNumber: Number(e.target.value),
-                })
-              }
-              addonBefore={
-                <span
-                  style={
-                    darkMode
-                      ? { color: "#f9fafb", backgroundColor: "#4b5563" }
-                      : {}
-                  }
-                >
-                  {t("new")}
-                </span>
-              }
-            />
-          </Input.Group>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "4px",
+                  fontSize: "12px",
+                  color: darkMode ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                {t("previousReading")}
+              </label>
+              <Input
+                style={styles.readOnlyStyle}
+                value={
+                  selectRoom
+                    ? (
+                        availableRooms.find((r) => r._id === selectRoom)
+                          ?.previousElectricityReading || 0
+                      ).toString()
+                    : "0"
+                }
+                readOnly
+                addonAfter="kWh"
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "4px",
+                  fontSize: "12px",
+                  color: darkMode ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                {t("currentReading")}
+              </label>
+              <Input
+                style={styles.readOnlyStyle}
+                value={
+                  selectRoom
+                    ? (
+                        availableRooms.find((r) => r._id === selectRoom)
+                          ?.currentElectricityReading || 0
+                      ).toString()
+                    : "0"
+                }
+                readOnly
+                addonAfter="kWh"
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              marginTop: "8px",
+              padding: "8px",
+              backgroundColor: darkMode ? "#374151" : "#f3f4f6",
+              borderRadius: "4px",
+              fontSize: "14px",
+              color: darkMode ? "#f9fafb" : "#374151",
+            }}
+          >
+            <strong>{t("consumption")}: </strong>
+            {selectRoom
+              ? Math.max(
+                  0,
+                  (availableRooms.find((r) => r._id === selectRoom)
+                    ?.currentElectricityReading || 0) -
+                    (availableRooms.find((r) => r._id === selectRoom)
+                      ?.previousElectricityReading || 0)
+                ).toString() + " kWh"
+              : "0 kWh"}
+            <span style={{ marginLeft: "16px" }}>
+              <strong>{t("amount")}: </strong>
+              {formatPrice(calculateElectricalPrice())}
+            </span>
+          </div>
         </Form.Item>
 
         <Form.Item label={t("waterBill")}>
-          <Input.Group compact>
-            <Input
-              style={{
-                width: "48%",
-                marginRight: "4%",
-                ...styles.inputStyle,
-              }}
-              placeholder={t("oldNumber")}
-              type="number"
-              value={waterBill.oldNumber}
-              onChange={(e) =>
-                setWaterBill({
-                  ...waterBill,
-                  oldNumber: Number(e.target.value),
-                })
-              }
-              addonBefore={
-                <span
-                  style={
-                    darkMode
-                      ? { color: "#f9fafb", backgroundColor: "#4b5563" }
-                      : {}
-                  }
-                >
-                  {t("old")}
-                </span>
-              }
-            />
-            <Input
-              style={{
-                width: "48%",
-                ...styles.inputStyle,
-              }}
-              placeholder={t("newNumber")}
-              type="number"
-              value={waterBill.newNumber}
-              onChange={(e) =>
-                setWaterBill({
-                  ...waterBill,
-                  newNumber: Number(e.target.value),
-                })
-              }
-              addonBefore={
-                <span
-                  style={
-                    darkMode
-                      ? { color: "#f9fafb", backgroundColor: "#4b5563" }
-                      : {}
-                  }
-                >
-                  {t("new")}
-                </span>
-              }
-            />
-          </Input.Group>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "4px",
+                  fontSize: "12px",
+                  color: darkMode ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                {t("previousReading")}
+              </label>
+              <Input
+                style={styles.readOnlyStyle}
+                value={
+                  selectRoom
+                    ? (
+                        availableRooms.find((r) => r._id === selectRoom)
+                          ?.previousWaterReading || 0
+                      ).toString()
+                    : "0"
+                }
+                readOnly
+                addonAfter="m³"
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "4px",
+                  fontSize: "12px",
+                  color: darkMode ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                {t("currentReading")}
+              </label>
+              <Input
+                style={styles.readOnlyStyle}
+                value={
+                  selectRoom
+                    ? (
+                        availableRooms.find((r) => r._id === selectRoom)
+                          ?.currentWaterReading || 0
+                      ).toString()
+                    : "0"
+                }
+                readOnly
+                addonAfter="m³"
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              marginTop: "8px",
+              padding: "8px",
+              backgroundColor: darkMode ? "#374151" : "#f3f4f6",
+              borderRadius: "4px",
+              fontSize: "14px",
+              color: darkMode ? "#f9fafb" : "#374151",
+            }}
+          >
+            <strong>{t("consumption")}: </strong>
+            {selectRoom
+              ? Math.max(
+                  0,
+                  (availableRooms.find((r) => r._id === selectRoom)
+                    ?.currentWaterReading || 0) -
+                    (availableRooms.find((r) => r._id === selectRoom)
+                      ?.previousWaterReading || 0)
+                ).toString() + " m³"
+              : "0 m³"}
+            <span style={{ marginLeft: "16px" }}>
+              <strong>{t("amount")}: </strong>
+              {formatPrice(calculateWaterPrice())}
+            </span>
+          </div>
         </Form.Item>
 
         {/* Additional Fees Section */}

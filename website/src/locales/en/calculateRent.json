@@ -23,5 +23,12 @@
   "noNegativeNumbers": "Numbers must not be negative.",
   "newGreaterThanOld": "New number must be greater than or equal to old number.",
   "calculationSuccess": "Calculation completed successfully!",
-  "calculationError": "An error occurred during calculation."
+  "calculationError": "An error occurred during calculation.",
+  "previousReading": "Previous Reading",
+  "currentReading": "Current Reading",
+  "consumption": "Consumption",
+  "utilityReadingsNote": "Utility Readings Information",
+  "utilityReadingsDescription": "Utility readings are taken from the data saved in the room. To update new readings, please go to Room Management section.",
+  "roomNotFound": "Room information not found.",
+  "pleaseUpdateUtilityReadings": "Please update the current utility readings for this room before calculating rent."
 }

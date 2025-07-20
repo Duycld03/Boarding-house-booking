@@ -23,5 +23,12 @@
   "noNegativeNumbers": "Số không được âm.",
   "newGreaterThanOld": "Số mới phải lớn hơn hoặc bằng số cũ.",
   "calculationSuccess": "Tính toán hoàn tất thành công!",
-  "calculationError": "Đã xảy ra lỗi trong quá trình tính toán."
+  "calculationError": "Đã xảy ra lỗi trong quá trình tính toán.",
+  "previousReading": "Chỉ Số Cũ",
+  "currentReading": "Chỉ Số Hiện Tại",
+  "consumption": "Mức Tiêu Thụ",
+  "utilityReadingsNote": "Thông tin chỉ số điện nước",
+  "utilityReadingsDescription": "Chỉ số điện nước được lấy từ dữ liệu đã lưu trong phòng. Để cập nhật chỉ số mới, vui lòng vào mục Quản lý phòng.",
+  "roomNotFound": "Không tìm thấy thông tin phòng.",
+  "pleaseUpdateUtilityReadings": "Vui lòng cập nhật chỉ số điện nước hiện tại cho phòng này trước khi tính tiền thuê."
 }

@@ -94,13 +94,7 @@ class PaymentBillController {
 
   async calculateMonthlyRoomRent(req, res) {
     try {
-      const {
-        roomId,
-        paymentAmount,
-        electricalBill,
-        waterBill,
-        additionalFees = [],
-      } = req.body;
+      const { roomId, paymentAmount, additionalFees = [] } = req.body;
 
       const now = new Date();
       const month = now.getMonth() === 0 ? 12 : now.getMonth();
@@ -114,31 +108,65 @@ class PaymentBillController {
           .json({ message: "This month's rent has been paid." });
       }
 
-      const room = await Room.findById(roomId).populate("rentBy");
+      const room = await Room.findById(roomId).populate("rentBy").populate({
+        path: "boardingHouseId",
+        select: "electricityPrice waterPrice",
+      });
       if (!room) {
         return res.status(404).json({ message: "Not found room" });
       }
+
+      // Get utility prices from boarding house
+      const electricityPrice = room.boardingHouseId?.electricityPrice || 0;
+      const waterPrice = room.boardingHouseId?.waterPrice || 0;
+
+      // Get utility readings from room
+      const electricalOldNumber = room.previousElectricityReading || 0;
+      const electricalNewNumber = room.currentElectricityReading || 0;
+      const waterOldNumber = room.previousWaterReading || 0;
+      const waterNewNumber = room.currentWaterReading || 0;
+
+      // Calculate consumption and costs
+      const electricalQuantityConsumed = Math.max(
+        0,
+        electricalNewNumber - electricalOldNumber
+      );
+      const waterQuantityConsumed = Math.max(
+        0,
+        waterNewNumber - waterOldNumber
+      );
+
+      const electricalTotalAmount =
+        electricalQuantityConsumed * electricityPrice;
+      const waterTotalAmount = waterQuantityConsumed * waterPrice;
+
+      // Update room utility readings - move current to previous for next billing cycle
+      room.previousElectricityReading = electricalNewNumber;
+      room.previousWaterReading = waterNewNumber;
+
+      // Save room with updated readings
+      await room.save();
 
       const additionalFee = additionalFees.map((fee) => {
         return { feeName: fee.name, feeAmount: fee.amount };
       });
 
-      // Tạo PaymentBill
+      // Tạo PaymentBill với dữ liệu từ room
       const newPaymentBill = await PaymentBill.create({
         roomId,
         paymentAmount,
         status: "pending",
         electricalBill: {
-          oldNumber: electricalBill.oldNumber,
-          newNumber: electricalBill.newNumber,
-          quantityConsumed: electricalBill.newNumber - electricalBill.oldNumber,
-          totalAmount: electricalBill.totalAmount,
+          oldNumber: electricalOldNumber,
+          newNumber: electricalNewNumber,
+          quantityConsumed: electricalQuantityConsumed,
+          totalAmount: electricalTotalAmount,
         },
         waterBill: {
-          oldNumber: waterBill.oldNumber,
-          newNumber: waterBill.newNumber,
-          quantityConsumed: waterBill.newNumber - waterBill.oldNumber,
-          totalAmount: waterBill.totalAmount,
+          oldNumber: waterOldNumber,
+          newNumber: waterNewNumber,
+          quantityConsumed: waterQuantityConsumed,
+          totalAmount: waterTotalAmount,
         },
         additionalFee: additionalFee,
         month,

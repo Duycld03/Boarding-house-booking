@@ -291,7 +291,16 @@ class RoomController {
   async updateRoom(req, res) {
     try {
       const { roomId } = req.params;
-      const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
+      const {
+        roomNumber,
+        boardingHouseId,
+        description,
+        roomTypeId,
+        previousElectricityReading,
+        previousWaterReading,
+        currentElectricityReading,
+        currentWaterReading,
+      } = req.body;
 
       if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
         return res.status(400).json({ message: "Missing required parameters" });
@@ -316,8 +325,30 @@ class RoomController {
 
       room.description = description;
       room.roomTypeId = roomTypeId;
-      // room.isAvailable = true;
-      // room.boardingHouseId = boardingHouseId;
+
+      // Update previous utility readings if provided
+      if (
+        previousElectricityReading !== undefined &&
+        previousElectricityReading !== null
+      ) {
+        room.previousElectricityReading = Number(previousElectricityReading);
+      }
+
+      if (previousWaterReading !== undefined && previousWaterReading !== null) {
+        room.previousWaterReading = Number(previousWaterReading);
+      }
+
+      // Update current utility readings if provided
+      if (
+        currentElectricityReading !== undefined &&
+        currentElectricityReading !== null
+      ) {
+        room.currentElectricityReading = Number(currentElectricityReading);
+      }
+
+      if (currentWaterReading !== undefined && currentWaterReading !== null) {
+        room.currentWaterReading = Number(currentWaterReading);
+      }
 
       if (req.file) {
         if (room?.images?.publicId) {
@@ -331,9 +362,9 @@ class RoomController {
       }
 
       await room.save();
-      res.status(201).json({ message: "Room added successfully" });
+      res.status(201).json({ message: "Room updated successfully" });
     } catch (error) {
-      console.error("Error adding room:", error);
+      console.error("Error updating room:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }

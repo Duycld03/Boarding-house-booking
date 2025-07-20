@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Upload, Select, Space, Row, Col, Typography } from "antd";
+import {
+  Form,
+  Input,
+  Upload,
+  Select,
+  Space,
+  Row,
+  Col,
+  Typography,
+  InputNumber,
+} from "antd";
 import { CameraOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import {
@@ -49,6 +59,38 @@ function UpdateRoomPage({
     formData.append("description", values.description);
     formData.append("roomTypeId", values.roomType);
     formData.append("Room", fileList[0].originFileObj);
+
+    // Add utility readings if they exist
+    if (
+      values.previousElectricityReading !== undefined &&
+      values.previousElectricityReading !== null
+    ) {
+      formData.append(
+        "previousElectricityReading",
+        values.previousElectricityReading
+      );
+    }
+    if (
+      values.previousWaterReading !== undefined &&
+      values.previousWaterReading !== null
+    ) {
+      formData.append("previousWaterReading", values.previousWaterReading);
+    }
+    if (
+      values.currentElectricityReading !== undefined &&
+      values.currentElectricityReading !== null
+    ) {
+      formData.append(
+        "currentElectricityReading",
+        values.currentElectricityReading
+      );
+    }
+    if (
+      values.currentWaterReading !== undefined &&
+      values.currentWaterReading !== null
+    ) {
+      formData.append("currentWaterReading", values.currentWaterReading);
+    }
 
     try {
       const res = await updateRoom(roomData._id, formData);
@@ -230,6 +272,11 @@ function UpdateRoomPage({
                   roomType: roomData.roomTypeId._id,
                   roomNumber: roomData.roomNumber,
                   description: roomData.description,
+                  previousElectricityReading:
+                    roomData.previousElectricityReading,
+                  previousWaterReading: roomData.previousWaterReading,
+                  currentElectricityReading: roomData.currentElectricityReading,
+                  currentWaterReading: roomData.currentWaterReading,
                 }
               }
             >
@@ -323,6 +370,223 @@ function UpdateRoomPage({
                     }`}
                   />
                 </Form.Item>
+
+                {/* Utility Readings Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Text strong className={`${getTextColor()} text-lg`}>
+                      {t("roomManagement.updateRoom.utilityReadings")}
+                    </Text>
+                  </div>
+
+                  {/* Electricity Readings */}
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        label={
+                          <div className="flex items-center gap-2">
+                            <Text className={`${getTextColor()}`}>
+                              {t(
+                                "roomManagement.updateRoom.previousElectricityReading"
+                              )}
+                            </Text>
+                          </div>
+                        }
+                        name="previousElectricityReading"
+                        rules={[
+                          {
+                            type: "number",
+                            min: 0,
+                            message: t(
+                              "roomManagement.updateRoom.previousElectricityValidation"
+                            ),
+                          },
+                        ]}
+                      >
+                        <InputNumber
+                          size="large"
+                          placeholder={t(
+                            "roomManagement.updateRoom.enterPreviousElectricityReading"
+                          )}
+                          className={`w-full rounded-lg ${
+                            darkMode
+                              ? "[&_.ant-input-number-input]:bg-gray-700 [&_.ant-input-number-input]:border-gray-600 [&_.ant-input-number-input]:text-gray-200"
+                              : ""
+                          }`}
+                          min={0}
+                          precision={0}
+                          formatter={(value) =>
+                            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                          }
+                          parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        label={
+                          <Text className={`${getTextColor()}`}>
+                            {t(
+                              "roomManagement.updateRoom.currentElectricityReading"
+                            )}
+                          </Text>
+                        }
+                        name="currentElectricityReading"
+                        rules={[
+                          {
+                            type: "number",
+                            min: 0,
+                            message: t(
+                              "roomManagement.updateRoom.currentElectricityValidation"
+                            ),
+                          },
+                          ({ getFieldValue }) => ({
+                            validator(_, value) {
+                              const previousReading = getFieldValue(
+                                "previousElectricityReading"
+                              );
+                              if (
+                                !value ||
+                                !previousReading ||
+                                value >= previousReading
+                              ) {
+                                return Promise.resolve();
+                              }
+                              return Promise.reject(
+                                new Error(
+                                  t(
+                                    "roomManagement.updateRoom.electricityReadingCompareValidation"
+                                  )
+                                )
+                              );
+                            },
+                          }),
+                        ]}
+                      >
+                        <InputNumber
+                          size="large"
+                          placeholder={t(
+                            "roomManagement.updateRoom.enterCurrentElectricityReading"
+                          )}
+                          className={`w-full rounded-lg ${
+                            darkMode
+                              ? "[&_.ant-input-number-input]:bg-gray-700 [&_.ant-input-number-input]:border-gray-600 [&_.ant-input-number-input]:text-gray-200"
+                              : ""
+                          }`}
+                          min={0}
+                          precision={0}
+                          formatter={(value) =>
+                            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                          }
+                          parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+
+                  {/* Water Readings */}
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        label={
+                          <div className="flex items-center gap-2">
+                            <Text className={`${getTextColor()}`}>
+                              {t(
+                                "roomManagement.updateRoom.previousWaterReading"
+                              )}
+                            </Text>
+                          </div>
+                        }
+                        name="previousWaterReading"
+                        rules={[
+                          {
+                            type: "number",
+                            min: 0,
+                            message: t(
+                              "roomManagement.updateRoom.previousWaterValidation"
+                            ),
+                          },
+                        ]}
+                      >
+                        <InputNumber
+                          size="large"
+                          placeholder={t(
+                            "roomManagement.updateRoom.enterPreviousWaterReading"
+                          )}
+                          className={`w-full rounded-lg ${
+                            darkMode
+                              ? "[&_.ant-input-number-input]:bg-gray-700 [&_.ant-input-number-input]:border-gray-600 [&_.ant-input-number-input]:text-gray-200"
+                              : ""
+                          }`}
+                          min={0}
+                          precision={0}
+                          formatter={(value) =>
+                            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                          }
+                          parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        label={
+                          <Text className={`${getTextColor()}`}>
+                            {t("roomManagement.updateRoom.currentWaterReading")}
+                          </Text>
+                        }
+                        name="currentWaterReading"
+                        rules={[
+                          {
+                            type: "number",
+                            min: 0,
+                            message: t(
+                              "roomManagement.updateRoom.currentWaterValidation"
+                            ),
+                          },
+                          ({ getFieldValue }) => ({
+                            validator(_, value) {
+                              const previousReading = getFieldValue(
+                                "previousWaterReading"
+                              );
+                              if (
+                                !value ||
+                                !previousReading ||
+                                value >= previousReading
+                              ) {
+                                return Promise.resolve();
+                              }
+                              return Promise.reject(
+                                new Error(
+                                  t(
+                                    "roomManagement.updateRoom.waterReadingCompareValidation"
+                                  )
+                                )
+                              );
+                            },
+                          }),
+                        ]}
+                      >
+                        <InputNumber
+                          size="large"
+                          placeholder={t(
+                            "roomManagement.updateRoom.enterCurrentWaterReading"
+                          )}
+                          className={`w-full rounded-lg ${
+                            darkMode
+                              ? "[&_.ant-input-number-input]:bg-gray-700 [&_.ant-input-number-input]:border-gray-600 [&_.ant-input-number-input]:text-gray-200"
+                              : ""
+                          }`}
+                          min={0}
+                          precision={0}
+                          formatter={(value) =>
+                            `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                          }
+                          parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </div>
               </Space>
             </Form>
           </Col>
