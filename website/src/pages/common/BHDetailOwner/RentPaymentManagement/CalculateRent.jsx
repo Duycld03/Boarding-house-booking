@@ -483,7 +483,7 @@ const CalculateRent = ({
 
   // Update the table column for amount formatting
   const renderAmountColumn = (amount) => {
-    return <span>{formatPrice(amount)}</span>;
+    return <span>{formatPrice(amount, { showFullFormat: true })}</span>;
   };
 
   return (
@@ -718,7 +718,7 @@ const CalculateRent = ({
         {/* Room Price with updated formatting */}
         <Form.Item label={t("roomPrice")}>
           <Input
-            value={formatPrice(roomPrice)}
+            value={formatPrice(roomPrice, { showFullFormat: true })}
             readOnly
             style={styles.readOnlyStyle}
           />
@@ -727,7 +727,7 @@ const CalculateRent = ({
         {/* Total Amount with updated formatting */}
         <Form.Item label={t("totalAmount")}>
           <Input
-            value={formatPrice(totalAmount)}
+            value={formatPrice(totalAmount, { showFullFormat: true })}
             readOnly
             style={styles.totalAmountStyle}
           />
