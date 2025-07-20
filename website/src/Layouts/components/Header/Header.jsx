@@ -438,14 +438,16 @@ const CustomHeader = () => {
         closable
         onClose={() => setOpen(false)}
         open={open}
-        bodyStyle={{
-          backgroundColor: darkMode ? "#1f2937" : "#fff",
-          padding: "12px 0",
-        }}
-        headerStyle={{
-          backgroundColor: darkMode ? "#1f2937" : "#fff",
-          color: darkMode ? "#fff" : "inherit",
-          borderBottom: darkMode ? "1px solid #4b5563" : "1px solid #f0f0f0",
+        styles={{
+          body: {
+            backgroundColor: darkMode ? "#1f2937" : "#fff",
+            padding: "12px 0",
+          },
+          header: {
+            backgroundColor: darkMode ? "#1f2937" : "#fff",
+            color: darkMode ? "#fff" : "inherit",
+            borderBottom: darkMode ? "1px solid #4b5563" : "1px solid #f0f0f0",
+          },
         }}
       >
         {isLoggedIn && (

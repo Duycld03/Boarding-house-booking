@@ -78,8 +78,6 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
 
   // Handle configuration step submit
   const onConfigurationSubmit = (values) => {
-    console.log("Configuration values:", values); // Debug log
-
     if (addMode === "single") {
       // Single room mode
       const { roomNumber, roomTypeId, description, image } = values;
@@ -112,8 +110,6 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
         errorMessage: "",
       };
 
-      console.log("Generated single room:", singleRoom); // Debug log
-
       const duplicates = new Set();
       if (existingRoomNumbers.has(singleRoom.roomNumber)) {
         duplicates.add(singleRoom.roomNumber);
@@ -126,14 +122,12 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
     } else {
       // Bulk mode
       const { numberingFormat, floorConfigs } = values; // Không còn customFormat
-      console.log("Floor configurations:", floorConfigs); // Debug log
 
       // Generate rooms from floor configurations
       const generatedRooms = generateRoomsFromFloorConfigs(
         floorConfigs,
         numberingFormat
       );
-      console.log("Generated rooms from floor configs:", generatedRooms); // Debug log
 
       const duplicates = checkDuplicates(generatedRooms, existingRoomNumbers);
 
@@ -238,13 +232,6 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
       const missingDescription =
         !room.description || room.description.trim() === "";
 
-      // Debug log để xác định lỗi
-      if (missingType || missingDescription) {
-        console.log("Room with missing fields:", room);
-        console.log("Missing type:", missingType);
-        console.log("Missing description:", missingDescription);
-      }
-
       return missingType || missingDescription;
     });
 
@@ -271,8 +258,6 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
         image: room.image,
       }));
 
-      console.log("Final rooms to submit:", roomsToSubmit); // Debug log
-
       // Process each room
       const promises = roomsToSubmit.map((roomData) => {
         const formData = new FormData();
@@ -285,28 +270,15 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
         if (roomData.image) {
           if (roomData.image instanceof File) {
             formData.append("Room", roomData.image);
-            console.log("Appending image as File:", roomData.image.name);
           } else if (roomData.image.file instanceof File) {
             formData.append("Room", roomData.image.file);
-            console.log(
-              "Appending image from image.file:",
-              roomData.image.file.name
-            );
           } else if (
             roomData.image.preview &&
             roomData.image.file instanceof File
           ) {
             formData.append("Room", roomData.image.file);
-            console.log(
-              "Appending image with preview from file:",
-              roomData.image.file.name
-            );
           } else if (roomData.image.originFileObj instanceof File) {
             formData.append("Room", roomData.image.originFileObj);
-            console.log(
-              "Appending image as originFileObj:",
-              roomData.image.originFileObj.name
-            );
           } else if (
             typeof roomData.image === "string" &&
             roomData.image.startsWith("data:")
@@ -324,7 +296,6 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
 
             const imageFile = new File([u8arr], "image.jpg", { type: mime });
             formData.append("Room", imageFile);
-            console.log("Converting base64 to File for upload");
           } else if (
             typeof roomData.image.preview === "string" &&
             roomData.image.preview.startsWith("data:")

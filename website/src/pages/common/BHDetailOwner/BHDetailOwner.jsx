@@ -26,28 +26,27 @@ import { getBoardingHouseDetail } from "../../../api/ownerUser/boardingHouseAPI"
 import {
   updateBoardingHouseDetailsOwner,
   getManagersForOwner,
-} from '../../../api/BoardingHouseAPI';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import RoomType from './RoomType/RoomType';
-import RenewalRequest from './RenewalRequestManagement/RenewalRequest';
-import TenantManagement from './TenantManagement/TenantManagement';
-import RoomManagement from './RoomManagement/RoomManagement';
-import RevenueManagement from './RevenueManagement';
-import RentPaymentManagement from './RentPaymentManagement';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHotel } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+} from "../../../api/BoardingHouseAPI";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import RoomType from "./RoomType/RoomType";
+import RenewalRequest from "./RenewalRequestManagement/RenewalRequest";
+import TenantManagement from "./TenantManagement/TenantManagement";
+import RoomManagement from "./RoomManagement/RoomManagement";
+import RevenueManagement from "./RevenueManagement";
+import RentPaymentManagement from "./RentPaymentManagement";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHotel } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../../context/themeContext';
-import './BHDetailOwner.module.css'; // Import custom CSS for additional dark mode fixes
-import classNames from 'classnames';
-import './darkModeOverrides.css';
-import { useCurrentUser } from '@/context/userContext';
-import userRole from '@/constants/userRole';
-import BoardingHouseForm from './BoardingHouseForm';
-import ReviewManagement from './ReviewManagement';
-
+import { useTranslation } from "react-i18next";
+import { useTheme } from "../../../context/themeContext";
+import "./BHDetailOwner.module.css"; // Import custom CSS for additional dark mode fixes
+import classNames from "classnames";
+import "./darkModeOverrides.css";
+import { useCurrentUser } from "@/context/userContext";
+import userRole from "@/constants/userRole";
+import BoardingHouseForm from "./BoardingHouseForm";
+import ReviewManagement from "./ReviewManagement";
 
 const { TabPane } = Tabs;
 
@@ -58,10 +57,10 @@ const BHDetailOwner = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { t, i18n } = useTranslation('bhManagement');
+  const { t, i18n } = useTranslation("bhManagement");
 
   const { darkMode } = useTheme();
-  const lang = i18n.language || 'vi';
+  const lang = i18n.language || "vi";
 
   const boardingHouseName = location.state?.name || t("defaultTitle");
 
@@ -109,7 +108,6 @@ const BHDetailOwner = () => {
   useEffect(() => {
     if (darkMode) {
       document.body.classList.add("dark-mode");
-      console.log("Added dark-mode class to body");
     } else {
       document.body.classList.remove("dark-mode");
     }
@@ -336,39 +334,38 @@ const BHDetailOwner = () => {
         "boardingHouseType",
         updatedData.boardingHouseType?._id || updatedData.boardingHouseType
       );
-      payload.append('name', updatedData.name);
-      payload.append('description', updatedData.description || '');
-      payload.append('priceRange', updatedData.priceRange);
-      payload.append('electricityPrice', updatedData.electricityPrice);
-      payload.append('waterPrice', updatedData.waterPrice);
+      payload.append("name", updatedData.name);
+      payload.append("description", updatedData.description || "");
+      payload.append("priceRange", updatedData.priceRange);
+      payload.append("electricityPrice", updatedData.electricityPrice);
+      payload.append("waterPrice", updatedData.waterPrice);
       payload.append(
-        'address[province][name]',
+        "address[province][name]",
         updatedData.address.province.name
       );
       payload.append(
-        'address[province][name_en]',
+        "address[province][name_en]",
         updatedData.address.province.name_en
       );
 
       payload.append(
-        'address[district][name]',
+        "address[district][name]",
         updatedData.address.district.name
       );
       payload.append(
-        'address[district][name_en]',
+        "address[district][name_en]",
         updatedData.address.district.name_en
       );
 
-      payload.append('address[ward][name]', updatedData.address.ward.name);
+      payload.append("address[ward][name]", updatedData.address.ward.name);
       payload.append(
-        'address[ward][name_en]',
+        "address[ward][name_en]",
         updatedData.address.ward.name_en
       );
-      payload.append('address[detail]', updatedData.address.detail);
-      payload.append('location[lat]', updatedData.location.lat);
-      payload.append('location[lon]', updatedData.location.lon);
-      payload.append('staffId', updatedData.staffId);
-
+      payload.append("address[detail]", updatedData.address.detail);
+      payload.append("location[lat]", updatedData.location.lat);
+      payload.append("location[lon]", updatedData.location.lon);
+      payload.append("staffId", updatedData.staffId);
 
       const oldImg = [];
 
@@ -469,9 +466,9 @@ const BHDetailOwner = () => {
           <RoomManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
 
-        <Tabs.TabPane tab={t("tabs.tenantManagement")} key="tenantManagement">
+        {/* <Tabs.TabPane tab={t("tabs.tenantManagement")} key="tenantManagement">
           <TenantManagement />
-        </Tabs.TabPane>
+        </Tabs.TabPane> */}
 
         <Tabs.TabPane tab={t("tabs.revenueManagement")} key="revenueManagement">
           <RevenueManagement boardingHouseId={boardingHouseId} />
@@ -487,7 +484,7 @@ const BHDetailOwner = () => {
         >
           <RentPaymentManagement />
         </Tabs.TabPane>
-        <Tabs.TabPane tab={t('tabs.reviewManagement')} key="reviewManagement">
+        <Tabs.TabPane tab={t("tabs.reviewManagement")} key="reviewManagement">
           <ReviewManagement boardingHouseId={boardingHouseId} />
         </Tabs.TabPane>
       </Tabs>

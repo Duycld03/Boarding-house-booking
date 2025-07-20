@@ -84,7 +84,6 @@ function FilterButton({ setFilterValue }) {
     setLoading(true);
     try {
       const response = await getBhByArea(filters);
-      console.log(response);
       if (!response || response?.success === false) {
         throw new Error(response?.message || "Failed to apply filters.");
       }

@@ -104,7 +104,6 @@ const RevenueManagementOwner = () => {
         console.warn("No monthly data found");
       }
     } catch (error) {
-      console.error("Error fetching revenue data:", error);
       setMonthlyData(null);
     }
   };

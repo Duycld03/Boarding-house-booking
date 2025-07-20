@@ -70,8 +70,6 @@ function BoardingHouseDetail() {
     loadedItems: 0,
   });
 
-  console.log("bh data: ", boardingHouse);
-
   const roomTypeRef = useRef(null);
 
   useEffect(() => {
@@ -177,8 +175,6 @@ function BoardingHouseDetail() {
       const response = await getReviewByBhId(id, paginationParams);
 
       if (response && response.data) {
-        console.log("Default pagination: ", response?.pagination);
-
         const newReviews = shouldAppend
           ? [...reviews, ...response.data]
           : response.data;

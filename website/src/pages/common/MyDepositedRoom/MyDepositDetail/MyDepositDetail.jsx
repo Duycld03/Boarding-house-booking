@@ -51,14 +51,6 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
     setPayRentVisible(true);
   };
 
-  const refundDeposit = async (userId) => {
-    console.log("Refund deposit for", userId, "in room", depositRoomId);
-  };
-
-  const extendRent = async (userId) => {
-    console.log("Extend rent for", userId, "in room", depositRoomId);
-  };
-
   const report = async (userId) => {
     console.log("Report", userId, "in room", depositRoomId);
   };

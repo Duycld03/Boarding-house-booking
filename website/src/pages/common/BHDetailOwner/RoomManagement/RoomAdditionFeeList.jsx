@@ -167,8 +167,6 @@ function RoomAdditionFeeList({ roomId, onRefresh }) {
 
   // ============ TABLE CHANGE HANDLER ============
   const handleTableChange = useCallback((newPagination, filters, sorter) => {
-    console.log("Table change:", { newPagination, filters, sorter }); // Debug log
-
     setPaginationState((prev) => {
       const newState = {
         ...prev,
@@ -186,7 +184,6 @@ function RoomAdditionFeeList({ roomId, onRefresh }) {
         newState.sortOrder = "desc";
       }
 
-      console.log("New pagination state:", newState); // Debug log
       return newState;
     });
   }, []);

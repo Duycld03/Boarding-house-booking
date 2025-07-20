@@ -86,7 +86,6 @@ const AddReview = ({
       };
 
       const reviewResponse = await addReview(reviewDataToSend);
-      console.log("Response1:", reviewResponse.success);
 
       if (reviewResponse.success === true) {
         toast.success(t("addReview.successMessage"));
