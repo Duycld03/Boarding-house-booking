@@ -47,7 +47,6 @@ function FilterDeposit({
       filters.boardingHouseId = values.boardingHouseId;
     }
 
-    console.log("Applied filters:", filters);
     setFilterValue(filters);
     // Giữ popup mở sau khi submit
   };

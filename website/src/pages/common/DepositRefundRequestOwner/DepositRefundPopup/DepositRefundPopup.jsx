@@ -151,8 +151,6 @@ function DepositRefundPopup({
         requestData
       );
 
-      console.log("Response:", response);
-
       if (response.payUrl) {
         window.location.href = response.payUrl;
       } else {

@@ -23,8 +23,6 @@ function EditRoomModal({ room, roomTypes, onClose, onUpdate, visible }) {
   // Reset form và state khi modal mở/đóng
   useEffect(() => {
     if (visible && room) {
-      console.log("Setting up modal for room:", room);
-
       // Lưu lại dữ liệu gốc
       originalData.current = { ...room };
 

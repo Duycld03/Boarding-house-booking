@@ -55,7 +55,6 @@ function CreateAppointmentForm({ ownerId, listRoomData }) {
 
   const fetchOwnerAppointment = async () => {
     if (!ownerId) {
-      console.log("can not get owner id");
       return;
     }
     setLoading(true);

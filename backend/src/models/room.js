@@ -76,13 +76,7 @@ RoomSchema.pre('save', async function (next) {
       const roomType = this.roomTypeId;
       const currentRenters = this.rentBy.length;
 
-      console.log(`📊 Room data:`, {
-        roomNumber: this.roomNumber,
-        boardingHouseType: boardingHouseType?.codeName,
-        maxPeople: roomType?.peopleNumber,
-        currentRenters,
-        currentAvailability: this.isAvailable
-      });
+
 
       if (boardingHouseType && roomType) {
         const typeCode = boardingHouseType.codeName;
@@ -90,17 +84,14 @@ RoomSchema.pre('save', async function (next) {
 
         if (typeCode === 'nha_tro_truyen_thong' || typeCode === 'mini_house') {
           newAvailability = currentRenters === 0;
-          console.log(`🏠 Traditional/Mini house logic: ${currentRenters === 0}`);
         }
         else if (typeCode === 'nha_tro_kien_truc_xa') {
           const maxPeople = parseInt(roomType.peopleNumber) || 0;
           newAvailability = currentRenters < maxPeople;
-          console.log(`🏢 Dormitory logic: ${currentRenters} < ${maxPeople} = ${newAvailability}`);
         }
 
         // Chỉ update nếu có thay đổi
         if (newAvailability !== undefined && this.isAvailable !== newAvailability) {
-          console.log(`✅ Updating availability: ${this.isAvailable} → ${newAvailability}`);
           this.isAvailable = newAvailability;
         } else {
           console.log(`ℹ️ No availability change needed`);
@@ -122,7 +113,6 @@ RoomSchema.pre('save', async function (next) {
 // ===== FIX 2: Cải thiện Static Method =====
 RoomSchema.statics.updateRoomAvailability = async function (roomId) {
   try {
-    console.log(`🔄 Updating availability for room ID: ${roomId}`);
 
     const room = await this.findById(roomId)
       .populate({
@@ -145,12 +135,6 @@ RoomSchema.statics.updateRoomAvailability = async function (roomId) {
     const roomType = room.roomTypeId;
     const currentRenters = room.rentBy.length;
 
-    console.log(`📊 Room ${room.roomNumber} data:`, {
-      boardingHouseType: boardingHouseType?.codeName,
-      maxPeople: roomType?.peopleNumber,
-      currentRenters,
-      currentAvailability: room.isAvailable
-    });
 
     if (boardingHouseType && roomType) {
       const typeCode = boardingHouseType.codeName;
@@ -170,7 +154,6 @@ RoomSchema.statics.updateRoomAvailability = async function (roomId) {
           { _id: roomId },
           { isAvailable: newAvailability }
         );
-        console.log(`✅ Room ${room.roomNumber} availability updated: ${room.isAvailable} → ${newAvailability}`);
 
         // Update object để return đúng data
         room.isAvailable = newAvailability;
@@ -191,7 +174,6 @@ RoomSchema.statics.updateRoomAvailability = async function (roomId) {
 // ===== FIX 3: Cải thiện Bulk Update Method =====
 RoomSchema.statics.updateAllRoomsAvailability = async function () {
   try {
-    console.log(`🔄 Starting bulk availability update...`);
 
     const rooms = await this.find()
       .populate({
@@ -206,7 +188,6 @@ RoomSchema.statics.updateAllRoomsAvailability = async function () {
         select: 'peopleNumber'
       });
 
-    console.log(`📊 Found ${rooms.length} rooms to process`);
 
     let updatedCount = 0;
     const bulkOps = [];
@@ -361,7 +342,6 @@ export const addRenter = async (roomId, accountId) => {
     await room.save({ session });
 
     await session.commitTransaction();
-    console.log(`✅ Renter added successfully to room ${room.roomNumber}`);
 
     return {
       success: true,
@@ -386,7 +366,6 @@ export const removeRenter = async (roomId, accountId) => {
   session.startTransaction();
 
   try {
-    console.log(`👤 Removing renter ${accountId} from room ${roomId}`);
 
     const room = await Room.findById(roomId).session(session);
     if (!room) {
@@ -491,10 +470,7 @@ export const testRoomStatusUpdate = async (roomId) => {
 
   try {
     const result = await Room.updateRoomAvailability(roomId);
-    console.log(`✅ Manual update result:`, {
-      roomNumber: result.roomNumber,
-      isAvailable: result.isAvailable
-    });
+
   } catch (error) {
     console.error(`❌ Manual update failed:`, error.message);
   }

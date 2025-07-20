@@ -68,7 +68,6 @@ const DepositRoom = () => {
       });
 
       if (!initialResponse?.pagination?.totalItems) {
-        toast.error("Failed to get boarding houses count");
         return;
       }
 
@@ -82,7 +81,6 @@ const DepositRoom = () => {
       });
 
       if (response?.data) {
-        console.log("Fetched boarding houses:", response.data.length);
         setBoardingHouses(response.data);
       }
     } catch (error) {
@@ -100,7 +98,6 @@ const DepositRoom = () => {
       });
       if (res?.data && res?.pagination) {
         setDepositedRooms(res.data);
-        console.log(res);
 
         setPagination({
           currentPage: res.pagination.currentPage,
@@ -142,15 +139,12 @@ const DepositRoom = () => {
       // Fetch max deposit amount
       const maxDepositResult = await getMaxDeposit(boardingHouseId);
 
-      console.log("Received max deposit amount:", maxDepositResult);
-
       if (maxDepositResult) {
         setMaxDepositAmount(maxDepositResult);
       }
 
       // Fetch max rental time
       const maxTimeResult = await getRentTime(boardingHouseId);
-      console.log("Received max rental time:", maxTimeResult);
 
       if (maxTimeResult) {
         setMaxRentalTime(maxTimeResult);

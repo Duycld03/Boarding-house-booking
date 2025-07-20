@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { TableCustom as Table, Button, ConfirmModal } from '@/component';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { TableCustom as Table, Button, ConfirmModal } from "@/component";
 import {
   getTenantsByBoardingHouse,
   deleteTenantFromBoardingHouse,
-} from '@/api/tenantManagement';
-import { toast } from 'react-toastify';
-import convertTimetap from '@/utils/convertTimetap';
-import { Avatar } from 'antd';
-import DefaultAvatar from '@/assets/images/none_avatar.png';
+} from "@/api/tenantManagement";
+import { toast } from "react-toastify";
+import convertTimetap from "@/utils/convertTimetap";
+import { Avatar } from "antd";
+import DefaultAvatar from "@/assets/images/none_avatar.png";
 
 const TenantManagement = () => {
   const { boardingHouseId } = useParams();
@@ -22,7 +22,6 @@ const TenantManagement = () => {
       setLoading(true);
       try {
         const data = await getTenantsByBoardingHouse(boardingHouseId);
-        console.log(data);
 
         setTenantData(data);
       } catch (error) {
@@ -37,7 +36,7 @@ const TenantManagement = () => {
 
   const handleDelete = async () => {
     if (!selectedTenant || !selectedTenant.accountId) {
-      toast.error('Error: Missing tenant accountId.');
+      toast.error("Error: Missing tenant accountId.");
       return;
     }
 
@@ -52,15 +51,15 @@ const TenantManagement = () => {
       const updatedData = await getTenantsByBoardingHouse(boardingHouseId);
       setTenantData(updatedData);
 
-      toast.success('Tenant deleted successfully.');
+      toast.success("Tenant deleted successfully.");
     } catch (error) {
       console.error(
-        '🔥 Delete Tenant Error:',
+        "🔥 Delete Tenant Error:",
         error.response?.data || error.message
       );
       toast.error(
         `Failed to delete tenant: ${
-          error.response?.data?.message || 'Unknown error'
+          error.response?.data?.message || "Unknown error"
         }`
       );
     } finally {
@@ -71,9 +70,9 @@ const TenantManagement = () => {
 
   const columns = [
     {
-      title: 'Avatar',
-      dataIndex: 'avatarImage',
-      key: 'avatarImage',
+      title: "Avatar",
+      dataIndex: "avatarImage",
+      key: "avatarImage",
       render: (avatarImage) => {
         return (
           <Avatar
@@ -85,33 +84,33 @@ const TenantManagement = () => {
       },
     },
     {
-      title: 'Tenant Name',
-      dataIndex: 'tenantName',
-      key: 'tenantName',
+      title: "Tenant Name",
+      dataIndex: "tenantName",
+      key: "tenantName",
     },
     {
-      title: 'Room Number',
-      dataIndex: 'roomNumber',
-      key: 'roomNumber',
+      title: "Room Number",
+      dataIndex: "roomNumber",
+      key: "roomNumber",
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: 'Phone number',
-      dataIndex: 'phoneNumber',
-      key: 'phoneNumber',
+      title: "Phone number",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
     },
     {
-      title: 'Gender',
-      dataIndex: 'gender',
-      key: 'gender',
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (record) => (
         <Button
           size="large"
