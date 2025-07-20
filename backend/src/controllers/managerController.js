@@ -19,6 +19,7 @@ class ManagerController {
       const filter = {
         role: 'staff',
         createdBy: req.user.userId,
+        deleted: false,
       };
 
       let managers = await Account.find(filter)
