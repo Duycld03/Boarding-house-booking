@@ -5,8 +5,8 @@ import { toast } from "react-toastify";
 import { getElectricalAndWaterPrice } from "@/api/ownerUser/boardingHouseAPI";
 import { calculateMonthlyBill } from "@/api/ownerUser/paymentBillAPI";
 import { getRoomAdditionFeeForMonthlyCalculate } from "@/api/staffUser/roomAdditionFee";
-import { useTheme } from "@/context/themeContext";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/ThemeContext";
 import formatAmount, { useFormatAmount } from "@/utils/formatAmount";
 
 const CalculateRent = ({
@@ -246,13 +246,13 @@ const CalculateRent = ({
   const getStyles = () => {
     return {
       modalBodyStyle: darkMode
-        ? { backgroundColor: "#111827", color: "#f9fafb" } // Using background.dark and text.dark from your theme
-        : { backgroundColor: "#ffffff" }, // Using background.light
+        ? { backgroundColor: "#1f2937", color: "#f9fafb" }
+        : { backgroundColor: "#ffffff" },
 
       modalHeaderStyle: darkMode
         ? {
-            backgroundColor: "#0f172a",
-            borderBottom: "1px solid #1f2937",
+            backgroundColor: "#1f2937",
+            borderBottom: "1px solid #374151",
             color: "#f9fafb",
           }
         : {
@@ -261,17 +261,17 @@ const CalculateRent = ({
 
       inputStyle: darkMode
         ? {
-            backgroundColor: "#1f2937",
+            backgroundColor: "#374151",
             color: "#f9fafb",
-            borderColor: "#374151",
+            borderColor: "#4b5563",
           }
         : { backgroundColor: "#f9fafb" },
 
       readOnlyStyle: darkMode
         ? {
-            backgroundColor: "#1f2937",
+            backgroundColor: "#374151",
             color: "#f9fafb",
-            borderColor: "#374151",
+            borderColor: "#4b5563",
             fontWeight: "bold",
           }
         : {
@@ -281,36 +281,36 @@ const CalculateRent = ({
 
       totalAmountStyle: darkMode
         ? {
-            backgroundColor: "#1e3a8a", // Darker blue that works better with dark theme
-            color: "#93c5fd", // Lighter blue for better contrast
+            backgroundColor: "#1e40af",
+            color: "#bfdbfe",
             fontWeight: "bold",
             fontSize: "16px",
-            borderColor: "#2563eb", // primary color
+            borderColor: "#3b82f6",
           }
         : {
             backgroundColor: "#eff6ff",
             fontWeight: "bold",
-            color: "#3b82f6", // primary color from theme
+            color: "#3b82f6",
             fontSize: "16px",
             borderColor: "#bfdbfe",
           },
 
       fromMonthStyle: darkMode
-        ? { fontStyle: "italic", color: "#9ca3af" } // Lighter gray for dark mode
-        : { fontStyle: "italic", color: "#6b7280" }, // Darker gray for light mode
+        ? { fontStyle: "italic", color: "#9ca3af" }
+        : { fontStyle: "italic", color: "#6b7280" },
 
       tableHeaderStyle: darkMode
         ? {
-            backgroundColor: "#1f2937",
+            backgroundColor: "#374151",
             color: "#f9fafb",
-            borderColor: "#374151",
+            borderColor: "#4b5563",
           }
         : {},
 
       tableStyle: darkMode
         ? {
-            backgroundColor: "#111827",
-            borderColor: "#374151",
+            backgroundColor: "#1f2937",
+            borderColor: "#4b5563",
             color: "#f9fafb",
           }
         : {},
@@ -350,24 +350,120 @@ const CalculateRent = ({
         const style = document.createElement("style");
         style.id = "calculate-rent-styles";
         style.innerHTML = `
-          .ant-input-group-addon {
+          .ant-modal-content {
+            background-color: #1f2937 !important;
+            border-color: #374151 !important;
+          }
+          
+          .ant-modal-header {
+            background-color: #1f2937 !important;
+            border-bottom-color: #374151 !important;
+          }
+          
+          .ant-modal-title {
+            color: #f9fafb !important;
+          }
+          
+          .ant-modal-close {
+            color: #f9fafb !important;
+          }
+          
+          .ant-modal-close:hover {
+            color: #e5e7eb !important;
             background-color: #374151 !important;
-            color: #d1d5db !important;
+          }
+          
+          .ant-modal-body {
+            background-color: #1f2937 !important;
+          }
+          
+          .ant-form-item-label > label {
+            color: #f9fafb !important;
+          }
+          
+          .ant-select-selector {
+            background-color: #374151 !important;
+            color: #f9fafb !important;
             border-color: #4b5563 !important;
           }
-          .ant-table-cell {
+          
+          .ant-select-selection-placeholder {
+            color: #9ca3af !important;
+          }
+          
+          .ant-select-arrow {
             color: #f9fafb !important;
           }
+          
+          .ant-input {
+            background-color: #374151 !important;
+            color: #f9fafb !important;
+            border-color: #4b5563 !important;
+          }
+          
+          .ant-input:hover {
+            border-color: #3b82f6 !important;
+          }
+          
+          .ant-input:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+          }
+          
+          .ant-input-group-addon {
+            background-color: #4b5563 !important;
+            color: #f9fafb !important;
+            border-color: #4b5563 !important;
+          }
+          
+          .ant-table {
+            background-color: #1f2937 !important;
+          }
+          
           .ant-table-thead > tr > th {
+            background-color: #374151 !important;
+            color: #f9fafb !important;
+            border-color: #4b5563 !important;
+          }
+          
+          .ant-table-tbody > tr > td {
             background-color: #1f2937 !important;
             color: #f9fafb !important;
-            border-color: #374151 !important;
+            border-color: #4b5563 !important;
           }
-          .ant-table-tbody > tr > td {
-            border-color: #374151 !important;
+          
+          .ant-table-tbody > tr:hover > td {
+            background-color: #374151 !important;
           }
+          
           .ant-empty-description {
-            color: #d1d5db !important;
+            color: #9ca3af !important;
+          }
+          
+          .ant-btn-default {
+            background-color: #374151 !important;
+            border-color: #4b5563 !important;
+            color: #f9fafb !important;
+          }
+          
+          .ant-btn-default:hover {
+            background-color: #4b5563 !important;
+            border-color: #6b7280 !important;
+            color: #f9fafb !important;
+          }
+          
+          .ant-btn-primary {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+          }
+          
+          .ant-btn-primary:hover {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+          }
+          
+          .ant-spin-dot-item {
+            background-color: #3b82f6 !important;
           }
         `;
         document.head.appendChild(style);
@@ -387,7 +483,7 @@ const CalculateRent = ({
 
   // Update the table column for amount formatting
   const renderAmountColumn = (amount) => {
-    return <span>{formatPrice(amount, { showFullFormat: true })}</span>;
+    return <span>{formatPrice(amount)}</span>;
   };
 
   return (
@@ -403,8 +499,16 @@ const CalculateRent = ({
       width={700}
       bodyStyle={styles.modalBodyStyle}
       headerStyle={styles.modalHeaderStyle}
+      className={darkMode ? "dark-calculate-rent-modal" : ""}
       okButtonProps={{
-        style: darkMode ? { background: "#1890ff" } : {},
+        style: darkMode
+          ? { background: "#3b82f6", borderColor: "#3b82f6" }
+          : {},
+      }}
+      cancelButtonProps={{
+        style: darkMode
+          ? { background: "#374151", borderColor: "#4b5563", color: "#f9fafb" }
+          : {},
       }}
     >
       <Form layout="vertical" form={form}>
@@ -417,7 +521,10 @@ const CalculateRent = ({
             placeholder={t("selectRoom")}
             onChange={handleRoomChange}
             value={selectRoom}
-            style={darkMode ? { background: "#141414" } : {}}
+            style={styles.inputStyle}
+            dropdownStyle={
+              darkMode ? { backgroundColor: "#374151", color: "#f9fafb" } : {}
+            }
           >
             {availableRooms.map((room) => (
               <Select.Option key={room._id} value={room._id}>
@@ -433,13 +540,7 @@ const CalculateRent = ({
               style={{
                 width: "48%",
                 marginRight: "4%",
-                ...(darkMode
-                  ? {
-                      backgroundColor: "#1f2937",
-                      color: "#f9fafb",
-                      borderColor: "#374151",
-                    }
-                  : {}),
+                ...styles.inputStyle,
               }}
               placeholder={t("oldNumber")}
               type="number"
@@ -451,7 +552,13 @@ const CalculateRent = ({
                 })
               }
               addonBefore={
-                <span style={darkMode ? { color: "#d1d5db" } : {}}>
+                <span
+                  style={
+                    darkMode
+                      ? { color: "#f9fafb", backgroundColor: "#4b5563" }
+                      : {}
+                  }
+                >
                   {t("old")}
                 </span>
               }
@@ -459,13 +566,7 @@ const CalculateRent = ({
             <Input
               style={{
                 width: "48%",
-                ...(darkMode
-                  ? {
-                      backgroundColor: "#1f2937",
-                      color: "#f9fafb",
-                      borderColor: "#374151",
-                    }
-                  : {}),
+                ...styles.inputStyle,
               }}
               placeholder={t("newNumber")}
               type="number"
@@ -477,7 +578,13 @@ const CalculateRent = ({
                 })
               }
               addonBefore={
-                <span style={darkMode ? { color: "#d1d5db" } : {}}>
+                <span
+                  style={
+                    darkMode
+                      ? { color: "#f9fafb", backgroundColor: "#4b5563" }
+                      : {}
+                  }
+                >
                   {t("new")}
                 </span>
               }
@@ -491,13 +598,7 @@ const CalculateRent = ({
               style={{
                 width: "48%",
                 marginRight: "4%",
-                ...(darkMode
-                  ? {
-                      backgroundColor: "#1f2937",
-                      color: "#f9fafb",
-                      borderColor: "#374151",
-                    }
-                  : {}),
+                ...styles.inputStyle,
               }}
               placeholder={t("oldNumber")}
               type="number"
@@ -509,7 +610,13 @@ const CalculateRent = ({
                 })
               }
               addonBefore={
-                <span style={darkMode ? { color: "#d1d5db" } : {}}>
+                <span
+                  style={
+                    darkMode
+                      ? { color: "#f9fafb", backgroundColor: "#4b5563" }
+                      : {}
+                  }
+                >
                   {t("old")}
                 </span>
               }
@@ -517,13 +624,7 @@ const CalculateRent = ({
             <Input
               style={{
                 width: "48%",
-                ...(darkMode
-                  ? {
-                      backgroundColor: "#1f2937",
-                      color: "#f9fafb",
-                      borderColor: "#374151",
-                    }
-                  : {}),
+                ...styles.inputStyle,
               }}
               placeholder={t("newNumber")}
               type="number"
@@ -535,7 +636,13 @@ const CalculateRent = ({
                 })
               }
               addonBefore={
-                <span style={darkMode ? { color: "#d1d5db" } : {}}>
+                <span
+                  style={
+                    darkMode
+                      ? { color: "#f9fafb", backgroundColor: "#4b5563" }
+                      : {}
+                  }
+                >
                   {t("new")}
                 </span>
               }
@@ -611,7 +718,7 @@ const CalculateRent = ({
         {/* Room Price with updated formatting */}
         <Form.Item label={t("roomPrice")}>
           <Input
-            value={formatPrice(roomPrice, { showFullFormat: true })}
+            value={formatPrice(roomPrice)}
             readOnly
             style={styles.readOnlyStyle}
           />
@@ -620,7 +727,7 @@ const CalculateRent = ({
         {/* Total Amount with updated formatting */}
         <Form.Item label={t("totalAmount")}>
           <Input
-            value={formatPrice(totalAmount, { showFullFormat: true })}
+            value={formatPrice(totalAmount)}
             readOnly
             style={styles.totalAmountStyle}
           />
