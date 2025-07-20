@@ -96,11 +96,9 @@ const RevenueManagement = ({ boardingHouseId }) => {
         response.transactions.length > 0
       ) {
         setMonthlyData(response);
-        console.log("Monthly data fetched successfully:", response);
       } else {
         // Handle case with no data
         setMonthlyData(null);
-        console.warn("No monthly data found");
       }
     } catch (error) {
       setMonthlyData(null);

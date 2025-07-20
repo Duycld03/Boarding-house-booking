@@ -280,8 +280,6 @@ function RoomManagement({ boardingHouseId }) {
   // Cải thiện hàm xử lý thay đổi table (pagination, sorting, filtering)
   const handleTableChange = useCallback(
     (newPagination, filters, sorter) => {
-      console.log("Table change:", { newPagination, filters, sorter });
-
       const newPaginationOptions = {
         ...paginationOptions,
         page: newPagination.current,

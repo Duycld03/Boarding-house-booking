@@ -34,7 +34,7 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
   const isStaff = hasRole(userRole.staff);
 
   // Tạo danh sách menu items với hỗ trợ đa ngôn ngữ
-  const menuItems = [
+  const menuItemsWithVisibility = [
     {
       key: "profile",
       label: <Link to="/profile">{t("menu.profile")}</Link>,
@@ -143,7 +143,12 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
       icon: <DollarCircleOutlined />,
       visible: isOwner || isStaff,
     },
-  ].filter((item) => item.visible); // Lọc các menu item theo quyền
+  ];
+
+  // Lọc và loại bỏ thuộc tính visible trước khi render
+  const menuItems = menuItemsWithVisibility
+    .filter((item) => item.visible)
+    .map(({ visible, ...item }) => item); // Loại bỏ thuộc tính visible
 
   // Define theme-based styles
   const themeStyles = {

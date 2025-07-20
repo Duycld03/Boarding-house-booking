@@ -13,7 +13,6 @@ export const generateRooms = (values) => {
     const { floors, roomsPerFloor, roomTypes, numberingFormat, prefix } = values;
     const rooms = [];
 
-    console.log('Generate rooms input:', values); // Debug log
 
     for (let floor = 1; floor <= floors; floor++) {
         for (let roomIndex = 1; roomIndex <= roomsPerFloor; roomIndex++) {
@@ -39,7 +38,6 @@ export const generateRooms = (values) => {
         }
     }
 
-    console.log('Generated rooms:', rooms); // Debug log
     return rooms;
 };
 

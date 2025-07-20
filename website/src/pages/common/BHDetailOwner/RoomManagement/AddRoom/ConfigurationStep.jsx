@@ -119,10 +119,6 @@ function ConfigurationStep({ form, roomTypes, addMode, setAddMode, onSubmit }) {
       0
     );
     setTotalRooms(total);
-
-    // Debug log
-    console.log("Floor configs changed:", floorConfigs);
-    console.log("New total rooms:", total);
   }, [floorConfigs]);
 
   // Sửa hàm handleImageUpload
@@ -182,7 +178,6 @@ function ConfigurationStep({ form, roomTypes, addMode, setAddMode, onSubmit }) {
   };
 
   const handleFinish = (values) => {
-    console.log("Form values:", values);
     onSubmit(values);
   };
 
