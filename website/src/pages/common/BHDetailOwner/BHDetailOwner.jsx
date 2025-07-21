@@ -365,8 +365,11 @@ const BHDetailOwner = () => {
       payload.append("address[detail]", updatedData.address.detail);
       payload.append("location[lat]", updatedData.location.lat);
       payload.append("location[lon]", updatedData.location.lon);
-      payload.append("staffId", updatedData.staffId);
-
+ if (updatedData.staffId && updatedData.staffId !== 'undefined') {
+        payload.append('staffId', updatedData.staffId);
+      } else {
+        payload.append('staffId', '');
+      }
       const oldImg = [];
 
       if (updatedData.primaryImage instanceof File) {
