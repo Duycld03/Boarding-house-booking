@@ -239,7 +239,7 @@
     "addRoom": {
       "button": {
         "addRoom": "Thêm phòng",
-        "bulkAddRoom": "Thêm phòng hàng loạt",
+        "bulkAddRoom": "Thêm phòng",
         "btnCancel": "Hủy",
         "btnSelect": "Chọn"
       },
@@ -330,6 +330,17 @@
     },
     "editRoom": {
       "title": "Sửa phòng"
+    },
+    "messages": {
+      "deleteFailed": "Xóa thất bại",
+      "updateSuccess": "Cập nhật phòng thành công",
+      "imageUploadSuccess": "Tải lên hình ảnh thành công",
+      "imageRemoveFailed": "Xóa hình ảnh thất bại",
+      "roomTypeChanged": "Đã thay đổi loại phòng thành: {type}",
+      "roomTypeChangeFailed": "Thay đổi loại phòng thất bại",
+      "descriptionChangeFailed": "Thay đổi mô tả thất bại",
+      "imageRemoved": "Đã xóa hình ảnh thành công",
+      "imageUploadFailed": "Tải lên hình ảnh thất bại"
     },
     "reviewStep": {
       "bulkEditControls": "Chỉnh sửa hàng loạt phòng đã chọn",

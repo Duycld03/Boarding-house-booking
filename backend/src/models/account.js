@@ -72,14 +72,13 @@ const UserSchema = new Schema({
 
 // Schema cho Owner (chủ nhà trọ)
 const OwnerSchema = new Schema({
-  businessType: {
-    type: String,
-    enum: ['individual', 'company'],
-    default: 'individual'
-  },
-  businessName: {
-    type: String,
-    trim: true
+  subscription: {
+    plan: { type: String, enum: ['FREE', 'STANDARD', 'PREMIUM'], default: 'FREE' },
+    startDate: { type: Date, default: Date.now },
+    endDate: Date,
+    graceEndDate: { type: Date, index: true },
+    status: { type: String, enum: ['ACTIVE', 'GRACE_PERIOD', 'EXPIRED'], default: 'ACTIVE' },
+    isActive: { type: Boolean, default: true }
   }
 });
 

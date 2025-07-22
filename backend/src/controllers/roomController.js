@@ -40,28 +40,6 @@ class RoomController {
     }
   }
 
-  async getRoomsByBoardingHouse(req, res) {
-    try {
-      const { boardingHouseId } = req.params;
-
-      if (!boardingHouseId) {
-        return res.status(400).json({ message: "Missing required parameters" });
-      }
-
-      const rooms = await Room.find({
-        boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId),
-      })
-        .populate("roomTypeId")
-        .populate("rentBy")
-        .sort({ createdAt: -1 });
-
-      res.status(200).json(rooms);
-    } catch (error) {
-      console.error("Error fetching rooms:", error);
-      res.status(500).json({ message: "Server error", error });
-    }
-  }
-
   async getUnpaidRoomsByBoardingHouse(req, res) {
     try {
       const { boardingHouseId } = req.params;
@@ -108,6 +86,7 @@ class RoomController {
 
       const filter = {
         boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId),
+        isActive: true,
       };
 
       const paginationOptions = {
@@ -135,87 +114,11 @@ class RoomController {
     }
   }
 
-  // Backend API - Improved addRoom method
+  // Giữ lại phương thức này - xử lý cả trường hợp thêm một hoặc nhiều phòng
   async addRoom(req, res) {
     try {
       const roomData = req.body;
       const rooms = Array.isArray(roomData) ? roomData : [roomData];
-
-      // Validate  required fields for each room
-      for (const room of rooms) {
-        const { roomNumber, boardingHouseId, description, roomTypeId } = room;
-
-        if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
-          return res.status(400).json({
-            message: "Missing required parameters",
-            missingFields: {
-              roomNumber,
-              boardingHouseId,
-              description,
-              roomTypeId,
-            },
-          });
-        }
-      }
-
-      // Check for duplicate room numbers in the same boarding house
-      const roomNumbers = rooms.map((room) => room.roomNumber);
-      const duplicateCheck = await Room.find({
-        boardingHouseId: rooms[0].boardingHouseId,
-        roomNumber: { $in: roomNumbers },
-      });
-
-      if (duplicateCheck.length > 0) {
-        const existingNumbers = duplicateCheck.map((room) => room.roomNumber);
-        return res.status(400).json({
-          message: "Some rooms already exist",
-          duplicateRooms: existingNumbers,
-        });
-      }
-
-      // Check for duplicates within the current batch
-      const uniqueNumbers = new Set(roomNumbers);
-      if (uniqueNumbers.size !== roomNumbers.length) {
-        const duplicatesInBatch = roomNumbers.filter(
-          (item, index) => roomNumbers.indexOf(item) !== index
-        );
-        return res.status(400).json({
-          message: "Duplicate room numbers in the same request",
-          duplicateRooms: [...new Set(duplicatesInBatch)],
-        });
-      }
-
-      // Create room documents
-      const roomDocs = rooms.map((room) => ({
-        roomNumber: room.roomNumber,
-        boardingHouseId: room.boardingHouseId,
-        description: room.description,
-        roomTypeId: room.roomTypeId,
-        isAvailable: true,
-        images: room.images || null,
-      }));
-
-      // Save all rooms
-      const savedRooms = await Room.insertMany(roomDocs);
-
-      res.status(201).json({
-        message: "Room added successfully",
-        room: savedRooms[0],
-      });
-    } catch (error) {
-      console.error("Error adding room:", error);
-      res.status(500).json({ message: "Server error", error: error.message });
-    }
-  }
-
-  // Alternative: Create separate endpoint for bulk add
-  async addRooms(req, res) {
-    try {
-      const { rooms } = req.body;
-
-      if (!Array.isArray(rooms) || rooms.length === 0) {
-        return res.status(400).json({ message: "Invalid rooms data" });
-      }
 
       // Validate required fields for each room
       for (const room of rooms) {
@@ -223,12 +126,12 @@ class RoomController {
 
         if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
           return res.status(400).json({
-            message: "Missing required parameters in one or more rooms",
+            message: "Missing required parameters",
             missingFields: {
-              roomNumber,
-              boardingHouseId,
-              description,
-              roomTypeId,
+              roomNumber: !roomNumber ? "required" : undefined,
+              boardingHouseId: !boardingHouseId ? "required" : undefined,
+              description: !description ? "required" : undefined,
+              roomTypeId: !roomTypeId ? "required" : undefined,
             },
           });
         }
@@ -274,13 +177,21 @@ class RoomController {
       // Save all rooms
       const savedRooms = await Room.insertMany(roomDocs);
 
-      res.status(201).json({
-        message: `${savedRooms.length} rooms added successfully`,
-        rooms: savedRooms,
-        count: savedRooms.length,
-      });
+      // Trả về response tương ứng dựa trên số lượng phòng đã thêm
+      if (savedRooms.length === 1) {
+        res.status(201).json({
+          message: "Room added successfully",
+          room: savedRooms[0],
+        });
+      } else {
+        res.status(201).json({
+          message: `${savedRooms.length} rooms added successfully`,
+          rooms: savedRooms,
+          count: savedRooms.length,
+        });
+      }
     } catch (error) {
-      console.error("Error adding rooms:", error);
+      console.error("Error adding room(s):", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }

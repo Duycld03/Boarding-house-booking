@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { TableCustom as Table, Button } from '@/component';
-import convertTimetap from '@/utils/convertTimetap';
+import React, { useState, useEffect } from "react";
+import { TableCustom as Table, Button } from "@/component";
+import convertTimetap from "@/utils/convertTimetap";
 import {
   getRenewalRequestByBhID,
   handleExtensionRequestAction,
-} from '@/api/renewalRequestAPI';
-import { Tag, Input, Modal, Form } from 'antd';
-import { toast } from 'react-toastify';
-import ConfirmModal from '@/component/ConfirmModal';
-import { useTranslation } from 'react-i18next';
+} from "@/api/renewalRequestAPI";
+import { Tag, Input, Modal, Form } from "antd";
+import { toast } from "react-toastify";
+import ConfirmModal from "@/component/ConfirmModal";
+import { useTranslation } from "react-i18next";
 
 const RenewalRequest = ({ boardingHouseId }) => {
-  const { t } = useTranslation('renewalManagement');
+  const { t } = useTranslation("renewalManagement");
 
   const statusColors = {
-    pending: 'orange',
-    accepted: 'green',
-    rejected: 'red',
+    pending: "orange",
+    accepted: "green",
+    rejected: "red",
   };
 
   const statusLabel = (status) => t(`status.${status}`);
@@ -25,7 +25,7 @@ const RenewalRequest = ({ boardingHouseId }) => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [reasonForCancel, setReasonForCancel] = useState('');
+  const [reasonForCancel, setReasonForCancel] = useState("");
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
 
   const [paginationOptions, setPaginationOptions] = useState({
@@ -60,8 +60,6 @@ const RenewalRequest = ({ boardingHouseId }) => {
         limit: paginationInfo.limit || 10,
       });
     } catch (error) {
-      console.error('❌ Failed to fetch renewal requests:', error);
-      toast.error(t('messages.fetchError'));
       setRequests([]);
     } finally {
       setLoading(false);
@@ -101,39 +99,39 @@ const RenewalRequest = ({ boardingHouseId }) => {
   const handleRejectConfirm = async () => {
     try {
       if (!reasonForCancel) {
-        toast.error(t('messages.rejectReasonRequired'));
+        toast.error(t("messages.rejectReasonRequired"));
         return;
       }
 
       await handleExtensionRequestAction(
         selectedRequest?.requestId,
-        'reject',
+        "reject",
         reasonForCancel
       );
-      toast.success(t('messages.rejectSuccess'));
+      toast.success(t("messages.rejectSuccess"));
       setIsRejectModalOpen(false);
-      setReasonForCancel('');
+      setReasonForCancel("");
       fetchRequests();
     } catch (error) {
-      console.error('Error rejecting renewal request:', error);
-      toast.error(t('messages.rejectError'));
+      console.error("Error rejecting renewal request:", error);
+      toast.error(t("messages.rejectError"));
     }
   };
 
   const handleConfirmAccept = async () => {
     try {
       if (!selectedRequest?.requestId) {
-        console.error('Request ID is missing');
+        console.error("Request ID is missing");
         return;
       }
 
-      await handleExtensionRequestAction(selectedRequest.requestId, 'accept');
-      toast.success(t('messages.acceptSuccess'));
+      await handleExtensionRequestAction(selectedRequest.requestId, "accept");
+      toast.success(t("messages.acceptSuccess"));
       setIsModalOpen(false);
       fetchRequests();
     } catch (error) {
-      console.error('Error accepting renewal request:', error);
-      toast.error(t('messages.acceptError'));
+      console.error("Error accepting renewal request:", error);
+      toast.error(t("messages.acceptError"));
     }
   };
 
@@ -144,59 +142,59 @@ const RenewalRequest = ({ boardingHouseId }) => {
 
   const handleCancelRejectModal = () => {
     setIsRejectModalOpen(false);
-    setReasonForCancel('');
+    setReasonForCancel("");
   };
 
   const columns = [
     {
-      title: t('table.tenantName'),
-      dataIndex: 'tenantName',
-      key: 'tenantName',
+      title: t("table.tenantName"),
+      dataIndex: "tenantName",
+      key: "tenantName",
     },
     {
-      title: t('table.roomNumber'),
-      dataIndex: 'roomNumber',
-      key: 'roomNumber',
+      title: t("table.roomNumber"),
+      dataIndex: "roomNumber",
+      key: "roomNumber",
     },
     {
-      title: t('table.boardingHouse'),
-      dataIndex: 'boardingHouseName',
-      key: 'boardingHouseName',
+      title: t("table.boardingHouse"),
+      dataIndex: "boardingHouseName",
+      key: "boardingHouseName",
     },
     {
-      title: t('table.status'),
-      dataIndex: 'status',
-      key: 'status',
+      title: t("table.status"),
+      dataIndex: "status",
+      key: "status",
       render: (status) => (
         <Tag color={statusColors[status]}>{statusLabel(status)}</Tag>
       ),
     },
     {
-      title: t('table.currentEndDate'),
-      dataIndex: 'currentEndDate',
-      key: 'currentEndDate',
+      title: t("table.currentEndDate"),
+      dataIndex: "currentEndDate",
+      key: "currentEndDate",
       render: (text) => convertTimetap(text, false),
     },
     {
-      title: t('table.requestedEndDate'),
-      dataIndex: 'requestedEndDate',
-      key: 'requestedEndDate',
+      title: t("table.requestedEndDate"),
+      dataIndex: "requestedEndDate",
+      key: "requestedEndDate",
       render: (text) => convertTimetap(text, false),
     },
     {
-      title: t('table.action'),
+      title: t("table.action"),
       render: (record) =>
-        record.status === 'pending' && (
+        record.status === "pending" && (
           <div className="flex gap-3 items-center">
             <Button
-              title={t('action.reject')}
+              title={t("action.reject")}
               btnReject
               size="large"
-              style={{ backgroundColor: 'red', color: 'white', border: 'none' }}
+              style={{ backgroundColor: "red", color: "white", border: "none" }}
               onClick={() => handleReject(record)}
             />
             <Button
-              title={t('action.accept')}
+              title={t("action.accept")}
               size="large"
               btnAccept
               className="text-white"
@@ -211,19 +209,19 @@ const RenewalRequest = ({ boardingHouseId }) => {
   return (
     <div>
       <Table
-        tableName={t('table.tableName')}
+        tableName={t("table.tableName")}
         columns={columns}
         data={requests}
         loading={loading}
         pagination={tablePaginationConfig}
         onChange={handleTableChange}
-        noDataText={t('messages.noData')}
+        noDataText={t("messages.noData")}
       />
 
       <ConfirmModal
-        title={t('modal.confirmTitle')}
-        content={t('modal.confirmContent', {
-          room: selectedRequest?.roomNumber || '',
+        title={t("modal.confirmTitle")}
+        content={t("modal.confirmContent", {
+          room: selectedRequest?.roomNumber || "",
         })}
         onOk={handleConfirmAccept}
         onCancel={handleCancelModal}
@@ -231,30 +229,30 @@ const RenewalRequest = ({ boardingHouseId }) => {
       />
 
       <Modal
-        title={t('modal.rejectTitle')}
+        title={t("modal.rejectTitle")}
         open={isRejectModalOpen}
         onOk={handleRejectConfirm}
         onCancel={handleCancelRejectModal}
-        okText={t('action.reject')}
+        okText={t("action.reject")}
         width="400px"
-        cancelText={t('action.cancel')}
+        cancelText={t("action.cancel")}
       >
         <Form layout="vertical">
           <Form.Item
-            label={t('form.rejectReason')}
+            label={t("form.rejectReason")}
             name="reasonForCancel"
             rules={[
               {
                 required: true,
-                message: t('form.rejectReasonRequired'),
+                message: t("form.rejectReasonRequired"),
               },
             ]}
           >
             <Input.TextArea
-              placeholder={t('form.rejectReasonPlaceholder')}
+              placeholder={t("form.rejectReasonPlaceholder")}
               value={reasonForCancel}
               onChange={(e) => setReasonForCancel(e.target.value)}
-              style={{ width: '100%', height: '100px' }}
+              style={{ width: "100%", height: "100px" }}
             />
           </Form.Item>
         </Form>

@@ -77,6 +77,18 @@ const BHDetailOwner = () => {
 
   const isOwner = hasRole(userRole.owner);
 
+  const [activeTab, setActiveTab] = useState("boardingHouseDetail");
+
+  // Hàm để chuyển đổi tab
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+  };
+
+  // Hàm để chuyển sang tab roomType
+  const switchToRoomType = () => {
+    setActiveTab("roomType");
+  };
+
   const fetchBoardingHouseDetails = async () => {
     if (!boardingHouseId) {
       toast.error(t("errors.noId"));
@@ -365,10 +377,10 @@ const BHDetailOwner = () => {
       payload.append("address[detail]", updatedData.address.detail);
       payload.append("location[lat]", updatedData.location.lat);
       payload.append("location[lon]", updatedData.location.lon);
- if (updatedData.staffId && updatedData.staffId !== 'undefined') {
-        payload.append('staffId', updatedData.staffId);
+      if (updatedData.staffId && updatedData.staffId !== "undefined") {
+        payload.append("staffId", updatedData.staffId);
       } else {
-        payload.append('staffId', '');
+        payload.append("staffId", "");
       }
       const oldImg = [];
 
@@ -429,7 +441,7 @@ const BHDetailOwner = () => {
         />{" "}
         {boardingHouseName || t("defaultTitle")}
       </h1>
-      <Tabs defaultActiveKey="boardingHouseDetail">
+      <Tabs activeKey={activeTab} onChange={handleTabChange}>
         {/* Tab: Boarding House Detail */}
         <Tabs.TabPane
           tab={t("tabs.boardingHouseDetail")}
@@ -466,7 +478,10 @@ const BHDetailOwner = () => {
         </Tabs.TabPane>
 
         <Tabs.TabPane tab={t("tabs.room")} key="room">
-          <RoomManagement boardingHouseId={boardingHouseId} />
+          <RoomManagement
+            boardingHouseId={boardingHouseId}
+            switchToRoomType={switchToRoomType}
+          />
         </Tabs.TabPane>
 
         {/* <Tabs.TabPane tab={t("tabs.tenantManagement")} key="tenantManagement">

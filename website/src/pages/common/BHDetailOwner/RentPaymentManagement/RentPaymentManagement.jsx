@@ -92,9 +92,14 @@ const RentPaymentManagement = () => {
       }
     } catch (error) {
       console.error("Error fetching payment bills:", error);
-      toast.error(
-        error.response?.data?.message || error.message || t("errorLoadingData")
-      );
+      // Kiểm tra nếu status không phải 404 thì mới hiển thị toast báo lỗi
+      if (error.response?.status !== 404) {
+        toast.error(
+          error.response?.data?.message ||
+            error.message ||
+            t("errorLoadingData")
+        );
+      }
       setRentPaymentData([]);
     } finally {
       setLoading(false);
@@ -259,7 +264,7 @@ const RentPaymentManagement = () => {
 
   return (
     <div
-      className={`container mx-auto py-8 px-4 ${
+      className={`container mx-auto px-4 ${
         darkMode ? "bg-gray-700 text-text-dark" : "text-text-light"
       }`}
     >

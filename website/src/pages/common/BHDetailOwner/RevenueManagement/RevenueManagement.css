@@ -1,6 +1,6 @@
 /* Dark Mode Styles */
 .dark-mode .revenue-management-container {
-  background-color: #1f1f1f;
+  background-color: #1f1f1f00;
   color: #e0e0e0;
 }
 
@@ -11,7 +11,7 @@
 
 /* Select boxes */
 .dark-mode .revenue-management-container select {
-  background-color: #141414;
+  background-color: #1f1f1f00;
   color: #e0e0e0;
   border-color: #434343;
 }
