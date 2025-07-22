@@ -33,7 +33,15 @@ const RevenueMonthlyView = ({
     !monthlyData.transactions ||
     monthlyData.transactions.length === 0
   ) {
-    return <Empty description={t("monthlyView.noData")} />;
+    return (
+      <Empty
+        description={
+          <span className={darkMode ? "text-gray-300" : "text-gray-500"}>
+            {t("monthlyView.noData")}
+          </span>
+        }
+      />
+    );
   }
 
   // Calculate total utility expenses

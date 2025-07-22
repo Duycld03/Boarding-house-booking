@@ -18,11 +18,13 @@ import {
 import { Input, Modal, Form } from "antd";
 import DepositRefundPopup from "./DepositRefundPopup";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/ThemeContext";
 
 function DepositRefundRequestOwner() {
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation("depositRefundRequest");
+  const { darkMode } = useTheme();
   const currentRequestRef = useRef(null);
 
   // State management
@@ -361,17 +363,20 @@ function DepositRefundRequestOwner() {
       showSizeChanger: true,
       showQuickJumper: true,
       pageSizeOptions: ["10", "20", "50", "100"],
-      showTotal: (total, range) =>
-        t("showingRecords", {
-          start: range[0],
-          end: range[1],
-          total,
-        }) || `Showing ${range[0]} to ${range[1]} of ${total} records`,
+      showTotal: (total, range) => (
+        <span className={darkMode ? "text-gray-300" : "text-gray-600"}>
+          {t("showingRecords", {
+            start: range[0],
+            end: range[1],
+            total,
+          }) || `Showing ${range[0]} to ${range[1]} of ${total} records`}
+        </span>
+      ),
       // Thêm các props này để đảm bảo hoạt động đúng
       hideOnSinglePage: false,
       responsive: true,
     }),
-    [pagination, t]
+    [pagination, t, darkMode]
   );
 
   return (
