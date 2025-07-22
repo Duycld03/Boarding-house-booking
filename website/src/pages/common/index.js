@@ -24,3 +24,4 @@ export { default as DepositRefundRequestOwner } from './DepositRefundRequestOwne
 export { default as RevenueManagementOwner } from './RevenueManagementOwner';
 export { default as DepositManagement } from './DepositManagement';
 export { default as AccessDeniedPage } from './AccessDeniedPage';
+export { default as Subscription } from './Subscription';

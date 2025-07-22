@@ -12,3 +12,7 @@ export const getRoomsByBoardingHouse = (boardingHouseId, paginationOptions = {})
 
     return axios.get(`/staff/room/boarding-house/${boardingHouseId}`, { params });
 }
+
+export const getRoomById = () => {
+    return axios.get(`/owner/total-room/`);
+}

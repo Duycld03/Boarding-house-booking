@@ -4,6 +4,10 @@ import Room from "../models/room.js";
 import PaymentBill from "../models/paymentBill.js";
 import paginate from "../utils/pagination.js";
 import DepositRoom from "../models/depositRoom.js";
+import BoardingHouse from "../models/boardingHouse.js";
+import { Owner } from "../models/account.js";
+import { LIMITS } from "../constants/subscriptionLimits.js";
+
 
 class RoomController {
   async getRoomsByRoomType(req, res) {
@@ -257,6 +261,49 @@ class RoomController {
     } catch (error) {
       console.error("Error deleting room:", error);
       res.status(500).json({ message: "Server error", error });
+    }
+  }
+
+  async getTotalRooms(req, res) {
+    try {
+      const ownerId = req.user.userId;
+
+      // Lấy tất cả boarding houses của owner
+      const boardingHouses = await BoardingHouse.find({
+        ownerId,
+        isActive: true
+      }).select('_id');
+
+      const boardingHouseIds = boardingHouses.map(bh => bh._id);
+
+      // Đếm tổng số phòng thuộc về các boarding house của owner
+      const totalRooms = await Room.countDocuments({
+        boardingHouseId: { $in: boardingHouseIds },
+        isActive: true
+      });
+
+      // Đếm số staff đang làm việc cho owner
+      const totalStaff = await mongoose.model('Account').countDocuments({
+        role: 'staff',
+        createdBy: ownerId,
+        deleted: false
+      });
+
+      return res.status(200).json({
+        success: true,
+        total: {
+          rooms: totalRooms,
+          boardingHouses: boardingHouses.length,
+          staff: totalStaff
+        }
+      });
+    } catch (error) {
+      console.error("Error getting resource counts:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message
+      });
     }
   }
 }

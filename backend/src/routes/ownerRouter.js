@@ -139,6 +139,11 @@ ownerRouter.get(
   roomController.getUnpaidRoomsByBoardingHouse
 );
 
+ownerRouter.get(
+  '/total-rooms/',
+  roomController.getTotalRooms
+);
+
 // get electrical and water price
 ownerRouter.get(
   '/electrical-water-price/:boardingHouseId',
