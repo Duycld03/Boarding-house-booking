@@ -330,136 +330,132 @@ const CalculateRent = ({
 
         if (darkMode) {
           style.innerHTML = `
-            .ant-modal-content {
+            .dark-calculate-rent-modal .ant-modal-content {
               background-color: #1f2937 !important;
               border-color: #374151 !important;
-              max-height: 90vh !important;
             }
             
-            .ant-modal-body {
+            .dark-calculate-rent-modal .ant-modal-body {
               background-color: #1f2937 !important;
-              max-height: 70vh !important;
-              overflow-y: auto !important;
               padding: 16px !important;
             }
             
-            .ant-modal-header {
+            .dark-calculate-rent-modal .ant-modal-header {
               background-color: #1f2937 !important;
               border-bottom-color: #374151 !important;
             }
             
-            .ant-modal-title {
+            .dark-calculate-rent-modal .ant-modal-title {
               color: #f9fafb !important;
             }
             
-            .ant-modal-close {
+            .dark-calculate-rent-modal .ant-modal-close {
               color: #f9fafb !important;
             }
             
-            .ant-modal-close:hover {
+            .dark-calculate-rent-modal .ant-modal-close:hover {
               color: #e5e7eb !important;
               background-color: #374151 !important;
             }
             
-            .ant-form-item-label > label {
+            .dark-calculate-rent-modal .ant-form-item-label > label {
               color: #f9fafb !important;
             }
             
-            .ant-select-selector {
+            .dark-calculate-rent-modal .ant-select-selector {
               background-color: #374151 !important;
               color: #f9fafb !important;
               border-color: #4b5563 !important;
             }
             
-            .ant-select-selection-placeholder {
+            .dark-calculate-rent-modal .ant-select-selection-placeholder {
               color: #9ca3af !important;
             }
             
-            .ant-select-arrow {
+            .dark-calculate-rent-modal .ant-select-arrow {
               color: #f9fafb !important;
             }
             
-            .ant-input {
+            .dark-calculate-rent-modal .ant-input {
               background-color: #374151 !important;
               color: #f9fafb !important;
               border-color: #4b5563 !important;
             }
             
-            .ant-input:hover {
+            .dark-calculate-rent-modal .ant-input:hover {
               border-color: #3b82f6 !important;
             }
             
-            .ant-input:focus {
+            .dark-calculate-rent-modal .ant-input:focus {
               border-color: #3b82f6 !important;
               box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
             }
             
-            .ant-input-group-addon {
+            .dark-calculate-rent-modal .ant-input-group-addon {
               background-color: #4b5563 !important;
               color: #f9fafb !important;
               border-color: #4b5563 !important;
             }
             
-            .ant-table {
+            .dark-calculate-rent-modal .ant-table {
               background-color: #1f2937 !important;
             }
             
-            .ant-table-thead > tr > th {
+            .dark-calculate-rent-modal .ant-table-thead > tr > th {
               background-color: #374151 !important;
               color: #f9fafb !important;
               border-color: #4b5563 !important;
             }
             
-            .ant-table-tbody > tr > td {
+            .dark-calculate-rent-modal .ant-table-tbody > tr > td {
               background-color: #1f2937 !important;
               color: #f9fafb !important;
               border-color: #4b5563 !important;
             }
             
-            .ant-table-tbody > tr:hover > td {
+            .dark-calculate-rent-modal .ant-table-tbody > tr:hover > td {
               background-color: #374151 !important;
             }
             
-            .ant-empty-description {
+            .dark-calculate-rent-modal .ant-empty-description {
               color: #9ca3af !important;
             }
             
-            .ant-btn-default {
+            .dark-calculate-rent-modal .ant-btn-default {
               background-color: #374151 !important;
               border-color: #4b5563 !important;
               color: #f9fafb !important;
             }
             
-            .ant-btn-default:hover {
+            .dark-calculate-rent-modal .ant-btn-default:hover {
               background-color: #4b5563 !important;
               border-color: #6b7280 !important;
               color: #f9fafb !important;
             }
             
-            .ant-btn-primary {
+            .dark-calculate-rent-modal .ant-btn-primary {
               background-color: #3b82f6 !important;
               border-color: #3b82f6 !important;
             }
             
-            .ant-btn-primary:hover {
+            .dark-calculate-rent-modal .ant-btn-primary:hover {
               background-color: #2563eb !important;
               border-color: #2563eb !important;
             }
             
-            .ant-spin-dot-item {
+            .dark-calculate-rent-modal .ant-spin-dot-item {
               background-color: #3b82f6 !important;
             }
           `;
         } else {
-          // Light mode styles - chỉ cần kiểm soát scroll
+          // Light mode styles
           style.innerHTML = `
-            .ant-modal-content {
-              max-height: 90vh !important;
+            .calculate-rent-modal .ant-modal-content {
+              background-color: #ffffff !important;
             }
             
-            .ant-modal-body {
-              max-height: 70vh !important;
-              overflow-y: auto !important;
+            .calculate-rent-modal .ant-modal-body {
+              background-color: #ffffff !important;
             }
           `;
         }
@@ -494,18 +490,19 @@ const CalculateRent = ({
       confirmLoading={loading}
       destroyOnClose
       width={700}
-      centered
       style={{
-        maxHeight: "90vh",
+        top: 20,
       }}
       bodyStyle={{
         ...styles.modalBodyStyle,
-        maxHeight: "70vh",
-        overflowY: "auto",
+        maxHeight: "none",
+        overflowY: "visible",
         padding: "16px",
       }}
       headerStyle={styles.modalHeaderStyle}
-      className={darkMode ? "dark-calculate-rent-modal" : ""}
+      className={
+        darkMode ? "dark-calculate-rent-modal" : "calculate-rent-modal"
+      }
       okButtonProps={{
         style: darkMode
           ? { background: "#3b82f6", borderColor: "#3b82f6" }
