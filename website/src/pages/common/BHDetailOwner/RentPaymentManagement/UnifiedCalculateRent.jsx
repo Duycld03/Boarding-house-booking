@@ -532,9 +532,8 @@ const UnifiedCalculateRent = ({
     .dark-segmented .ant-segmented-item:hover {
       background-color: #4b5563 !important;
     }
-    .dark-segmented .ant-segmented-item-selected {
-      background-color: #3b82f6 !important;
-      color: #ffffff !important;
+    .dark-segmented .ant-segmented-item-label[aria-selected="true"] {
+      color: #000 !important;
     }
     .dark-table .ant-table {
       background-color: #1f2937 !important;
@@ -575,6 +574,93 @@ const UnifiedCalculateRent = ({
     .dark-calculate-modal .ant-empty-description {
       color: #9ca3af !important;
     }
+    .dark-calculate-modal .ant-checkbox-wrapper {
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-checkbox-wrapper:hover {
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-progress-text {
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-divider {
+      border-color: #374151 !important;
+    }
+    .dark-calculate-modal .ant-spin-text {
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-table-summary {
+      background-color: #374151 !important;
+    }
+    .dark-calculate-modal .ant-table-summary-row > td {
+      background-color: #374151 !important;
+      border-color: #4b5563 !important;
+    }
+    .dark-calculate-modal .ant-select-dropdown {
+      background-color: #374151 !important;
+      border-color: #4b5563 !important;
+    }
+    .dark-calculate-modal .ant-select-item {
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-select-item:hover {
+      background-color: #4b5563 !important;
+    }
+    .dark-calculate-modal .ant-select-item-option-selected {
+      background-color: #3b82f6 !important;
+      color: #ffffff !important;
+    }
+    .dark-calculate-modal .ant-select-selection-placeholder {
+      color: #9ca3af !important;
+    }
+    .dark-calculate-modal .ant-select-multiple .ant-select-selection-item {
+      background-color: #4b5563 !important;
+      border-color: #6b7280 !important;
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-select-multiple .ant-select-selection-item-remove {
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-select-multiple .ant-select-selection-item-remove:hover {
+      color: #ef4444 !important;
+      background-color: rgba(239, 68, 68, 0.1) !important;
+    }
+    .dark-calculate-modal .ant-btn {
+      background-color: #374151 !important;
+      border-color: #4b5563 !important;
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-btn:hover {
+      background-color: #4b5563 !important;
+      border-color: #6b7280 !important;
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-modal-body {
+      background-color: #1f2937 !important;
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-modal-footer {
+      background-color: #1f2937 !important;
+      border-top: 1px solid #374151 !important;
+    }
+    .dark-calculate-modal .ant-typography {
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-table-cell {
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-input {
+      background-color: #374151 !important;
+      border-color: #4b5563 !important;
+      color: #f9fafb !important;
+    }
+    .dark-calculate-modal .ant-input:focus {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    }
+    .dark-calculate-modal .ant-input::placeholder {
+      color: #9ca3af !important;
+    }
   `;
 
   return (
@@ -605,19 +691,7 @@ const UnifiedCalculateRent = ({
             : {},
         }}
         footer={[
-          <Button
-            key="cancel"
-            onClick={onClose}
-            style={
-              darkMode
-                ? {
-                    background: "#374151",
-                    borderColor: "#4b5563",
-                    color: "#f9fafb",
-                  }
-                : {}
-            }
-          >
+          <Button key="cancel" onClick={onClose}>
             {t("cancel")}
           </Button>,
           <Button
@@ -629,9 +703,6 @@ const UnifiedCalculateRent = ({
               (calculationMode === "single" && !selectedRoom) ||
               (calculationMode === "bulk" && selectedRooms.length === 0) ||
               calculating
-            }
-            style={
-              darkMode ? { background: "#3b82f6", borderColor: "#3b82f6" } : {}
             }
           >
             {calculating ? t("calculating") : t("calculate")}
@@ -701,7 +772,15 @@ const UnifiedCalculateRent = ({
                     ))}
                   </Select>
                 ) : (
-                  <Empty description={t("noAvailableRooms")} />
+                  <Empty
+                    description={
+                      <span
+                        className={darkMode ? "text-gray-300" : "text-gray-500"}
+                      >
+                        {t("noAvailableRooms")}
+                      </span>
+                    }
+                  />
                 )}
               </Form.Item>
 
@@ -763,6 +842,7 @@ const UnifiedCalculateRent = ({
                       pagination={false}
                       size="small"
                       bordered
+                      className={darkMode ? "dark-table" : ""}
                       style={{
                         backgroundColor: darkMode ? "#374151" : "#f9fafb",
                       }}
@@ -859,6 +939,7 @@ const UnifiedCalculateRent = ({
                       pagination={false}
                       size="small"
                       bordered
+                      className={darkMode ? "dark-table" : ""}
                       style={{
                         backgroundColor: darkMode ? "#374151" : "#f9fafb",
                       }}
@@ -892,6 +973,7 @@ const UnifiedCalculateRent = ({
                         pagination={false}
                         size="small"
                         bordered
+                        className={darkMode ? "dark-table" : ""}
                       />
                     ) : (
                       <Alert
@@ -986,6 +1068,7 @@ const UnifiedCalculateRent = ({
                       pagination={false}
                       size="small"
                       bordered
+                      className={darkMode ? "dark-table" : ""}
                       style={{
                         backgroundColor: darkMode ? "#374151" : "#f9fafb",
                       }}
@@ -1097,7 +1180,15 @@ const UnifiedCalculateRent = ({
                     </Select>
                   </div>
                 ) : (
-                  <Empty description={t("noAvailableRooms")} />
+                  <Empty
+                    description={
+                      <span
+                        className={darkMode ? "text-gray-300" : "text-gray-500"}
+                      >
+                        {t("noAvailableRooms")}
+                      </span>
+                    }
+                  />
                 )}
               </Form.Item>
 
@@ -1151,15 +1242,6 @@ const UnifiedCalculateRent = ({
                         {t("totalEstimate")}:{" "}
                         {formatPrice(totalEstimate, { showFullFormat: true })}
                       </strong>
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          marginTop: "4px",
-                          opacity: 0.8,
-                        }}
-                      >
-                        ({t("excludingAdditionalFees")})
-                      </div>
                     </div>
                   </Form.Item>
                 </>
