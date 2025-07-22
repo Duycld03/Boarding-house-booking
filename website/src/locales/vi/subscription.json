@@ -1,0 +1,74 @@
+{
+  "pageTitle": "Chọn Gói Dịch Vụ",
+  "pageDescription": "Mở khóa tiềm năng kinh doanh nhà trọ của bạn với các công cụ quản lý mạnh mẽ",
+  "billing": {
+    "monthly": "Hàng tháng",
+    "yearly": "Hàng năm",
+    "saveLabel": "Tiết kiệm 17%"
+  },
+  "currentPlan": {
+    "title": "Gói hiện tại",
+    "daysRemaining": "Còn {{days}} ngày (hết hạn {{date}})",
+    "gracePeriod": "Thời gian gia hạn đến {{date}}",
+    "expired": "Đã hết hạn sử dụng",
+    "renewButton": "Gia hạn gói dịch vụ",
+    "status": {
+      "active": "Đang hoạt động",
+      "inactive": "Không hoạt động",
+      "expiringSoon": "Sắp hết hạn",
+      "gracePeriod": "Thời gian gia hạn",
+      "noPlan": "Chưa có gói"
+    }
+  },
+  "resources": {
+    "boardingHouses": "Nhà trọ",
+    "rooms": "Phòng",
+    "staff": "Nhân viên"
+  },
+  "plans": {
+    "free": {
+      "name": "Miễn phí",
+      "subtitle": "Hoàn hảo để bắt đầu",
+      "features": [
+        "1 Nhà trọ",
+        "Tối đa 5 phòng",
+        "Không có quản lý nhân viên",
+        "Bảng điều khiển cơ bản"
+      ]
+    },
+    "standard": {
+      "name": "Tiêu chuẩn",
+      "subtitle": "Tốt nhất cho doanh nghiệp đang phát triển",
+      "features": [
+        "Tối đa 5 nhà trọ",
+        "Tối đa 30 phòng",
+        "Tối đa 3 nhân viên",
+        "Báo cáo doanh thu"
+      ]
+    },
+    "premium": {
+      "name": "Cao cấp",
+      "subtitle": "Dành cho hoạt động quy mô lớn",
+      "features": [
+        "Không giới hạn nhà trọ",
+        "Không giới hạn phòng",
+        "Không giới hạn nhân viên",
+        "Báo cáo doanh thu",
+        "Đội ngũ hỗ trợ riêng"
+      ]
+    }
+  },
+  "pricing": {
+    "perMonth": "/tháng",
+    "perYear": "/năm",
+    "saveAmount": "Tiết kiệm ${{amount}} mỗi năm",
+    "monthlyCost": "${{amount}}/tháng khi thanh toán theo năm",
+    "currentPlan": "Gói hiện tại",
+    "getStarted": "Bắt đầu",
+    "upgradeTo": "Nâng cấp lên {{name}}",
+    "badges": {
+      "mostPopular": "Phổ biến nhất",
+      "enterprise": "Doanh nghiệp"
+    }
+  }
+}

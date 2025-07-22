@@ -23,77 +23,111 @@
 }
 
 /* Dark mode styles */
-.dark-card {
-  background-color: #1f1f1f;
-  border-color: #303030;
+.dark-mode .subscription-container {
+  background: rgb(31 41 55);
   color: #f0f0f0;
 }
 
-.dark-card-secondary {
-  background-color: #141414;
-  border-color: #303030;
+.dark-mode .subscription-hero {
+  background: linear-gradient(135deg, #4c3d9e 0%, #7269d0 100%) !important;
+  box-shadow: 0 10px 30px rgba(76, 61, 158, 0.3) !important;
 }
 
-.dark-card .ant-card-head {
-  border-bottom-color: #303030;
-  color: #f0f0f0;
+.dark-mode .subscription-card {
+  background: #3c4656 !important;
+  border-color: #303030 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
-.dark-card .ant-list-item {
-  border-bottom-color: #303030;
+.dark-mode .subscription-card .ant-card-head {
+  border-bottom-color: #303030 !important;
+  background: #1f1f1f !important;
+}
+
+.dark-mode .usage-card {
+  border-color: #303030 !important;
+}
+
+.dark-mode .ant-typography {
+  color: #f0f0f0 !important;
+}
+
+.dark-mode .ant-typography.ant-typography-secondary {
+  color: #bfbfbf !important;
+}
+
+.dark-mode .ant-list-item {
+  border-bottom-color: #303030 !important;
+}
+
+.dark-mode .billing-toggle {
+  background-color: rgba(48, 48, 48, 0.7) !important;
+  border-color: rgba(80, 80, 80, 0.5) !important;
+}
+
+.dark-mode .ant-switch {
+  background-color: rgba(80, 80, 80, 0.7) !important;
+}
+
+.dark-mode .ant-switch-checked {
+  background-color: #ffc53d !important;
+}
+
+.dark-mode .plan-feature-list .ant-list-item {
+  border-bottom: none !important;
 }
 
 .dark-modal .ant-modal-content {
-  background-color: #1f1f1f;
-  color: #f0f0f0;
+  background-color: #1f1f1f !important;
+  color: #f0f0f0 !important;
 }
 
 .dark-modal .ant-modal-header {
-  background-color: #1f1f1f;
-  border-bottom-color: #303030;
+  background-color: #1f1f1f !important;
+  border-bottom-color: #303030 !important;
 }
 
 .dark-modal .ant-modal-title {
-  color: #f0f0f0;
+  color: #f0f0f0 !important;
 }
 
 .dark-modal .ant-modal-close {
-  color: #999;
+  color: #999 !important;
 }
 
 .dark-modal .ant-modal-close:hover {
-  color: #f0f0f0;
+  color: #f0f0f0 !important;
 }
 
 .dark-modal .ant-modal-footer {
-  border-top-color: #303030;
+  border-top-color: #303030 !important;
 }
 
 .dark-tabs .ant-tabs-nav {
-  margin-bottom: 24px;
+  margin-bottom: 24px !important;
 }
 
 .dark-tabs .ant-tabs-tab {
-  background: #141414;
-  border-color: #303030;
+  background: #141414 !important;
+  border-color: #303030 !important;
 }
 
 .dark-tabs .ant-tabs-tab-active {
-  background: #1f1f1f;
-  border-color: #303030;
+  background: #1f1f1f !important;
+  border-color: #303030 !important;
 }
 
 .dark-tabs .ant-tabs-tab-btn {
-  color: #aaa;
+  color: #aaa !important;
 }
 
 .dark-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #1890ff;
+  color: #1890ff !important;
 }
 
 .dark-tabs .ant-tabs-content {
-  background: #1f1f1f;
-  border-color: #303030;
+  background: #1f1f1f !important;
+  border-color: #303030 !important;
 }
 
 /* Responsive adjustments */

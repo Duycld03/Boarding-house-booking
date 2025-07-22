@@ -159,13 +159,11 @@
 
 /* Modal */
 .dark-mode .ant-modal-content {
-  background-color: #1f1f1f;
   box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48),
     0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
 }
 
 .dark-mode .ant-modal-header {
-  background-color: #1f1f1f;
   border-color: #434343;
 }
 
@@ -189,7 +187,7 @@
 .dark-mode .ant-input,
 .dark-mode .ant-input-number,
 .dark-mode .ant-input-number-input {
-  background-color: #141414;
+  background-color: #1f2937;
   border-color: #434343;
   color: #d9d9d9;
 }

@@ -6,9 +6,11 @@ import PricingPlans from "./components/PricingPlans";
 import CurrentPlanCard from "./components/CurrentPlanCard";
 import PaymentModal from "./components/PaymentModal";
 import { plans } from "./data/plans";
-// import { getUserSubscription } from "../../../api/subscriptionAPI"; // Giả sử có API này
-import moment from "moment"; // Nhớ cài đặt moment nếu chưa có
 import { useCurrentUser } from "@/context/userContext";
+import { useTheme } from "@/context/ThemeContext";
+import { useTranslation } from "react-i18next";
+import "./SubscriptionPage.css";
+import i18n from "@/config-translation/config-translation";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -20,6 +22,8 @@ const SubscriptionPage = () => {
   const [currentPlan, setCurrentPlan] = useState("FREE");
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation("subscription");
+  const { darkMode } = useTheme();
 
   const { user } = useCurrentUser();
 
@@ -38,18 +42,7 @@ const SubscriptionPage = () => {
     };
 
     fetchSubscription();
-  }, []);
-
-  // Hàm tính toán usage hiện tại
-  const getCurrentUsage = () => {
-    return {
-      boardingHouses: { current: 1, limit: 1 },
-      rooms: { current: 4, limit: 5 },
-      staff: { current: 0, limit: 0 },
-    };
-  };
-
-  const usage = getCurrentUsage();
+  }, [user]);
 
   const getProgressColor = (current, limit) => {
     if (limit === 0) return "#ff4d4f";
@@ -72,19 +65,35 @@ const SubscriptionPage = () => {
   const currentPlanObject =
     plans.find((plan) => plan.key === currentPlan) || plans[0];
 
+  // Get localized plans data
+  const localizedPlans = plans.map((plan) => {
+    const key = plan.key.toLowerCase();
+    return {
+      ...plan,
+      name: t(`plans.${key}.name`),
+      subtitle: t(`plans.${key}.subtitle`),
+      features: t(`plans.${key}.features`, { returnObjects: true }),
+      badge: plan.badge
+        ? t(`pricing.badges.${plan.badge.toLowerCase().replace(" ", "")}`)
+        : null,
+    };
+  });
+
   return (
     <div
+      className={`subscription-container ${darkMode ? "dark-mode" : ""}`}
       style={{
         maxWidth: "1400px",
         margin: "0 auto",
         padding: "40px 24px",
-        background: "#f5f7fa",
+        background: darkMode ? "rgb(31 41 55)" : "#f5f7fa",
         minHeight: "100vh",
       }}
     >
       {/* Hero Section */}
       <div style={{ textAlign: "center", marginBottom: "60px" }}>
         <div
+          className="subscription-hero"
           style={{
             background: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)",
             borderRadius: "20px",
@@ -103,7 +112,7 @@ const SubscriptionPage = () => {
             }}
           >
             <CrownOutlined style={{ marginRight: "16px", color: "#ffd700" }} />
-            Choose Your Plan
+            {t("pageTitle")}
           </Title>
           <Paragraph
             style={{
@@ -114,12 +123,12 @@ const SubscriptionPage = () => {
               margin: "0 auto 30px",
             }}
           >
-            Unlock the full potential of your boarding house business with our
-            powerful management tools
+            {t("pageDescription")}
           </Paragraph>
 
           {/* Billing Toggle */}
           <div
+            className="billing-toggle"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -138,7 +147,7 @@ const SubscriptionPage = () => {
                 fontWeight: billingCycle === "monthly" ? "600" : "400",
               }}
             >
-              Monthly
+              {t("billing.monthly")}
             </Text>
             <Switch
               checked={billingCycle === "yearly"}
@@ -159,12 +168,12 @@ const SubscriptionPage = () => {
                 fontWeight: billingCycle === "yearly" ? "600" : "400",
               }}
             >
-              Yearly
+              {t("billing.yearly")}
               <Tag
                 color="gold"
                 style={{ marginLeft: "8px", fontWeight: "600" }}
               >
-                Save 17%
+                {t("billing.saveLabel")}
               </Tag>
             </Text>
           </div>
@@ -175,20 +184,21 @@ const SubscriptionPage = () => {
         {/* Current Plan Status */}
         <CurrentPlanCard
           currentPlan={currentPlanObject}
-          usage={usage}
           getProgressColor={getProgressColor}
           getProgressPercent={getProgressPercent}
-          subscription={subscription} // Truyền dữ liệu subscription từ API
+          subscription={subscription}
+          darkMode={darkMode}
         />
 
         {/* Pricing Plans */}
         <PricingPlans
-          plans={plans}
+          plans={localizedPlans}
           currentPlan={currentPlan}
           billingCycle={billingCycle}
           handleUpgrade={handleUpgrade}
           hoveredCard={hoveredCard}
           setHoveredCard={setHoveredCard}
+          darkMode={darkMode}
         />
       </div>
 
@@ -198,6 +208,7 @@ const SubscriptionPage = () => {
         setShowPaymentModal={setShowPaymentModal}
         selectedPlan={selectedPlan}
         billingCycle={billingCycle}
+        darkMode={darkMode}
       />
     </div>
   );

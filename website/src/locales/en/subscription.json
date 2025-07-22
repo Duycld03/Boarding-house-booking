@@ -1,0 +1,74 @@
+{
+  "pageTitle": "Choose Your Plan",
+  "pageDescription": "Unlock the full potential of your boarding house business with our powerful management tools",
+  "billing": {
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "saveLabel": "Save 17%"
+  },
+  "currentPlan": {
+    "title": "Current Plan",
+    "daysRemaining": "{{days}} days remaining (expires {{date}})",
+    "gracePeriod": "Grace period until {{date}}",
+    "expired": "Subscription has expired",
+    "renewButton": "Renew Subscription",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "expiringSoon": "Expiring Soon",
+      "gracePeriod": "Grace Period",
+      "noPlan": "No Plan"
+    }
+  },
+  "resources": {
+    "boardingHouses": "Boarding Houses",
+    "rooms": "Rooms",
+    "staff": "Staff Members"
+  },
+  "plans": {
+    "free": {
+      "name": "Free",
+      "subtitle": "Perfect for getting started",
+      "features": [
+        "1 Boarding House",
+        "Up to 5 Rooms",
+        "No Staff Management",
+        "Basic dashboard"
+      ]
+    },
+    "standard": {
+      "name": "Standard",
+      "subtitle": "Best for growing businesses",
+      "features": [
+        "Up to 5 Boarding Houses",
+        "Up to 30 Rooms",
+        "Up to 3 Staff Members",
+        "Revenue Reports"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "subtitle": "For large-scale operations",
+      "features": [
+        "Unlimited Boarding Houses",
+        "Unlimited Rooms",
+        "Unlimited Staff",
+        "Dedicated Support Team",
+        "Revenue Reports"
+      ]
+    }
+  },
+  "pricing": {
+    "perMonth": "/month",
+    "perYear": "/year",
+    "saveAmount": "Save ${{amount}} per year",
+    "monthlyCost": "${{amount}}/month when billed annually",
+    "currentPlan": "Current Plan",
+    "getStarted": "Get Started",
+    "upgradeTo": "Upgrade to {{name}}",
+    "badges": {
+      "mostPopular": "Most Popular",
+      "enterprise": "Enterprise"
+    }
+  }
+}

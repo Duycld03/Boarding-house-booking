@@ -1,6 +1,9 @@
 import React from "react";
 import { Card, Button, Row, Col, Typography, List, Space } from "antd";
 import { CheckCircleFilled } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
+import formatAmount, { formatPrice } from "@/utils/formatAmount";
 
 const { Title, Text } = Typography;
 
@@ -11,11 +14,40 @@ const PricingPlans = ({
   handleUpgrade,
   hoveredCard,
   setHoveredCard,
+  darkMode,
 }) => {
+  const { t } = useTranslation("subscription");
+  const currentLanguage = i18next.language;
+
+  console.log("currrent plan", plans);
+
   return (
     <Row gutter={[24, 24]} style={{ marginTop: "40px" }}>
       {plans.map((plan) => {
         const PlanIcon = plan.icon;
+
+        // Lấy giá hiện tại dựa vào billing cycle
+        const currentPrice =
+          billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
+
+        // Format giá theo ngôn ngữ hiện tại
+        const formattedPrice =
+          plan.monthlyPrice > 0
+            ? formatPrice(currentPrice, currentLanguage, {
+                showFullFormat: true,
+              })
+            : "0";
+
+        // Format giá để hiển thị tiết kiệm
+        const savingAmount = plan.originalYearlyPrice - plan.yearlyPrice;
+        const formattedSaving = formatPrice(savingAmount, currentLanguage);
+
+        // Format giá hàng tháng khi thanh toán theo năm
+        const monthlyFromYearly = Math.round(plan.yearlyPrice / 12);
+        const formattedMonthlyFromYearly = formatPrice(
+          monthlyFromYearly,
+          currentLanguage
+        );
 
         return (
           <Col xs={24} lg={8} key={plan.key}>
@@ -33,18 +65,25 @@ const PricingPlans = ({
               onMouseLeave={() => setHoveredCard(null)}
             >
               <Card
+                className={`subscription-card ${darkMode ? "dark-mode" : ""}`}
                 style={{
                   height: "100%",
                   borderRadius: "16px",
                   border:
                     currentPlan === plan.key
                       ? `2px solid ${plan.color}`
+                      : darkMode
+                      ? "1px solid #303030"
                       : "1px solid #f0f0f0",
                   boxShadow:
                     hoveredCard === plan.key
-                      ? "0 16px 32px rgba(0, 0, 0, 0.15)"
+                      ? darkMode
+                        ? "0 16px 32px rgba(0, 0, 0, 0.3)"
+                        : "0 16px 32px rgba(0, 0, 0, 0.15)"
+                      : darkMode
+                      ? "0 6px 16px rgba(0, 0, 0, 0.2)"
                       : "0 6px 16px rgba(0, 0, 0, 0.08)",
-                  background: "white",
+                  background: darkMode ? "#1f1f1f" : "white",
                   overflow: "hidden",
                   position: "relative",
                   display: "flex",
@@ -108,28 +147,36 @@ const PricingPlans = ({
                   style={{
                     padding: "24px",
                     textAlign: "center",
-                    borderBottom: "1px solid #f0f0f0",
+                    borderBottom: darkMode
+                      ? "1px solid #303030"
+                      : "1px solid #f0f0f0",
                   }}
                 >
                   <div style={{ marginBottom: "12px" }}>
+                    {/* Sử dụng giá đã được format */}
                     <span
                       style={{
-                        fontSize: "40px",
+                        fontSize: "34px",
                         fontWeight: "700",
-                        color: "#1a1a1a",
+                        color: darkMode ? "#f0f0f0" : "#1a1a1a",
                       }}
                     >
-                      {plan.monthlyPrice > 0 && "$"}
-                      {billingCycle === "monthly"
-                        ? plan.monthlyPrice
-                        : plan.yearlyPrice}
+                      {plan.monthlyPrice === 0
+                        ? formatAmount(0, currentLanguage)
+                        : formattedPrice}
                     </span>
                     {plan.monthlyPrice > 0 && (
                       <Text
                         type="secondary"
-                        style={{ fontSize: "16px", marginLeft: "6px" }}
+                        style={{
+                          fontSize: "16px",
+                          marginLeft: "6px",
+                          color: darkMode ? "#bfbfbf" : undefined,
+                        }}
                       >
-                        /{billingCycle === "monthly" ? "month" : "year"}
+                        {billingCycle === "monthly"
+                          ? t("pricing.perMonth")
+                          : t("pricing.perYear")}
                       </Text>
                     )}
                   </div>
@@ -143,13 +190,19 @@ const PricingPlans = ({
                           fontWeight: "600",
                         }}
                       >
-                        Save ${plan.originalYearlyPrice - plan.yearlyPrice} per
-                        year
+                        {t("pricing.saveAmount", { amount: formattedSaving })}
                       </Text>
                       <br />
-                      <Text type="secondary" style={{ fontSize: "12px" }}>
-                        ${Math.round(plan.yearlyPrice / 12)}/month when billed
-                        annually
+                      <Text
+                        type="secondary"
+                        style={{
+                          fontSize: "12px",
+                          color: darkMode ? "#bfbfbf" : undefined,
+                        }}
+                      >
+                        {t("pricing.monthlyCost", {
+                          amount: formattedMonthlyFromYearly,
+                        })}
                       </Text>
                     </div>
                   )}
@@ -169,10 +222,14 @@ const PricingPlans = ({
                     }}
                   >
                     <List
+                      className="plan-feature-list"
                       dataSource={plan.features}
                       renderItem={(feature) => (
                         <List.Item
-                          style={{ padding: "10px 0", border: "none" }}
+                          style={{
+                            padding: "10px 0",
+                            border: "none",
+                          }}
                         >
                           <Space align="start">
                             <CheckCircleFilled
@@ -182,7 +239,14 @@ const PricingPlans = ({
                                 marginTop: "2px",
                               }}
                             />
-                            <Text style={{ fontSize: "14px" }}>{feature}</Text>
+                            <Text
+                              style={{
+                                fontSize: "14px",
+                                color: darkMode ? "#f0f0f0" : undefined,
+                              }}
+                            >
+                              {feature}
+                            </Text>
                           </Space>
                         </List.Item>
                       )}
@@ -200,9 +264,12 @@ const PricingPlans = ({
                           borderRadius: "10px",
                           fontSize: "15px",
                           fontWeight: "600",
+                          background: darkMode ? "#303030" : undefined,
+                          color: darkMode ? "#999" : undefined,
+                          borderColor: darkMode ? "#444" : undefined,
                         }}
                       >
-                        <CheckCircleFilled /> Current Plan
+                        <CheckCircleFilled /> {t("pricing.currentPlan")}
                       </Button>
                     ) : (
                       <Button
@@ -229,8 +296,8 @@ const PricingPlans = ({
                         }}
                       >
                         {plan.key === "FREE"
-                          ? "Get Started"
-                          : `Upgrade to ${plan.name}`}
+                          ? t("pricing.getStarted")
+                          : t("pricing.upgradeTo", { name: plan.name })}
                       </Button>
                     )}
                   </div>

@@ -4,6 +4,7 @@ import { HomeOutlined, BuildOutlined, TeamOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { LIMITS } from "../data/plans";
 import { useCurrentUser } from "@/context/userContext";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
@@ -16,9 +17,9 @@ const calculateDaysRemaining = (endDate) => {
 };
 
 // Lấy trạng thái hiển thị của subscription
-const getSubscriptionStatus = (subscription) => {
+const getSubscriptionStatus = (subscription, t) => {
   if (!subscription || !subscription.isActive)
-    return { text: "Inactive", color: "error" };
+    return { text: t("currentPlan.status.inactive"), color: "error" };
 
   const daysRemaining = calculateDaysRemaining(subscription.endDate);
   const graceEndDate = moment(subscription.graceEndDate);
@@ -28,29 +29,40 @@ const getSubscriptionStatus = (subscription) => {
     today.isAfter(moment(subscription.endDate)) &&
     today.isBefore(graceEndDate)
   ) {
-    return { text: "Grace Period", color: "warning" };
+    return { text: t("currentPlan.status.gracePeriod"), color: "warning" };
   }
 
   if (daysRemaining <= 7) {
-    return { text: "Expiring Soon", color: "warning" };
+    return { text: t("currentPlan.status.expiringSoon"), color: "warning" };
   }
 
-  return { text: "Active", color: "success" };
+  return { text: t("currentPlan.status.active"), color: "success" };
 };
 
-// Giảm kích thước của Usage Progress Card
-const UsageProgressCard = ({ title, current, limit, color, percent, icon }) => {
+// Component để hiển thị thẻ sử dụng tài nguyên
+const UsageProgressCard = ({
+  title,
+  current,
+  limit,
+  color,
+  percent,
+  icon,
+  darkMode,
+}) => {
   // Xử lý hiển thị đúng giới hạn
   const displayLimit = limit === Infinity ? "∞" : limit;
 
   return (
     <div
+      className={darkMode ? "usage-card" : ""}
       style={{
         textAlign: "center",
         padding: "16px 12px",
-        background: "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)",
+        background: darkMode
+          ? "linear-gradient(135deg, rgb(55, 65, 81) 0%, rgb(75, 85, 99) 100%)"
+          : "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)",
         borderRadius: "12px",
-        border: "1px solid #f0f0f0",
+        border: darkMode ? "1px solid rgb(75, 85, 99)" : "1px solid #f0f0f0",
       }}
     >
       <div style={{ fontSize: "26px", marginBottom: "10px", color }}>
@@ -75,6 +87,7 @@ const UsageProgressCard = ({ title, current, limit, color, percent, icon }) => {
           fontWeight: "500",
           marginTop: "6px",
           display: "block",
+          color: darkMode ? "#e5e7eb" : undefined,
         }}
       >
         {title}
@@ -83,13 +96,16 @@ const UsageProgressCard = ({ title, current, limit, color, percent, icon }) => {
   );
 };
 
-// Giảm kích thước của Current Plan Card
+// Component thẻ gói hiện tại
 const CurrentPlanCard = ({
   currentPlan,
   getProgressColor,
   getProgressPercent,
   subscription,
+  darkMode,
 }) => {
+  const { t } = useTranslation("subscription");
+
   // Lấy thông tin resources từ user context
   const { user } = useCurrentUser();
   const resourceData = user?.resources || {
@@ -103,12 +119,17 @@ const CurrentPlanCard = ({
     ? calculateDaysRemaining(subscription.endDate)
     : 0;
   const subscriptionStatus = subscription
-    ? getSubscriptionStatus(subscription)
-    : { text: "No Plan", color: "default" };
+    ? getSubscriptionStatus(subscription, t)
+    : { text: t("currentPlan.status.noPlan"), color: "default" };
 
   // Format hiển thị ngày hết hạn
   const formattedEndDate = subscription?.endDate
     ? moment(subscription.endDate).format("MMM DD, YYYY")
+    : "-";
+
+  // Format hiển thị ngày gia hạn
+  const formattedGraceEndDate = subscription?.graceEndDate
+    ? moment(subscription.graceEndDate).format("MMM DD, YYYY")
     : "-";
 
   // Xử lý giới hạn theo loại plan
@@ -136,10 +157,13 @@ const CurrentPlanCard = ({
 
   return (
     <Card
+      className={`subscription-card ${darkMode ? "dark-mode" : ""}`}
       style={{
         borderRadius: "16px",
-        background: "white",
-        boxShadow: "0 6px 20px rgba(0, 0, 0, 0.08)",
+        background: darkMode ? "rgb(31, 41, 55)" : "white",
+        boxShadow: darkMode
+          ? "0 6px 20px rgba(0, 0, 0, 0.25)"
+          : "0 6px 20px rgba(0, 0, 0, 0.08)",
         border: `1.5px solid ${currentPlan.color}`,
         overflow: "hidden",
         marginBottom: "30px",
@@ -147,7 +171,9 @@ const CurrentPlanCard = ({
     >
       <div
         style={{
-          background: `linear-gradient(135deg, ${currentPlan.color}10 0%, ${currentPlan.color}03 100%)`,
+          background: darkMode
+            ? `linear-gradient(135deg, ${currentPlan.color}25 0%, ${currentPlan.color}15 100%)`
+            : `linear-gradient(135deg, ${currentPlan.color}10 0%, ${currentPlan.color}03 100%)`,
           padding: "16px 20px",
           marginBottom: "16px",
           borderRadius: "12px",
@@ -182,9 +208,12 @@ const CurrentPlanCard = ({
               >
                 <Title
                   level={4}
-                  style={{ margin: 0, color: currentPlan.color }}
+                  style={{
+                    margin: 0,
+                    color: darkMode ? "#f9fafb" : currentPlan.color,
+                  }}
                 >
-                  Current Plan: {currentPlan.name}
+                  {t("currentPlan.title")}: {currentPlan.name}
                 </Title>
                 {subscription && (
                   <Tag
@@ -199,21 +228,30 @@ const CurrentPlanCard = ({
                 )}
               </div>
               {subscription && (
-                <Text type="secondary" style={{ fontSize: "13px" }}>
+                <Text
+                  type="secondary"
+                  style={{
+                    fontSize: "13px",
+                    color: darkMode ? "#d1d5db" : undefined,
+                  }}
+                >
                   {daysRemaining > 0
-                    ? `${daysRemaining} days remaining (expires ${formattedEndDate})`
+                    ? t("currentPlan.daysRemaining", {
+                        days: daysRemaining,
+                        date: formattedEndDate,
+                      })
                     : subscription.status === "ACTIVE"
-                    ? `Grace period until ${moment(
-                        subscription.graceEndDate
-                      ).format("MMM DD, YYYY")}`
-                    : "Subscription has expired"}
+                    ? t("currentPlan.gracePeriod", {
+                        date: formattedGraceEndDate,
+                      })
+                    : t("currentPlan.expired")}
                 </Text>
               )}
             </div>
           </div>
         </div>
 
-        {/* Nút gia hạn giữ nguyên */}
+        {/* Nút gia hạn */}
         {subscription &&
           (daysRemaining <= 7 ||
             moment().isAfter(moment(subscription.endDate))) && (
@@ -227,7 +265,7 @@ const CurrentPlanCard = ({
                   fontSize: "12px",
                 }}
               >
-                Renew Subscription
+                {t("currentPlan.renewButton")}
               </Button>
             </div>
           )}
@@ -238,11 +276,19 @@ const CurrentPlanCard = ({
         {[
           {
             key: "boardingHouses",
-            title: "Boarding Houses",
+            title: t("resources.boardingHouses"),
             icon: <HomeOutlined />,
           },
-          { key: "rooms", title: "Rooms", icon: <BuildOutlined /> },
-          { key: "staff", title: "Staff Members", icon: <TeamOutlined /> },
+          {
+            key: "rooms",
+            title: t("resources.rooms"),
+            icon: <BuildOutlined />,
+          },
+          {
+            key: "staff",
+            title: t("resources.staff"),
+            icon: <TeamOutlined />,
+          },
         ].map((item) => (
           <Col xs={24} sm={8} key={item.key}>
             <UsageProgressCard
@@ -268,6 +314,7 @@ const CurrentPlanCard = ({
                     )
               }
               icon={item.icon}
+              darkMode={darkMode}
             />
           </Col>
         ))}
