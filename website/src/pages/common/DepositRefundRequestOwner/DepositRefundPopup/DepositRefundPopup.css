@@ -180,13 +180,15 @@
   box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
 }
 
-/* Additional styles to prevent horizontal scroll */
-.ant-modal-content {
+/* Additional styles to prevent horizontal scroll - scoped to deposit refund modal */
+.dark-modal .ant-modal-content,
+.deposit-refund-modal .ant-modal-content {
   overflow-x: hidden !important;
   max-height: 90vh !important;
 }
 
-.ant-modal-body {
+.dark-modal .ant-modal-body,
+.deposit-refund-modal .ant-modal-body {
   overflow-x: hidden !important;
   overflow-y: auto !important;
   max-width: 100% !important;
@@ -194,84 +196,102 @@
   padding: 8px !important;
 }
 
-.ant-card {
+.dark-modal .ant-card,
+.deposit-refund-modal .ant-card {
   margin-bottom: 8px !important;
 }
 
-.ant-card-body {
+.dark-modal .ant-card-body,
+.deposit-refund-modal .ant-card-body {
   padding: 12px !important;
 }
 
-.ant-card-head {
+.dark-modal .ant-card-head,
+.deposit-refund-modal .ant-card-head {
   padding: 0 12px !important;
   min-height: 40px !important;
 }
 
-.ant-row {
+.dark-modal .ant-row,
+.deposit-refund-modal .ant-row {
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
 
-.ant-col {
+.dark-modal .ant-col,
+.deposit-refund-modal .ant-col {
   padding-left: 4px !important;
   padding-right: 4px !important;
 }
 
-.ant-input-number {
+.dark-modal .ant-input-number,
+.deposit-refund-modal .ant-input-number {
   min-width: 0 !important;
   max-width: 100% !important;
 }
 
-.ant-input-number-input {
+.dark-modal .ant-input-number-input,
+.deposit-refund-modal .ant-input-number-input {
   min-width: 0 !important;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments - scoped to deposit refund modal */
 @media (max-width: 576px) {
-  .ant-modal {
+  .dark-modal .ant-modal,
+  .deposit-refund-modal .ant-modal {
     margin: 8px !important;
     max-width: calc(100vw - 16px) !important;
   }
 
-  .ant-modal-content {
+  .dark-modal .ant-modal-content,
+  .deposit-refund-modal .ant-modal-content {
     margin: 0 !important;
     max-height: 95vh !important;
   }
 
-  .ant-modal-body {
+  .dark-modal .ant-modal-body,
+  .deposit-refund-modal .ant-modal-body {
     max-height: 80vh !important;
     padding: 6px !important;
   }
 
-  .ant-col {
+  .dark-modal .ant-col,
+  .deposit-refund-modal .ant-col {
     margin-bottom: 6px;
   }
 
-  .ant-card-body {
+  .dark-modal .ant-card-body,
+  .deposit-refund-modal .ant-card-body {
     padding: 8px !important;
   }
 
-  .ant-card-head {
+  .dark-modal .ant-card-head,
+  .deposit-refund-modal .ant-card-head {
     padding: 0 8px !important;
     min-height: 36px !important;
   }
 }
 
-/* Additional optimizations for damage assessment section */
-.ant-form-item {
+/* Additional optimizations for damage assessment section - scoped to deposit refund modal */
+.dark-modal .ant-form-item,
+.deposit-refund-modal .ant-form-item {
   margin-bottom: 12px !important;
 }
 
-.ant-form-item-label {
+.dark-modal .ant-form-item-label,
+.deposit-refund-modal .ant-form-item-label {
   padding-bottom: 2px !important;
 }
 
-.ant-input,
-.ant-input-number {
+.dark-modal .ant-input,
+.dark-modal .ant-input-number,
+.deposit-refund-modal .ant-input,
+.deposit-refund-modal .ant-input-number {
   height: 32px !important;
 }
 
-.ant-btn-sm {
+.dark-modal .ant-btn-sm,
+.deposit-refund-modal .ant-btn-sm {
   height: 24px !important;
   padding: 0 6px !important;
 }
