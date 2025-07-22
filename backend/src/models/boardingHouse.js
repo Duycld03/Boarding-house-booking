@@ -56,18 +56,6 @@ const BoardingHouseSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-    totalRooms: {
-      type: Number,
-      required: false,
-      min: 0,
-      default: 0,
-    },
-    availableRooms: {
-      type: Number,
-      required: false,
-      min: 0,
-      default: 0,
-    },
     electricityPrice: {
       type: Number,
       required: true,

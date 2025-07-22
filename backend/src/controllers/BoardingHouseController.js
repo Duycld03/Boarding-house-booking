@@ -12,6 +12,7 @@ import multer from 'multer';
 import { Account } from '../models/account.js';
 import Review from '../models/review.js';
 import paginate from '../utils/pagination.js';
+import boardingHouseService from '../service/boardingHouseService.js';
 
 class boardingHouseController {
   async getAllBHOnDashBoard(req, res, next) {
@@ -23,7 +24,10 @@ class boardingHouseController {
         })
         .sort({ createdAt: -1 });
 
-      return res.status(200).json(boardingHData);
+      // Thêm thống kê vào kết quả
+      const boardingHDataWithStats = await boardingHouseService.addStatsToBoaringHouses(boardingHData);
+
+      return res.status(200).json(boardingHDataWithStats);
     } catch (error) {
       console.error('Error fetching boarding house data:', error);
       return res.status(500).json({
@@ -47,9 +51,13 @@ class boardingHouseController {
           message: 'Boarding house not found',
         });
       }
+
+      // Thêm thống kê vào kết quả
+      const boardingHouseWithStats = await boardingHouseService.addStatsToBoaringHouse(boardingHouse);
+
       return res.status(200).json({
         success: true,
-        data: boardingHouse,
+        data: boardingHouseWithStats,
       });
     } catch (error) {
       console.error('Error fetching boarding house details:', error);
@@ -76,7 +84,11 @@ class boardingHouseController {
           message: 'Boarding house not found',
         });
       }
-      return res.status(200).json(boardingHouse);
+
+      // Thêm thống kê vào kết quả
+      const boardingHouseWithStats = await boardingHouseService.addStatsToBoaringHouse(boardingHouse);
+
+      return res.status(200).json(boardingHouseWithStats);
     } catch (error) {
       console.error('Error fetching boarding house details:', error);
       return res.status(500).json({
@@ -492,9 +504,16 @@ class boardingHouseController {
       // Lưu boarding house vào database
       const savedBoardingHouse = await newBoardingHouse.save();
 
+      // Thêm thống kê vào kết quả (sẽ là 0 vì chưa có phòng)
+      const boardingHouseWithStats = {
+        ...savedBoardingHouse.toObject(),
+        totalRooms: 0,
+        availableRooms: 0
+      };
+
       return res.status(201).json({
         message: 'Boarding house created successfully!',
-        data: savedBoardingHouse,
+        data: boardingHouseWithStats,
       });
     } catch (error) {
       console.error('Error creating boarding house:', error);
@@ -603,6 +622,8 @@ class boardingHouseController {
         { filter, page, limit },
         req
       );
+
+      // Populate cần thiết
       paginatedResult.data = await BoardingHouse.populate(
         paginatedResult.data,
         [
@@ -610,15 +631,8 @@ class boardingHouseController {
           { path: 'ownerId' },
         ]
       );
-      // // Query the boarding houses based on filter
-      // const boardingHouses = await BoardingHouse.find(filter)
-      //   .populate('boardingHouseType')
-      //   .populate({
-      //     path: 'ownerId',
-      //   })
-      //   .sort({ createdAt: -1 });
 
-      // Lọc bổ sung dựa trên province, district, ward, name (nếu cần thiết)
+      // Lọc thêm theo province, district, v.v...
       paginatedResult.data = paginatedResult.data.filter((bh) => {
         return (
           (!province ||
@@ -638,6 +652,9 @@ class boardingHouseController {
             (bh.name && bh.name.toLowerCase().includes(name.toLowerCase())))
         );
       });
+
+      // Thêm thông tin stats vào kết quả
+      paginatedResult.data = await boardingHouseService.addStatsToBoaringHouses(paginatedResult.data);
 
       res.status(200).json(paginatedResult);
     } catch (error) {
@@ -923,6 +940,12 @@ class boardingHouseController {
       // Gọi helper paginate
       const result = await paginate(BoardingHouse, paginationOptions, req);
 
+      // Thêm thống kê phòng vào kết quả
+      const boardingHousesWithStats = await boardingHouseService.addStatsToBoaringHouses(result.data);
+
+      // Cập nhật lại data trong result
+      result.data = boardingHousesWithStats;
+
       return res.status(200).json({
         success: true,
         ...result,
@@ -954,10 +977,10 @@ class boardingHouseController {
         priceRange,
         electricityPrice,
         waterPrice,
-        totalRooms = 0,
         staffId,
-        availableRooms = 0,
       } = req.body;
+
+      // Xóa totalRooms và availableRooms từ req.body
 
       const boardingHouseTypeExists =
         await BoardingHouseType.findById(boardingHouseType);
@@ -968,35 +991,7 @@ class boardingHouseController {
           .json({ message: 'Invalid boarding house type.' });
       }
 
-      if (!name || /[!@#$%^&*(),.?":{}|<>]/g.test(name)) {
-        console.error('Invalid name:', name);
-        return res.status(400).json({
-          message: 'Name is required and must not contain special characters.',
-        });
-      }
-      const existingBoardingHouse = await BoardingHouse.findOne({ name });
-      if (existingBoardingHouse) {
-        console.error('Boarding house name already exists:', name);
-        return res.status(400).json({
-          message: 'A boarding house with this name already exists.',
-        });
-      }
-
-      if (
-        !address ||
-        !address.province?.name ||
-        !address.province?.name_en ||
-        !address.district?.name ||
-        !address.district?.name_en ||
-        !address.ward?.name ||
-        !address.ward?.name_en
-      ) {
-        console.error('Invalid address structure:', address);
-        return res.status(400).json({
-          message:
-            'Province, district, and ward must include both name and name_en.',
-        });
-      }
+      // Các validation còn lại giữ nguyên...
 
       let validManagerId = staffId;
       if (staffId === '') {
@@ -1032,16 +1027,21 @@ class boardingHouseController {
         address,
         location,
         images,
-        totalRooms,
-        availableRooms,
-        staffId: validManagerId, // Use validManagerId here
+        staffId: validManagerId,
       });
 
       const savedBoardingHouse = await newBoardingHouse.save();
 
+      // Thêm thống kê vào kết quả (sẽ là 0 vì chưa có phòng)
+      const boardingHouseWithStats = {
+        ...savedBoardingHouse.toObject(),
+        totalRooms: 0,
+        availableRooms: 0
+      };
+
       return res.status(201).json({
         message: 'Boarding house created successfully!',
-        data: savedBoardingHouse,
+        data: boardingHouseWithStats,
       });
     } catch (error) {
       console.error('Error creating boarding house:', error);
@@ -1051,6 +1051,7 @@ class boardingHouseController {
       });
     }
   }
+
   async updateBoardingHouseDetailsOwner(req, res, next) {
     try {
       const { id } = req.params; // Boarding house ID

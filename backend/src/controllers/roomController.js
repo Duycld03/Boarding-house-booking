@@ -4,6 +4,8 @@ import Room from "../models/room.js";
 import PaymentBill from "../models/paymentBill.js";
 import paginate from "../utils/pagination.js";
 import DepositRoom from "../models/depositRoom.js";
+import BoardingHouse from "../models/boardingHouse.js";
+import boardingHouseService from "../service/boardingHouseService.js";
 
 class RoomController {
   async getRoomsByRoomType(req, res) {
@@ -141,7 +143,7 @@ class RoomController {
       const roomData = req.body;
       const rooms = Array.isArray(roomData) ? roomData : [roomData];
 
-      // Validate  required fields for each room
+      // Validate required fields for each room
       for (const room of rooms) {
         const { roomNumber, boardingHouseId, description, roomTypeId } = room;
 
@@ -149,10 +151,10 @@ class RoomController {
           return res.status(400).json({
             message: "Missing required parameters",
             missingFields: {
-              roomNumber,
-              boardingHouseId,
-              description,
-              roomTypeId,
+              roomNumber: !roomNumber ? "required" : undefined,
+              boardingHouseId: !boardingHouseId ? "required" : undefined,
+              description: !description ? "required" : undefined,
+              roomTypeId: !roomTypeId ? "required" : undefined,
             },
           });
         }
@@ -198,12 +200,27 @@ class RoomController {
       // Save all rooms
       const savedRooms = await Room.insertMany(roomDocs);
 
-      res.status(201).json({
-        message: "Room added successfully",
-        room: savedRooms[0],
-      });
+      // Lấy boarding house và thêm stats
+      const boardingHouse = await BoardingHouse.findById(rooms[0].boardingHouseId);
+      const boardingHouseWithStats = await boardingHouseService.addStatsToBoaringHouse(boardingHouse);
+
+      // Trả về response tương ứng dựa trên số lượng phòng đã thêm
+      if (savedRooms.length === 1) {
+        res.status(201).json({
+          message: "Room added successfully",
+          room: savedRooms[0],
+          boardingHouse: boardingHouseWithStats
+        });
+      } else {
+        res.status(201).json({
+          message: `${savedRooms.length} rooms added successfully`,
+          rooms: savedRooms,
+          count: savedRooms.length,
+          boardingHouse: boardingHouseWithStats
+        });
+      }
     } catch (error) {
-      console.error("Error adding room:", error);
+      console.error("Error adding room(s):", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
@@ -288,7 +305,7 @@ class RoomController {
   async updateRoom(req, res) {
     try {
       const { roomId } = req.params;
-      const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
+      const { roomNumber, boardingHouseId, description, roomTypeId, isAvailable } = req.body;
 
       if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
         return res.status(400).json({ message: "Missing required parameters" });
@@ -313,8 +330,11 @@ class RoomController {
 
       room.description = description;
       room.roomTypeId = roomTypeId;
-      // room.isAvailable = true;
-      // room.boardingHouseId = boardingHouseId;
+
+      // Cập nhật trạng thái phòng nếu được cung cấp
+      if (isAvailable !== undefined) {
+        room.isAvailable = isAvailable;
+      }
 
       if (req.file) {
         if (room?.images?.publicId) {
@@ -328,12 +348,22 @@ class RoomController {
       }
 
       await room.save();
-      res.status(201).json({ message: "Room added successfully" });
+
+      // Lấy boarding house và thêm stats mới sau khi cập nhật phòng
+      const boardingHouse = await BoardingHouse.findById(boardingHouseId);
+      const boardingHouseWithStats = await boardingHouseService.addStatsToBoaringHouse(boardingHouse);
+
+      res.status(200).json({
+        message: "Room updated successfully",
+        room: room,
+        boardingHouse: boardingHouseWithStats
+      });
     } catch (error) {
-      console.error("Error adding room:", error);
+      console.error("Error updating room:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
+
   async deleteRoom(req, res) {
     try {
       const { roomId } = req.params;
@@ -341,8 +371,25 @@ class RoomController {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
+      // Lấy thông tin phòng trước khi xóa
+      const room = await Room.findById(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      const boardingHouseId = room.boardingHouseId;
+
+      // Xóa phòng
       await Room.findByIdAndDelete(roomId);
-      res.status(200).json({ message: "Room deleted successfully" });
+
+      // Lấy boarding house và thêm stats mới sau khi xóa phòng
+      const boardingHouse = await BoardingHouse.findById(boardingHouseId);
+      const boardingHouseWithStats = await boardingHouseService.addStatsToBoaringHouse(boardingHouse);
+
+      res.status(200).json({
+        message: "Room deleted successfully",
+        boardingHouse: boardingHouseWithStats
+      });
     } catch (error) {
       console.error("Error deleting room:", error);
       res.status(500).json({ message: "Server error", error });
