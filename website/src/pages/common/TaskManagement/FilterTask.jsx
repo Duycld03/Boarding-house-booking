@@ -47,7 +47,7 @@ const FilterTask = ({ setFilterValue, onClose }) => {
         setSelectedPriority(undefined);
         setSelectedStatus(undefined);
         setFilterValue(undefined);
-        setOpen(false);
+        // setOpen(false);
     };
 
     const themeConfig = {

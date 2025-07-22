@@ -76,6 +76,7 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
             onCancel={onClose}
             onOk={() => form.submit()}
             okText={t('actions.save')}
+            forceRender
             footer={null}
         >
             <Form

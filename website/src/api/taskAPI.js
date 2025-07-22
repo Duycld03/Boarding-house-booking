@@ -1,13 +1,9 @@
 import axios from './axios.config';
-export const getOwnerTasks = (filterValue = {}) => {
-    return axios.get('/owner/tasks', {
-        params: filterValue,
-    });
+export const getOwnerTasks = (params = {}) => {
+    return axios.get('/owner/tasks', { params });
 };
-export const getStaffTasks = (filterValue = {}) => {
-    return axios.get('/staff/tasks', {
-        params: filterValue,
-    });
+export const getStaffTasks = (params = {}) => {
+    return axios.get('/staff/tasks', { params });
 };
 export const createOwnerTask = (taskData) => {
     return axios.post('/owner/tasks', taskData);

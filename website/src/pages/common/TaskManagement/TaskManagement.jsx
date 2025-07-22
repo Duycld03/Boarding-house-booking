@@ -33,6 +33,16 @@ function TaskManagement() {
 
     const [filterValue, setFilterValue] = useState();
     const [staffList, setStaffList] = useState([]);
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        total: 0,
+    });
+
+    const [paginationOptions, setPaginationOptions] = useState({
+        page: 1,
+        limit: 10,
+    });
     useEffect(() => {
     }, [filterValue]);
     const columns = useMemo(
@@ -147,19 +157,23 @@ function TaskManagement() {
         setLoading(true);
         try {
             const res = isOwner
-                ? await getOwnerTasks(filterValue)
-                : await getStaffTasks(filterValue);
+                ? await getOwnerTasks({ ...filterValue, ...paginationOptions })
+                : await getStaffTasks({ ...filterValue, ...paginationOptions });
+
             setTasks(res.data || []);
+            setPagination({
+                current: res.pagination?.currentPage || 1,
+                pageSize: res.pagination?.limit || 10,
+                total: res.pagination?.totalItems || 0,
+            });
         } catch (error) {
             toast.error(t('messages.fetchFailed'));
         } finally {
             setLoading(false);
         }
-    }, [isOwner, filterValue]);
+    }, [isOwner, filterValue, paginationOptions, t]);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+
 
     const handleDelete = async () => {
         if (!selectedTask?._id) return;
@@ -177,7 +191,34 @@ function TaskManagement() {
     };
     useEffect(() => {
     }, [staffList]);
+    const handleTableChange = useCallback(
+        (pagination, filters, sorter) => {
+            const newPaginationOptions = {
+                ...paginationOptions,
+                page: pagination.current,
+                limit: pagination.pageSize,
+            };
 
+            setPaginationOptions(newPaginationOptions);
+        },
+        [paginationOptions]
+    );
+
+    const tablePaginationConfig = useMemo(
+        () => ({
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            onChange: handleTableChange,
+        }),
+        [pagination, handleTableChange]
+    );
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData, paginationOptions]);
     return (
         <div>
             <TaskModal
@@ -211,6 +252,8 @@ function TaskManagement() {
                 data={tasks}
                 loading={loading}
                 noDataText={t('table.noData')}
+                pagination={tablePaginationConfig}
+                onChange={handleTableChange}
             />
 
             <ConfirmModal
