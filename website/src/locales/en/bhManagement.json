@@ -97,9 +97,9 @@
   "form": {
     "section": {
       "information": "1. Information",
-      "price": "2. Price",
+      "price": "4. Price",
       "images": "3. Image",
-      "address": "4. Address"
+      "address": "2. Address"
     },
     "labels": {
       "boardingHouseName": "Name Boarding House",
