@@ -195,7 +195,7 @@ function DepositRefundPopup({
       width={700}
       destroyOnClose
       centered
-      className={darkMode ? "dark-modal" : ""}
+      className={`deposit-refund-modal ${darkMode ? "dark-modal" : ""}`}
       style={{ maxWidth: "90vw" }}
     >
       <Spin spinning={loading}>
