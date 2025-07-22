@@ -39,6 +39,9 @@ const BoardingHouseForm = ({
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const lang = i18n.language || 'vi';
+  const selectedManager = managers.find(
+    (m) => m._id === updatedData.staffId && !m.isDeleted
+  );
 
   return (
     <div className="mx-auto md:w-[100%]">
@@ -140,22 +143,28 @@ const BoardingHouseForm = ({
               <Form.Item label={t('form.labels.manager')}>
                 <Select
                   name="staffId"
-                  value={updatedData.staffId || ''}
+                  value={selectedManager ? selectedManager._id : undefined}
                   onChange={(value) => {
                     setUpdatedData((prev) => ({
                       ...prev,
                       staffId: value,
                     }));
                   }}
-                  // disabled={!isOwner}
                   className={darkMode ? 'dark-mode-select' : ''}
                   placeholder={t('form.placeholders.selectManager')}
+                  showSearch
+                  allowClear
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().includes(input.toLowerCase())
+                  }
                 >
-                  {managers.map((manager) => (
-                    <Select.Option key={manager._id} value={manager._id}>
-                      {manager.fullname}
-                    </Select.Option>
-                  ))}
+                  {managers
+                    .filter((manager) => !manager.isDeleted)
+                    .map((manager) => (
+                      <Select.Option key={manager._id} value={manager._id}>
+                        {manager.fullname}
+                      </Select.Option>
+                    ))}
                 </Select>
               </Form.Item>
             )}
