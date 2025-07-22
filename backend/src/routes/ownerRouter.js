@@ -146,6 +146,10 @@ ownerRouter.post(
   "/calculate-monthly-bill",
   paymentBillController.calculateMonthlyRoomRent
 );
+ownerRouter.post(
+  "/calculate-bulk-monthly-bill",
+  paymentBillController.calculateBulkMonthlyRent
+);
 ownerRouter.get("/staff", managerController.getStaff);
 ownerRouter.post("/addstaff", managerController.addStaff);
 ownerRouter.delete("/staff/:id", managerController.deleteStaff);

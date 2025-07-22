@@ -192,6 +192,10 @@ staffRouter.post(
   "/calculate-monthly-bill",
   paymentBillController.calculateMonthlyRoomRent
 );
+staffRouter.post(
+  "/calculate-bulk-monthly-bill",
+  paymentBillController.calculateBulkMonthlyRent
+);
 staffRouter.put(
   "/payment-bill/:paymentBillId",
   paymentBillController.updatePaymentBill

@@ -77,7 +77,6 @@ class RoomController {
       const paidRooms = await PaymentBill.find({
         month: lastMonth,
         year: lastYear,
-        status: { $regex: /^paid$/i },
       }).distinct("roomId");
 
       const validDeposits = await DepositRoom.find({

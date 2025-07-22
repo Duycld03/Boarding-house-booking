@@ -3,6 +3,7 @@ import Revenue from "../models/revenue.js";
 import Room from "../models/room.js";
 import UserPayment from "../models/userPayment.js";
 import DepositRoom from "../models/depositRoom.js";
+import RoomAdditionalFees from "../models/roomAdditionalFees.js";
 import paginate from "../utils/pagination.js";
 
 class PaymentBillController {
@@ -94,7 +95,7 @@ class PaymentBillController {
 
   async calculateMonthlyRoomRent(req, res) {
     try {
-      const { roomId, paymentAmount, additionalFees = [] } = req.body;
+      const { roomId } = req.body;
 
       const now = new Date();
       const month = now.getMonth() === 0 ? 12 : now.getMonth();
@@ -108,10 +109,13 @@ class PaymentBillController {
           .json({ message: "This month's rent has been paid." });
       }
 
-      const room = await Room.findById(roomId).populate("rentBy").populate({
-        path: "boardingHouseId",
-        select: "electricityPrice waterPrice",
-      });
+      const room = await Room.findById(roomId)
+        .populate("rentBy")
+        .populate("roomTypeId") // Add roomTypeId populate to get room price
+        .populate({
+          path: "boardingHouseId",
+          select: "electricityPrice waterPrice",
+        });
       if (!room) {
         return res.status(404).json({ message: "Not found room" });
       }
@@ -140,6 +144,25 @@ class PaymentBillController {
         electricalQuantityConsumed * electricityPrice;
       const waterTotalAmount = waterQuantityConsumed * waterPrice;
 
+      // Get room price from roomTypeId
+      const roomPrice = room.roomTypeId?.price || 0;
+
+      // Get room-specific additional fees from database
+      const roomAdditionalFees = await RoomAdditionalFees.find({ roomId });
+
+      // Calculate additional fees total from room-specific fees
+      const additionalFeeTotal = roomAdditionalFees.reduce(
+        (sum, fee) => sum + (Number(fee.feeAmount) || 0),
+        0
+      );
+
+      // Calculate total payment amount
+      const paymentAmount =
+        roomPrice +
+        electricalTotalAmount +
+        waterTotalAmount +
+        additionalFeeTotal;
+
       // Update room utility readings - move current to previous for next billing cycle
       room.previousElectricityReading = electricalNewNumber;
       room.previousWaterReading = waterNewNumber;
@@ -147,9 +170,11 @@ class PaymentBillController {
       // Save room with updated readings
       await room.save();
 
-      const additionalFee = additionalFees.map((fee) => {
-        return { feeName: fee.name, feeAmount: fee.amount };
-      });
+      // Format additional fees from room-specific fees
+      const additionalFee = roomAdditionalFees.map((fee) => ({
+        feeName: fee.feeName,
+        feeAmount: fee.feeAmount,
+      }));
 
       // Tạo PaymentBill với dữ liệu từ room
       const newPaymentBill = await PaymentBill.create({
@@ -186,27 +211,6 @@ class PaymentBillController {
         paymentMethod: "",
       }));
       await UserPayment.insertMany(userPayments);
-
-      let revenue = await Revenue.findOne({
-        month,
-        year,
-        boardingHouseId: room.boardingHouseId,
-      });
-      if (!revenue) {
-        revenue = await Revenue.create({
-          boardingHouseId: room.boardingHouseId,
-          month,
-          year,
-          totalRevenue: paymentAmount,
-          transactionCount: 1,
-          transactions: [newPaymentBill._id],
-        });
-      } else {
-        revenue.transactions.push(newPaymentBill._id);
-        revenue.totalRevenue += paymentAmount;
-        revenue.transactionCount += 1;
-        await revenue.save();
-      }
 
       res.status(201).json({
         message: "Calculate monthly rent successfully",
@@ -426,6 +430,212 @@ class PaymentBillController {
       });
     } catch (error) {
       return res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  async calculateBulkMonthlyRent(req, res) {
+    try {
+      const { roomIds } = req.body;
+
+      if (!roomIds || !Array.isArray(roomIds) || roomIds.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Room IDs array is required and cannot be empty",
+        });
+      }
+
+      const now = new Date();
+      const month = now.getMonth() === 0 ? 12 : now.getMonth();
+      const year =
+        now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+
+      const results = [];
+      const errors = [];
+
+      // Process each room
+      for (const roomId of roomIds) {
+        try {
+          // Check if bill already exists for this room
+          const existingBill = await PaymentBill.findOne({
+            roomId,
+            month,
+            year,
+          });
+          if (existingBill) {
+            errors.push({
+              roomId,
+              error: `Payment bill already exists for this month`,
+            });
+            continue;
+          }
+
+          const room = await Room.findById(roomId)
+            .populate("rentBy")
+            .populate("roomTypeId") // Add roomTypeId populate to get room price
+            .populate({
+              path: "boardingHouseId",
+              select: "electricityPrice waterPrice",
+            });
+
+          if (!room) {
+            errors.push({
+              roomId,
+              error: "Room not found",
+            });
+            continue;
+          }
+
+          if (!room.rentBy || room.rentBy.length === 0) {
+            errors.push({
+              roomId,
+              error: "No tenants found in this room",
+            });
+            continue;
+          }
+
+          // Get utility prices from boarding house
+          const electricityPrice = room.boardingHouseId?.electricityPrice || 0;
+          const waterPrice = room.boardingHouseId?.waterPrice || 0;
+
+          // Get utility readings from room
+          const electricalOldNumber = room.previousElectricityReading || 0;
+          const electricalNewNumber = room.currentElectricityReading || 0;
+          const waterOldNumber = room.previousWaterReading || 0;
+          const waterNewNumber = room.currentWaterReading || 0;
+
+          // Calculate consumption and costs
+          const electricalQuantityConsumed = Math.max(
+            0,
+            electricalNewNumber - electricalOldNumber
+          );
+          const waterQuantityConsumed = Math.max(
+            0,
+            waterNewNumber - waterOldNumber
+          );
+
+          const electricalTotalAmount =
+            electricalQuantityConsumed * electricityPrice;
+          const waterTotalAmount = waterQuantityConsumed * waterPrice;
+
+          // Calculate room price
+          const roomPrice = room.roomTypeId?.price || 0;
+
+          // Get room-specific additional fees
+          const roomAdditionalFees = await RoomAdditionalFees.find({ roomId });
+
+          // Calculate additional fees total from room-specific fees
+          const additionalFeeTotal = roomAdditionalFees.reduce(
+            (sum, fee) => sum + (Number(fee.feeAmount) || 0),
+            0
+          );
+
+          // Calculate total payment amount
+          const paymentAmount =
+            roomPrice +
+            electricalTotalAmount +
+            waterTotalAmount +
+            additionalFeeTotal;
+
+          // Update room utility readings - move current to previous for next billing cycle
+          room.previousElectricityReading = electricalNewNumber;
+          room.previousWaterReading = waterNewNumber;
+          await room.save();
+
+          // Format additional fees from room-specific fees
+          const additionalFee = roomAdditionalFees.map((fee) => ({
+            feeName: fee.feeName,
+            feeAmount: fee.feeAmount,
+          }));
+
+          // Create PaymentBill
+          const newPaymentBill = await PaymentBill.create({
+            roomId,
+            paymentAmount,
+            status: "pending",
+            electricalBill: {
+              oldNumber: electricalOldNumber,
+              newNumber: electricalNewNumber,
+              quantityConsumed: electricalQuantityConsumed,
+              totalAmount: electricalTotalAmount,
+            },
+            waterBill: {
+              oldNumber: waterOldNumber,
+              newNumber: waterNewNumber,
+              quantityConsumed: waterQuantityConsumed,
+              totalAmount: waterTotalAmount,
+            },
+            additionalFee: additionalFee,
+            month,
+            year,
+          });
+
+          // Create UserPayments for each tenant
+          const totalPeople = room.rentBy.length;
+          const splitAmount = paymentAmount / totalPeople;
+
+          const userPayments = room.rentBy.map((user) => ({
+            paymentBillId: newPaymentBill._id,
+            accountId: user._id,
+            paymentAmount: splitAmount,
+            status: "Pending",
+            paymentMethod: "",
+          }));
+          await UserPayment.insertMany(userPayments);
+
+          // Update revenue
+          let revenue = await Revenue.findOne({
+            month,
+            year,
+            boardingHouseId: room.boardingHouseId,
+          });
+          if (!revenue) {
+            revenue = await Revenue.create({
+              boardingHouseId: room.boardingHouseId,
+              month,
+              year,
+              totalRevenue: paymentAmount,
+              transactionCount: 1,
+              transactions: [newPaymentBill._id],
+            });
+          } else {
+            revenue.transactions.push(newPaymentBill._id);
+            revenue.totalRevenue += paymentAmount;
+            revenue.transactionCount += 1;
+            await revenue.save();
+          }
+
+          results.push({
+            roomId,
+            roomNumber: room.roomNumber,
+            paymentBill: newPaymentBill,
+            success: true,
+          });
+        } catch (error) {
+          errors.push({
+            roomId,
+            error: error.message,
+          });
+          console.log(`Error processing room ${roomId}:`, error);
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: `Bulk calculation completed. ${results.length} successful, ${errors.length} failed.`,
+        results,
+        errors,
+        summary: {
+          total: roomIds.length,
+          successful: results.length,
+          failed: errors.length,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Error in bulk calculation",
+        error: error.message,
+      });
     }
   }
 }

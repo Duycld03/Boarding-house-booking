@@ -374,7 +374,7 @@ function UpdateRoomPage({
                 {/* Utility Readings Section */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Text strong className={`${getTextColor()} text-lg`}>
+                    <Text strong className={`${getTextColor()} text-2xl`}>
                       {t("roomManagement.updateRoom.utilityReadings")}
                     </Text>
                   </div>

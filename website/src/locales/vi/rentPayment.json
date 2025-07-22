@@ -7,6 +7,8 @@
   "waterBill": "Tiền Nước",
   "paymentAmount": "Tổng Tiền",
   "calculateMonthly": "Tính Tiền Tháng",
+  "calculateBulk": "Tính Tiền Hàng Loạt",
+  "calculateRent": "Tính Tiền Thuê",
   "noRentData": "Không có dữ liệu thanh toán",
   "notApplicable": "Không có",
   "pending": "Đang chờ",
