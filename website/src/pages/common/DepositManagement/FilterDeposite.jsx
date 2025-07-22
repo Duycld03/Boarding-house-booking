@@ -1,20 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { Select, Slider, Form } from "antd";
 import ButtonCustom from "@/component/Button";
+import { useTheme } from "@/context/ThemeContext";
+import "./DepositManagement.css";
 
 const { Option } = Select;
 
 function FilterDeposit({
   setFilterValue,
   listRoom,
-  boardingHouses = [], // Thêm prop boardingHouses
+  boardingHouses = [],
   maxRentalTime = 12,
   loading = false,
   t,
 }) {
+  const { darkMode } = useTheme();
+  // State to manage filter popup visibility and form values
   const [isOpen, setIsOpen] = useState(false);
   const [form] = Form.useForm();
   const [rentalTime, setRentalTime] = useState([1, maxRentalTime]);
+
+  // Ref to control dropdown
+  const selectRef = useRef(null);
+  const boardingHouseSelectRef = useRef(null);
+
+  // Apply dark mode to dropdown when it opens
+  const handleDropdownVisibleChange = (open, selectName) => {
+    if (open && darkMode) {
+      setTimeout(() => {
+        const dropdowns = document.querySelectorAll(".ant-select-dropdown");
+        dropdowns.forEach((dropdown) => {
+          dropdown.classList.add("dark-mode-dropdown");
+        });
+      }, 0);
+    }
+  };
 
   // Cập nhật giá trị state khi props thay đổi
   useEffect(() => {
@@ -65,6 +85,7 @@ function FilterDeposit({
 
   return (
     <div className="relative inline-block text-left">
+      {/* Filter button */}
       <ButtonCustom
         onClick={handleFilterClick}
         size="large"
@@ -72,11 +93,29 @@ function FilterDeposit({
         btnFilter
         disabled={loading}
       />
+
       {isOpen && (
-        <div className="absolute right-0 z-10 mt-2 w-96 rounded-md bg-white ring-1 shadow-lg ring-black/5 p-4">
-          <Form form={form} onFinish={handleSubmit} layout="vertical">
+        <div
+          className={`absolute right-0 z-10 mt-2 w-96 rounded-md shadow-lg p-4 ${
+            darkMode ? "bg-gray-800" : "bg-white"
+          }`}
+        >
+          <Form
+            form={form}
+            onFinish={handleSubmit}
+            layout="vertical"
+            className={darkMode ? "dark-form" : ""}
+          >
             <Form.Item className="mb-2" label="Status" name="status">
-              <Select placeholder="Select status" allowClear>
+              <Select
+                placeholder="Select status"
+                allowClear
+                className={darkMode ? "dark-select" : ""}
+                ref={selectRef}
+                onDropdownVisibleChange={(open) =>
+                  handleDropdownVisibleChange(open, "status")
+                }
+              >
                 <Option value="accepted">{t(`status.accepted`)}</Option>
                 <Option value="deleted">{t(`status.deleted`)}</Option>
                 <Option value="pending">{t(`status.pending`)}</Option>
@@ -84,12 +123,13 @@ function FilterDeposit({
               </Select>
             </Form.Item>
 
+            {/* Rental Time slider */}
             <Form.Item
               className="mb-2"
               label="Rental Time Range"
               name="rentalTime"
             >
-              <div className="flex justify-between text-2xl mt-1 mb-2">
+              <div className="flex justify-between mt-1 mb-2 rental-range-labels">
                 <p>min: {rentalTime[0]} </p>
                 <p>max: {rentalTime[1]}</p>
               </div>
@@ -103,12 +143,21 @@ function FilterDeposit({
                   setRentalTime(value);
                   form.setFieldsValue({ rentalTime: value });
                 }}
+                className={darkMode ? "dark-slider" : ""}
               />
             </Form.Item>
 
-            {/* Thay thế Room Number bằng Boarding House */}
+            {/* Boarding House select */}
             <Form.Item label="Boarding House" name="boardingHouseId">
-              <Select placeholder="Select boarding house" allowClear>
+              <Select
+                placeholder="Select boarding house"
+                allowClear
+                className={darkMode ? "dark-select" : ""}
+                ref={boardingHouseSelectRef}
+                onDropdownVisibleChange={(open) =>
+                  handleDropdownVisibleChange(open, "boardingHouse")
+                }
+              >
                 {boardingHouses?.map((bh) => (
                   <Option key={bh._id} value={bh._id}>
                     {bh.name}
@@ -117,6 +166,7 @@ function FilterDeposit({
               </Select>
             </Form.Item>
 
+            {/* Buttons */}
             <Form.Item>
               <div className="flex justify-between">
                 <ButtonCustom

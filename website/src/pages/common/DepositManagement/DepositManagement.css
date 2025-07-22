@@ -1,0 +1,113 @@
+/* Filter popup styles */
+.filter-popup {
+  padding: 16px;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+/* Light mode styles */
+.filter-popup.light-mode {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode styles */
+.filter-popup.dark-mode {
+  background-color: #1f2937;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e5e7eb;
+}
+
+/* Form in dark mode */
+.dark-form .ant-form-item-label > label {
+  color: #e5e7eb !important;
+}
+
+/* Select in dark mode */
+.dark-select .ant-select-selector {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+
+.dark-select .ant-select-selection-placeholder {
+  color: #9ca3af !important;
+}
+
+.dark-select .ant-select-arrow {
+  color: #9ca3af !important;
+}
+
+/* Dropdown items in dark mode */
+.dark-mode .ant-select-dropdown {
+  background-color: #374151 !important;
+  border: 1px solid #4b5563 !important;
+}
+
+.dark-mode .ant-select-item {
+  color: #e5e7eb !important;
+}
+
+.dark-mode
+  .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: #4b5563 !important;
+}
+
+.dark-mode
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+/* Slider in dark mode */
+.dark-slider .ant-slider-rail {
+  background-color: #4b5563 !important;
+}
+
+.dark-slider .ant-slider-track {
+  background-color: #3b82f6 !important;
+}
+
+.dark-slider .ant-slider-handle {
+  border-color: #3b82f6 !important;
+  background-color: #3b82f6 !important;
+}
+
+.dark-slider .ant-slider-handle:focus {
+  box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Rental time range labels in dark mode */
+.dark-mode .rental-range-labels {
+  color: #e5e7eb;
+}
+
+/* Additional dropdown styles for dark mode */
+.ant-select-dropdown.dark-mode-dropdown {
+  background-color: #374151 !important;
+}
+
+.ant-select-dropdown.dark-mode-dropdown .ant-select-item {
+  color: #e5e7eb !important;
+}
+
+.ant-select-dropdown.dark-mode-dropdown
+  .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: #4b5563 !important;
+}
+
+.ant-select-dropdown.dark-mode-dropdown
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+/* Empty state in dark mode */
+.dark-mode .ant-empty-description {
+  color: #9ca3af !important;
+}
+
+/* Override z-index for dark mode dropdown */
+body .ant-select-dropdown.dark-mode-dropdown {
+  z-index: 1050 !important;
+}
