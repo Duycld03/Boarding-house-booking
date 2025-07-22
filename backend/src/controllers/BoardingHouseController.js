@@ -1,16 +1,12 @@
 import mongoose from 'mongoose';
 import BoardingHouse from '../models/boardingHouse.js';
 import BoardingHouseType from '../models/boardingHouseType.js';
-import RoomType from '../models/roomType.js';
-import Room from '../models/room.js';
 import { v2 as cloudinary } from 'cloudinary';
-import facilities from '../models/facilities.js';
 
 // import path from "path";
 import fs from 'fs';
 import multer from 'multer';
 import { Account } from '../models/account.js';
-import Review from '../models/review.js';
 import paginate from '../utils/pagination.js';
 
 class boardingHouseController {
@@ -875,6 +871,8 @@ class boardingHouseController {
     }
   }
 
+
+
   async getAllBHOwner(req, res, next) {
     try {
       // Lấy thông tin tài khoản từ token
@@ -885,17 +883,25 @@ class boardingHouseController {
           .json({ success: false, message: 'User not found' });
       }
 
-      // Xây dựng filter theo ownerId
-      let filter = {};
+      // Xây dựng filter ban đầu với isActive: true
+      let filter = {
+        isActive: true
+      };
 
+      // Thêm điều kiện dựa trên role mà không ghi đè filter ban đầu
       if (account.role === 'owner') {
-        filter = { ownerId: account._id };
+        filter = {
+          ...filter,  // Giữ lại isActive: true
+          ownerId: account._id
+        };
       } else if (account.role === 'manager' || account.role === 'staff') {
-        filter = { staffId: account._id };
+        filter = {
+          ...filter,  // Giữ lại isActive: true
+          staffId: account._id
+        };
       }
 
-      // (Tuỳ chỉnh thêm nếu bạn muốn filter theo query string)
-      // Ví dụ: ?status=active
+      // Thêm các điều kiện filter khác từ query params
       const { status, startDate, endDate } = req.query;
       if (status) filter.status = status;
       if (startDate && endDate) {
@@ -911,13 +917,13 @@ class boardingHouseController {
         defaultLimit: 10,
         maxLimit: 100,
         sortField: 'createdAt',
-        sortOrder: 'desc', // Theo code gốc bạn dùng sort({ createdAt: -1 })
-        filter, // filter ownerId + các filter khác
-        allowQueryFilters: ['status'], // whitelist những query filter cho BoardingHouse
-        allowSearchFields: ['name', 'address'], // nếu bạn muốn search theo tên hoặc địa chỉ
-        fields: '-__v', // không trả về trường __v
-        populate: ['boardingHouseType'], // populate ref tới type
-        includeTotalData: true, // nếu cần totalCount, totalPages…
+        sortOrder: 'desc',
+        filter,
+        allowQueryFilters: ['status'],
+        allowSearchFields: ['name', 'address'],
+        fields: '-__v',
+        populate: ['boardingHouseType'],
+        includeTotalData: true,
       };
 
       // Gọi helper paginate
@@ -936,6 +942,7 @@ class boardingHouseController {
       });
     }
   }
+
   async createBoardingHouseOwner(req, res, next) {
     try {
       const account = await Account.findById(req.user.userId);

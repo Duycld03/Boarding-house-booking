@@ -10,7 +10,7 @@ import UpdateRoomPage from "./UpdateRoom";
 import { useTranslation } from "react-i18next";
 import DefaulImage from "@/assets/images/blankRoom.jpg";
 
-function RoomManagement({ boardingHouseId }) {
+function RoomManagement({ boardingHouseId, switchToRoomType }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectRoomData, setSelectRoomData] = useState(null);
@@ -111,6 +111,14 @@ function RoomManagement({ boardingHouseId }) {
       }
     };
   }, []);
+
+  const handleSwitchToRoomType = () => {
+    if (switchToRoomType) {
+      switchToRoomType();
+    } else {
+      console.warn("switchToRoomType function not provided");
+    }
+  };
 
   // Cải thiện pagination config
   const tablePaginationConfig = useMemo(
@@ -343,6 +351,7 @@ function RoomManagement({ boardingHouseId }) {
       <AddRoom
         boardingHouseId={boardingHouseId}
         refreshRoomData={handleAddRoomSuccess}
+        onSwitchToRoomType={handleSwitchToRoomType}
       />
       <Table
         data={rooms || []}

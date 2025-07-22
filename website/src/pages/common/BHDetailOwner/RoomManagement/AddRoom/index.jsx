@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Form } from "antd";
-import { Button } from "@/component";
+import { Button, ConfirmModal } from "@/component";
 import { toast } from "react-toastify";
 import { addRoom, getRoomTypeByBhId } from "@/api/ownerUser/boardingHouseAPI";
 import { useTranslation } from "react-i18next";
@@ -10,7 +10,7 @@ import ReviewStep from "./ReviewStep";
 import { checkDuplicates } from "@/utils/roomUtils";
 import "./AddRoom.css"; // Import custom styles
 
-function AddRoom({ boardingHouseId, refreshRoomData }) {
+function AddRoom({ boardingHouseId, refreshRoomData, onSwitchToRoomType }) {
   const [form] = Form.useForm();
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -22,6 +22,8 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
   const [duplicateRooms, setDuplicateRooms] = useState(new Set());
   const [existingRoomNumbers, setExistingRoomNumbers] = useState(new Set());
   const [addMode, setAddMode] = useState("bulk"); // "bulk" or "single"
+  // Thêm state mới để điều khiển ConfirmModal
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
 
   const { t } = useTranslation("bhManagement");
 
@@ -35,16 +37,23 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
         throw new Error("No room type found");
       }
     } catch (error) {
-      Modal.confirm({
-        title: t("roomManagement.addRoom.noRoomType.title"),
-        content: t("roomManagement.addRoom.noRoomType.content"),
-        onOk: () => {
-          setVisible(false);
-        },
-        okText: t("common.ok"),
-        cancelButtonProps: { style: { display: "none" } },
-      });
+      // Thay vì sử dụng Modal.confirm, hiển thị ConfirmModal
+      setConfirmModalVisible(true);
     }
+  };
+
+  // Xử lý các hành động cho ConfirmModal
+  const handleConfirmOk = () => {
+    setVisible(false);
+    setConfirmModalVisible(false);
+    if (onSwitchToRoomType) {
+      onSwitchToRoomType();
+    }
+  };
+
+  const handleConfirmCancel = () => {
+    setConfirmModalVisible(false);
+    setVisible(false);
   };
 
   useEffect(() => {
@@ -457,6 +466,18 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
           onClick={() => setVisible(true)}
         />
       </div>
+
+      {/* Thêm ConfirmModal component */}
+      <ConfirmModal
+        title={t("roomManagement.addRoom.noRoomType.title")}
+        content={t("roomManagement.addRoom.noRoomType.content")}
+        isOpen={confirmModalVisible}
+        onOk={handleConfirmOk}
+        onCancel={handleConfirmCancel}
+        confirmLoading={false}
+      />
+
+      {/* Modal hiện tại giữ nguyên */}
       <Modal
         confirmLoading={loadingSubmit}
         title={getModalTitle()}
@@ -531,7 +552,7 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
             onRoomUpdate={handleRoomUpdate}
             onBulkUpdate={handleBulkUpdate}
             onRoomSelection={handleRoomSelection}
-            onFloorSelection={handleFloorSelection} // Thêm prop này
+            onFloorSelection={handleFloorSelection}
             setEditingRoom={setEditingRoom}
             onBulkSubmit={onBulkSubmit}
           />

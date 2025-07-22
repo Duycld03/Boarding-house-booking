@@ -47,3 +47,8 @@ export const updateAvatar = (data) => {
 export const getStaffAccounts = () => {
   return axios.get("/owner/staffs");
 };
+
+
+export const getOwnerDataForDashboard = () => {
+  return axios.get(`/owner/total-rooms/`);
+}

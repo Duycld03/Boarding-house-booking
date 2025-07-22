@@ -159,6 +159,11 @@ const routes = [
     page: CommonPages.StaffManagement,
     layout: ProfileLayout,
   },
+  {
+    path: "/subscription",
+    page: CommonPages.Subscription,
+    layout: ProfileLayout,
+  },
 ];
 
 export default routes;

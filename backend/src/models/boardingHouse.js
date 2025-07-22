@@ -113,6 +113,11 @@ const BoardingHouseSchema = new mongoose.Schema(
 
     images: [ImagesSchema],
     location: LocationSchema,
+    isActive: { type: Boolean, default: true },
+    deactivatedAt: Date,
+    deactivatedReason: String
+
+
   },
   { timestamps: true }
 );

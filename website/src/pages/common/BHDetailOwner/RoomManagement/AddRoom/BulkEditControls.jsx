@@ -136,7 +136,7 @@ function BulkEditControls({
       debouncedUpdate(newData);
 
       toast.success(
-        t("roomManagement.imageRemoved", "Image removed successfully")
+        t("roomManagement.messages.imageRemoved", "Image removed successfully")
       );
     } catch (error) {
       console.error("Error removing image:", error);

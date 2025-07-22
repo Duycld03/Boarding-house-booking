@@ -46,6 +46,8 @@ const RoomSchema = new mongoose.Schema(
     previousWaterReading: {
       type: Number,
     },
+    isActive: { type: Boolean, default: true },
+    deactivatedAt: Date
   },
   { timestamps: true }
 );
@@ -171,7 +173,6 @@ RoomSchema.statics.updateRoomAvailability = async function (roomId) {
   }
 };
 
-// ===== FIX 3: Cải thiện Bulk Update Method =====
 RoomSchema.statics.updateAllRoomsAvailability = async function () {
   try {
 
@@ -401,7 +402,6 @@ export const removeRenter = async (roomId, accountId) => {
   }
 };
 
-// ===== FIX 6: Cải thiện Cron Job =====
 import cron from 'node-cron';
 
 // Chạy vào 2:00 AM hàng ngày
@@ -414,66 +414,3 @@ cron.schedule('0 2 * * *', async () => {
     console.error('❌ Error in daily availability sync:', error);
   }
 });
-
-// ===== DEBUGGING UTILITIES =====
-
-// Debug function để check một room cụ thể
-export const debugRoom = async (roomId) => {
-  try {
-    console.log(`🔍 Debugging room: ${roomId}`);
-
-    const room = await Room.findById(roomId)
-      .populate('boardingHouseId')
-      .populate('roomTypeId')
-      .populate('rentBy');
-
-    if (!room) {
-      console.log(`❌ Room not found`);
-      return;
-    }
-
-    console.log(`📊 Room Debug Info:`, {
-      roomNumber: room.roomNumber,
-      isAvailable: room.isAvailable,
-      rentersCount: room.rentBy.length,
-      renters: room.rentBy.map(r => r._id),
-      boardingHouseId: room.boardingHouseId?._id,
-      roomTypeId: room.roomTypeId?._id,
-      lastUpdated: room.updatedAt
-    });
-
-    // Populate boarding house type
-    await room.populate({
-      path: 'boardingHouseId',
-      populate: {
-        path: 'boardingHouseType',
-        select: 'codeName'
-      }
-    });
-
-    const availabilityCheck = await room.checkAvailabilityRules();
-    console.log(`🔍 Availability Rules Check:`, availabilityCheck);
-
-    return {
-      room,
-      availabilityCheck
-    };
-  } catch (error) {
-    console.error(`❌ Error debugging room:`, error);
-  }
-};
-
-export const testRoomStatusUpdate = async (roomId) => {
-  console.log(`🧪 Testing room status update for: ${roomId}`);
-
-  await debugRoom(roomId);
-
-  try {
-    const result = await Room.updateRoomAvailability(roomId);
-
-  } catch (error) {
-    console.error(`❌ Manual update failed:`, error.message);
-  }
-
-  await debugRoom(roomId);
-};

@@ -247,7 +247,9 @@
       "imageRemoveFailed": "Failed to remove image",
       "roomTypeChanged": "Room type changed to: {type}",
       "roomTypeChangeFailed": "Failed to change room type",
-      "descriptionChangeFailed": "Failed to change description"
+      "descriptionChangeFailed": "Failed to change description",
+      "imageRemoved": "Image removed successfully",
+      "imageUploadFailed": "Image upload failed"
     },
     "modal": {
       "confirmDelete": {
@@ -258,7 +260,7 @@
     "addRoom": {
       "button": {
         "addRoom": "Add Room",
-        "bulkAddRoom": "Bulk Add Rooms",
+        "bulkAddRoom": "Add Rooms",
         "btnCancel": "Cancel"
       },
       "modal": {
@@ -268,6 +270,10 @@
         "bulkModeTitle": "Custom Floor Configuration",
         "singleModeReviewTitle": "Add Single Room - Review",
         "bulkModeReviewTitle": "Bulk Add Rooms - Review"
+      },
+      "noRoomType": {
+        "title": "No Room Type Available",
+        "content": "You need to create at least one room type before adding rooms. Would you like to create a room type now?"
       },
       "chooseAddMode": "Choose Add Mode",
       "singleRoom": "Single Room",

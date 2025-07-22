@@ -167,7 +167,7 @@ function ConfigurationStep({ form, roomTypes, addMode, setAddMode, onSubmit }) {
     setImageFile(null);
     form.setFieldsValue({ image: null });
 
-    toast.info(t("roomManagement.imageRemoved"));
+    toast.info(t("roomManagement.messages.imageRemoved"));
   };
 
   const handleNumberingFormatChange = (value) => {

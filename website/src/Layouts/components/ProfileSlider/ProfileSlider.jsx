@@ -12,6 +12,7 @@ import {
   EyeOutlined,
   RollbackOutlined,
   DollarCircleOutlined,
+  CrownOutlined, // Thêm icon cho Subscription
 } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
@@ -40,6 +41,17 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
       label: <Link to="/profile">{t("menu.profile")}</Link>,
       icon: <UserOutlined />,
       visible: true, // Ai cũng có quyền xem
+    },
+    // Thêm mới mục Subscription (đặt sau profile để dễ nhìn thấy)
+    {
+      key: "subscription",
+      label: (
+        <Link to="/subscription">
+          {t("menu.subscription") || "Subscription"}
+        </Link>
+      ),
+      icon: <CrownOutlined />,
+      visible: isOwner, // Chỉ hiển thị cho Owner
     },
     {
       key: "appointment-management",
