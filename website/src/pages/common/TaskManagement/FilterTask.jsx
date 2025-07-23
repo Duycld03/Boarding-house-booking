@@ -129,51 +129,52 @@ const FilterTask = ({ setFilterValue, onClose }) => {
                             className="py-4 px-6"
                             onFinish={handleApplyFilter}
                         >
-                            {isOwner && (
-                                <Form.Item label={t('filters.responsibleBy')} name="responsibleBy">
+                            <div className="flex flex-col gap-[0px]">
+                                {isOwner && (
+                                    <Form.Item label={t('filters.responsibleBy')} name="responsibleBy">
+                                        <Select
+                                            allowClear
+                                            showSearch
+                                            value={selectedStaff}
+                                            onChange={setSelectedStaff}
+                                            placeholder={t('filters.selectResponsible')}
+                                            optionFilterProp="label"
+                                            options={staffList.map((staff) => ({
+                                                label: staff.fullname,
+                                                value: staff._id,
+                                            }))}
+                                        />
+                                    </Form.Item>
+                                )}
+
+                                <Form.Item label={t('filters.priority')} name="priority">
                                     <Select
                                         allowClear
-                                        showSearch
-                                        value={selectedStaff}
-                                        onChange={setSelectedStaff}
-                                        placeholder={t('filters.selectResponsible')}
-                                        optionFilterProp="label"
-                                        options={staffList.map((staff) => ({
-                                            label: staff.fullname,
-                                            value: staff._id,
-                                        }))}
+                                        value={selectedPriority}
+                                        onChange={setSelectedPriority}
+                                        placeholder={t('filters.selectPriority')}
+                                        options={[
+                                            { label: t('priorities.high'), value: 'High' },
+                                            { label: t('priorities.medium'), value: 'Medium' },
+                                            { label: t('priorities.low'), value: 'Low' },
+                                        ]}
                                     />
                                 </Form.Item>
-                            )}
 
-                            <Form.Item label={t('filters.priority')} name="priority">
-                                <Select
-                                    allowClear
-                                    value={selectedPriority}
-                                    onChange={setSelectedPriority}
-                                    placeholder={t('filters.selectPriority')}
-                                    options={[
-                                        { label: t('priorities.high'), value: 'High' },
-                                        { label: t('priorities.medium'), value: 'Medium' },
-                                        { label: t('priorities.low'), value: 'Low' },
-                                    ]}
-                                />
-                            </Form.Item>
-
-                            <Form.Item label={t('filters.status')} name="status">
-                                <Select
-                                    allowClear
-                                    value={selectedStatus}
-                                    onChange={setSelectedStatus}
-                                    placeholder={t('filters.selectStatus')}
-                                    options={[
-                                        { label: t('statuses.inprogress'), value: 'In Progress' },
-                                        { label: t('statuses.completed'), value: 'Completed' },
-                                        { label: t('statuses.cancelled'), value: 'Cancelled' },
-                                    ]}
-                                />
-                            </Form.Item>
-
+                                <Form.Item label={t('filters.status')} name="status">
+                                    <Select
+                                        allowClear
+                                        value={selectedStatus}
+                                        onChange={setSelectedStatus}
+                                        placeholder={t('filters.selectStatus')}
+                                        options={[
+                                            { label: t('statuses.inprogress'), value: 'In Progress' },
+                                            { label: t('statuses.completed'), value: 'Completed' },
+                                            { label: t('statuses.cancelled'), value: 'Cancelled' },
+                                        ]}
+                                    />
+                                </Form.Item>
+                            </div>
                             <div className="flex justify-evenly mt-4">
                                 <ButtonCustom
                                     btnFilter

@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip } from "antd";
 import FilterTask from './FilterTask';
 import ButtonCustom from "../../../component/Button";
+import { useTheme } from '@/context/themeContext';
 
 function TaskManagement() {
     const { hasRole } = useCurrentUser();
@@ -30,6 +31,7 @@ function TaskManagement() {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [loadingStaffList, setLoadingStaffList] = useState(false);
+    const { darkMode } = useTheme();
 
     const [filterValue, setFilterValue] = useState();
     const [staffList, setStaffList] = useState([]);
@@ -213,6 +215,7 @@ function TaskManagement() {
             pageSizeOptions: ['10', '20', '50', '100'],
             onChange: handleTableChange,
         }),
+
         [pagination, handleTableChange]
     );
 
@@ -246,15 +249,18 @@ function TaskManagement() {
                 <FilterTask setFilterValue={setFilterValue} />
 
             </div>
-            <Table
-                tableName={t('table.title')}
-                columns={columns}
-                data={tasks}
-                loading={loading}
-                noDataText={t('table.noData')}
-                pagination={tablePaginationConfig}
-                onChange={handleTableChange}
-            />
+            <div className={darkMode ? 'dark-pagination' : ''}>
+
+                <Table
+                    tableName={t('table.title')}
+                    columns={columns}
+                    data={tasks}
+                    loading={loading}
+                    noDataText={t('table.noData')}
+                    pagination={tablePaginationConfig}
+                    onChange={handleTableChange}
+                />
+            </div>
 
             <ConfirmModal
                 isOpen={isOpenDeleteModal}
