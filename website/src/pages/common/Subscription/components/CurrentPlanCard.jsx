@@ -52,9 +52,19 @@ const UsageProgressCard = ({
   // Xử lý hiển thị đúng giới hạn
   const displayLimit = limit === Infinity ? "∞" : limit;
 
+  // Điều chỉnh màu sắc theo chế độ sáng/tối
+  const adjustedColor = darkMode
+    ? lightenColor(color, 15) // Làm sáng màu trong dark mode
+    : color;
+
+  // Icon color và text color cũng nên điều chỉnh theo chế độ
+  const iconColor = darkMode ? lightenColor(color, 20) : color;
+  const textColor = darkMode ? "#e5e7eb" : "#1f2937";
+  const valueColor = darkMode ? lightenColor(color, 10) : color;
+
   return (
     <div
-      className={darkMode ? "usage-card" : ""}
+      className={darkMode ? "usage-card dark" : "usage-card"}
       style={{
         textAlign: "center",
         padding: "16px 12px",
@@ -65,7 +75,7 @@ const UsageProgressCard = ({
         border: darkMode ? "1px solid rgb(75, 85, 99)" : "1px solid #f0f0f0",
       }}
     >
-      <div style={{ fontSize: "26px", marginBottom: "10px", color }}>
+      <div style={{ fontSize: "26px", marginBottom: "10px", color: iconColor }}>
         {icon}
       </div>
       <Progress
@@ -73,12 +83,17 @@ const UsageProgressCard = ({
         percent={percent}
         format={() => (
           <div>
-            <div style={{ fontSize: "16px", fontWeight: "600", color }}>
+            <div
+              style={{ fontSize: "16px", fontWeight: "600", color: valueColor }}
+            >
               {current}/{displayLimit}
             </div>
           </div>
         )}
-        strokeColor={color}
+        strokeColor={adjustedColor}
+        trailColor={
+          darkMode ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)"
+        }
         width={70}
       />
       <Text
@@ -87,13 +102,39 @@ const UsageProgressCard = ({
           fontWeight: "500",
           marginTop: "6px",
           display: "block",
-          color: darkMode ? "#e5e7eb" : undefined,
+          color: textColor,
         }}
       >
         {title}
       </Text>
     </div>
   );
+};
+
+// Hàm để làm sáng màu cho dark mode
+const lightenColor = (color, amount) => {
+  // Nếu là màu hex
+  if (color.startsWith("#")) {
+    let r = parseInt(color.slice(1, 3), 16);
+    let g = parseInt(color.slice(3, 5), 16);
+    let b = parseInt(color.slice(5, 7), 16);
+
+    r = Math.min(255, r + amount);
+    g = Math.min(255, g + amount);
+    b = Math.min(255, b + amount);
+
+    return `#${r.toString(16).padStart(2, "0")}${g
+      .toString(16)
+      .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  }
+
+  // Nếu là màu RGB
+  if (color.startsWith("rgb")) {
+    return color;
+  }
+
+  // Màu được định nghĩa trước (red, green, ...)
+  return color;
 };
 
 // Component thẻ gói hiện tại
@@ -155,6 +196,12 @@ const CurrentPlanCard = ({
   // Kiểm tra xem người dùng có đang ở gói Premium không
   const isPremium = planKey === "PREMIUM";
 
+  // Hàm getProgressColor được điều chỉnh theo darkMode
+  const getAdjustedProgressColor = (current, limit) => {
+    const baseColor = getProgressColor(current, limit);
+    return darkMode ? lightenColor(baseColor, 15) : baseColor;
+  };
+
   return (
     <Card
       className={`subscription-card ${darkMode ? "dark-mode" : ""}`}
@@ -164,7 +211,9 @@ const CurrentPlanCard = ({
         boxShadow: darkMode
           ? "0 6px 20px rgba(0, 0, 0, 0.25)"
           : "0 6px 20px rgba(0, 0, 0, 0.08)",
-        border: `1.5px solid ${currentPlan.color}`,
+        border: `1.5px solid ${
+          darkMode ? lightenColor(currentPlan.color, 10) : currentPlan.color
+        }`,
         overflow: "hidden",
         marginBottom: "30px",
       }}
@@ -190,7 +239,9 @@ const CurrentPlanCard = ({
             <div
               style={{
                 fontSize: "26px",
-                color: currentPlan.color,
+                color: darkMode
+                  ? lightenColor(currentPlan.color, 15)
+                  : currentPlan.color,
                 marginRight: "12px",
               }}
             >
@@ -260,8 +311,12 @@ const CurrentPlanCard = ({
                 type="primary"
                 size="small"
                 style={{
-                  background: currentPlan.color,
-                  borderColor: currentPlan.color,
+                  background: darkMode
+                    ? lightenColor(currentPlan.color, 15)
+                    : currentPlan.color,
+                  borderColor: darkMode
+                    ? lightenColor(currentPlan.color, 15)
+                    : currentPlan.color,
                   fontSize: "12px",
                 }}
               >
@@ -298,7 +353,7 @@ const CurrentPlanCard = ({
               color={
                 isPremium && item.key !== "staff"
                   ? currentPlan.color
-                  : getProgressColor(
+                  : getAdjustedProgressColor(
                       usage[item.key].current,
                       usage[item.key].limit
                     )

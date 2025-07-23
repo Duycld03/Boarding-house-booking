@@ -14,37 +14,44 @@ function Login() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const location = useLocation();
+  const [invalidRole, setInvalidRole] = useState(false);
 
   const { darkMode } = useTheme();
 
-  const { loginData, isLogin, user } = useCurrentUser();
+  const { loginData, isLogin, user, loading: userLoading } = useCurrentUser();
 
   useEffect(() => {
-    if (isLogin && (user.role === "staff" || user.role === "owner")) {
+    if (isLogin && !userLoading && user) {
       navigate("/profile");
+      if (loading) {
+        toast.success("Login successful");
+      }
     }
-  }, []);
+  }, [isLogin, user, userLoading, navigate]);
+
+  // useEffect xử lý thông báo khi tài khoản không có quyền
+  useEffect(() => {
+    if (invalidRole) {
+      setInvalidRole(false);
+    }
+  }, [invalidRole]);
 
   const onFinish = async (values) => {
     try {
       setLoading(true);
       const res = await login(values);
-      const role = res.user.role;
-      loginData(res.user, res.token);
 
-      localStorage.setItem("access_token", res.token);
+      // Lưu token và gọi API lấy user
+      const result = await loginData(null, res.token);
 
-      if (role === "staff" || role === "owner") {
-        navigate("/profile");
-        toast.success("Login successful");
-      } else {
-        navigate("/access-denied");
+      // Nếu không có user (đã bị xóa token trong userContext vì không phải staff/owner)
+      if (!result) {
+        setInvalidRole(true);
       }
-
-      setLoading(false);
     } catch (error) {
-      toast.error(error?.response?.data?.message);
+      toast.error(error?.response?.data?.message || "Login failed");
       form.resetFields();
+    } finally {
       setLoading(false);
     }
   };
@@ -74,10 +81,6 @@ function Login() {
     >
       <Card style={cardStyle}>
         <div className={darkMode ? "text-white" : "text-gray-900"}>
-          <p className="mb-5">
-            <Back />
-          </p>
-
           <h2
             className={`font-body text-4xl font-bold text-center mb-5 ${
               darkMode ? "text-white" : "text-gray-900"

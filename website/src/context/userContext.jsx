@@ -1,15 +1,13 @@
 import { createContext, useContext, useState, useMemo, useEffect } from "react";
 import { getOwnerDataForDashboard } from "@/api/accountAPI";
+import { getUser } from "@/api/authAPI";
 import userRole from "@/constants/userRole";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [ownerResources, setOwnerResources] = useState(null);
 
   const fetchOwnerResources = async () => {
@@ -20,27 +18,68 @@ export const UserProvider = ({ children }) => {
         const data = await response;
         setOwnerResources(data.total);
 
-        const updatedUser = {
-          ...user,
+        // Cập nhật thông tin resources trong user state
+        setUser((prevUser) => ({
+          ...prevUser,
           resources: data.total,
-        };
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        setUser(updatedUser);
+        }));
       }
     } catch (error) {
       console.error("Failed to fetch owner resources:", error);
     }
   };
 
+  // Lấy thông tin người dùng từ API
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("access_token");
+
+      if (token) {
+        const userData = await getUser();
+        console.log("User data from API:", userData); // Thêm log để debug
+
+        // Kiểm tra nếu user role không phải staff hoặc owner thì xóa token
+        if (
+          userData &&
+          userData.role !== "staff" &&
+          userData.role !== "owner"
+        ) {
+          console.log("Invalid role detected:", userData.role); // Thêm log để debug
+          localStorage.removeItem("access_token");
+          setUser(null);
+          setLoading(false);
+          return false;
+        }
+
+        setUser(userData);
+
+        // Nếu là owner, lấy thêm thông tin tài nguyên
+        if (userData && userData.role === "owner") {
+          await fetchOwnerResources();
+        }
+
+        return true; // Trả về true khi mọi thứ OK
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+      contextLogout(); // Logout nếu token không hợp lệ
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Chỉ lưu token khi đăng nhập, không lưu thông tin user
   const loginData = async (userData, token) => {
     localStorage.setItem("access_token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
 
-    // Nếu user là owner, lấy thông tin tài nguyên
-    if (userData.role === "owner") {
-      await fetchOwnerResources();
-    }
+    // Lấy thông tin user từ API
+    await fetchUserData();
+
+    // Trả về thông tin user hiện tại để kiểm tra role
+    return user;
   };
 
   const updateOwnerResources = async () => {
@@ -53,7 +92,6 @@ export const UserProvider = ({ children }) => {
   };
 
   const contextLogout = () => {
-    localStorage.removeItem("user");
     localStorage.removeItem("access_token");
     setUser(null);
     setOwnerResources(null);
@@ -63,15 +101,10 @@ export const UserProvider = ({ children }) => {
 
   const isLogin = useMemo(() => !!user, [user]);
 
-  // Khi component mount và user là owner, lấy thông tin tài nguyên
+  // Kiểm tra token và lấy thông tin người dùng khi component được mount
   useEffect(() => {
-    if (user?.role === "owner" && !user?.resources) {
-      const token = localStorage.getItem("access_token");
-      if (token) {
-        fetchOwnerResources(token);
-      }
-    }
-  }, [user?.role]);
+    fetchUserData();
+  }, []);
 
   return (
     <UserContext.Provider
@@ -81,8 +114,10 @@ export const UserProvider = ({ children }) => {
         hasRole,
         loginData,
         contextLogout,
-        ownerResources, // Cung cấp trực tiếp thông tin tài nguyên
-        updateOwnerResources, // Hàm để cập nhật lại thông tin tài nguyên khi cần
+        ownerResources,
+        updateOwnerResources,
+        loading,
+        refetchUser: fetchUserData,
       }}
     >
       {children}

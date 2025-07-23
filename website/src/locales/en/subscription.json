@@ -67,7 +67,7 @@
     "getStarted": "Get Started",
     "upgradeTo": "Upgrade to {{name}}",
     "badges": {
-      "mostPopular": "Most Popular",
+      "mostpopular": "Most Popular",
       "enterprise": "Enterprise"
     }
   }

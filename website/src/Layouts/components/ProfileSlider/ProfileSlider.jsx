@@ -6,17 +6,27 @@ import {
   UserOutlined,
   ScheduleOutlined,
   HomeFilled,
+  HomeOutlined, // Sẽ sử dụng icon này cho Boarding House Management
   SnippetsOutlined,
   ContainerOutlined,
   HeartOutlined,
   EyeOutlined,
   RollbackOutlined,
   DollarCircleOutlined,
-  CrownOutlined, // Thêm icon cho Subscription
+  CrownOutlined,
+  CheckSquareOutlined,
+  BuildOutlined,
 } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
-import { faMoneyBill } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMoneyBill,
+  faTasks,
+  faClipboardCheck,
+  faHome,
+  faHouseUser,
+  faBuildingUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { useCurrentUser } from "@/context/userContext";
 import userRole from "@/constants/userRole";
 import { useTheme } from "@/context/ThemeContext";
@@ -26,7 +36,7 @@ const { Sider } = Layout;
 const CustomProfileSlider = ({ width = 250, ...props }) => {
   const [collapsed, setCollapsed] = useState(false);
   const { darkMode } = useTheme();
-  const { t } = useTranslation("profile"); // Đảm bảo có namespace "profile" trong i18n
+  const { t } = useTranslation("profile");
   const { hasRole } = useCurrentUser();
 
   // Xác định vai trò người dùng
@@ -40,9 +50,8 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
       key: "profile",
       label: <Link to="/profile">{t("menu.profile")}</Link>,
       icon: <UserOutlined />,
-      visible: true, // Ai cũng có quyền xem
+      visible: true,
     },
-    // Thêm mới mục Subscription (đặt sau profile để dễ nhìn thấy)
     {
       key: "subscription",
       label: (
@@ -51,25 +60,25 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
         </Link>
       ),
       icon: <CrownOutlined />,
-      visible: isOwner, // Chỉ hiển thị cho Owner
+      visible: isOwner,
     },
     {
       key: "appointment-management",
       label: <Link to="/my-appointment">{t("menu.myAppointment")}</Link>,
       icon: <ScheduleOutlined />,
-      visible: isUser, // Chỉ User
+      visible: isUser,
     },
     {
       key: "favourite-list",
       label: <Link to="/favourite-list">{t("menu.myFavourite")}</Link>,
       icon: <HeartOutlined />,
-      visible: isUser, // Chỉ User
+      visible: isUser,
     },
     {
       key: "watch-later",
       label: <Link to="/watch-later">{t("menu.watchLater")}</Link>,
       icon: <EyeOutlined />,
-      visible: isUser, // Chỉ User
+      visible: isUser,
     },
     {
       key: "bh-management-owner",
@@ -78,21 +87,23 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
           {t("menu.boardingHouseManagement")}
         </Link>
       ),
-      icon: <HomeFilled />,
-      visible: isOwner || isStaff, // Chỉ Owner và Staff
+      // Thay đổi icon thành HomeOutlined như yêu cầu
+      icon: <HomeOutlined />,
+      visible: isOwner || isStaff,
     },
     {
       key: "deposit-list",
       label: <Link to="/deposit-list">{t("menu.depositManagement")}</Link>,
       icon: <ContainerOutlined />,
-      visible: isOwner || isStaff, // Chỉ Owner và Staff
+      visible: isOwner || isStaff,
     },
     {
       key: "staff-list",
       label: <Link to="/staff-list">{t("menu.staffManagement")}</Link>,
       icon: <ContainerOutlined />,
-      visible: isOwner, // Chỉ Owner
+      visible: isOwner,
     },
+    // Các mục menu khác giữ nguyên
     {
       key: "my-owner-report",
       label: (
@@ -152,7 +163,7 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
     {
       key: "task-management",
       label: <Link to="/task-management">{t("menu.taskManagement")}</Link>,
-      icon: <DollarCircleOutlined />,
+      icon: <FontAwesomeIcon icon={faTasks} />,
       visible: isOwner || isStaff,
     },
   ];
@@ -160,7 +171,7 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
   // Lọc và loại bỏ thuộc tính visible trước khi render
   const menuItems = menuItemsWithVisibility
     .filter((item) => item.visible)
-    .map(({ visible, ...item }) => item); // Loại bỏ thuộc tính visible
+    .map(({ visible, ...item }) => item);
 
   // Define theme-based styles
   const themeStyles = {
