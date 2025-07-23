@@ -57,5 +57,44 @@
   "auth": {
     "login-btn": "Đăng nhập",
     "register-btn": "Đăng ký"
+  },
+  "subscription": {
+    "modal": {
+      "gracePeriod": {
+        "title": "Gói đăng ký đã hết hạn",
+        "message": "Gói đăng ký của bạn đã hết hạn",
+        "days": "ngày",
+        "daysRemaining": "còn lại để gia hạn",
+        "upgradeNow": "Gia hạn ngay",
+        "later": "Để sau"
+      },
+      "expired": {
+        "title": "Tính năng bị giới hạn",
+        "message": "Gói đăng ký của bạn đã hết hạn. Vui lòng gia hạn để tiếp tục sử dụng tính năng này.",
+        "upgradeNow": "Gia hạn ngay",
+        "cancel": "Dừng lại"
+      },
+      "limitExceeded": {
+        "title": "Đã đạt giới hạn gói đăng ký",
+        "message": "Bạn đã sử dụng hết giới hạn của gói hiện tại",
+        "upgrade": "Nâng cấp gói",
+        "cancel": "Hủy"
+      }
+    },
+    "limitTypes": {
+      "boardingHouses": "nhà trọ",
+      "rooms": "phòng",
+      "staff": "nhân viên"
+    },
+    "demo": {
+      "title": "Demo các thành phần Modal",
+      "gracePeriod": "Modal Gia Hạn",
+      "expired": "Modal Hết Hạn",
+      "limitExceeded": "Modal Giới Hạn"
+    },
+    "alerts": {
+      "upgradeSelected": "Nâng cấp được chọn!",
+      "continueSelected": "Tiếp tục được chọn!"
+    }
   }
 }

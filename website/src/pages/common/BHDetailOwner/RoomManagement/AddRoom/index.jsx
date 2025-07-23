@@ -9,6 +9,9 @@ import ConfigurationStep from "./ConfigurationStep";
 import ReviewStep from "./ReviewStep";
 import { checkDuplicates } from "@/utils/roomUtils";
 import "./AddRoom.css"; // Import custom styles
+import { SubscriptionChecker } from "@/component/Subscription";
+import { Navigate } from "react-router-dom";
+import { useCurrentUser } from "@/context/userContext";
 
 function AddRoom({ boardingHouseId, refreshRoomData, onSwitchToRoomType }) {
   const [form] = Form.useForm();
@@ -25,6 +28,7 @@ function AddRoom({ boardingHouseId, refreshRoomData, onSwitchToRoomType }) {
   // Thêm state mới để điều khiển ConfirmModal
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
 
+  const { user } = useCurrentUser();
   const { t } = useTranslation("bhManagement");
 
   // Fetch room types when modal opens
@@ -459,12 +463,18 @@ function AddRoom({ boardingHouseId, refreshRoomData, onSwitchToRoomType }) {
   return (
     <div>
       <div className="flex justify-between mb-4 ml-2">
-        <Button
-          title={t("roomManagement.addRoom.button.bulkAddRoom")}
-          btnAdd
-          size="large"
-          onClick={() => setVisible(true)}
-        />
+        <SubscriptionChecker
+          user={user}
+          limitType="rooms"
+          currentCount={10} // Sử dụng số lượng phòng thực tế thay vì 100
+        >
+          <Button
+            title={t("roomManagement.addRoom.button.bulkAddRoom")}
+            btnAdd
+            size="large"
+            onClick={() => setVisible(true)}
+          />
+        </SubscriptionChecker>
       </div>
 
       {/* Thêm ConfirmModal component */}

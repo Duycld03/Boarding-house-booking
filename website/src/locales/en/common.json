@@ -58,5 +58,44 @@
   "auth": {
     "login-btn": "Login",
     "register-btn": "Register"
+  },
+  "subscription": {
+    "modal": {
+      "gracePeriod": {
+        "title": "Subscription Expired",
+        "message": "Your subscription has expired",
+        "days": "days",
+        "daysRemaining": "remaining to renew",
+        "upgradeNow": "Renew Now",
+        "later": "Later"
+      },
+      "expired": {
+        "title": "Feature Limited",
+        "message": "Your subscription has expired. Please renew to continue using this feature.",
+        "upgradeNow": "Renew Now",
+        "cancel": "Cancel"
+      },
+      "limitExceeded": {
+        "title": "Subscription Limit Reached",
+        "message": "You have used all the limits of your current subscription",
+        "upgrade": "Upgrade Plan",
+        "cancel": "Cancel"
+      }
+    },
+    "limitTypes": {
+      "boardingHouses": "boarding houses",
+      "rooms": "rooms",
+      "staff": "staff"
+    },
+    "demo": {
+      "title": "Modal Components Demo",
+      "gracePeriod": "Grace Period Modal",
+      "expired": "Expired Modal",
+      "limitExceeded": "Limit Exceeded Modal"
+    },
+    "alerts": {
+      "upgradeSelected": "Upgrade selected!",
+      "continueSelected": "Continue selected!"
+    }
   }
 }
