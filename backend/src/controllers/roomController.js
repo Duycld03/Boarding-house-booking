@@ -62,43 +62,45 @@ class RoomController {
     }
   }
 
-  async getUnpaidRoomsByBoardingHouse(req, res) {
+  async getRoomsEligibleForBill(req, res) {
     try {
       const { boardingHouseId } = req.params;
-
-      if (!boardingHouseId) {
-        return res.status(400).json({ message: "boardingHouseId là bắt buộc" });
-      }
-
-      // Lấy thời gian tháng trước
       const now = new Date();
       const lastMonth = now.getMonth() === 0 ? 12 : now.getMonth();
       const lastYear =
         now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
 
-      // Lấy danh sách roomId đã thanh toán trong tháng trước thuộc boardingHouseId
+      if (!boardingHouseId) {
+        return res.status(400).json({ message: "boardingHouseId là bắt buộc" });
+      }
+
       const paidRooms = await PaymentBill.find({
-        month: lastMonth.toString(),
-        year: lastYear.toString(),
-        status: { $regex: /^paid$/i },
+        month: lastMonth,
+        year: lastYear,
       }).distinct("roomId");
 
-      // Lọc danh sách phòng chưa thanh toán theo boardingHouseId
-      const unpaidRooms = await Room.find({
-        _id: { $nin: paidRooms },
+      const validDeposits = await DepositRoom.find({
+        status: { $regex: /^confirmed$/i },
+        startDate: { $lte: now },
+        endDate: { $gte: now },
+      }).select("roomId");
+
+      const validRoomIds = validDeposits.map((d) => d.roomId.toString());
+
+      const eligibleRooms = await Room.find({
+        _id: { $in: validRoomIds, $nin: paidRooms },
         boardingHouseId: boardingHouseId,
       })
         .populate("roomTypeId")
         .sort({ roomNumber: 1 });
 
-      //   const roomNumbers = unpaidRooms.map((room) => room.roomNumber);
-
-      return res.status(200).json(unpaidRooms);
+      return res.status(200).json(eligibleRooms);
     } catch (error) {
-      console.error("Error fetching unpaid rooms:", error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Lỗi server", error });
+      console.error(
+        "Lỗi khi lấy danh sách phòng đủ điều kiện tạo bill:",
+        error
+      );
+      return res.status(500).json({ message: "Server error", error });
     }
   }
 
@@ -288,7 +290,16 @@ class RoomController {
   async updateRoom(req, res) {
     try {
       const { roomId } = req.params;
-      const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
+      const {
+        roomNumber,
+        boardingHouseId,
+        description,
+        roomTypeId,
+        previousElectricityReading,
+        previousWaterReading,
+        currentElectricityReading,
+        currentWaterReading,
+      } = req.body;
 
       if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
         return res.status(400).json({ message: "Missing required parameters" });
@@ -313,8 +324,30 @@ class RoomController {
 
       room.description = description;
       room.roomTypeId = roomTypeId;
-      // room.isAvailable = true;
-      // room.boardingHouseId = boardingHouseId;
+
+      // Update previous utility readings if provided
+      if (
+        previousElectricityReading !== undefined &&
+        previousElectricityReading !== null
+      ) {
+        room.previousElectricityReading = Number(previousElectricityReading);
+      }
+
+      if (previousWaterReading !== undefined && previousWaterReading !== null) {
+        room.previousWaterReading = Number(previousWaterReading);
+      }
+
+      // Update current utility readings if provided
+      if (
+        currentElectricityReading !== undefined &&
+        currentElectricityReading !== null
+      ) {
+        room.currentElectricityReading = Number(currentElectricityReading);
+      }
+
+      if (currentWaterReading !== undefined && currentWaterReading !== null) {
+        room.currentWaterReading = Number(currentWaterReading);
+      }
 
       if (req.file) {
         if (room?.images?.publicId) {
@@ -328,9 +361,9 @@ class RoomController {
       }
 
       await room.save();
-      res.status(201).json({ message: "Room added successfully" });
+      res.status(201).json({ message: "Room updated successfully" });
     } catch (error) {
-      console.error("Error adding room:", error);
+      console.error("Error updating room:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }

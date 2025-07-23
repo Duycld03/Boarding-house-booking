@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import convertTimetap from "@/utils/convertTimetap";
 import { Tag } from "antd";
 import formatAmount, { useFormatAmount } from "@/utils/formatAmount";
-import CalculateRent from "./CalculateRent";
+import UnifiedCalculateRent from "./UnifiedCalculateRent";
 import UpdateRentModal from "./UpdateRentModal";
 import { getPaymentBillByBoardingHouseId } from "@/api/ownerUser/paymentBillAPI";
 import { useTranslation } from "react-i18next";
@@ -28,7 +28,7 @@ const RentPaymentManagement = () => {
   // State management
   const [rentPaymentData, setRentPaymentData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isCalculateOpen, setIsCalculateOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedPaymentBill, setSelectedPaymentBill] = useState(null);
   const [filterValue, setFilterValue] = useState({});
@@ -254,7 +254,7 @@ const RentPaymentManagement = () => {
    * Handle opening calculate rent modal
    */
   const handleOpenCalculateModal = useCallback(() => {
-    setIsOpen(true);
+    setIsCalculateOpen(true);
   }, []);
 
   return (
@@ -268,7 +268,7 @@ const RentPaymentManagement = () => {
         <div className="flex gap-3">
           <Button
             btnAdd
-            title={t("calculateMonthly")}
+            title={t("calculateRent")}
             size="large"
             onClick={handleOpenCalculateModal}
           />
@@ -287,9 +287,9 @@ const RentPaymentManagement = () => {
       />
 
       {/* Modals */}
-      <CalculateRent
-        visible={isOpen}
-        setVisible={setIsOpen}
+      <UnifiedCalculateRent
+        visible={isCalculateOpen}
+        setVisible={setIsCalculateOpen}
         boardingHouseId={boardingHouseId}
         fetchRentPaymentData={fetchPaymentBillDetails}
       />
