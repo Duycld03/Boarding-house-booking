@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, Button, Switch, Row, Col, Typography, Tag } from "antd";
 import { CrownOutlined } from "@ant-design/icons";
 
@@ -25,6 +25,8 @@ const SubscriptionPage = () => {
   const { t } = useTranslation("subscription");
   const { darkMode } = useTheme();
 
+  const pricingPlansRef = useRef(null);
+
   const { user } = useCurrentUser();
 
   useEffect(() => {
@@ -32,10 +34,32 @@ const SubscriptionPage = () => {
       try {
         setLoading(true);
 
-        setSubscription(user?.subscription || null);
-        setCurrentPlan(user?.subscription?.plan || "FREE");
+        // Nếu có subscription từ user, sử dụng nó
+        if (user?.subscription) {
+          setSubscription(user.subscription);
+          setCurrentPlan(user.subscription.plan);
+        } else {
+          // Nếu không có, tạo một subscription mặc định với gói FREE
+          setSubscription({
+            plan: "FREE",
+            isActive: true,
+            endDate: null,
+            graceEndDate: null,
+            status: "ACTIVE",
+          });
+          setCurrentPlan("FREE");
+        }
       } catch (error) {
         console.error("Error fetching subscription data:", error);
+        // Trong trường hợp lỗi, vẫn đặt giá trị mặc định là FREE
+        setSubscription({
+          plan: "FREE",
+          isActive: true,
+          endDate: null,
+          graceEndDate: null,
+          status: "ACTIVE",
+        });
+        setCurrentPlan("FREE");
       } finally {
         setLoading(false);
       }
@@ -62,6 +86,16 @@ const SubscriptionPage = () => {
     setShowPaymentModal(true);
   };
 
+  const scrollToPricingPlans = () => {
+    if (pricingPlansRef.current) {
+      pricingPlansRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
+  // Đảm bảo luôn có một currentPlanObject hợp lệ
   const currentPlanObject =
     plans.find((plan) => plan.key === currentPlan) || plans[0];
 
@@ -181,25 +215,49 @@ const SubscriptionPage = () => {
       </div>
 
       <div>
-        {/* Current Plan Status */}
-        <CurrentPlanCard
-          currentPlan={currentPlanObject}
-          getProgressColor={getProgressColor}
-          getProgressPercent={getProgressPercent}
-          subscription={subscription}
-          darkMode={darkMode}
-        />
+        {/* Hiển thị loading hoặc current plan card khi dữ liệu đã sẵn sàng */}
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px 0" }}>
+            <div className="ant-spin ant-spin-lg ant-spin-spinning">
+              <span className="ant-spin-dot ant-spin-dot-spin">
+                <i className="ant-spin-dot-item"></i>
+                <i className="ant-spin-dot-item"></i>
+                <i className="ant-spin-dot-item"></i>
+                <i className="ant-spin-dot-item"></i>
+              </span>
+            </div>
+            <div
+              style={{
+                marginTop: "16px",
+                color: darkMode ? "#f0f0f0" : "#555",
+              }}
+            >
+              {t("loading")}
+            </div>
+          </div>
+        ) : (
+          <CurrentPlanCard
+            currentPlan={currentPlanObject}
+            getProgressColor={getProgressColor}
+            getProgressPercent={getProgressPercent}
+            subscription={subscription}
+            darkMode={darkMode}
+            scrollToPricingPlans={scrollToPricingPlans}
+          />
+        )}
 
-        {/* Pricing Plans */}
-        <PricingPlans
-          plans={localizedPlans}
-          currentPlan={currentPlan}
-          billingCycle={billingCycle}
-          handleUpgrade={handleUpgrade}
-          hoveredCard={hoveredCard}
-          setHoveredCard={setHoveredCard}
-          darkMode={darkMode}
-        />
+        {/* Pricing Plans với ref */}
+        <div ref={pricingPlansRef}>
+          <PricingPlans
+            plans={localizedPlans}
+            currentPlan={currentPlan}
+            billingCycle={billingCycle}
+            handleUpgrade={handleUpgrade}
+            hoveredCard={hoveredCard}
+            setHoveredCard={setHoveredCard}
+            darkMode={darkMode}
+          />
+        </div>
       </div>
 
       {/* Payment Modal */}

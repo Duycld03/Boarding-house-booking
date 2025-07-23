@@ -12,12 +12,23 @@
     "gracePeriod": "Thời gian gia hạn đến {{date}}",
     "expired": "Đã hết hạn sử dụng",
     "renewButton": "Gia hạn gói dịch vụ",
+    "alert": {
+      "expired": "Gói đăng ký của bạn đã hết hạn. Vui lòng gia hạn để tiếp tục sử dụng đầy đủ các tính năng.",
+      "expiringSoon": "Gói đăng ký của bạn sẽ hết hạn trong {{days}} ngày. Vui lòng gia hạn để tránh gián đoạn dịch vụ.",
+      "gracePeriod": "Gói đăng ký của bạn đang trong thời gian gia hạn. Vui lòng gia hạn để tiếp tục sử dụng đầy đủ các tính năng.",
+      "renewNow": "Gia hạn ngay",
+      "expiringToday": "Gói đăng ký của bạn sẽ hết hạn vào cuối ngày hôm nay. Vui lòng gia hạn để tránh gián đoạn dịch vụ."
+    },
+    "expiringToday": "Hết hạn hôm nay",
+
     "status": {
       "active": "Đang hoạt động",
       "inactive": "Không hoạt động",
       "expiringSoon": "Sắp hết hạn",
       "gracePeriod": "Thời gian gia hạn",
-      "noPlan": "Chưa có gói"
+      "noPlan": "Chưa có gói",
+      "expired": "Đã hết hạn",
+      "expiringToday": "Hết hạn hôm nay"
     }
   },
   "resources": {

@@ -17,7 +17,18 @@
       "inactive": "Inactive",
       "expiringSoon": "Expiring Soon",
       "gracePeriod": "Grace Period",
-      "noPlan": "No Plan"
+      "noPlan": "No Plan",
+      "expired": "Expired",
+      "expiringToday": "Expires today"
+    },
+    "expiringToday": "Expires today",
+
+    "alert": {
+      "expired": "Your subscription has expired. Please renew to continue using all features.",
+      "expiringSoon": "Your subscription will expire in {{days}} days. Please renew to avoid service interruption.",
+      "gracePeriod": "Your subscription is in the grace period. Please renew to continue using all features.",
+      "renewNow": "Renew Now",
+      "expiringToday": "Your subscription expires today. Please renew to avoid service interruption."
     }
   },
   "resources": {
