@@ -7,6 +7,8 @@
   "waterBill": "Water Bill",
   "paymentAmount": "Payment Amount",
   "calculateMonthly": "Calculate Monthly",
+  "calculateBulk": "Bulk Calculate",
+  "calculateRent": "Calculate Rent",
   "noRentData": "No rent payment data available",
   "notApplicable": "N/A",
   "pending": "Pending",

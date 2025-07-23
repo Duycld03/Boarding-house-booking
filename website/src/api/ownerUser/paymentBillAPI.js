@@ -14,3 +14,7 @@ export const getPaymentBillByBoardingHouseId = (
 export const calculateMonthlyBill = (data) => {
   return axios.post("/staff/calculate-monthly-bill", data);
 };
+
+export const calculateBulkMonthlyBill = (data) => {
+  return axios.post("/staff/calculate-bulk-monthly-bill", data);
+};

@@ -277,36 +277,126 @@ const UpdateRentModal = ({
 
   const styles = getStyles();
 
-  // Add dynamic CSS for dark mode
+  // Add minimal CSS for dark mode and scroll control
   useEffect(() => {
-    const injectStyles = () => {
-      const existingStyle = document.getElementById("update-rent-styles");
-      if (existingStyle) {
-        existingStyle.remove();
-      }
-
-      if (visible && darkMode) {
-        const style = document.createElement("style");
-        style.id = "update-rent-styles";
-        style.innerHTML = `
-          .ant-input-group-addon {
+    if (visible) {
+      const style = document.createElement("style");
+      style.id = "update-rent-modal-styles";
+      style.innerHTML = `
+        .update-rent-modal .ant-modal-content {
+          ${
+            darkMode
+              ? `
+            background-color: #111827 !important;
+            border: 1px solid #374151 !important;
+          `
+              : ""
+          }
+        }
+        .update-rent-modal .ant-modal-header {
+          ${
+            darkMode
+              ? `
+            background-color: #0f172a !important;
+            border-bottom: 1px solid #1f2937 !important;
+          `
+              : ""
+          }
+        }
+        .update-rent-modal .ant-modal-title {
+          ${darkMode ? `color: #f9fafb !important;` : ""}
+        }
+        .update-rent-modal .ant-modal-close {
+          ${darkMode ? `color: #f9fafb !important;` : ""}
+        }
+        .update-rent-modal .ant-modal-close:hover {
+          ${darkMode ? `color: #d1d5db !important;` : ""}
+        }
+        .update-rent-modal .ant-modal-footer {
+          ${
+            darkMode
+              ? `
+            background-color: #111827 !important;
+            border-top: 1px solid #1f2937 !important;
+          `
+              : ""
+          }
+        }
+        .update-rent-modal .ant-form-item-label > label {
+          ${darkMode ? `color: #f9fafb !important;` : ""}
+        }
+        .update-rent-modal .ant-input-group-addon {
+          ${
+            darkMode
+              ? `
             background-color: #374151 !important;
             color: #d1d5db !important;
             border-color: #4b5563 !important;
+          `
+              : ""
           }
-        `;
-        document.head.appendChild(style);
-      }
-    };
+        }
+        .update-rent-modal .ant-input {
+          ${
+            darkMode
+              ? `
+            background-color: #1f2937 !important;
+            color: #f9fafb !important;
+            border-color: #374151 !important;
+          `
+              : ""
+          }
+        }
+        .update-rent-modal .ant-input:hover {
+          ${darkMode ? `border-color: #4b5563 !important;` : ""}
+        }
+        .update-rent-modal .ant-input:focus {
+          ${
+            darkMode
+              ? `
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+          `
+              : ""
+          }
+        }
+        
+        /* Hide all scrollbars */
+        .update-rent-modal .ant-modal-body::-webkit-scrollbar {
+          display: none !important;
+        }
+        .update-rent-modal .ant-modal-body {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
+        }
+        .update-rent-modal::-webkit-scrollbar {
+          display: none !important;
+        }
+        .update-rent-modal {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
+        }
+        
+        /* Hide scrollbars for the modal wrapper */
+        .ant-modal-wrap::-webkit-scrollbar {
+          display: none !important;
+        }
+        .ant-modal-wrap {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
+        }
+      `;
+      document.head.appendChild(style);
 
-    injectStyles();
-
-    return () => {
-      const existingStyle = document.getElementById("update-rent-styles");
-      if (existingStyle) {
-        existingStyle.remove();
-      }
-    };
+      return () => {
+        const existingStyle = document.getElementById(
+          "update-rent-modal-styles"
+        );
+        if (existingStyle) {
+          existingStyle.remove();
+        }
+      };
+    }
   }, [visible, darkMode]);
 
   if (!paymentBill) return null;
@@ -322,10 +412,27 @@ const UpdateRentModal = ({
       confirmLoading={loading}
       destroyOnClose
       width={600}
-      bodyStyle={styles.modalBodyStyle}
+      style={{
+        top: 20,
+      }}
+      wrapClassName="update-rent-modal-wrap"
+      bodyStyle={{
+        ...styles.modalBodyStyle,
+        padding: "12px 16px",
+        maxHeight: "none",
+        overflow: "visible",
+      }}
       headerStyle={styles.modalHeaderStyle}
+      className="update-rent-modal"
       okButtonProps={{
-        style: darkMode ? { background: "#1890ff" } : {},
+        style: darkMode
+          ? { background: "#3b82f6", borderColor: "#3b82f6" }
+          : {},
+      }}
+      cancelButtonProps={{
+        style: darkMode
+          ? { background: "#374151", borderColor: "#4b5563", color: "#f9fafb" }
+          : {},
       }}
     >
       {initializing ? (
@@ -333,8 +440,15 @@ const UpdateRentModal = ({
           <Spin size="large" tip={t("loading")} />
         </div>
       ) : (
-        <Form layout="vertical" form={form}>
-          <Form.Item label={t("roomInformation")}>
+        <Form
+          layout="vertical"
+          form={form}
+          style={{ margin: 0, height: "100%" }}
+        >
+          <Form.Item
+            label={t("roomInformation")}
+            style={{ marginBottom: "8px" }}
+          >
             <Input
               value={`${t("room")} ${
                 billDetails?.roomNumber || paymentBill.roomNumber
@@ -344,7 +458,10 @@ const UpdateRentModal = ({
             />
           </Form.Item>
 
-          <Form.Item label={t("electricalBill")}>
+          <Form.Item
+            label={t("electricalBill")}
+            style={{ marginBottom: "8px" }}
+          >
             <Input.Group compact>
               <Input
                 style={{
@@ -402,7 +519,7 @@ const UpdateRentModal = ({
             </Input.Group>
           </Form.Item>
 
-          <Form.Item label={t("waterBill")}>
+          <Form.Item label={t("waterBill")} style={{ marginBottom: "8px" }}>
             <Input.Group compact>
               <Input
                 style={{
@@ -460,7 +577,10 @@ const UpdateRentModal = ({
             </Input.Group>
           </Form.Item>
 
-          <Form.Item label={t("electricalBillAmount")}>
+          <Form.Item
+            label={t("electricalBillAmount")}
+            style={{ marginBottom: "8px" }}
+          >
             <Input
               value={formatPrice(calculateElectricalPrice(), {
                 showFullFormat: true,
@@ -470,7 +590,10 @@ const UpdateRentModal = ({
             />
           </Form.Item>
 
-          <Form.Item label={t("waterBillAmount")}>
+          <Form.Item
+            label={t("waterBillAmount")}
+            style={{ marginBottom: "8px" }}
+          >
             <Input
               value={formatPrice(calculateWaterPrice(), {
                 showFullFormat: true,
@@ -480,7 +603,7 @@ const UpdateRentModal = ({
             />
           </Form.Item>
 
-          <Form.Item label={t("roomPrice")}>
+          <Form.Item label={t("roomPrice")} style={{ marginBottom: "8px" }}>
             <Input
               value={formatPrice(roomPrice, { showFullFormat: true })}
               readOnly
@@ -488,7 +611,10 @@ const UpdateRentModal = ({
             />
           </Form.Item>
 
-          <Form.Item label={t("additionalFeeAmount")}>
+          <Form.Item
+            label={t("additionalFeeAmount")}
+            style={{ marginBottom: "8px" }}
+          >
             <Input
               value={formatPrice(additionalFeesTotal, { showFullFormat: true })}
               readOnly
@@ -496,7 +622,7 @@ const UpdateRentModal = ({
             />
           </Form.Item>
 
-          <Form.Item label={t("totalAmount")}>
+          <Form.Item label={t("totalAmount")} style={{ marginBottom: "0px" }}>
             <Input
               value={formatPrice(totalAmount, { showFullFormat: true })}
               readOnly

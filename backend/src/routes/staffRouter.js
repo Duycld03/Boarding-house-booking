@@ -15,9 +15,9 @@ import {
   paymentBillController,
   managerController,
   roomAdditionFeeController,
-  taskController
-} from '../controllers/index.js';
-import { upload } from '../config/cloudinary.config.js';
+  taskController,
+} from "../controllers/index.js";
+import { upload } from "../config/cloudinary.config.js";
 
 const staffRouter = Router();
 
@@ -160,9 +160,9 @@ staffRouter.post("/expense", bhExpenseController.addExpense);
 staffRouter.delete("/expense/:expenseId", bhExpenseController.deleteExpense);
 
 //revenue
-staffRouter.get('/revenue', revenueController.getRevenuePerBoardingHouse);
-staffRouter.get('/revenue/years', revenueController.getAvailableYears);
-staffRouter.get('/revenue/year', revenueController.getRevenueByYear);
+staffRouter.get("/revenue", revenueController.getRevenuePerBoardingHouse);
+staffRouter.get("/revenue/years", revenueController.getAvailableYears);
+staffRouter.get("/revenue/year", revenueController.getRevenueByYear);
 
 staffRouter.get("/total-revenue", revenueController.getTotalRevenue);
 staffRouter.get(
@@ -179,7 +179,7 @@ staffRouter.get(
 
 staffRouter.get(
   "/unpaid-rooms/:boardingHouseId",
-  roomController.getUnpaidRoomsByBoardingHouse
+  roomController.getRoomsEligibleForBill
 );
 
 // get electrical and water price
@@ -191,6 +191,10 @@ staffRouter.get(
 staffRouter.post(
   "/calculate-monthly-bill",
   paymentBillController.calculateMonthlyRoomRent
+);
+staffRouter.post(
+  "/calculate-bulk-monthly-bill",
+  paymentBillController.calculateBulkMonthlyRent
 );
 staffRouter.put(
   "/payment-bill/:paymentBillId",
@@ -234,6 +238,6 @@ staffRouter.get(
 staffRouter.get("/boardinghouse/reviews/:id", ReviewController.getReviewByBhId);
 
 //task
-staffRouter.get('/tasks', taskController.getTasks);
-staffRouter.put('/tasks/:id', taskController.updateTask);
+staffRouter.get("/tasks", taskController.getTasks);
+staffRouter.put("/tasks/:id", taskController.updateTask);
 export { staffRouter };
