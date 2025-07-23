@@ -47,7 +47,8 @@ import vi_staffManagement from "@/locales/vi/staffManagement.json";
 import en_revenueManagement from "@/locales/en/revenueManagement.json";
 import vi_revenueManagement from "@/locales/vi/revenueManagement.json";
 import { StaffManagement } from "@/pages/common";
-
+import en_appointment from "@/locales/en/appointment.json";
+import vi_appointment from "@/locales/vi/appointment.json";
 i18n.use(initReactI18next).init({
   resources: {
     en: {
@@ -74,6 +75,7 @@ i18n.use(initReactI18next).init({
       staffManagement: en_staffManagement,
       revenueManagement: en_revenueManagement,
       depositRefundRequest: en_depositRefundRequest,
+      appointment: en_appointment
     },
     vi: {
       menu: vi_menu,
@@ -99,6 +101,7 @@ i18n.use(initReactI18next).init({
       staffManagement: vi_staffManagement,
       revenueManagement: vi_revenueManagement,
       depositRefundRequest: vi_depositRefundRequest,
+      appointment: vi_appointment
     },
   },
   lng: "en",

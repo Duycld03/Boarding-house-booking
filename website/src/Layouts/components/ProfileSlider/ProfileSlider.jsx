@@ -143,6 +143,12 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
       icon: <DollarCircleOutlined />,
       visible: isOwner || isStaff,
     },
+    {
+      key: "appointment-owner",
+      label: <Link to="/appointment-owner">Appointment Management</Link>,
+      icon: <DollarCircleOutlined />,
+      visible: isOwner || isStaff,
+    },
   ];
 
   // Lọc và loại bỏ thuộc tính visible trước khi render
@@ -162,9 +168,8 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
       collapsed={collapsed}
       theme={darkMode ? "dark" : "light"}
       onCollapse={() => setCollapsed(!collapsed)}
-      className={`lg:block hidden transition-colors duration-300 ${
-        darkMode ? "dark-theme" : "light-theme"
-      }`}
+      className={`lg:block hidden transition-colors duration-300 ${darkMode ? "dark-theme" : "light-theme"
+        }`}
       style={themeStyles}
       {...props}
     >

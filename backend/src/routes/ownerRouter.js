@@ -15,6 +15,7 @@ import {
   taskController,
   accountController,
   managerController,
+  appointmentController
 } from '../controllers/index.js';
 import { upload } from '../config/cloudinary.config.js';
 
@@ -161,4 +162,22 @@ ownerRouter.put('/tasks/:id', taskController.updateTask);
 ownerRouter.delete('/tasks/:id', taskController.deleteTask);
 ownerRouter.get('/staffs', accountController.getStaffAccounts);
 
+//appointment
+ownerRouter.get("/:ownerId/appointments", appointmentController.getAppointmentsByOwnerId)
+ownerRouter.get(
+  "/:boardingHouseId",
+  appointmentController.getAppointmentsByBoardingHouseId
+);
+ownerRouter.get(
+  "/appointment/:appointmentId",
+  appointmentController.getAppointmentDetailForOwner
+);
+ownerRouter.post(
+  "/appointments/accept/:appointmentId",
+  appointmentController.acceptViewingRequest
+);
+ownerRouter.post(
+  "/appointments/reject/:appointmentId",
+  appointmentController.rejectViewingRequest
+);
 export { ownerRouter };
