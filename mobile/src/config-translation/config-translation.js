@@ -58,7 +58,8 @@ import en_refundRequest from "@/locales/en/refundRequest.json";
 import vi_refundRequest from "@/locales/vi/refundRequest.json";
 import en_depositRoomDetail from "@/locales/en/depositRoomDetail.json";
 import vi_depositRoomDetail from "@/locales/vi/depositRoomDetail.json";
-
+import vi_filter from '@/locales/vi/filter.json';
+import en_filter from '@/locales/en/filter.json';
 i18n.use(initReactI18next).init({
   resources: {
     en: {
@@ -90,7 +91,7 @@ i18n.use(initReactI18next).init({
       refundRequest: en_refundRequest,
       myRenewalRequest: en_RenewalRequest,
       depositRoomDetail: en_depositRoomDetail,
-
+      filter: en_filter,
     },
     vi: {
       setting: vi_setting,
@@ -121,6 +122,7 @@ i18n.use(initReactI18next).init({
       myRenewalRequest: vi_RenewalRequest,
       refundRequest: vi_refundRequest,
       depositRoomDetail: vi_depositRoomDetail,
+      filter: vi_filter,
     },
   },
   lng: 'en',
