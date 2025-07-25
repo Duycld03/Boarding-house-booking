@@ -259,7 +259,7 @@ const RentPaymentManagement = () => {
 
   return (
     <div
-      className={`container mx-auto py-8 px-4 ${
+      className={`container mx-auto ${
         darkMode ? "bg-gray-700 text-text-dark" : "text-text-light"
       }`}
     >
