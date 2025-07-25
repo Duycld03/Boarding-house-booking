@@ -10,9 +10,13 @@ import {
 import TaskModal from './TaskModal';
 import { useCurrentUser } from '@/context/userContext';
 import userRole from '@/constants/userRole';
-import { getStaffAccounts } from '../../../api/accountAPI';
+import { getStaff } from '../../../api/staffAPI';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from "antd";
+import FilterTask from './FilterTask';
+import ButtonCustom from "../../../component/Button";
+import { useTheme } from '@/context/themeContext';
+
 function TaskManagement() {
     const { hasRole } = useCurrentUser();
     const { t } = useTranslation('task');
@@ -25,10 +29,24 @@ function TaskManagement() {
     const [selectedTask, setSelectedTask] = useState(null);
     const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [loadingStaffList, setLoadingStaffList] = useState(false);
+    const { darkMode } = useTheme();
 
-    const [filterValue, setFilterValue] = useState({});
+    const [filterValue, setFilterValue] = useState();
     const [staffList, setStaffList] = useState([]);
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        total: 0,
+    });
 
+    const [paginationOptions, setPaginationOptions] = useState({
+        page: 1,
+        limit: 10,
+    });
+    useEffect(() => {
+    }, [filterValue]);
     const columns = useMemo(
         () => [
             {
@@ -50,15 +68,16 @@ function TaskManagement() {
                 dataIndex: 'details',
                 key: 'details',
                 width: 200,
-                render: (details) =>
-                    details ? (
+                render: (details) => {
+                    if (!details) return null;
+                    return (
                         <Tooltip title={details}>
                             {details.length > 50 ? `${details.slice(0, 50)}...` : details}
                         </Tooltip>
-                    ) : (
-                        t('messages.noData')
-                    ),
-            },
+                    );
+                },
+            }
+            ,
 
             {
                 title: t('columns.responsibleBy'),
@@ -126,9 +145,9 @@ function TaskManagement() {
     );
     useEffect(() => {
         if (isOwner) {
-            getStaffAccounts()
-                .then((data) => {
-                    setStaffList(data || []);
+            getStaff()
+                .then((res) => {
+                    setStaffList(res.data || []);
                 })
                 .catch((err) => {
                     toast.error(t('messages.fetchFailed'));
@@ -140,19 +159,23 @@ function TaskManagement() {
         setLoading(true);
         try {
             const res = isOwner
-                ? await getOwnerTasks(filterValue)
-                : await getStaffTasks();
+                ? await getOwnerTasks({ ...filterValue, ...paginationOptions })
+                : await getStaffTasks({ ...filterValue, ...paginationOptions });
+
             setTasks(res.data || []);
+            setPagination({
+                current: res.pagination?.currentPage || 1,
+                pageSize: res.pagination?.limit || 10,
+                total: res.pagination?.totalItems || 0,
+            });
         } catch (error) {
             toast.error(t('messages.fetchFailed'));
         } finally {
             setLoading(false);
         }
-    }, [isOwner, filterValue]);
+    }, [isOwner, filterValue, paginationOptions, t]);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+
 
     const handleDelete = async () => {
         if (!selectedTask?._id) return;
@@ -168,7 +191,37 @@ function TaskManagement() {
             setIsOpenDeleteModal(false);
         }
     };
+    useEffect(() => {
+    }, [staffList]);
+    const handleTableChange = useCallback(
+        (pagination, filters, sorter) => {
+            const newPaginationOptions = {
+                ...paginationOptions,
+                page: pagination.current,
+                limit: pagination.pageSize,
+            };
 
+            setPaginationOptions(newPaginationOptions);
+        },
+        [paginationOptions]
+    );
+
+    const tablePaginationConfig = useMemo(
+        () => ({
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            onChange: handleTableChange,
+        }),
+
+        [pagination, handleTableChange]
+    );
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData, paginationOptions]);
     return (
         <div>
             <TaskModal
@@ -182,8 +235,8 @@ function TaskManagement() {
                 staffList={staffList}
             />
 
-            {isOwner && (
-                <div className="mb-4">
+            <div className={`flex mb-4 relative ${isOwner ? 'justify-between' : 'justify-end'}`}>
+                {isOwner && (
                     <Button
                         size="large"
                         title={t('actions.add')}
@@ -191,15 +244,23 @@ function TaskManagement() {
                         bgColor="rgb(59 130 246)"
                         className="text-white"
                     />
-                </div>
-            )}
-            <Table
-                tableName={t('table.title')}
-                columns={columns}
-                data={tasks}
-                loading={loading}
-                noDataText={t('table.noData')}
-            />
+                )}
+
+                <FilterTask setFilterValue={setFilterValue} />
+
+            </div>
+            <div className={darkMode ? 'dark-pagination' : ''}>
+
+                <Table
+                    tableName={t('table.title')}
+                    columns={columns}
+                    data={tasks}
+                    loading={loading}
+                    noDataText={t('table.noData')}
+                    pagination={tablePaginationConfig}
+                    onChange={handleTableChange}
+                />
+            </div>
 
             <ConfirmModal
                 isOpen={isOpenDeleteModal}

@@ -58,6 +58,7 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
             } else {
                 await createOwnerTask(payload);
                 toast.success(t('messages.createSuccess'));
+                form.resetFields();
             }
             onClose();
             onSuccess();
@@ -75,6 +76,7 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
             onCancel={onClose}
             onOk={() => form.submit()}
             okText={t('actions.save')}
+            forceRender
             footer={null}
         >
             <Form
@@ -124,7 +126,10 @@ function TaskModal({ open, onClose, onSuccess, task, staffList = [] }) {
                         rules={[{ required: true, message: t('validation.responsibleBy') }]}
                         style={formItemStyle}
                     >
-                        <Select disabled={isStaff && task} placeholder={t('form.selectStaff')}>
+                        <Select
+                            disabled={isStaff && task}
+                            placeholder={t('form.selectStaff')}
+                        >
                             {staffList.map((staff) => (
                                 <Option key={staff._id} value={staff._id}>
                                     {staff.fullname}

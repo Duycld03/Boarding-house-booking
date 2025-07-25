@@ -41,7 +41,10 @@
         "save": "Lưu",
         "edit": "Cập nhật",
         "delete": "Xóa",
-        "add": "Thêm công việc"
+        "add": "Thêm công việc",
+        "filter": "Lọc",
+        "reset": "Xóa lọc",
+        "close": "Đóng"
     },
     "modal": {
         "addTitle": "Thêm công việc",
@@ -67,5 +70,14 @@
         "cancel": "Huỷ",
         "submit": "Lưu",
         "loading": "Đang lưu..."
+    },
+    "filters": {
+        "responsibleBy": "Người phụ trách",
+        "selectResponsible": "Chọn người phụ trách",
+        "unassigned": "Chưa giao",
+        "priority": "Độ ưu tiên",
+        "selectPriority": "Chọn độ ưu tiên",
+        "status": "Trạng thái",
+        "selectStatus": "Chọn trạng thái"
     }
 }

@@ -1,67 +1,66 @@
 import Task from "../models/task.js";
 import { Account } from "../models/account.js";
-
+import paginate from '../utils/pagination.js';
 class TaskController {
     async getTasks(req, res) {
         try {
-            const { priority, status } = req.query;
-            const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
-            const skip = (page - 1) * limit;
+            const account = await Account.findById(req.user.userId);
+            if (!account) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
 
             let filter = {};
-
-            if (req.user.role === 'staff') {
-                filter.responsibleBy = req.user.userId;
-            } else {
-                if (req.query.responsibleBy) {
+            if (account.role === "staff") {
+                filter.responsibleBy = account._id;
+            } else if (account.role === "owner") {
+                if (req.query.responsibleBy === "null") {
+                    filter.responsibleBy = { $exists: false };
+                } else if (req.query.responsibleBy) {
                     filter.responsibleBy = req.query.responsibleBy;
                 }
             }
 
+            const { priority, status, startDate, endDate, search } = req.query;
             if (priority) filter.priority = priority;
             if (status) filter.status = status;
-
-            const totalTasks = await Task.countDocuments(filter);
-
-            if (totalTasks === 0) {
-                return res.status(200).json({
-                    message: "No tasks found",
-                    pagination: {
-                        currentPage: page,
-                        totalPages: 0,
-                        totalItems: 0,
-                        hasNextPage: false,
-                        hasPrevPage: false,
-                    },
-                    data: [],
-                });
+            if (startDate && endDate) {
+                filter.createdAt = {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate),
+                };
             }
 
-            const tasks = await Task.find(filter)
-                .populate("responsibleBy", "fullname email")
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit);
+            // Cấu hình phân trang
+            const paginationOptions = {
+                defaultPage: 1,
+                defaultLimit: 10,
+                maxLimit: 100,
+                sortField: "createdAt",
+                sortOrder: "desc",
+                filter,
+                allowQueryFilters: ["priority", "status"],
+                allowSearchFields: ["title", "details"],
+                fields: "-__v",
+                populate: ["responsibleBy"],
+                includeTotalData: true,
+            };
 
-            const totalPages = Math.ceil(totalTasks / limit);
+            const result = await paginate(Task, paginationOptions, req);
 
             return res.status(200).json({
                 success: true,
-                pagination: {
-                    currentPage: page,
-                    totalPages,
-                    totalItems: totalTasks,
-                    hasNextPage: page < totalPages,
-                    hasPrevPage: page > 1,
-                },
-                data: tasks,
+                ...result,
             });
         } catch (error) {
             console.error("Error in getTasks:", error);
-            return res.status(500).json({ success: false, message: error.message });
+            return res.status(500).json({
+                success: false,
+                message: "Failed to fetch tasks. Please try again later.",
+                error: error.message,
+            });
         }
     }
+
     async createTask(req, res) {
         try {
             const { title, responsibleBy, details, priority, dueDate, createdBy } = req.body;
