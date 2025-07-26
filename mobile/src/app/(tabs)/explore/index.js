@@ -27,6 +27,7 @@ import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { fetchProvinces, fetchDistricts, fetchWards } from "@/API/addressAPI";
 import { Button } from "@/components/ui";
 import Logo from '../../../assets/images/newLogo.png';
+import coverBhType from "@/utils/coverBhType";
 
 const ExploreFilterScreen = () => {
   const router = useRouter();
@@ -96,8 +97,26 @@ const ExploreFilterScreen = () => {
 
       const typeRes = await getAllBoardingHouseTypeUser();
       if (typeRes?.data) {
-        setTypes(typeRes.data);
+        const formattedTypes = typeRes.data.map((type) => {
+          const label = type.label;
+          const code =
+            label === "Nhà trọ truyền thống"
+              ? "nha_tro_truyen_thong"
+              : label === "Mini house"
+                ? "mini_house"
+                : label === "Nhà trọ kiến trúc xá"
+                  ? "nha_tro_kien_truc_xa"
+                  : "unknown";
+
+          return {
+            value: type.value,
+            label: type.label,
+            name: code,
+          };
+        });
+        setTypes(formattedTypes);
       }
+
     } catch (e) {
       console.error("Fetch filter options failed:", e);
     }
@@ -386,10 +405,10 @@ const ExploreFilterScreen = () => {
                     {
                       color: selectedType === type.value
                         ? '#40BFFF'
-                        : (isDarkMode ? '#FFF' : '#223263')
+                        : (isDarkMode ? '#FFF' : '#18191bff')
                     }
                   ]}>
-                    {type.label}
+                    {coverBhType(type.name, i18n.language)}
                   </Text>
                 </TouchableOpacity>
               ))}

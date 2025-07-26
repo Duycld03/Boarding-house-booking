@@ -21,5 +21,16 @@
     "ward": "Ward",
     "selectWard": "Select ward",
     "address": "Address",
-    "ratingAbove": "{{rating}} stars and up"
+    "ratingAbove": "{{rating}} stars and up",
+    "accommodation_types": {
+        "nha_tro_truyen_thong": "Traditional Boarding House",
+        "mini_house": "Mini House",
+        "nha_tro_kien_truc_xa": "Dormitory Style Boarding House",
+        "nha_tro_cao_cap": "Premium Boarding House"
+    },
+    "boardingHouseTypes": {
+        "Nhà trọ truyền thống": "Traditional Boarding House",
+        "Mini house": "Mini Apartment",
+        "Nhà trọ kiến trúc xá": "Dormitory"
+    }
 }
