@@ -135,24 +135,6 @@ const AddStaffModal = ({ onAddData }) => {
             </Form.Item>
 
             <Form.Item
-              label={t('forms.phoneNumber.label')}
-              name="phoneNumber"
-              style={{ marginBottom: 0 }}
-              rules={[
-                { required: true, message: t('forms.phoneNumber.required') },
-                {
-                  pattern: /^[0-9]{10,11}$/,
-                  message: t('forms.phoneNumber.invalidFormat'),
-                },
-              ]}
-            >
-              <Input
-                placeholder={t('forms.phoneNumber.placeholder')}
-                className={darkMode ? 'dark-mode-input' : ''}
-              />
-            </Form.Item>
-
-            <Form.Item
               label={t('updateAccount.creationDate')}
               name="hireDate"
               style={{ marginBottom: 0 }}
