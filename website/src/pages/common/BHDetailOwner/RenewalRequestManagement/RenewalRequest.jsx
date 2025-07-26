@@ -60,8 +60,8 @@ const RenewalRequest = ({ boardingHouseId }) => {
         limit: paginationInfo.limit || 10,
       });
     } catch (error) {
-      console.error('❌ Failed to fetch renewal requests:', error);
-      toast.error(t('messages.fetchError'));
+      // console.error('❌ Failed to fetch renewal requests:', error);
+      // toast.error(t('messages.fetchError'));
       setRequests([]);
     } finally {
       setLoading(false);
