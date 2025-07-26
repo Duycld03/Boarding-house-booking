@@ -3,15 +3,14 @@ import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { generateToken, verifyToken } from "../utils/functions.js";
 import { v2 as cloudinary } from "cloudinary";
-import paginate from '../utils/pagination.js'
+import paginate from "../utils/pagination.js";
 
 class accountController {
   async getAllAccount(req, res) {
     try {
       const accountData = await Account.find().sort({ createdAt: -1 });
 
-      return res.status(200).json(
-        accountData);
+      return res.status(200).json(accountData);
     } catch (error) {
       return res.status(500).json({
         success: false,
@@ -20,7 +19,6 @@ class accountController {
       });
     }
   }
-
 
   async softDeleteAccount(req, res, next) {
     try {
@@ -61,14 +59,14 @@ class accountController {
         defaultPage: 1,
         defaultLimit: 10,
         maxLimit: 100,
-        sortField: 'createdAt',
-        sortOrder: 'asc',
+        sortField: "createdAt",
+        sortOrder: "asc",
         filter,
-        allowQueryFilters: ['gender', 'role', 'status'],
-        allowSearchFields: ['email', 'username', 'phone'],
-        fields: '-password',
-        populate: ['role'],
-        includeTotalData: true
+        allowQueryFilters: ["gender", "role", "status"],
+        allowSearchFields: ["email", "username", "phone"],
+        fields: "-password",
+        populate: ["role"],
+        includeTotalData: true,
       };
 
       // Gọi helper paginate
@@ -76,10 +74,10 @@ class accountController {
 
       return res.status(200).json(result);
     } catch (error) {
-      console.error('Error filtering accounts:', error);
+      console.error("Error filtering accounts:", error);
       return res.status(500).json({
         success: false,
-        message: 'Server Error',
+        message: "Server Error",
         error: error.message,
       });
     }
@@ -87,7 +85,8 @@ class accountController {
 
   async createAccount(req, res, next) {
     try {
-      const { username, password, email, phoneNumber, fullname, gender, role } = req.body;
+      const { username, password, email, phoneNumber, fullname, gender, role } =
+        req.body;
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -103,7 +102,6 @@ class accountController {
       await newUser.save();
 
       res.status(201).json(newUser);
-
     } catch (error) {
       console.error("Error creating account:", error);
       return res.status(400).json(error.errorResponse);
@@ -114,8 +112,6 @@ class accountController {
     try {
       const { phoneNumber, fullname, gender, role } = req.body;
       const { accountId } = req.params;
-
-
 
       // Chỉ cập nhật các trường có thể thay đổi
       const updatedAccountData = {
@@ -257,7 +253,7 @@ class accountController {
         service: "gmail",
         auth: {
           user: "todohongy@gmail.com",
-          pass: "ersq syrb ihov ilvx",
+          pass: "onbg hyaz wxcd vmgw",
         },
       });
 
@@ -318,13 +314,15 @@ class accountController {
   }
   async getStaffAccounts(req, res) {
     try {
-      const staffs = await Account.find({ role: 'staff', deleted: { $ne: true } })
-        .select('_id fullname email avatarImage');
+      const staffs = await Account.find({
+        role: "staff",
+        deleted: { $ne: true },
+      }).select("_id fullname email avatarImage");
 
       res.status(200).json(staffs);
     } catch (error) {
-      console.error('Error fetching staff accounts:', error);
-      res.status(500).json({ message: 'Lỗi server', error: error.message });
+      console.error("Error fetching staff accounts:", error);
+      res.status(500).json({ message: "Lỗi server", error: error.message });
     }
   }
 }
