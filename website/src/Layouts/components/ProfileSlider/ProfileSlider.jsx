@@ -145,7 +145,7 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
     },
     {
       key: "appointment-owner",
-      label: <Link to="/appointment-owner">Appointment Management</Link>,
+      label: <Link to="/appointment-owner">{t("menu.appoinmentManagement")}</Link>,
       icon: <DollarCircleOutlined />,
       visible: isOwner || isStaff,
     },

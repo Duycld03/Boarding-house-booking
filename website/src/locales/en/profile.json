@@ -60,6 +60,7 @@
     "myDepositRefundRequest": "My Deposit Refund Requests",
     "depositRefundManagement": "Deposit Refund Management",
     "revenueManagement": "Revenue Management",
-    "taskManagement": "Task Management"
+    "taskManagement": "Task Management",
+    "appoinmentManagement": "Appoinment Management"
   }
 }
