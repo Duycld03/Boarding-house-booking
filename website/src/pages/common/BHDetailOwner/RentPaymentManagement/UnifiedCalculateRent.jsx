@@ -521,7 +521,8 @@ const UnifiedCalculateRent = ({
       border-bottom: 1px solid #374151 !important;
     }
     .dark-calculate-modal .ant-modal-title {
-      color: #f9fafb !important;
+      color: #f9fafb ;
+      background-color: #1f2937;
     }
     .dark-form .ant-form-item-label > label {
       color: #f9fafb !important;

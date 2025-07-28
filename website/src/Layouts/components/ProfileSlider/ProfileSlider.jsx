@@ -5,13 +5,16 @@ import { useTranslation } from "react-i18next";
 import {
   UserOutlined,
   ScheduleOutlined,
-  HomeFilled,
+  HomeOutlined, // Đổi từ HomeFilled thành HomeOutlined
   SnippetsOutlined,
   ContainerOutlined,
   HeartOutlined,
   EyeOutlined,
   RollbackOutlined,
   DollarCircleOutlined,
+  CheckSquareOutlined, // Icon cho Task Management
+  CalendarOutlined, // Icon cho Appointment Management
+  TeamOutlined, // Icon mới cho Staff Management
 } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-regular-svg-icons";
@@ -66,7 +69,7 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
           {t("menu.boardingHouseManagement")}
         </Link>
       ),
-      icon: <HomeFilled />,
+      icon: <HomeOutlined />, // Đổi từ HomeFilled thành HomeOutlined
       visible: isOwner || isStaff, // Chỉ Owner và Staff
     },
     {
@@ -78,7 +81,7 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
     {
       key: "staff-list",
       label: <Link to="/staff-list">{t("menu.staffManagement")}</Link>,
-      icon: <ContainerOutlined />,
+      icon: <TeamOutlined />, // Đổi từ ContainerOutlined thành TeamOutlined
       visible: isOwner, // Chỉ Owner
     },
     {
@@ -140,13 +143,15 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
     {
       key: "task-management",
       label: <Link to="/task-management">{t("menu.taskManagement")}</Link>,
-      icon: <DollarCircleOutlined />,
+      icon: <CheckSquareOutlined />, // Icon mới cho Task Management
       visible: isOwner || isStaff,
     },
     {
       key: "appointment-owner",
-      label: <Link to="/appointment-owner">{t("menu.appoinmentManagement")}</Link>,
-      icon: <DollarCircleOutlined />,
+      label: (
+        <Link to="/appointment-owner">{t("menu.appoinmentManagement")}</Link>
+      ),
+      icon: <CalendarOutlined />, // Icon mới cho Appointment Management
       visible: isOwner || isStaff,
     },
   ];
@@ -168,8 +173,9 @@ const CustomProfileSlider = ({ width = 250, ...props }) => {
       collapsed={collapsed}
       theme={darkMode ? "dark" : "light"}
       onCollapse={() => setCollapsed(!collapsed)}
-      className={`lg:block hidden transition-colors duration-300 ${darkMode ? "dark-theme" : "light-theme"
-        }`}
+      className={`lg:block hidden transition-colors duration-300 ${
+        darkMode ? "dark-theme" : "light-theme"
+      }`}
       style={themeStyles}
       {...props}
     >

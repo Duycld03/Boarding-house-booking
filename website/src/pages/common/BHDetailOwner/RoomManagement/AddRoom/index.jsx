@@ -41,7 +41,7 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
         onOk: () => {
           setVisible(false);
         },
-        okText: t("common.ok"),
+        okText: t("roomManagement.common.ok"),
         cancelButtonProps: { style: { display: "none" } },
       });
     }
