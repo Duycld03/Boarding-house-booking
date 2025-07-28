@@ -33,7 +33,6 @@ function PaymentDetail() {
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
         if (paymentData) {
-          console.log("paymentData", JSON.parse(paymentData));
           setUserPayment(JSON.parse(paymentData));
         } else {
           setUserPayment({});
@@ -49,7 +48,6 @@ function PaymentDetail() {
     loadPaymentData();
   }, [paymentData]);
 
-  console.log("userPayment", userPayment);
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -223,22 +221,19 @@ function PaymentDetail() {
             >
               <InfoRow
                 label={t("paymentDetail.oldReading")}
-                value={`${
-                  userPayment.paymentBillId?.electricalBill?.oldNumber || 0
-                } kWh`}
+                value={`${userPayment.paymentBillId?.electricalBill?.oldNumber || 0
+                  } kWh`}
               />
               <InfoRow
                 label={t("paymentDetail.newReading")}
-                value={`${
-                  userPayment.paymentBillId?.electricalBill?.newNumber || 0
-                } kWh`}
+                value={`${userPayment.paymentBillId?.electricalBill?.newNumber || 0
+                  } kWh`}
               />
               <InfoRow
                 label={t("paymentDetail.consumption")}
-                value={`${
-                  userPayment.paymentBillId?.electricalBill?.quantityConsumed ||
+                value={`${userPayment.paymentBillId?.electricalBill?.quantityConsumed ||
                   0
-                } kWh`}
+                  } kWh`}
               />
               <View className="border-t border-gray-200 dark:border-gray-600 mt-2 pt-2">
                 <InfoRow
@@ -260,21 +255,18 @@ function PaymentDetail() {
             >
               <InfoRow
                 label={t("paymentDetail.oldReading")}
-                value={`${
-                  userPayment.paymentBillId?.waterBill?.oldNumber || 0
-                } m³`}
+                value={`${userPayment.paymentBillId?.waterBill?.oldNumber || 0
+                  } m³`}
               />
               <InfoRow
                 label={t("paymentDetail.newReading")}
-                value={`${
-                  userPayment.paymentBillId?.waterBill?.newNumber || 0
-                } m³`}
+                value={`${userPayment.paymentBillId?.waterBill?.newNumber || 0
+                  } m³`}
               />
               <InfoRow
                 label={t("paymentDetail.consumption")}
-                value={`${
-                  userPayment.paymentBillId?.waterBill?.quantityConsumed || 0
-                } m³`}
+                value={`${userPayment.paymentBillId?.waterBill?.quantityConsumed || 0
+                  } m³`}
               />
               <View className="border-t border-gray-200 dark:border-gray-600 mt-2 pt-2">
                 <InfoRow
@@ -298,9 +290,9 @@ function PaymentDetail() {
                 label={t("paymentDetail.roomRent")}
                 value={formatAmount(
                   (userPayment.paymentBillId?.paymentAmount || 0) -
-                    (userPayment.paymentBillId?.electricalBill?.totalAmount ||
-                      0) -
-                    (userPayment.paymentBillId?.waterBill?.totalAmount || 0),
+                  (userPayment.paymentBillId?.electricalBill?.totalAmount ||
+                    0) -
+                  (userPayment.paymentBillId?.waterBill?.totalAmount || 0),
                   currentLanguage
                 )}
               />

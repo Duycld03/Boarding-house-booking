@@ -195,6 +195,8 @@
       "updateRoom": "Cập nhật phòng",
       "deleteRoom": "Xóa phòng",
       "roomType": "Loại phòng",
+      "deleteRoomTile": "Xác nhận xóa phòng",
+      "deleteRoomDescription": "Bạn có chắc chắn muốn xóa phòng này? Hành động này không thể hoàn tác.",
       "roomNumber": "Số phòng",
       "description": "Mô tả",
       "pleaseUploadImage": "Vui lòng tải lên hình ảnh cho phòng",

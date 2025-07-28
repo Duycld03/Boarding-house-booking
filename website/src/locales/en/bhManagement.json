@@ -190,6 +190,8 @@
       "backToRoomManagement": "Back to Room Management",
       "updateRoom": "Update Room",
       "deleteRoom": "Delete Room",
+      "deleteRoomTile": "Confirm Delete Room",
+      "deleteRoomDescription": "Are you sure you want to delete this room? This action cannot be undone.",
       "roomType": "Room Type",
       "roomNumber": "Room Number",
       "description": "Description",

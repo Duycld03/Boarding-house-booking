@@ -623,8 +623,8 @@ function UpdateRoomPage({
       </div>
 
       <ConfirmModal
-        title={t("roomAdditionFee.modal.deleteFee.title")}
-        content={t("roomAdditionFee.messages.warning.deleteConfirmation")}
+        title={t("roomManagement.updateRoom.deleteRoomTile")}
+        content={t("roomManagement.updateRoom.deleteRoomDescription")}
         onOk={() => {
           onDelete(roomData._id);
           setIsOpenDeleteModal(false);
