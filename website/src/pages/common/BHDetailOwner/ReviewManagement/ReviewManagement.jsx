@@ -60,9 +60,9 @@ function ReviewManagement({ boardingHouseId }) {
           toast.error(t('messages.fetchFailed'));
         }
       } catch (error) {
-        toast.error(
-          error?.response?.data?.message || t('messages.fetchFailed')
-        );
+        // toast.error(
+        //   error?.response?.data?.message || t('messages.fetchFailed')
+        // );
       } finally {
         setLoading(false);
       }

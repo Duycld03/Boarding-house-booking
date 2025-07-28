@@ -24,7 +24,7 @@ import {
 function SearchScreen() {
   const { themedClasses, isDarkMode } = useThemedClasses();
   const { theme } = useTheme();
-  const { t } = useTranslation('home');
+  const { t, i18n } = useTranslation('home');
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,7 +50,10 @@ function SearchScreen() {
           id: item._id,
           name: item.name,
           price: item.priceRange,
-          detail: item.address?.province,
+          detail:
+            item.address?.province?.[
+              i18n.language === 'en' ? 'name_en' : 'name'
+            ] || '',
           rating: item.rating || 0,
           reviewCount: item.reviewCount || 0,
           img:
