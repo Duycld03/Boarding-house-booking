@@ -3,11 +3,13 @@ import React, { useEffect } from "react";
 import { sendOTPChangeEmail } from "../../../../api/accountAPI";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function ChangeEmailModal({ isOpen, email, setToggleModal }) {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = React.useState(false);
+  const { darkMode } = useTheme();
 
   const onCancel = () => {
     setToggleModal(false);
@@ -114,75 +116,101 @@ export default function ChangeEmailModal({ isOpen, email, setToggleModal }) {
 
   return (
     <>
-      {/* Dark mode styles injection */}
-      <style jsx global>{`
-        .dark-modal .ant-modal-content {
-          background-color: #1f1f1f !important;
-          border-color: #434343 !important;
-        }
-        .dark-modal .ant-modal-header {
-          background-color: #1f1f1f !important;
-          border-bottom-color: #434343 !important;
-        }
-        .dark-modal .ant-modal-title {
-          color: #ffffff !important;
-        }
-        .dark-modal .ant-modal-body {
-          background-color: #1f1f1f !important;
-        }
-        .dark-modal .ant-modal-footer {
-          background-color: #1f1f1f !important;
-          border-top-color: #434343 !important;
-        }
-        .dark-modal .ant-modal-close {
-          color: #ffffff !important;
-        }
-        .dark-modal .ant-modal-close:hover {
-          color: #40a9ff !important;
-        }
-        .dark-modal .ant-btn-default {
-          background-color: #1f1f1f !important;
-          border-color: #434343 !important;
-          color: #ffffff !important;
-        }
-        .dark-modal .ant-btn-default:hover {
-          background-color: #333333 !important;
-          border-color: #40a9ff !important;
-          color: #40a9ff !important;
-        }
-        .dark-modal .ant-btn-primary {
-          background-color: #1890ff !important;
-          border-color: #1890ff !important;
-        }
-        .dark-modal .ant-btn-primary:hover {
-          background-color: #40a9ff !important;
-          border-color: #40a9ff !important;
-        }
-        .dark-modal .ant-form-item-label > label {
-          color: #ffffff !important;
-        }
-        .dark-modal .ant-input {
-          background-color: #1f1f1f !important;
-          border-color: #434343 !important;
-          color: #ffffff !important;
-        }
-        .dark-modal .ant-input:hover {
-          border-color: #40a9ff !important;
-        }
-        .dark-modal .ant-input:focus {
-          background-color: #1f1f1f !important;
-          border-color: #40a9ff !important;
-          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
-        }
-        .dark-modal .ant-input::placeholder {
-          color: #8c8c8c !important;
-        }
-
-        /* Dark mode mask overlay */
-        .dark-mode .ant-modal-mask {
-          background-color: rgba(0, 0, 0, 0.7) !important;
-        }
-      `}</style>
+      {/* Conditionally inject dark mode styles only when darkMode is true */}
+      {darkMode && (
+        <style>{`
+          .dark-modal .ant-modal-content {
+            background-color: #111827 !important;
+            border: 1px solid #374151 !important;
+          }
+          .dark-modal .ant-modal-header {
+            background-color: #111827 !important;
+            border-bottom: 1px solid #374151 !important;
+          }
+          .dark-modal .ant-modal-title {
+            color: #f9fafb !important;
+            background: none !important;
+            border: none !important;
+          }
+          .dark-modal .ant-modal-header .ant-modal-title {
+            color: #f9fafb !important;
+            background: transparent !important;
+            border: none !important;
+          }
+          .dark-modal .ant-modal-body {
+            background-color: #111827 !important;
+            color: #f9fafb !important;
+          }
+          .dark-modal .ant-modal-footer {
+            background-color: #111827 !important;
+            border-top: 1px solid #374151 !important;
+          }
+          .dark-modal .ant-modal-close {
+            color: #9ca3af !important;
+          }
+          .dark-modal .ant-modal-close:hover {
+            color: #f9fafb !important;
+          }
+          .dark-modal .ant-modal-close .ant-modal-close-x {
+            color: #9ca3af !important;
+          }
+          .dark-modal .ant-modal-close:hover .ant-modal-close-x {
+            color: #f9fafb !important;
+          }
+          .dark-modal .ant-btn-default {
+            background-color: #1f2937 !important;
+            border-color: #374151 !important;
+            color: #f9fafb !important;
+          }
+          .dark-modal .ant-btn-default:hover {
+            background-color: #374151 !important;
+            border-color: #3b82f6 !important;
+            color: #3b82f6 !important;
+          }
+          .dark-modal .ant-btn-primary {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: #ffffff !important;
+          }
+          .dark-modal .ant-btn-primary:hover {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+          }
+          .dark-modal .ant-btn-primary:focus {
+            background-color: #1d4ed8 !important;
+            border-color: #1d4ed8 !important;
+          }
+          .dark-modal .ant-form-item-label > label {
+            color: #f9fafb !important;
+          }
+          .dark-modal .ant-input {
+            background-color: #1f2937 !important;
+            border-color: #374151 !important;
+            color: #f9fafb !important;
+          }
+          .dark-modal .ant-input:hover {
+            border-color: #3b82f6 !important;
+            background-color: #1f2937 !important;
+          }
+          .dark-modal .ant-input:focus {
+            background-color: #1f2937 !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+          }
+          .dark-modal .ant-input::placeholder {
+            color: #9ca3af !important;
+          }
+          .dark-modal .ant-input::-webkit-input-placeholder {
+            color: #9ca3af !important;
+          }
+          .dark-modal .ant-input::-moz-placeholder {
+            color: #9ca3af !important;
+          }
+          .dark-modal .ant-input:-ms-input-placeholder {
+            color: #9ca3af !important;
+          }
+        `}</style>
+      )}
 
       <Modal
         title="Change Email"
@@ -191,8 +219,8 @@ export default function ChangeEmailModal({ isOpen, email, setToggleModal }) {
         onOk={() => form.submit()}
         confirmLoading={loading}
         destroyOnClose
-        className="dark-modal"
-        maskStyle={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+        className={darkMode ? "dark-modal" : ""}
+        maskStyle={darkMode ? { backgroundColor: "rgba(17, 24, 39, 0.8)" } : {}}
       >
         <Form form={form} onFinish={handleSave} layout="vertical">
           <Form.Item name="email" className="mt-10">
