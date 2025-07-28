@@ -13,6 +13,13 @@
 .dark .ant-select-selection-placeholder {
   color: #9ca3af !important;
 }
+.dark .ant-modal-confirm-content {
+  color: #a6a6a6;
+}
+
+.dark .ant-modal-confirm-title {
+  color: #d9d9d9;
+}
 
 .dark .ant-select-arrow {
   color: #9ca3af !important;

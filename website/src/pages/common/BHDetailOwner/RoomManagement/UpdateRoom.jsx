@@ -123,12 +123,6 @@ function UpdateRoomPage({
     try {
       const res = await getRoomTypeByBhId(boardingHouseId);
       setRoomTypes(res.data);
-      if (res.data.length === 0) {
-        toast.error(t("roomManagement.updateRoom.noRoomTypeFound"));
-        if (onBack) {
-          onBack();
-        }
-      }
     } catch (error) {
       toast.error(t("roomManagement.updateRoom.errorFetchingRoomTypes"));
       console.log(error);
@@ -269,14 +263,15 @@ function UpdateRoomPage({
               onFinish={onFinish}
               initialValues={
                 roomData && {
-                  roomType: roomData.roomTypeId._id,
-                  roomNumber: roomData.roomNumber,
-                  description: roomData.description,
+                  roomType: roomData?.roomTypeId?._id,
+                  roomNumber: roomData?.roomNumber,
+                  description: roomData?.description,
                   previousElectricityReading:
-                    roomData.previousElectricityReading,
-                  previousWaterReading: roomData.previousWaterReading,
-                  currentElectricityReading: roomData.currentElectricityReading,
-                  currentWaterReading: roomData.currentWaterReading,
+                    roomData?.previousElectricityReading,
+                  previousWaterReading: roomData?.previousWaterReading,
+                  currentElectricityReading:
+                    roomData?.currentElectricityReading,
+                  currentWaterReading: roomData?.currentWaterReading,
                 }
               }
             >

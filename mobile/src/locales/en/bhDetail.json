@@ -43,12 +43,12 @@
   "alreadySaved": "Saved!",
   "saveThisBoardingHouse": "Save this boarding house",
   "alreadyReported": "You have reported this boarding house. Please wait for admin to process.",
-  "reportThisBoardingHouse": "Report this boarding house",
   "savedSuccess": "Boarding house saved successfully!",
   "removedSuccess": "Boarding house removed from saved list!",
   "likeCount": "Like count",
   "totalReview": " Reviews",
   "loadMore": "Load more review",
+  "loadingBoardingHouseDetails": "Loading boarding house details...",
   "addReview": {
     "title": "Rating and Review",
     "ratingLabel": "Rating",

@@ -180,7 +180,7 @@ function Profile() {
   }, []);
 
   const cardStyle = {
-    background: darkMode ? "#1f1f1f" : "#fff",
+    background: darkMode ? "rgb(17 24 39)" : "#fff",
     boxShadow: darkMode
       ? "0 4px 12px rgba(0, 0, 0, 0.4)"
       : "0 4px 12px rgba(0, 0, 0, 0.1)",

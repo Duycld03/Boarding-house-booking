@@ -11,7 +11,8 @@
 }
 
 .dark-modal .ant-modal-title {
-  color: #f9fafb !important; /* gray-50 */
+  color: #f9fafb; /* gray-50 */
+  background-color: #1f2937;
 }
 
 .dark-modal .ant-modal-close {
@@ -126,7 +127,6 @@
 }
 
 .dark-modal .ant-btn-default {
-  background-color: #374151 !important; /* gray-700 */
   border-color: #4b5563 !important; /* gray-600 */
   color: #f9fafb !important; /* gray-50 */
 }

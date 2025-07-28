@@ -284,6 +284,10 @@
         "singleModeReviewTitle": "Add Single Room - Review",
         "bulkModeReviewTitle": "Bulk Add Rooms - Review"
       },
+      "noRoomType": {
+        "title": "No Room Types Found",
+        "content": "Please create room types before adding rooms."
+      },
       "chooseAddMode": "Choose Add Mode",
       "singleRoom": "Single Room",
       "addOneRoomAtATime": "Add one room at a time",
