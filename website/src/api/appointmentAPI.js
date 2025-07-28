@@ -26,11 +26,8 @@ export const getAppointmentsByBoardingHouseId = (boardingHouseId) => {
 export const getAppointmentDetailForOwner = (id) => {
     return axios.get(`/owner/appointment/${id}`);
 };
-export const acceptAppointment = (appointmentId, confirmOverlap = false) => {
-    return axios.post(`/owner/appointments/accept/${appointmentId}`, { confirmOverlap });
-};
-export const rejectAppointment = (appointmentId) => {
-    return axios.post(`/owner/appointments/reject/${appointmentId}`);
+export const handleViewingRequest = (appointmentId, data = {}) => {
+    return axios.post(`/staff/appointments/update/${appointmentId}`, data);
 };
 export const getAppointmentsByOwnerId = (ownerId, params = {}) =>
     axios.get(`/owner/${ownerId}/appointments`, { params });

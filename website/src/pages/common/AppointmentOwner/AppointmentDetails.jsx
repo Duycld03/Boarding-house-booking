@@ -3,7 +3,7 @@ import { Card, Avatar, Tag, Typography, Form, Modal } from "antd";
 import { Button } from '@/component';
 import moment from "moment";
 import DefaultAccount from "@/assets/images/none_avatar.png";
-import { acceptAppointment, rejectAppointment } from "../../../api/appointmentAPI";
+import { handleViewingRequest } from "../../../api/appointmentAPI";
 import { toast } from "react-toastify";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../context/themeContext';
@@ -49,7 +49,7 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
         }
 
         try {
-            await acceptAppointment(appointment._id);
+            await handleViewingRequest(appointment._id, { action: 'accept' });
             toast.success("Appointment accepted successfully!");
             onAcceptSuccess();
         } catch (err) {
@@ -58,7 +58,7 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
                 const confirm = window.confirm(error.message);
                 if (confirm) {
                     try {
-                        await acceptAppointment(appointment._id, true);
+                        await handleViewingRequest(appointment._id, true);
                         toast.success("Appointment accepted with overlap!");
                     } catch (confirmErr) {
                         toast.error(confirmErr.response?.data?.message || "Failed to accept appointment after confirmation.");
@@ -111,7 +111,7 @@ const AppointmentDetail = ({ appointment, onAcceptSuccess = () => { } }) => {
                 }
 
                 try {
-                    await rejectAppointment(appointment._id, { reason });
+                    await handleViewingRequest(appointment._id, { action: 'reject', reason });
                     toast.success(t('messages.rejectSuccess'));
                     onAcceptSuccess();
                 } catch (err) {

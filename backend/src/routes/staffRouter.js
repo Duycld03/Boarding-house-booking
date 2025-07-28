@@ -16,6 +16,7 @@ import {
   managerController,
   roomAdditionFeeController,
   taskController,
+  appointmentController,
 } from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -240,4 +241,8 @@ staffRouter.get("/boardinghouse/reviews/:id", ReviewController.getReviewByBhId);
 //task
 staffRouter.get("/tasks", taskController.getTasks);
 staffRouter.put("/tasks/:id", taskController.updateTask);
+staffRouter.post(
+  "/appointments/update/:appointmentId",
+  appointmentController.handleViewingRequest
+);
 export { staffRouter };

@@ -335,10 +335,13 @@ class AppointmentController {
             return res.status(500).json({ message: "Server error", error: error.message });
         }
     }
-    async acceptViewingRequest(req, res) {
+    async handleViewingRequest(req, res) {
         try {
             const { appointmentId } = req.params;
+            const { action, reason } = req.body;
+            const userId = req.user?.userId;
 
+            // Lấy thông tin appointment
             const request = await Appointment.findById(appointmentId)
                 .populate({
                     path: "roomId",
@@ -354,95 +357,69 @@ class AppointmentController {
             }
 
             if (request.status !== "pending") {
-                return res.status(400).json({ message: "Only pending requests can be accepted" });
+                return res.status(400).json({ message: "Only pending requests can be processed" });
             }
 
-            // Tính khoảng thời gian trùng (30 phút trước và sau)
-            const startTime = new Date(request.appointmentDate.getTime() - 30 * 60000);
-            const endTime = new Date(request.appointmentDate.getTime() + 30 * 60000);
 
-            // Tìm các yêu cầu khác trùng thời gian và chưa bị từ chối
-            const overlappingRequests = await Appointment.find({
-                _id: { $ne: request._id },
-                roomId: request.roomId._id,
-                status: { $in: ["pending", "accepted"] },
-                appointmentDate: {
-                    $gte: startTime,
-                    $lte: endTime,
-                },
-            });
 
-            // Nếu đã có một cái đã được accept => không cho accept nữa
-            const alreadyAccepted = overlappingRequests.find(r => r.status === "accepted");
-            if (alreadyAccepted) {
-                return res.status(400).json({
-                    message: `A viewing request has already been accepted for this time slot.`,
-                });
-            }
+            if (action === "accept") {
+                // Tính khoảng thời gian trùng (30 phút trước và sau)
+                const startTime = new Date(request.appointmentDate.getTime() - 30 * 60000);
+                const endTime = new Date(request.appointmentDate.getTime() + 30 * 60000);
 
-            // Chấp nhận lịch hẹn này
-            request.status = "accepted";
-            await request.save();
-
-            // Lọc các yêu cầu bị trùng ngày + giờ => reject
-            const targetDate = request.appointmentDate.toISOString().split("T")[0];
-            const toReject = overlappingRequests.filter(r => {
-                const dateStr = r.appointmentDate.toISOString().split("T")[0];
-                return dateStr === targetDate;
-            });
-
-            const rejectIds = toReject.map(r => r._id);
-            if (rejectIds.length > 0) {
-                await Appointment.updateMany(
-                    { _id: { $in: rejectIds } },
-                    {
-                        status: "rejected",
-                        reasonForCancel: "This time slot has already been booked by another tenant.",
-                    }
-                );
-            }
-
-            res.status(200).json({ message: "Viewing request accepted successfully", request });
-        } catch (error) {
-            console.error("Error accepting viewing request:", error);
-            res.status(500).json({ message: "Server error", error: error.message });
-        }
-    }
-    async rejectViewingRequest(req, res) {
-        try {
-            const { appointmentId } = req.params;
-            const { reason } = req.body;
-            const userId = req.user?.userId;
-
-            const request = await Appointment.findById(appointmentId)
-                .populate({
-                    path: "roomId",
-                    populate: {
-                        path: "boardingHouseId",
-                        populate: { path: "ownerId", select: "fullname email" }
-                    }
+                // Tìm các yêu cầu khác trùng thời gian và chưa bị từ chối
+                const overlappingRequests = await Appointment.find({
+                    _id: { $ne: request._id },
+                    roomId: request.roomId._id,
+                    status: { $in: ["pending", "accepted"] },
+                    appointmentDate: {
+                        $gte: startTime,
+                        $lte: endTime,
+                    },
                 });
 
-            if (!request) {
-                return res.status(404).json({ message: "Viewing request not found" });
+                // Nếu đã có một cái đã được accept => không cho accept nữa
+                const alreadyAccepted = overlappingRequests.find(r => r.status === "accepted");
+                if (alreadyAccepted) {
+                    return res.status(400).json({
+                        message: `A viewing request has already been accepted for this time slot.`,
+                    });
+                }
+
+                // Chấp nhận lịch hẹn này
+                request.status = "accepted";
+                await request.save();
+
+                // Lọc các yêu cầu bị trùng ngày + giờ => reject
+                const targetDate = request.appointmentDate.toISOString().split("T")[0];
+                const toReject = overlappingRequests.filter(r => {
+                    const dateStr = r.appointmentDate.toISOString().split("T")[0];
+                    return dateStr === targetDate;
+                });
+
+                const rejectIds = toReject.map(r => r._id);
+                if (rejectIds.length > 0) {
+                    await Appointment.updateMany(
+                        { _id: { $in: rejectIds } },
+                        {
+                            status: "rejected",
+                            reasonForCancel: "This time slot has already been booked by another tenant.",
+                        }
+                    );
+                }
+
+                return res.status(200).json({ message: "Viewing request accepted successfully", request });
+            } else if (action === "reject") {
+                request.status = "rejected";
+                request.reasonForCancel = reason || "Rejected by owner";
+                await request.save();
+
+                return res.status(200).json({ message: "Viewing request rejected successfully", request });
+            } else {
+                return res.status(400).json({ message: "Invalid action. Use 'accept' or 'reject'." });
             }
-
-            const ownerId = request.roomId?.boardingHouseId?.ownerId?._id.toString();
-            if (ownerId !== userId) {
-                return res.status(403).json({ message: "You do not have permission to reject this appointment" });
-            }
-
-            if (request.status !== "pending") {
-                return res.status(400).json({ message: "Only pending requests can be rejected" });
-            }
-
-            request.status = "rejected";
-            request.reasonForCancel = reason || "Rejected by owner";
-            await request.save();
-
-            res.status(200).json({ message: "Viewing request rejected successfully", request });
         } catch (error) {
-            console.error("Error rejecting viewing request:", error);
+            console.error("Error processing viewing request:", error);
             res.status(500).json({ message: "Server error", error: error.message });
         }
     }

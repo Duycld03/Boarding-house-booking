@@ -174,12 +174,6 @@ ownerRouter.get(
   "/appointment/:appointmentId",
   appointmentController.getAppointmentDetailForOwner
 );
-ownerRouter.post(
-  "/appointments/accept/:appointmentId",
-  appointmentController.acceptViewingRequest
-);
-ownerRouter.post(
-  "/appointments/reject/:appointmentId",
-  appointmentController.rejectViewingRequest
-);
+
+
 export { ownerRouter };
