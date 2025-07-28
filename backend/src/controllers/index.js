@@ -21,7 +21,6 @@ import paymentBillController from './paymentBillController.js';
 import managerController from './managerController.js';
 import roomAdditionFeeController from './roomAdditionFeeController.js';
 import taskController from './taskController.js';
-
 export {
   authController,
   withdrawalRequestsController,

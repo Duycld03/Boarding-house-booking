@@ -20,3 +20,15 @@ export const getOwnerAppointmentById = (id) => {
 export const createAppointment = (value) => {
     return axios.post(`/auth/appointment/create-appointment/`, value)
 }
+export const getAppointmentsByBoardingHouseId = (boardingHouseId) => {
+    return axios.get(`/owner/${boardingHouseId}`);
+};
+export const getAppointmentDetailForOwner = (id) => {
+    return axios.get(`/owner/appointment/${id}`);
+};
+export const handleViewingRequest = (appointmentId, data = {}) => {
+    return axios.post(`/staff/appointments/update/${appointmentId}`, data);
+};
+export const getAppointmentsByOwnerId = (ownerId, params = {}) =>
+    axios.get(`/owner/${ownerId}/appointments`, { params });
+

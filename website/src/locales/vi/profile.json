@@ -60,6 +60,7 @@
     "myDepositRefundRequest": "Yêu cầu hoàn tiền cọc",
     "depositRefundManagement": "Quản lý hoàn tiền cọc",
     "revenueManagement": "Quản lý doanh thu",
-    "taskManagement": "Quản lý công việc"
+    "taskManagement": "Quản lý công việc",
+    "appoinmentManagement": "Quản lý cuộc hẹn"
   }
 }

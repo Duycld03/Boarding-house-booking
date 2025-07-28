@@ -159,6 +159,11 @@ const routes = [
     page: CommonPages.StaffManagement,
     layout: ProfileLayout,
   },
+  {
+    path: '/appointment-owner/',
+    page: CommonPages.AppointmentOwner,
+    layout: ProfileLayout,
+  },
 ];
 
 export default routes;

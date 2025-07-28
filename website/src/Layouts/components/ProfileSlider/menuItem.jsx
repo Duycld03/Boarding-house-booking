@@ -119,6 +119,12 @@ const getMenuItems = () => {
       icon: <DollarCircleOutlined />,
       visible: isOwner || isStaff,
     },
+    {
+      key: 'appointment-owner',
+      label: <Link to="/appointment-owner">Appointment Management</Link>,
+      icon: <ScheduleOutlined />,
+      visible: isOwner || isStaff
+    },
   ];
   return menuItems.filter((item) => item.visible);
 };
