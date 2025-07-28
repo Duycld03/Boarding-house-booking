@@ -1,0 +1,36 @@
+{
+    "filterTitle": "Filter Boarding House",
+    "name": "Name Boarding House",
+    "enterName": "Enter name",
+    "priceRange": "Price Range",
+    "min": "Min",
+    "max": "Max",
+    "type": "Type",
+    "rating": "Rating",
+    "applyFilter": "Apply Filter",
+    "filterResultTitle": "Filtered Results",
+    "totalResults": "{{count}} result",
+    "totalResults_plural": "{{count}} results",
+    "emptyTitle": "No results",
+    "emptyMessage": "No boarding house matches your filters.",
+    "itemName": "boarding houses",
+    "province": "Province",
+    "selectProvince": "Select province",
+    "district": "District",
+    "selectDistrict": "Select district",
+    "ward": "Ward",
+    "selectWard": "Select ward",
+    "address": "Address",
+    "ratingAbove": "{{rating}} stars and up",
+    "accommodation_types": {
+        "nha_tro_truyen_thong": "Traditional Boarding House",
+        "mini_house": "Mini House",
+        "nha_tro_kien_truc_xa": "Dormitory Style Boarding House",
+        "nha_tro_cao_cap": "Premium Boarding House"
+    },
+    "boardingHouseTypes": {
+        "Nhà trọ truyền thống": "Traditional Boarding House",
+        "Mini house": "Mini Apartment",
+        "Nhà trọ kiến trúc xá": "Dormitory"
+    }
+}

@@ -36,7 +36,7 @@ const BoardingHouseCard = ({
 
   const timeAgoText = formatTimeAgo(updatedAt, t);
   const translatedDetail = truncateDetail(
-    detail
+    typeof detail === 'string'
       ? t(`location.${detail}`, { defaultValue: detail })
       : t('location.No address provided')
   );
@@ -50,7 +50,7 @@ const BoardingHouseCard = ({
           const favoriteIds = response.favorites.map((fav) => fav.id);
           setIsFavorite(favoriteIds.includes(id));
         }
-      } catch (error) {}
+      } catch (error) { }
     };
     fetchFavoriteStatus();
   }, [id]);

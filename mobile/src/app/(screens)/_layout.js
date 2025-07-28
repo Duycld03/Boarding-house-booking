@@ -44,7 +44,14 @@ const ScreenLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="filterBH"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
+
     </>
   );
 };

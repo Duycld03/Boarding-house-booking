@@ -568,15 +568,11 @@ class boardingHouseController {
       let filter = {};
 
       if (boardingHouseType) {
-        filter.boardingHouseType = new mongoose.Types.ObjectId(
-          boardingHouseType
-        );
+        filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType);
       }
       if (rating) {
         const ratings = rating.split(',').map(Number);
-        const validRatings = ratings.filter(
-          (r) => !isNaN(r) && r >= 0 && r <= 5
-        );
+        const validRatings = ratings.filter((r) => !isNaN(r) && r >= 0 && r <= 5);
         if (validRatings.length > 0) {
           filter.rating = { $in: validRatings };
         } else {
@@ -598,18 +594,11 @@ class boardingHouseController {
       }
 
       // Sử dụng paginate
-      const paginatedResult = await paginate(
-        BoardingHouse,
-        { filter, page, limit },
-        req
-      );
-      paginatedResult.data = await BoardingHouse.populate(
-        paginatedResult.data,
-        [
-          { path: 'boardingHouseType', select: 'name codeName' },
-          { path: 'ownerId' },
-        ]
-      );
+      const paginatedResult = await paginate(BoardingHouse, { filter, page, limit }, req);
+      paginatedResult.data = await BoardingHouse.populate(paginatedResult.data, [
+        { path: "boardingHouseType", select: "name codeName" },
+        { path: "ownerId" }
+      ]);
       // // Query the boarding houses based on filter
       // const boardingHouses = await BoardingHouse.find(filter)
       //   .populate('boardingHouseType')
@@ -619,24 +608,11 @@ class boardingHouseController {
       //   .sort({ createdAt: -1 });
 
       // Lọc bổ sung dựa trên province, district, ward, name (nếu cần thiết)
-      paginatedResult.data = paginatedResult.data.filter((bh) => {
-        return (
-          (!province ||
-            (bh.address?.province &&
-              bh.address.province
-                .toLowerCase()
-                .includes(province.toLowerCase()))) &&
-          (!district ||
-            (bh.address?.district &&
-              bh.address.district
-                .toLowerCase()
-                .includes(district.toLowerCase()))) &&
-          (!ward ||
-            (bh.address?.ward &&
-              bh.address.ward.toLowerCase().includes(ward.toLowerCase()))) &&
-          (!name ||
-            (bh.name && bh.name.toLowerCase().includes(name.toLowerCase())))
-        );
+      paginatedResult.data = paginatedResult.data.filter(bh => {
+        return (!province || (bh.address?.province && bh.address.province.toLowerCase().includes(province.toLowerCase())))
+          && (!district || (bh.address?.district && bh.address.district.toLowerCase().includes(district.toLowerCase())))
+          && (!ward || (bh.address?.ward && bh.address.ward.toLowerCase().includes(ward.toLowerCase())))
+          && (!name || (bh.name && bh.name.toLowerCase().includes(name.toLowerCase())));
       });
 
       res.status(200).json(paginatedResult);
@@ -1198,90 +1174,89 @@ class boardingHouseController {
         rating,
         priceRange,
         name,
+        page = 1,
+        limit = 6,
       } = req.query;
-      let result = [];
 
-      let filter = { totalRooms: { $gt: 0 } };
+      const filter = {
+        totalRooms: { $gt: 0 },
+      };
 
-      // Nếu có loại nhà trọ, chuyển thành ObjectId
       if (boardingHouseType) {
-        filter.boardingHouseType = new mongoose.Types.ObjectId(
-          boardingHouseType
-        );
+        filter.boardingHouseType = new mongoose.Types.ObjectId(boardingHouseType);
       }
-
-      // Nếu có rating, chuyển thành mảng số và kiểm tra hợp lệ
       if (rating) {
-        const ratings = rating.split(',').map(Number);
-        const validRatings = ratings.filter(
-          (r) => !isNaN(r) && r >= 0 && r <= 5
-        );
-        if (validRatings.length > 0) {
-          filter.rating = { $in: validRatings };
-        } else {
-          return res.status(400).json({
-            success: false,
-            message:
-              'Invalid rating format. Each rating must be a number between 0 and 5.',
-          });
+        const ratings = rating.split(',').map(Number).filter(r => !isNaN(r));
+        if (ratings.length) {
+          filter.rating = { $in: ratings };
         }
       }
-
-      // Nếu có priceRange, kiểm tra định dạng và áp dụng bộ lọc
       if (priceRange) {
         const prices = priceRange.split(',').map(Number);
-        if (prices.length === 2 && !isNaN(prices[0]) && !isNaN(prices[1])) {
+        if (prices.length === 2) {
           filter.priceRange = { $gte: prices[0], $lte: prices[1] };
-        } else {
-          return res.status(400).json({
-            success: false,
-            message: "Invalid price range format. Use 'priceRange=min,max'.",
-          });
+        }
+      } else {
+        if (req.query.priceMin || req.query.priceMax) {
+          filter.priceRange = {};
+          if (req.query.priceMin) {
+            filter.priceRange.$gte = Number(req.query.priceMin);
+          }
+          if (req.query.priceMax) {
+            filter.priceRange.$lte = Number(req.query.priceMax);
+          }
         }
       }
-
-      // Truy vấn cơ sở dữ liệu với bộ lọc
-      const boardingHData = await BoardingHouse.find(filter, { reviews: 0 });
-
-      result = boardingHData;
-
-      // Lọc theo tỉnh/thành phố
       if (province) {
-        result = result.filter(
-          (bh) =>
-            bh.address?.province
-              .toLowerCase()
-              .includes(province.toLowerCase()) ?? false
-        );
+        filter.$or = [
+          { "address.province.name": { $regex: province, $options: "i" } },
+          { "address.province.name_en": { $regex: province, $options: "i" } }
+        ];
       }
 
-      // Lọc theo quận/huyện
       if (district) {
-        result = result.filter(
-          (bh) =>
-            bh.address?.district
-              .toLowerCase()
-              .includes(district.toLowerCase()) ?? false
-        );
-      }
-
-      // Lọc theo phường/xã
-      if (ward?.trim()) {
-        result = result.filter(
-          (bh) =>
-            bh.address?.ward?.toLowerCase().includes(ward.toLowerCase()) ??
-            false
-        );
-      }
-      if (name) {
-        result = result.filter((bh) => {
-          return bh.name && bh.name.toLowerCase().includes(name.toLowerCase());
+        filter.$and = filter.$and || [];
+        filter.$and.push({
+          $or: [
+            { "address.district.name": { $regex: district, $options: "i" } },
+            { "address.district.name_en": { $regex: district, $options: "i" } }
+          ]
         });
       }
-      res.status(200).json(result);
+
+      if (ward) {
+        filter.$and = filter.$and || [];
+        filter.$and.push({
+          $or: [
+            { "address.ward.name": { $regex: ward, $options: "i" } },
+            { "address.ward.name_en": { $regex: ward, $options: "i" } }
+          ]
+        });
+      }
+      if (name) {
+        filter.name = { $regex: name, $options: 'i' };
+      }
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+      const totalDocs = await BoardingHouse.countDocuments(filter);
+      const results = await BoardingHouse.find(filter, { reviews: 0 })
+        .sort({ updatedAt: -1 }) // hoặc sort theo rating, v.v.
+        .skip(skip)
+        .limit(parseInt(limit));
+
+      return res.status(200).json({
+        success: true,
+        data: results,
+        totalDocs,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalDocs / limit),
+          hasNextPage: skip + results.length < totalDocs,
+          hasPrevPage: skip > 0,
+        },
+      });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      console.error('getBhByArea error:', error);
+      res.status(500).json({ success: false, message: 'Server error', error });
     }
   }
   async createBoardingHouseType(req, res) {
