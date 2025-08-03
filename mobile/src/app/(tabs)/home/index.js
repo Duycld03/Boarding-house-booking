@@ -1,29 +1,29 @@
-import React, { useState, useCallback } from 'react';
-import { Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useCallback } from "react";
+import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import ScreenContainer, {
   ScrollContainer,
-} from '@/components/layout/ScreenContainer';
-import { useThemedClasses } from '@/utils/useTheme';
-import HorizontalList from '@/components/ui/HorizontalList';
+} from "@/components/layout/ScreenContainer";
+import { useThemedClasses } from "@/utils/useTheme";
+import HorizontalList from "@/components/ui/HorizontalList";
 import {
   getAllBHHome,
   getHighRatingBH,
   getNewestBH,
-} from '@/API/boardingHouseAPI';
+} from "@/API/boardingHouseAPI";
 
-import Logo from '../../../assets/images/newLogo.png';
+import Logo from "../../../assets/images/newLogo.png";
 
-import { useTranslation } from 'react-i18next';
-import Loader from '@/components/ui/Loader';
-import { getUser } from '@/API/authAPI';
+import { useTranslation } from "react-i18next";
+import Loader from "@/components/ui/Loader";
+import { getUser } from "@/API/authAPI";
 
 function Home() {
   const { isDarkMode } = useThemedClasses();
   const router = useRouter();
-  const { t, i18n } = useTranslation('home');
+  const { t, i18n } = useTranslation("home");
   const [data, setData] = useState({
     all: [],
     newest: [],
@@ -53,15 +53,15 @@ function Home() {
               price: item.priceRange,
               detail:
                 item.address?.province?.[
-                  i18n.language === 'en' ? 'name_en' : 'name'
-                ] || '',
+                  i18n.language === "en" ? "name_en" : "name"
+                ] || "",
               rating: item.rating || 0,
               reviewCount: item.reviewCount || 0,
               updatedAt: item.updatedAt || 0,
               img:
                 item.images?.find((i) => i.isPrimary)?.imageUrl ||
                 item.images?.[0]?.imageUrl ||
-                '',
+                "",
             })) || [];
 
           if (isActive) {
@@ -72,7 +72,7 @@ function Home() {
             });
           }
         } catch (error) {
-          console.error('Error fetching BH:', error);
+          console.error("Error fetching BH:", error);
           if (isActive) {
             setData({ all: [], newest: [], highRating: [] });
           }
@@ -108,7 +108,7 @@ function Home() {
   // Header Component với gradient và animation + Auth buttons + Logo
   const Header = () => (
     <LinearGradient
-      colors={isDarkMode ? ['#1e293b', '#334155'] : ['#0ea5e9', '#0284c7']}
+      colors={isDarkMode ? ["#1e293b", "#334155"] : ["#0ea5e9", "#0284c7"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.header}
@@ -119,11 +119,11 @@ function Home() {
           <View style={styles.logoSection}>
             <Image source={Logo} style={styles.logo} resizeMode="contain" />
             <View style={styles.textSection}>
-              <Text style={[styles.greeting, { color: '#ffffff' }]}>
-                {t('greeting', 'Xin chào!')}
+              <Text style={[styles.greeting, { color: "#ffffff" }]}>
+                {t("greeting", "Xin chào!")}
               </Text>
-              <Text style={[styles.welcomeText, { color: '#e0f2fe' }]}>
-                {t('welcome')}
+              <Text style={[styles.welcomeText, { color: "#e0f2fe" }]}>
+                {t("welcome")}
               </Text>
             </View>
           </View>
@@ -135,20 +135,16 @@ function Home() {
             <View style={styles.authButtonsContainer}>
               <TouchableOpacity
                 style={styles.loginButton}
-                onPress={() => router.push('/login')}
+                onPress={() => router.push("/login")}
               >
-                <Text style={styles.loginButtonText}>
-                  {t('login', 'Đăng nhập')}
-                </Text>
+                <Text style={styles.loginButtonText}>{t("login")}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.registerButton}
-                onPress={() => router.push('/register')}
+                onPress={() => router.push("/register")}
               >
-                <Text style={styles.registerButtonText}>
-                  {t('register', 'Đăng ký')}
-                </Text>
+                <Text style={styles.registerButtonText}>{t("register")}</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -172,27 +168,27 @@ function Home() {
       <TouchableOpacity
         style={[
           styles.searchBar,
-          { backgroundColor: isDarkMode ? '#374151' : '#ffffff' },
+          { backgroundColor: isDarkMode ? "#374151" : "#ffffff" },
         ]}
-        onPress={() => router.push('/searchBH')}
+        onPress={() => router.push("/searchBH")}
       >
         <Ionicons
           name="search-outline"
           size={20}
-          color={isDarkMode ? '#9ca3af' : '#6b7280'}
+          color={isDarkMode ? "#9ca3af" : "#6b7280"}
         />
         <Text
           style={[
             styles.searchPlaceholder,
-            { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+            { color: isDarkMode ? "#9ca3af" : "#6b7280" },
           ]}
         >
-          {t('welcome', 'Tìm kiếm nhà trọ...')}
+          {t("welcome", "Tìm kiếm nhà trọ...")}
         </Text>
         <Ionicons
           name="filter-outline"
           size={20}
-          color={isDarkMode ? '#9ca3af' : '#6b7280'}
+          color={isDarkMode ? "#9ca3af" : "#6b7280"}
         />
       </TouchableOpacity>
     </View>
@@ -204,11 +200,11 @@ function Home() {
       <View
         style={[
           styles.statsCard,
-          { backgroundColor: isDarkMode ? '#1f2937' : '#ffffff' },
+          { backgroundColor: isDarkMode ? "#1f2937" : "#ffffff" },
         ]}
       >
         <LinearGradient
-          colors={['#10b981', '#059669']}
+          colors={["#10b981", "#059669"]}
           style={styles.statsIconContainer}
         >
           <Ionicons name="home-outline" size={20} color="#ffffff" />
@@ -216,7 +212,7 @@ function Home() {
         <Text
           style={[
             styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#111827' },
+            { color: isDarkMode ? "#ffffff" : "#111827" },
           ]}
         >
           {allCount}
@@ -224,21 +220,21 @@ function Home() {
         <Text
           style={[
             styles.statsLabel,
-            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
+            { color: isDarkMode ? "#e5e7eb" : "#4b5563" },
           ]}
         >
-          {t('All')}
+          {t("All")}
         </Text>
       </View>
 
       <View
         style={[
           styles.statsCard,
-          { backgroundColor: isDarkMode ? '#1f2937' : '#ffffff' },
+          { backgroundColor: isDarkMode ? "#1f2937" : "#ffffff" },
         ]}
       >
         <LinearGradient
-          colors={['#f59e0b', '#d97706']}
+          colors={["#f59e0b", "#d97706"]}
           style={styles.statsIconContainer}
         >
           <Ionicons name="star-outline" size={20} color="#ffffff" />
@@ -247,7 +243,7 @@ function Home() {
         <Text
           style={[
             styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#111827' },
+            { color: isDarkMode ? "#ffffff" : "#111827" },
           ]}
         >
           {highRatingCount}
@@ -255,21 +251,21 @@ function Home() {
         <Text
           style={[
             styles.statsLabel,
-            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
+            { color: isDarkMode ? "#e5e7eb" : "#4b5563" },
           ]}
         >
-          {t('rating')}
+          {t("rating")}
         </Text>
       </View>
 
       <View
         style={[
           styles.statsCard,
-          { backgroundColor: isDarkMode ? '#1f2937' : '#ffffff' },
+          { backgroundColor: isDarkMode ? "#1f2937" : "#ffffff" },
         ]}
       >
         <LinearGradient
-          colors={['#8b5cf6', '#7c3aed']}
+          colors={["#8b5cf6", "#7c3aed"]}
           style={styles.statsIconContainer}
         >
           <Ionicons name="time-outline" size={20} color="#ffffff" />
@@ -277,7 +273,7 @@ function Home() {
         <Text
           style={[
             styles.statsNumber,
-            { color: isDarkMode ? '#ffffff' : '#111827' },
+            { color: isDarkMode ? "#ffffff" : "#111827" },
           ]}
         >
           {newestCount}
@@ -285,10 +281,10 @@ function Home() {
         <Text
           style={[
             styles.statsLabel,
-            { color: isDarkMode ? '#e5e7eb' : '#4b5563' },
+            { color: isDarkMode ? "#e5e7eb" : "#4b5563" },
           ]}
         >
-          {t('newest', 'Mới nhất')}
+          {t("newest", "Mới nhất")}
         </Text>
       </View>
     </View>
@@ -304,7 +300,7 @@ function Home() {
         <Text
           style={[
             styles.sectionTitle,
-            { color: isDarkMode ? '#ffffff' : '#1f2937' },
+            { color: isDarkMode ? "#ffffff" : "#1f2937" },
           ]}
         >
           {title}
@@ -314,7 +310,7 @@ function Home() {
         style={styles.seeMoreButton}
         onPress={() => router.push(link)}
       >
-        <Text style={styles.seeMoreText}>{t('seeMore', 'Xem thêm')}</Text>
+        <Text style={styles.seeMoreText}>{t("seeMore", "Xem thêm")}</Text>
         <Ionicons name="chevron-forward" size={16} color="#0ea5e9" />
       </TouchableOpacity>
     </View>
@@ -325,12 +321,12 @@ function Home() {
       <View
         style={[
           styles.loadingContainer,
-          { backgroundColor: isDarkMode ? '#111827' : '#f8fafc' },
+          { backgroundColor: isDarkMode ? "#111827" : "#f8fafc" },
         ]}
       >
         <Loader
-          color={isDarkMode ? '#3B82F6' : '#1D4ED8'}
-          textColor={isDarkMode ? '#e0f2fe' : '#1f2937'}
+          color={isDarkMode ? "#3B82F6" : "#1D4ED8"}
+          textColor={isDarkMode ? "#e0f2fe" : "#1f2937"}
         />
       </View>
     );
@@ -353,26 +349,26 @@ function Home() {
 
         <View style={styles.sectionsContainer}>
           <SectionHeader
-            title={t('All', 'Tất cả')}
+            title={t("All", "Tất cả")}
             link="/allBH"
             icon="grid-outline"
-            gradient={['#06b6d4', '#0891b2']}
+            gradient={["#06b6d4", "#0891b2"]}
           />
           <HorizontalList data={data.all} />
 
           <SectionHeader
-            title={t('newest', 'Mới nhất')}
+            title={t("newest", "Mới nhất")}
             link="/newestBH"
             icon="sparkles-outline"
-            gradient={['#8b5cf6', '#7c3aed']}
+            gradient={["#8b5cf6", "#7c3aed"]}
           />
           <HorizontalList data={newestData} />
 
           <SectionHeader
-            title={t('rating', 'Đánh giá cao')}
+            title={t("rating", "Đánh giá cao")}
             link="/highRatingBH"
             icon="trophy-outline"
-            gradient={['#f59e0b', '#d97706']}
+            gradient={["#f59e0b", "#d97706"]}
           />
           <HorizontalList data={highRatingData} />
         </View>
@@ -390,34 +386,34 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 25,
   },
   headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerLeft: {
     flex: 1,
   },
   headerRight: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   // Logo Section Styles
   logoSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   logo: {
     width: 50,
     height: 50,
     marginRight: 12,
     borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   textSection: {
     flex: 1,
   },
   greeting: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
   welcomeText: {
@@ -426,47 +422,47 @@ const styles = StyleSheet.create({
   },
   // Auth Buttons Styles
   authButtonsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   loginButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
   loginButtonText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   registerButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
   },
   registerButtonText: {
-    color: '#0ea5e9',
+    color: "#0ea5e9",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   notificationButton: {
-    position: 'relative',
+    position: "relative",
     padding: 8,
     borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
   notificationBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 4,
     right: 4,
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#ef4444',
+    backgroundColor: "#ef4444",
   },
   // Quick Actions Styles
   quickActionsContainer: {
@@ -475,11 +471,11 @@ const styles = StyleSheet.create({
   },
   quickActionsTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 12,
   },
   quickActionsButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   quickActionButton: {
@@ -491,12 +487,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -508,7 +504,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   statsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 20,
     marginBottom: 24,
     gap: 12,
@@ -517,8 +513,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -528,63 +524,63 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 8,
   },
   statsNumber: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
   statsLabel: {
     fontSize: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
   sectionsContainer: {
     paddingHorizontal: 20,
   },
   sectionHeaderContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 24,
     marginBottom: 16,
   },
   sectionHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   sectionIcon: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   seeMoreButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,
-    backgroundColor: '#e0f2fe',
+    backgroundColor: "#e0f2fe",
   },
   seeMoreText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#0ea5e9',
+    fontWeight: "600",
+    color: "#0ea5e9",
     marginRight: 4,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
