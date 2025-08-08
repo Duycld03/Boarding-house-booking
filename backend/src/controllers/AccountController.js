@@ -8,7 +8,8 @@ import paginate from "../utils/pagination.js";
 class accountController {
   async getAllAccount(req, res) {
     try {
-      const accountData = await Account.find().sort({ createdAt: -1 });
+      const accountData = await Account.find({ deleted: false }).sort({ createdAt: -1 });
+
 
       return res.status(200).json(accountData);
     } catch (error) {
@@ -43,8 +44,10 @@ class accountController {
     try {
       const { gender, role, startDate, endDate, status } = req.query;
 
-      // Xây dựng filter cơ bản
-      const filter = {};
+      const filter = {
+        deleted: false, // ✅ Thêm điều kiện này để chỉ lấy account chưa bị xóa
+      };
+
       if (gender) filter.gender = gender;
       if (role) filter.role = role;
       if (status) filter.status = status;

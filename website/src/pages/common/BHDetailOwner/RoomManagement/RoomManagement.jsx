@@ -175,7 +175,7 @@ function RoomManagement({ boardingHouseId }) {
         key: "tenants",
         render: (tenants) => {
           if (!Array.isArray(tenants) || tenants.length === 0) {
-            return <span style={{ color: "#999" }}>-</span>;
+            return <span style={{ color: "#999" }}></span>;
           }
           return (
             <span>

@@ -196,6 +196,11 @@ function AccountManagement() {
         key: "fullname",
       },
       {
+        title: t("columns.gender"),
+        dataIndex: "gender",
+        key: "gender",
+      },
+      {
         title: t("columns.email"),
         dataIndex: "email",
         key: "email",
@@ -206,12 +211,7 @@ function AccountManagement() {
         key: "role",
         render: (role) => translateRole(role),
       },
-      {
-        title: t("columns.status"),
-        dataIndex: "status",
-        key: "status",
-        render: (status) => translateStatus(status),
-      },
+
       {
         title: t("columns.createdAt"),
         dataIndex: "createdAt",

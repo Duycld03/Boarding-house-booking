@@ -23,6 +23,7 @@
     "pending": "Pending",
     "accepted": "Accepted",
     "rejected": "Rejected",
+    "canceled": "Rejected",
     "completed": "Completed"
   },
   "allAppointmentsLoaded": "All appointments loaded",

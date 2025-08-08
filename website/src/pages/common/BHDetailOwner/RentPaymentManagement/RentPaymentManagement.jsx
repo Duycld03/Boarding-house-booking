@@ -92,9 +92,9 @@ const RentPaymentManagement = () => {
       }
     } catch (error) {
       console.error("Error fetching payment bills:", error);
-      toast.error(
-        error.response?.data?.message || error.message || t("errorLoadingData")
-      );
+      // toast.error(
+      //   error.response?.data?.message || error.message || t("errorLoadingData")
+      // );
       setRentPaymentData([]);
     } finally {
       setLoading(false);

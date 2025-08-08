@@ -111,20 +111,12 @@ class AppointmentController {
 
             const { status } = req.body;
 
-            const validStatuses = ["pending", "confirmed", "rejected", "completed"];
-            if (!validStatuses.includes(status)) {
-                return res.status(400).json({ message: "Invalid status value" });
-            }
-
             const updatedAppointment = await Appointment.findByIdAndUpdate(
                 id,
                 { status },
                 { new: true }
             );
 
-            if (!updatedAppointment) {
-                return res.status(404).json({ message: "Appointment not found" });
-            }
 
             res.status(200).json({ message: "Appointment status updated", updatedAppointment });
         } catch (error) {

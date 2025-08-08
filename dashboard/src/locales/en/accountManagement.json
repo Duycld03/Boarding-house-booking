@@ -9,7 +9,8 @@
     "role": "Role",
     "status": "Status",
     "createdAt": "Created At",
-    "action": "Action"
+    "action": "Action",
+    "gender": "Gender"
   },
   "role": {
     "user": "User",
@@ -102,7 +103,8 @@
       "required": "Role is required",
       "options": {
         "user": "User",
-        "owner": "Owner"
+        "owner": "Owner",
+        "staff": "Staff"
       }
     }
   },
@@ -112,7 +114,7 @@
     },
     "confirmDelete": {
       "title": "Confirm Deletion",
-      "content": "Do you want to delete this account report?"
+      "content": "Do you want to delete this account?"
     }
   },
   "messages": {

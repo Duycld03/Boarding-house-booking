@@ -15,9 +15,6 @@ import {
 import { useNotification } from '@/context/NotificationProvider';
 import {
   Ionicons,
-  MaterialIcons,
-  AntDesign,
-  FontAwesome,
   FontAwesome5,
 } from '@expo/vector-icons';
 import { AppointmentCard } from '@/components/screen/myAppointment';

@@ -780,9 +780,9 @@ class boardingHouseController {
         totalRooms: { $gt: 0 },
       };
 
-      // Thêm điều kiện tìm kiếm nếu có tên
+
       if (name && name.trim() !== '') {
-        filter.name = { $regex: name.trim(), $options: 'i' }; // Không phân biệt hoa thường
+        filter.name = { $regex: name.trim(), $options: 'i' };
       }
 
       const paginationOptions = {
