@@ -41,7 +41,9 @@ export default function RefundRequest() {
   useEffect(() => {
     if (!depositId) {
       showError(t("invalidDepositId"));
-      router.back();
+      setTimeout(() => {
+        router.back();
+      }, 2500);
     }
   }, [depositId, router, showError, t]);
 
@@ -77,11 +79,12 @@ export default function RefundRequest() {
         reason: reason.trim(),
       });
 
-      if (response.success) {
+      if (response) {
         showSuccess(t("requestSubmitted"));
 
-        // Chỉ cần router.back() thôi, useFocusEffect sẽ tự động refresh
-        router.back();
+        setTimeout(() => {
+          router.back();
+        }, 2500);
       } else {
         throw new Error(response.message || t("submitError"));
       }
@@ -138,9 +141,8 @@ export default function RefundRequest() {
             }}
           >
             <View
-              className={`${
-                isDarkMode ? "bg-gray-800" : "bg-white"
-              } rounded-2xl p-5`}
+              className={`${isDarkMode ? "bg-gray-800" : "bg-white"
+                } rounded-2xl p-5`}
               style={{ borderRadius: 16 }}
             >
               <View className="flex-row items-center mb-4">
@@ -165,16 +167,14 @@ export default function RefundRequest() {
                 </View>
                 <View>
                   <Text
-                    className={`text-xl font-bold ${
-                      isDarkMode ? "text-gray-100" : "text-gray-900"
-                    }`}
+                    className={`text-xl font-bold ${isDarkMode ? "text-gray-100" : "text-gray-900"
+                      }`}
                   >
                     {t("refundRequestTitle")}
                   </Text>
                   <Text
-                    className={`text-base ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     {t("refundRequestSubtitle")}
                   </Text>
@@ -182,21 +182,18 @@ export default function RefundRequest() {
               </View>
 
               <View
-                className={`p-4 rounded-xl ${
-                  isDarkMode ? "bg-gray-700" : "bg-gray-50"
-                }`}
+                className={`p-4 rounded-xl ${isDarkMode ? "bg-gray-700" : "bg-gray-50"
+                  }`}
               >
                 <Text
-                  className={`text-sm ${
-                    isDarkMode ? "text-gray-300" : "text-gray-600"
-                  } mb-2`}
+                  className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                    } mb-2`}
                 >
                   {t("importantNote")}
                 </Text>
                 <Text
-                  className={`text-xs ${
-                    isDarkMode ? "text-gray-400" : "text-gray-500"
-                  }`}
+                  className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
                 >
                   {t("refundPolicy")}
                 </Text>
@@ -208,19 +205,17 @@ export default function RefundRequest() {
         {/* Reason Input */}
         <View className="mb-6">
           <Text
-            className={`text-base font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-black"
-            }`}
+            className={`text-base font-semibold mb-2 ${isDarkMode ? "text-white" : "text-black"
+              }`}
           >
             {t("reason")} <Text style={{ color: "red" }}>*</Text>
           </Text>
 
           <View
-            className={`border rounded-lg ${
-              isDarkMode
-                ? "border-gray-600 bg-gray-800"
-                : "border-gray-300 bg-white"
-            }`}
+            className={`border rounded-lg ${isDarkMode
+              ? "border-gray-600 bg-gray-800"
+              : "border-gray-300 bg-white"
+              }`}
           >
             <TextInput
               value={reason}
@@ -231,9 +226,8 @@ export default function RefundRequest() {
               numberOfLines={6}
               textAlignVertical="top"
               maxLength={500}
-              className={`p-4 text-base ${
-                isDarkMode ? "text-gray-200" : "text-black"
-              }`}
+              className={`p-4 text-base ${isDarkMode ? "text-gray-200" : "text-black"
+                }`}
               style={{
                 minHeight: 120,
                 fontSize: 16,
@@ -245,22 +239,20 @@ export default function RefundRequest() {
           {/* Character Counter */}
           <View className="flex-row justify-between items-center mt-2">
             <Text
-              className={`text-xs ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
-              }`}
+              className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}
             >
               {t("reasonHint")}
             </Text>
             <Text
-              className={`text-xs ${
-                reason.length > 450
-                  ? "text-orange-500"
-                  : reason.length > 500
+              className={`text-xs ${reason.length > 450
+                ? "text-orange-500"
+                : reason.length > 500
                   ? "text-red-500"
                   : isDarkMode
-                  ? "text-gray-400"
-                  : "text-gray-500"
-              }`}
+                    ? "text-gray-400"
+                    : "text-gray-500"
+                }`}
             >
               {reason.length}/500
             </Text>

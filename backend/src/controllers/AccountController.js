@@ -45,7 +45,7 @@ class accountController {
       const { gender, role, startDate, endDate, status } = req.query;
 
       const filter = {
-        deleted: false, // ✅ Thêm điều kiện này để chỉ lấy account chưa bị xóa
+        deleted: false,
       };
 
       if (gender) filter.gender = gender;

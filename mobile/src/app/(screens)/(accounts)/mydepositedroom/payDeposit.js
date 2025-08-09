@@ -93,12 +93,16 @@ const PayDeposit = () => {
         setDepositInfo(depositData);
         setChecking(false);
       } catch (error) {
-        router.back();
-        setChecking(false);
+
+        setTimeout(() => {
+          router.back();
+        }, 3000); setChecking(false);
       }
     } else if (checking && !params.deposit) {
-      router.back();
-      setChecking(false);
+
+      setTimeout(() => {
+        router.back();
+      }, 3000); setChecking(false);
     }
   }, [isLogin, params.deposit, router, showError, t, checking]);
 
@@ -144,7 +148,10 @@ const PayDeposit = () => {
       } else if (response.success) {
         setLoading(false);
         showSuccess(t("paymentInitiated"));
-        router.back();
+
+        setTimeout(() => {
+          router.back();
+        }, 3000);
       } else {
         throw new Error(response.message || t("paymentFailed"));
       }
@@ -163,7 +170,10 @@ const PayDeposit = () => {
       setWebviewVisible(false);
       setPaymentUrl(null);
       showSuccess(t("paymentSuccessful"));
-      router.back();
+
+      setTimeout(() => {
+        router.back();
+      }, 3000);
     }
     // Check for failure indicators
     else if (navState.url.includes("status=fail")) {
@@ -239,16 +249,16 @@ const PayDeposit = () => {
                 ? "#4f46e5"
                 : "#4f46e5"
               : isDarkMode
-              ? "#1f2937"
-              : "#ffffff",
+                ? "#1f2937"
+                : "#ffffff",
           borderColor:
             paymentMethod === method
               ? isDarkMode
                 ? "#6366f1"
                 : "#6366f1"
               : isDarkMode
-              ? "#374151"
-              : "#e5e7eb",
+                ? "#374151"
+                : "#e5e7eb",
         }}
       >
         <View className="flex-row items-center justify-between w-full">
@@ -276,8 +286,8 @@ const PayDeposit = () => {
                         ? "#60a5fa"
                         : "#2563eb"
                       : isDarkMode
-                      ? "#f472b6"
-                      : "#db2777"
+                        ? "#f472b6"
+                        : "#db2777"
                   }
                 />
               )}
@@ -288,9 +298,9 @@ const PayDeposit = () => {
                   paymentMethod === method
                     ? "font-bold text-white text-base"
                     : themedClasses(
-                        "font-bold text-gray-800 text-base",
-                        "font-bold text-gray-100 text-base"
-                      )
+                      "font-bold text-gray-800 text-base",
+                      "font-bold text-gray-100 text-base"
+                    )
                 }
               >
                 {title}
@@ -404,15 +414,15 @@ const PayDeposit = () => {
                   colors={
                     isDarkMode
                       ? [
-                          "rgba(75, 85, 99, 0)",
-                          "rgba(75, 85, 99, 0.5)",
-                          "rgba(75, 85, 99, 0)",
-                        ]
+                        "rgba(75, 85, 99, 0)",
+                        "rgba(75, 85, 99, 0.5)",
+                        "rgba(75, 85, 99, 0)",
+                      ]
                       : [
-                          "rgba(229, 231, 235, 0)",
-                          "rgba(229, 231, 235, 0.8)",
-                          "rgba(229, 231, 235, 0)",
-                        ]
+                        "rgba(229, 231, 235, 0)",
+                        "rgba(229, 231, 235, 0.8)",
+                        "rgba(229, 231, 235, 0)",
+                      ]
                   }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
@@ -633,8 +643,8 @@ const PayDeposit = () => {
                     ? "#374151"
                     : "#d1d5db"
                   : isDarkMode
-                  ? "#4f46e5"
-                  : "#4f46e5",
+                    ? "#4f46e5"
+                    : "#4f46e5",
                 opacity: !paymentMethod ? 0.8 : 1,
                 shadowColor: isDarkMode ? "#000" : "#4f46e5",
                 shadowOffset: { width: 0, height: 2 },
@@ -646,8 +656,8 @@ const PayDeposit = () => {
               {loading
                 ? t("processing")
                 : !paymentMethod
-                ? t("selectMethodFirst")
-                : t("confirmPayment")}
+                  ? t("selectMethodFirst")
+                  : t("confirmPayment")}
             </Button>
           </View>
         </ScrollContainer>

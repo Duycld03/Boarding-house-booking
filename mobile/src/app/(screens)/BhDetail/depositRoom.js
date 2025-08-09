@@ -159,7 +159,9 @@ export default function DepositRoom() {
 
       const response = await depositRoom(depositData);
       showSuccess(t("successMessage"));
-      router.back();
+      setTimeout(() => {
+        router.back();
+      }, 2000);
     } catch (error) {
       showError(error?.response?.data?.message || "Failed to process deposit");
     } finally {
@@ -206,28 +208,25 @@ export default function DepositRoom() {
         {/* Room Selection */}
         <View className="mb-5">
           <Text
-            className={`text-base font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-black"
-            }`}
+            className={`text-base font-semibold mb-2 ${isDarkMode ? "text-white" : "text-black"
+              }`}
           >
             {t("selectRoom")} <Text style={{ color: "red" }}>*</Text>
           </Text>
           <TouchableOpacity
-            className={`border rounded-lg p-4 ${
-              isDarkMode
-                ? "border-gray-600 bg-gray-800"
-                : "border-gray-300 bg-white"
-            } ${errors.roomId ? "border-red-500" : ""}`}
+            className={`border rounded-lg p-4 ${isDarkMode
+              ? "border-gray-600 bg-gray-800"
+              : "border-gray-300 bg-white"
+              } ${errors.roomId ? "border-red-500" : ""}`}
             onPress={() => setShowRoomPicker(true)}
           >
             <Text
-              className={`text-base ${
-                isDarkMode ? "text-gray-200" : "text-black"
-              } ${!selectedRoomId ? "opacity-60" : ""}`}
+              className={`text-base ${isDarkMode ? "text-gray-200" : "text-black"
+                } ${!selectedRoomId ? "opacity-60" : ""}`}
             >
               {selectedRoomId
                 ? roomsList.find((room) => room._id === selectedRoomId)
-                    ?.roomNumber
+                  ?.roomNumber
                 : t("selectRoom")}
             </Text>
           </TouchableOpacity>
@@ -249,19 +248,16 @@ export default function DepositRoom() {
               onPress={() => setShowRoomPicker(false)}
             >
               <View
-                className={`rounded-t-3xl max-h-[80%] ${
-                  isDarkMode ? "bg-gray-900" : "bg-white"
-                }`}
+                className={`rounded-t-3xl max-h-[80%] ${isDarkMode ? "bg-gray-900" : "bg-white"
+                  }`}
               >
                 <View
-                  className={`flex-row justify-between items-center p-4 border-b ${
-                    isDarkMode ? "border-gray-700" : "border-gray-200"
-                  }`}
+                  className={`flex-row justify-between items-center p-4 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"
+                    }`}
                 >
                   <Text
-                    className={`text-lg font-semibold ${
-                      isDarkMode ? "text-white" : "text-black"
-                    }`}
+                    className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-black"
+                      }`}
                   >
                     {t("selectRoom")}
                   </Text>
@@ -270,9 +266,8 @@ export default function DepositRoom() {
                     className="p-1"
                   >
                     <Text
-                      className={`text-xl ${
-                        isDarkMode ? "text-white" : "text-black"
-                      }`}
+                      className={`text-xl ${isDarkMode ? "text-white" : "text-black"
+                        }`}
                     >
                       ✕
                     </Text>
@@ -283,24 +278,21 @@ export default function DepositRoom() {
                     roomsList.map((room) => (
                       <TouchableOpacity
                         key={room._id}
-                        className={`p-4 border-b ${
-                          isDarkMode ? "border-gray-700" : "border-gray-200"
-                        } ${
-                          selectedRoomId === room._id
+                        className={`p-4 border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"
+                          } ${selectedRoomId === room._id
                             ? isDarkMode
                               ? "bg-gray-700"
                               : "bg-gray-100"
                             : ""
-                        }`}
+                          }`}
                         onPress={() => {
                           handleRoomChange(room._id);
                           setShowRoomPicker(false);
                         }}
                       >
                         <Text
-                          className={`text-base ${
-                            selectedRoomId === room._id ? "font-semibold" : ""
-                          } ${isDarkMode ? "text-white" : "text-black"}`}
+                          className={`text-base ${selectedRoomId === room._id ? "font-semibold" : ""
+                            } ${isDarkMode ? "text-white" : "text-black"}`}
                         >
                           {room.roomNumber}
                         </Text>
@@ -308,9 +300,8 @@ export default function DepositRoom() {
                     ))
                   ) : (
                     <Text
-                      className={`text-center p-4 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-500"
-                      }`}
+                      className={`text-center p-4 ${isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}
                     >
                       {t("noRoomsAvailable") || "No rooms available"}
                     </Text>
@@ -325,19 +316,17 @@ export default function DepositRoom() {
         {/* Rental Start Date */}
         <View className="mb-5">
           <Text
-            className={`text-base font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-black"
-            }`}
+            className={`text-base font-semibold mb-2 ${isDarkMode ? "text-white" : "text-black"
+              }`}
           >
             {t("rentalDate")} <Text style={{ color: "red" }}>*</Text>
           </Text>
           <TouchableOpacity
             onPress={() => setShowStartDatePicker(true)}
-            className={`p-4 border rounded-lg ${
-              isDarkMode
-                ? "border-gray-700 bg-gray-800"
-                : "border-gray-300 bg-white"
-            }`}
+            className={`p-4 border rounded-lg ${isDarkMode
+              ? "border-gray-700 bg-gray-800"
+              : "border-gray-300 bg-white"
+              }`}
           >
             <Text className={isDarkMode ? "text-white" : "text-black"}>
               {format(startDate, "dd/MM/yyyy")} -{" "}
@@ -359,9 +348,8 @@ export default function DepositRoom() {
         {/* Rental Time */}
         <View className="mb-5">
           <Text
-            className={`text-base font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-black"
-            }`}
+            className={`text-base font-semibold mb-2 ${isDarkMode ? "text-white" : "text-black"
+              }`}
           >
             {t("rentalTime")} <Text style={{ color: "red" }}>*</Text>
           </Text>
@@ -386,20 +374,18 @@ export default function DepositRoom() {
 
             <View className="w-1/3">
               <TouchableOpacity
-                className={`border rounded-lg p-2 ml-2 h-[42px] justify-center items-center ${
-                  isDarkMode
-                    ? "border-gray-600 bg-gray-800"
-                    : "border-gray-300 bg-white"
-                }`}
+                className={`border rounded-lg p-2 ml-2 h-[42px] justify-center items-center ${isDarkMode
+                  ? "border-gray-600 bg-gray-800"
+                  : "border-gray-300 bg-white"
+                  }`}
                 onPress={() => {
                   // Toggle between month and year
                   setTimeType(timeType === "month" ? "year" : "month");
                 }}
               >
                 <Text
-                  className={`text-base text-center ${
-                    isDarkMode ? "text-gray-200" : "text-black"
-                  }`}
+                  className={`text-base text-center ${isDarkMode ? "text-gray-200" : "text-black"
+                    }`}
                 >
                   {timeType === "month" ? t("month") : t("year")}
                 </Text>
