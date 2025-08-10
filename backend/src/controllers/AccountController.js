@@ -46,17 +46,17 @@ class accountController {
 
       const filter = {
         deleted: false,
+        role: { $ne: "admin" },
       };
 
-      if (gender) filter.gender = gender;
-      if (role) filter.role = role;
-      if (status) filter.status = status;
-      if (startDate && endDate) {
-        filter.createdAt = {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate),
-        };
-      }
+      filter.gender = gender;
+      filter.role = role;
+      filter.status = status;
+      filter.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+
 
       const paginationOptions = {
         defaultPage: 1,

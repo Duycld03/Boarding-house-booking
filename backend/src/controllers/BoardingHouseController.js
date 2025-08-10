@@ -69,13 +69,6 @@ class boardingHouseController {
         .populate('boardingHouseType')
         .populate('ownerId')
         .exec();
-
-      if (!boardingHouse) {
-        return res.status(404).json({
-          success: false,
-          message: 'Boarding house not found',
-        });
-      }
       return res.status(200).json(boardingHouse);
     } catch (error) {
       console.error('Error fetching boarding house details:', error);

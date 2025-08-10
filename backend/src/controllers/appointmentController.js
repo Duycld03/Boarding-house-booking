@@ -235,6 +235,7 @@ class AppointmentController {
             res.status(500).json({ message: "Lỗi server", error });
         }
     }
+
     async getAppointmentsByBoardingHouseId(req, res) {
         try {
             const { boardingHouseId } = req.params;
