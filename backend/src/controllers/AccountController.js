@@ -40,23 +40,22 @@ class accountController {
         .json({ message: "An error occurred", error: error.message });
     }
   }
+
   async filterAccounts(req, res) {
     try {
       const { gender, role, startDate, endDate, status } = req.query;
 
-      const filter = {
-        deleted: false,
-        role: { $ne: "admin" },
-      };
-
-      filter.gender = gender;
-      filter.role = role;
-      filter.status = status;
-      filter.createdAt = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate),
-      };
-
+      // Xây dựng filter cơ bản
+      const filter = {};
+      if (gender) filter.gender = gender;
+      if (role) filter.role = role;
+      if (status) filter.status = status;
+      if (startDate && endDate) {
+        filter.createdAt = {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
+        };
+      }
 
       const paginationOptions = {
         defaultPage: 1,
@@ -85,6 +84,7 @@ class accountController {
       });
     }
   }
+
 
   async createAccount(req, res, next) {
     try {

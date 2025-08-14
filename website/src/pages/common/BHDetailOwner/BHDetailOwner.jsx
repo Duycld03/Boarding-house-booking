@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import {
   Form,
@@ -30,7 +30,6 @@ import {
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import RoomType from "./RoomType/RoomType";
 import RenewalRequest from "./RenewalRequestManagement/RenewalRequest";
-import TenantManagement from "./TenantManagement/TenantManagement";
 import RoomManagement from "./RoomManagement/RoomManagement";
 import RevenueManagement from "./RevenueManagement";
 import RentPaymentManagement from "./RentPaymentManagement";
@@ -94,6 +93,11 @@ const BHDetailOwner = () => {
       toast.error(t("errors.fetchFailed"));
     }
   };
+
+  // ✅ Thêm callback function để refresh boarding house data
+  const handleBoardingHouseUpdate = useCallback(() => {
+    fetchBoardingHouseDetails();
+  }, []);
 
   useEffect(() => {
     fetchBoardingHouseDetails();
@@ -365,10 +369,10 @@ const BHDetailOwner = () => {
       payload.append("address[detail]", updatedData.address.detail);
       payload.append("location[lat]", updatedData.location.lat);
       payload.append("location[lon]", updatedData.location.lon);
- if (updatedData.staffId && updatedData.staffId !== 'undefined') {
-        payload.append('staffId', updatedData.staffId);
+      if (updatedData.staffId && updatedData.staffId !== "undefined") {
+        payload.append("staffId", updatedData.staffId);
       } else {
-        payload.append('staffId', '');
+        payload.append("staffId", "");
       }
       const oldImg = [];
 
@@ -466,7 +470,11 @@ const BHDetailOwner = () => {
         </Tabs.TabPane>
 
         <Tabs.TabPane tab={t("tabs.room")} key="room">
-          <RoomManagement boardingHouseId={boardingHouseId} />
+          <RoomManagement
+            loading={loading}
+            boardingHouseId={boardingHouseId}
+            onRoomChange={handleBoardingHouseUpdate}
+          />
         </Tabs.TabPane>
 
         {/* <Tabs.TabPane tab={t("tabs.tenantManagement")} key="tenantManagement">
@@ -474,7 +482,7 @@ const BHDetailOwner = () => {
         </Tabs.TabPane> */}
 
         <Tabs.TabPane tab={t("tabs.revenueManagement")} key="revenueManagement">
-          <RevenueManagement boardingHouseId={boardingHouseId} />
+          <RevenueManagement boardingHouseId={boardingHouseId} onAddRoom />
         </Tabs.TabPane>
 
         <Tabs.TabPane tab={t("tabs.renewalManagement")} key="renewalManagement">
