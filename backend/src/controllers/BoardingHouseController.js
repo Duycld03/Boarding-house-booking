@@ -69,13 +69,6 @@ class boardingHouseController {
         .populate('boardingHouseType')
         .populate('ownerId')
         .exec();
-
-      if (!boardingHouse) {
-        return res.status(404).json({
-          success: false,
-          message: 'Boarding house not found',
-        });
-      }
       return res.status(200).json(boardingHouse);
     } catch (error) {
       console.error('Error fetching boarding house details:', error);
@@ -780,9 +773,9 @@ class boardingHouseController {
         totalRooms: { $gt: 0 },
       };
 
-      // Thêm điều kiện tìm kiếm nếu có tên
+
       if (name && name.trim() !== '') {
-        filter.name = { $regex: name.trim(), $options: 'i' }; // Không phân biệt hoa thường
+        filter.name = { $regex: name.trim(), $options: 'i' };
       }
 
       const paginationOptions = {

@@ -10,7 +10,7 @@ import UpdateRoomPage from "./UpdateRoom";
 import { useTranslation } from "react-i18next";
 import DefaulImage from "@/assets/images/blankRoom.jpg";
 
-function RoomManagement({ boardingHouseId }) {
+function RoomManagement({ boardingHouseId, onRoomChange }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectRoomData, setSelectRoomData] = useState(null);
@@ -175,7 +175,7 @@ function RoomManagement({ boardingHouseId }) {
         key: "tenants",
         render: (tenants) => {
           if (!Array.isArray(tenants) || tenants.length === 0) {
-            return <span style={{ color: "#999" }}>-</span>;
+            return <span style={{ color: "#999" }}></span>;
           }
           return (
             <span>
@@ -258,6 +258,11 @@ function RoomManagement({ boardingHouseId }) {
           res?.message || t("roomManagement.messages.deleteSuccess")
         );
         handleUpdateComplete(); // Quay về danh sách và refresh data
+
+        // ✅ Gọi callback để update boarding house data
+        if (onRoomChange) {
+          onRoomChange();
+        }
       } catch (error) {
         console.error("Delete room error:", error);
         toast.error(
@@ -268,14 +273,19 @@ function RoomManagement({ boardingHouseId }) {
         setLoading(false);
       }
     },
-    [t, handleUpdateComplete]
+    [t, handleUpdateComplete, onRoomChange]
   );
 
   // Hàm xử lý khi update từ UpdateRoomPage
   const handleUpdateFromUpdate = useCallback(() => {
     toast.success(t("roomManagement.messages.updateSuccess"));
     handleUpdateComplete(); // Quay về danh sách và refresh data
-  }, [t, handleUpdateComplete]);
+
+    // ✅ Gọi callback nếu có thay đổi ảnh hưởng đến boarding house
+    if (onRoomChange) {
+      onRoomChange();
+    }
+  }, [t, handleUpdateComplete, onRoomChange]);
 
   // Cải thiện hàm xử lý thay đổi table (pagination, sorting, filtering)
   const handleTableChange = useCallback(
@@ -312,7 +322,12 @@ function RoomManagement({ boardingHouseId }) {
     // Reset về trang 1 khi thêm mới để thấy item vừa thêm
     setPaginationOptions((prev) => ({ ...prev, page: 1 }));
     fetchRooms();
-  }, [fetchRooms]);
+
+    // ✅ Gọi callback để update boarding house data
+    if (onRoomChange) {
+      onRoomChange();
+    }
+  }, [fetchRooms, onRoomChange]);
 
   // Early return nếu không có boardingHouseId
   if (!boardingHouseId) {
@@ -343,6 +358,8 @@ function RoomManagement({ boardingHouseId }) {
       <AddRoom
         boardingHouseId={boardingHouseId}
         refreshRoomData={handleAddRoomSuccess}
+        // ✅ Pass callback xuống AddRoom component
+        onRoomAdded={onRoomChange}
       />
       <Table
         data={rooms || []}

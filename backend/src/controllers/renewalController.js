@@ -44,8 +44,6 @@ class renewalController {
       // Gọi hàm paginate
       const result = await paginate(ExtensionRequest, paginationOptions, req);
 
-
-
       // Trả về kết quả có phân trang
       return res.status(200).json({
         success: true,

@@ -24,6 +24,19 @@ export default function Layout() {
     'Poppins-Thin': require('@/assets/fonts/Poppins-Thin.ttf'),
   });
 
+  if (__DEV__) {
+    const originalWarn = console.warn;
+    console.warn = (...args) => {
+      const message = args[0];
+
+      if (typeof message === 'string') {
+        return;
+      }
+
+      originalWarn(...args);
+    };
+  }
+
   const router = useRouter();
   const segments = useSegments();
   const [appReady, setAppReady] = useState(false); // để kiểm soát khi load xong language + font

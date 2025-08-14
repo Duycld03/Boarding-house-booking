@@ -7,7 +7,7 @@ import { calculateMonthlyBill } from "@/api/ownerUser/paymentBillAPI";
 import { getRoomAdditionFeeForMonthlyCalculate } from "@/api/staffUser/roomAdditionFee";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/ThemeContext";
-import formatAmount, { useFormatAmount } from "@/utils/formatAmount";
+import { useFormatAmount } from "@/utils/formatAmount";
 
 const CalculateRent = ({
   visible,

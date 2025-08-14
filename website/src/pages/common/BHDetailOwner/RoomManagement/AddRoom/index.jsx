@@ -330,13 +330,14 @@ function AddRoom({ boardingHouseId, refreshRoomData }) {
 
       refreshRoomData();
       toast.success(
-        t("roomManagement.bulkAddRoom.success", { count: rooms.length })
+        t("roomManagement.messages.addRoomSuccess", { count: rooms.length })
       );
       onCancel();
     } catch (error) {
       console.error("Error submitting rooms:", error);
       toast.error(
-        error.response?.data?.message || t("roomManagement.bulkAddRoom.error")
+        error.response?.data?.message ||
+          t("roomManagement.messages.addRoomFailed")
       );
     } finally {
       setLoadingSubmit(false);

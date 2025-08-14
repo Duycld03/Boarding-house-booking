@@ -177,11 +177,19 @@
         "label": "Mô tả",
         "required": "Vui lòng nhập mô tả!"
       },
-
+      "messages": {
+        "addRoomSuccess": "Thêm phòng thành công",
+        "addRoomFailed": "Thêm phòng thất bại"
+      },
       "uploadImage": "Tải lên hình ảnh",
       "uploadHint": "Nhấp hoặc kéo thả hình ảnh để tải lên",
       "supportedFormats": "Hỗ trợ: JPG, PNG tối đa 10MB",
       "extra": "Tải lên hình ảnh rõ nét của phòng để thu hút người thuê",
+      "selectRoomType": "Chọn loại phòng",
+      "enterRoomNumber": "Nhập số phòng",
+      "enterDescription": "Nhập mô tả",
+      "clickToUploadImage": "Nhấp để tải lên hình ảnh",
+      "imageFileFormat": "Hỗ trợ định dạng JPG, PNG, JPEG",
       "image": {
         "label": "Hình ảnh phòng",
         "uploadText": "Tải lên hình ảnh",
@@ -251,6 +259,31 @@
       "createdAt": "Ngày tạo",
       "actions": "Hành động"
     },
+    "status": {
+      "available": "Có sẵn",
+      "occupied": "Đã được thuê"
+    },
+    "actions": {
+      "delete": "Xóa",
+      "update": "Cập nhật"
+    },
+    "messages": {
+      "deleteFailed": "Xóa thất bại",
+      "updateSuccess": "Cập nhật phòng thành công",
+      "addRoomSuccess": "Thêm phòng thành công",
+      "addRoomFailed": "Thêm phòng thất bại",
+      "imageUploadSuccess": "Tải hình ảnh lên thành công",
+      "imageRemoveFailed": "Không thể xóa hình ảnh",
+      "roomTypeChanged": "Đã thay đổi loại phòng thành: {type}",
+      "roomTypeChangeFailed": "Không thể thay đổi loại phòng",
+      "descriptionChangeFailed": "Không thể thay đổi mô tả"
+    },
+    "modal": {
+      "confirmDelete": {
+        "title": "Xác nhận xóa",
+        "content": "Bạn có chắc chắn muốn xóa phòng này không?"
+      }
+    },
     "addRoom": {
       "button": {
         "addRoom": "Thêm phòng",
@@ -258,7 +291,6 @@
         "btnCancel": "Hủy",
         "btnSelect": "Chọn"
       },
-
       "modal": {
         "title": "Thêm phòng mới",
         "okText": "Thêm phòng",
@@ -266,6 +298,10 @@
         "bulkModeTitle": "Cấu hình tầng tùy chỉnh",
         "singleModeReviewTitle": "Thêm phòng đơn - Xem lại",
         "bulkModeReviewTitle": "Thêm phòng hàng loạt - Xem lại"
+      },
+      "noRoomType": {
+        "title": "Không tìm thấy loại phòng",
+        "content": "Vui lòng thêm loại phòng trước khi tạo phòng. Hãy vào Quản lý loại phòng để thêm loại phòng trước."
       },
       "chooseAddMode": "Chọn chế độ thêm phòng",
       "singleRoom": "Phòng đơn",
@@ -277,6 +313,7 @@
       "total": "Tổng cộng",
       "rooms": "phòng",
       "floor": "Tầng",
+      "floorNumber": "Số tầng",
       "floorNumberRequired": "Cần nhập số tầng",
       "roomCount": "Số lượng phòng",
       "roomCountRequired": "Cần nhập số lượng phòng",
@@ -298,7 +335,6 @@
       "formatPreview": "Xem trước định dạng:",
       "customFormatInstructions": "Hướng dẫn định dạng tùy chỉnh",
       "availableVariables": "Các biến có sẵn:",
-      "floorNumber": "Số tầng",
       "roomNumber": "Số phòng",
       "roomNumberWithLeadingZeros": "Số phòng có số 0 đứng trước (01, 02, v.v.)",
       "letterBasedOnFloor": "Chữ cái dựa theo tầng (A, B, C, v.v.)",
@@ -338,10 +374,6 @@
         "invalidImageType": "Vui lòng tải lên file hình ảnh hợp lệ",
         "imageSizeLimit": "Kích thước hình ảnh phải nhỏ hơn 10MB",
         "fixErrorsFirst": "Vui lòng sửa các lỗi trước khi tạo phòng"
-      },
-      "noRoomType": {
-        "title": "Không tìm thấy loại phòng",
-        "content": "Vui lòng thêm loại phòng trước khi tạo phòng. Hãy vào Quản lý loại phòng để thêm loại phòng trước."
       }
     },
     "editRoom": {
@@ -495,6 +527,15 @@
 
     "messages": {
       "noData": "Không có phí nào được tìm thấy",
+      "deleteFailed": "Xóa không thành công",
+      "updateSuccess": "Cập nhật phòng thành công",
+      "addRoomSuccess": "Thêm phòng thành công",
+      "addRoomFailed": "Thêm phòng không thành công",
+      "imageUploadSuccess": "Tải ảnh lên thành công",
+      "imageRemoveFailed": "Xóa ảnh không thành công",
+      "roomTypeChanged": "Loại phòng đã thay đổi thành: {{type}}",
+      "roomTypeChangeFailed": "Thay đổi loại phòng không thành công",
+      "descriptionChangeFailed": "Thay đổi mô tả không thành công",
       "success": {
         "feeAdded": "Thêm phí thành công",
         "feeUpdated": "Cập nhật phí thành công",

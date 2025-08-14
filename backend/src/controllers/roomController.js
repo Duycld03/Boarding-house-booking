@@ -4,6 +4,8 @@ import Room from "../models/room.js";
 import PaymentBill from "../models/paymentBill.js";
 import paginate from "../utils/pagination.js";
 import DepositRoom from "../models/depositRoom.js";
+import { updateBoardingHouseRoomCounts } from '../utils/updateBoardingHouseRoomCounts.js';
+
 
 class RoomController {
   async getRoomsByRoomType(req, res) {
@@ -35,7 +37,6 @@ class RoomController {
 
       res.status(200).json(availableRooms);
     } catch (error) {
-      console.error("Error fetching rooms:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -57,7 +58,6 @@ class RoomController {
 
       res.status(200).json(rooms);
     } catch (error) {
-      console.error("Error fetching rooms:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -96,10 +96,7 @@ class RoomController {
 
       return res.status(200).json(eligibleRooms);
     } catch (error) {
-      console.error(
-        "Lỗi khi lấy danh sách phòng đủ điều kiện tạo bill:",
-        error
-      );
+
       return res.status(500).json({ message: "Server error", error });
     }
   }
@@ -128,7 +125,6 @@ class RoomController {
 
       return res.status(200).json(result);
     } catch (error) {
-      console.error("Error fetching rooms:", error);
       return res.status(500).json({
         success: false,
         message: "Server error",
@@ -143,7 +139,7 @@ class RoomController {
       const roomData = req.body;
       const rooms = Array.isArray(roomData) ? roomData : [roomData];
 
-      // Validate  required fields for each room
+      // Validate required fields for each room
       for (const room of rooms) {
         const { roomNumber, boardingHouseId, description, roomTypeId } = room;
 
@@ -175,19 +171,7 @@ class RoomController {
         });
       }
 
-      // Check for duplicates within the current batch
-      const uniqueNumbers = new Set(roomNumbers);
-      if (uniqueNumbers.size !== roomNumbers.length) {
-        const duplicatesInBatch = roomNumbers.filter(
-          (item, index) => roomNumbers.indexOf(item) !== index
-        );
-        return res.status(400).json({
-          message: "Duplicate room numbers in the same request",
-          duplicateRooms: [...new Set(duplicatesInBatch)],
-        });
-      }
 
-      // Create room documents
       const roomDocs = rooms.map((room) => ({
         roomNumber: room.roomNumber,
         boardingHouseId: room.boardingHouseId,
@@ -199,93 +183,25 @@ class RoomController {
 
       // Save all rooms
       const savedRooms = await Room.insertMany(roomDocs);
+
+      try {
+        const boardingHouseId = rooms[0].boardingHouseId;
+        await updateBoardingHouseRoomCounts(boardingHouseId);
+      } catch (updateError) {
+        // Không throw error để không ảnh hưởng đến response chính
+      }
 
       res.status(201).json({
         message: "Room added successfully",
         room: savedRooms[0],
-      });
-    } catch (error) {
-      console.error("Error adding room:", error);
-      res.status(500).json({ message: "Server error", error: error.message });
-    }
-  }
-
-  // Alternative: Create separate endpoint for bulk add
-  async addRooms(req, res) {
-    try {
-      const { rooms } = req.body;
-
-      if (!Array.isArray(rooms) || rooms.length === 0) {
-        return res.status(400).json({ message: "Invalid rooms data" });
-      }
-
-      // Validate required fields for each room
-      for (const room of rooms) {
-        const { roomNumber, boardingHouseId, description, roomTypeId } = room;
-
-        if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
-          return res.status(400).json({
-            message: "Missing required parameters in one or more rooms",
-            missingFields: {
-              roomNumber,
-              boardingHouseId,
-              description,
-              roomTypeId,
-            },
-          });
-        }
-      }
-
-      // Check for duplicate room numbers in the same boarding house
-      const roomNumbers = rooms.map((room) => room.roomNumber);
-      const duplicateCheck = await Room.find({
-        boardingHouseId: rooms[0].boardingHouseId,
-        roomNumber: { $in: roomNumbers },
-      });
-
-      if (duplicateCheck.length > 0) {
-        const existingNumbers = duplicateCheck.map((room) => room.roomNumber);
-        return res.status(400).json({
-          message: "Some rooms already exist",
-          duplicateRooms: existingNumbers,
-        });
-      }
-
-      // Check for duplicates within the current batch
-      const uniqueNumbers = new Set(roomNumbers);
-      if (uniqueNumbers.size !== roomNumbers.length) {
-        const duplicatesInBatch = roomNumbers.filter(
-          (item, index) => roomNumbers.indexOf(item) !== index
-        );
-        return res.status(400).json({
-          message: "Duplicate room numbers in the same request",
-          duplicateRooms: [...new Set(duplicatesInBatch)],
-        });
-      }
-
-      // Create room documents
-      const roomDocs = rooms.map((room) => ({
-        roomNumber: room.roomNumber,
-        boardingHouseId: room.boardingHouseId,
-        description: room.description,
-        roomTypeId: room.roomTypeId,
-        isAvailable: true,
-        images: room.images || null,
-      }));
-
-      // Save all rooms
-      const savedRooms = await Room.insertMany(roomDocs);
-
-      res.status(201).json({
-        message: `${savedRooms.length} rooms added successfully`,
-        rooms: savedRooms,
         count: savedRooms.length,
       });
     } catch (error) {
-      console.error("Error adding rooms:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
+
+
 
   async updateRoom(req, res) {
     try {
@@ -363,7 +279,6 @@ class RoomController {
       await room.save();
       res.status(201).json({ message: "Room updated successfully" });
     } catch (error) {
-      console.error("Error updating room:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -374,10 +289,22 @@ class RoomController {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
-      await Room.findByIdAndDelete(roomId);
+      const roomToDelete = await Room.findById(roomId);
+      if (!roomToDelete) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      const boardingHouseId = roomToDelete.boardingHouseId;
+
+      await Room.findByIdAndDelete(roomId).then(() => {
+        updateBoardingHouseRoomCounts(boardingHouseId);
+
+      })
+
+
+
       res.status(200).json({ message: "Room deleted successfully" });
     } catch (error) {
-      console.error("Error deleting room:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }

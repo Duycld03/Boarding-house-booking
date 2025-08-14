@@ -172,19 +172,26 @@
         "placeholder": "Enter Description",
         "required": "Please enter description!"
       },
-      "image": {
-        "label": "Image",
-        "uploadText": "Upload Image",
-        "uploadHint": "Click or drag and drop image to upload",
-        "supportedFormats": "Supported: JPG, PNG up to 10MB",
-        "extra": "Upload clear images of the room to attract tenants"
+      "messages": {
+        "addRoomSuccess": "Room added successfully",
+        "addRoomFailed": "Failed to add room"
       },
       "uploadImage": "Upload Image",
+      "uploadHint": "Click or drag and drop image to upload",
+      "supportedFormats": "Supported: JPG, PNG up to 10MB",
+      "extra": "Upload clear images of the room to attract tenants",
       "selectRoomType": "Select Room Type",
       "enterRoomNumber": "Enter Room Number",
       "enterDescription": "Enter Description",
       "clickToUploadImage": "Click to upload image",
-      "imageFileFormat": "Support JPG, PNG, JPEG formats"
+      "imageFileFormat": "Support JPG, PNG, JPEG formats",
+      "image": {
+        "label": "Room Image",
+        "uploadText": "Upload Image",
+        "uploadHint": "Click or drag and drop image to upload",
+        "supportedFormats": "Supported: JPG, PNG up to 10MB",
+        "extra": "Upload clear images of the room to attract tenants"
+      }
     },
     "updateRoom": {
       "backToRoomManagement": "Back to Room Management",
@@ -258,9 +265,11 @@
     "messages": {
       "deleteFailed": "Delete failed",
       "updateSuccess": "Room updated successfully",
+      "addRoomSuccess": "Room added successfully",
+      "addRoomFailed": "Failed to add room",
       "imageUploadSuccess": "Image uploaded successfully",
       "imageRemoveFailed": "Failed to remove image",
-      "roomTypeChanged": "Room type changed to: {type}",
+      "roomTypeChanged": "Room type changed to: {{type}}",
       "roomTypeChangeFailed": "Failed to change room type",
       "descriptionChangeFailed": "Failed to change description"
     },
@@ -274,7 +283,8 @@
       "button": {
         "addRoom": "Add Room",
         "bulkAddRoom": "Bulk Add Rooms",
-        "btnCancel": "Cancel"
+        "btnCancel": "Cancel",
+        "btnSelect": "Select"
       },
       "modal": {
         "title": "Add New Room",
@@ -320,6 +330,7 @@
       "formatPreview": "Format Preview:",
       "customFormatInstructions": "Custom Format Instructions",
       "availableVariables": "Available variables:",
+      "roomNumber": "Room number",
       "roomNumberWithLeadingZeros": "Room number with leading zeros (01, 02, etc.)",
       "letterBasedOnFloor": "Letter based on floor (A, B, C, etc.)",
       "examples": "Examples:",
@@ -328,7 +339,37 @@
       "generateRooms": "Generate Rooms",
       "createRoom": "Create Room",
       "createAllRooms": "Create All Rooms ({{count}})",
-      "roomType": "Room Type"
+      "roomType": "Room Type",
+      "form": {
+        "roomType": {
+          "label": "Room Type",
+          "placeholder": "Select Room Type",
+          "required": "Please select a room type!"
+        },
+        "roomNumber": {
+          "label": "Room Number",
+          "placeholder": "Enter room number (e.g. A101, B02)",
+          "required": "Please enter room number!"
+        },
+        "description": {
+          "label": "Room Description",
+          "placeholder": "Enter detailed room description, amenities and features...",
+          "required": "Please enter room description!"
+        },
+        "image": {
+          "label": "Room Image",
+          "uploadText": "Upload Image",
+          "uploadHint": "Click or drag and drop image to upload",
+          "supportedFormats": "Supported: JPG, PNG up to 10MB",
+          "extra": "Upload clear images of the room to attract tenants"
+        }
+      },
+      "validation": {
+        "imageRequired": "Please upload room image",
+        "invalidImageType": "Please upload valid image file",
+        "imageSizeLimit": "Image size must be less than 10MB",
+        "fixErrorsFirst": "Please fix errors before creating rooms"
+      }
     },
     "editRoom": {
       "title": "Edit Room"

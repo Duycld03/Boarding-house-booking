@@ -128,12 +128,13 @@ function FilterAccount({ setFilterValue }) {
                 options={[
                   { label: t("forms.role.options.user"), value: "user" },
                   { label: t("forms.role.options.owner"), value: "owner" },
+                  { label: t("forms.role.options.staff"), value: "staff" },
                 ]}
                 allowClear
               />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               label={t("filters.status")}
               name="status"
               className="mb-2"
@@ -153,7 +154,7 @@ function FilterAccount({ setFilterValue }) {
                   {t("filters.statusOptions.inactive")}
                 </Option>
               </Select>
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item
               label={t("filters.startDate")}

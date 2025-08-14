@@ -23,6 +23,7 @@
     "pending": "Chờ Xác Nhận",
     "accepted": "Đã Chấp Nhận",
     "rejected": "Đã Từ Chối",
+    "canceled": "Đã Hủy",
     "completed": "Hoàn Thành"
   },
   "allAppointmentsLoaded": "Đã tải tất cả lịch hẹn",

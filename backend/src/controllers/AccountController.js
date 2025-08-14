@@ -8,7 +8,8 @@ import paginate from "../utils/pagination.js";
 class accountController {
   async getAllAccount(req, res) {
     try {
-      const accountData = await Account.find().sort({ createdAt: -1 });
+      const accountData = await Account.find({ deleted: false }).sort({ createdAt: -1 });
+
 
       return res.status(200).json(accountData);
     } catch (error) {
@@ -39,6 +40,7 @@ class accountController {
         .json({ message: "An error occurred", error: error.message });
     }
   }
+
   async filterAccounts(req, res) {
     try {
       const { gender, role, startDate, endDate, status } = req.query;
@@ -82,6 +84,7 @@ class accountController {
       });
     }
   }
+
 
   async createAccount(req, res, next) {
     try {

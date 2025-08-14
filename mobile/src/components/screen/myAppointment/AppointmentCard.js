@@ -63,6 +63,16 @@ const AppointmentCard = ({ item, onCancel }) => {
             iconColor: 'red', // red-800 : red-100
             borderColor: isDarkMode ? 'border-red-500/30' : 'border-red-200'
         },
+        canceled: {
+            bg: isDarkMode
+                ? 'bg-gradient-to-r from-red-500 via-red-600 to-pink-500'
+                : 'bg-gradient-to-r from-red-400 via-red-500 to-pink-400',
+            text: 'text-white',
+            iconName: 'close-circle',
+            iconLibrary: Ionicons,
+            iconColor: 'red', // red-800 : red-100
+            borderColor: isDarkMode ? 'border-red-500/30' : 'border-red-200'
+        },
         completed: {
             bg: isDarkMode
                 ? 'bg-gradient-to-r from-green-500 via-emerald-600 to-teal-500'
