@@ -22,7 +22,7 @@ function ChangePassword() {
       const res = await changePassword(values);
 
       localStorage.setItem("access_token", res.token);
-      toast.success(t("message.success"));
+      toast.success(t("changePassword.message.success"));
       navigate("/");
       setLoading(false);
     } catch (error) {

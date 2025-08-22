@@ -69,6 +69,7 @@ function ChangeEmail() {
       });
     } catch (error) {
       showError(t("message.error"));
+      console.log(error);
     } finally {
       setLoading(false);
     }

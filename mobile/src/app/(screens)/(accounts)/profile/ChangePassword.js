@@ -95,11 +95,11 @@ function ChangePassword() {
       setLoading(true);
       const res = await changePassword(formData);
 
-      showSuccess(t("message.success"));
+      showSuccess(t("changePassword.message.success"));
       router.back();
       router.replace("/profile"); // Navigate back to the profile page
     } catch (error) {
-      showError(t("message.error"));
+      showError(t("changePassword.message.error"));
       setFormData({
         oldPassword: "",
         newPassword: "",

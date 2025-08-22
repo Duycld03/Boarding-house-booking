@@ -77,10 +77,11 @@ function FilterDeposit({
           <Form form={form} onFinish={handleSubmit} layout="vertical">
             <Form.Item className="mb-2" label="Status" name="status">
               <Select placeholder="Select status" allowClear>
-                <Option value="accepted">{t(`status.accepted`)}</Option>
-                <Option value="deleted">{t(`status.deleted`)}</Option>
                 <Option value="pending">{t(`status.pending`)}</Option>
+                <Option value="accepted">{t(`status.accepted`)}</Option>
                 <Option value="rejected">{t(`status.rejected`)}</Option>
+                <Option value="confirmed">{t(`status.confirmed`)}</Option>
+                <Option value="refunded">{t(`status.refunded`)}</Option>
               </Select>
             </Form.Item>
 
