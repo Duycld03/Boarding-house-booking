@@ -21,7 +21,14 @@ export const UserProvider = ({ children }) => {
 
   const hasRole = (roles) => user && roles.includes(user.role);
 
-  const isLogin = useMemo(() => !!user, [user]);
+  const isLogin = useMemo(() => {
+    const localUser = localStorage.getItem("user");
+    if (!localUser) {
+      localStorage.removeItem("access_token");
+      return false;
+    }
+    return true;
+  }, [user]);
 
   return (
     <UserContext.Provider

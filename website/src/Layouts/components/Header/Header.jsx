@@ -76,7 +76,12 @@ const CustomHeader = () => {
         setAvatarSource(res?.avatarImage?.url || null);
         setUsername(res?.username || t("common:general.user"));
         setIsLoggedIn(true);
-      } catch {
+      } catch (error) {
+        if (error.status === 401) {
+          localStorage.removeItem("access_token");
+          contextLogout();
+          navigate("/");
+        }
         setIsLoggedIn(false);
         setAvatarSource(null);
       }

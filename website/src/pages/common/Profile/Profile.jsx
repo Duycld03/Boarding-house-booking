@@ -27,6 +27,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { updateAvatar } from "../../../api/accountAPI";
 import DefaultAvatar from "../../../assets/images/none_avatar.png";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -49,6 +50,7 @@ const beforeUpload = (file) => {
 };
 
 function Profile() {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [formEmail] = Form.useForm();
   const [profileLoading, setProfileLoading] = useState(true);
@@ -137,9 +139,8 @@ function Profile() {
       setProfileLoading(false);
     } catch (error) {
       setProfileLoading(false);
-      setImageUrl(DefaultAvatar); // Thiết lập avatar mặc định nếu có lỗi
+      setImageUrl(DefaultAvatar);
       setImageError(true);
-      toast.error(t("actions.error"));
     }
   };
 
