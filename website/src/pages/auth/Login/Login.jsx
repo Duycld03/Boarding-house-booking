@@ -32,8 +32,6 @@ function Login() {
       const role = res.user.role;
       loginData(res.user, res.token);
 
-      localStorage.setItem("access_token", res.token);
-
       if (role === "staff" || role === "owner") {
         navigate("/profile");
         toast.success("Login successful");

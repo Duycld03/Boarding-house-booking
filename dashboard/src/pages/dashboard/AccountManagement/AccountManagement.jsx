@@ -131,9 +131,6 @@ function AccountManagement() {
         toast.error(t("messages.fetchFailed"));
       }
     } catch (error) {
-      toast.error(
-        "An error occurred: " + (error.response?.data?.error || error.message)
-      );
     } finally {
       setLoading(false);
     }

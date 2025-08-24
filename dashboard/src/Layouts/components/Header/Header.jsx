@@ -67,7 +67,12 @@ const CustomHeader = () => {
         setAvatarSource(res?.avatarImage?.url || null);
         setUsername(res?.username || "");
         setIsLoggedIn(true);
-      } catch {
+      } catch (error) {
+        if (error.status === 401) {
+          localStorage.removeItem("admin_token");
+          contextLogout();
+          navigate("/");
+        }
         setIsLoggedIn(false);
         setAvatarSource(null);
       }

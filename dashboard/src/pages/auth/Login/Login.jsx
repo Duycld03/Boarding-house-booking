@@ -26,8 +26,6 @@ function Login() {
       const role = res.user.role;
       loginData(res.user, res.token);
 
-      localStorage.setItem("access_token", res.token);
-
       if (role === "admin") {
         navigate("/dashboard/account-management");
         toast.success("Login successful");

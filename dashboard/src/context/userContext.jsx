@@ -4,24 +4,31 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("admin");
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
   const loginData = (userData, token) => {
-    localStorage.setItem("access_token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("admin_token", token);
+    localStorage.setItem("admin", JSON.stringify(userData));
     setUser(userData);
   };
 
   const contextLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("admin");
     setUser(null);
   };
 
   const hasRole = (roles) => user && roles.includes(user.role);
 
-  const isLogin = useMemo(() => !!user, [user]);
+  const isLogin = useMemo(() => {
+    const localUser = localStorage.getItem("admin");
+    if (!localUser) {
+      localStorage.removeItem("admin_token");
+      return false;
+    }
+    return true;
+  }, [user]);
 
   return (
     <UserContext.Provider
