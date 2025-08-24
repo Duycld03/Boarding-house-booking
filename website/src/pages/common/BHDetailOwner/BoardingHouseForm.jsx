@@ -192,7 +192,7 @@ const BoardingHouseForm = ({
                 darkMode ? 'text-white' : 'text-black'
               }`}
             >
-              {t('form.section.price')}
+              {t('form.section.priceUp')}
             </h2>
 
             <Form.Item label={t('form.labels.priceRange')} className="mb-2">
@@ -412,7 +412,7 @@ const BoardingHouseForm = ({
             darkMode ? 'text-white' : 'text-black'
           }`}
         >
-          {t('form.section.address')}
+          {t('form.section.addressUp')}
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

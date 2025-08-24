@@ -17,7 +17,8 @@
   "buttons": {
     "delete": "Delete",
     "replay": "Reply",
-    "detail": "Detail"
+    "detail": "Detail",
+    "close": "Close"
   },
   "modals": {
     "deleteTitle": "Delete Confirmation",
