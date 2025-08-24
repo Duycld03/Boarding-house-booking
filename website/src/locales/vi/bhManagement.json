@@ -102,9 +102,9 @@
   "form": {
     "section": {
       "information": "1. Thông tin",
-      "price": "2. Giá cả",
+      "price": "4. Giá cả",
       "images": "3. Ảnh",
-      "address": "4. Địa chỉ"
+      "address": "2. Địa chỉ"
     },
     "labels": {
       "boardingHouseName": "Tên nhà trọ",
