@@ -140,7 +140,7 @@ const ReportDetailModal = ({ isOpen, onClose, reportData, onReplay }) => {
               height={150}
               className="rounded-md transition-transform transform hover:scale-105"
               style={{ objectFit: 'cover' }}
-              src={images?.[0]?.imageUrl}
+              src={target?.images?.[0]?.imageUrl}
               alt="Boarding House Image"
             />
           ) : (
