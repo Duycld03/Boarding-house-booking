@@ -136,7 +136,9 @@ npm start
 
 ### Mobile Application
 
-![Mobile App](images/mobile.png)
+<p align="center">
+  <img src="images/mobile.png" alt="Mobile App" width="300"/>
+</p>
 
 ### Web Application
 
