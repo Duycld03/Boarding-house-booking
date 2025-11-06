@@ -1,0 +1,42 @@
+{
+  "loaderComponent": {
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "allLoaded": "All items loaded",
+    "loadingMore": "Loading more {{itemName}}...",
+    "loadMore": "Load more {{itemName}}...",
+    "progressText": "{{currentCount}} of {{totalCount}} items loaded"
+  },
+  "accommodation_types": {
+    "nha_tro_truyen_thong": "Traditional Boarding House",
+    "mini_house": "Mini House",
+    "nha_tro_kien_truc_xa": "Dormitory Style Boarding House",
+    "nha_tro_cao_cap": "Premium Boarding House"
+  },
+  "boardingHouseTypes": {
+    "Nhà trọ truyền thống": "Traditional Boarding House",
+    "Mini house": "Mini Apartment",
+    "Nhà trọ kiến trúc xá": "Dormitory"
+  },
+  "address": {
+    "province": "Province",
+    "district": "District",
+    "ward": "Ward",
+    "detail": "Detail"
+  },
+  "addressFormat": "{{detail}} {{ward}} {{district}} {{province}}",
+  "favorites": "Favorites",
+  "confirmDeletion": "Confirm Deletion",
+  "confirmRemoveFavorite": "Are you sure you want to remove this favorite?",
+  "watchLater": "Watch later",
+  "confirmRemoveWatchLater": "Are you sure you want to remove this from your watch later list?",
+  "noWatchLater": "No watch later items",
+  "noWatchLaterDesc": "You have no saved items to watch later.",
+  "noFavorites": "No favorites yet",
+  "noFavoritesDesc": "You have not added any favorites yet.",
+  "tabs": {
+    "home": "Home",
+    "explore": "Explore",
+    "account": "Account"
+  }
+}

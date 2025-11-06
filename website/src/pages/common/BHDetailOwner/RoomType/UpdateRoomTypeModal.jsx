@@ -1,14 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Select, Upload, InputNumber, Image } from 'antd';
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  Upload,
+  InputNumber,
+  Image,
+  ConfigProvider,
+} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button } from '@/component';
 import { toast } from 'react-toastify';
 import {
   getAllFacilities,
   updateRoomTypeToBoardingHouse,
-} from '@/api/roomTypeManagement';
+} from '@/api/roomTypeAPI';
+import { useTheme } from '@/context/themeContext';
+import classNames from 'classnames';
+import Style from './UpdateRoomTypeModal.module.css';
+import { useTranslation } from 'react-i18next';
+import coverFacility from '@/utils/coverFacility';
+import i18n from 'i18next';
+
+const cx = classNames.bind(Style);
 
 const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
+  const { darkMode } = useTheme();
+  const { t } = useTranslation('roomType');
+  const currentLanguage = i18n.language;
+
   const [formData, setFormData] = useState({
     typeName: '',
     facilities: [],
@@ -22,7 +43,6 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fetch danh sách facilities
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
@@ -30,55 +50,25 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
         setFacilitiesList(response?.data || []);
       } catch (error) {
         console.error('Failed to fetch facilities:', error);
-        toast.error('Failed to fetch facilities.');
+        toast.error(t('toast.fetchFacilitiesError'));
       }
     };
-
     fetchFacilities();
-  }, []);
+  }, [t]);
+
   useEffect(() => {
-    if (formData.facilities.length === 0) {
-      setFormData((prev) => {
-        if (prev.facilities.length === 0) return prev; // ✅ Không cập nhật nếu đã rỗng
-        return { ...prev, facilities: [] };
-      });
-    }
-  }, [formData.facilities]);
-
-  // ✅ Cập nhật state khi `roomData` thay đổi
-  useEffect(() => {
-    if (!roomData) return; // ✅ Tránh cập nhật khi `roomData` chưa có
-
-    setFormData((prev) => {
-      // 🔥 Kiểm tra nếu dữ liệu thực sự thay đổi mới setState
-      if (
-        prev.typeName === roomData.typeName &&
-        prev.roomSize === roomData.roomSize &&
-        prev.price === roomData.price &&
-        prev.peopleNumber === roomData.peopleNumber &&
-        prev.image === (roomData.image?.imageUrl || null) &&
-        JSON.stringify(prev.facilities) ===
-          JSON.stringify(roomData.facilities?.map((fac) => fac._id) || [])
-      ) {
-        return prev; // ✅ Nếu dữ liệu không thay đổi, không cập nhật state
-      }
-
-      return {
-        typeName: roomData.typeName || '',
-        facilities: roomData.facilities?.map((fac) => fac._id) || [],
-        roomSize: roomData.roomSize || '',
-        price: roomData.price || '',
-        peopleNumber: roomData.peopleNumber || '',
-        image: roomData.image?.imageUrl || null,
-      };
+    if (!roomData) return;
+    setFormData({
+      typeName: roomData.typeName || '',
+      facilities: roomData.facilities?.map((fac) => fac._id) || [],
+      roomSize: roomData.roomSize || '',
+      price: roomData.price || '',
+      peopleNumber: roomData.peopleNumber || '',
+      image: roomData.image?.imageUrl || null,
     });
-
     setImagePreview(roomData.image?.imageUrl || null);
-  }, [roomData]); // 🔥 Chỉ chạy khi `roomData` thay đổi
+  }, [roomData]);
 
-  // 🔥 Đảm bảo chỉ chạy khi `roomData` thay đổi
-
-  // ✅ Reset form khi modal đóng
   useEffect(() => {
     if (!visible) {
       setFormData({
@@ -91,15 +81,13 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
       });
       setImagePreview(null);
     }
-  }, [visible]); // 🔥 Chỉ chạy khi `visible` thay đổi
+  }, [visible]);
 
-  // ✅ Xử lý thay đổi input
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Xử lý chọn facilities
   const handleSelectChange = (selectedValues) => {
     setFormData((prev) => ({
       ...prev,
@@ -107,7 +95,6 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
     }));
   };
 
-  // ✅ Xử lý ảnh upload
   const uploadProps = {
     beforeUpload: (file) => {
       setFormData((prev) => ({ ...prev, image: file }));
@@ -119,45 +106,34 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
     showUploadList: false,
   };
 
-  // ✅ Xóa ảnh
   const handleRemoveImage = () => {
     setFormData((prev) => ({ ...prev, image: null }));
     setImagePreview(null);
   };
 
-  // ✅ Gửi dữ liệu lên API
   const handleSubmit = async () => {
     if (!formData.typeName.trim()) {
-      toast.error('Type Name is required.');
+      toast.error(t('form.typeName.error'));
       return;
     }
-    if (!/^\d+x\d+$/.test(formData.roomSize)) {
-      toast.error('Room size must be in format 20x30 or 30x40.');
+    if (!/\d+x\d+/.test(formData.roomSize)) {
+      toast.error(t('form.roomSize.error'));
       return;
     }
-    // if (
-    //   !formData.price ||
-    //   formData.price < 500000 ||
-    //   formData.price > 100000000
-    // ) {
-    //   toast.error('Price must be between 500,000 and 100,000,000 VND.');
-    //   return;
-    // }
     if (!formData.price || isNaN(Number(formData.price))) {
-      toast.error('Please enter a valid number for rent/month!');
+      toast.error(t('form.price.error'));
       return;
     }
     if (!formData.peopleNumber || formData.peopleNumber < 1) {
-      toast.error('People number must be at least 1.');
+      toast.error(t('form.peopleNumber.error'));
       return;
     }
     if (!formData.image) {
-      toast.error('You must upload an image.');
+      toast.error(t('form.image.error'));
       return;
     }
 
     setLoading(true);
-
     const formDataToSend = new FormData();
     formDataToSend.append('typeName', formData.typeName);
     formDataToSend.append('roomSize', formData.roomSize);
@@ -177,141 +153,191 @@ const UpdateRoomTypeModal = ({ visible, onClose, roomData, onUpdate }) => {
         roomData._id,
         formDataToSend
       );
-
       if (response?.message === 'Room Type updated successfully') {
-        toast.success('Room type updated successfully!');
+        toast.success(t('toast.updateSuccess'));
         onClose();
         onUpdate();
       }
     } catch (error) {
-      console.error('❌ API Error:', error.response?.data || error.message);
-      const errorMessage =
-        error.response?.data?.message || 'Failed to submit form.';
-
-      toast.error(errorMessage);
+      console.error('API Error:', error.response?.data || error.message);
+      toast.error(error.response?.data?.message || t('toast.error'));
     } finally {
       setLoading(false);
     }
   };
 
+  const themeConfig = {
+    algorithm: darkMode
+      ? ConfigProvider.darkAlgorithm
+      : ConfigProvider.defaultAlgorithm,
+    token: darkMode
+      ? {
+          colorText: '#ffffff',
+          colorBgContainer: '#1f2937',
+          colorBorder: '#4b5563',
+          colorTextPlaceholder: '#9ca3af',
+        }
+      : {},
+    components: {
+      Input: darkMode
+        ? {
+            colorBgContainer: '#374151',
+            colorText: '#f9fafb',
+            colorBorder: '#4b5563',
+          }
+        : {},
+      Select: darkMode
+        ? {
+            colorBgElevated: '#374151',
+            colorText: '#f9fafb',
+            optionSelectedBg: '#2563eb',
+          }
+        : {},
+    },
+  };
+
   return (
-    <Modal
-      title="Update Room Type"
-      open={visible}
-      onCancel={onClose}
-      footer={null}
-      destroyOnClose
-    >
-      <Form layout="vertical">
-        <Form.Item label="Room Type Name" required className="mb-2">
-          <Input
-            placeholder="Enter room type name"
-            name="typeName"
-            value={formData.typeName}
-            onChange={handleInputChange}
-          />
-        </Form.Item>
-
-        <Form.Item label="Facilities" className="mb-2">
-          <Select
-            mode="multiple"
-            placeholder="Select facilities"
-            value={formData.facilities || []}
-            onChange={handleSelectChange}
-          >
-            {facilitiesList.map((facility) => (
-              <Select.Option key={facility._id} value={facility._id}>
-                {facility.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          label="Room Size (e.g., 20x30, 30x40)"
-          required
-          className="mb-2"
-        >
-          <Input
-            placeholder="Enter room size"
-            name="roomSize"
-            value={formData.roomSize}
-            onChange={handleInputChange}
-          />
-        </Form.Item>
-
-        <Form.Item label="Rent/month" required className="mb-2">
-          <InputNumber
-            placeholder="Enter rent/month"
-            name="price"
-            value={formData.price ? Number(formData.price) : undefined} // Đảm bảo là số hoặc undefined
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, price: value }))
-            }
-            formatter={(value) =>
-              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-            }
-            parser={(value) => value.replace(/\$\s?|,*/g, '')}
-            className="w-full"
-          />
-        </Form.Item>
-
-        <Form.Item label="People Number" required className="mb-2">
-          <InputNumber
-            placeholder="Enter number of people"
-            name="peopleNumber"
-            value={formData.peopleNumber}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, peopleNumber: value }))
-            }
-            className="w-full"
-          />
-        </Form.Item>
-
-        <Form.Item label="Room Image" className="mb-2">
-          {!imagePreview ? (
-            <Upload
-              {...uploadProps}
-              listType="picture-card"
-              className="custom-upload"
-            >
-              <div>
-                <PlusOutlined />
-                <p>Upload</p>
+    <ConfigProvider theme={themeConfig}>
+      <Modal
+        title={
+          <span className={darkMode ? 'text-white' : ''}>
+            {t('modal.updateTitle')}
+          </span>
+        }
+        open={visible}
+        onCancel={onClose}
+        footer={null}
+        destroyOnClose
+        className={darkMode ? 'ant-modal-dark' : ''}
+        styles={
+          darkMode
+            ? {
+                mask: { backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+                content: {
+                  backgroundColor: '#1f2937',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                },
+                header: { backgroundColor: '#1f2937', color: '#ffffff' },
+                body: { backgroundColor: '#1f2937', color: '#ffffff' },
+              }
+            : {}
+        }
+      >
+        <Form layout="vertical" className={cx('no-margin')}>
+          <Form.Item label="Room Image" required>
+            {!imagePreview ? (
+              <Upload {...uploadProps} listType="picture-card">
+                <div className="flex flex-col items-center justify-center w-full h-full">
+                  <PlusOutlined style={{ fontSize: 22 }} />
+                  <p style={{ marginTop: 8, fontSize: 14 }}>Upload</p>
+                </div>
+              </Upload>
+            ) : (
+              <div className="relative w-full">
+                <img
+                  src={imagePreview}
+                  alt="Room Image"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: 350,
+                    objectFit: 'cover',
+                    borderRadius: 8,
+                    display: 'block',
+                  }}
+                />
+                <button
+                  onClick={handleRemoveImage}
+                  className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded"
+                  type="button"
+                >
+                  X
+                </button>
               </div>
-            </Upload>
-          ) : (
-            <div
-              className="relative"
-              style={{ width: '200px', height: '200px' }}
-            >
-              <Image
-                src={imagePreview}
-                alt="Room Image"
-                className="w-full rounded"
-                style={{ width: '200px', height: '200px' }}
-              />
-              <button
-                onClick={handleRemoveImage}
-                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded"
-              >
-                X
-              </button>
-            </div>
-          )}
-        </Form.Item>
+            )}
+          </Form.Item>
+          <Form.Item label={t('form.typeName.label')} required>
+            <Input
+              name="typeName"
+              value={formData.typeName}
+              onChange={handleInputChange}
+              placeholder={t('form.typeName.placeholder')}
+              className={cx({ 'dark-mode-input': darkMode })}
+            />
+          </Form.Item>
 
-        <div className="flex justify-end mt-4">
-          <Button btnCancel title="Cancel" onClick={onClose} className="mr-2" />
-          <Button
-            className="bg-primary text-white"
-            title="Update"
-            loading={loading}
-            onClick={handleSubmit}
-          />
-        </div>
-      </Form>
-    </Modal>
+          <Form.Item label={t('form.facilities.label')}>
+            <Select
+              mode="multiple"
+              placeholder={t('form.facilities.placeholder')}
+              value={formData.facilities}
+              onChange={handleSelectChange}
+              className={cx({ 'dark-mode-select': darkMode })}
+            >
+              {facilitiesList.map((facility) => (
+                <Select.Option key={facility._id} value={facility._id}>
+                  {coverFacility(
+                    facility.codeName || facility.name,
+                    currentLanguage
+                  )}{' '}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item label={t('form.roomSize.label')} required>
+            <Input
+              name="roomSize"
+              value={formData.roomSize}
+              onChange={handleInputChange}
+              placeholder={t('form.roomSize.placeholder')}
+              className={cx({ 'dark-mode-input': darkMode })}
+            />
+          </Form.Item>
+
+          <Form.Item label={t('form.price.label')} required>
+            <InputNumber
+              name="price"
+              value={formData.price ? Number(formData.price) : undefined}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, price: value }))
+              }
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              }
+              parser={(value) => value.replace(/\$\s?|,*/g, '')}
+              className="w-full"
+            />
+          </Form.Item>
+
+          <Form.Item label={t('form.peopleNumber.label')} required>
+            <InputNumber
+              name="peopleNumber"
+              value={formData.peopleNumber}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, peopleNumber: value }))
+              }
+              className="w-full"
+            />
+          </Form.Item>
+
+          <div className="flex justify-end mt-4">
+            <Button
+              btnCancel
+              title={t('button.cancel')}
+              onClick={onClose}
+              className="mr-2"
+            />
+            <Button
+              className="bg-primary text-white"
+              title={t('button.update')}
+              loading={loading}
+              onClick={handleSubmit}
+            />
+          </div>
+        </Form>
+      </Modal>
+    </ConfigProvider>
   );
 };
 

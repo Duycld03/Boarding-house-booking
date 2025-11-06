@@ -1,0 +1,63 @@
+{
+  "title": "My Reports",
+  "myReport": {
+    "reportType": "Report Type",
+    "target": "Target",
+    "reason": "Reason",
+    "status": "Status",
+    "details": "Details",
+    "createdAt": "Created At",
+    "action": "Action",
+    "detail": "Click to view detail"
+  },
+  "detail": {
+    "title": "Report Detail",
+    "reviewInfo": "Review Information",
+    "boardingInfo": "Boarding House Information",
+    "unknown": "Unknown",
+    "name": "Name",
+    "type": "Type",
+    "rating": "Rating",
+    "content": "Content",
+    "images": "Images",
+    "reportInfo": "Report Information",
+    "reportedAt": "Reported At",
+    "reportImages": "Report Images",
+    "noContent": "No content",
+    "noImages": "No images available",
+    "reporter": "Reporter",
+    "reviewer": "Reviewer"
+  },
+  "messages": {
+    "noData": "No report found",
+    "fetchError": "Failed to fetch data. Please try again later.",
+    "detailFetchError": "Failed to fetch report details.",
+    "deleteSuccess": "Review report deleted successfully.",
+    "deleteFailed": "Failed to delete review report.",
+    "replayError": "Missing reply information. Please check again.",
+    "replayFailed": "Failed to send reply or update report.",
+    "replaySuccess": "Replay submitted successfully!"
+  },
+  "status": {
+    "pending": "Pending",
+    "resolved": "Resolved",
+    "rejected": "Rejected"
+  },
+  "reasons": {
+    "Privacy violation": "Privacy violation",
+    "Scam on Rent or Deposit": "Scam on Rent or Deposit",
+    "False Advertisement": "False Advertisement",
+    "Unfriendly Landlord": "Unfriendly Landlord",
+    "Poor Security": "Poor Security",
+    "Misleading information": "Misleading information",
+    "Spam": "Spam",
+    "Inappropriate content": "Inappropriate content"
+  },
+  "boardingHouseTypes": {
+    "Nhà trọ truyền thống": "Traditional Boarding House",
+    "Mini house": "Mini Apartment",
+    "Nhà trọ kiến trúc xá": "Dormitory"
+  },
+  "noReports": "No Reports Found",
+  "noReportsDesc": "You haven't submitted any reports yet."
+}

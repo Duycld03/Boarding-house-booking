@@ -12,6 +12,7 @@ import {
   renewalController,
   userPaymentController,
   refundRequestController,
+  paymentBillController,
 } from "../controllers/index.js";
 import { upload } from "../config/cloudinary.config.js";
 
@@ -28,6 +29,8 @@ authRouter.delete(
   "/favorites/:boardingHouseId",
   favoriteController.deleteFavorite
 );
+authRouter.get("/allfavorites", favoriteController.getAllFavorites);
+
 authRouter.post("/change-password", accountController.changePassword);
 authRouter.put("/profile", accountController.updateAccountFromProfile);
 
@@ -59,9 +62,15 @@ authRouter.post(
   "/appointment/create-appointment/",
   appointmentController.createAppointment
 );
-authRouter.post("/reviews", ReviewController.addReview);
+authRouter.post("/reviews",
+  upload.array("review"),
+  ReviewController.addReview);
 
 // report
+authRouter.get(
+  "/reports/boarding-house/exist",
+  reportController.checkBHReportExist
+);
 authRouter.get("/reports/exist", reportController.checkReportExist);
 authRouter.post(
   "/reports",
@@ -70,11 +79,16 @@ authRouter.post(
 );
 authRouter.get("/reports", reportController.getReportByUserId);
 authRouter.get("/reports/:reportId", reportController.getReportReviewDetail);
+authRouter.get('/review-reports', reportController.getReviewReports);
 
 //review
-authRouter.put("/reviews/:reviewId", ReviewController.updateReview);
-authRouter.get("/reviews", ReviewController.getReviewsUser);
+authRouter.put(
+  "/reviews/:reviewId",
+  upload.fields([{ name: "images", maxCount: 5 }]),
+  ReviewController.updateReview
+); authRouter.get("/reviews", ReviewController.getReviewsUser);
 authRouter.delete("/reviews/:reviewId", ReviewController.softDeleteReview);
+authRouter.get('/review/:reviewId', ReviewController.getReviewDetail);
 
 authRouter.get("/watchlater", watchLaterController.getWatchLater);
 authRouter.get("/watchlater/all", watchLaterController.getAllWatchLater);
@@ -91,12 +105,23 @@ authRouter.get(
   "/deposited-room/:depositRoomId",
   depositController.getDepositRoom
 );
+authRouter.get(
+  "/deposited-room/detail/:depositRoomId",
+  depositController.getDepositRoomDetail
+);
+
+//payment
 authRouter.post("/pay-rent", depositController.payRent);
 authRouter.get(
   "/pay-rent/:depositRoomId",
   depositController.checkPayRentStatus
 );
 authRouter.post("/pay-deposit", depositController.payDeposit);
+authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
+authRouter.get(
+  "/deposit-payment-bill/:paymentBillId",
+  paymentBillController.getPaymentBillForRent
+);
 
 // refund request
 authRouter.get("/refund-requests", refundRequestController.getRefundRequests);
@@ -104,9 +129,14 @@ authRouter.post(
   "/refund-requests",
   refundRequestController.createRefundRequest
 );
-
-// userPayment
-authRouter.get("/user-payment", userPaymentController.getUserPaymentByUserId);
+authRouter.get(
+  "/refund-request/check-exists/:depositRoomId",
+  refundRequestController.checkRefundRequestExists
+);
+authRouter.get(
+  "/refund-request/my-requests",
+  refundRequestController.getMyRefundRequestsSimple
+);
 
 //renewal
 authRouter.get("/renewal", renewalController.getExtensionRequests);

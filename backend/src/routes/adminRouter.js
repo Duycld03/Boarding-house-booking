@@ -6,10 +6,11 @@ import {
   boardingHouseController,
   reportController,
   ReviewController,
-  depositController
+  depositController,
 } from '../controllers/index.js';
 import reviewController from '../controllers/reviewController.js';
 import facilitiesController from '../controllers/facilitiesController.js';
+import { upload } from "../config/cloudinary.config.js";
 
 const adminRouter = Router();
 
@@ -56,6 +57,7 @@ adminRouter.get(
   '/reportReview/:reportId',
   reportController.getReportReviewDetail
 );
+adminRouter.get('/reportBH/:reportId', reportController.getReportReviewDetail);
 
 //review
 adminRouter.get('/reviews', ReviewController.getReviews);
@@ -63,8 +65,6 @@ adminRouter.get('/reviews/filter', reviewController.filterReviews);
 adminRouter.delete('/reviews/:reviewId', reviewController.softDeleteReview);
 adminRouter.get('/boarding-house-reports', reportController.getBHReports);
 adminRouter.get('/review/:reviewId', ReviewController.getReviewDetail);
-
-
 
 //boarding house
 adminRouter.get('/boardinghouse', boardingHouseController.getAllBHOnDashBoard);
@@ -74,6 +74,7 @@ adminRouter.get(
 );
 adminRouter.put(
   '/boardinghouse/:id',
+  upload.array("boardingHouse"),
   boardingHouseController.updateBoardingHouseDetails
 );
 adminRouter.get('/types', boardingHouseController.getAllBoardingHouseTypes);
@@ -95,10 +96,12 @@ adminRouter.get(
 );
 adminRouter.post(
   '/boardinghouse/create',
+  upload.array("boardingHouse"),
   boardingHouseController.createBoardingHouse
 );
 adminRouter.post(
   '/boardinghouse/uploadFile',
+  upload.array("boardingHouse"),
   boardingHouseController.uploadFile
 );
 adminRouter.get(
@@ -145,14 +148,11 @@ adminRouter.get('/account/filter', accountController.filterAccounts);
 adminRouter.post('/account/create', accountController.createAccount);
 adminRouter.put('/account/:accountId', accountController.updateAccount);
 
-
 //Facilities
-adminRouter.get("/facilities", facilitiesController.getAllFacilities);
-adminRouter.delete("/facilities/:id", facilitiesController.deleteFacilities); //delete
-adminRouter.put("/facilities/:id", facilitiesController.updateFacilities); //update   
-adminRouter.get("/facilities/filter", facilitiesController.filterFacilities); //filter 
-adminRouter.post("/facilities", facilitiesController.addFacilities); //add
-
-
+adminRouter.get('/facilities', facilitiesController.getAllFacilities);
+adminRouter.delete('/facilities/:id', facilitiesController.deleteFacilities); //delete
+adminRouter.put('/facilities/:id', facilitiesController.updateFacilities); //update
+adminRouter.get('/facilities/filter', facilitiesController.filterFacilities); //filter
+adminRouter.post('/facilities', facilitiesController.addFacilities); //add
 
 export { adminRouter };

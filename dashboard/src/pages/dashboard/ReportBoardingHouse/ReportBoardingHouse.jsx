@@ -1,21 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   TableCustom as Table,
   Button,
   ConfirmModal,
   FormReplayPopup,
-} from "../../../component";
-import { toast } from "react-toastify";
-import { Tag } from "antd";
+} from '../../../component';
+import { toast } from 'react-toastify';
+import { Tag } from 'antd';
 import {
   deleteReport,
   sendReplyByEmail,
-  getBHReports,
   filterBHReports,
-} from "../../../api/reportManagement";
-import convertTimetap from "../../../utils/convertTimetap";
-import FilterBHReportPopup from "./FilterBHReportPopup ";
-import { useTranslation } from "react-i18next";
+  getReportBHDetail,
+} from '../../../api/reportAPI';
+import convertTimetap from '../../../utils/convertTimetap';
+import FilterBHReportPopup from './FilterBHReportPopup ';
+import { useTranslation } from 'react-i18next';
+import ReportDetailModal from './ReportDetailModal';
+import { FileTextOutlined } from '@ant-design/icons';
 
 function ReportBoardingHouse() {
   const [data, setData] = useState([]);
@@ -25,26 +27,45 @@ function ReportBoardingHouse() {
   const [isReplayPopupOpen, setIsReplayPopupOpen] = useState(false);
   const [replayReportData, setReplayReportData] = useState(null);
   const [filterValue, setFilterValue] = useState({});
-  const { t } = useTranslation("reportBoardingHouse");
+  const { t } = useTranslation('reportBoardingHouse');
+
+  // Thêm state quản lý phân trang
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    limit: 10,
+  });
+
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+
+  // Thêm state quản lý các tùy chọn phân trang gửi đến API
+  const [paginationOptions, setPaginationOptions] = useState({
+    page: 1,
+    limit: 10,
+    sortField: 'createdAt',
+    sortOrder: 'desc',
+  });
 
   const coverReasonToMultipleLanguage = (reasonValue) => {
     const reasonLowerCase = reasonValue.toLowerCase();
 
     switch (reasonLowerCase) {
-      case "scam on rent or deposit".toLowerCase(): {
-        return t("reason.scamOnRentOrDeposit");
+      case 'scam on rent or deposit'.toLowerCase(): {
+        return t('reason.scamOnRentOrDeposit');
       }
-      case "false advertisement".toLowerCase(): {
-        return t("reason.falseAdvertisement");
+      case 'false advertisement'.toLowerCase(): {
+        return t('reason.falseAdvertisement');
       }
-      case "violation of privacy".toLowerCase(): {
-        return t("reason.violationOfPrivacy");
+      case 'violation of privacy'.toLowerCase(): {
+        return t('reason.violationOfPrivacy');
       }
-      case "unfriendly landlord".toLowerCase(): {
-        return t("reason.unfriendlyLandlord");
+      case 'unfriendly landlord'.toLowerCase(): {
+        return t('reason.unfriendlyLandlord');
       }
-      case "poor security".toLowerCase(): {
-        return t("reason.poorSecurity");
+      case 'poor security'.toLowerCase(): {
+        return t('reason.poorSecurity');
       }
       default: {
         return reasonValue;
@@ -52,85 +73,104 @@ function ReportBoardingHouse() {
     }
   };
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await getBHReports();
-      if (res) {
-        setData(res);
-        console.log(res);
-      } else {
-        setData([]);
-      }
-    } catch (error) {
-      console.error("Failed to fetch withdrawal requests:", error);
-      toast.error(t("toast.fetchFailed"));
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Thay thế hàm fetchData bằng filterReportData với phân trang
   const filterReportData = async () => {
     setLoading(true);
     try {
-      const res = await filterBHReports(filterValue);
-      if (res) {
-        setData(res);
+      const res = await filterBHReports(filterValue, paginationOptions);
+
+      if (res?.data && res?.pagination) {
+        setData(res.data);
+        setPagination({
+          currentPage: res.pagination.currentPage,
+          totalPages: res.pagination.totalPages,
+          totalItems: res.pagination.totalItems,
+          limit: res.pagination.limit,
+        });
       } else {
-        throw new Error("Invalid response format");
+        throw new Error('Invalid response format');
       }
     } catch (error) {
-      console.error("Failed to fetch filtered reports:", error);
-      toast.error(t("toast.filterFailed"));
+      console.error('Failed to fetch filtered reports:', error);
+      toast.error(t('toast.filterFailed'));
       setData([]);
     } finally {
       setLoading(false);
     }
   };
+  const handleViewDetailApi = async (record) => {
+    try {
+      const res = await getReportBHDetail(record._id);
+      if (res) {
+        setSelectedReport(res);
+        setIsDetailModalOpen(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch report detail:', error);
+      toast.error(t('toast.getDetailFailed'));
+    }
+  };
 
-  //fetch account data
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // Xử lý sự kiện thay đổi trang
+  const handleTableChange = (pagination) => {
+    setPaginationOptions((prev) => ({
+      ...prev,
+      page: pagination.current,
+      limit: pagination.pageSize,
+    }));
+  };
 
-  //Filter BH report
+  // Cấu hình phân trang cho bảng
+  const tablePaginationConfig = {
+    current: pagination.currentPage,
+    pageSize: pagination.limit,
+    total: pagination.totalItems,
+    showSizeChanger: true,
+  };
+
+  const handleViewDetail = (record) => {
+    setSelectedReport(record);
+    setIsDetailModalOpen(true);
+  };
+
+  // Loại bỏ useEffect với getBHReports
+  // Chỉ giữ lại useEffect với filterReportData
   useEffect(() => {
     filterReportData();
-  }, [filterValue]);
+  }, [filterValue, paginationOptions]);
 
   // Define columns for the Table component
   const columns = [
     {
-      title: t("columns.reporter"),
-      dataIndex: "reporter",
-      key: "reporter",
-      render: (reporter) => reporter?.fullname || "N/A",
+      title: t('columns.reporter'),
+      dataIndex: 'reporter',
+      key: 'reporter',
+      render: (reporter) => reporter?.fullname || 'N/A',
     },
     {
-      title: t("columns.boardingHouseName"),
-      dataIndex: "targetId",
-      key: "email",
-      render: (target) => target?.name || "N/A",
+      title: t('columns.boardingHouseName'),
+      dataIndex: 'targetId',
+      key: 'email',
+      render: (target) => target?.name || 'N/A',
     },
     {
-      title: t("columns.reason"),
-      dataIndex: "reason",
-      key: "reason",
+      title: t('columns.reason'),
+      dataIndex: 'reason',
+      key: 'reason',
       render: (reason) => {
         const reasonText = coverReasonToMultipleLanguage(reason);
         return <span>{reasonText}</span>;
       },
     },
     {
-      title: t("columns.status"),
-      dataIndex: "status",
-      key: "status",
+      title: t('columns.status'),
+      dataIndex: 'status',
+      key: 'status',
       render: (status) => {
         const statusColors = {
-          pending: "orange",
-          resolved: "green",
-          rejected: "red",
+          pending: 'orange',
+          resolved: 'green',
+          rejected: 'red',
         };
         return (
           <Tag color={statusColors[status.toLowerCase()]}>
@@ -140,35 +180,34 @@ function ReportBoardingHouse() {
       },
     },
     {
-      title: t("columns.createdAt"),
-      dataIndex: "createdAt",
-      key: "createdAt",
+      title: t('columns.createdAt'),
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       render: (createdAt) => convertTimetap(createdAt),
     },
     {
-      title: t("columns.processedDate"),
-      dataIndex: "updatedAt",
-      key: "updatedAt",
+      title: t('columns.processedDate'),
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
       render: (updatedAt) => convertTimetap(updatedAt),
     },
     {
-      title: t("columns.action"),
+      title: t('columns.action'),
       render: (record) => (
         <div className="flex gap-2">
           <Button
-            title={t("buttons.delete")}
+            title={t('buttons.delete')}
             btnDelete
             className="btn-delete"
             onClick={() => handleDeleteModal(record)}
           />
-          {record.status !== "rejected" && record.status !== "resolved" && (
-            <Button
-              title={t("buttons.replay")}
-              btnReplay
-              className="btn-replay"
-              onClick={() => handleReplay(record)}
-            />
-          )}
+          <Button
+            title={t('buttons.detail')}
+            icon={<FileTextOutlined />}
+            className={'text-white'}
+            bgColor={'rgb(5 150 105)'}
+            onClick={() => handleViewDetailApi(record)}
+          />
         </div>
       ),
     },
@@ -192,11 +231,12 @@ function ReportBoardingHouse() {
 
     try {
       await deleteReport(selectedRequest._id);
-      setData(data.filter((item) => item._id !== selectedRequest._id));
-      toast.success(t("toast.deleteSuccess"));
+      // Sau khi xóa, gọi lại API để lấy dữ liệu mới nhất
+      filterReportData();
+      toast.success(t('toast.deleteSuccess'));
     } catch (error) {
-      console.error("Failed to delete report:", error);
-      toast.error(t("toast.deleteFailed"));
+      console.error('Failed to delete report:', error);
+      toast.error(t('toast.deleteFailed'));
     } finally {
       setIsOpenDeleteModal(false);
       setSelectedRequest(null);
@@ -205,7 +245,7 @@ function ReportBoardingHouse() {
 
   const handleReplaySubmit = async (formData) => {
     if (!replayReportData || !replayReportData._id) {
-      toast.error(t("toast.missingData"));
+      toast.error(t('toast.missingData'));
       return;
     }
 
@@ -216,10 +256,11 @@ function ReportBoardingHouse() {
       });
 
       setIsReplayPopupOpen(false);
-      fetchData();
+      // Gọi lại API để lấy dữ liệu mới nhất
+      filterReportData();
     } catch (error) {
-      console.error("Failed to send reply:", error);
-      toast.error(t("toast.replyFailed"));
+      console.error('Failed to send reply:', error);
+      toast.error(t('toast.replyFailed'));
     }
   };
 
@@ -229,16 +270,26 @@ function ReportBoardingHouse() {
         <div className="flex justify-end mb-4">
           <FilterBHReportPopup setFilterValue={setFilterValue} />
         </div>
-        {/* Show filtered data if available, else show full data */}
-        <Table columns={columns} data={data} loading={loading} />
+        {/* Show filtered data with pagination */}
+        <Table
+          tableName={t('title')}
+          columns={columns}
+          onRowClick={(record) => {
+            console.log('Row clicked:', record);
+          }}
+          data={data}
+          loading={loading}
+          pagination={tablePaginationConfig}
+          onChange={handleTableChange}
+        />
         <ConfirmModal
-          title={t("modals.deleteTitle")}
-          content={t("modals.deleteContent")}
+          title={t('modals.deleteTitle')}
+          content={t('modals.deleteContent')}
           onOk={handleDelete}
           onCancel={() => setIsOpenDeleteModal(false)}
           isOpen={isOpenDeleteModal}
-          cancelText={t("modals.cancelButton")}
-          okText={t("modals.confirmButton")}
+          cancelText={t('modals.cancelButton')}
+          okText={t('modals.confirmButton')}
         />
         {isReplayPopupOpen && (
           <FormReplayPopup
@@ -246,13 +297,22 @@ function ReportBoardingHouse() {
             onClose={() => setIsReplayPopupOpen(false)}
             onSubmit={handleReplaySubmit}
             reportData={replayReportData}
-            title={t("replyForm.title")}
-            statusLabel={t("replyForm.status")}
-            detailsLabel={t("replyForm.details")}
-            submitText={t("replyForm.submit")}
-            cancelText={t("replyForm.cancel")}
+            title={t('replyForm.title')}
+            statusLabel={t('replyForm.status')}
+            detailsLabel={t('replyForm.details')}
+            submitText={t('replyForm.submit')}
+            cancelText={t('replyForm.cancel')}
           />
         )}
+        <ReportDetailModal
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          reportData={selectedReport}
+          onReplay={(record) => {
+            setReplayReportData(record);
+            setIsReplayPopupOpen(true);
+          }}
+        />
       </>
     </div>
   );

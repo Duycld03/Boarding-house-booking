@@ -1,1 +1,1 @@
-export { default } from "./BHDetailOwner";
+export { default } from './BHDetailOwner';

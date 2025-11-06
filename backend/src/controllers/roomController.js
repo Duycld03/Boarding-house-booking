@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
 import Room from "../models/room.js";
 import PaymentBill from "../models/paymentBill.js";
+import paginate from "../utils/pagination.js";
+import DepositRoom from "../models/depositRoom.js";
+import { updateBoardingHouseRoomCounts } from '../utils/updateBoardingHouseRoomCounts.js';
 
 
 class RoomController {
@@ -14,20 +17,26 @@ class RoomController {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
+      // Get deposit room IDs with confirmed status
+      const depositRoomIds = await DepositRoom.find({
+        status: "confirmed",
+      }).distinct("roomId");
+
+      // Create filter with roomTypeId and exclude depositRoomIds
       const filter = {
         roomTypeId: new mongoose.Types.ObjectId(roomTypeId),
         isAvailable: true,
+        _id: { $nin: depositRoomIds },
       };
 
       if (boardingHouseId) {
         filter.boardingHouseId = new mongoose.Types.ObjectId(boardingHouseId);
       }
 
-      const rooms = await Room.find(filter);
+      const availableRooms = await Room.find(filter);
 
-      res.status(200).json(rooms);
+      res.status(200).json(availableRooms);
     } catch (error) {
-      console.error("Error fetching rooms:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -49,48 +58,46 @@ class RoomController {
 
       res.status(200).json(rooms);
     } catch (error) {
-      console.error("Error fetching rooms:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
 
-  async getUnpaidRoomsByBoardingHouse(req, res) {
+  async getRoomsEligibleForBill(req, res) {
     try {
       const { boardingHouseId } = req.params;
-
-      if (!boardingHouseId) {
-        return res.status(400).json({ message: "boardingHouseId là bắt buộc" });
-      }
-
-      // Lấy thời gian tháng trước
       const now = new Date();
       const lastMonth = now.getMonth() === 0 ? 12 : now.getMonth();
       const lastYear =
         now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
 
-      // Lấy danh sách roomId đã thanh toán trong tháng trước thuộc boardingHouseId
+      if (!boardingHouseId) {
+        return res.status(400).json({ message: "boardingHouseId là bắt buộc" });
+      }
+
       const paidRooms = await PaymentBill.find({
-        month: lastMonth.toString(),
-        year: lastYear.toString(),
-        status: { $regex: "paid", $options: "i" },
+        month: lastMonth,
+        year: lastYear,
       }).distinct("roomId");
 
-      // Lọc danh sách phòng chưa thanh toán theo boardingHouseId
-      const unpaidRooms = await Room.find({
-        _id: { $nin: paidRooms },
+      const validDeposits = await DepositRoom.find({
+        status: { $regex: /^confirmed$/i },
+        startDate: { $lte: now },
+        endDate: { $gte: now },
+      }).select("roomId");
+
+      const validRoomIds = validDeposits.map((d) => d.roomId.toString());
+
+      const eligibleRooms = await Room.find({
+        _id: { $in: validRoomIds, $nin: paidRooms },
         boardingHouseId: boardingHouseId,
       })
         .populate("roomTypeId")
         .sort({ roomNumber: 1 });
 
-      //   const roomNumbers = unpaidRooms.map((room) => room.roomNumber);
-
-      return res.status(200).json(unpaidRooms);
+      return res.status(200).json(eligibleRooms);
     } catch (error) {
-      console.error("Error fetching unpaid rooms:", error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Lỗi server", error });
+
+      return res.status(500).json({ message: "Server error", error });
     }
   }
 
@@ -98,67 +105,117 @@ class RoomController {
     try {
       const { boardingHouseId } = req.params;
 
-      if (!boardingHouseId) {
-        return res.status(400).json({ message: "Missing required parameters" });
-      }
-
-      const rooms = await Room.find({
+      const filter = {
         boardingHouseId: new mongoose.Types.ObjectId(boardingHouseId),
-      })
-        .populate("roomTypeId")
-        .populate("rentBy")
-        .sort({ createdAt: -1 });
+      };
 
-      res.status(200).json(rooms);
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: "createdAt",
+        sortOrder: "desc",
+        filter,
+        populate: [{ path: "roomTypeId" }, { path: "rentBy" }],
+        includeTotalData: true,
+      };
+
+      // Gọi helper paginate
+      const result = await paginate(Room, paginationOptions, req);
+
+      return res.status(200).json(result);
     } catch (error) {
-      console.error("Error fetching rooms:", error);
-      res.status(500).json({ message: "Server error", error });
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: error.message,
+      });
     }
   }
 
+  // Backend API - Improved addRoom method
   async addRoom(req, res) {
     try {
-      const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
+      const roomData = req.body;
+      const rooms = Array.isArray(roomData) ? roomData : [roomData];
 
-      if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
-        return res.status(400).json({ message: "Missing required parameters" });
+      // Validate required fields for each room
+      for (const room of rooms) {
+        const { roomNumber, boardingHouseId, description, roomTypeId } = room;
+
+        if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
+          return res.status(400).json({
+            message: "Missing required parameters",
+            missingFields: {
+              roomNumber,
+              boardingHouseId,
+              description,
+              roomTypeId,
+            },
+          });
+        }
       }
 
-      const existingRoom = await Room.findOne({
-        roomNumber,
-        boardingHouseId,
+      // Check for duplicate room numbers in the same boarding house
+      const roomNumbers = rooms.map((room) => room.roomNumber);
+      const duplicateCheck = await Room.find({
+        boardingHouseId: rooms[0].boardingHouseId,
+        roomNumber: { $in: roomNumbers },
       });
 
-      if (existingRoom) {
-        return res.status(400).json({ message: "Room already exists" });
+      if (duplicateCheck.length > 0) {
+        const existingNumbers = duplicateCheck.map((room) => room.roomNumber);
+        return res.status(400).json({
+          message: "Some rooms already exist",
+          duplicateRooms: existingNumbers,
+        });
       }
 
-      const room = new Room({
+
+      const roomDocs = rooms.map((room) => ({
+        roomNumber: room.roomNumber,
+        boardingHouseId: room.boardingHouseId,
+        description: room.description,
+        roomTypeId: room.roomTypeId,
+        isAvailable: true,
+        images: room.images || null,
+      }));
+
+      // Save all rooms
+      const savedRooms = await Room.insertMany(roomDocs);
+
+      try {
+        const boardingHouseId = rooms[0].boardingHouseId;
+        await updateBoardingHouseRoomCounts(boardingHouseId);
+      } catch (updateError) {
+        // Không throw error để không ảnh hưởng đến response chính
+      }
+
+      res.status(201).json({
+        message: "Room added successfully",
+        room: savedRooms[0],
+        count: savedRooms.length,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+
+
+
+  async updateRoom(req, res) {
+    try {
+      const { roomId } = req.params;
+      const {
         roomNumber,
         boardingHouseId,
         description,
         roomTypeId,
-        isAvailable: true,
-      });
-
-      if (req.file) {
-        room.images = {
-          imageUrl: req.file.path,
-          publicId: req.file.filename,
-        };
-      }
-
-      await room.save();
-      res.status(201).json({ message: "Room added successfully" });
-    } catch (error) {
-      console.error("Error adding room:", error);
-      res.status(500).json({ message: "Server error", error });
-    }
-  }
-  async updateRoom(req, res) {
-    try {
-      const { roomId } = req.params;
-      const { roomNumber, boardingHouseId, description, roomTypeId } = req.body;
+        previousElectricityReading,
+        previousWaterReading,
+        currentElectricityReading,
+        currentWaterReading,
+      } = req.body;
 
       if (!roomNumber || !boardingHouseId || !roomTypeId || !description) {
         return res.status(400).json({ message: "Missing required parameters" });
@@ -183,8 +240,30 @@ class RoomController {
 
       room.description = description;
       room.roomTypeId = roomTypeId;
-      // room.isAvailable = true;
-      // room.boardingHouseId = boardingHouseId;
+
+      // Update previous utility readings if provided
+      if (
+        previousElectricityReading !== undefined &&
+        previousElectricityReading !== null
+      ) {
+        room.previousElectricityReading = Number(previousElectricityReading);
+      }
+
+      if (previousWaterReading !== undefined && previousWaterReading !== null) {
+        room.previousWaterReading = Number(previousWaterReading);
+      }
+
+      // Update current utility readings if provided
+      if (
+        currentElectricityReading !== undefined &&
+        currentElectricityReading !== null
+      ) {
+        room.currentElectricityReading = Number(currentElectricityReading);
+      }
+
+      if (currentWaterReading !== undefined && currentWaterReading !== null) {
+        room.currentWaterReading = Number(currentWaterReading);
+      }
 
       if (req.file) {
         if (room?.images?.publicId) {
@@ -198,9 +277,8 @@ class RoomController {
       }
 
       await room.save();
-      res.status(201).json({ message: "Room added successfully" });
+      res.status(201).json({ message: "Room updated successfully" });
     } catch (error) {
-      console.error("Error adding room:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }
@@ -211,10 +289,22 @@ class RoomController {
         return res.status(400).json({ message: "Missing required parameters" });
       }
 
-      await Room.findByIdAndDelete(roomId);
+      const roomToDelete = await Room.findById(roomId);
+      if (!roomToDelete) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      const boardingHouseId = roomToDelete.boardingHouseId;
+
+      await Room.findByIdAndDelete(roomId).then(() => {
+        updateBoardingHouseRoomCounts(boardingHouseId);
+
+      })
+
+
+
       res.status(200).json({ message: "Room deleted successfully" });
     } catch (error) {
-      console.error("Error deleting room:", error);
       res.status(500).json({ message: "Server error", error });
     }
   }

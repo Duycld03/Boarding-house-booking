@@ -1,0 +1,240 @@
+/* Profile.module.css */
+
+/* Dark mode styles for disabled input */
+.dark-form .ant-input-disabled,
+.dark-form .ant-input[disabled] {
+  background-color: #1f1f1f !important;
+  border-color: #404040 !important;
+  color: #a0a0a0 !important;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Dark mode styles for disabled input value/text */
+.dark-form .ant-input-disabled::placeholder,
+.dark-form .ant-input[disabled]::placeholder {
+  color: #666666 !important;
+  opacity: 0.6;
+}
+
+.dark-form .ant-input-disabled[value],
+.dark-form .ant-input[disabled][value] {
+  color: #cccccc !important;
+  font-weight: 500;
+}
+
+/* Specific styles for input with actual value (not empty) */
+.dark-form .ant-input-disabled:not(:placeholder-shown),
+.dark-form .ant-input[disabled]:not(:placeholder-shown) {
+  color: #e0e0e0 !important;
+  background-color: #252525 !important;
+}
+
+/* Style for readonly inputs (alternative to disabled) */
+.dark-form .ant-input[readonly] {
+  background-color: #1f1f1f !important;
+  border-color: #404040 !important;
+  color: #cccccc !important;
+  cursor: default;
+}
+
+.dark-form .ant-input[readonly]:not(:placeholder-shown) {
+  color: #e0e0e0 !important;
+  background-color: #252525 !important;
+}
+
+.dark-form .ant-input-disabled:hover,
+.dark-form .ant-input[disabled]:hover {
+  background-color: #1f1f1f !important;
+  border-color: #404040 !important;
+}
+
+.dark-form .ant-input-disabled:focus,
+.dark-form .ant-input[disabled]:focus {
+  background-color: #1f1f1f !important;
+  border-color: #404040 !important;
+  box-shadow: none !important;
+}
+
+/* Dark mode styles for form labels */
+.dark-form .ant-form-item-label > label {
+  color: #e5e5e5 !important;
+}
+
+.dark-form .ant-form-item-label > label.ant-form-item-required::before {
+  color: #ff4d4f !important;
+}
+
+/* Dark mode styles for radio buttons */
+.dark-form .ant-radio-wrapper {
+  color: #e5e5e5 !important;
+}
+
+.dark-form .ant-radio-wrapper:hover .ant-radio .ant-radio-inner {
+  border-color: #1890ff !important;
+}
+
+.dark-form .ant-radio-checked .ant-radio-inner {
+  background-color: #1890ff !important;
+  border-color: #1890ff !important;
+}
+
+.dark-form .ant-radio-inner {
+  background-color: #2a2a2a !important;
+  border-color: #555555 !important;
+}
+
+.dark-form .ant-radio-inner::after {
+  background-color: #ffffff !important;
+}
+
+/* Dark mode styles for input focus */
+.dark-form .ant-input:focus,
+.dark-form .ant-input-focused {
+  background-color: #2a2a2a !important;
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+/* Dark mode styles for input hover */
+.dark-form .ant-input:hover:not(.ant-input-disabled):not([disabled]) {
+  background-color: #2a2a2a !important;
+  border-color: #555555 !important;
+}
+
+/* Dark mode styles for form validation messages */
+.dark-form .ant-form-item-explain-error {
+  color: #ff7875 !important;
+}
+
+.dark-form .ant-form-item-has-error .ant-input {
+  background-color: #2a2a2a !important;
+  border-color: #ff4d4f !important;
+}
+
+.dark-form .ant-form-item-has-error .ant-input:focus {
+  background-color: #2a2a2a !important;
+  border-color: #ff4d4f !important;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
+}
+
+/* Dark mode styles for upload component */
+.dark-form .ant-upload.ant-upload-select-picture-circle {
+  background-color: #2a2a2a !important;
+  border-color: #555555 !important;
+}
+
+.dark-form .ant-upload.ant-upload-select-picture-circle:hover {
+  border-color: #1890ff !important;
+}
+
+/* Dark mode styles for divider */
+.dark-form .ant-divider-horizontal {
+  border-top-color: #404040 !important;
+}
+
+/* Dark mode styles for typography in forms */
+.dark-form .ant-typography {
+  color: #e5e5e5 !important;
+}
+
+.dark-form .ant-typography.ant-typography-caption {
+  color: #a0a0a0 !important;
+}
+
+/* Dark mode styles for buttons in forms */
+.dark-form .ant-btn-default {
+  border-color: #555555 !important;
+  color: #e5e5e5 !important;
+}
+
+.dark-form .ant-btn-default:hover {
+  background-color: #3a3a3a !important;
+  border-color: #666666 !important;
+  color: #ffffff !important;
+}
+
+/* Specific styles for email input section */
+.emailSection .ant-input-disabled,
+.emailSection .ant-input[disabled] {
+  background-color: #1a1a1a !important;
+  border-color: #333333 !important;
+  color: #888888 !important;
+  opacity: 0.9;
+}
+
+.dark-form .ant-input-outlined[disabled] {
+  color: white !important;
+}
+
+/* Enhanced styles for email input with value */
+.dark-form input[name="email"].ant-input-disabled,
+.dark-form input[name="email"][disabled] {
+  background-color: #1a1a1a !important;
+  border-color: #404040 !important;
+  color: #d0d0d0 !important;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Style for input with value attribute set */
+.dark-form .ant-input-disabled[value]:not([value=""]),
+.dark-form .ant-input[disabled][value]:not([value=""]) {
+  color: #e5e5e5 !important;
+  background-color: #222222 !important;
+  border-color: #555555 !important;
+}
+
+/* Text selection in disabled inputs */
+.dark-form .ant-input-disabled::selection,
+.dark-form .ant-input[disabled]::selection {
+  background-color: rgba(24, 144, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+/* Avatar uploader dark mode styles */
+.avatar-uploader .ant-upload {
+  background-color: transparent !important;
+}
+
+.avatar-uploader .ant-upload:hover {
+  border-color: #1890ff !important;
+}
+
+/* Dark mode card styles */
+.profileCard {
+  background-color: #1f1f1f !important;
+  border-color: #333333 !important;
+}
+
+/* Dark mode text styles */
+.darkText {
+  color: #e5e5e5 !important;
+}
+
+.darkTextSecondary {
+  color: #a0a0a0 !important;
+}
+
+/* Responsive adjustments for dark mode */
+@media (max-width: 768px) {
+  .dark-form .ant-form-item-label {
+    padding-bottom: 4px;
+  }
+
+  .dark-form .ant-input {
+    font-size: 16px; /* Prevent zoom on mobile */
+  }
+}
+
+/* Animation for dark mode transitions */
+.dark-form * {
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease !important;
+}
+/* Profile.css hoặc global.css */
+/* ✅ Chỉ áp dụng cho avatar upload trong profile */
+.avatarUpload .ant-upload-select {
+  width: 200px !important;
+  height: 200px !important;
+}

@@ -1,5 +1,5 @@
 import { TableCustom as Table } from "@/component";
-import { getRentPaymentByUserId } from "@/api/rentPayment";
+import { getRentPaymentByUserId } from "@/api/rentPaymentAPI";
 import { useEffect, useState } from "react";
 import { Tag } from "antd";
 import RentPaymentDetailModal from "./RentPaymentDetailModal";
@@ -13,7 +13,7 @@ function MyRentPayment() {
     try {
       setLoading(true);
       const res = await getRentPaymentByUserId();
-      setRentPayment(res);
+      setRentPayment(res.data || []);
     } catch (error) {
       console.error("Failed to fetch rent payments:", error);
     } finally {
@@ -66,20 +66,17 @@ function MyRentPayment() {
       dataIndex: "paymentMethod",
       key: "paymentMethod",
     },
-    {
-      title: "Month's Rent",
-      dataIndex: ["paymentBillId", "createdAt"],
-      key: "createdAt",
-      render: (text) => {
-        const date = new Date(text);
-        date.setMonth(date.getMonth());
-        return date.toLocaleString("en-US", { month: "long", year: "numeric" });
-      },
-    },
+    // {
+    //   title: "Month's Rent",
+    //   dataIndex: ["paymentBillId", "month"],
+    //   key: "month",
+    //   render: (text) => {
+    //     const date = new Date(text);
+    //     date.setMonth(date.getMonth());
+    //     return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+    //   },
+    // },
   ];
-
-  console.log(rentPayment);
-
   return (
     <>
       <Table

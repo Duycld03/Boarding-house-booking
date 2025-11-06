@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Form, Button, Card, Input } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getUser, verifyRegister } from "../../../api/authManagement";
+import { getUser, verifyRegister } from "../../../api/authAPI";
 import { Back } from "../../../component";
 
 function VerifyRegister() {

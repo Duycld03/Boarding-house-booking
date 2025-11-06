@@ -1,6 +1,7 @@
 import Review from '../models/review.js';
 import BoardingHouse from '../models/boardingHouse.js';
 import { v2 as cloudinary } from 'cloudinary';
+import paginate from '../utils/pagination.js';
 
 class ReviewController {
   async getReviews(req, res) {
@@ -26,72 +27,108 @@ class ReviewController {
     try {
       const { boardingHouse, startDate, endDate, ratings } = req.query;
 
+      // Xây dựng filter cơ bản
       let filter = { parentId: null };
-
-      // Validate and add date range filter
+      // Lọc theo khoảng thời gian
+      // Ex: startDate=2025-05-01&endDate=2025-05-31
       if (startDate || endDate) {
         const start = startDate ? new Date(startDate) : null;
         const end = endDate ? new Date(endDate) : null;
 
-        if (start && isNaN(start)) {
-          return res
-            .status(400)
-            .json({ message: 'Invalid start date provided' });
+        if (start && isNaN(start.getTime())) {
+          return res.status(400).json({ message: 'Invalid start date' });
         }
 
-        if (end && isNaN(end)) {
-          return res.status(400).json({ message: 'Invalid end date provided' });
+        if (end && isNaN(end.getTime())) {
+          return res.status(400).json({ message: 'Invalid end date' });
         }
 
         filter.createdAt = {};
         if (start) filter.createdAt.$gte = start;
-        if (end) filter.createdAt.$lte = end;
-      }
-
-      if (ratings) {
-        if (Array.isArray(ratings)) {
-          const ratingArray = ratings.map(Number);
-
-          if (!ratingArray.every((r) => r >= 1 && r <= 5)) {
-            return res
-              .status(400)
-              .json({ message: 'Invalid ratings provided' });
-          }
-
-          // Lọc reviews có rating nằm trong ratingArray
-          filter.rating = { $in: ratingArray };
-        } else {
-          return res
-            .status(400)
-            .json({ message: 'Ratings must be an array of strings' });
+        if (end) {
+          end.setHours(23, 59, 59, 999);
+          filter.createdAt.$lte = end;
         }
       }
 
-      const reviews = await Review.find(filter)
-        .populate({
-          path: 'accountId',
-          select: 'username _id fullname avatarImage',
-        })
-        .populate('boardingHouseId', 'name')
-        .sort({ createdAt: 1 });
+      // Lọc theo ratings
+      if (ratings) {
+        let ratingArray = [];
 
+        if (Array.isArray(ratings)) {
+          ratingArray = ratings.map((r) => Number(r));
+        } else {
+          ratingArray = [Number(ratings)];
+        }
+
+        // Kiểm tra hợp lệ
+        if (!ratingArray.every((r) => r >= 1 && r <= 5 && !isNaN(r))) {
+          return res.status(400).json({ message: 'Invalid ratings provided' });
+        }
+
+        filter.rating = { $in: ratingArray };
+      }
+
+      // Thiết lập cấu hình phân trang
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: 'createdAt',
+        sortOrder: 'desc',
+        filter,
+        allowSearchFields: [],
+        fields: '',
+        populate: [
+          { path: 'accountId', select: 'username _id fullname avatarImage' },
+          { path: 'boardingHouseId', select: 'name' },
+        ],
+        includeTotalData: true,
+      };
+
+      // Dữ liệu phân trang ban đầu
+      let result = await paginate(Review, paginationOptions, req);
+
+      // Lọc theo boardingHouse.name nếu có
       if (boardingHouse) {
-        const filteredReviews = reviews.filter((review) =>
-          review?.boardingHouseId?.name
-            ?.toLowerCase()
-            .includes(boardingHouse.toLowerCase())
+        const keyword = boardingHouse.toLowerCase();
+        result.data = result.data.filter((review) =>
+          review?.boardingHouseId?.name?.toLowerCase().includes(keyword)
         );
 
-        res.status(200).json(filteredReviews);
-      } else {
-        res.status(200).json(reviews);
+        // Cập nhật lại tổng số item và trang
+        const totalItems = result.data.length;
+        const currentPage = parseInt(req.query.page) || 1;
+        const limit =
+          parseInt(req.query.limit) || paginationOptions.defaultLimit;
+        const startIndex = (currentPage - 1) * limit;
+        const paginatedData = result.data.slice(startIndex, startIndex + limit);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        return res.status(200).json({
+          success: true,
+          pagination: {
+            currentPage,
+            totalPages,
+            totalItems,
+            limit,
+            hasNextPage: currentPage < totalPages,
+            hasPrevPage: currentPage > 1,
+          },
+          data: paginatedData,
+        });
       }
+
+      return res.status(200).json(result);
     } catch (error) {
       console.error('Error filtering reviews:', error);
-      res.status(500).json({ success: false, message: 'Server Error' });
+      return res.status(500).json({
+        success: false,
+        message: 'Server Error',
+        error: error.message,
+      });
     }
   }
-
   async softDeleteReview(req, res) {
     try {
       const { reviewId } = req.params;
@@ -131,6 +168,7 @@ class ReviewController {
       );
 
       return res.status(200).json({
+        success: true,
         message: 'Review deleted successfully',
         newRating: averageRating, // Trả về rating mới sau khi xóa review
       });
@@ -143,63 +181,76 @@ class ReviewController {
   async updateReview(req, res) {
     try {
       const { reviewId } = req.params;
-      const { content, rating, images, boardingHouseId } = req.body;
-      const accountId = req.user.userId;
+      const accountId = req.user?.userId;
+
+
+      const { content, rating, boardingHouseId } = req.body;
 
       if (!accountId) {
-        return res
-          .status(401)
-          .json({ success: false, message: 'Account ID not found.' });
+        if (req.files.images) {
+          await Promise.all(req.files.images.map(
+            file => cloudinary.uploader.destroy(file.filename)
+          ));
+        }
+        return res.status(401).json(
+          { success: false, message: 'Account ID not found.' }
+        );
       }
 
       const review = await Review.findOne({ _id: reviewId, accountId });
       if (!review) {
-        return res
-          .status(403)
-          .json({ message: 'You are not authorized to update this review' });
-      }
-
-      // Check nếu rating hợp lệ (1-5)
-      if (rating !== undefined && (rating < 1 || rating > 5)) {
-        return res
-          .status(400)
-          .json({ message: 'Rating must be between 1 and 5.' });
-      }
-
-      // Cập nhật review trước để rating mới được tính chính xác
-      review.content = content !== undefined ? content : review.content;
-      review.rating = rating !== undefined ? rating : review.rating;
-      review.images = images !== undefined ? images : review.images; // Cho phép xóa ảnh bằng cách gửi array rỗng
-      await review.save();
-
-      // 🔥 Truy vấn lại danh sách review sau khi cập nhật
-      const reviews = await Review.find({
-        boardingHouseId: review.boardingHouseId,
-        parentId: null, // Chỉ lấy review gốc
-        deleted: false,
-      });
-
-      if (reviews.length > 0) {
-        const totalRating = reviews.reduce((sum, rev) => sum + rev.rating, 0);
-        const averageRating = (totalRating / reviews.length).toFixed(1);
-
-        // 🔥 Cập nhật BoardingHouse nhưng không cập nhật `updatedAt`
-        await BoardingHouse.findByIdAndUpdate(
-          review.boardingHouseId,
-          { rating: averageRating },
-          { new: true, timestamps: false } // 🔥 Ngăn Mongoose cập nhật `updatedAt`
+        if (req.files.images) {
+          await Promise.all(req.files.images.map(
+            file => cloudinary.uploader.destroy(file.filename)
+          ));
+        }
+        return res.status(403).json(
+          { success: false, message: 'Unauthorized' }
         );
       }
 
-      return res
-        .status(200)
-        .json({ message: 'Review updated successfully', review });
+      review.content = content || review.content;
+      review.rating = rating || review.rating;
+
+      if (req.files.images && req.files.images.length > 0) {
+        if (review.images && review.images.length > 0) {
+          await Promise.all(review.images.map(
+            oldImg => cloudinary.uploader.destroy(oldImg.publicId)
+          ));
+        }
+
+        review.images = req.files.images.map(file => ({
+          imageUrl: file.path,
+          publicId: file.filename
+        }));
+      }
+
+      await review.save();
+
+      const reviews = await Review.find(
+        { boardingHouseId: review.boardingHouseId, parentId: null, deleted: false }
+      );
+
+      if (reviews.length > 0) {
+        const avgRating = (reviews.reduce((sum, rev) => sum + rev.rating, 0) / reviews.length).toFixed(1);
+        await BoardingHouse.findByIdAndUpdate(
+          review.boardingHouseId, { rating: avgRating }, { new: true, timestamps: false }
+        );
+      }
+
+      return res.status(200).json(
+        { success: true, message: 'Review updated successfully', review }
+      );
     } catch (error) {
-      console.error('Error updating review:', error);
-      return res.status(500).json({ message: 'Server Error' });
+      console.error('Error:', error);
+      if (req.files.images) {
+        await Promise.all(req.files.images.map(file => cloudinary.uploader.destroy(file.filename)));
+      }
+      return res.status(500).json(
+        { success: false, message: 'Server Error', error: error.message }
+      );
     }
   }
-
   async getReviewsUser(req, res) {
     try {
       // 🔥 Lấy toàn bộ review gốc (không có parentId)
@@ -284,6 +335,11 @@ class ReviewController {
       });
 
       if (existingReview) {
+        if (req.files && req.files.length > 0) {
+          for (const file of req.files) {
+            cloudinary.uploader.destroy(file.filename);
+          }
+        }
         return res.status(400).json({
           success: false,
           message: 'You have already reviewed this boarding house.',
@@ -297,14 +353,21 @@ class ReviewController {
         });
       }
 
+
+
       // Tạo review mới
       const newReview = new Review({
         accountId,
         boardingHouseId,
         content,
         rating,
-        images,
       });
+      if (req.files && req.files.length > 0) {
+        newReview.images = req.files.map((file) => ({
+          imageUrl: file.path,
+          publicId: file.filename,
+        }));
+      }
 
       await newReview.save();
 
@@ -496,7 +559,7 @@ class ReviewController {
         })
         .sort({ createdAt: 1 });
 
-      return res.status(200).json({ ...review.toObject(), replies });
+      return res.status(200).json({ success: true, data: { review, replies } });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -507,45 +570,112 @@ class ReviewController {
       const { id } = req.params;
 
       if (!id) {
-        return res.status(400).json({ message: 'bhId is required' });
+        return res.status(400).json({
+          success: false,
+          message: 'bhId is required'
+        });
       }
 
-      // ✅ Lấy danh sách review gốc
-      const allReviews = await Review.find({
+      // ✅ Đếm tổng số review trước khi paginate
+      const totalItems = await Review.countDocuments({
         boardingHouseId: id,
-        parentId: null, // Chỉ lấy review gốc
-      })
-        .populate({
-          path: 'accountId',
-          select: 'fullname avatarImage',
-        })
-        .sort({ updatedAt: -1 });
+        parentId: null
+      });
 
-      if (!allReviews.length) {
-        return res.status(404).json({ message: 'No reviews found' });
+      const result = await paginate(
+        Review,
+        {
+          filter: {
+            boardingHouseId: id,
+            parentId: null
+          },
+
+          // Populate thông tin account
+          populate: [{
+            path: 'accountId',
+            select: 'fullname avatarImage'
+          }],
+
+          // Cấu hình pagination
+          defaultLimit: 10,
+          maxLimit: 50,
+          sortField: 'updatedAt',
+
+          // Cho phép search theo content và rating
+          searchableFields: ['content'],
+          allowQueryFilters: [
+            'rating',
+            'rating_gte',
+            'rating_lte',
+            'createdAt_gte',
+            'createdAt_lte'
+          ],
+
+          // Cho phép sort theo các trường
+          sortableFields: ['updatedAt', 'createdAt', 'rating'],
+
+          // Không cần URLs và totalData để tối ưu performance
+          includeUrls: false,
+          includeTotalData: false
+        },
+        req
+      );
+
+      if (!result.success) {
+        return res.status(500).json({
+          success: false,
+          message: 'Error fetching reviews',
+          error: result.error
+        });
       }
 
       // ✅ Duyệt qua từng review để lấy nội dung của reply (nếu có)
       const reviewsWithReply = await Promise.all(
-        allReviews.map(async (review) => {
-          const reply = await Review.findOne({ parentId: review._id }).select(
-            '_id content'
-          );
+        result.data.map(async (review) => {
+          const reply = await Review.findOne({
+            parentId: review._id
+          }).select('_id content createdAt accountId')
+            .populate({
+              path: 'accountId',
+              select: 'fullname avatarImage'
+            });
 
           return {
-            ...review.toObject(),
-            replyId: reply ? reply._id : null,
-            replyContent: reply ? reply.content : null, // Lưu nội dung phản hồi vào object
+            ...review,
+            replyContent: reply ? {
+              _id: reply._id,
+              content: reply.content,
+              createdAt: reply.createdAt,
+              account: reply.accountId
+            } : null
           };
         })
       );
 
-      res.status(200).json(reviewsWithReply);
+      // ✅ Trả về kết quả với totalItems
+      res.status(200).json({
+        success: true,
+        pagination: {
+          ...result.pagination,
+          totalItems: totalItems // Thêm totalItems vào pagination
+        },
+        data: reviewsWithReply,
+        meta: {
+          boardingHouseId: id,
+          totalReviews: totalItems, // Thêm totalReviews vào meta để dễ sử dụng
+          ...result.meta
+        }
+      });
+
     } catch (error) {
-      console.error('🔥 Server Error:', error);
-      res.status(500).json({ message: 'Server error', error: error.message });
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message
+      });
     }
   }
+
   async updateReplyReview(req, res) {
     try {
       const accountId = req.user?.userId;

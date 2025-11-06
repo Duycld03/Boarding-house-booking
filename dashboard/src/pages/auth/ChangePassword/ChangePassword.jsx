@@ -2,11 +2,12 @@ import { Form, Button, Card, Input } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getUser } from "../../../api/authManagement";
-import { changePassword } from "../../../api/AccountManagement";
+import { getUser } from "../../../api/authAPI";
+import { changePassword } from "../../../api/accountAPI";
 import { Back } from "../../../component";
 import { useTheme } from "../../../context/themeContext";
 import { useTranslation } from "react-i18next";
+import styles from "./ChangePassword.module.css";
 
 function ChangePassword() {
   const [form] = Form.useForm();
@@ -74,7 +75,6 @@ function ChangePassword() {
           onFinish={onFinish}
           autoComplete="off"
           layout="vertical"
-          className={darkMode ? "dark-form" : ""}
         >
           <Form.Item
             label={
@@ -98,6 +98,12 @@ function ChangePassword() {
               size="large"
               placeholder={t("changePassword.oldPassword.placeholder")}
               autoComplete="old-password"
+              style={
+                darkMode
+                  ? { backgroundColor: "#111827", border: "#111827" }
+                  : {}
+              }
+              className={darkMode ? styles.darkPasswordInput : ""}
             />
           </Form.Item>
           <Form.Item
@@ -122,6 +128,12 @@ function ChangePassword() {
               size="large"
               placeholder={t("changePassword.newPassword.placeholder")}
               autoComplete="new-password"
+              style={
+                darkMode
+                  ? { backgroundColor: "#111827", border: "#111827" }
+                  : {}
+              }
+              className={darkMode ? styles.darkPasswordInput : ""}
             />
           </Form.Item>
           <Form.Item
@@ -157,6 +169,12 @@ function ChangePassword() {
               size="large"
               placeholder={t("changePassword.confirmPassword.placeholder")}
               autoComplete="new-password"
+              style={
+                darkMode
+                  ? { backgroundColor: "#111827", border: "#111827" }
+                  : {}
+              }
+              className={darkMode ? styles.darkPasswordInput : ""}
             />
           </Form.Item>
 

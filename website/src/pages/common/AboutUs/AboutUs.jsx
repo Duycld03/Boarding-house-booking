@@ -1,9 +1,18 @@
 import React from "react";
 import { TeamOutlined, AimOutlined, CodeOutlined } from "@ant-design/icons";
+import { useTheme } from "../../../context/themeContext"; // Assuming themeContext is set up
+import { useTranslation } from "react-i18next"; // Assuming i18n is configured
 
 function AboutUs() {
+  const { darkMode } = useTheme();
+  const { t } = useTranslation("aboutUs");
+
   return (
-    <div className="min-h-screen py-10 px-5">
+    <div
+      className={`min-h-screen py-10 px-5 ${darkMode ? "bg-background-dark text-text-dark" : "bg-[#f0f2f5] text-gray-800"
+        }`}
+    >
+      {/* Header Section */}
       <header
         className="text-center mb-12 bg-cover bg-center bg-no-repeat py-20 px-4"
         style={{
@@ -11,93 +20,94 @@ function AboutUs() {
         }}
       >
         <h1 className="text-4xl sm:text-6xl lg:text-8xl font-extrabold text-white">
-          We Are MotelLease Tech
+          {t("header.title")}
         </h1>
         <p className="text-white mt-8 max-w-xl mx-auto text-base sm:text-lg lg:text-xl">
-          At MotelLease Tech, we believe in simplifying the rental experience
-          for everyone. Our platform bridges the gap between landlords and
-          tenants by providing a seamless, efficient, and transparent rental
-          process. From helping tenants find their ideal rental properties to
-          giving landlords tools to manage their listings, we strive to make the
-          process stress-free and modern.
+          {t("header.subtitle")}
         </p>
       </header>
 
+      {/* About Us Section */}
       <div>
         <h2 className="text-4xl font-bold text-blue-600 mb-4 text-center">
-          WHO ARE WE?
+          {t("aboutUs.title")}
         </h2>
         <h2 className="text-6xl font-bold mb-4 text-center">
-          ABOUT MOTELLEASE TECH
+          {t("aboutUs.subtitle")}
         </h2>
-        <hr className=" border-black mx-auto w-1/4 my-8" />
+        <hr className="border-black mx-auto w-1/4 my-8" />
 
+        {/* Cards Section */}
         <div className="flex flex-col lg:flex-row gap-6 mx-auto p-4">
-          <div className="bg-white p-8 rounded-lg shadow-md flex-1">
+          {/* Meet Our Team Card */}
+          <div
+            className={`p-8 rounded-lg shadow-md flex-1 ${darkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
+              }`}
+          >
             <div className="flex items-center justify-center mb-4">
               <TeamOutlined className="text-blue-600 text-6xl" />
             </div>
             <h2 className="text-2xl font-bold text-blue-600 mb-4 text-center">
-              Meet Our Team
+              {t("cards.team.title")}
             </h2>
-            <p className="text-gray-700 mt-4">
-              <strong>Members and Roles:</strong>
+            <p className="mt-4">
+              <strong>{t("cards.team.membersTitle")}</strong>
             </p>
-            <ul className="list-disc ml-5 mt-2 text-gray-700 space-y-2">
-              <li>Doan Thanh Phuc - Team Leader</li>
-              <li>Nguyen Truong Duy - Backend Developer</li>
-              <li>Tran Gia Vy - Backend Developer</li>
-              <li>Duong My Tien - website Developer</li>
-              <li>To Do Hong Y - website Developer</li>
+            <ul className="list-disc ml-5 mt-2 space-y-2">
+              <li>{t("cards.team.members.0")}</li>
+              <li>{t("cards.team.members.1")}</li>
+              <li>{t("cards.team.members.2")}</li>
+              <li>{t("cards.team.members.3")}</li>
+              <li>{t("cards.team.members.4")}</li>
             </ul>
-            <p className="text-gray-700 mt-4">
-              <strong>Our Goal:</strong> To create a platform that connects
-              tenants and landlords efficiently, using modern technology.
+            <p className="mt-4">
+              <strong>{t("cards.team.goalTitle")}</strong>{" "}
+              {t("cards.team.goal")}
             </p>
           </div>
 
-          <div className="bg-white p-8 rounded-lg shadow-md flex-1">
+          {/* Why This Project & Goals Card */}
+          <div
+            className={`p-8 rounded-lg shadow-md flex-1 ${darkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
+              }`}
+          >
             <div className="flex items-center justify-center mb-4">
               <AimOutlined className="text-blue-600 text-6xl" />
             </div>
             <h2 className="text-2xl font-bold text-blue-600 mb-4 text-center">
-              Why This Project & Goals
+              {t("cards.project.title")}
             </h2>
-            <ul className="list-disc ml-5 text-gray-700 space-y-2">
+            <ul className="list-disc ml-5 space-y-2">
               <li>
-                <strong>Why This Project?</strong> Addressing real-world
-                problems: Difficulty in finding and managing rental properties,
-                leveraging technology to optimize the rental process for both
-                tenants and landlords, and aligning with market trends and the
-                growing demand for digital platforms.
+                <strong>{t("cards.project.whyTitle")}</strong>{" "}
+                {t("cards.project.why")}
               </li>
               <li>
-                <strong>Project Goals:</strong> Build a platform that connects
-                landlords and tenants easily, provide features like online
-                booking, electronic payments, and contract management, and
-                enhance the rental experience by utilizing modern technologies.
+                <strong>{t("cards.project.goalsTitle")}</strong>{" "}
+                {t("cards.project.goals")}
               </li>
             </ul>
           </div>
 
-          <div className="bg-white p-8 rounded-lg shadow-md flex-1">
+          {/* Technologies & Future Vision Card */}
+          <div
+            className={`p-8 rounded-lg shadow-md flex-1 ${darkMode ? "bg-gray-800 border border-gray-700" : "bg-white"
+              }`}
+          >
             <div className="flex items-center justify-center mb-4">
               <CodeOutlined className="text-blue-600 text-6xl" />
             </div>
             <h2 className="text-2xl font-bold text-blue-600 mb-4 text-center">
-              Technologies & Future Vision
+              {t("cards.technologies.title")}
             </h2>
-            <ul className="list-disc ml-5 text-gray-700 space-y-2">
+            <ul className="list-disc ml-5 space-y-2">
               <li>
-                <strong>Technologies Used:</strong> ReactJS, Node.js, MongoDB,
-                integration with electronic payment systems (Momo, VNPay), and
-                modern deployment and security tools (CI/CD, Cloud Hosting).
+                <strong>{t("cards.technologies.usedTitle")}</strong>{" "}
+                {t("cards.technologies.used")}
               </li>
               <li>
-                <strong>Vision & Future Development:</strong> Adding features
-                like user reviews and feedback, expanding the platform to cover
-                more regions, and enhancing user experience with AI-powered
-                rental recommendations.
+                <strong>{t("cards.technologies.futureTitle")}</strong>{" "}
+                {t("cards.technologies.future")}
               </li>
             </ul>
           </div>

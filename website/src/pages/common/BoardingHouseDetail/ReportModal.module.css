@@ -1,0 +1,140 @@
+.customUpload :global(.ant-upload) {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+
+/* Light mode styles */
+.modal {
+  background: var(--background-light, #ffffff);
+  color: var(--text-light, #111827);
+}
+
+.modalTitle {
+  color: var(--text-light, #111827);
+}
+
+.textColor {
+  color: var(--text-light, #111827);
+}
+
+.inputStyle {
+  background: var(--background-light, #ffffff);
+  color: var(--text-light, #111827);
+  border-color: #d9d9d9;
+}
+
+.uploadBox {
+  background: var(--background-light, #ffffff);
+  border-color: #d9d9d9;
+}
+
+.uploadIconColor {
+  color: #6b7280;
+}
+
+.uploadTextColor {
+  color: #6b7280;
+}
+
+/* Dark mode styles */
+.darkModal {
+  background: var(--background-dark, #111827);
+  color: var(--text-dark, #f9fafb);
+}
+
+.darkModalTitle {
+  color: var(--text-dark, #f9fafb);
+}
+
+.darkTextColor {
+  color: var(--text-dark, #f9fafb);
+}
+
+.darkInputStyle {
+  background: var(--background-dark, #111827) !important;
+  color: var(--text-dark, #f9fafb) !important;
+  border-color: #374151 !important;
+}
+
+.darkUploadBox {
+  background: var(--background-dark, #111827);
+  border-color: #374151;
+}
+
+.darkUploadIconColor {
+  color: #9ca3af;
+}
+
+.darkUploadTextColor {
+  color: #9ca3af;
+}
+
+/* Global dark mode styles */
+:global(.dark) :global(.ant-modal-content) {
+  background-color: var(--background-dark, #111827);
+}
+
+:global(.dark) :global(.ant-modal-header) {
+  background-color: var(--background-dark, #111827);
+  border-bottom: 1px solid #374151;
+}
+
+:global(.dark) :global(.ant-modal-title) {
+  color: var(--text-dark, #f9fafb);
+}
+
+:global(.dark) :global(.ant-modal-close) {
+  color: var(--text-dark, #f9fafb);
+}
+
+:global(.dark) :global(.ant-form-item-label > label) {
+  color: var(--text-dark, #f9fafb);
+}
+
+:global(.dark) :global(.ant-select-selection-placeholder) {
+  color: #9ca3af !important;
+}
+
+:global(.dark) :global(.ant-select-dropdown) {
+  background-color: #1f2937;
+}
+
+:global(.dark) :global(.ant-select-item) {
+  color: var(--text-dark, #f9fafb);
+}
+
+:global(.dark) :global(.ant-select-item-option-selected) {
+  background-color: var(--primary, #3b82f6);
+}
+
+:global(.dark)
+  :global(
+    .ant-select-item-option-active:not(.ant-select-item-option-disabled)
+  ) {
+  background-color: #2d3748;
+}
+
+:global(.dark) :global(.ant-btn-primary) {
+  background-color: var(--primary, #3b82f6);
+}
+
+/* Force dark background on form elements */
+:global(.dark) :global(.ant-input),
+:global(.dark) :global(.ant-input-textarea) textarea,
+:global(.dark) :global(.ant-select-selector) {
+  color: var(--text-dark, #f9fafb) !important;
+  border-color: #374151 !important;
+}
+
+/* Fix placeholder colors in dark mode */
+:global(.dark) :global(.ant-input::placeholder),
+:global(.dark) :global(.ant-input-textarea textarea::placeholder) {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}
+
+:global(.dark) :global(.ant-select-selection-placeholder) {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}

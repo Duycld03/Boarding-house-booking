@@ -1,16 +1,17 @@
-import Account from "../models/account.js";
+import { Account } from "../models/account.js";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { generateToken, verifyToken } from "../utils/functions.js";
 import { v2 as cloudinary } from "cloudinary";
+import paginate from "../utils/pagination.js";
 
 class accountController {
   async getAllAccount(req, res) {
     try {
-      const accountData = await Account.find().sort({ createdAt: -1 });
+      const accountData = await Account.find({ deleted: false }).sort({ createdAt: -1 });
 
-      return res.status(200).json(
-        accountData);
+
+      return res.status(200).json(accountData);
     } catch (error) {
       return res.status(500).json({
         success: false,
@@ -20,21 +21,14 @@ class accountController {
     }
   }
 
-
   async softDeleteAccount(req, res, next) {
     try {
       const { accountId } = req.params;
-      // Sử dụng findById để tìm tài khoản theo ID duy nhất
       const accountData = await Account.findById(accountId);
-
-      if (!accountData) {
-        return res.status(404).json({ message: "Account not found" });
-      }
-
       accountData.deleted = true;
       accountData.deletedAt = new Date();
 
-      await accountData.save(); // Lưu lại tài khoản với thay đổi soft delete
+      await accountData.save();
 
       return res
         .status(200)
@@ -49,8 +43,10 @@ class accountController {
 
   async filterAccounts(req, res) {
     try {
-      let { gender, role, startDate, endDate, status } = req.query;
-      let filter = {};
+      const { gender, role, startDate, endDate, status } = req.query;
+
+      // Xây dựng filter cơ bản
+      const filter = {};
       if (gender) filter.gender = gender;
       if (role) filter.role = role;
       if (status) filter.status = status;
@@ -61,69 +57,39 @@ class accountController {
         };
       }
 
-      const accounts = await Account.find(filter).sort({ createdAt: 1 });
-      res.status(200).json(accounts);
+      const paginationOptions = {
+        defaultPage: 1,
+        defaultLimit: 10,
+        maxLimit: 100,
+        sortField: "createdAt",
+        sortOrder: "asc",
+        filter,
+        allowQueryFilters: ["gender", "role", "status"],
+        allowSearchFields: ["email", "username", "phone"],
+        fields: "-password",
+        populate: ["role"],
+        includeTotalData: true,
+      };
+
+      // Gọi helper paginate
+      const result = await paginate(Account, paginationOptions, req);
+
+      return res.status(200).json(result);
     } catch (error) {
       console.error("Error filtering accounts:", error);
-      res.status(500).json({ message: "Server Error" });
+      return res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: error.message,
+      });
     }
   }
+
 
   async createAccount(req, res, next) {
     try {
       const { username, password, email, phoneNumber, fullname, gender, role } =
         req.body;
-
-      if (
-        !username ||
-        !password ||
-        !email ||
-        !phoneNumber ||
-        !fullname ||
-        !gender ||
-        !role
-      ) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: "Invalid email format" });
-      }
-
-      if (!/^[0-9]+$/.test(phoneNumber) || phoneNumber.length < 10) {
-        return res.status(400).json({
-          error:
-            "Phone number must contain only numbers and be at least 10 digits long",
-        });
-      }
-
-      const trimmedFullName = fullname.trim();
-      if (!/^[a-zA-Z\s]+$/.test(trimmedFullName)) {
-        return res.status(400).json({
-          error: "Full name cannot contain numbers or special characters",
-        });
-      }
-
-      if (!["male", "female", "other"].includes(gender)) {
-        return res.status(400).json({ error: "Invalid gender value" });
-      }
-
-      if (!["admin", "user", "owner"].includes(role)) {
-        return res.status(400).json({ error: "Invalid role value" });
-      }
-
-      const existingUser = await Account.findOne({ username });
-      if (existingUser) {
-        return res
-          .status(400)
-          .json({ error: "Username is already registered" });
-      }
-
-      const existingEmail = await Account.findOne({ email });
-      if (existingEmail) {
-        return res.status(400).json({ error: "Email is already registered" });
-      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -132,16 +98,16 @@ class accountController {
         password: hashedPassword,
         email,
         phoneNumber,
-        fullname: trimmedFullName,
+        fullname,
         gender,
         role,
       });
-      // // Lưu vào database
       await newUser.save();
 
       res.status(201).json(newUser);
     } catch (error) {
-      return res.status(400).json(error.message);
+      console.error("Error creating account:", error);
+      return res.status(400).json(error.errorResponse);
     }
   }
 
@@ -150,49 +116,15 @@ class accountController {
       const { phoneNumber, fullname, gender, role } = req.body;
       const { accountId } = req.params;
 
-      // Kiểm tra các trường bắt buộc có mặt trong yêu cầu
-      if (!phoneNumber || !fullname || !gender || !role) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
-
-      if (!/^[0-9]+$/.test(phoneNumber) || phoneNumber.length < 10) {
-        return res.status(400).json({
-          error:
-            "Phone number must contain only numbers and be at least 10 digits long",
-        });
-      }
-
-      const trimmedFullName = fullname.trim();
-      if (!/^[a-zA-Z\s]+$/.test(trimmedFullName)) {
-        return res.status(400).json({
-          error: "Full name cannot contain numbers or special characters",
-        });
-      }
-
-      if (!["male", "female", "other"].includes(gender)) {
-        return res.status(400).json({ error: "Invalid gender value" });
-      }
-
-      if (!["user", "owner"].includes(role)) {
-        return res.status(400).json({ error: "Invalid role value" });
-      }
-
-      // Kiểm tra xem accountId có tồn tại không
-      const existingAccount = await Account.findById(accountId);
-      if (!existingAccount) {
-        return res.status(404).json({ error: "Account not found" });
-      }
-
       // Chỉ cập nhật các trường có thể thay đổi
       const updatedAccountData = {
         phoneNumber,
-        fullname: trimmedFullName,
+        fullname,
         gender,
         role,
         ...req.body,
       };
 
-      // Cập nhật dữ liệu
       const updatedAccount = await Account.findByIdAndUpdate(
         accountId,
         updatedAccountData,
@@ -253,21 +185,6 @@ class accountController {
     try {
       const { fullname, phoneNumber, gender } = req.body;
       const account = await Account.findById(req.user.userId);
-
-      if (!account) {
-        return res.status(404).json({ message: "Account not found" });
-      }
-
-      if (!/^[0-9]+$/.test(phoneNumber) || phoneNumber.length < 10) {
-        return res.status(400).json({
-          message:
-            "Phone number must contain only numbers and be at least 10 digits long",
-        });
-      }
-
-      if (!["male", "female", "other"].includes(gender)) {
-        return res.status(400).json({ message: "Invalid gender value" });
-      }
 
       account.fullname = fullname.trim();
       account.phoneNumber = phoneNumber;
@@ -339,7 +256,7 @@ class accountController {
         service: "gmail",
         auth: {
           user: "todohongy@gmail.com",
-          pass: "ersq syrb ihov ilvx",
+          pass: "onbg hyaz wxcd vmgw",
         },
       });
 
@@ -396,6 +313,19 @@ class accountController {
     } catch (error) {
       console.log("Error verifying email:", error);
       res.status(500).json({ message: "Server Error" });
+    }
+  }
+  async getStaffAccounts(req, res) {
+    try {
+      const staffs = await Account.find({
+        role: "staff",
+        deleted: { $ne: true },
+      }).select("_id fullname email avatarImage");
+
+      res.status(200).json(staffs);
+    } catch (error) {
+      console.error("Error fetching staff accounts:", error);
+      res.status(500).json({ message: "Lỗi server", error: error.message });
     }
   }
 }

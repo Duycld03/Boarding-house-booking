@@ -1,20 +1,18 @@
-// utils/timeUtils.js
-
-export const formatTimeAgo = (updatedAt) => {
+export const formatTimeAgo = (updatedAt, t) => {
   const updatedAtTimestamp = new Date(updatedAt || new Date()).getTime();
   const now = new Date().getTime();
   const hoursAgo = Math.floor((now - updatedAtTimestamp) / 3600000);
 
-  let timeAgoText = 'Just posted';
-
   if (hoursAgo >= 24) {
     const daysAgo = Math.floor(hoursAgo / 24);
-    timeAgoText = daysAgo === 1 ? '1 day ago' : `${daysAgo} days ago`;
-  } else if (hoursAgo > 1) {
-    timeAgoText = `${hoursAgo} hours ago`;
+    return daysAgo === 1
+      ? t('timeAgo.oneDayAgo')
+      : t('timeAgo.manyDaysAgo', { count: daysAgo });
   } else if (hoursAgo === 1) {
-    timeAgoText = '1 hour ago';
+    return t('timeAgo.oneHourAgo');
+  } else if (hoursAgo > 1) {
+    return t('timeAgo.manyHoursAgo', { count: hoursAgo });
   }
 
-  return timeAgoText;
+  return t('timeAgo.justPosted');
 };

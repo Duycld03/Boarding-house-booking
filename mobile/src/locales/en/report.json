@@ -1,0 +1,35 @@
+{
+  "report": {
+    "title": "Report",
+    "reason": "Reason",
+    "detail": "Details",
+    "images": "Images",
+    "addImages": "Add Images",
+    "selectReason": "Select a reason",
+    "enterDetail": "Describe the issue",
+    "submit": "Submit Report",
+    "success": "Report submitted successfully",
+    "error": "Failed to submit report",
+    "validationError": "Please fill all required fields",
+    "reasonRequired": "Please select a reason",
+    "detailRequired": "Please provide details about the issue",
+    "uploadLimit": "Maximum 6 images allowed",
+    "dragDropText": "Drag and drop files here, or click to select",
+    "alreadyReported": "You have already reported this review",
+    "reasons": {
+      "boardingHouse": {
+        "scamRent": "Scam or fraudulent listing",
+        "falseAd": "False or misleading information",
+        "privacy": "Privacy violation",
+        "unfriendly": "Unfriendly environment",
+        "security": "Security concerns"
+      },
+      "review": {
+        "spam": "Spam or irrelevant content",
+        "misleading": "Misleading information",
+        "privacy": "Privacy violation",
+        "inappropriate": "Inappropriate content"
+      }
+    }
+  }
+}

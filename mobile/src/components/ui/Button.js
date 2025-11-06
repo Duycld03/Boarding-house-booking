@@ -1,9 +1,10 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, View } from 'react-native';
 import { useThemedClasses } from '@/utils/useTheme';
+import PropTypes from 'prop-types';
 
 /**
- * CustomButton component with support for different variants and states
+ * CustomButton component with support for different variants, states, and icons
  * @param {string} variant - primary, secondary, outline, text
  * @param {boolean} fullWidth - whether the button should take full width
  * @param {boolean} loading - shows loading spinner when true
@@ -15,6 +16,10 @@ import { useThemedClasses } from '@/utils/useTheme';
  * @param {object} textStyle - additional style for the button text
  * @param {string} className - additional className for the button (for tailwind)
  * @param {string} textClassName - additional className for the text (for tailwind)
+ * @param {ReactNode} icon - icon component to display
+ * @param {string} iconPosition - left, right
+ * @param {object} iconStyle - additional style for the icon
+ * @param {string} iconClassName - additional className for the icon
  */
 const Button = ({
     variant = 'primary',
@@ -28,6 +33,10 @@ const Button = ({
     textStyle,
     className = '',
     textClassName = '',
+    icon,
+    iconPosition = 'left',
+    iconStyle,
+    iconClassName = '',
     ...props
 }) => {
     const { themedClasses } = useThemedClasses();
@@ -43,6 +52,13 @@ const Button = ({
         sm: "py-2 px-4",
         md: "py-3 px-5",
         lg: "py-4 px-6"
+    };
+
+    // Icon spacing classes based on size
+    const iconSpacingClasses = {
+        sm: children ? "mx-1" : "mx-0",
+        md: children ? "mx-2" : "mx-0",
+        lg: children ? "mx-2" : "mx-0"
     };
 
     // Width classes
@@ -108,16 +124,17 @@ const Button = ({
     // Combine text classes without redefining textClassName
     const finalTextClassName = `${textClasses[variant]} ${textSize[size]} ${textClassName}`;
 
-    return (
-        <TouchableOpacity
-            onPress={onPress}
-            disabled={disabled || loading}
-            activeOpacity={0.8}
-            className={buttonClassName}
-            style={style}
-            {...props}
-        >
-            {loading ? (
+    // Icon component with styling
+    const IconComponent = icon ? (
+        <View className={`${iconSpacingClasses[size]} ${iconClassName}`} style={iconStyle}>
+            {icon}
+        </View>
+    ) : null;
+
+    // Render content based on icon position
+    const renderContent = () => {
+        if (loading) {
+            return (
                 <View className="flex-row items-center">
                     <ActivityIndicator
                         size="small"
@@ -131,13 +148,92 @@ const Button = ({
                         </Text>
                     )}
                 </View>
-            ) : (
+            );
+        }
+
+        if (!icon) {
+            return (
                 <Text className={finalTextClassName} style={textStyle}>
                     {children}
                 </Text>
-            )}
+            );
+        }
+
+        // With icon
+        return (
+            <View className="flex-row items-center">
+                {iconPosition === 'left' && IconComponent}
+                {children && (
+                    <Text className={finalTextClassName} style={textStyle}>
+                        {children}
+                    </Text>
+                )}
+                {iconPosition === 'right' && IconComponent}
+            </View>
+        );
+    };
+
+    return (
+        <TouchableOpacity
+            onPress={onPress}
+            disabled={disabled || loading}
+            activeOpacity={0.8}
+            className={buttonClassName}
+            style={style}
+            {...props}
+        >
+            {renderContent()}
         </TouchableOpacity>
     );
+};
+
+Button.propTypes = {
+    variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text']),
+    fullWidth: PropTypes.bool,
+    loading: PropTypes.bool,
+    disabled: PropTypes.bool,
+    onPress: PropTypes.func,
+    size: PropTypes.oneOf(['sm', 'md', 'lg']),
+    children: PropTypes.node,
+    style: PropTypes.object,
+    textStyle: PropTypes.object,
+    className: PropTypes.string,
+    textClassName: PropTypes.string,
+    icon: PropTypes.node,
+    iconPosition: PropTypes.oneOf(['left', 'right']),
+    iconStyle: PropTypes.object,
+    iconClassName: PropTypes.string
+};
+
+Button.defaultProps = {
+    variant: 'primary',
+    fullWidth: false,
+    loading: false,
+    disabled: false,
+    size: 'md',
+    className: '',
+    textClassName: '',
+    iconPosition: 'left',
+    iconClassName: ''
+};
+
+//prop types for Button component
+Button.propTypes = {
+    variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text']),
+    fullWidth: PropTypes.bool,
+    loading: PropTypes.bool,
+    disabled: PropTypes.bool,
+    onPress: PropTypes.func,
+    size: PropTypes.oneOf(['sm', 'md', 'lg']),
+    children: PropTypes.node,
+    style: PropTypes.object,
+    textStyle: PropTypes.object,
+    className: PropTypes.string,
+    textClassName: PropTypes.string,
+    icon: PropTypes.node,
+    iconPosition: PropTypes.oneOf(['left', 'right']),
+    iconStyle: PropTypes.object,
+    iconClassName: PropTypes.string
 };
 
 export default Button;

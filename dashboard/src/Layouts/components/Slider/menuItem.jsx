@@ -57,24 +57,16 @@ const menuItems = [
     ),
     icon: <HomeOutlined />,
   },
-  {
-    key: "boarding-house-type-management",
-    label: (
-      <Link to={dashBoard + "/boarding-house-type-management"}>
-        Boarding House Type Management
-      </Link>
-    ),
-    icon: <HomeOutlined />,
-  },
-  {
-    key: "withdrawal-requests-management",
-    label: (
-      <Link to={dashBoard + "/withdrawal-requests-management"}>
-        Withdrawal Requests
-      </Link>
-    ),
-    icon: <FontAwesomeIcon icon={faCreditCard} />,
-  },
+  // {
+  //   key: "boarding-house-type-management",
+  //   label: (
+  //     <Link to={dashBoard + "/boarding-house-type-management"}>
+  //       Boarding House Type Management
+  //     </Link>
+  //   ),
+  //   icon: <HomeOutlined />,
+  // },
+
   {
     key: "list-boarding-house-reviews",
     label: (
@@ -84,15 +76,15 @@ const menuItems = [
     ),
     icon: <FontAwesomeIcon icon={faCalendarCheck} />,
   },
-  {
-    key: "Facilities-management",
-    label: (
-      <Link to={dashBoard + "/Facilities-management"}>
-        Facilities Management
-      </Link>
-    ),
-    icon: <FontAwesomeIcon icon={faTools} />,
-  },
+  // {
+  //   key: "Facilities-management",
+  //   label: (
+  //     <Link to={dashBoard + "/Facilities-management"}>
+  //       Facilities Management
+  //     </Link>
+  //   ),
+  //   icon: <FontAwesomeIcon icon={faTools} />,
+  // },
 ];
 
 export default menuItems;

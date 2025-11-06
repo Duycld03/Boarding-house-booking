@@ -2,6 +2,7 @@ import { Modal } from "antd";
 import ButtonCustom from "../Button";
 import { useTheme } from "@/context/ThemeContext";
 import "./ConfirmModal.css"; // Import CSS for the close button styling
+import { useTranslation } from "react-i18next";
 
 const ConfirmModal = ({
   title,
@@ -12,6 +13,7 @@ const ConfirmModal = ({
   confirmLoading,
 }) => {
   const { darkMode } = useTheme();
+  const { t } = useTranslation("common");
 
   // Modal styles based on theme
   const modalStyles = {
@@ -76,17 +78,16 @@ const ConfirmModal = ({
       >
         <ButtonCustom
           size="large"
-          title="Confirm"
+          title={t("confirmComponent.btnConfirm")}
           onClick={onOk}
-          className={
-            darkMode
-              ? "bg-teal-500 text-white hover:bg-teal-400"
-              : "bg-teal-600 text-white hover:bg-teal-700"
-          }
+          className={"bg-teal-600 text-white hover:bg-teal-700"}
+          style={{
+            backgroundColor: darkMode ? "#0d9488" : "#14b8a6", // bg-teal-600 : bg-teal-500
+          }}
           loading={confirmLoading}
         />
         <ButtonCustom
-          title="Cancel"
+          title={t("confirmComponent.btnCancel")}
           onClick={onCancel}
           size="large"
           btnCancel

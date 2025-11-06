@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { Input, Button, Card, Dropdown, Menu } from 'antd';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import { Input, Button, Card, Dropdown, Menu } from "antd";
+import { toast } from "react-toastify";
 import {
   replyReview,
   updateReplyReview,
   softDeleteReplyReview,
-} from '../../api/ReviewManagement';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+} from "../../api/reviewAPI";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEdit,
   faTrash,
   faEllipsisV,
-} from '@fortawesome/free-solid-svg-icons';
-import { ConfirmModal } from '@/component';
+} from "@fortawesome/free-solid-svg-icons";
+import { ConfirmModal } from "@/component";
 
 const MAX_LENGTH = 100;
 
 const ReviewReply = ({
   reviewId,
   replyId,
-  currentReply = '',
+  currentReply = "",
   onReviewUpdated,
   isReplying,
   setIsReplying,
   isOwner,
 }) => {
-  const [replyContent, setReplyContent] = useState(currentReply || '');
+  const [replyContent, setReplyContent] = useState(currentReply || "");
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -34,7 +34,7 @@ const ReviewReply = ({
   // ✅ Xóa mềm reply
   const handleDeleteReply = async () => {
     if (!replyId) {
-      toast.error('Reply ID is missing.');
+      toast.error("Reply ID is missing.");
       return;
     }
 
@@ -42,14 +42,14 @@ const ReviewReply = ({
     try {
       const response = await softDeleteReplyReview(replyId);
       if (response.success) {
-        toast.success('Reply deleted successfully.');
+        toast.success("Reply deleted successfully.");
         onReviewUpdated();
       } else {
-        toast.error(response.data?.message || 'Failed to delete reply.');
+        toast.error(response.data?.message || "Failed to delete reply.");
       }
     } catch (error) {
-      console.error('❌ Failed to delete reply:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete reply.');
+      console.error("❌ Failed to delete reply:", error);
+      toast.error(error.response?.data?.message || "Failed to delete reply.");
     } finally {
       setLoading(false);
       setIsDeleteModalOpen(false);
@@ -58,11 +58,11 @@ const ReviewReply = ({
 
   const handleUpdateReply = async () => {
     if (!replyContent.trim()) {
-      toast.error('Reply content cannot be empty.');
+      toast.error("Reply content cannot be empty.");
       return;
     }
     if (!replyId) {
-      toast.error('Reply ID is missing.');
+      toast.error("Reply ID is missing.");
       return;
     }
 
@@ -73,12 +73,12 @@ const ReviewReply = ({
         content: replyContent.trim(),
       });
 
-      toast.success('Reply updated successfully!');
+      toast.success("Reply updated successfully!");
       onReviewUpdated();
       setIsEditing(false);
     } catch (error) {
-      console.error('❌ Failed to update reply:', error);
-      toast.error(error.response?.data?.message || 'Failed to update reply.');
+      console.error("❌ Failed to update reply:", error);
+      toast.error(error.response?.data?.message || "Failed to update reply.");
     } finally {
       setLoading(false);
     }
@@ -86,19 +86,19 @@ const ReviewReply = ({
 
   const submitReply = async () => {
     if (!replyContent.trim()) {
-      toast.error('Reply content cannot be empty.');
+      toast.error("Reply content cannot be empty.");
       return;
     }
 
     setLoading(true);
     try {
       await replyReview({ parentId: reviewId, content: replyContent.trim() });
-      toast.success('Reply sent successfully!');
+      toast.success("Reply sent successfully!");
       onReviewUpdated();
       setIsReplying(false);
     } catch (error) {
-      console.error('Failed to send reply:', error);
-      toast.error('Failed to send reply. Please try again later.');
+      console.error("Failed to send reply:", error);
+      toast.error("Failed to send reply. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -109,7 +109,7 @@ const ReviewReply = ({
       setReplyContent(currentReply);
       setIsEditing(false);
     } else {
-      setReplyContent('');
+      setReplyContent("");
       setIsReplying(false);
     }
   };
@@ -135,7 +135,7 @@ const ReviewReply = ({
             <strong className="text-blue-500">Owner Reply:</strong>
             {isOwner && (
               <div className="absolute top-0 right-0 mt-[-2px] mr-[-5px]">
-                <Dropdown overlay={menu} trigger={['click']}>
+                <Dropdown overlay={menu} trigger={["click"]}>
                   <Button type="text">
                     <FontAwesomeIcon
                       icon={faEllipsisV}
@@ -155,7 +155,7 @@ const ReviewReply = ({
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="text-blue-500 ml-2 hover:underline"
                 >
-                  {isExpanded ? 'See less' : 'See more'}
+                  {isExpanded ? "See less" : "See more"}
                 </button>
               </>
             )}
@@ -172,10 +172,10 @@ const ReviewReply = ({
             onChange={(e) => setReplyContent(e.target.value)}
             className="mt-2 rounded-lg border border-gray-300 p-2 text-sm w-full max-w-full"
             style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-              height: '100px',
-              fontSize: '16px',
+              wordWrap: "break-word",
+              whiteSpace: "pre-wrap",
+              height: "100px",
+              fontSize: "16px",
             }}
           />
           <div className="mt-2 flex flex-wrap gap-4">
@@ -185,7 +185,7 @@ const ReviewReply = ({
               loading={loading}
               className="rounded-md px-4 py-2"
             >
-              {isEditing ? 'Update Reply' : 'Send Reply'}
+              {isEditing ? "Update Reply" : "Send Reply"}
             </Button>
             <Button
               onClick={handleCancel}

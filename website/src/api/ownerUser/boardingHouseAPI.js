@@ -1,0 +1,48 @@
+import axios from "../axios.config";
+
+export const getBoardingHouseDetail = (id) => {
+  return axios.get(`/boardinghouse/${id}`);
+};
+
+export const getRoomTypeByBhId = (id, boardingHouseId) => {
+  return axios.get(`/boardinghouse/room-types/${id}`, {
+    params: { boardingHouseId },
+  });
+};
+
+export const getReviewByBhId = (id, paginationOptions = {}) => {
+  const params = {
+    ...paginationOptions,
+  };
+  return axios.get(`/boardinghouse/reviews/${id}`, { params });
+};
+
+export const getBhByArea = async (filterValue) => {
+  return axios.get(`/boardinghouse/home/area`, {
+    params: filterValue,
+  });
+};
+
+export const getElectricalAndWaterPrice = (boardingHouseId) => {
+  return axios.get(`/staff/electrical-water-price/${boardingHouseId}`);
+};
+
+export const addRoom = async (data) => {
+  return axios.post(`/staff/room/boarding-house`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+export const deleteRoom = async (id) => {
+  return axios.delete(`/staff/room/boarding-house/${id}`);
+};
+
+export const updateRoom = async (roomId, data) => {
+  return axios.put(`/staff/room/boarding-house/${roomId}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};

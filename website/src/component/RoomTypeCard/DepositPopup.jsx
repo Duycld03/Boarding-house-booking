@@ -1,22 +1,28 @@
-import { Form, Modal, InputNumber, Select, Radio, DatePicker } from "antd";
+import {
+  Form,
+  Modal,
+  InputNumber,
+  Select,
+  DatePicker,
+  ConfigProvider,
+  theme,
+} from "antd";
 import React, { useState } from "react";
 import formatAmount from "../../utils/formatAmount";
-import { depositRoom } from "../../api/depositManagement";
+import { depositRoom } from "../../api/depositAPI";
 import { toast } from "react-toastify";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/ThemeContext";
 
 const { RangePicker } = DatePicker;
 
-function DepositPopup({
-  visible,
-  toggleVisible,
-  roomData,
-  listRoomData,
-  boardingHouse,
-}) {
+function DepositPopup({ visible, toggleVisible, roomData, listRoomData }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [dates, setDates] = useState([dayjs(), dayjs().add(1, "month")]);
+  const { t } = useTranslation("depositPopup");
+  const { darkMode } = useTheme();
 
   const onCancel = () => {
     form.resetFields();
@@ -27,7 +33,7 @@ function DepositPopup({
     setLoading(true);
     try {
       const res = await depositRoom(values);
-      toast.success(res.message);
+      toast.success(t("successMessage"));
     } catch (error) {
       toast.warning(error?.response?.data?.message);
     } finally {
@@ -37,7 +43,7 @@ function DepositPopup({
   };
 
   const disabledDate = (current) => {
-    return current && current < dayjs().startOf("day");
+    return current && current < dayjs().startOf("day").add(7, "days");
   };
 
   const handleRentalTimeChange = (value) => {
@@ -65,101 +71,130 @@ function DepositPopup({
     });
   };
 
+  // Phải bọc bằng ConfigProvider để áp dụng dark mode cho các component của Ant Design
   return (
-    <Modal
-      open={visible}
-      onOk={() => form.submit()}
-      confirmLoading={loading}
-      okText="Deposit"
-      onCancel={onCancel}
-      destroyOnClose
+    <ConfigProvider
+      theme={{
+        algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: {
+          colorPrimary: "#ff7a45", // Màu chính từ giao diện hiện tại
+        },
+      }}
     >
-      <h1 className="text-3xl md:text-4xl font-semibold mb-4">
-        {boardingHouse?.name}
-      </h1>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        initialValues={{
-          roomType: roomData?.typeName,
-          price: roomData?.price,
-          rentalTime: 1,
-          rentalDate: dates,
-          timeType: "month",
-          payment: "vnpay",
-        }}
+      <Modal
+        open={visible}
+        onOk={() => form.submit()}
+        confirmLoading={loading}
+        okText={t("okText")}
+        cancelText={t("cancel")}
+        onCancel={onCancel}
+        destroyOnClose
+        className="dark:bg-background-dark"
+        rootClassName="dark:bg-background-dark"
+        title={
+          <h1 className="text-2xl font-semibold dark:text-text-dark">
+            {t("title")}
+          </h1>
+        }
       >
-        <Form.Item name="roomType" className="mb-2">
-          <p className="text-3xl">{roomData?.typeName}</p>
-        </Form.Item>
-        <Form.Item name="price" className="mb-2">
-          <p className="text-3xl text-orange-500 font-semibold">
-            {formatAmount(roomData?.price)} (VND)/ month
-          </p>
-        </Form.Item>
-        <Form.Item
-          name="roomId"
-          label="Select a room"
-          rules={[{ required: true, message: "Please select a room" }]}
-        >
-          <Select placeholder="Select a room">
-            {listRoomData.map((room) => (
-              <Select.Option key={room._id} value={room._id}>
-                {room.roomNumber}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          label="Rental date"
-          name="rentalDate"
-          className="mb-2"
-          rules={[{ required: true }]}
-        >
-          <RangePicker
-            disabledDate={disabledDate}
-            onChange={handleRentalDateChange}
-            format={"DD/MM/YYYY"}
-            disabled={[false, true]}
-            allowEmpty={[false, true]}
-            onClick={() => form.setFieldsValue({ rentalDate: [] })}
-          />
-        </Form.Item>
-        <Form.Item label="Rental time" className="mb-2" required>
-          <div className="flex space-x-2">
-            <Form.Item
-              name="rentalTime"
-              className="w-full"
-              rules={[
-                { required: true, message: "Please enter rental time" },
-                {
-                  type: "number",
-                  min: 1,
-                  message: "Rental time must be greater than 0",
-                },
-              ]}
-            >
-              <InputNumber
-                placeholder="Enter rental time"
-                className="w-full"
-                onChange={handleRentalTimeChange}
-              />
+        <div className="dark:bg-background-dark dark:text-text-dark">
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            initialValues={{
+              roomType: roomData?.typeName,
+              price: roomData?.price,
+              rentalTime: 1,
+              rentalDate: dates,
+              timeType: "month",
+            }}
+            className="dark:text-text-dark"
+          >
+            <Form.Item name="price" className="mb-2" hidden>
+              <p className="text-3xl text-orange-500 font-semibold">
+                {formatAmount(roomData?.price)} (VND)/ month
+              </p>
             </Form.Item>
-            <Form.Item name="timeType" className="w-[30%]" required>
+            <Form.Item
+              name="roomId"
+              label={
+                <span className="dark:text-text-dark">{t("selectRoom")}</span>
+              }
+              rules={[{ required: true, message: t("selectRoomRequired") }]}
+            >
               <Select
-                placeholder="Select type of time"
-                onChange={handleRentalTypeChange}
-                rules={[{ required: true }]}
+                placeholder={t("selectRoom")}
+                className="dark:bg-background-dark dark:text-text-dark"
               >
-                <Select.Option value="month">Month</Select.Option>
-                <Select.Option value="year">Year</Select.Option>
+                {listRoomData.map((room) => (
+                  <Select.Option key={room._id} value={room._id}>
+                    {room.roomNumber}
+                  </Select.Option>
+                ))}
               </Select>
             </Form.Item>
-          </div>
-        </Form.Item>
-      </Form>
-    </Modal>
+            <Form.Item
+              label={
+                <span className="dark:text-text-dark">{t("rentalDate")}</span>
+              }
+              name="rentalDate"
+              className="mb-8"
+              rules={[{ required: true }]}
+            >
+              <RangePicker
+                disabledDate={disabledDate}
+                onChange={handleRentalDateChange}
+                format={"DD/MM/YYYY"}
+                disabled={[false, true]}
+                allowEmpty={[false, true]}
+                onClick={() => form.setFieldsValue({ rentalDate: [] })}
+                className="dark:bg-background-dark dark:text-text-dark w-full"
+              />
+            </Form.Item>
+            <Form.Item
+              label={
+                <span className="dark:text-text-dark">{t("rentalTime")}</span>
+              }
+              className="mb-2"
+              required
+            >
+              <div className="flex space-x-2">
+                <Form.Item
+                  name="rentalTime"
+                  className="w-full"
+                  rules={[
+                    { required: true, message: t("rentalTimeRequired") },
+                    {
+                      type: "number",
+                      min: 1,
+                      message: t("rentalTimeMin"),
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    placeholder={t("enterRentalTime")}
+                    className="w-full dark:bg-background-dark dark:text-text-dark"
+                    onChange={handleRentalTimeChange}
+                  />
+                </Form.Item>
+                <Form.Item name="timeType" className="w-[30%]" required>
+                  <Select
+                    placeholder={t("selectTimeType")}
+                    onChange={handleRentalTypeChange}
+                    rules={[{ required: true }]}
+                    className="dark:bg-background-dark dark:text-text-dark"
+                  >
+                    <Select.Option value="month">{t("month")}</Select.Option>
+                    <Select.Option value="year">{t("year")}</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+    </ConfigProvider>
   );
 }
 

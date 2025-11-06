@@ -22,6 +22,7 @@ const getMenuItems = () => {
 
   const isOwner = hasRole(userRole.owner);
   const isUser = hasRole(userRole.user);
+  const isStaff = hasRole(userRole.staff);
 
   const menuItems = [
     {
@@ -52,6 +53,18 @@ const getMenuItems = () => {
       key: "bh-management-owner",
       label: <Link to="/bh-management-owner">Boarding House Management</Link>,
       icon: <HomeFilled />,
+      visible: isOwner || isStaff, // Chỉ Owner
+    },
+    {
+      key: "deposit-list",
+      label: <Link to="/deposit-list">Deposit Management</Link>,
+      icon: <ContainerOutlined />,
+      visible: isOwner || isStaff, // Chỉ Owner
+    },
+    {
+      key: "staff-list",
+      label: <Link to="/staff-list">Staff Management</Link>,
+      icon: <ContainerOutlined />,
       visible: isOwner, // Chỉ Owner
     },
     {
@@ -98,7 +111,19 @@ const getMenuItems = () => {
       key: "revenue-management-owner",
       label: <Link to="/revenue-management-owner">Revenue Management</Link>,
       icon: <DollarCircleOutlined />,
-      visible: isOwner,
+      visible: isOwner || isStaff,
+    },
+    {
+      key: "task-management",
+      label: <Link to="/task-management">Task Management</Link>,
+      icon: <DollarCircleOutlined />,
+      visible: isOwner || isStaff,
+    },
+    {
+      key: 'appointment-owner',
+      label: <Link to="/appointment-owner">Appointment Management</Link>,
+      icon: <ScheduleOutlined />,
+      visible: isOwner || isStaff
     },
   ];
   return menuItems.filter((item) => item.visible);

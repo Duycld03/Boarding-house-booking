@@ -1,18 +1,17 @@
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const instance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 instance.interceptors.request.use(
   async function (config) {
     // Do something before request is sent
-    const accessToken =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2EyYmVlNmI3NjM0NjYwMjI0MGUxMjAiLCJ1c2VybmFtZSI6Im93bmVyMTIzIiwicm9sZSI6Im93bmVyIiwiaWF0IjoxNzQ3MTIxNzM5LCJleHAiOjE3NDcyMDgxMzl9.o9pxPmIp0tRpZVbJmJZYa_PU7U0qkH2sNAG6jBFtm_g';
+    const accessToken = await AsyncStorage.getItem("access_token");
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -20,7 +19,6 @@ instance.interceptors.request.use(
   },
   function (error) {
     // Do something with request error
-    console.log('Request error', error);
     return Promise.reject(error);
   }
 );
@@ -38,15 +36,12 @@ instance.interceptors.response.use(
     // Do something with response error
     if (error.response) {
       // Server responded with a status code out of 2xx range
-      console.log('Response error data:', error.response.data);
-      console.log('Response error status:', error.response.status);
-      console.log('Response error headers:', error.response.headers);
     } else if (error.request) {
       // Request was made but no response was received
-      console.log('Request error', error.request);
+
     } else {
       // Something happened in setting up the request
-      console.log('Error', error.message);
+
     }
 
     return Promise.reject(error);

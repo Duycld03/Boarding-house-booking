@@ -8,9 +8,50 @@ const ScreenLayout = () => {
           name="(accounts)"
           options={{
             headerShown: false,
+            presentation: 'modal',
+            animation: 'slide_from_right',
+          }}
+        />
+        <Stack.Screen
+          name="BhDetail"
+          options={{
+            headerShown: false,
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="allBH"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="newestBH"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="highRatingBH"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="searchBH"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="filterBH"
+          options={{
+            headerShown: false,
           }}
         />
       </Stack>
+
     </>
   );
 };

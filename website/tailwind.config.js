@@ -21,6 +21,7 @@ export default {
           light: '#111827',
           dark: '#f9fafb',
         },
+        primary: '#3b82f6',
       },
       "fonts": [
         {

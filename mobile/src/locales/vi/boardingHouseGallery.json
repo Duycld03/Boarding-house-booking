@@ -1,0 +1,20 @@
+{
+  "common": {
+    "goToLogin": "Đi đến Đăng nhập",
+    "warning": "Cảnh báo",
+    "ok": "OK"
+  },
+  "auth": {
+    "loginRequired": "Bạn phải đăng nhập trước khi sử dụng tính năng này"
+  },
+  "watchLater": {
+    "savedSuccess": "Đã lưu vào Xem sau",
+    "removedSuccess": "Đã xóa khỏi Xem sau"
+  },
+  "noImages": "Không có hình ảnh để hiển thị",
+  "report": {
+    "alreadyReported": "Bạn đã báo cáo nhà trọ này. Báo cáo của bạn đang được xử lý.",
+    "reportExists": "Báo Cáo Đã Tồn Tại",
+    "successMessage": "Báo cáo của bạn đã được gửi thành công"
+  }
+}

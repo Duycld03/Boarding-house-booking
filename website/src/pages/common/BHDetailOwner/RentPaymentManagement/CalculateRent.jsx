@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Button, Table, Select } from "antd";
-import { getAvailableRooms } from "@/api/ownerUser/roomManagement";
+import React, { useEffect, useState, useContext } from "react";
+import { Modal, Form, Input, Table, Select, Spin, Empty } from "antd";
+import { getAvailableRooms } from "@/api/ownerUser/roomAPI";
 import { toast } from "react-toastify";
-import { getElectricalAndWaterPrice } from "@/api/ownerUser/boardingHouse";
-import { calculateMonthlyBill } from "@/api/ownerUser/paymentBillManagement";
+import { getElectricalAndWaterPrice } from "@/api/ownerUser/boardingHouseAPI";
+import { calculateMonthlyBill } from "@/api/ownerUser/paymentBillAPI";
+import { getRoomAdditionFeeForMonthlyCalculate } from "@/api/staffUser/roomAdditionFee";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/ThemeContext";
+import { useFormatAmount } from "@/utils/formatAmount";
 
 const CalculateRent = ({
   visible,
@@ -11,160 +15,161 @@ const CalculateRent = ({
   boardingHouseId,
   fetchRentPaymentData,
 }) => {
+  const { t, i18n } = useTranslation("calculateRent"); // Get both t and i18n
+  const { darkMode } = useTheme();
   const [form] = Form.useForm();
   const [additionalFees, setAdditionalFees] = useState([]);
-  const [electricalBill, setElectricalBill] = useState({
-    oldNumber: 0,
-    newNumber: 0,
-  });
-  const [waterBill, setWaterBill] = useState({ oldNumber: 0, newNumber: 0 });
   const [availableRooms, setAvailableRooms] = useState([]);
   const [selectRoom, setSelectRoom] = useState(null);
   const [roomPrice, setRoomPrice] = useState(0);
   const [waterBillPrice, setWaterBillPrice] = useState(0);
   const [electricalBillPrice, setElectricalBillPrice] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
-
   const [loading, setLoading] = useState(false);
+  const [loadingFees, setLoadingFees] = useState(false);
+  const [previousMonth, setPreviousMonth] = useState(null);
+  const [previousYear, setPreviousYear] = useState(null);
+
+  // Use the useFormatAmount hook to get language-aware formatting functions
+  const { formatPrice } = useFormatAmount(i18n.language);
 
   const onClose = () => {
     setVisible(false);
     setAdditionalFees([]);
-    setElectricalBill({ oldNumber: 0, newNumber: 0 });
-    setWaterBill({ oldNumber: 0, newNumber: 0 });
+    setSelectRoom(null);
     form.resetFields();
   };
 
   const onOk = async () => {
     const values = form.getFieldsValue();
 
-    if (
-      values.roomNumber === undefined ||
-      electricalBill.newNumber === undefined ||
-      waterBill.newNumber === undefined ||
-      electricalBill.oldNumber === undefined ||
-      waterBill.oldNumber === undefined
-    ) {
-      toast.error("Please fill in all fields before saving.");
+    if (values.roomNumber === undefined) {
+      toast.error(t("fillAllFields"));
+      return;
+    }
+
+    // Check if room has current utility readings
+    const selectedRoom = availableRooms.find((room) => room._id === selectRoom);
+    if (!selectedRoom) {
+      toast.error(t("roomNotFound"));
       return;
     }
 
     if (
-      electricalBill.oldNumber < 0 ||
-      electricalBill.newNumber < 0 ||
-      waterBill.oldNumber < 0 ||
-      waterBill.newNumber < 0
+      selectedRoom.currentElectricityReading === undefined ||
+      selectedRoom.currentElectricityReading === null ||
+      selectedRoom.currentWaterReading === undefined ||
+      selectedRoom.currentWaterReading === null
     ) {
-      toast.error("Numbers must not be negative.");
+      toast.error(t("pleaseUpdateUtilityReadings"));
       return;
     }
 
-    if (
-      electricalBill.newNumber < electricalBill.oldNumber ||
-      waterBill.newNumber < waterBill.oldNumber
-    ) {
-      toast.error("New number must be greater than or equal to old number.");
-      return;
-    }
-
-    if (electricalBill.newNumber < electricalBill.oldNumber) {
-      toast.error(
-        "New electrical bill number must be greater than old number."
-      );
-      return;
-    }
-
-    if (waterBill.newNumber < waterBill.oldNumber) {
-      toast.error("New water bill number must be greater than old number.");
-      return;
-    }
+    // Convert additional fees to the format expected by the API
+    const formattedFees = additionalFees.map((fee) => ({
+      feeName: fee.name || fee.feeName,
+      feeAmount: Number(fee.amount || fee.feeAmount) || 0,
+    }));
 
     const payload = {
       roomId: selectRoom,
       paymentAmount: totalAmount,
-      electricalBill: {
-        oldNumber: electricalBill.oldNumber,
-        newNumber: electricalBill.newNumber,
-        quantityConsumed: electricalBill.newNumber - electricalBill.oldNumber,
-        totalAmount: calculateElectricalPrice(),
-        price: electricalBillPrice,
-      },
-      waterBill: {
-        oldNumber: waterBill.oldNumber,
-        newNumber: waterBill.newNumber,
-        quantityConsumed: waterBill.newNumber - waterBill.oldNumber,
-        totalAmount: calculateWaterPrice(),
-        price: waterBillPrice,
-      },
-      additionalFees: additionalFees,
+      additionalFee: formattedFees,
     };
 
     setLoading(true);
     try {
-      console.log(payload);
       const res = await calculateMonthlyBill(payload);
-      toast.success(res.message);
+      toast.success(res.message || t("calculationSuccess"));
       fetchRentPaymentData();
     } catch (error) {
       console.error("Error calculating rent:", error);
-      toast.error(error.response?.data?.message || "An error occurred");
+      toast.error(error.response?.data?.message || t("calculationError"));
     } finally {
       setLoading(false);
       onClose();
     }
-
-    console.log("Data is valid. Proceed with saving...");
   };
 
-  const handleAddFee = () => {
-    setAdditionalFees([
-      ...additionalFees,
-      { key: Date.now(), name: "", amount: 0 },
-    ]);
+  // This function will fetch additional fees when a room is selected
+  const fetchAdditionalFees = async (roomId) => {
+    if (!roomId) return;
+
+    setLoadingFees(true);
+    try {
+      const response = await getRoomAdditionFeeForMonthlyCalculate(roomId);
+
+      if (response.success) {
+        // Format the fees to match our component's expected structure
+        const fees = response.additionalFees.map((fee, index) => ({
+          key: index,
+          feeName: fee.feeName,
+          feeAmount: fee.feeAmount,
+        }));
+
+        setAdditionalFees(fees);
+        setPreviousMonth(response.month);
+        setPreviousYear(response.year);
+      } else {
+        setAdditionalFees([]);
+      }
+    } catch (error) {
+      console.error("Error fetching additional fees:", error);
+      // No error toast for missing fees - silently handle it
+      setAdditionalFees([]);
+    } finally {
+      setLoadingFees(false);
+    }
   };
 
-  const handleFeeChange = (key, field, value) => {
-    setAdditionalFees(
-      additionalFees.map((fee) =>
-        fee.key === key ? { ...fee, [field]: value } : fee
-      )
+  const calculateElectricalPrice = () => {
+    const selectedRoom = availableRooms.find((room) => room._id === selectRoom);
+    if (!selectedRoom) return 0;
+
+    const consumption = Math.max(
+      0,
+      (selectedRoom.currentElectricityReading || 0) -
+        (selectedRoom.previousElectricityReading || 0)
     );
+    return consumption * electricalBillPrice;
   };
 
-  const handleDeleteFee = (key) => {
-    setAdditionalFees(additionalFees.filter((fee) => fee.key !== key));
+  const calculateWaterPrice = () => {
+    const selectedRoom = availableRooms.find((room) => room._id === selectRoom);
+    if (!selectedRoom) return 0;
+
+    const consumption = Math.max(
+      0,
+      (selectedRoom.currentWaterReading || 0) -
+        (selectedRoom.previousWaterReading || 0)
+    );
+    return consumption * waterBillPrice;
   };
 
-  const calculateElectricalPrice = () =>
-    Math.max(
-      (electricalBill.newNumber - electricalBill.oldNumber) *
-        electricalBillPrice ?? 0,
-      0
-    );
+  const calculateTotalAmount = () => {
+    const additionalFeesTotal = additionalFees.reduce((sum, fee) => {
+      const amount = Number(fee.amount || fee.feeAmount) || 0;
+      return sum + amount;
+    }, 0);
 
-  const calculateWaterPrice = () =>
-    Math.max(
-      (waterBill.newNumber - waterBill.oldNumber) * waterBillPrice ?? 0,
-      0
-    );
-
-  const CalculateTotalAmount = () => {
     return (
       roomPrice +
       calculateElectricalPrice() +
       calculateWaterPrice() +
-      additionalFees.reduce((sum, fee) => sum + Number(fee.amount), 0)
+      additionalFeesTotal
     );
   };
 
   useEffect(() => {
-    const total = CalculateTotalAmount();
+    const total = calculateTotalAmount();
     setTotalAmount(total);
   }, [
     roomPrice,
-    calculateElectricalPrice,
-    calculateWaterPrice,
+    selectRoom,
+    electricalBillPrice,
+    waterBillPrice,
     additionalFees,
+    availableRooms,
   ]);
 
   const fetchAvailableRooms = async () => {
@@ -173,7 +178,6 @@ const CalculateRent = ({
       setAvailableRooms(res);
     } catch (error) {
       setAvailableRooms([]);
-    } finally {
     }
   };
 
@@ -194,41 +198,336 @@ const CalculateRent = ({
     }
   }, [boardingHouseId]);
 
+  // When room selection changes, fetch room details and additional fees
   useEffect(() => {
-    const selectedRoom = availableRooms.find((room) => room._id === selectRoom);
-    debugger;
-    if (selectedRoom) {
-      setRoomPrice(selectedRoom?.roomTypeId?.price);
-      setElectricalBill({
-        oldNumber: selectedRoom.previousElectricityReading,
-        newNumber: 0,
-      });
-      setWaterBill({
-        oldNumber: selectedRoom.previousWaterReading,
-        newNumber: 0,
-      });
+    if (selectRoom) {
+      const selectedRoom = availableRooms.find(
+        (room) => room._id === selectRoom
+      );
+
+      if (selectedRoom) {
+        // Set room price from room type
+        setRoomPrice(selectedRoom?.roomTypeId?.price || 0);
+
+        // Fetch additional fees for this room
+        fetchAdditionalFees(selectRoom);
+      }
     }
-  }, [selectRoom]);
+  }, [selectRoom, availableRooms]);
+
+  const handleRoomChange = (value) => {
+    setSelectRoom(value);
+    form.setFieldsValue({ roomNumber: value });
+  };
+
+  // Updated getStyles function with colors from your tailwind.config.js
+  const getStyles = () => {
+    return {
+      modalBodyStyle: darkMode
+        ? { backgroundColor: "#1f2937", color: "#f9fafb" }
+        : { backgroundColor: "#ffffff" },
+
+      modalHeaderStyle: darkMode
+        ? {
+            backgroundColor: "#1f2937",
+            borderBottom: "1px solid #374151",
+            color: "#f9fafb",
+          }
+        : {
+            borderBottom: "1px solid #e5e7eb",
+          },
+
+      inputStyle: darkMode
+        ? {
+            backgroundColor: "#374151",
+            color: "#f9fafb",
+            borderColor: "#4b5563",
+          }
+        : { backgroundColor: "#f9fafb" },
+
+      readOnlyStyle: darkMode
+        ? {
+            backgroundColor: "#374151",
+            color: "#f9fafb",
+            borderColor: "#4b5563",
+            fontWeight: "bold",
+          }
+        : {
+            backgroundColor: "#f8fafc",
+            fontWeight: "bold",
+          },
+
+      totalAmountStyle: darkMode
+        ? {
+            backgroundColor: "#1e40af",
+            color: "#bfdbfe",
+            fontWeight: "bold",
+            fontSize: "16px",
+            borderColor: "#3b82f6",
+          }
+        : {
+            backgroundColor: "#eff6ff",
+            fontWeight: "bold",
+            color: "#3b82f6",
+            fontSize: "16px",
+            borderColor: "#bfdbfe",
+          },
+
+      fromMonthStyle: darkMode
+        ? { fontStyle: "italic", color: "#9ca3af" }
+        : { fontStyle: "italic", color: "#6b7280" },
+
+      tableHeaderStyle: darkMode
+        ? {
+            backgroundColor: "#374151",
+            color: "#f9fafb",
+            borderColor: "#4b5563",
+          }
+        : {},
+
+      tableStyle: darkMode
+        ? {
+            backgroundColor: "#1f2937",
+            borderColor: "#4b5563",
+            color: "#f9fafb",
+          }
+        : {},
+
+      emptyStyle: darkMode ? { color: "#9ca3af" } : { color: "#6b7280" },
+    };
+  };
+
+  const styles = getStyles();
+
+  useEffect(() => {
+    // Add a class when the modal is visible
+    if (visible) {
+      document.body.classList.add(
+        darkMode ? "dark-modal-open" : "light-modal-open"
+      );
+    }
+
+    return () => {
+      // Clean up when modal closes
+      document.body.classList.remove("dark-modal-open", "light-modal-open");
+    };
+  }, [visible, darkMode]);
+
+  // Add this useEffect for dynamic styling without external CSS
+  useEffect(() => {
+    // Function to inject styles into document head
+    const injectStyles = () => {
+      // Remove any existing style element first
+      const existingStyle = document.getElementById("calculate-rent-styles");
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+
+      if (visible) {
+        // Create style element for both dark and light mode styles
+        const style = document.createElement("style");
+        style.id = "calculate-rent-styles";
+
+        if (darkMode) {
+          style.innerHTML = `
+            .dark-calculate-rent-modal .ant-modal-content {
+              background-color: #1f2937 !important;
+              border-color: #374151 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-modal-body {
+              background-color: #1f2937 !important;
+              padding: 16px !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-modal-header {
+              background-color: #1f2937 !important;
+              border-bottom-color: #374151 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-modal-title {
+              color: #f9fafb !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-modal-close {
+              color: #f9fafb !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-modal-close:hover {
+              color: #e5e7eb !important;
+              background-color: #374151 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-form-item-label > label {
+              color: #f9fafb !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-select-selector {
+              background-color: #374151 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-select-selection-placeholder {
+              color: #9ca3af !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-select-arrow {
+              color: #f9fafb !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-input {
+              background-color: #374151 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-input:hover {
+              border-color: #3b82f6 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-input:focus {
+              border-color: #3b82f6 !important;
+              box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-input-group-addon {
+              background-color: #4b5563 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-table {
+              background-color: #1f2937 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-table-thead > tr > th {
+              background-color: #374151 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-table-tbody > tr > td {
+              background-color: #1f2937 !important;
+              color: #f9fafb !important;
+              border-color: #4b5563 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-table-tbody > tr:hover > td {
+              background-color: #374151 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-empty-description {
+              color: #9ca3af !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-btn-default {
+              background-color: #374151 !important;
+              border-color: #4b5563 !important;
+              color: #f9fafb !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-btn-default:hover {
+              background-color: #4b5563 !important;
+              border-color: #6b7280 !important;
+              color: #f9fafb !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-btn-primary {
+              background-color: #3b82f6 !important;
+              border-color: #3b82f6 !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-btn-primary:hover {
+              background-color: #2563eb !important;
+              border-color: #2563eb !important;
+            }
+            
+            .dark-calculate-rent-modal .ant-spin-dot-item {
+              background-color: #3b82f6 !important;
+            }
+          `;
+        } else {
+          // Light mode styles
+          style.innerHTML = `
+            .calculate-rent-modal .ant-modal-content {
+              background-color: #ffffff !important;
+            }
+            
+            .calculate-rent-modal .ant-modal-body {
+              background-color: #ffffff !important;
+            }
+          `;
+        }
+        document.head.appendChild(style);
+      }
+    };
+
+    injectStyles();
+
+    return () => {
+      // Clean up styles on unmount
+      const existingStyle = document.getElementById("calculate-rent-styles");
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, [visible, darkMode]);
+
+  // Update the table column for amount formatting
+  const renderAmountColumn = (amount) => {
+    return <span>{formatPrice(amount, { showFullFormat: true })}</span>;
+  };
 
   return (
     <Modal
-      title="Calculate Rent"
+      title={t("calculateRent")}
       open={visible}
       onCancel={onClose}
       onOk={onOk}
+      okText={t("calculate")}
+      cancelText={t("cancel")}
       confirmLoading={loading}
       destroyOnClose
+      width={700}
+      style={{
+        top: 20,
+      }}
+      bodyStyle={{
+        ...styles.modalBodyStyle,
+        maxHeight: "none",
+        overflowY: "visible",
+        padding: "16px",
+      }}
+      headerStyle={styles.modalHeaderStyle}
+      className={
+        darkMode ? "dark-calculate-rent-modal" : "calculate-rent-modal"
+      }
+      okButtonProps={{
+        style: darkMode
+          ? { background: "#3b82f6", borderColor: "#3b82f6" }
+          : {},
+      }}
+      cancelButtonProps={{
+        style: darkMode
+          ? { background: "#374151", borderColor: "#4b5563", color: "#f9fafb" }
+          : {},
+      }}
     >
       <Form layout="vertical" form={form}>
         <Form.Item
-          label="Room Number"
+          label={t("roomNumber")}
           name="roomNumber"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: t("pleaseSelectRoom") }]}
         >
           <Select
-            placeholder="Select Room"
-            onChange={setSelectRoom}
+            placeholder={t("selectRoom")}
+            onChange={handleRoomChange}
             value={selectRoom}
+            style={styles.inputStyle}
+            dropdownStyle={
+              darkMode ? { backgroundColor: "#374151", color: "#f9fafb" } : {}
+            }
           >
             {availableRooms.map((room) => (
               <Select.Option key={room._id} value={room._id}>
@@ -238,105 +537,265 @@ const CalculateRent = ({
           </Select>
         </Form.Item>
 
-        <Form.Item label="Electrical Bill">
-          <Input.Group compact>
-            <Input
-              style={{ width: "48%" }}
-              placeholder="Old Number"
-              type="number"
-              value={electricalBill.oldNumber}
-              onChange={(e) =>
-                setElectricalBill({
-                  ...electricalBill,
-                  oldNumber: Number(e.target.value),
-                })
-              }
-            />
-            <Input
-              style={{ width: "48%" }}
-              placeholder="New Number"
-              type="number"
-              value={electricalBill.newNumber}
-              onChange={(e) =>
-                setElectricalBill({
-                  ...electricalBill,
-                  newNumber: Number(e.target.value),
-                })
-              }
-            />
-          </Input.Group>
+        {/* Utility Readings Information */}
+        {selectRoom && (
+          <div
+            style={{
+              marginBottom: "16px",
+              padding: "12px",
+              backgroundColor: darkMode ? "#1e40af" : "#dbeafe",
+              borderRadius: "6px",
+              fontSize: "13px",
+              color: darkMode ? "#bfdbfe" : "#1e40af",
+            }}
+          >
+            <strong>ℹ️ {t("utilityReadingsNote")}</strong>
+            <br />
+            {t("utilityReadingsDescription")}
+          </div>
+        )}
+
+        <Form.Item label={t("electricalBill")}>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "4px",
+                  fontSize: "12px",
+                  color: darkMode ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                {t("previousReading")}
+              </label>
+              <Input
+                style={styles.readOnlyStyle}
+                value={
+                  selectRoom
+                    ? (
+                        availableRooms.find((r) => r._id === selectRoom)
+                          ?.previousElectricityReading || 0
+                      ).toString()
+                    : "0"
+                }
+                readOnly
+                addonAfter="kWh"
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "4px",
+                  fontSize: "12px",
+                  color: darkMode ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                {t("currentReading")}
+              </label>
+              <Input
+                style={styles.readOnlyStyle}
+                value={
+                  selectRoom
+                    ? (
+                        availableRooms.find((r) => r._id === selectRoom)
+                          ?.currentElectricityReading || 0
+                      ).toString()
+                    : "0"
+                }
+                readOnly
+                addonAfter="kWh"
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              marginTop: "8px",
+              padding: "8px",
+              backgroundColor: darkMode ? "#374151" : "#f3f4f6",
+              borderRadius: "4px",
+              fontSize: "14px",
+              color: darkMode ? "#f9fafb" : "#374151",
+            }}
+          >
+            <strong>{t("consumption")}: </strong>
+            {selectRoom
+              ? Math.max(
+                  0,
+                  (availableRooms.find((r) => r._id === selectRoom)
+                    ?.currentElectricityReading || 0) -
+                    (availableRooms.find((r) => r._id === selectRoom)
+                      ?.previousElectricityReading || 0)
+                ).toString() + " kWh"
+              : "0 kWh"}
+            <span style={{ marginLeft: "16px" }}>
+              <strong>{t("amount")}: </strong>
+              {formatPrice(calculateElectricalPrice())}
+            </span>
+          </div>
         </Form.Item>
 
-        <Form.Item label="Water Bill">
-          <Input.Group compact>
-            <Input
-              style={{ width: "48%" }}
-              placeholder="Old Number"
-              type="number"
-              value={waterBill.oldNumber}
-              onChange={(e) =>
-                setWaterBill({
-                  ...waterBill,
-                  oldNumber: Number(e.target.value),
-                })
-              }
-            />
-            <Input
-              style={{ width: "48%" }}
-              placeholder="New Number"
-              type="number"
-              value={waterBill.newNumber}
-              onChange={(e) =>
-                setWaterBill({
-                  ...waterBill,
-                  newNumber: Number(e.target.value),
-                })
-              }
-            />
-          </Input.Group>
+        <Form.Item label={t("waterBill")}>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "4px",
+                  fontSize: "12px",
+                  color: darkMode ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                {t("previousReading")}
+              </label>
+              <Input
+                style={styles.readOnlyStyle}
+                value={
+                  selectRoom
+                    ? (
+                        availableRooms.find((r) => r._id === selectRoom)
+                          ?.previousWaterReading || 0
+                      ).toString()
+                    : "0"
+                }
+                readOnly
+                addonAfter="m³"
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "4px",
+                  fontSize: "12px",
+                  color: darkMode ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                {t("currentReading")}
+              </label>
+              <Input
+                style={styles.readOnlyStyle}
+                value={
+                  selectRoom
+                    ? (
+                        availableRooms.find((r) => r._id === selectRoom)
+                          ?.currentWaterReading || 0
+                      ).toString()
+                    : "0"
+                }
+                readOnly
+                addonAfter="m³"
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              marginTop: "8px",
+              padding: "8px",
+              backgroundColor: darkMode ? "#374151" : "#f3f4f6",
+              borderRadius: "4px",
+              fontSize: "14px",
+              color: darkMode ? "#f9fafb" : "#374151",
+            }}
+          >
+            <strong>{t("consumption")}: </strong>
+            {selectRoom
+              ? Math.max(
+                  0,
+                  (availableRooms.find((r) => r._id === selectRoom)
+                    ?.currentWaterReading || 0) -
+                    (availableRooms.find((r) => r._id === selectRoom)
+                      ?.previousWaterReading || 0)
+                ).toString() + " m³"
+              : "0 m³"}
+            <span style={{ marginLeft: "16px" }}>
+              <strong>{t("amount")}: </strong>
+              {formatPrice(calculateWaterPrice())}
+            </span>
+          </div>
         </Form.Item>
 
-        <Table dataSource={additionalFees} pagination={false} rowKey="key">
-          <Table.Column
-            title="Fee Name"
-            dataIndex="name"
-            render={(text, record) => (
-              <Input
-                value={text}
-                onChange={(e) =>
-                  handleFeeChange(record.key, "name", e.target.value)
-                }
+        {/* Additional Fees Section */}
+        <Form.Item
+          label={
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <span>{t("additionalFees")}</span>
+              {previousMonth && previousYear && (
+                <span style={{ ...styles.fromMonthStyle, marginLeft: "10px" }}>
+                  {t("fromMonth")} {previousMonth}/{previousYear}
+                </span>
+              )}
+            </div>
+          }
+        >
+          {loadingFees ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                padding: "20px",
+              }}
+            >
+              <Spin tip={t("loadingFees")} />
+            </div>
+          ) : additionalFees && additionalFees.length > 0 ? (
+            <Table
+              dataSource={additionalFees}
+              pagination={false}
+              rowKey="key"
+              size="small"
+              bordered
+              style={styles.tableStyle}
+            >
+              <Table.Column
+                title={t("feeName")}
+                dataIndex="feeName"
+                render={(text) => <span>{text}</span>}
+                style={styles.tableHeaderStyle}
               />
-            )}
-          />
-          <Table.Column
-            title="Amount"
-            dataIndex="amount"
-            render={(text, record) => (
-              <Input
-                type="number"
-                value={text}
-                onChange={(e) =>
-                  handleFeeChange(record.key, "amount", e.target.value)
-                }
+              <Table.Column
+                title={t("amount")}
+                dataIndex="feeAmount"
+                render={(amount) => renderAmountColumn(amount)}
+                align="right"
+                style={styles.tableHeaderStyle}
               />
-            )}
-          />
-          <Table.Column
-            title="Action"
-            render={(text, record) => (
-              <Button onClick={() => handleDeleteFee(record.key)}>
-                Delete
-              </Button>
-            )}
-          />
-        </Table>
-        <Button onClick={handleAddFee} style={{ marginTop: 10 }}>
-          Add Fee
-        </Button>
+            </Table>
+          ) : (
+            <Empty
+              description={
+                <span style={{ color: darkMode ? "#d1d5db" : "#6b7280" }}>
+                  {t("noAdditionalFees")}
+                </span>
+              }
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              style={{ margin: "10px 0" }}
+            />
+          )}
+        </Form.Item>
 
-        <Form.Item label="Total Amount">
-          <Input value={totalAmount} readOnly />
+        {/* Room Price with updated formatting */}
+        <Form.Item label={t("roomPrice")}>
+          <Input
+            value={formatPrice(roomPrice, { showFullFormat: true })}
+            readOnly
+            style={styles.readOnlyStyle}
+          />
+        </Form.Item>
+
+        {/* Total Amount with updated formatting */}
+        <Form.Item label={t("totalAmount")}>
+          <Input
+            value={formatPrice(totalAmount, { showFullFormat: true })}
+            readOnly
+            style={styles.totalAmountStyle}
+          />
         </Form.Item>
       </Form>
     </Modal>

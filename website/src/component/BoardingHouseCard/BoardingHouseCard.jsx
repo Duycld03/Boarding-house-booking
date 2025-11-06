@@ -9,9 +9,15 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { addFavorite, getFavorite } from "../../api/favoriteManagement"; // Import API
+import { addFavorite, getFavorite } from "../../api/favoriteAPI";
 import { useCurrentUser } from "@/context/userContext";
 import userRoles from "@/constants/userRole";
+import { formatTimeAgo } from "@/utils/timeUtils";
+import { useTranslation } from "react-i18next";
+import truncateDetail from "@/utils/truncateDetail";
+import { useTheme } from "@/context/ThemeContext";
+import i18next from "i18next";
+import formatAmount from "@/utils/formatAmount";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -22,34 +28,36 @@ const BoardingHouseCard = ({
   detail,
   rating,
   img,
-  timeAgo,
+  updatedAt,
   isFavorite: initialFavorite = false,
 }) => {
   const { hasRole } = useCurrentUser();
   const isOwner = hasRole(userRoles.owner);
-
+  const { darkMode } = useTheme();
   const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const validRating = Number.isFinite(rating) ? Math.round(rating) : 0;
+  const { t } = useTranslation("home");
+  const timeAgoText = formatTimeAgo(updatedAt, t);
+  const translatedDetail = truncateDetail(
+    detail
+      ? t(`location.${detail}`, { defaultValue: detail })
+      : t("location.No address provided")
+  );
 
-  // Điều hướng khi click vào card
   const handleCardClick = () => {
     navigate(`/boarding-house/${id}`);
   };
 
-  // Xử lý thêm/xóa yêu thích
+  const currentLanguage = i18next.language;
+
   const handleFavoriteClick = async (event) => {
-    event.stopPropagation(); // Ngăn chặn click vào card
-
+    event.stopPropagation();
     try {
-      console.log("Calling API with id:", id);
-      const response = await addFavorite(id); // Gọi API
-      console.log("API Response:", response);
-
+      const response = await addFavorite(id);
       if (response && typeof response.isFavorite !== "undefined") {
-        setIsFavorite(response.isFavorite); // Cập nhật trạng thái
+        setIsFavorite(response.isFavorite);
       } else {
-        console.error("Invalid response structure:", response);
         toast.error("Dữ liệu phản hồi không hợp lệ!");
       }
     } catch (error) {
@@ -84,14 +92,19 @@ const BoardingHouseCard = ({
         flexDirection: "column",
         overflow: "hidden",
         marginRight: "10px",
+        backgroundColor: darkMode ? "#1f2937" : "#fff",
+        color: darkMode ? "#fff" : "#000",
       }}
+      bodyStyle={{ padding: 16 }}
     >
       <div style={{ flex: 1, overflow: "hidden" }}>
-        <Typography.Title level={5} style={{ fontSize: "20px" }}>
+        <Typography.Title
+          level={5}
+          style={{ fontSize: "20px", color: darkMode ? "#fff" : undefined }}
+        >
           {name}
         </Typography.Title>
 
-        {/* Hiển thị rating */}
         <div
           style={{
             display: "flex",
@@ -108,7 +121,6 @@ const BoardingHouseCard = ({
           ))}
         </div>
 
-        {/* Giá tiền */}
         <Typography.Text
           style={{
             color: "#f57c00",
@@ -116,25 +128,28 @@ const BoardingHouseCard = ({
             fontSize: "18px",
             marginTop: "12px",
             marginBottom: "12px",
+            display: "block",
           }}
         >
-          {price} VND/month
+          {formatAmount(price, currentLanguage)} {t("currencyPerMonth")}
         </Typography.Text>
 
-        {/* Detail + TimeAgo + Icon Heart */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             marginTop: 8,
+            color: darkMode ? "#e5e7eb" : undefined,
           }}
         >
-          <Typography.Text strong>
-            {detail} - {timeAgo}
+          <Typography.Text
+            strong
+            style={{ color: darkMode ? "#e5e7eb" : undefined }}
+          >
+            {translatedDetail} - {timeAgoText}
           </Typography.Text>
 
-          {/* Icon heart */}
           <Button
             type="text"
             onClick={handleFavoriteClick}
@@ -143,7 +158,12 @@ const BoardingHouseCard = ({
               isFavorite ? (
                 <HeartFilled style={{ color: "red", fontSize: "22px" }} />
               ) : (
-                <HeartOutlined style={{ fontSize: "22px" }} />
+                <HeartOutlined
+                  style={{
+                    fontSize: "22px",
+                    color: darkMode ? "#fff" : undefined,
+                  }}
+                />
               )
             }
           />
@@ -157,15 +177,15 @@ const BoardingHouseGrid = ({ data }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { darkMode } = useTheme();
 
-  // Gọi API lấy danh sách phòng yêu thích khi trang tải
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
         setLoading(true);
         const response = await getFavorite();
         if (response && Array.isArray(response.favorites)) {
-          setFavoriteIds(response.favorites.map((fav) => fav.id)); // Lưu danh sách ID yêu thích
+          setFavoriteIds(response.favorites.map((fav) => fav.id));
         }
       } catch (error) {
         console.error("Failed to fetch favorites:", error);
@@ -183,11 +203,16 @@ const BoardingHouseGrid = ({ data }) => {
     .slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE)
     .map((item) => ({
       ...item,
-      isFavorite: favoriteIds.includes(item.id), // Kiểm tra xem có trong danh sách yêu thích không
+      isFavorite: favoriteIds.includes(item.id),
     }));
 
   return (
-    <div>
+    <div
+      style={{
+        backgroundColor: darkMode ? "#1f2937" : "#fff",
+        padding: 20,
+      }}
+    >
       {loading ? (
         <Spin
           size="large"
@@ -196,14 +221,7 @@ const BoardingHouseGrid = ({ data }) => {
       ) : (
         <>
           <List
-            grid={{
-              gutter: 10,
-              xs: 1,
-              sm: 1,
-              md: 2,
-              lg: 3,
-              xl: 3,
-            }}
+            grid={{ gutter: 10, xs: 1, sm: 1, md: 2, lg: 3, xl: 3 }}
             dataSource={paginatedData}
             renderItem={(item) => (
               <List.Item style={{ padding: 0 }}>
@@ -218,22 +236,36 @@ const BoardingHouseGrid = ({ data }) => {
               alignItems: "center",
               marginTop: 16,
               gap: 10,
-              marginRight: 20,
-              marginBottom: 20,
             }}
           >
             <Button
+              shape="circle"
+              size="middle"
               disabled={currentPage === 0}
               onClick={() => setCurrentPage((prev) => prev - 1)}
               icon={<LeftOutlined />}
+              style={{
+                backgroundColor: darkMode ? "#374151" : "#fff",
+                border: `1px solid ${darkMode ? "#4B5563" : "#d9d9d9"}`,
+                color: darkMode ? "#fff" : "#000",
+              }}
             />
-            <Typography.Text>
+
+            <Typography.Text style={{ color: darkMode ? "#fff" : "#000" }}>
               {currentPage + 1} / {totalPages}
             </Typography.Text>
+
             <Button
+              shape="circle"
+              size="middle"
               disabled={currentPage === totalPages - 1}
               onClick={() => setCurrentPage((prev) => prev + 1)}
               icon={<RightOutlined />}
+              style={{
+                backgroundColor: darkMode ? "#374151" : "#fff",
+                border: `1px solid ${darkMode ? "#4B5563" : "#d9d9d9"}`,
+                color: darkMode ? "#fff" : "#000",
+              }}
             />
           </div>
         </>

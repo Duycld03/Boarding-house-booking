@@ -1,11 +1,14 @@
 {
+  "tableName": "Đánh giá",
   "columns": {
     "boardingHouseName": "Tên nhà trọ",
     "content": "Nội dung",
     "rating": "Đánh giá",
     "createdAt": "Ngày tạo",
     "reviewer": "Người đánh giá",
-    "action": "Hành động"
+    "action": "Hành động",
+    "reply":"Chủ trả lời"
+
   },
   "buttons": {
     "delete": "Xóa",
@@ -22,6 +25,7 @@
     }
   },
   "messages": {
+    "noData": "Không tìm thấy đánh giá",
     "fetchError": "Không thể tải đánh giá. Vui lòng thử lại sau.",
     "deleteSuccess": "Xóa đánh giá thành công.",
     "deleteFailed": "Xóa đánh giá thất bại.",
@@ -44,7 +48,7 @@
       "startDateRequired": "Vui lòng chọn ngày bắt đầu.",
       "endDateRequired": "Vui lòng chọn ngày kết thúc."
     },
-        "images": "Ảnh"
+        "images": "Ảnh:"
 
   }
 }

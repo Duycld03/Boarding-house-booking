@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "Boarding house booking",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,7 +15,18 @@
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.duycld03.mobile",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "mobile",
+            "host": "*"
+          },
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -27,7 +38,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./src/assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -36,6 +47,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cdfbe59c-ec57-4909-b11b-6b7988048158"
+      }
     }
   }
 }

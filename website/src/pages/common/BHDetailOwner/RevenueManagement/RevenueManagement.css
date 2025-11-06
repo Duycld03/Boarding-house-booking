@@ -1,0 +1,371 @@
+/* Dark Mode Styles */
+.dark-mode .revenue-management-container {
+  background-color: #111827;
+  color: #e0e0e0;
+}
+
+/* Header và labels */
+.dark-mode .revenue-management-container label {
+  color: #d9d9d9;
+}
+
+/* Select boxes */
+.dark-mode .revenue-management-container select {
+  background-color: #111827;
+  color: #e0e0e0;
+  border-color: #434343;
+}
+
+.dark-mode .revenue-management-container select:focus {
+  border-color: #177ddc;
+}
+
+.dark-mode .revenue-management-container select option {
+  background-color: #141414;
+  color: #e0e0e0;
+}
+
+/* Tabs */
+.dark-mode .revenue-management-container .tabs-container {
+  background-color: #141414;
+}
+
+.dark-mode .revenue-management-container .tab-button {
+  color: #a6a6a6;
+}
+
+.dark-mode .revenue-management-container .tab-button.active {
+  background-color: #1f1f1f;
+  color: #e0e0e0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Expense Cards */
+.dark-mode .expense-summary-card {
+  background-color: #141414;
+  border-color: #434343;
+}
+
+.dark-mode .expense-summary-card p {
+  color: #d9d9d9;
+}
+
+/* Các thẻ card theo màu */
+.dark-mode .bg-red-50 {
+  background-color: rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.3);
+}
+
+.dark-mode .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.dark-mode .bg-blue-50 {
+  background-color: rgba(34, 211, 238, 0.15);
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+.dark-mode .bg-green-50 {
+  background-color: rgba(163, 230, 53, 0.15);
+  border-color: rgba(163, 230, 53, 0.3);
+}
+
+/* Text colors */
+.dark-mode .text-red-600,
+.dark-mode .text-red-700 {
+  color: #ff7875;
+}
+
+.dark-mode .text-orange-600,
+.dark-mode .text-orange-700 {
+  color: #ff9c6e;
+}
+
+.dark-mode .text-blue-600,
+.dark-mode .text-blue-700 {
+  color: #69c0ff;
+}
+
+.dark-mode .text-green-600,
+.dark-mode .text-green-700 {
+  color: #b7eb8f;
+}
+
+.dark-mode .text-gray-500,
+.dark-mode .text-gray-600,
+.dark-mode .text-gray-700 {
+  color: #a6a6a6;
+}
+
+/* Detail Cards */
+.dark-mode .expense-details-card {
+  background-color: #141414;
+  border-color: #434343;
+}
+
+.dark-mode .expense-details-card h3 {
+  color: #d9d9d9;
+}
+
+.dark-mode .expense-details-card .border-b,
+.dark-mode .expense-details-card .border-t {
+  border-color: #434343;
+}
+
+/* Pie Chart Container */
+.dark-mode .pie-chart-container {
+  background-color: #141414;
+  border-color: #434343;
+}
+
+.dark-mode .pie-chart-container h3 {
+  color: #d9d9d9;
+}
+
+.dark-mode .refresh-button {
+  background-color: #141414;
+  color: #d9d9d9;
+}
+
+.dark-mode .refresh-button:hover {
+  background-color: #303030;
+}
+
+/* Table */
+.dark-mode .expense-table {
+  background-color: #141414;
+  border-color: #434343;
+}
+
+.dark-mode .expense-table thead {
+  background-color: #1f1f1f;
+}
+
+.dark-mode .expense-table th,
+.dark-mode .expense-table td {
+  border-color: #434343;
+  color: #d9d9d9;
+}
+
+.dark-mode .expense-table tr:hover {
+  background-color: #1f1f1f;
+}
+
+/* Empty state */
+.dark-mode .ant-empty-description {
+  color: #a6a6a6;
+}
+
+/* Modal */
+.dark-mode .ant-modal-content {
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.48),
+    0 6px 16px 0 rgba(0, 0, 0, 0.32), 0 9px 28px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .ant-modal-header {
+  background-color: #1f1f1f;
+  border-color: #434343;
+}
+
+.dark-mode .ant-modal-title {
+  background-color: #111827;
+  color: #d9d9d9;
+}
+
+.dark-mode .ant-modal-close-x {
+  color: #a6a6a6;
+}
+.dark-mode .ant-input-number-group-addon {
+  color: #d9d9d9;
+}
+
+.dark-mode .ant-modal-footer {
+  border-color: #434343;
+}
+
+/* Form trong modal */
+.dark-mode .ant-form-item-label > label {
+  color: #d9d9d9;
+}
+
+.dark-mode .ant-input,
+.dark-mode .ant-input-number,
+.dark-mode .ant-input-number-input {
+  background-color: #1f2937;
+  border-color: #434343;
+  color: #d9d9d9;
+}
+
+.dark-mode .ant-input:focus,
+.dark-mode .ant-input-number:focus,
+.dark-mode .ant-input-focused,
+.dark-mode .ant-input-number-focused {
+  border-color: #177ddc;
+  box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.2);
+}
+
+.dark-mode .ant-input-number-handler-wrap {
+  background-color: #1f1f1f;
+  border-color: #434343;
+}
+
+.dark-mode .ant-input-number-handler-up-inner,
+.dark-mode .ant-input-number-handler-down-inner {
+  color: #a6a6a6;
+}
+
+.dark-mode .ant-divider {
+  border-color: #434343;
+}
+
+.dark-mode .ant-divider-inner-text {
+  color: #d9d9d9;
+}
+
+/* Buttons */
+.dark-mode .ant-btn {
+  border-color: #434343;
+}
+
+.dark-mode .ant-btn-primary {
+  background-color: #177ddc;
+  border-color: #177ddc;
+  color: #fff;
+}
+
+.dark-mode .ant-btn-link {
+  color: #177ddc;
+}
+
+.dark-mode .ant-btn-dashed {
+  border-color: #434343;
+  color: #d9d9d9;
+}
+
+/* Popconfirm */
+.dark-mode .ant-popover-inner {
+  background-color: #1f1f1f;
+}
+
+.dark-mode .ant-popover-title {
+  color: #d9d9d9;
+  border-color: #434343;
+}
+
+.dark-mode .ant-popover-inner-content {
+  color: #a6a6a6;
+}
+
+.dark-mode .ant-popover-message-title {
+  color: #d9d9d9;
+}
+
+.dark-mode .ant-popover-buttons .ant-btn {
+  background-color: transparent;
+  border-color: #434343;
+  color: #d9d9d9;
+}
+
+.dark-mode .ant-popover-buttons .ant-btn-primary {
+  background-color: #177ddc;
+  border-color: #177ddc;
+  color: #fff;
+}
+
+.dark-mode .ant-popover-buttons .ant-btn-dangerous {
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+/* Thêm style cho mũi tên của Popconfirm */
+.dark-mode .ant-popover-arrow .ant-popover-arrow-content {
+  background-color: #1f1f1f;
+}
+
+.dark-mode .ant-popover-placement-top .ant-popover-arrow-content::before,
+.dark-mode .ant-popover-placement-topLeft .ant-popover-arrow-content::before,
+.dark-mode .ant-popover-placement-topRight .ant-popover-arrow-content::before {
+  border-top-color: #1f1f1f;
+  border-left-color: #1f1f1f;
+}
+
+.dark-mode .ant-popover-placement-bottom .ant-popover-arrow-content::before,
+.dark-mode .ant-popover-placement-bottomLeft .ant-popover-arrow-content::before,
+.dark-mode
+  .ant-popover-placement-bottomRight
+  .ant-popover-arrow-content::before {
+  border-bottom-color: #1f1f1f;
+  border-right-color: #1f1f1f;
+}
+
+.dark-mode .ant-popover-placement-left .ant-popover-arrow-content::before,
+.dark-mode .ant-popover-placement-leftTop .ant-popover-arrow-content::before,
+.dark-mode
+  .ant-popover-placement-leftBottom
+  .ant-popover-arrow-content::before {
+  border-bottom-color: #1f1f1f;
+  border-left-color: #1f1f1f;
+}
+
+.dark-mode .ant-popover-placement-right .ant-popover-arrow-content::before,
+.dark-mode .ant-popover-placement-rightTop .ant-popover-arrow-content::before,
+.dark-mode
+  .ant-popover-placement-rightBottom
+  .ant-popover-arrow-content::before {
+  border-top-color: #1f1f1f;
+  border-right-color: #1f1f1f;
+}
+
+/* Style cho icon trong Popconfirm */
+.dark-mode .ant-popover-message > .anticon {
+  color: #faad14;
+}
+
+/* Style cho warning icon trong Popconfirm */
+.dark-mode .ant-popover-message > .anticon-exclamation-circle {
+  color: #faad14;
+}
+
+/* Style cho content wrapper */
+.dark-mode .ant-popover-message {
+  color: #d9d9d9;
+}
+
+/* Style cho hover button trong Popconfirm */
+.dark-mode .ant-popover-buttons .ant-btn:hover,
+.dark-mode .ant-popover-buttons .ant-btn:focus {
+  background-color: #303030;
+  border-color: #434343;
+  color: #ffffff;
+}
+
+.dark-mode .ant-popover-buttons .ant-btn-primary:hover,
+.dark-mode .ant-popover-buttons .ant-btn-primary:focus {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.dark-mode .ant-popover-buttons .ant-btn-dangerous:hover,
+.dark-mode .ant-popover-buttons .ant-btn-dangerous:focus {
+  background-color: #a61d24;
+  border-color: #ff7875;
+  color: #ffffff;
+}
+
+/* Loading spinner */
+.dark-mode .loading-spinner {
+  border-color: #177ddc transparent #177ddc transparent;
+}
+
+.dark-mode .ant-popover-inner {
+  background-color: white;
+}
+
+.dark-mode .ant-popconfirm-message {
+  background-color: white;
+}
+
+.dark-mode .ant-popconfirm-inner-content {
+  background-color: white;
+}

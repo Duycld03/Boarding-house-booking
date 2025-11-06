@@ -1,0 +1,18 @@
+{
+  "payDeposit": "Thanh Toán Đặt Cọc",
+  "room": "Phòng",
+  "rentalPeriod": "Thời Gian Thuê",
+  "rentalTime": "Thời Hạn Thuê",
+  "month": "tháng",
+  "months": "tháng",
+  "depositAmount": "Tiền Đặt Cọc",
+  "selectPaymentMethod": "Chọn Phương Thức Thanh Toán",
+  "processing": "Đang xử lý...",
+  "selectMethodFirst": "Vui lòng chọn phương thức thanh toán",
+  "confirmPayment": "Xác Nhận Thanh Toán",
+  "invalidDepositData": "Thông tin đặt cọc không hợp lệ",
+  "pleaseSelectPaymentMethod": "Vui lòng chọn phương thức thanh toán",
+  "paymentFailed": "Quá trình thanh toán thất bại",
+  "paymentInitiated": "Bắt đầu thanh toán thành công",
+  "paymentSuccessful": "Thanh toán tiền đặt cọc thành công!"
+}

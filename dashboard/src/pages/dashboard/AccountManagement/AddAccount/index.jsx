@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Form, Select, Modal, Input, ConfigProvider } from "antd";
 import { Button } from "../../../../component";
 import { toast } from "react-toastify";
@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/context/themeContext";
 import Style from "./AddAccountModal.module.css"; // Import custom CSS for additional dark mode fixes
 import classNames from "classnames";
-const cx = classNames.bind(Style); // Bind the styles to the classNames function
+const cx = classNames.bind(Style);
 
 const { Option } = Select;
 
@@ -20,8 +20,95 @@ const AddAccountModal = ({ onAddData }) => {
   const [step, setStep] = useState(1);
   const [form1Data, setForm1Data] = useState({});
 
-  // Theme-specific styles
+  // Refs for Step 1 fields
+  const fullnameRef = useRef(null);
+  const emailRef = useRef(null);
+  const genderRef = useRef(null);
+  const phoneNumberRef = useRef(null);
+  const nextBtnRef = useRef(null);
 
+  // Refs for Step 2 fields
+  const usernameRef = useRef(null);
+  const passwordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
+  const roleRef = useRef(null);
+  const submitBtnRef = useRef(null);
+
+  // Arrays of refs for easier navigation
+  const step1FieldRefs = [
+    fullnameRef,
+    emailRef,
+    genderRef,
+    phoneNumberRef,
+    nextBtnRef,
+  ];
+  const step2FieldRefs = [
+    usernameRef,
+    passwordRef,
+    confirmPasswordRef,
+    roleRef,
+    submitBtnRef,
+  ];
+
+  // Handle Enter key press to navigate between fields
+  const handleKeyDown = (e, currentIndex, step) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const fieldRefs = step === 1 ? step1FieldRefs : step2FieldRefs;
+      const nextIndex = currentIndex + 1;
+
+      if (nextIndex < fieldRefs.length) {
+        // Focus next field
+        const nextRef = fieldRefs[nextIndex];
+        if (nextRef.current) {
+          if (nextIndex === fieldRefs.length - 1) {
+            // If it's the button, focus it
+            nextRef.current.focus();
+          } else {
+            // For form fields, we need to focus the input element
+            setTimeout(() => {
+              let input = null;
+
+              // Try different selectors based on the component type
+              if (nextRef.current.querySelector) {
+                input =
+                  nextRef.current.querySelector("input") ||
+                  nextRef.current.querySelector(".ant-select-selector") ||
+                  nextRef.current.querySelector("textarea");
+              }
+
+              // If no input found, try the ref itself
+              if (!input) {
+                input = nextRef.current;
+              }
+
+              if (input && input.focus) {
+                input.focus();
+
+                // For Select components, trigger click to open dropdown
+                if (
+                  input.classList &&
+                  input.classList.contains("ant-select-selector")
+                ) {
+                  setTimeout(() => input.click(), 50);
+                }
+              }
+            }, 100);
+          }
+        }
+      } else if (step === 1) {
+        // If at the end of step 1, trigger next button
+        handleNext();
+      } else if (step === 2) {
+        // If at the end of step 2, trigger submit
+        handleSubmit();
+      }
+    }
+  };
+
+  // Theme-specific styles
   // Modal styles for dark mode
   const modalStyles = darkMode
     ? {
@@ -99,38 +186,38 @@ const AddAccountModal = ({ onAddData }) => {
       .then((values) => {
         setForm1Data(values);
         setStep(2);
+        // Focus first field in step 2 after a short delay
+        setTimeout(() => {
+          if (usernameRef.current) {
+            const input = usernameRef.current.querySelector("input");
+            if (input) input.focus();
+          }
+        }, 100);
       })
       .catch(() => {
         toast.error(t("errors.form1"));
       });
   };
 
+  // Thay đổi hàm handleSubmit để chỉ validate form2
   const handleSubmit = () => {
-    form1
+    form2
       .validateFields()
-      .then((values1) => {
-        form2
-          .validateFields()
-          .then((values2) => {
-            const { confirmPassword, ...accountData } = values2;
+      .then((values2) => {
+        const { confirmPassword, ...accountData } = values2;
 
-            const finalValues = {
-              ...form1Data,
-              ...accountData,
-            };
+        const finalValues = {
+          ...form1Data,
+          ...accountData,
+        };
 
-            onAddData(finalValues);
-            toast.success(t("messages.addSuccess"));
-            handleCancel();
-          })
-          .catch((error) => {
-            console.error("Form 2 validation failed:", error);
-            toast.error(t("errors.form2"));
-          });
+        onAddData(finalValues);
+
+        handleCancel();
       })
       .catch((error) => {
-        console.error("Form 1 validation failed:", error);
-        toast.error(t("errors.form1"));
+        console.error("Form 2 validation failed:", error);
+        toast.error(t("errors.form2"));
       });
   };
 
@@ -219,7 +306,7 @@ const AddAccountModal = ({ onAddData }) => {
         footer={null}
         destroyOnClose
         styles={modalStyles}
-        className={cx({ "dark-mode-modal": darkMode })}
+        className={darkMode ? "ant-modal-dark" : ""}
       >
         <div className={cx({ "dark-mode-form": darkMode })}>
           {step === 1 && (
@@ -240,11 +327,14 @@ const AddAccountModal = ({ onAddData }) => {
                 ]}
                 style={formStyles.item}
               >
-                <Input
-                  placeholder={t("forms.fullname.placeholder")}
-                  className={darkModeInputClass}
-                  style={formStyles.input}
-                />
+                <div ref={fullnameRef}>
+                  <Input
+                    placeholder={t("forms.fullname.placeholder")}
+                    className={darkModeInputClass}
+                    style={formStyles.input}
+                    onKeyDown={(e) => handleKeyDown(e, 0, 1)}
+                  />
+                </div>
               </Form.Item>
 
               <Form.Item
@@ -260,11 +350,14 @@ const AddAccountModal = ({ onAddData }) => {
                 ]}
                 style={formStyles.item}
               >
-                <Input
-                  placeholder={t("forms.email.placeholder")}
-                  className={darkModeInputClass}
-                  style={formStyles.input}
-                />
+                <div ref={emailRef}>
+                  <Input
+                    placeholder={t("forms.email.placeholder")}
+                    className={darkModeInputClass}
+                    style={formStyles.input}
+                    onKeyDown={(e) => handleKeyDown(e, 1, 1)}
+                  />
+                </div>
               </Form.Item>
 
               <Form.Item
@@ -311,14 +404,18 @@ const AddAccountModal = ({ onAddData }) => {
                 ]}
                 style={formStyles.item}
               >
-                <Input
-                  placeholder={t("forms.phoneNumber.placeholder")}
-                  className={darkModeInputClass}
-                  style={formStyles.input}
-                />
+                <div ref={phoneNumberRef}>
+                  <Input
+                    placeholder={t("forms.phoneNumber.placeholder")}
+                    className={darkModeInputClass}
+                    style={formStyles.input}
+                    onKeyDown={(e) => handleKeyDown(e, 3, 1)}
+                  />
+                </div>
               </Form.Item>
 
               <Button
+                ref={nextBtnRef}
                 className={primaryButtonClass}
                 size="large"
                 onClick={handleNext}
@@ -343,11 +440,14 @@ const AddAccountModal = ({ onAddData }) => {
                 ]}
                 style={formStyles.item}
               >
-                <Input
-                  placeholder={t("forms.username.placeholder")}
-                  className={darkModeInputClass}
-                  style={formStyles.input}
-                />
+                <div ref={usernameRef}>
+                  <Input
+                    placeholder={t("forms.username.placeholder")}
+                    className={darkModeInputClass}
+                    style={formStyles.input}
+                    onKeyDown={(e) => handleKeyDown(e, 0, 2)}
+                  />
+                </div>
               </Form.Item>
 
               <Form.Item
@@ -363,11 +463,14 @@ const AddAccountModal = ({ onAddData }) => {
                 ]}
                 style={formStyles.item}
               >
-                <Input.Password
-                  placeholder={t("forms.password.placeholder")}
-                  className={darkModeInputClass}
-                  style={formStyles.input}
-                />
+                <div ref={passwordRef}>
+                  <Input.Password
+                    placeholder={t("forms.password.placeholder")}
+                    className={darkModeInputClass}
+                    style={formStyles.input}
+                    onKeyDown={(e) => handleKeyDown(e, 1, 2)}
+                  />
+                </div>
               </Form.Item>
 
               <Form.Item
@@ -396,11 +499,14 @@ const AddAccountModal = ({ onAddData }) => {
                 ]}
                 style={formStyles.item}
               >
-                <Input.Password
-                  placeholder={t("forms.confirmPassword.placeholder")}
-                  className={darkModeInputClass}
-                  style={formStyles.input}
-                />
+                <div ref={confirmPasswordRef}>
+                  <Input.Password
+                    placeholder={t("forms.confirmPassword.placeholder")}
+                    className={darkModeInputClass}
+                    style={formStyles.input}
+                    onKeyDown={(e) => handleKeyDown(e, 2, 2)}
+                  />
+                </div>
               </Form.Item>
 
               <Form.Item
@@ -434,6 +540,7 @@ const AddAccountModal = ({ onAddData }) => {
                   {t("buttons.back")}
                 </Button>
                 <Button
+                  ref={submitBtnRef}
                   className={primaryButtonClass}
                   size="large"
                   onClick={handleSubmit}

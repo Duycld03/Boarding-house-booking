@@ -11,7 +11,7 @@ instance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
     config.headers.Authorization = `Bearer ${localStorage.getItem(
-      "access_token"
+      "admin_token"
     )}`;
     return config;
   },

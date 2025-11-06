@@ -1,148 +1,153 @@
-
 /* Dark mode for Form Items */
-.dark-form .ant-form-item-label>label {
-    color: #e5e7eb !important;
+.dark-form .ant-form-item-label > label {
+  color: #e5e7eb !important;
 }
 
 /* Alternative styling - can be used globally */
-.dark .ant-form-item-label>label,
-.dark-form .ant-form-item-label>label {
-    color: #e5e7eb !important;
+.dark .ant-form-item-label > label,
+.dark-form .ant-form-item-label > label {
+  color: #e5e7eb !important;
 }
 
 /* Dark mode for Select components */
 .ant-select-dark .ant-select-selector {
-    background-color: #1f2937 !important;
-    border-color: #4b5563 !important;
-    color: #e5e7eb !important;
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
 }
 
 .ant-select-dark .ant-select-arrow {
-    color: #9ca3af !important;
+  color: #9ca3af !important;
 }
 
 .ant-select-dark .ant-select-selection-placeholder {
-    color: #9ca3af !important;
+  color: #9ca3af !important;
 }
 
 .ant-select-dark .ant-select-selection-item {
-    color: #e5e7eb !important;
+  color: #e5e7eb !important;
 }
 
 .ant-select-dropdown.ant-select-dropdown-dark {
-    background-color: #1f2937 !important;
+  background-color: #1f2937 !important;
 }
 
 .ant-select-dropdown.ant-select-dropdown-dark .ant-select-item {
-    color: #e5e7eb !important;
+  color: #e5e7eb !important;
 }
 
 .ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option-selected {
-    background-color: #374151 !important;
+  background-color: #374151 !important;
 }
 
-.ant-select-dropdown.ant-select-dropdown-dark .ant-select-item-option-active:not(.ant-select-item-option-selected) {
-    background-color: #374151 !important;
+.ant-select-dropdown.ant-select-dropdown-dark
+  .ant-select-item-option-active:not(.ant-select-item-option-selected) {
+  background-color: #374151 !important;
 }
 
 /* Dark mode for DatePicker components */
 .ant-picker-dark {
-    background-color: #1f2937 !important;
-    border-color: #4b5563 !important;
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
 }
 
 .ant-picker-dark input {
-    color: #e5e7eb !important;
+  color: #e5e7eb !important;
 }
 
 .ant-picker-dark .ant-picker-suffix {
-    color: #9ca3af !important;
+  color: #9ca3af !important;
 }
 
 .ant-picker-dark .ant-picker-clear {
-    background-color: #374151 !important;
-    color: #9ca3af !important;
+  background-color: #374151 !important;
+  color: #9ca3af !important;
 }
 
 .ant-picker-dark.ant-picker-focused {
-    border-color: #60a5fa !important;
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
 }
 
 /* Dark mode for the DatePicker dropdown panel */
 .ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-panel-container {
-    background-color: #1f2937 !important;
+  background-color: #1f2937 !important;
 }
 
 .ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-header {
-    color: #e5e7eb !important;
-    border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+  border-color: #4b5563 !important;
 }
 
 .ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-header-view {
-    color: #e5e7eb !important;
+  color: #e5e7eb !important;
 }
 
 .ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-header button {
-    color: #9ca3af !important;
+  color: #9ca3af !important;
 }
 
 .ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-content th {
-    color: #9ca3af !important;
+  color: #9ca3af !important;
 }
 
 .ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-cell {
-    color: #e5e7eb !important;
+  color: #e5e7eb !important;
 }
 
 .ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-cell-in-view {
-    color: #e5e7eb !important;
+  color: #e5e7eb !important;
 }
 
-.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-cell:hover .ant-picker-cell-inner {
-    background-color: #374151 !important;
+.ant-picker-dropdown.ant-picker-dropdown-dark
+  .ant-picker-cell:hover
+  .ant-picker-cell-inner {
+  background-color: #374151 !important;
 }
 
-.ant-picker-dropdown.ant-picker-dropdown-dark .ant-picker-cell-selected .ant-picker-cell-inner {
-    background-color: #3b82f6 !important;
+.ant-picker-dropdown.ant-picker-dropdown-dark
+  .ant-picker-cell-selected
+  .ant-picker-cell-inner {
+  background-color: #3b82f6 !important;
 }
 
 /* Dark mode for modal */
 .ant-modal.ant-modal-dark .ant-modal-content {
-    background-color: #1f2937 !important;
+  background-color: #1f2937 !important;
 }
 
 .ant-modal.ant-modal-dark .ant-modal-header {
-    background-color: #1f2937 !important;
-    border-color: #4b5563 !important;
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
 }
 
 .ant-modal.ant-modal-dark .ant-modal-title {
-    color: #e5e7eb !important;
+  color: #e5e7eb;
+  background-color: #1f2937;
 }
 
 .ant-modal.ant-modal-dark .ant-modal-close-x {
-    color: #9ca3af !important;
+  color: #9ca3af !important;
 }
 
 .ant-modal.ant-modal-dark .ant-modal-body {
-    color: #e5e7eb !important;
+  color: #e5e7eb !important;
 }
 
 .ant-modal.ant-modal-dark .ant-modal-footer {
-    border-color: #4b5563 !important;
+  border-color: #4b5563 !important;
 }
 
 .ant-picker-dark {
-    background-color: #1f2937;
-    border-color: #374151;
+  background-color: #1f2937;
+  border-color: #374151;
 }
 
 .ant-picker-dark input {
-    color: white;
+  color: white;
 }
 
 /* This is the key styling for placeholder color in dark mode */
 .ant-picker-dark input::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
 }

@@ -1,0 +1,35 @@
+{
+    "filterTitle": "Lọc nhà trọ",
+    "name": "Tên nhà trọ",
+    "enterName": "Nhập tên nhà trọ",
+    "priceRange": "Khoảng giá",
+    "min": "Tối thiểu",
+    "max": "Tối đa",
+    "type": "Loại",
+    "rating": "Đánh giá",
+    "applyFilter": "Áp dụng bộ lọc",
+    "filterResultTitle": "Kết quả lọc",
+    "totalResults": "{{count}} kết quả",
+    "emptyTitle": "Không có kết quả",
+    "emptyMessage": "Không tìm thấy nhà trọ phù hợp với bộ lọc.",
+    "itemName": "nhà trọ",
+    "province": "Tỉnh/Thành phố",
+    "selectProvince": "Chọn tỉnh",
+    "district": "Quận/Huyện",
+    "selectDistrict": "Chọn quận",
+    "ward": "Phường/Xã",
+    "selectWard": "Chọn phường",
+    "address": "Địa chỉ",
+    "ratingAbove": "{{rating}} sao trở lên",
+    "accommodation_types": {
+        "nha_tro_truyen_thong": "Traditional Boarding House",
+        "mini_house": "Mini House",
+        "nha_tro_kien_truc_xa": "Dormitory Style Boarding House",
+        "nha_tro_cao_cap": "Premium Boarding House"
+    },
+    "boardingHouseTypes": {
+        "Nhà trọ truyền thống": "Traditional Boarding House",
+        "Mini house": "Mini Apartment",
+        "Nhà trọ kiến trúc xá": "Dormitory"
+    }
+}

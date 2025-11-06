@@ -7,14 +7,14 @@ import {
 } from "@ant-design/icons";
 import formatAmount from "../../../utils/formatAmount";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getMyDepositedRoom } from "@/api/depositManagement";
+import { getMyDepositedRoom } from "@/api/depositAPI";
 import { Loader } from "../../../component";
 import { Tag } from "antd";
 import MyDepositDetail from "./MyDepositDetail";
 import { toast } from "react-toastify";
 import ActionDropdown from "./ActionDropdown";
 import RenewalRequestForm from "./RenewalRequestForm";
-import { getExtensionRequests } from "@/api/extensionRequest";
+import { getExtensionRequests } from "@/api/extensionRequestAPI";
 import PayDepositPopup from "./MyDepositDetail/PayDepositPopup";
 import CreateDepositRefundRequest from "./CreateDepositRefundRequest";
 

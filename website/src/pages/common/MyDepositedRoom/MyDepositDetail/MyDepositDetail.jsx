@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Modal, Card, Image, List, Avatar, Dropdown, Menu } from "antd";
 import { DollarOutlined, EllipsisOutlined } from "@ant-design/icons";
-import { checkPayRentStatus, getDepositRoom } from "@/api/depositManagement";
+import { checkPayRentStatus, getDepositRoom } from "@/api/depositAPI";
 import formatAmount from "@/utils/formatAmount";
 import { useCurrentUser } from "@/context/userContext";
 import PayRentPopup from "./PayRentPopup";
@@ -49,14 +49,6 @@ function MyDepositDetail({ depositRoomId, isModalVisible, handleCancel }) {
   const payRent = async (userId) => {
     setPayRentData({ userId, depositRoomId, amount: depositRoom.price });
     setPayRentVisible(true);
-  };
-
-  const refundDeposit = async (userId) => {
-    console.log("Refund deposit for", userId, "in room", depositRoomId);
-  };
-
-  const extendRent = async (userId) => {
-    console.log("Extend rent for", userId, "in room", depositRoomId);
   };
 
   const report = async (userId) => {

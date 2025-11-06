@@ -1,12 +1,13 @@
-import { DefaultLayout } from "./Layouts";
+import { DefaultLayout } from './Layouts';
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   Navigate,
-} from "react-router-dom";
-import routes from "./routes";
-import { ToastContainer } from "react-toastify";
+} from 'react-router-dom';
+import routes from './routes';
+import { ToastContainer } from 'react-toastify';
+import './config-translation/config-translation';
 
 function App() {
   return (

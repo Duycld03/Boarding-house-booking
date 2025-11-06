@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Form, Button, Card, Input } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getUser } from "../../../api/authManagement";
+import { getUser } from "../../../api/authAPI";
 import { Back } from "../../../component";
-import { verifyChangeEmail } from "../../../api/AccountManagement";
+import { verifyChangeEmail } from "../../../api/accountAPI";
 
 function VerifyChangeEmail() {
   const navigate = useNavigate();

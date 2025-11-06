@@ -1,0 +1,35 @@
+{
+  "report": {
+    "title": "Báo cáo",
+    "reason": "Lý do",
+    "detail": "Chi tiết",
+    "images": "Hình ảnh",
+    "addImages": "Thêm hình ảnh",
+    "selectReason": "Chọn một lý do",
+    "enterDetail": "Mô tả vấn đề",
+    "submit": "Gửi báo cáo",
+    "success": "Báo cáo đã được gửi thành công",
+    "error": "Không thể gửi báo cáo",
+    "validationError": "Vui lòng điền đầy đủ các trường bắt buộc",
+    "reasonRequired": "Vui lòng chọn một lý do",
+    "detailRequired": "Vui lòng cung cấp chi tiết về vấn đề",
+    "uploadLimit": "Tối đa 6 hình ảnh được phép",
+    "dragDropText": "Kéo và thả tệp vào đây, hoặc nhấp để chọn",
+    "alreadyReported": "Bạn đã báo cáo đánh giá này rồi",
+    "reasons": {
+      "boardingHouse": {
+        "scamRent": "Lừa đảo hoặc danh sách gian lận",
+        "falseAd": "Thông tin sai lệch hoặc gây hiểu lầm",
+        "privacy": "Vi phạm quyền riêng tư",
+        "unfriendly": "Môi trường không thân thiện",
+        "security": "Vấn đề về an ninh"
+      },
+      "review": {
+        "spam": "Spam hoặc nội dung không liên quan",
+        "misleading": "Thông tin gây hiểu lầm",
+        "privacy": "Vi phạm quyền riêng tư",
+        "inappropriate": "Nội dung không phù hợp"
+      }
+    }
+  }
+}

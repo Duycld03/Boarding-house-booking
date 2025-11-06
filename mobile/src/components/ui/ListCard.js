@@ -1,0 +1,159 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
+import { useTheme } from '@/context/ThemeProvider';
+
+const getPrimaryImage = (images = [], fallbackImages = []) => {
+  const source =
+    Array.isArray(images) && images.length > 0 ? images : fallbackImages;
+  if (!Array.isArray(source) || source.length === 0) {
+    return 'https://via.placeholder.com/200';
+  }
+  const primary = source.find((img) => img?.isPrimary);
+  return primary ? primary.imageUrl : source[0].imageUrl;
+};
+
+const getAddress = (address, t) => {
+  if (!address) {
+    return t('addressFormat', {
+      detail: 'N/A',
+      ward: '',
+      district: '',
+      province: '',
+    });
+  }
+  const { detail, ward, district, province } = address;
+  return t('addressFormat', { detail, ward, district, province });
+};
+
+const renderStars = (rating = 0) => {
+  const stars = Math.round(rating);
+  return (
+    <View style={styles.rating}>
+      {Array.from({ length: stars }).map((_, i) => (
+        <AntDesign key={i} name="star" size={16} color="#facc15" />
+      ))}
+    </View>
+  );
+};
+
+const ListCard = ({
+  data,
+  onConfirmDelete,
+  setSelectedId,
+  mode = 'watchLater',
+}) => {
+  const { isDarkMode } = useTheme();
+  const { t } = useTranslation('common');
+  const router = useRouter();
+
+  const handleRemove = (id) => {
+    setSelectedId(id);
+    onConfirmDelete();
+  };
+
+  const goToDetail = (id) => {
+    router.push(`/BhDetail/${id}`);
+  };
+
+  const renderItem = ({ item }) => {
+    const house = item?.boardingHouseId || item;
+
+    const type =
+      typeof house?.boardingHouseType === 'object'
+        ? house?.boardingHouseType?.name
+        : house?.boardingHouseType;
+
+    // ❌ Bỏ qua nếu không có loại nhà trọ hợp lệ
+    if (!type || type === 'undefined' || type === 'Unknown') {
+      return null;
+    }
+
+    const navigateId = house?._id;
+    const itemId = mode === 'favorite' ? house?._id : item?._id || item?.id;
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.card,
+          { backgroundColor: isDarkMode ? '#1f2937' : '#FFF' },
+        ]}
+        onPress={() => goToDetail(navigateId)}
+      >
+        <View style={styles.imageWrapper}>
+          <Image
+            source={{ uri: getPrimaryImage(house?.images, house?.img) }}
+            style={styles.image}
+          />
+        </View>
+        <View style={styles.info}>
+          <Text style={[styles.name, { color: isDarkMode ? '#fff' : '#000' }]}>
+            {house?.name}
+          </Text>
+          <Text style={[styles.type, { color: isDarkMode ? '#ccc' : '#666' }]}>
+            {t(`boardingHouseTypes.${type}`)}
+          </Text>
+          {renderStars(house?.rating)}
+          <Text
+            style={[styles.address, { color: isDarkMode ? '#aaa' : '#888' }]}
+          >
+            {getAddress(house?.address, t)}
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => handleRemove(itemId)}
+          style={styles.deleteIcon}
+        >
+          <AntDesign name="close" size={20} color="red" />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDarkMode ? '#111827' : '#f9fafb' },
+      ]}
+    >
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => `${item?._id || index}`}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { padding: 12, flex: 1 },
+  card: {
+    flexDirection: 'row',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    elevation: 2,
+    alignItems: 'center',
+  },
+  imageWrapper: { width: 100, height: 100, marginRight: 12 },
+  image: { width: '100%', height: '100%', borderRadius: 6 },
+  info: { flex: 1 },
+  name: { fontSize: 18, fontWeight: 'bold' },
+  type: { fontSize: 14 },
+  rating: { flexDirection: 'row', marginTop: 4 },
+  address: { fontSize: 12, marginTop: 4 },
+  deleteIcon: { marginLeft: 8 },
+});
+
+export default ListCard;

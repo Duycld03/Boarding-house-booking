@@ -1,0 +1,37 @@
+// Tạo mobile/src/locales/vi/depositRoomDetail.json
+{
+  "depositDetail": "Chi Tiết Đặt Cọc",
+  "loading": "Đang tải",
+  "notFound": "Không Tìm Thấy",
+  "depositNotFoundMessage": "Không thể tìm thấy thông tin phòng đặt cọc.",
+  "noImagesAvailable": "Không có hình ảnh",
+  "room": "Phòng",
+  "depositAmount": "Số Tiền Cọc",
+  "rentalTime": "Thời Gian Thuê",
+  "months": "tháng",
+  "rentalPeriod": "Thời Gian Thuê",
+  "to": "đến",
+  "roomSize": "Diện Tích",
+  "monthlyPrice": "Giá Thuê/Tháng",
+  "refundRequestInfo": "Thông Tin Yêu Cầu Hoàn Tiền",
+  "refundStatusLabel": "Trạng thái",
+  "reason": "Lý do",
+  "roommates": "Người Ở Cùng",
+  "payDeposit": "Thanh Toán Cọc",
+  "requestRefund": "Yêu Cầu Hoàn Tiền",
+  "refundRequestAlreadyExists": "Đã có yêu cầu hoàn tiền cho khoản cọc này",
+  "invalidDepositId": "ID đặt cọc không hợp lệ",
+  "fetchError": "Không thể tải thông tin chi tiết đặt cọc",
+  "status": {
+    "pending": "Chờ duyệt",
+    "accepted": "Đã chấp nhận",
+    "confirmed": "Đã xác nhận",
+    "rejected": "Đã từ chối",
+    "refunded": "Đã hoàn tiền"
+  },
+  "refundStatus": {
+    "pending": "Chờ duyệt",
+    "approved": "Đã duyệt",
+    "rejected": "Đã từ chối"
+  }
+}

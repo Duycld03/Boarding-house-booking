@@ -1,0 +1,19 @@
+{
+  "myRenewalRequests": "Yêu cầu gia hạn của tôi",
+  "noRenewalRequests": "Không có yêu cầu gia hạn nào",
+  "noRenewalRequestsDescription": "Bạn chưa có yêu cầu gia hạn nào",
+  "renewalRequests": "yêu cầu gia hạn",
+  "viewDetails": "Xem chi tiết",
+  "room": "Phòng",
+  "previousEndDate": "Ngày kết thúc hiện tại",
+  "requestedExtensionDate": "Ngày gia hạn mới",
+  "tenantNote": "Ghi chú của bạn",
+  "ownerNote": "Phản hồi của chủ nhà",
+  "approvedMessage": "Yêu cầu gia hạn đã được phê duyệt",
+  "rejectedMessage": "Yêu cầu gia hạn đã bị từ chối",
+  "status": {
+    "pending": "Đang chờ",
+    "approved": "Đã duyệt",
+    "rejected": "Đã từ chối"
+  }
+}

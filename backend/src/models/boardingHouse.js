@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import mongoose_delete from "mongoose-delete";
+import mongoose from 'mongoose';
+import mongoose_delete from 'mongoose-delete';
 
 const ImagesSchema = new mongoose.Schema({
   _id: {
@@ -12,7 +12,7 @@ const ImagesSchema = new mongoose.Schema({
   },
   publicId: {
     type: String,
-    default: "",
+    default: '',
   },
   isPrimary: {
     type: Boolean,
@@ -35,8 +35,13 @@ const BoardingHouseSchema = new mongoose.Schema(
   {
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Account",
+      ref: 'Account',
       required: true,
+    },
+    staffId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Account',
+      default: null,
     },
     name: {
       type: String,
@@ -44,7 +49,7 @@ const BoardingHouseSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default: "",
+      default: '',
     },
     priceRange: {
       type: Number,
@@ -84,27 +89,28 @@ const BoardingHouseSchema = new mongoose.Schema(
     },
     boardingHouseType: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "BoardingHouseType",
+      ref: 'BoardingHouseType',
       required: true,
     },
     address: {
       province: {
-        type: String,
-        required: true,
+        name: { type: String, required: true },
+        name_en: { type: String, required: true },
       },
       district: {
-        type: String,
-        required: true,
+        name: { type: String, required: true },
+        name_en: { type: String, required: true },
       },
       ward: {
-        type: String,
-        required: true,
+        name: { type: String, required: true },
+        name_en: { type: String, required: true },
       },
       detail: {
         type: String,
-        default: "",
+        default: '',
       },
     },
+
     images: [ImagesSchema],
     location: LocationSchema,
   },
@@ -116,5 +122,5 @@ BoardingHouseSchema.plugin(mongoose_delete, {
   overrideMethods: true,
 });
 
-const BoardingHouse = mongoose.model("BoardingHouse", BoardingHouseSchema);
+const BoardingHouse = mongoose.model('BoardingHouse', BoardingHouseSchema);
 export default BoardingHouse;

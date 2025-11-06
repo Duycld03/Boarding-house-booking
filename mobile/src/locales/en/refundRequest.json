@@ -1,0 +1,42 @@
+{
+  "refund": {
+    "pageTitle": "Refund Requests",
+    "emptyTitle": "No Refund Requests",
+    "emptyMessage": "When you request a refund, it will appear here.",
+    "room": "Room",
+    "endDate": "End Date",
+    "amount": "Refund Amount",
+    "reason": "Reason",
+    "noReason": "None",
+    "createdAt": "Created At",
+    "status": {
+      "label": "Status",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+     "paid": "Paid"    },
+    "loadMore": "Load More",
+    "loadAll": "All Requests Loaded",
+    "loadingMore": "Loading more...",
+    "requests": "requests"
+  },
+  "common": {
+    "errorRefreshing": "Error refreshing data"
+  },
+  "title": "Refund Request",
+  "refundRequestTitle": "Request Deposit Refund",
+  "refundRequestSubtitle": "Submit your refund request",
+  "importantNote": "Important Note:",
+  "refundPolicy": "Refund requests can only be submitted 7 days before the deposit end date. Processing may take 3-5 business days.",
+  "reason": "Reason for Refund",
+  "enterReason": "Please explain in detail why you want to request a refund...",
+  "reasonHint": "Minimum 10 characters required",
+  "reasonRequired": "Please provide a reason for refund",
+  "reasonTooShort": "Reason must be at least 10 characters long",
+  "reasonTooLong": "Reason cannot exceed 500 characters",
+  "requestSubmitted": "Refund request submitted successfully",
+  "submitError": "Failed to submit refund request",
+  "submitting": "Submitting...",
+  "submitRequest": "Submit Refund Request",
+  "invalidDepositId": "Invalid deposit ID"
+}

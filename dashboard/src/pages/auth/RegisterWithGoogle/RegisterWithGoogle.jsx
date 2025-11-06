@@ -2,7 +2,7 @@ import { Form, Button, Card, Input, Select } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { register, getUser } from "../../../api/authManagement";
+import { registerWithGoogle, getUser } from "../../../api/authAPI";
 import { Back } from "../../../component";
 
 function RegisterWithGoogle() {
@@ -14,7 +14,7 @@ function RegisterWithGoogle() {
   const onFinish = async (values) => {
     try {
       setLoading(true);
-      const res = await register(values);
+      const res = await registerWithGoogle(values);
       localStorage.setItem("access_token", res.token);
       toast.success("Register successful");
       navigate("/");

@@ -1,0 +1,35 @@
+{
+  "confirmComponent": {
+    "btnConfirm": "Confirm",
+    "btnCancel": "Cancel"
+  },
+  "accommodation_types": {
+    "nha_tro_truyen_thong": "Traditional Boarding House",
+    "mini_house": "Mini House",
+    "nha_tro_kien_truc_xa": "Dormitory Style Boarding House",
+    "nha_tro_cao_cap": "Premium Boarding House"
+  },
+  "home": "Home",
+  "about": "About",
+  "contact": "Contact",
+  "profile": "Profile",
+  "changePassword": "Change Password",
+  "logout": "Logout",
+  "switchToLightMode": "Switch to Light Mode",
+  "switchToDarkMode": "Switch to Dark Mode",
+  "auth": {
+    "login-btn": "Login",
+    "register-btn": "Register"
+  },
+  "menu": {
+    "accountManagement": "Account Management",
+    "reportManagement": "Report Management",
+    "reportReview": "Report Review",
+    "reportBoardingHouse": "Report Boarding House",
+    "boardingHouseManagement": "Boarding House Management",
+    "reviewManagement": "Review Management",
+    "facilitiesManagement": "Facilities Management",
+    "boardingHouseTypeManagement": "Boarding House Type Management",
+    "withdrawalRequests": "Withdrawal Requests"
+  }
+}

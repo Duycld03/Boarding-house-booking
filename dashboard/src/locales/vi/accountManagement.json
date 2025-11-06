@@ -1,5 +1,6 @@
 {
   "title": "Quản Lý Tài Khoản",
+  "tableName": "Tài Khoản",
   "columns": {
     "avatar": "Ảnh Đại Diện",
     "username": "Tên Đăng Nhập",
@@ -8,7 +9,8 @@
     "role": "Vai Trò",
     "status": "Trạng Thái",
     "createdAt": "Ngày Tạo",
-    "action": "Thao Tác"
+    "action": "Thao Tác",
+    "gender": "Giới Tính"
   },
   "role": {
     "user": "Người Dùng",
@@ -22,7 +24,7 @@
   },
   "buttons": {
     "delete": "Xóa",
-    "detail": "Chi Tiết",
+    "update": "Update",
     "addNew": "Thêm Tài Khoản Mới",
     "next": "Tiếp Theo",
     "back": "Quay Lại",
@@ -101,7 +103,8 @@
       "required": "Vai trò là bắt buộc",
       "options": {
         "user": "Người Dùng",
-        "owner": "Chủ Sở Hữu"
+        "owner": "Chủ Trọ",
+        "staff": "Nhân Viên"
       }
     }
   },
@@ -122,7 +125,8 @@
     "deleteSuccess": "Xóa tài khoản thành công",
     "deleteFailed": "Xóa tài khoản thất bại. Phản hồi từ máy chủ không thành công.",
     "invalidId": "ID không hợp lệ",
-    "fetchError": "Không thể tải danh sách tài khoản. Vui lòng thử lại sau."
+    "fetchError": "Không thể tải danh sách tài khoản. Vui lòng thử lại sau.",
+    "des": "Đã xảy ra lỗi: {{error}}"
   },
   "errors": {
     "form1": "Vui lòng sửa lỗi trong biểu mẫu 1.",

@@ -1,19 +1,19 @@
 {
+  "tableName": "Review",
   "columns": {
     "boardingHouseName": "Boarding House Name",
     "content": "Content",
     "rating": "Rating",
     "createdAt": "Created Date",
     "reviewer": "Reviewer",
-    "action": "Action"
+    "action": "Action",
+    "reply":"Owner reply"
   },
   "buttons": {
     "delete": "Delete",
     "detail": "Detail",
     "submit": "Apply",
-    "cancel": "Cancel",
-    "owner": "Owner reply"
-
+    "cancel": "Cancel"
   },
   "modals": {
     "confirmDelete": {
@@ -22,6 +22,7 @@
     }
   },
   "messages": {
+    "noData": "No reviews found",
     "fetchError": "Failed to fetch reviews. Please try again later.",
     "deleteSuccess": "Delete review successful.",
     "deleteFailed": "Failed to delete review.",
@@ -44,6 +45,6 @@
       "startDateRequired": "Please select a start date.",
       "endDateRequired": "Please select an end date."
     },
-    "images": "Images"
+    "images": "Images:"
   }
 }

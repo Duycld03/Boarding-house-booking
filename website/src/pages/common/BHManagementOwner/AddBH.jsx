@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import AddressSelector from "../../../component/AddressSelector";
-import { getAllBoardingHouseTypesOwner } from "../../../api/BoardingHManagement";
+import { getAllBoardingHouseTypesOwner } from "../../../api/BoardingHouseAPI";
 import {
   fetchProvinces,
   fetchDistricts,
@@ -17,117 +17,148 @@ import {
   Image,
   Modal,
   Spin,
+  ConfigProvider,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { createBoardingHouseOwner } from "../../../api/BoardingHManagement";
+import {
+  createBoardingHouseOwner,
+  getManagersForOwner,
+} from "../../../api/BoardingHouseAPI"; // Assuming this function exists to fetch managers
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/context/themeContext";
+import classNames from "classnames";
+import "./AddBHModal.module.css"; // Import custom CSS for additional dark mode fixes
+import "./darkModeOverrides.css";
+
+const cx = classNames;
 
 const AddBHModal = ({ onAddData }) => {
-  // State management
-  const [isModalVisible, setIsModalVisible] = useState(false); // Controls modal visibility
+  const { t, i18n } = useTranslation("bhManagement");
+  const { darkMode } = useTheme();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [formData, setFormData] = useState({
     boardingHouseType: "",
     name: "",
-    address: {
-      province: "",
-      district: "",
-      ward: "",
-      detail: "",
-    },
+    address: { province: "", district: "", ward: "", detail: "" },
     description: "",
     primaryImage: null,
     otherImages: [],
     priceRange: "",
     electricityPrice: "",
     waterPrice: "",
+    staffId: "",
   });
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [boardingHouseTypes, setBoardingHouseTypes] = useState([]);
   const [geoLocation, setGeoLocation] = useState(null);
+  const [managers, setManagers] = useState([]); // To store the list of managers
+  const lang = i18n.language || "vi";
 
-  // Function to reset form data
-  const resetFormData = () => {
-    setFormData({
-      boardingHouseType: "",
-      name: "",
-      address: {
-        province: "",
-        district: "",
-        ward: "",
-        detail: "",
-      },
-      description: "",
-      primaryImage: null,
-      otherImages: [],
-      priceRange: "",
-      electricityPrice: "",
-      waterPrice: "",
-    });
-    setDistricts([]); // Clear districts
-    setWards([]); // Clear wards
-  };
+  const darkInputStyle = darkMode
+    ? {
+        backgroundColor: "#374151",
+        color: "#fff",
+        borderColor: "#4b5563",
+      }
+    : {};
+  const darkModeSelectClass = cx({
+    "dark-mode-select": darkMode,
+  });
 
-  // Open modal and reset form
-  const openModal = () => {
-    resetFormData(); // Clear form data
-    setIsModalVisible(true); // Open modal
-  };
-
-  // Close modal
-  const closeModal = () => {
-    setIsModalVisible(false); // Close modal
-  };
-
-  // Fetch provinces, districts, and wards dynamically
+  // Fetch provinces/districts/wards on address change
   useEffect(() => {
     const fetchData = async () => {
       try {
         const provincesData = await fetchProvinces();
         setProvinces(provincesData);
 
-        if (formData?.address?.province) {
+        if (formData?.address?.province?.name) {
           const selectedProvince = provincesData.find(
-            (p) => p.name === formData.address.province
+            (p) => p.name.vi === formData.address.province.name
           );
           if (selectedProvince) {
-            const districtsData = await fetchDistricts(selectedProvince.code);
+            const districtsData = await fetchDistricts(selectedProvince.id);
             setDistricts(districtsData);
             setWards([]);
 
-            if (formData?.address?.district) {
+            if (formData?.address?.district?.name) {
               const selectedDistrict = districtsData.find(
-                (d) => d.name === formData.address.district
+                (d) => d.name.vi === formData.address.district.name
               );
               if (selectedDistrict) {
-                const wardsData = await fetchWards(selectedDistrict.code);
+                const wardsData = await fetchWards(selectedDistrict.id);
                 setWards(wardsData);
               }
             }
           }
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching address data:", error);
       }
     };
     fetchData();
-  }, [formData?.address?.province, formData?.address?.district]);
+  }, [formData?.address?.province?.name, formData?.address?.district?.name]);
 
-  const fetchBoardingHouseTypes = async () => {
-    try {
-      const response = await getAllBoardingHouseTypesOwner();
-      setBoardingHouseTypes(response.data || []);
-    } catch (error) {
-      console.error("Failed to fetch boarding house types:", error);
-      toast.error("Failed to fetch boarding house types.");
-    }
+  // Fetch boarding house types
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const response = await getAllBoardingHouseTypesOwner();
+        setBoardingHouseTypes(response.data || []);
+      } catch (error) {
+        console.error("Failed to fetch boarding house types:", error);
+        toast.error(t("errors.fetchBoardingHouseTypes"));
+      }
+    };
+    fetchTypes();
+  }, [t]);
+  // Fetch managers for the logged-in owner
+  useEffect(() => {
+    const fetchManagers = async () => {
+      try {
+        const response = await getManagersForOwner(); // Assuming this API returns managers for the logged-in owner
+        setManagers(response.data || []);
+      } catch (error) {
+        // console.error('Failed to fetch managers:', error);
+        // toast.error(t('errors.fetchManagers'));
+      }
+    };
+    fetchManagers();
+  }, [t]);
+
+  // Reset form data
+  const resetFormData = () => {
+    setFormData({
+      boardingHouseType: "",
+      name: "",
+      address: { province: "", district: "", ward: "", detail: "" },
+      description: "",
+      primaryImage: null,
+      otherImages: [],
+      priceRange: "",
+      electricityPrice: "",
+      waterPrice: "",
+      staffId: "",
+    });
+    setDistricts([]);
+    setWards([]);
+    setGeoLocation(null);
   };
 
-  useEffect(() => {
-    fetchBoardingHouseTypes();
-  }, []);
+  // Handlers
+  const openModal = () => {
+    resetFormData();
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -144,6 +175,7 @@ const AddBHModal = ({ onAddData }) => {
       }));
     }
   };
+
   const uploadOtherImgProps = {
     beforeUpload: (file) => {
       handleFileChange({ target: { files: [file] } }, false);
@@ -185,14 +217,19 @@ const AddBHModal = ({ onAddData }) => {
   };
 
   const handleRemovePrimaryImage = () => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      primaryImage: null,
-    }));
+    setFormData((prev) => ({ ...prev, primaryImage: null }));
   };
 
+  // Fetch geolocation from address
   const getLocation = async () => {
     try {
+      if (
+        !formData.address.ward ||
+        !formData.address.district ||
+        !formData.address.province
+      )
+        return;
+
       const res = await axios.get(
         "https://nominatim.openstreetmap.org/search",
         {
@@ -203,466 +240,648 @@ const AddBHModal = ({ onAddData }) => {
           },
         }
       );
-      setGeoLocation(res.data[0]);
-    } catch (error) {
-      console.log("Error getting location:", error);
-    }
+      if (res.data && res.data.length > 0) {
+        setGeoLocation(res.data[0]);
+      }
+    } catch (error) {}
   };
 
   useEffect(() => {
     getLocation();
-  }, [formData?.address?.ward]);
+  }, [
+    formData?.address?.ward,
+    formData?.address?.district,
+    formData?.address?.province,
+  ]);
 
+  // Submit handler
   const handleSubmit = async () => {
     try {
-      setLoading(true); // Show loading spinner
+      setLoading(true);
 
-      const payload = new FormData();
+      // Validation with i18n messages
       if (!formData.boardingHouseType) {
-        toast.error("Please select a boarding house type.");
+        toast.error(t("errors.selectBoardingHouseType"));
+        setLoading(false);
         return;
       }
+
       if (!formData.name) {
-        toast.error("Please enter a boarding house name.");
+        toast.error(t("errors.enterBoardingHouseName"));
+        setLoading(false);
         return;
       }
       if (!formData.address.province) {
-        toast.error("Please select a boarding house province.");
+        toast.error(t("errors.selectProvince"));
+        setLoading(false);
         return;
       }
       if (!formData.address.district) {
-        toast.error("Please select a boarding house district.");
+        toast.error(t("errors.selectDistrict"));
+        setLoading(false);
         return;
       }
       if (!formData.address.ward) {
-        toast.error("Please select a boarding house ward.");
+        toast.error(t("errors.selectWard"));
+        setLoading(false);
         return;
       }
       if (!formData.address.detail) {
-        toast.error("Please enter a boarding house details.");
+        toast.error(t("errors.enterAddressDetail"));
+        setLoading(false);
         return;
       }
       if (!formData.primaryImage) {
-        toast.error("You must upload a primary image.");
+        toast.error(t("errors.uploadPrimaryImage"));
+        setLoading(false);
         return;
       }
       if (!formData.priceRange) {
-        toast.error("Please enter price range.");
+        toast.error(t("errors.enterPriceRange"));
+        setLoading(false);
         return;
       }
       if (!formData.electricityPrice) {
-        toast.error("Please enter electricity price.");
+        toast.error(t("errors.enterElectricityPrice"));
+        setLoading(false);
         return;
       }
       if (!formData.waterPrice) {
-        toast.error("Please enter water price.");
+        toast.error(t("errors.enterWaterPrice"));
+        setLoading(false);
         return;
       }
       if (!geoLocation) {
-        toast.error("Please mark the location on the map.");
+        toast.error(t("errors.markLocationOnMap"));
+        setLoading(false);
+        return;
+      }
+      if (formData.otherImages.length > 15) {
+        toast.error(t("errors.maxOtherImages"));
+        setLoading(false);
         return;
       }
 
+      // Prepare payload
+      const payload = new FormData();
       payload.append("boardingHouseType", formData.boardingHouseType);
       payload.append("name", formData.name);
+      payload.append("staffId", formData.staffId);
+
       payload.append("description", formData.description);
       payload.append("priceRange", formData.priceRange);
       payload.append("electricityPrice", formData.electricityPrice);
       payload.append("waterPrice", formData.waterPrice);
-      payload.append("address[province]", formData.address.province);
-      payload.append("address[district]", formData.address.district);
-      payload.append("address[ward]", formData.address.ward);
+      payload.append("address[province][name]", formData.address.province.name);
+      payload.append(
+        "address[province][name_en]",
+        formData.address.province.name_en
+      );
+
+      payload.append("address[district][name]", formData.address.district.name);
+      payload.append(
+        "address[district][name_en]",
+        formData.address.district.name_en
+      );
+
+      payload.append("address[ward][name]", formData.address.ward.name);
+      payload.append("address[ward][name_en]", formData.address.ward.name_en);
+
       payload.append("address[detail]", formData.address.detail);
       payload.append("location[lat]", geoLocation.lat);
       payload.append("location[lon]", geoLocation.lon);
 
-      // Ensure only one primary image and a maximum of 15 other images
       const allImages = [];
       if (formData.primaryImage) allImages.push(formData.primaryImage);
-      if (formData.otherImages.length > 15) {
-        toast.error("You can't upload more than 15 other images.");
-        return;
-      }
       allImages.push(...formData.otherImages);
 
       if (allImages.length === 0) {
-        toast.error("You must upload at least one image.");
+        toast.error(t("errors.uploadAtLeastOneImage"));
+        setLoading(false);
         return;
       }
 
-      allImages.forEach((file, index) => {
+      allImages.forEach((file) => {
         payload.append("boardingHouse", file);
       });
 
       const response = await createBoardingHouseOwner(payload);
 
       if (response?.message === "Boarding house created successfully!") {
-        toast.success(response.message);
-        onAddData(); // Refresh parent data
-        closeModal(); // Close modal
+        toast.success(t("messages.createdSuccess"));
+        onAddData();
+        closeModal();
       } else {
-        throw new Error(response?.message || "Failed to add boarding house.");
+        throw new Error(response?.message || t("errors.failedToAdd"));
       }
     } catch (error) {
       console.error("Error submitting boarding house:", error);
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "Failed to submit the form."
+          t("errors.failedToSubmitForm")
       );
     } finally {
-      setGeoLocation(null); // Reset location
-      setLoading(false); // Hide loading spinner
+      setLoading(false);
+      setGeoLocation(null);
     }
   };
 
+  // Dark mode modal styles
+  const modalStyles = darkMode
+    ? {
+        mask: { backgroundColor: "rgba(0, 0, 0, 0.6)" },
+        content: {
+          backgroundColor: "#1f2937",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+        },
+        header: {
+          backgroundColor: "#1f2937",
+          color: "#fff",
+          borderBottom: "1px solid #374151",
+        },
+        body: { backgroundColor: "#1f2937", color: "#fff" },
+        footer: { backgroundColor: "#1f2937", borderTop: "1px solid #374151" },
+      }
+    : {};
+
+  // Form item style
+  const formItemStyle = darkMode
+    ? { marginBottom: 4, color: "#F9FAFB" }
+    : { marginBottom: 4 };
+
+  // Button styles
+  const primaryBtnClass = cx("bg-primary w-full text-white", {
+    "dark:bg-blue-600": darkMode,
+  });
+  const secondaryBtnClass = cx("bg-gray-300", { "dark:bg-gray-600": darkMode });
+
   return (
-    <>
-      {/* Trigger Button */}
-      <Button
-        btnAdd
-        title="Add Boarding House"
-        size="large"
-        onClick={openModal} // Open modal and reset form
-      />
+    <ConfigProvider
+      theme={{
+        algorithm: darkMode
+          ? ConfigProvider.darkAlgorithm
+          : ConfigProvider.defaultAlgorithm,
+        token: darkMode
+          ? {
+              colorBgContainer: "#1f2937",
+              colorText: "#F9FAFB",
+              colorBorder: "#4B5563",
+              colorPrimary: "#3b82f6",
+            }
+          : {},
+      }}
+    >
+      <>
+        <Button
+          btnAdd
+          title={t("buttons.addBoardingHouse")}
+          size="large"
+          onClick={openModal}
+        />
 
-      {/* Outer Modal */}
-      <Modal
-        title="Create Boarding House"
-        open={isModalVisible}
-        onCancel={closeModal} // Close modal
-        footer={null}
-        destroyOnClose
-      >
-        <Form
-          layout="vertical"
-          onSubmitCapture={handleSubmit}
-          className="bg-white rounded-lg w-full max-w-3xl"
+        <Modal
+          title={
+            <span className={cx({ "text-white font-medium": darkMode })}>
+              {t("modals.createBoardingHouseTitle")}
+            </span>
+          }
+          open={isModalVisible}
+          onCancel={closeModal}
+          footer={null}
+          destroyOnClose
+          styles={modalStyles}
+          className={darkMode ? "ant-modal-dark" : ""}
         >
-          <h2 className="text-3xl font-bold mb-4 ">1. Information</h2>
-          {/* Boarding House Type */}
-          <Form.Item
-            label="Boarding House Type"
-            name="boardingHouseType"
-            rules={[
-              {
-                required: true,
-                message: "Please select a boarding house type",
-              },
-            ]}
-            className="mb-2"
+          <Form
+            layout="vertical"
+            onSubmitCapture={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+            className={cx(
+              { "bg-gray-800": darkMode, "bg-white": !darkMode },
+              "rounded-lg",
+              "w-full max-w-3xl"
+            )}
           >
-            <Select
-              placeholder="Select Type"
-              value={formData.boardingHouseType}
-              onChange={(value) =>
-                setFormData((prev) => ({ ...prev, boardingHouseType: value }))
-              }
+            <h2
+              className={cx("text-3xl font-bold mb-4", {
+                "text-white": darkMode,
+              })}
             >
-              {boardingHouseTypes.map((type) => (
-                <Select.Option key={type.value} value={type.value}>
-                  {type.label}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+              {t("form.section.information")}
+            </h2>
 
-          {/* Boarding House Name */}
-          <Form.Item
-            label="Name Boarding House"
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: "Please enter the boarding house name",
-              },
-            ]}
-            className="mb-2"
-          >
-            <Input
-              placeholder="Enter boarding house name"
+            <Form.Item
+              label={t("form.labels.boardingHouseType")}
+              name="boardingHouseType"
+              rules={[
+                {
+                  required: true,
+                  message: t("form.validation.selectBoardingHouseType"),
+                },
+              ]}
+              style={formItemStyle}
+            >
+              <Select
+                placeholder={t("form.placeholders.selectType")}
+                className={darkModeSelectClass}
+                style={darkInputStyle.select}
+                value={formData.boardingHouseType}
+                onChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    boardingHouseType: value,
+                  }))
+                }
+                dropdownStyle={darkMode ? { backgroundColor: "#374151" } : {}}
+              >
+                {boardingHouseTypes.map((type) => (
+                  <Select.Option key={type.value} value={type.value}>
+                    {t(`boardingHouseTypes.${type.label}`) || type.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              label={t("form.labels.manager")}
+              name="staffId"
+              style={formItemStyle}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <Select
+                placeholder={t("form.placeholders.selectManager")}
+                value={formData.staffId}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, staffId: value }))
+                }
+                className={darkModeSelectClass}
+                style={darkInputStyle.select}
+                dropdownStyle={darkMode ? { backgroundColor: "#374151" } : {}}
+              >
+                {managers.map((manager) => (
+                  <Select.Option key={manager._id} value={manager._id}>
+                    {manager.fullname}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label={t("form.labels.boardingHouseName")}
               name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-            />
-          </Form.Item>
-          {/* Description */}
-          <Form.Item label="Description" name="description" className="mb-2">
-            <Input.TextArea
-              placeholder="Enter description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={4}
-            />
-          </Form.Item>
+              rules={[
+                {
+                  required: true,
+                  message: t("form.validation.enterBoardingHouseName"),
+                },
+              ]}
+              style={formItemStyle}
+            >
+              <Input
+                placeholder={t("form.placeholders.enterBoardingHouseName")}
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className={cx({ "dark-mode-input": darkMode })}
+                style={
+                  darkMode
+                    ? {
+                        // backgroundColor: '#374151',
+                        borderColor: "#4B5563",
+                        color: "#F9FAFB",
+                      }
+                    : {}
+                }
+              />
+            </Form.Item>
 
-          <h2 className="text-3xl font-bold mb-4 mt-10 ">2. Address</h2>
-          {/* Address Selector */}
-          <AddressSelector
-            provinces={provinces}
-            districts={districts}
-            wards={wards}
-            onProvinceChange={handleInputChange}
-            onDistrictChange={handleInputChange}
-            onInputChange={handleInputChange}
-            formData={formData}
-            location={geoLocation}
-            setGeoLocation={setGeoLocation}
-          />
-          <h2 className="text-3xl font-bold mb-4 mt-10 ">3. Image</h2>
-          {/* Primary Image */}
-          <Form.Item label={<span>Primary Image</span>} className="mb-4">
-            <div className="flex flex-col gap-4">
-              {/* Nút Upload Primary Image */}
-              {!formData.primaryImage && (
+            <Form.Item
+              label={t("form.labels.description")}
+              name="description"
+              style={formItemStyle}
+            >
+              <Input.TextArea
+                placeholder={t("form.placeholders.enterDescription")}
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={4}
+                className={cx({ "dark-mode-input": darkMode })}
+                style={
+                  darkMode
+                    ? {
+                        // backgroundColor: '#374151',
+                        borderColor: "#4B5563",
+                        color: "#F9FAFB",
+                      }
+                    : {}
+                }
+              />
+            </Form.Item>
+
+            <h2
+              className={cx("text-3xl font-bold mb-4 mt-10", {
+                "text-white": darkMode,
+              })}
+            >
+              {t("form.section.address")}
+            </h2>
+
+            <AddressSelector
+              provinces={provinces}
+              districts={districts}
+              wards={wards}
+              onProvinceChange={handleInputChange}
+              onDistrictChange={handleInputChange}
+              onInputChange={handleInputChange}
+              formData={formData}
+              location={geoLocation}
+              setGeoLocation={setGeoLocation}
+              darkMode={darkMode}
+            />
+
+            <h2
+              className={cx("text-3xl font-bold mb-4 mt-10", {
+                "text-white": darkMode,
+              })}
+            >
+              {t("form.section.images")}
+            </h2>
+
+            <Form.Item label={t("form.labels.primaryImage")} className="mb-4">
+              <div className="flex flex-col gap-4">
+                {!formData.primaryImage && (
+                  <Upload
+                    {...uploadProps}
+                    name="boardingHouse"
+                    listType="picture-card"
+                    showUploadList={false}
+                    className="custom-upload w-full max-w-lg"
+                  >
+                    <div
+                      className={cx(
+                        "flex flex-col items-center justify-center border border-dashed rounded-lg p-6 transition",
+                        {
+                          "border-gray-300 hover:border-blue-500 hover:bg-gray-50 text-gray-500":
+                            !darkMode,
+                          "border-gray-600 hover:border-blue-600 hover:bg-gray-700 text-white":
+                            darkMode,
+                        }
+                      )}
+                    >
+                      <PlusOutlined className="text-2xl" />
+                      <p className="mt-2 text-sm font-medium">
+                        {t("form.labels.addImage")}
+                      </p>
+                      <p className="text-xs">
+                        {t("form.labels.dragDropOrClick")}
+                      </p>
+                    </div>
+                  </Upload>
+                )}
+
+                {formData.primaryImage && (
+                  <div className="items-center justify-center flex flex-col gap-4 relative">
+                    <Image
+                      src={URL.createObjectURL(formData.primaryImage)}
+                      alt="Primary"
+                      className="object-cover border rounded"
+                      style={{ width: "100%", height: "auto", maxHeight: 300 }}
+                      preview={{
+                        mask: <span className="text-white">Preview</span>,
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemovePrimaryImage}
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-3 py-1 rounded-full z-10 shadow-lg"
+                    >
+                      X
+                    </button>
+                  </div>
+                )}
+              </div>
+              <style>{`
+                .custom-upload .ant-upload {
+                  border: none !important;
+                  background: none !important;
+                  padding: 0 !important;
+                }
+              `}</style>
+            </Form.Item>
+
+            <Form.Item label={t("form.labels.otherImages")} className="">
+              <div className="flex flex-wrap gap-4">
+                {formData.otherImages.map((file, index) => (
+                  <div key={index} className="relative">
+                    <Image
+                      src={URL.createObjectURL(file)}
+                      alt={`Other ${index + 1}`}
+                      name="boardingHouse"
+                      className="object-cover border rounded"
+                      width={100}
+                      height={100}
+                      preview={{ mask: <span>Preview</span> }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveOtherImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
+                    >
+                      X
+                    </button>
+                  </div>
+                ))}
+
                 <Upload
-                  {...uploadProps}
-                  name="boardingHouse"
+                  {...uploadOtherImgProps}
                   listType="picture-card"
                   showUploadList={false}
-                  className="custom-upload w-full max-w-lg"
+                  className="custom-upload"
                 >
-                  <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                    <PlusOutlined className="text-2xl text-gray-400" />
-                    <p className="text-gray-500 mt-2 text-sm font-medium">
-                      Add Image
+                  <div
+                    className={cx(
+                      "flex flex-col items-center justify-center border border-dashed rounded-lg p-6 transition",
+                      {
+                        "border-gray-300 hover:border-blue-500 hover:bg-gray-50 text-gray-500":
+                          !darkMode,
+                        "border-gray-600 hover:border-blue-600 hover:bg-gray-700 text-white":
+                          darkMode,
+                      }
+                    )}
+                  >
+                    <PlusOutlined className="text-2xl" />
+                    <p className="mt-2 text-sm font-medium">
+                      {t("form.labels.addOtherImages")}
                     </p>
-                    <p className="text-gray-400 text-xs">
-                      Drag-drop or click here to choose a file
+                    <p className="text-xs">
+                      {t("form.labels.dragDropOrClick")}
                     </p>
                   </div>
                 </Upload>
-              )}
+              </div>
+              <style>{`
+                .custom-upload .ant-upload {
+                  border: none !important;
+                  background: none !important;
+                  padding: 0 !important;
+                }
+              `}</style>
+            </Form.Item>
 
-              {/* Hiển thị Primary Image nếu đã upload */}
-              {formData.primaryImage && (
-                <div className="items-center justify-center flex flex-col gap-4">
-                  <Image
-                    src={URL.createObjectURL(formData.primaryImage)}
-                    alt="Primary"
-                    className="object-cover border rounded"
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      maxHeight: "300px",
-                    }}
-                    preview={{
-                      mask: <span className="text-white">Preview</span>,
-                    }}
-                  />
-                  {/* Nút xóa ảnh */}
-                  <button
-                    type="button"
-                    onClick={handleRemovePrimaryImage}
-                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-3 py-1 rounded-full z-10 shadow-lg"
-                  >
-                    X
-                  </button>
-                </div>
-              )}
-            </div>
-            {/* thêm css để bỏ đường viền khung của antd*/}
-            <style>
-              {`
-                            .custom-upload .ant-upload
-                            {
-                            border: none !important;
-                            background: none !important;
-                            padding: 0 !important;
-                            }
-                        `}
-            </style>
-          </Form.Item>
+            <h2
+              className={cx("text-3xl font-bold mb-4", {
+                "text-white": darkMode,
+              })}
+            >
+              {t("form.section.price")}
+            </h2>
 
-          {/* Other Images */}
-          <Form.Item label={<span>Other Images</span>} className="mb-4">
-            <div className="mt-4 flex flex-wrap gap-4">
-              {formData.otherImages.map((file, index) => (
-                <div key={index} className="relative">
-                  {/* Hiển thị ảnh bằng Ant Design Image */}
-                  <Image
-                    src={URL.createObjectURL(file)}
-                    alt={`Other ${index + 1}`}
-                    name="boardingHouse"
-                    className="object-cover border rounded"
-                    width={100}
-                    height={100}
-                    preview={{
-                      mask: <span>Preview</span>,
-                    }}
-                  />
-                  {/* Nút delete */}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveOtherImage(index)}
-                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10"
-                  >
-                    X
-                  </button>
-                </div>
-              ))}
-
-              {/* Upload component */}
-              <Upload
-                {...uploadOtherImgProps}
-                listType="picture-card"
-                showUploadList={false}
-                className="custom-upload"
-              >
-                <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-gray-50 transition">
-                  <PlusOutlined className="text-2xl text-gray-400" />
-                  <p className="text-gray-500 mt-2 text-sm font-medium">
-                    Add Images
-                  </p>
-                  <p className="text-gray-400 text-xs">
-                    Drag-drop or click here to choose a file
-                  </p>
-                </div>
-              </Upload>
-            </div>
-            {/* thêm css để bỏ đường viền khung của antd*/}
-            <style>
-              {`
-                            .custom-upload .ant-upload
-                            {
-                            border: none !important;
-                            background: none !important;
-                            padding: 0 !important;
-                            }
-                        `}
-            </style>
-          </Form.Item>
-          <h2 className="text-3xl font-bold mb-4 mt-10 ">4. Price</h2>
-          {/* Price Range */}
-          <Form.Item
-            label="Price Rent/month (VND)"
-            name="priceRange"
-            rules={[{ required: true, message: "Please enter the price rent" }]}
-            className="mb-2"
-          >
-            <InputNumber
-              placeholder="Enter price rent"
+            <Form.Item
+              label={t("form.labels.priceRange")}
               name="priceRange"
-              value={formData.priceRange}
-              onChange={(value) =>
-                handleInputChange({ target: { name: "priceRange", value } })
-              }
-              formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              } // Thêm dấu phẩy ngăn cách hàng nghìn
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")} // Loại bỏ dấu phẩy khi nhập
-              className="w-full"
-              min={0}
-            />
-          </Form.Item>
+              rules={[
+                {
+                  required: true,
+                  message: t("form.validation.enterPriceRange"),
+                },
+              ]}
+              style={formItemStyle}
+            >
+              <InputNumber
+                placeholder={t("form.placeholders.enterPriceRange")}
+                name="priceRange"
+                value={formData.priceRange}
+                onChange={(value) =>
+                  handleInputChange({ target: { name: "priceRange", value } })
+                }
+                formatter={(value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                className={cx("w-full", { "dark-mode-input": darkMode })}
+                style={
+                  darkMode
+                    ? {
+                        backgroundColor: "#374151",
+                        borderColor: "#4B5563",
+                        color: "#F9FAFB",
+                      }
+                    : {}
+                }
+                min={0}
+              />
+            </Form.Item>
 
-          {/* Electricity Price */}
-          <Form.Item
-            label="Electricity Price/kWh (VND)"
-            name="electricityPrice"
-            rules={[
-              { required: true, message: "Please enter the electricity price" },
-            ]}
-            className="mb-2"
-          >
-            <InputNumber
-              placeholder="Enter electricity price"
+            <Form.Item
+              label={t("form.labels.electricityPrice")}
               name="electricityPrice"
-              value={formData.electricityPrice}
-              onChange={(value) =>
-                handleInputChange({
-                  target: { name: "electricityPrice", value },
-                })
-              }
-              formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-              className="w-full"
-              min={0}
-            />
-          </Form.Item>
+              rules={[
+                {
+                  required: true,
+                  message: t("form.validation.enterElectricityPrice"),
+                },
+              ]}
+              style={formItemStyle}
+            >
+              <InputNumber
+                placeholder={t("form.placeholders.enterElectricityPrice")}
+                name="electricityPrice"
+                value={formData.electricityPrice}
+                onChange={(value) =>
+                  handleInputChange({
+                    target: { name: "electricityPrice", value },
+                  })
+                }
+                formatter={(value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                className={cx("w-full", { "dark-mode-input": darkMode })}
+                style={
+                  darkMode
+                    ? {
+                        backgroundColor: "#374151",
+                        borderColor: "#4B5563",
+                        color: "#F9FAFB",
+                      }
+                    : {}
+                }
+                min={0}
+              />
+            </Form.Item>
 
-          {/* Water Price */}
-          <Form.Item
-            label="Water Price/m³ (VND)"
-            name="waterPrice"
-            rules={[
-              { required: true, message: "Please enter the water price" },
-            ]}
-            className="mb-2"
-          >
-            <InputNumber
-              placeholder="Enter water price"
+            <Form.Item
+              label={t("form.labels.waterPrice")}
               name="waterPrice"
-              value={formData.waterPrice}
-              onChange={(value) =>
-                handleInputChange({ target: { name: "waterPrice", value } })
-              }
-              formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              }
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-              className="w-full"
-              min={0}
-            />
-          </Form.Item>
-          {/* Total Rooms */}
-          {/* <Form.Item
-                    label="Total Rooms"
-                    name="totalRooms"
-                    rules={[{ required: true, message: "Please enter the total number of rooms" }]}
-                    className="mb-2"
-                >
-                    <Input
-                        type="number"
-                        placeholder="Enter total rooms"
-                        name="totalRooms"
-                        value={formData.totalRooms}
-                        onChange={handleInputChange}
-                    />
-                </Form.Item>
-
-                {/* Available Rooms */}
-          {/* <Form.Item
-                    label="Available Rooms"
-                    name="availableRooms"
-                    rules={[{ required: true, message: "Please enter the available rooms" }]}
-                    className="mb-2"
-                >
-                    <Input
-                        type="number"
-                        placeholder="Enter available rooms"
-                        name="availableRooms"
-                        value={formData.availableRooms}
-                        onChange={handleInputChange}
-                    />
-                </Form.Item> */}
-
-          <div className="flex justify-end mt-4">
-            <Button
-              title="Cancel"
-              btnCancel={true}
-              onClick={closeModal}
-              className="bg-red-500 hover:bg-red-600 text-white mr-2"
-              size="large"
+              rules={[
+                {
+                  required: true,
+                  message: t("form.validation.enterWaterPrice"),
+                },
+              ]}
+              style={formItemStyle}
             >
-              Cancel
-            </Button>
-            <Button
-              className="bg-primary text-white flex items-center"
-              size="large"
-              onClick={handleSubmit}
-              title="Submit"
-              loading={loading} // Disable button when loading
-            >
-              {loading ? <Spin size="small" className="mr-2" /> : null} Submit
-            </Button>
-          </div>
-        </Form>
-      </Modal>
-    </>
+              <InputNumber
+                placeholder={t("form.placeholders.enterWaterPrice")}
+                name="waterPrice"
+                value={formData.waterPrice}
+                onChange={(value) =>
+                  handleInputChange({ target: { name: "waterPrice", value } })
+                }
+                formatter={(value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                className={cx("w-full", { "dark-mode-input": darkMode })}
+                style={
+                  darkMode
+                    ? {
+                        backgroundColor: "#374151",
+                        borderColor: "#4B5563",
+                        color: "#F9FAFB",
+                      }
+                    : {}
+                }
+                min={0}
+              />
+            </Form.Item>
+
+            <div className="flex justify-end mt-4">
+              <Button
+                title={t("buttons.cancel")}
+                btnCancel={true}
+                onClick={closeModal}
+                className={cx("bg-red-500 hover:bg-red-600 text-white mr-2", {
+                  "dark:bg-red-700": darkMode,
+                })}
+                size="large"
+              >
+                {t("buttons.cancel")}
+              </Button>
+              <Button
+                className={cx("bg-primary text-white flex items-center", {
+                  "dark:bg-blue-600": darkMode,
+                })}
+                size="large"
+                onClick={handleSubmit}
+                title={loading ? t("buttons.loading") : t("buttons.submit")}
+                loading={loading}
+              >
+                {loading ? <Spin size="small" className="mr-2" /> : null}
+                {t("buttons.submit")}
+              </Button>
+            </div>
+          </Form>
+        </Modal>
+      </>
+    </ConfigProvider>
   );
 };
 

@@ -109,4 +109,15 @@ const Text = ({
     );
 };
 
+Text.defaultProps = {
+    variant: 'body',
+    weight: 'regular',
+    align: 'left',
+    muted: false,
+    contrast: false,
+    style: {},
+    className: '',
+};
+
+
 export default Text;

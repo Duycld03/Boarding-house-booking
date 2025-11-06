@@ -8,5 +8,14 @@
   "auth": {
     "login-btn": "Login",
     "register-btn": "Register"
+  },
+  "table-component": {
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "entries": "entries",
+      "no-data": "No data available in table"
+    }
   }
 }
